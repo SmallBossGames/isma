@@ -7,7 +7,7 @@ import tornadofx.reloadStylesheetsOnFocus
 import kotlin.reflect.KClass
 
 class MyApp : App() {
-    override val primaryView: KClass<out UIComponent> = MainView::class
+    override val primaryView: KClass<out UIComponent> = GrinCanvas::class
 
     init {
         reloadStylesheetsOnFocus()

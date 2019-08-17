@@ -3,5 +3,5 @@ package ru.nstu.grin
 /**
  * Class represents a graphic, drawing in grin
  */
-class Function {
+class Function(private val position: MappingPosition) {
 }

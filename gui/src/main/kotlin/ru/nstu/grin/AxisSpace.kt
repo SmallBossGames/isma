@@ -17,8 +17,7 @@ class AxisSpace {
     lateinit var axises: List<Axis>
     lateinit var functions: List<Function>
 
-    //Дальнейшая логика первоначальной перерисовки TODO возможно стоит сделать revalidate как в swing framework
+    // Дальнейшая логика первоначальной перерисовки TODO возможно стоит сделать revalidate как в swing framework
     init {
-
     }
 }

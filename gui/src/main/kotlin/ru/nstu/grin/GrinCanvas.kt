@@ -3,8 +3,10 @@ package ru.nstu.grin
 import javafx.scene.Parent
 import javafx.scene.canvas.Canvas
 import ru.nstu.grin.axis.Axis
-import tornadofx.*
-
+import tornadofx.stackpane
+import tornadofx.View
+import tornadofx.group
+import tornadofx.canvas
 
 class GrinCanvas : View() {
 

@@ -6,6 +6,5 @@ class GrinCanvasTest {
 
     @Test
     fun test() {
-
     }
 }

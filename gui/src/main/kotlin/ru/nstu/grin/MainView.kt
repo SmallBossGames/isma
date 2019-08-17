@@ -7,6 +7,7 @@ import tornadofx.*
  * MainView contains all components for grin graphic builder
  */
 class MainView : View() {
+
     override val root: javafx.scene.Parent = vbox {
         menubar {
             menu("Stage1") {

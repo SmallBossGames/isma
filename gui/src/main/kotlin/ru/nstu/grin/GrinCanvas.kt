@@ -2,7 +2,7 @@ package ru.nstu.grin
 
 import javafx.scene.Parent
 import javafx.scene.canvas.Canvas
-import org.nstu.grin.axis.Axis
+import ru.nstu.grin.axis.Axis
 import tornadofx.*
 
 

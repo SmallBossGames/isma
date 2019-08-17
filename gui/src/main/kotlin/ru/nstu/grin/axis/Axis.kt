@@ -1,7 +1,7 @@
 package ru.nstu.grin.axis
 
 import javafx.scene.canvas.GraphicsContext
-import org.nstu.grin.MappingPosition
+import ru.nstu.grin.MappingPosition
 
 /**
  * @author kostya05983

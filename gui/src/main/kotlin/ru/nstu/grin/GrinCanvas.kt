@@ -1,4 +1,4 @@
-package org.nstu.grin
+package ru.nstu.grin
 
 import javafx.scene.Parent
 import javafx.scene.canvas.Canvas

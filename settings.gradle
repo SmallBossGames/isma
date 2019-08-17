@@ -1,2 +1,3 @@
 rootProject.name = 'Grin'
 include 'gui'
+include 'runner'

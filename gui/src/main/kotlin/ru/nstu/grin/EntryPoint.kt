@@ -1,4 +1,4 @@
-package org.nstu.grin
+package ru.nstu.grin
 
 import tornadofx.App
 import tornadofx.UIComponent

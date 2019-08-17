@@ -1,6 +1,6 @@
-package org.nstu.grin
+package ru.nstu.grin
 
-import org.nstu.grin.axis.Axis
+import ru.nstu.grin.axis.Axis
 
 /**
  * Class represents an abstract definition

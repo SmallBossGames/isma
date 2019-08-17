@@ -1,3 +1,15 @@
+.idea/
+.gradle/
+
+target/
+out/
+build/
+application-custom.yml
+application-local.yml
+*private.resources
+*private.properties
+*.iml
+
 # Compiled class file
 *.class
 

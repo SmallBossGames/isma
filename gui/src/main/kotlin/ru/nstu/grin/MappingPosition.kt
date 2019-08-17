@@ -1,4 +1,4 @@
-package org.nstu.grin
+package ru.nstu.grin
 
 /**
  * @author kostya05983

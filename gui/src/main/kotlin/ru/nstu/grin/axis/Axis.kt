@@ -1,4 +1,4 @@
-package org.nstu.grin.axis
+package ru.nstu.grin.axis
 
 import javafx.scene.canvas.GraphicsContext
 

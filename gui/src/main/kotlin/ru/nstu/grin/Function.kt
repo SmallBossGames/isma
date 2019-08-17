@@ -1,4 +1,4 @@
-package org.nstu.grin
+package ru.nstu.grin
 
 /**
  * Class represents a graphic, drawing in grin

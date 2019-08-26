@@ -9,6 +9,7 @@ import tornadofx.*
 class MainView : View() {
 
     override val root: javafx.scene.Parent = vbox {
+        println(params)
         menubar {
             menu("Stage1") {
                 menuitem("Stage1")

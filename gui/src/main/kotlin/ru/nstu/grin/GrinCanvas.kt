@@ -7,6 +7,7 @@ import tornadofx.stackpane
 import tornadofx.View
 import tornadofx.group
 import tornadofx.canvas
+import java.util.function.Function
 
 class GrinCanvas : View() {
 
@@ -17,12 +18,37 @@ class GrinCanvas : View() {
         private const val HEIGHT = 300.0
     }
 
+    private val myFavouritePoints = drawByFunction(0.0, 100.0, 0.1, Function { myLovelyFunction(it) })
+
     override val root: Parent = stackpane {
         group {
             canvas(WIDTH, HEIGHT) {
-                Axis(this.graphicsContext2D, 0.0, 0.0, MappingPosition.LEFT)
-                Axis(graphicsContext2D, 0.0, 0.0, MappingPosition.BOTTOM)
+//                Axis(graphicsContext2D, 0.0, 0.0, MappingPosition.LEFT)
+//                Axis(graphicsContext2D, 0.0, 0.0, MappingPosition.BOTTOM)
+                ru.nstu.grin.Function(
+                    this,
+                    myFavouritePoints,
+                    MappingPosition.LEFT,
+                    MappingPosition.BOTTOM
+                )
             }
         }
     }
+
+    private fun drawByFunction(
+        min: Double,
+        max: Double,
+        step: Double,
+        func: Function<Double, Double>
+    ): List<Pair<Double, Double>> {
+        var current = min;
+        val results = mutableListOf<Pair<Double, Double>>()
+        while (current < max) {
+            results.add(Pair(current, func.apply(current)))
+            current += step;
+        }
+        return results
+    }
+
+    private fun myLovelyFunction(x: Double) = 2*x
 }

@@ -12,8 +12,6 @@ class MyApp : App() {
 
 
     init {
-//        parameters.named[0]
-
         reloadStylesheetsOnFocus()
     }
 }

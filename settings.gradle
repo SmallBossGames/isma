@@ -1,3 +1,4 @@
 rootProject.name = 'Grin'
 include 'gui'
 include 'runner'
+include 'operations'

@@ -1,5 +1,6 @@
 package ru.nstu.grin
 
+import ru.nstu.grin.view.GrinCanvas
 import tornadofx.*
 
 /**

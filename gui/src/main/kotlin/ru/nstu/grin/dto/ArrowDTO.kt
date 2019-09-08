@@ -1,11 +1,8 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.dto
 
 import javafx.scene.paint.Color
 
-/**
- * @author kostya05983
- */
-data class Arrow(
+data class ArrowDTO(
     var color: Color,
     val x: Double,
     val y: Double

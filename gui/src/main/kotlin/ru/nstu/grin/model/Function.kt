@@ -15,4 +15,4 @@ data class Function(
     val functionColor: Color,
     val xAxisColor: Color,
     val yAxisColor: Color
-)
+) : FormType

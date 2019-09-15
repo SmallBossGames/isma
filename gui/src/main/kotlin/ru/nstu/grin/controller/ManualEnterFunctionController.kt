@@ -1,5 +1,7 @@
 package ru.nstu.grin.controller
 
+import ru.nstu.grin.MappingPosition
+import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.ManualEnterFunctionModel
 import ru.nstu.grin.model.Point
 import tornadofx.Controller
@@ -109,9 +111,22 @@ class ManualEnterFunctionController : Controller() {
     }
 
     fun addFunction(function: List<Point>) {
-        fire(AddFunctionEvent(
+        val functionDto = FunctionDTO(
             points = function,
-
-        ))
+            minX = model.minX,
+            maxX = model.maxX,
+            minY = model.minY,
+            maxY = model.maxY,
+            xDirection = MappingPosition.valueOf(model.xDirection),
+            yDirection = MappingPosition.valueOf(model.yDirection),
+            functionColor = model.functionColor,
+            xAxisColor = model.xAxisColor,
+            yAxisColor = model.yAxisColor
+        )
+        fire(
+            AddFunctionEvent(
+                functionDTO = functionDto
+            )
+        )
     }
 }

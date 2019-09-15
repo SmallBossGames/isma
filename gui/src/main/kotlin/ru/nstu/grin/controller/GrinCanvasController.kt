@@ -20,13 +20,8 @@ class GrinCanvasController : Controller() {
             grinCanvasModel.arrows.add(ArrowConverter.convert(it.arrowDto))
         }
         subscribe<AddFunctionEvent> {
-            val function = ru.nstu.grin.model.Function(
-                pointArray = it.points,
-                xDirection = MappingPosition.LEFT,
-                yDirection = MappingPosition.BOTTOM,
-                functionColor =
-            )
-            grinCanvasModel.functions.add()
+
+//            grinCanvasModel.functions.add()
         }
     }
 

@@ -9,8 +9,6 @@ import kotlin.reflect.KClass
 class MyApp : App() {
     override val primaryView: KClass<out UIComponent> = MainView::class
 
-
-
     init {
         reloadStylesheetsOnFocus()
     }

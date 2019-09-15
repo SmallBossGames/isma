@@ -9,7 +9,9 @@ import tornadofx.*
 class AnalyticFunctionModalView : View() {
     override val root: Parent = vbox {
         label("Введите функцию в аналитическом виде:")
-        textfield()
+        textfield() {
+
+        }
         button("OK") {
             action {
                 TODO("Тут будет вызываться парс функции")

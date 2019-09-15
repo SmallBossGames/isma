@@ -109,6 +109,9 @@ class ManualEnterFunctionController : Controller() {
     }
 
     fun addFunction(function: List<Point>) {
-        fire(AddFunctionEvent(points = function))
+        fire(AddFunctionEvent(
+            points = function,
+
+        ))
     }
 }

@@ -1,5 +1,6 @@
 package ru.nstu.grin
 
+import ru.nstu.grin.view.ChooseFunctionModalView
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.*
 
@@ -15,8 +16,12 @@ class MainView : View() {
             menu("Stage1") {
                 menuitem("Stage1")
             }
-            menu("Stage2") {
-                menuitem("Stage2")
+            menu("Add") {
+                menuitem("Function") {
+                    action {
+                        find<ChooseFunctionModalView>().openModal()
+                    }
+                }
             }
         }
         add<GrinCanvas>()

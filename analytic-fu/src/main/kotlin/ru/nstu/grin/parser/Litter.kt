@@ -6,6 +6,8 @@ data class Number(
     val value: Double
 ) : Litter()
 
+object X : Litter()
+
 object PlusOperator : Litter()
 
 object MinusOperator : Litter()
@@ -14,6 +16,6 @@ object DelOperator : Litter()
 
 object MultiplyOperator : Litter()
 
-object LeftBracket: Litter()
+object LeftBracket : Litter()
 
-object RightBracket: Litter()
+object RightBracket : Litter()

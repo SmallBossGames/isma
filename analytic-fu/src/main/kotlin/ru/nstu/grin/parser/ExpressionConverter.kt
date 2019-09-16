@@ -16,6 +16,9 @@ class ExpressionConverter {
                 is Number -> {
                     outArray.add(obj)
                 }
+                X -> {
+                    outArray.add(obj)
+                }
                 PlusOperator -> {
                     if (operationStack.isNotEmpty()) {
                         val peek = operationStack.peek()

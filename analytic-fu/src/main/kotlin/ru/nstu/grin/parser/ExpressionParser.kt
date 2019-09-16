@@ -27,9 +27,12 @@ class ExpressionParser {
                     result.add(MultiplyOperator)
                 }
                 ch == Litters.X.ch -> {
-                    val last = result.last()
-                    if (last is Number) {
-                        result.add(MultiplyOperator)
+                    result.addfMemoryNotEmpty(memory)
+                    if (result.isNotEmpty()) {
+                        val last = result.last()
+                        if (last is Number) {
+                            result.add(MultiplyOperator)
+                        }
                     }
                     result.add(X)
                 }
@@ -41,14 +44,16 @@ class ExpressionParser {
                 }
             }
         }
+        result.addfMemoryNotEmpty(memory)
         return result
     }
 
-    private fun MutableList<Litter>.addfMemoryNotEmpty(memory: List<Char>) {
+    private fun MutableList<Litter>.addfMemoryNotEmpty(memory: MutableList<Char>) {
         if (memory.isNotEmpty()) {
             val number = Number(
                 memory.joinToString("").toDouble()
             )
+            memory.clear()
             add(number)
         }
     }

@@ -1,7 +1,7 @@
 package ru.nstu.grin.file
 
 import javafx.scene.paint.Color
-import ru.nstu.grin.MappingPosition
+import ru.nstu.grin.Direction
 import ru.nstu.grin.model.FormType
 import ru.nstu.grin.model.Point
 import java.io.File
@@ -31,8 +31,8 @@ class FunctionReader : Reader {
         }
         return ru.nstu.grin.model.Function(
             pointArray = pointArray,
-            xDirection = MappingPosition.BOTTOM,
-            yDirection = MappingPosition.LEFT,
+            xDirection = Direction.BOTTOM,
+            yDirection = Direction.LEFT,
             minDelta = 0.1,
             delta = 0.5,
             functionColor = Color.BLACK,

@@ -1,7 +1,7 @@
 package ru.nstu.grin.model
 
 import javafx.scene.paint.Color
-import ru.nstu.grin.MappingPosition
+import ru.nstu.grin.Direction
 import java.nio.ByteBuffer
 
 /**
@@ -9,8 +9,8 @@ import java.nio.ByteBuffer
  */
 data class Function(
     val pointArray: List<Point>,
-    val xDirection: MappingPosition,
-    val yDirection: MappingPosition,
+    val xDirection: Direction,
+    val yDirection: Direction,
     val minDelta: Double,
     val delta: Double,
     val functionColor: Color,

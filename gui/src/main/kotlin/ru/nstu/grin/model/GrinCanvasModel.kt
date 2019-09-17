@@ -2,7 +2,6 @@ package ru.nstu.grin.model
 
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
-import ru.nstu.grin.MappingPosition
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.ItemViewModel
 import tornadofx.*

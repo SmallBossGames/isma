@@ -2,7 +2,7 @@ package ru.nstu.grin.axis
 
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
-import ru.nstu.grin.MappingPosition
+import ru.nstu.grin.Direction
 
 /**
  * @author kostya05983
@@ -13,7 +13,7 @@ class Axis(
     private val delta: Double,
     private val minDelta: Double,
     private val deltas: List<String>,
-    private val position: MappingPosition,
+    private val position: Direction,
     private val backGroundColor: Color,
     private val delimiterColor: Color
 ) {
@@ -29,16 +29,16 @@ class Axis(
         val gc = canvas.graphicsContext2D
         gc.fill = backGroundColor //set color
         when (position) {
-            MappingPosition.TOP -> {
+            Direction.TOP -> {
                 gc.fillRect(0.0, 0.0, gc.canvas.width, WIDTH_AXIS)
             }
-            MappingPosition.LEFT -> {
+            Direction.LEFT -> {
                 gc.fillRect(0.0, 0.0, WIDTH_AXIS, gc.canvas.height)
             }
-            MappingPosition.RIGHT -> {
+            Direction.RIGHT -> {
                 gc.fillRect(gc.canvas.width - WIDTH_AXIS, 0.0, WIDTH_AXIS, gc.canvas.height)
             }
-            MappingPosition.BOTTOM -> {
+            Direction.BOTTOM -> {
                 gc.fillRect(0.0, gc.canvas.height - WIDTH_AXIS, gc.canvas.width, gc.canvas.height)
             }
         }

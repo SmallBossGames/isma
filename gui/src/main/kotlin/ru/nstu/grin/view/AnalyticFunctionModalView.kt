@@ -18,9 +18,12 @@ class AnalyticFunctionModalView : View() {
 
     override val root: Parent = vbox {
         form {
-            fieldset("Введите ниже точки") {
-                field("Точки:") {
+            fieldset("Введите формулу") {
+                field("формула") {
                     textfield().bind(model.textProperty)
+                }
+                field("Delta") {
+                    textfield().bind(model.deltaProperty)
                 }
             }
             fieldset("Границы X") {

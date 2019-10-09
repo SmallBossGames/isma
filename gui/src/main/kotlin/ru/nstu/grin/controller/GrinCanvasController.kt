@@ -16,7 +16,8 @@ class GrinCanvasController : Controller() {
             grinCanvasModel.arrows.add(ArrowConverter.convert(it.arrowDto))
         }
         subscribe<AddFunctionEvent> {
-
+            println("Happen")
+//            grinCanvasModel.functions.add()
 //            grinCanvasModel.functions.add()
         }
     }

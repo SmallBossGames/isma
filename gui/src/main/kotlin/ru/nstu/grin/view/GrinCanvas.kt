@@ -22,8 +22,12 @@ class GrinCanvas : View() {
 
     private val grinCanvasController: GrinCanvasController by inject()
 
+    init {
+
+    }
 
     override val root: Parent = stackpane {
+        val test = grinCanvasController.params
         group {
             add(context.canvas)
         }

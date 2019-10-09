@@ -15,16 +15,19 @@ class ChooseFunctionModalView : View() {
         button("Добавить функцию из файла") {
             action {
                 find<FileEnterFunctionView>().openModal()
+                close()
             }
         }
         button("Добавить функцию вручную по точкам") {
             action {
                 find<ManualEnterFunctionView>().openModal()
+                close()
             }
         }
         button("Добавить функцию аналитически") {
             action {
                 find<AnalyticFunctionModalView>().openModal()
+                close()
             }
         }
     }

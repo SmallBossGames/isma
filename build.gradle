@@ -15,6 +15,7 @@ allprojects {
 
 }
 
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'org.jetbrains.kotlin.jvm'
@@ -29,5 +30,11 @@ subprojects {
     dependencies {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlinVersion}"
         testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.2'
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 }

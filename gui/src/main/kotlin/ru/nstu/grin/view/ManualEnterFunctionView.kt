@@ -49,18 +49,18 @@ class ManualEnterFunctionView : View() {
                     val directions = FXCollections.observableArrayList(
                         Direction.values().map { it.name }
                     )
-                    combobox<String>(model.xDirectionProperty, directions)
+                    combobox<String>(model.yDirectionProperty, directions)
                 }
             }
             fieldset("Цвета") {
                 field("Цвет функций") {
-                    textfield().bind(model.functionColorProperty)
+                    colorpicker().bind(model.functionColorProperty)
                 }
                 field("Цвет x оси") {
-                    textfield().bind(model.xAxisColorProperty)
+                    colorpicker().bind(model.xAxisColorProperty)
                 }
                 field("Цвет y оси") {
-                    textfield().bind(model.yAxisColorProperty)
+                    colorpicker().bind(model.yAxisColorProperty)
                 }
             }
         }

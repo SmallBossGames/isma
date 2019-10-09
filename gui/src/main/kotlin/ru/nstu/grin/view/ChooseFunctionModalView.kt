@@ -2,6 +2,7 @@ package ru.nstu.grin.view
 
 import javafx.scene.Parent
 import tornadofx.View
+import tornadofx.action
 import tornadofx.button
 import tornadofx.vbox
 
@@ -12,13 +13,19 @@ class ChooseFunctionModalView : View() {
 
     override val root: Parent = vbox {
         button("Добавить функцию из файла") {
-            find<FileEnterFunctionView>().openModal()
+            action {
+                find<FileEnterFunctionView>().openModal()
+            }
         }
         button("Добавить функцию вручную по точкам") {
-            find<ManualEnterFunctionView>().openModal()
+            action {
+                find<ManualEnterFunctionView>().openModal()
+            }
         }
         button("Добавить функцию аналитически") {
-            find<AnalyticFunctionModalView>().openModal()
+            action {
+                find<AnalyticFunctionModalView>().openModal()
+            }
         }
     }
 }

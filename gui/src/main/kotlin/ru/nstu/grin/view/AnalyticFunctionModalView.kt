@@ -58,13 +58,13 @@ class AnalyticFunctionModalView : View() {
             }
             fieldset("Цвета") {
                 field("Цвет функций") {
-                    textfield().bind(model.functionColorProperty)
+                    colorpicker().bind(model.functionColorProperty)
                 }
                 field("Цвет x оси") {
-                    textfield().bind(model.xAxisColorProperty)
+                    colorpicker().bind(model.xAxisColorProperty)
                 }
                 field("Цвет y оси") {
-                    textfield().bind(model.yAxisColorProperty)
+                    colorpicker().bind(model.yAxisColorProperty)
                 }
             }
         }

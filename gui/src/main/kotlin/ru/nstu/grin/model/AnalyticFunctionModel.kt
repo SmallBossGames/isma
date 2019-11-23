@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
 import ru.nstu.grin.Direction
+import ru.nstu.grin.utils.ColorUtils
 import tornadofx.*
 
 class AnalyticFunctionModel : ViewModel() {
@@ -32,12 +33,12 @@ class AnalyticFunctionModel : ViewModel() {
     var yDirectionProperty = SimpleStringProperty(Direction.LEFT.name)
     var yDirection: String by yDirectionProperty
 
-    var functionColorProperty = SimpleObjectProperty<Color>()
+    var functionColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var functionColor by functionColorProperty
 
-    var xAxisColorProperty = SimpleObjectProperty<Color>()
+    var xAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var xAxisColor by xAxisColorProperty
 
-    var yAxisColorProperty = SimpleObjectProperty<Color>()
+    var yAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var yAxisColor by yAxisColorProperty
 }

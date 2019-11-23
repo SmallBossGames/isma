@@ -8,36 +8,44 @@ import ru.nstu.grin.model.GrinCanvasModel
 import tornadofx.*
 
 class GrinCanvas : View() {
-    companion object {
-        private const val WIDTH = 1200.0
-        private const val HEIGHT = 800.0
-    }
-
     private val context = Context(
         WIDTH,
         HEIGHT
     )
 
-    private val grinCanvasModel: GrinCanvasModel by inject()
+    private val model: GrinCanvasModel by inject()
 
-    private val grinCanvasController: GrinCanvasController by inject()
-
-    init {
-
-    }
+    private val controller: GrinCanvasController by inject()
 
     override val root: Parent = stackpane {
-        val test = grinCanvasController.params
+        val test = controller.params
+//        context.canvas.bindChildren(model.functionsProperty) {
+//            line {
+//                startX = 0.0
+//                startY = 10.0
+//                endX = 20.0
+//                endY = 20.0
+//            }
+//        }
         group {
+            bindChildren(model.functionsProperty) {
+                line {
+                    startX = 0.0
+                    startY = 10.0
+                    endX = 20.0
+                    endY = 20.0
+                }
+            }
             add(context.canvas)
+            context
         }
 
         context.canvas.setOnContextMenuRequested { contextEvent ->
             contextmenu {
-                menuitem("Add function").action {
+                item("Add function").action {
                     find<ChooseFunctionModalView>().openModal()
                 }
-                menuitem("Add arrow").action {
+                item("Add arrow").action {
                     find<ArrowModalView>(
                         mapOf(
                             ArrowModalView::x to contextEvent.screenX,
@@ -47,5 +55,10 @@ class GrinCanvas : View() {
                 }
             }
         }
+    }
+
+    private companion object {
+        private const val WIDTH = 1200.0
+        private const val HEIGHT = 800.0
     }
 }

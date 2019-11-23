@@ -10,7 +10,6 @@ import ru.nstu.grin.parser.ExpressionParser
 import tornadofx.Controller
 
 class AnalyticFunctionController : Controller() {
-
     private val model: AnalyticFunctionModel by inject()
     private val expressionConverter: ExpressionConverter = ExpressionConverter()
     private val expressionParser: ExpressionParser = ExpressionParser()

@@ -2,6 +2,8 @@ package ru.nstu.grin.model
 
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
+import javafx.scene.paint.Color
+import ru.nstu.grin.Direction
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.ItemViewModel
 import tornadofx.*

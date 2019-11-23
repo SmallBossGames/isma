@@ -1,5 +1,6 @@
 package ru.nstu.grin
 
+import javafx.scene.Parent
 import ru.nstu.grin.view.ChooseFunctionModalView
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.*
@@ -10,17 +11,14 @@ import tornadofx.*
  */
 class MainView : View() {
 
-    override val root: javafx.scene.Parent = vbox {
-        println(params)
+    override val root: Parent = vbox {
         menubar {
             menu("Stage1") {
-                menuitem("Stage1")
+                item("Stage1")
             }
             menu("Add") {
-                menuitem("Function") {
-                    action {
-                        find<ChooseFunctionModalView>().openModal()
-                    }
+                item("Function").action {
+                    find<ChooseFunctionModalView>().openModal()
                 }
             }
         }

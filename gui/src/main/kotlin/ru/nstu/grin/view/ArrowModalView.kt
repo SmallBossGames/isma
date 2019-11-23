@@ -1,8 +1,8 @@
 package ru.nstu.grin.view
 
 import javafx.scene.Parent
-import javafx.scene.paint.Color
-import ru.nstu.grin.dto.ArrowDTO
+import ru.nstu.grin.controller.ArrowController
+import ru.nstu.grin.model.ArrowViewModel
 import tornadofx.*
 
 /**
@@ -12,20 +12,26 @@ class ArrowModalView : View() {
     val x: Double by param()
     val y: Double by param()
 
-    private val model: ArrowDTO = ArrowDTO(Color.WHITE, x, y)
+    private val model: ArrowViewModel by inject()
+    private val controller: ArrowController by inject()
+
+    init {
+        model.x = x
+        model.y = y
+    }
 
     override val root: Parent = vbox {
         label("color")
         colorpicker {
-            setOnAction {
-                model.color = this.value
-            }
+            colorpicker().bind(model.arrowColorProperty)
         }
 
         button("Ok") {
             action {
-                println("Lul there is an arrow")
+                controller.sendArrow()
+                close()
             }
         }
+
     }
 }

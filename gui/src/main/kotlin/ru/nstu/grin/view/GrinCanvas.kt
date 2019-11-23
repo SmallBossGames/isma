@@ -3,6 +3,8 @@ package ru.nstu.grin.view
 import javafx.scene.Parent
 import javafx.stage.StageStyle
 import ru.nstu.grin.controller.GrinCanvasController
+import ru.nstu.grin.extensions.arrow
+import ru.nstu.grin.model.Arrow
 import ru.nstu.grin.model.Context
 import ru.nstu.grin.model.GrinCanvasModel
 import tornadofx.*
@@ -14,30 +16,16 @@ class GrinCanvas : View() {
     )
 
     private val model: GrinCanvasModel by inject()
-
     private val controller: GrinCanvasController by inject()
 
     override val root: Parent = stackpane {
-        val test = controller.params
-//        context.canvas.bindChildren(model.functionsProperty) {
-//            line {
-//                startX = 0.0
-//                startY = 10.0
-//                endX = 20.0
-//                endY = 20.0
-//            }
-//        }
+        println(controller.params)
         group {
-            bindChildren(model.functionsProperty) {
-                line {
-                    startX = 0.0
-                    startY = 10.0
-                    endX = 20.0
-                    endY = 20.0
-                }
+            bindChildren(model.arrowsProperty) {
+                line {  }
+                arrow(it.color, it.x, it.y)
             }
             add(context.canvas)
-            context
         }
 
         context.canvas.setOnContextMenuRequested { contextEvent ->

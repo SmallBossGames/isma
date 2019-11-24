@@ -14,8 +14,8 @@ class Arrow(
     var color: Color,
     val x: Double,
     val y: Double
-) {
-    fun draw(context: GraphicsContext) {
+) : Drawable {
+    override fun draw(context: GraphicsContext) {
         context.stroke = color
         context.strokeLine(x, y, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
         context.strokeLine(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH, x + DEFAULT_LENGTH / 2, y + DEFAULT_LENGTH)

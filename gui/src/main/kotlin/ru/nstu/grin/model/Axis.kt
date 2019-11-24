@@ -1,6 +1,7 @@
 package ru.nstu.grin.model
 
 import javafx.scene.Node
+import javafx.scene.canvas.GraphicsContext
 import tornadofx.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
@@ -20,7 +21,9 @@ class Axis(
     private val position: Direction,
     private val backGroundColor: Color,
     private val delimiterColor: Color
-) {
+) : Drawable {
+
+
     fun getShape(canvasWidth: Double, canvasHeight: Double): Node {
         val path = Path()
 
@@ -81,5 +84,9 @@ class Axis(
         const val WIDTH_AXIS = 50.0 // 100 px in default
         const val WIDTH_DELIMITER = 10.0
         const val TEXT_ALIGN = 30.0
+    }
+
+    override fun draw(context: GraphicsContext) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

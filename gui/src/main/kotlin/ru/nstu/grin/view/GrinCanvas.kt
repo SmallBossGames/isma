@@ -8,9 +8,9 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
 import javafx.stage.StageStyle
 import ru.nstu.grin.controller.GrinCanvasController
-import ru.nstu.grin.extensions.function
 import ru.nstu.grin.model.Arrow
 import ru.nstu.grin.model.GrinCanvasModel
+import ru.nstu.grin.model.Function
 import tornadofx.*
 
 class GrinCanvas : View() {
@@ -22,13 +22,14 @@ class GrinCanvas : View() {
     override val root: Parent = stackpane {
         println(controller.params)
         flowpane {
-
-            bindChildren(model.functionsProperty) {
-                function(it)
-            }
             canvas(WIDTH, HEIGHT) {
-                model.arrowsProperty.addListener { llisner: ListChangeListener.Change<out Arrow> ->
-                    llisner.list.forEach {
+                model.arrowsProperty.addListener { listener: ListChangeListener.Change<out Arrow> ->
+                    listener.list.forEach {
+                        it.draw(graphicsContext2D)
+                    }
+                }
+                model.functionsProperty.addListener { listener: ListChangeListener.Change<out Function> ->
+                    listener.list.forEach {
                         it.draw(graphicsContext2D)
                     }
                 }
@@ -46,7 +47,6 @@ class GrinCanvas : View() {
                             ).openModal(stageStyle = StageStyle.UTILITY)
                         }
                     }
-                    it.consume()
                 }
             }
         }

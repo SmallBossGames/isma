@@ -1,5 +1,6 @@
 package ru.nstu.grin.model
 
+import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
@@ -18,7 +19,10 @@ data class Function(
     val functionColor: Color,
     val xAxisColor: Color,
     val yAxisColor: Color
-) : FormType {
+) : FormType, Drawable {
+    override fun draw(context: GraphicsContext) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     fun getShape(): Shape {
         return Line(0.0, 10.0, 0.0, 20.0)

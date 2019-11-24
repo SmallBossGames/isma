@@ -1,10 +1,11 @@
 package ru.nstu.grin.model
 
 import javafx.scene.Node
+import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import javafx.scene.shape.Line
+import javafx.scene.shape.LineTo
+import javafx.scene.shape.MoveTo
 import javafx.scene.shape.Path
-import tornadofx.add
 
 /**
  * @author kostya05983
@@ -14,22 +15,29 @@ class Arrow(
     val x: Double,
     val y: Double
 ) {
+    fun draw(context: GraphicsContext) {
+        context.stroke = color
+        context.strokeLine(x, y, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
+        context.strokeLine(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH, x + DEFAULT_LENGTH / 2, y + DEFAULT_LENGTH)
+        context.strokeLine(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH / 2)
+    }
+
     fun getShape(): Node {
         val path = Path()
 
-        val base = Line(x, y, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
-        path.add(base)
+        val moveTo = MoveTo(x, y)
+        val base = LineTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
 
-        val left = Line(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH, x + DEFAULT_LENGTH / 2, y + DEFAULT_LENGTH)
-        path.add(left)
+        val leftMoveTo = MoveTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
+        val left = LineTo(x + DEFAULT_LENGTH / 2, y + DEFAULT_LENGTH)
+        val rightMoveTo = MoveTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
+        val right = LineTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH / 2)
 
-        val right = Line(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH, x + DEFAULT_LENGTH * 2, y + DEFAULT_LENGTH)
-        path.add(right)
-
+        path.elements.addAll(moveTo, base, leftMoveTo, left, rightMoveTo, right)
         return path
     }
 
     private companion object {
-        const val DEFAULT_LENGTH = 10
+        const val DEFAULT_LENGTH = 20
     }
 }

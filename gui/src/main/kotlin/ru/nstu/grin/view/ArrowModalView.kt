@@ -8,7 +8,7 @@ import tornadofx.*
 /**
  * @author Konstantin Volivach
  */
-class ArrowModalView : View() {
+class ArrowModalView : Fragment() {
     val x: Double by param()
     val y: Double by param()
 
@@ -16,6 +16,7 @@ class ArrowModalView : View() {
     private val controller: ArrowController by inject()
 
     init {
+        println("x=$x y=$y")
         model.x = x
         model.y = y
     }

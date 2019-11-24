@@ -1,6 +1,8 @@
 package ru.nstu.grin.model
 
 import javafx.scene.paint.Color
+import javafx.scene.shape.Line
+import javafx.scene.shape.Shape
 import ru.nstu.grin.Direction
 import java.nio.ByteBuffer
 
@@ -17,6 +19,10 @@ data class Function(
     val xAxisColor: Color,
     val yAxisColor: Color
 ) : FormType {
+
+    fun getShape(): Shape {
+        return Line(0.0, 10.0, 0.0, 20.0)
+    }
 
     /**
      * Format, next numbers of bytes

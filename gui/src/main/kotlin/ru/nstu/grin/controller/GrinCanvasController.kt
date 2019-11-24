@@ -5,7 +5,7 @@ import ru.nstu.grin.converters.FunctionConverter
 import ru.nstu.grin.dto.ArrowDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.GrinCanvasModel
-import tornadofx.Controller
+import tornadofx.*
 import tornadofx.FXEvent
 
 class GrinCanvasController : Controller() {
@@ -13,7 +13,8 @@ class GrinCanvasController : Controller() {
 
     init {
         subscribe<AddArrowEvent> {
-            model.arrows.add(ArrowConverter.convert(it.arrowDto))
+            val arrow = ArrowConverter.convert(it.arrowDto)
+            model.arrows.add(arrow)
         }
         subscribe<AddFunctionEvent> {
             val function = FunctionConverter.merge(it.functionDTO, 0.1, 1.0)

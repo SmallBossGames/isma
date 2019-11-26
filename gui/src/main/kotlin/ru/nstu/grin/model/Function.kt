@@ -21,7 +21,19 @@ data class Function(
     val yAxisColor: Color
 ) : FormType, Drawable {
     override fun draw(context: GraphicsContext) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        context.strokePolyline(
+            pointArray.map { it.x }.toDoubleArray(),
+            pointArray.map { it.y }.toDoubleArray(),
+            pointArray.size
+        )
+    }
+
+    private fun List<Double>.toDoubleArray(): DoubleArray {
+        val array = DoubleArray(this.size)
+        for (i in this.indices) {
+            array[i] = this[i]
+        }
+        return array
     }
 
     fun getShape(): Shape {

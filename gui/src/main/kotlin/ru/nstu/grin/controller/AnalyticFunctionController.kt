@@ -2,6 +2,7 @@ package ru.nstu.grin.controller
 
 import ru.nstu.grin.Direction
 import ru.nstu.grin.calculation.Calculator
+import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.AnalyticFunctionModel
 import ru.nstu.grin.model.Point
@@ -21,13 +22,17 @@ class AnalyticFunctionController : Controller() {
             maxX = model.maxX,
             minY = model.minY,
             maxY = model.maxY,
-            xDirection = Direction.valueOf(model.xDirection),
-            yDirection = Direction.valueOf(model.yDirection),
-            functionColor = model.functionColor,
-            xAxisColor = model.xAxisColor,
-            yAxisColor = model.yAxisColor,
-            xDelimeterColor = model.xDelimiterColor,
-            yDelimeterColor = model.yDelimeterColor
+            xAxis = AxisDTO(
+                color = model.xAxisColor,
+                delimeterColor = model.xDelimiterColor,
+                direction = Direction.valueOf(model.xDirection)
+            ),
+            yAxis = AxisDTO(
+                color = model.yAxisColor,
+                delimeterColor = model.yDelimeterColor,
+                direction = Direction.valueOf(model.yDirection)
+            ),
+            functionColor = model.functionColor
         )
         fire(
             AddFunctionEvent(

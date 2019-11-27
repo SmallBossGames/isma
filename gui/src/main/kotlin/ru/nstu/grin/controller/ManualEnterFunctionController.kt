@@ -1,6 +1,7 @@
 package ru.nstu.grin.controller
 
 import ru.nstu.grin.Direction
+import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.ManualEnterFunctionModel
 import ru.nstu.grin.model.Point
@@ -117,11 +118,18 @@ class ManualEnterFunctionController : Controller() {
             maxX = model.maxX,
             minY = model.minY,
             maxY = model.maxY,
-            xDirection = Direction.valueOf(model.xDirection),
-            yDirection = Direction.valueOf(model.yDirection),
-            functionColor = model.functionColor,
-            xAxisColor = model.xAxisColor,
-            yAxisColor = model.yAxisColor
+            xAxis = AxisDTO(
+                color = model.xAxisColor,
+                delimeterColor = model.xDelimiterColor,
+                direction = Direction.valueOf(model.xDirection)
+
+            ),
+            yAxis = AxisDTO(
+                color = model.yAxisColor,
+                delimeterColor = model.yDelimeterColor,
+                direction = Direction.valueOf(model.yDirection)
+            ),
+            functionColor = model.functionColor
         )
         fire(
             AddFunctionEvent(

@@ -34,6 +34,12 @@ class ManualEnterFunctionModel : ViewModel() {
     var xAxisColorProperty = SimpleObjectProperty<Color>()
     var xAxisColor by xAxisColorProperty
 
+    var xDelimeterColorProperty = SimpleObjectProperty<Color>()
+    var xDelimiterColor by xDelimeterColorProperty
+
     var yAxisColorProperty = SimpleObjectProperty<Color>()
     var yAxisColor by yAxisColorProperty
+
+    var yDelimiterColorProperty = SimpleObjectProperty<Color>()
+    var yDelimeterColor by yDelimiterColorProperty
 }

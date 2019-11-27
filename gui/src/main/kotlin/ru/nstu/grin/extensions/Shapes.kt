@@ -5,6 +5,7 @@ import javafx.scene.Parent
 import javafx.scene.paint.Color
 import ru.nstu.grin.Direction
 import ru.nstu.grin.model.Arrow
+import ru.nstu.grin.model.Axis
 import ru.nstu.grin.model.Function
 import ru.nstu.grin.model.Point
 import tornadofx.attachTo
@@ -19,23 +20,15 @@ fun Parent.arrow(arrow: Arrow) = arrow.getShape().attachTo(this)
 
 fun Parent.function(
     pointArray: List<Point>,
-    xDirection: Direction,
-    yDirection: Direction,
-    minDelta: Double,
-    delta: Double,
+    xAxis: Axis,
+    yAxis: Axis,
     functionColor: Color,
-    xAxisColor: Color,
-    yAxisColor: Color,
     op: Node.() -> Unit = {}
 ) = Function(
     pointArray = pointArray,
-    xDirection = xDirection,
-    yDirection = yDirection,
-    minDelta = minDelta,
-    delta = delta,
-    functionColor = functionColor,
-    xAxisColor = xAxisColor,
-    yAxisColor = yAxisColor
+    xAxis = xAxis,
+    yAxis = yAxis,
+    functionColor = functionColor
 ).getShape().attachTo(this, op)
 
 fun Parent.function(function: Function) = function.getShape().attachTo(this)

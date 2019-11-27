@@ -1,7 +1,6 @@
 package ru.nstu.grin.dto
 
 import javafx.scene.paint.Color
-import ru.nstu.grin.Direction
 import ru.nstu.grin.model.Point
 
 data class FunctionDTO(
@@ -10,11 +9,7 @@ data class FunctionDTO(
     val maxX: Double,
     val minY: Double,
     val maxY: Double,
-    val xDirection: Direction,
-    val yDirection: Direction,
-    val functionColor: Color,
-    val xAxisColor: Color,
-    val xDelimeterColor: Color,
-    val yAxisColor: Color,
-    val yDelimeterColor: Color
+    val xAxis: AxisDTO,
+    val yAxis: AxisDTO,
+    val functionColor: Color
 )

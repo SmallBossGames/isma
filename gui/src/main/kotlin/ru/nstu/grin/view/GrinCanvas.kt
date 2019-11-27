@@ -1,16 +1,13 @@
 package ru.nstu.grin.view
 
-import javafx.collections.ListChangeListener
 import javafx.event.EventTarget
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
-import javafx.stage.StageStyle
 import ru.nstu.grin.controller.GrinCanvasController
-import ru.nstu.grin.model.Arrow
+import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.GrinCanvasModel
-import ru.nstu.grin.model.Function
 import tornadofx.*
 
 class GrinCanvas : View() {
@@ -23,28 +20,16 @@ class GrinCanvas : View() {
         println(controller.params)
         flowpane {
             canvas(WIDTH, HEIGHT) {
-                model.arrowsProperty.addListener { listener: ListChangeListener.Change<out Arrow> ->
-                    listener.list.forEach {
-                        it.draw(graphicsContext2D)
-                    }
-                }
-                model.functionsProperty.addListener { listener: ListChangeListener.Change<out Function> ->
-                    listener.list.forEach {
-                        it.draw(graphicsContext2D)
-                    }
-                }
+                drawListener(model.arrowsProperty, graphicsContext2D)
+                drawListener(model.functionsProperty, graphicsContext2D)
+
                 setOnContextMenuRequested {
                     withCoordContextmenu {
                         item("Add function").action {
-                            find<ChooseFunctionModalView>().openModal()
+                            controller.openFunctionModal()
                         }
                         item("Add arrow").action {
-                            find<ArrowModalView>(
-                                mapOf(
-                                    ArrowModalView::x to outX,
-                                    ArrowModalView::y to outY
-                                )
-                            ).openModal(stageStyle = StageStyle.UTILITY)
+                            controller.openArrowModal(outX, outY)
                         }
                     }
                 }

@@ -14,5 +14,7 @@ data class FunctionDTO(
     val yDirection: Direction,
     val functionColor: Color,
     val xAxisColor: Color,
-    val yAxisColor: Color
+    val xDelimeterColor: Color,
+    val yAxisColor: Color,
+    val yDelimeterColor: Color
 )

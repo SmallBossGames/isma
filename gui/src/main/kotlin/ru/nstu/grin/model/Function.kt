@@ -12,13 +12,9 @@ import java.nio.ByteBuffer
  */
 data class Function(
     val pointArray: List<Point>,
-    val xDirection: Direction,
-    val yDirection: Direction,
-    val minDelta: Double,
-    val delta: Double,
-    val functionColor: Color,
-    val xAxisColor: Color,
-    val yAxisColor: Color
+    val xAxis: Axis,
+    val yAxis: Axis,
+    val functionColor: Color
 ) : FormType, Drawable {
     override fun draw(context: GraphicsContext) {
         context.strokePolyline(
@@ -26,6 +22,8 @@ data class Function(
             pointArray.map { it.y }.toDoubleArray(),
             pointArray.size
         )
+        xAxis.draw(context)
+        yAxis.draw(context)
     }
 
     private fun List<Double>.toDoubleArray(): DoubleArray {
@@ -52,21 +50,7 @@ data class Function(
      * | 47 -n - points array
      */
     override fun toByteArray(): ByteArray {
-        val byteBuffer = ByteBuffer.allocate(4096)
-        byteBuffer.put(xDirection.ordinal.toByte())
-        byteBuffer.put(yDirection.ordinal.toByte())
-        byteBuffer.putDouble(minDelta)
-        byteBuffer.putDouble(delta)
-
-        byteBuffer.put(functionColor.toBytes())
-        byteBuffer.put(xAxisColor.toBytes())
-        byteBuffer.put(yAxisColor.toBytes())
-
-        pointArray.forEach {
-            byteBuffer.putDouble(it.x)
-            byteBuffer.putDouble(it.y)
-        }
-        return byteBuffer.array()
+        TODO("Not implemented")
     }
 
     private fun Color.toBytes(): ByteArray {

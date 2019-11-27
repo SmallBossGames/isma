@@ -63,8 +63,14 @@ class AnalyticFunctionModalView : View() {
             field("Цвет x оси") {
                 colorpicker().bind(model.xAxisColorProperty)
             }
+            field("Цвет дельт оси x") {
+                colorpicker().bind(model.xDelimeterColorProperty)
+            }
             field("Цвет y оси") {
                 colorpicker().bind(model.yAxisColorProperty)
+            }
+            field("Цвте дельт оси y") {
+                colorpicker().bind(model.yDelimiterColorProperty)
             }
         }
         button("OK") {

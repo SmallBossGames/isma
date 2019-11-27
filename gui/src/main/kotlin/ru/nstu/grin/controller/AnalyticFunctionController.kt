@@ -25,7 +25,9 @@ class AnalyticFunctionController : Controller() {
             yDirection = Direction.valueOf(model.yDirection),
             functionColor = model.functionColor,
             xAxisColor = model.xAxisColor,
-            yAxisColor = model.yAxisColor
+            yAxisColor = model.yAxisColor,
+            xDelimeterColor = model.xDelimiterColor,
+            yDelimeterColor = model.yDelimeterColor
         )
         fire(
             AddFunctionEvent(

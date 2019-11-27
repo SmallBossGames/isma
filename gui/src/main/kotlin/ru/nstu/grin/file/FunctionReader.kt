@@ -29,15 +29,16 @@ class FunctionReader : Reader {
                 }
             }
         }
-        return ru.nstu.grin.model.Function(
-            pointArray = pointArray,
-            xDirection = Direction.BOTTOM,
-            yDirection = Direction.LEFT,
-            minDelta = 0.1,
-            delta = 0.5,
-            functionColor = Color.BLACK,
-            xAxisColor = Color.WHITE,
-            yAxisColor = Color.WHITE
-        )
+        TODO("Not implemented")
+//        return ru.nstu.grin.model.Function(
+//            pointArray = pointArray,
+//            xDirection = Direction.BOTTOM,
+//            yDirection = Direction.LEFT,
+//            minDelta = 0.1,
+//            delta = 0.5,
+//            functionColor = Color.BLACK,
+//            xAxisColor = Color.WHITE,
+//            yAxisColor = Color.WHITE
+//        )
     }
 }

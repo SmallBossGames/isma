@@ -39,6 +39,12 @@ class AnalyticFunctionModel : ViewModel() {
     var xAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var xAxisColor by xAxisColorProperty
 
+    var xDelimeterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var xDelimiterColor by xDelimeterColorProperty
+
     var yAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var yAxisColor by yAxisColorProperty
+
+    var yDelimiterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var yDelimeterColor by yDelimiterColorProperty
 }

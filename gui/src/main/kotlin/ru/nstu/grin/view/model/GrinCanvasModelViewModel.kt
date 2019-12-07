@@ -1,14 +1,16 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.view.model
 
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
-import javafx.scene.paint.Color
-import ru.nstu.grin.Direction
+import ru.nstu.grin.model.Edge
+import ru.nstu.grin.model.drawable.Arrow
+import ru.nstu.grin.model.drawable.Description
+import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.ItemViewModel
 import tornadofx.*
 
-class GrinCanvasModel : ItemViewModel<GrinCanvas>() {
+class GrinCanvasModelViewModel : ItemViewModel<GrinCanvas>() {
     val functionsProperty = SimpleListProperty<Function>(FXCollections.observableArrayList())
     var functions by functionsProperty
 

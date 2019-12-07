@@ -1,7 +1,7 @@
 package ru.nstu.grin.converters
 
 import ru.nstu.grin.dto.ArrowDTO
-import ru.nstu.grin.model.Arrow
+import ru.nstu.grin.model.drawable.Arrow
 
 /**
  * @author Konstantin Volivach

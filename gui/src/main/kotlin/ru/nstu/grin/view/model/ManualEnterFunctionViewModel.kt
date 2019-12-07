@@ -1,4 +1,4 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.view.model
 
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
 import tornadofx.*
 
-class ManualEnterFunctionModel : ViewModel() {
+class ManualEnterFunctionViewModel : ViewModel() {
     var textProperty = SimpleStringProperty()
     var text: String by textProperty
 

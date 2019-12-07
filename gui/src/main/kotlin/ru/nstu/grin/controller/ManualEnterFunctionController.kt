@@ -1,9 +1,9 @@
 package ru.nstu.grin.controller
 
-import ru.nstu.grin.Direction
+import ru.nstu.grin.model.Direction
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
-import ru.nstu.grin.model.ManualEnterFunctionModel
+import ru.nstu.grin.view.model.ManualEnterFunctionViewModel
 import ru.nstu.grin.model.Point
 import tornadofx.Controller
 
@@ -12,7 +12,7 @@ import tornadofx.Controller
  */
 class ManualEnterFunctionController : Controller() {
 
-    private val model: ManualEnterFunctionModel by inject()
+    private val model: ManualEnterFunctionViewModel by inject()
 
     enum class States {
         FIRST_PART,

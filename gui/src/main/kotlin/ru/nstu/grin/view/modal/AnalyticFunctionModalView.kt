@@ -1,11 +1,11 @@
-package ru.nstu.grin.view
+package ru.nstu.grin.view.modal
 
 import javafx.collections.FXCollections
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
-import ru.nstu.grin.Direction
+import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.AnalyticFunctionController
-import ru.nstu.grin.model.AnalyticFunctionModel
+import ru.nstu.grin.view.model.AnalyticFunctionModel
 import tornadofx.*
 
 /**

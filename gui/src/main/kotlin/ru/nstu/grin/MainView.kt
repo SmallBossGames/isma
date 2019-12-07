@@ -1,7 +1,7 @@
 package ru.nstu.grin
 
 import javafx.scene.Parent
-import ru.nstu.grin.view.ChooseFunctionModalView
+import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.*
 

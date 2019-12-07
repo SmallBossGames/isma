@@ -1,7 +1,7 @@
 package ru.nstu.grin.controller
 
 import ru.nstu.grin.converters.dto.ArrowDTOConverter
-import ru.nstu.grin.model.ArrowViewModel
+import ru.nstu.grin.view.model.ArrowViewModel
 import tornadofx.Controller
 
 class ArrowController : Controller() {

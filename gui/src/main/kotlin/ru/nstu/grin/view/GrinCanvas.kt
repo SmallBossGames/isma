@@ -7,11 +7,11 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
 import ru.nstu.grin.controller.GrinCanvasController
 import ru.nstu.grin.extensions.drawListener
-import ru.nstu.grin.model.GrinCanvasModel
+import ru.nstu.grin.view.model.GrinCanvasModelViewModel
 import tornadofx.*
 
 class GrinCanvas : View() {
-    private val model: GrinCanvasModel by inject()
+    private val model: GrinCanvasModelViewModel by inject()
     private val controller: GrinCanvasController by inject()
     private var outX = 0.0
     private var outY = 0.0

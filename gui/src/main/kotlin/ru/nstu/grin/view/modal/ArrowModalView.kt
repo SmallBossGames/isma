@@ -1,8 +1,8 @@
-package ru.nstu.grin.view
+package ru.nstu.grin.view.modal
 
 import javafx.scene.Parent
 import ru.nstu.grin.controller.ArrowController
-import ru.nstu.grin.model.ArrowViewModel
+import ru.nstu.grin.view.model.ArrowViewModel
 import tornadofx.*
 
 /**

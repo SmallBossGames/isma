@@ -5,14 +5,14 @@ import ru.nstu.grin.converters.ArrowConverter
 import ru.nstu.grin.converters.FunctionConverter
 import ru.nstu.grin.dto.ArrowDTO
 import ru.nstu.grin.dto.FunctionDTO
-import ru.nstu.grin.model.GrinCanvasModel
-import ru.nstu.grin.view.ArrowModalView
-import ru.nstu.grin.view.ChooseFunctionModalView
+import ru.nstu.grin.view.model.GrinCanvasModelViewModel
+import ru.nstu.grin.view.modal.ArrowModalView
+import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import tornadofx.*
 import tornadofx.FXEvent
 
 class GrinCanvasController : Controller() {
-    private val model: GrinCanvasModel by inject()
+    private val model: GrinCanvasModelViewModel by inject()
 
     init {
         subscribe<AddArrowEvent> {

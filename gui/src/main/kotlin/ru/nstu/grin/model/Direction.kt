@@ -1,4 +1,4 @@
-package ru.nstu.grin
+package ru.nstu.grin.model
 
 /**
  * @author kostya05983

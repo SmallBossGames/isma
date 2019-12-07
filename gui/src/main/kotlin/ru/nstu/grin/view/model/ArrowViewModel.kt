@@ -1,4 +1,4 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.view.model
 
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color

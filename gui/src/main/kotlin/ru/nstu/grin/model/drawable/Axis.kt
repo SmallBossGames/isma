@@ -1,9 +1,9 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.model.drawable
 
 import javafx.scene.canvas.GraphicsContext
-import tornadofx.*
 import javafx.scene.paint.Color
-import ru.nstu.grin.Direction
+import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 
 /**

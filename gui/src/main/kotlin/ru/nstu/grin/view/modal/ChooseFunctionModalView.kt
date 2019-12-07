@@ -1,6 +1,7 @@
-package ru.nstu.grin.view
+package ru.nstu.grin.view.modal
 
 import javafx.scene.Parent
+import ru.nstu.grin.view.FileEnterFunctionView
 import tornadofx.View
 import tornadofx.action
 import tornadofx.button
@@ -20,7 +21,7 @@ class ChooseFunctionModalView : View() {
         }
         button("Добавить функцию вручную по точкам") {
             action {
-                find<ManualEnterFunctionView>().openModal()
+                find<ManualEnterFunctionModalView>().openModal()
                 close()
             }
         }

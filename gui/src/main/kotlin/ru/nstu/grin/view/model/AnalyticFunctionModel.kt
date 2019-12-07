@@ -1,10 +1,10 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.view.model
 
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
-import ru.nstu.grin.Direction
+import ru.nstu.grin.model.Direction
 import ru.nstu.grin.utils.ColorUtils
 import tornadofx.*
 

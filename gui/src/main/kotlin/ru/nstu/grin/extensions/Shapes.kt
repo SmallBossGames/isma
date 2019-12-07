@@ -3,10 +3,9 @@ package ru.nstu.grin.extensions
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.paint.Color
-import ru.nstu.grin.Direction
-import ru.nstu.grin.model.Arrow
-import ru.nstu.grin.model.Axis
-import ru.nstu.grin.model.Function
+import ru.nstu.grin.model.drawable.Arrow
+import ru.nstu.grin.model.drawable.Axis
+import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.Point
 import tornadofx.attachTo
 

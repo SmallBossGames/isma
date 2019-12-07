@@ -1,7 +1,7 @@
 package ru.nstu.grin.converters
 
 import ru.nstu.grin.dto.AxisDTO
-import ru.nstu.grin.model.Axis
+import ru.nstu.grin.model.drawable.Axis
 
 object AxisConverter {
     fun merge(source: AxisDTO, minDelta: Double, delta: Double): Axis {

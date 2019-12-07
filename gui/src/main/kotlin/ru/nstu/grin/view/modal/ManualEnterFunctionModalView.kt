@@ -1,18 +1,18 @@
-package ru.nstu.grin.view
+package ru.nstu.grin.view.modal
 
 import javafx.collections.FXCollections
 import javafx.scene.Parent
-import ru.nstu.grin.Direction
+import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.ManualEnterFunctionController
-import ru.nstu.grin.model.ManualEnterFunctionModel
+import ru.nstu.grin.view.model.ManualEnterFunctionViewModel
 import tornadofx.*
 
 /**
  * @author Konstantin Volivach
  */
-class ManualEnterFunctionView : View() {
+class ManualEnterFunctionModalView : View() {
 
-    private val model: ManualEnterFunctionModel by inject()
+    private val model: ManualEnterFunctionViewModel by inject()
     private val controller: ManualEnterFunctionController by inject()
 
     override val root: Parent = vbox {
@@ -68,7 +68,7 @@ class ManualEnterFunctionView : View() {
             action {
                 val function = controller.parseFunction()
                 controller.addFunction(function)
-                closeModal()
+                close()
             }
         }
     }

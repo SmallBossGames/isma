@@ -1,4 +1,4 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.model.drawable
 
 import javafx.scene.Node
 import javafx.scene.canvas.GraphicsContext
@@ -6,9 +6,12 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.LineTo
 import javafx.scene.shape.MoveTo
 import javafx.scene.shape.Path
+import ru.nstu.grin.model.Drawable
 
 /**
  * @author kostya05983
+ * Class represents arrow on plot
+ * Help to show how description relative to function
  */
 class Arrow(
     var color: Color,

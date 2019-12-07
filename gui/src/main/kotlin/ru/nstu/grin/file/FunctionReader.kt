@@ -1,7 +1,5 @@
 package ru.nstu.grin.file
 
-import javafx.scene.paint.Color
-import ru.nstu.grin.Direction
 import ru.nstu.grin.model.FormType
 import ru.nstu.grin.model.Point
 import java.io.File
@@ -30,7 +28,7 @@ class FunctionReader : Reader {
             }
         }
         TODO("Not implemented")
-//        return ru.nstu.grin.model.Function(
+//        return ru.nstu.grin.model.drawable.Function(
 //            pointArray = pointArray,
 //            xDirection = Direction.BOTTOM,
 //            yDirection = Direction.LEFT,

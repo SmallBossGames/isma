@@ -1,7 +1,7 @@
 package ru.nstu.grin.converters
 
 import ru.nstu.grin.dto.FunctionDTO
-import ru.nstu.grin.model.Function
+import ru.nstu.grin.model.drawable.Function
 
 object FunctionConverter {
     fun merge(source: FunctionDTO, minDelta: Double, delta: Double): Function {

@@ -1,10 +1,12 @@
-package ru.nstu.grin.model
+package ru.nstu.grin.model.drawable
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
-import ru.nstu.grin.Direction
+import ru.nstu.grin.model.Drawable
+import ru.nstu.grin.model.FormType
+import ru.nstu.grin.model.Point
 import java.nio.ByteBuffer
 
 /**

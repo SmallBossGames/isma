@@ -7,6 +7,7 @@ import ru.nstu.grin.converters.model.FunctionConverter
 import ru.nstu.grin.dto.ArrowDTO
 import ru.nstu.grin.dto.DescriptionDTO
 import ru.nstu.grin.dto.FunctionDTO
+import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
 import ru.nstu.grin.view.modal.ArrowModalView
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
@@ -23,7 +24,7 @@ class GrinCanvasController : Controller() {
             model.arrows.add(arrow)
         }
         subscribe<AddFunctionEvent> {
-            val function = FunctionConverter.merge(it.functionDTO, 0.1, 1.0)
+            val function = FunctionConverter.merge(it.functionDTO, it.minAxisDelta, 1.0)
             model.functions.add(function)
         }
         subscribe<AddDescriptionEvent> {
@@ -32,8 +33,12 @@ class GrinCanvasController : Controller() {
         }
     }
 
-    fun openFunctionModal() {
-        find<ChooseFunctionModalView>().openModal()
+    fun openFunctionModal(drawSize: DrawSize) {
+        find<ChooseFunctionModalView>(
+            mapOf(
+                ChooseFunctionModalView::drawSize to drawSize
+            )
+        ).openModal()
     }
 
     fun openArrowModal(x: Double, y: Double) {
@@ -58,7 +63,8 @@ class GrinCanvasController : Controller() {
 class AddArrowEvent(val arrowDTO: ArrowDTO) : FXEvent()
 
 class AddFunctionEvent(
-    val functionDTO: FunctionDTO
+    val functionDTO: FunctionDTO,
+    val minAxisDelta: Double
 ) : FXEvent()
 
 class AddDescriptionEvent(val descriptionDTO: DescriptionDTO) : FXEvent()

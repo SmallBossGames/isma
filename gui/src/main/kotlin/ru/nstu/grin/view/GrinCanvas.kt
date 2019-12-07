@@ -7,6 +7,7 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
 import ru.nstu.grin.controller.GrinCanvasController
 import ru.nstu.grin.extensions.drawListener
+import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
 import tornadofx.*
 
@@ -27,7 +28,13 @@ class GrinCanvas : View() {
                 setOnContextMenuRequested {
                     withCoordContextmenu {
                         item("Add function").action {
-                            controller.openFunctionModal()
+                            val drawSize = DrawSize(
+                                minX = 0.0,
+                                maxX = this@canvas.width,
+                                minY = 0.0,
+                                maxY = this@canvas.height
+                            )
+                            controller.openFunctionModal(drawSize)
                         }
                         item("Add arrow").action {
                             controller.openArrowModal(outX, outY)

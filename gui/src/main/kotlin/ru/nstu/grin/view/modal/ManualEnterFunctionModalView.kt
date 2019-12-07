@@ -22,22 +22,6 @@ class ManualEnterFunctionModalView : View() {
                     textfield().bind(model.textProperty)
                 }
             }
-            fieldset("Границы X") {
-                field("MinX") {
-                    textfield().bind(model.minXProperty)
-                }
-                field("MaxX") {
-                    textfield().bind(model.maxXProperty)
-                }
-            }
-            fieldset("Границы Y") {
-                field("MinY") {
-                    textfield().bind(model.minYProperty)
-                }
-                field("MaxY") {
-                    textfield().bind(model.maxYProperty)
-                }
-            }
             fieldset("Направления осей") {
                 field("Ось x") {
                     val directions = FXCollections.observableArrayList(
@@ -67,7 +51,7 @@ class ManualEnterFunctionModalView : View() {
         button("OK") {
             action {
                 val function = controller.parseFunction()
-                controller.addFunction(function)
+                controller.addFunction(function = function)
                 close()
             }
         }

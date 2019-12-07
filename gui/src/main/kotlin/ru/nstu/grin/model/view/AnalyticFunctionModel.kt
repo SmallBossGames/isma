@@ -15,18 +15,6 @@ class AnalyticFunctionModel : ViewModel() {
     var deltaProperty = SimpleDoubleProperty(0.1)
     var delta: Double by deltaProperty
 
-    var minXProperty = SimpleDoubleProperty(0.0)
-    var minX: Double by minXProperty
-
-    var maxXProperty = SimpleDoubleProperty(10.0)
-    var maxX: Double by maxXProperty
-
-    var minYProperty = SimpleDoubleProperty(0.0)
-    var minY: Double by minYProperty
-
-    var maxYProperty = SimpleDoubleProperty(10.0)
-    var maxY: Double by maxYProperty
-
     var xDirectionProperty = SimpleStringProperty(Direction.BOTTOM.name)
     var xDirection: String by xDirectionProperty
 

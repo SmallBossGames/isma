@@ -3,6 +3,7 @@ package ru.nstu.grin.controller
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
+import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.ManualEnterFunctionViewModel
 import ru.nstu.grin.model.Point
 import tornadofx.Controller
@@ -114,10 +115,6 @@ class ManualEnterFunctionController : Controller() {
     fun addFunction(function: List<Point>) {
         val functionDto = FunctionDTO(
             points = function,
-            minX = model.minX,
-            maxX = model.maxX,
-            minY = model.minY,
-            maxY = model.maxY,
             xAxis = AxisDTO(
                 color = model.xAxisColor,
                 delimeterColor = model.xDelimiterColor,
@@ -133,8 +130,13 @@ class ManualEnterFunctionController : Controller() {
         )
         fire(
             AddFunctionEvent(
-                functionDTO = functionDto
+                functionDTO = functionDto,
+                minAxisDelta = 0.0
             )
         )
+    }
+
+    private fun calculateDeltas(drawSize: DrawSize): Double {
+        return drawSize.maxX - drawSize.minX
     }
 }

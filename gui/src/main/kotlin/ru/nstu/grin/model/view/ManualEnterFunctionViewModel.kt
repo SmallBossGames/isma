@@ -1,6 +1,5 @@
 package ru.nstu.grin.model.view
 
-import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
@@ -9,18 +8,6 @@ import tornadofx.*
 class ManualEnterFunctionViewModel : ViewModel() {
     var textProperty = SimpleStringProperty()
     var text: String by textProperty
-
-    var minXProperty = SimpleDoubleProperty()
-    var minX: Double by minXProperty
-
-    var maxXProperty = SimpleDoubleProperty()
-    var maxX: Double by maxXProperty
-
-    var minYProperty = SimpleDoubleProperty()
-    var minY: Double by minYProperty
-
-    var maxYProperty = SimpleDoubleProperty()
-    var maxY: Double by maxYProperty
 
     var xDirectionProperty = SimpleStringProperty()
     var xDirection: String by xDirectionProperty

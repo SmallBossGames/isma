@@ -5,6 +5,7 @@ import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.AnalyticFunctionController
+import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.AnalyticFunctionModel
 import tornadofx.*
 
@@ -12,6 +13,7 @@ import tornadofx.*
  * @author Konstantin Volivach
  */
 class AnalyticFunctionModalView : View() {
+    val drawSize: DrawSize by param()
 
     private val model: AnalyticFunctionModel by inject()
 
@@ -24,22 +26,6 @@ class AnalyticFunctionModalView : View() {
             }
             field("Delta") {
                 textfield().bind(model.deltaProperty)
-            }
-        }
-        fieldset("Границы X") {
-            field("MinX") {
-                textfield().bind(model.minXProperty)
-            }
-            field("MaxX") {
-                textfield().bind(model.maxXProperty)
-            }
-        }
-        fieldset("Границы Y") {
-            field("MinY") {
-                textfield().bind(model.minYProperty)
-            }
-            field("MaxY") {
-                textfield().bind(model.maxYProperty)
             }
         }
         fieldset("Направления осей") {
@@ -81,7 +67,7 @@ class AnalyticFunctionModalView : View() {
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
             action {
-                controller.addFunction()
+                controller.addFunction(drawSize)
                 close()
             }
         }

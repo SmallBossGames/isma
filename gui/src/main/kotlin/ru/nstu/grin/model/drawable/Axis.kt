@@ -5,6 +5,7 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
+import kotlin.math.min
 
 /**
  * @author kostya05983
@@ -21,7 +22,7 @@ class Axis(
     override fun draw(context: GraphicsContext) {
         drawRectangle(context)
         drawMinorDelimiters(context)
-        drawDeltaMarks(context)
+//        drawDeltaMarks(context)
     }
 
     private fun drawRectangle(graphicsContext: GraphicsContext) {
@@ -37,8 +38,13 @@ class Axis(
     private fun drawMinorDelimiters(graphicsContext: GraphicsContext) {
         graphicsContext.stroke = delimiterColor
         var current = 0.0
-        while (current < SettingProvider.getCanvasHeight()) {
+        while (current < SettingProvider.getCanvasHeight() - WIDTH_AXIS) {
             graphicsContext.strokeLine(WIDTH_AXIS - WIDTH_DELIMITER, current, WIDTH_AXIS, current)
+            current += minDelta
+        }
+        current = WIDTH_AXIS
+        while (current < SettingProvider.getCanvasWidth()) {
+            graphicsContext.strokeLine(current, SettingProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER), current, SettingProvider.getCanvasHeight() - WIDTH_AXIS)
             current += minDelta
         }
     }
@@ -57,7 +63,7 @@ class Axis(
         }
     }
 
-    private companion object {
+    companion object {
         const val WIDTH_AXIS = 50.0 // 100 px in default
         const val WIDTH_DELIMITER = 10.0
         const val TEXT_ALIGN = 30.0

@@ -3,7 +3,7 @@ package ru.nstu.grin.controller
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
-import ru.nstu.grin.view.model.ManualEnterFunctionViewModel
+import ru.nstu.grin.model.view.ManualEnterFunctionViewModel
 import ru.nstu.grin.model.Point
 import tornadofx.Controller
 

@@ -4,7 +4,7 @@ import javafx.collections.FXCollections
 import javafx.scene.Parent
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.ManualEnterFunctionController
-import ru.nstu.grin.view.model.ManualEnterFunctionViewModel
+import ru.nstu.grin.model.view.ManualEnterFunctionViewModel
 import tornadofx.*
 
 /**

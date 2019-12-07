@@ -1,4 +1,4 @@
-package ru.nstu.grin.converters
+package ru.nstu.grin.converters.model
 
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.model.drawable.Axis

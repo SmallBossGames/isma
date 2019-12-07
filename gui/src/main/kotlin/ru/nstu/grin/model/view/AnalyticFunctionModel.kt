@@ -1,4 +1,4 @@
-package ru.nstu.grin.view.model
+package ru.nstu.grin.model.view
 
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty

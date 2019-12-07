@@ -7,7 +7,7 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
 import ru.nstu.grin.controller.GrinCanvasController
 import ru.nstu.grin.extensions.drawListener
-import ru.nstu.grin.view.model.GrinCanvasModelViewModel
+import ru.nstu.grin.model.view.GrinCanvasModelViewModel
 import tornadofx.*
 
 class GrinCanvas : View() {
@@ -22,6 +22,7 @@ class GrinCanvas : View() {
             canvas(WIDTH, HEIGHT) {
                 drawListener(model.arrowsProperty, graphicsContext2D)
                 drawListener(model.functionsProperty, graphicsContext2D)
+                drawListener(model.descriptionsProperty, graphicsContext2D)
 
                 setOnContextMenuRequested {
                     withCoordContextmenu {
@@ -30,6 +31,9 @@ class GrinCanvas : View() {
                         }
                         item("Add arrow").action {
                             controller.openArrowModal(outX, outY)
+                        }
+                        item("Add description").action {
+                            controller.openDescriptionModal(outX, outY)
                         }
                     }
                 }

@@ -4,7 +4,7 @@ import ru.nstu.grin.model.Direction
 import ru.nstu.grin.calculation.Calculator
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
-import ru.nstu.grin.view.model.AnalyticFunctionModel
+import ru.nstu.grin.model.view.AnalyticFunctionModel
 import ru.nstu.grin.model.Point
 import ru.nstu.grin.parser.ExpressionConverter
 import ru.nstu.grin.parser.ExpressionParser

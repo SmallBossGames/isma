@@ -5,7 +5,7 @@ import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.AnalyticFunctionController
-import ru.nstu.grin.view.model.AnalyticFunctionModel
+import ru.nstu.grin.model.view.AnalyticFunctionModel
 import tornadofx.*
 
 /**

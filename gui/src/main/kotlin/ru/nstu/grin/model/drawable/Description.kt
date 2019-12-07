@@ -1,19 +1,21 @@
 package ru.nstu.grin.model.drawable
 
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.paint.Color
 import ru.nstu.grin.model.Drawable
 
 /**
  * @author kostya05983
  */
 data class Description(
-    val title: String,
-    val size: Int,
-    val font: String,
+    val text: String,
+    val size: Double,
     val x: Double,
-    val y: Double
+    val y: Double,
+    val color: Color
 ) : Drawable {
     override fun draw(context: GraphicsContext) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        context.stroke = color
+        context.strokeText(text, x, y, size)
     }
 }

@@ -1,10 +1,14 @@
 package ru.nstu.grin.dto
 
+import javafx.scene.paint.Color
+
 /**
  * @author kostya05983
  */
 data class DescriptionDTO(
-    val title: String,
-    val size: Int,
-    val font: String
+    val x: Double,
+    val y: Double,
+    val text: String,
+    val size: Double,
+    val textColor: Color
 )

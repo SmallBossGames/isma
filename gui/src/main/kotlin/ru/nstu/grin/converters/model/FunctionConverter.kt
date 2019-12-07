@@ -1,5 +1,6 @@
-package ru.nstu.grin.converters
+package ru.nstu.grin.converters.model
 
+import ru.nstu.grin.converters.model.AxisConverter
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.drawable.Function
 

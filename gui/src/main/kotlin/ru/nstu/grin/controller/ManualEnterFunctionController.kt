@@ -113,27 +113,28 @@ class ManualEnterFunctionController : Controller() {
     }
 
     fun addFunction(function: List<Point>) {
-        val functionDto = FunctionDTO(
-            points = function,
-            xAxis = AxisDTO(
-                color = model.xAxisColor,
-                delimeterColor = model.xDelimiterColor,
-                direction = Direction.valueOf(model.xDirection)
-
-            ),
-            yAxis = AxisDTO(
-                color = model.yAxisColor,
-                delimeterColor = model.yDelimeterColor,
-                direction = Direction.valueOf(model.yDirection)
-            ),
-            functionColor = model.functionColor
-        )
-        fire(
-            AddFunctionEvent(
-                functionDTO = functionDto,
-                minAxisDelta = 0.0
-            )
-        )
+        TODO("think about common controller or OOP method")
+//        val functionDto = FunctionDTO(
+//            points = function,
+//            xAxis = AxisDTO(
+//                color = model.xAxisColor,
+//                delimeterColor = model.xDelimiterColor,
+//                direction = Direction.valueOf(model.xDirection)
+//
+//            ),
+//            yAxis = AxisDTO(
+//                color = model.yAxisColor,
+//                delimeterColor = model.yDelimeterColor,
+//                direction = Direction.valueOf(model.yDirection)
+//            ),
+//            functionColor = model.functionColor
+//        )
+//        fire(
+//            AddFunctionEvent(
+//                functionDTO = functionDto,
+//                minAxisDelta = 0.0
+//            )
+//        )
     }
 
     private fun calculateDeltas(drawSize: DrawSize): Double {

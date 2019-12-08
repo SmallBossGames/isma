@@ -6,5 +6,6 @@ import ru.nstu.grin.model.Direction
 data class AxisDTO(
     val color: Color,
     val delimeterColor: Color,
-    val direction: Direction
+    val direction: Direction,
+    val deltaMarks: List<Double>
 )

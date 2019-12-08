@@ -9,6 +9,8 @@ import ru.nstu.grin.dto.DescriptionDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
+import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.view.GrinCanvas
 import ru.nstu.grin.view.modal.ArrowModalView
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.modal.DescriptionModalView
@@ -17,6 +19,7 @@ import tornadofx.FXEvent
 
 class GrinCanvasController : Controller() {
     private val model: GrinCanvasModelViewModel by inject()
+    private val view: GrinCanvas by inject()
 
     init {
         subscribe<AddArrowEvent> {
@@ -24,12 +27,19 @@ class GrinCanvasController : Controller() {
             model.arrows.add(arrow)
         }
         subscribe<AddFunctionEvent> {
-            val function = FunctionConverter.merge(it.functionDTO, it.minAxisDelta, 1.0)
+            val function = FunctionConverter.merge(it.functionDTO, it.minAxisDelta)
             model.functions.add(function)
         }
         subscribe<AddDescriptionEvent> {
             val description = DescriptionConverter.convert(it.descriptionDTO)
             model.descriptions.add(description)
+        }
+        subscribe<ClearCanvasEvent> {
+            view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
+                SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
+            model.functions.clear()
+            model.descriptions.clear()
+            model.arrows.clear()
         }
     }
 
@@ -68,3 +78,5 @@ class AddFunctionEvent(
 ) : FXEvent()
 
 class AddDescriptionEvent(val descriptionDTO: DescriptionDTO) : FXEvent()
+
+class ClearCanvasEvent : FXEvent()

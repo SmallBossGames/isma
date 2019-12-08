@@ -3,6 +3,7 @@ package ru.nstu.grin.view
 import javafx.event.EventTarget
 import javafx.scene.Node
 import javafx.scene.Parent
+import javafx.scene.canvas.Canvas
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
 import ru.nstu.grin.controller.GrinCanvasController
@@ -16,11 +17,13 @@ class GrinCanvas : View() {
     private val controller: GrinCanvasController by inject()
     private var outX = 0.0
     private var outY = 0.0
+    lateinit var canvas: Canvas
 
     override val root: Parent = stackpane {
         println(controller.params)
         flowpane {
             canvas(WIDTH, HEIGHT) {
+                canvas = this
                 drawListener(model.arrowsProperty, graphicsContext2D)
                 drawListener(model.functionsProperty, graphicsContext2D)
                 drawListener(model.descriptionsProperty, graphicsContext2D)

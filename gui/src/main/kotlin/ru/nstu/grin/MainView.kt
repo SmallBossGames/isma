@@ -1,6 +1,7 @@
 package ru.nstu.grin
 
 import javafx.scene.Parent
+import ru.nstu.grin.controller.ClearCanvasEvent
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.*
@@ -13,12 +14,14 @@ class MainView : View() {
 
     override val root: Parent = vbox {
         menubar {
-            menu("Stage1") {
-                item("Stage1")
-            }
             menu("Add") {
                 item("Function").action {
                     find<ChooseFunctionModalView>().openModal()
+                }
+            }
+            menu("Clear") {
+                item("Clear all").action {
+                    fire(ClearCanvasEvent())
                 }
             }
         }

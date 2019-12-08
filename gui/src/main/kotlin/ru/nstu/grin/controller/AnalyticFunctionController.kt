@@ -51,7 +51,7 @@ class AnalyticFunctionController : Controller() {
         val result = mutableListOf<Point>()
         var current = drawSize.minX
         while (current < drawSize.maxX) {
-            result.add(Point(current + Axis.WIDTH_AXIS, calculator.calculate(current)))
+            result.add(Point(current, calculator.calculate(current)))
             current += model.delta
         }
         return result

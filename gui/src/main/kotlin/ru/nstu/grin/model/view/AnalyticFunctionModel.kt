@@ -9,7 +9,7 @@ import ru.nstu.grin.utils.ColorUtils
 import tornadofx.*
 
 class AnalyticFunctionModel : ViewModel() {
-    var textProperty = SimpleStringProperty()
+    var textProperty = SimpleStringProperty("0.001*x*x")
     var text: String by textProperty
 
     var deltaProperty = SimpleDoubleProperty(0.1)

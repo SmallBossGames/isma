@@ -7,6 +7,7 @@ import javafx.scene.shape.Shape
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.FormType
 import ru.nstu.grin.model.Point
+import ru.nstu.grin.settings.SettingProvider
 import java.nio.ByteBuffer
 
 /**
@@ -20,8 +21,10 @@ data class Function(
 ) : FormType, Drawable {
     override fun draw(context: GraphicsContext) {
         context.strokePolyline(
-            pointArray.map { it.x }.toDoubleArray(),
-            pointArray.map { it.y }.toDoubleArray(),
+            pointArray.map { it.x + Axis.WIDTH_AXIS }.toDoubleArray(),
+            pointArray.map {
+                SettingProvider.getCanvasHeight() - it.y - Axis.WIDTH_AXIS
+            }.toDoubleArray(),
             pointArray.size
         )
         xAxis.draw(context)

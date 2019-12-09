@@ -6,6 +6,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.LineTo
 import javafx.scene.shape.MoveTo
 import javafx.scene.shape.Path
+import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
 
 /**
@@ -18,6 +19,25 @@ class Arrow(
     val x: Double,
     val y: Double
 ) : Drawable {
+    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
+        return when (direction) {
+            CoordinateDirection.X -> {
+                Arrow(
+                    color = color,
+                    x = x * scale,
+                    y = y
+                )
+            }
+            CoordinateDirection.Y -> {
+                Arrow(
+                    color = color,
+                    x = x,
+                    y = y * scale
+                )
+            }
+        }
+    }
+
     override fun draw(context: GraphicsContext) {
         context.stroke = color
         context.strokeLine(x, y, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)

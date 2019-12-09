@@ -2,6 +2,7 @@ package ru.nstu.grin.model.drawable
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
+import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
@@ -17,6 +18,13 @@ class Axis(
     private val backGroundColor: Color,
     private val delimiterColor: Color
 ) : Drawable {
+    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
+        val newDeltas = deltaMarks.map { it * scale }
+        return Axis(
+            minDelta, newDeltas, position, backGroundColor, delimiterColor
+        )
+    }
+
     override fun draw(context: GraphicsContext) {
         drawRectangle(context)
         drawMinorDelimiters(context)
@@ -27,9 +35,19 @@ class Axis(
         graphicsContext.fill = backGroundColor
         when (position) {
             Direction.LEFT -> graphicsContext.fillRect(0.0, 0.0, WIDTH_AXIS, SettingProvider.getCanvasHeight())
-            Direction.RIGHT -> graphicsContext.fillRect(SettingProvider.getCanvasWidth() - WIDTH_AXIS, 0.0, WIDTH_AXIS, SettingProvider.getCanvasHeight())
+            Direction.RIGHT -> graphicsContext.fillRect(
+                SettingProvider.getCanvasWidth() - WIDTH_AXIS,
+                0.0,
+                WIDTH_AXIS,
+                SettingProvider.getCanvasHeight()
+            )
             Direction.TOP -> graphicsContext.fillRect(0.0, 0.0, SettingProvider.getCanvasWidth(), WIDTH_AXIS)
-            Direction.BOTTOM -> graphicsContext.fillRect(0.0, SettingProvider.getCanvasHeight() - WIDTH_AXIS, SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
+            Direction.BOTTOM -> graphicsContext.fillRect(
+                0.0,
+                SettingProvider.getCanvasHeight() - WIDTH_AXIS,
+                SettingProvider.getCanvasWidth(),
+                SettingProvider.getCanvasHeight()
+            )
         }
     }
 
@@ -42,7 +60,12 @@ class Axis(
         }
         current = WIDTH_AXIS
         while (current < SettingProvider.getCanvasWidth()) {
-            graphicsContext.strokeLine(current, SettingProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER), current, SettingProvider.getCanvasHeight() - WIDTH_AXIS)
+            graphicsContext.strokeLine(
+                current,
+                SettingProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER),
+                current,
+                SettingProvider.getCanvasHeight() - WIDTH_AXIS
+            )
             current += minDelta
         }
     }
@@ -72,8 +95,10 @@ class Axis(
         when (position) {
             Direction.LEFT -> {
                 while (current < SettingProvider.getCanvasWidth() && i < stabilizedMarks.size) {
-                    graphicsContext.strokeText(stabilizedMarks[i].toString(), WIDTH_AXIS - TEXT_ALIGN,
-                        current - WIDTH_AXIS)
+                    graphicsContext.strokeText(
+                        stabilizedMarks[i].toString(), WIDTH_AXIS - TEXT_ALIGN,
+                        current - WIDTH_AXIS
+                    )
                     i++
                     current += minDelta * DEFAULT_DELTA_SPACE
                 }
@@ -82,8 +107,10 @@ class Axis(
             Direction.TOP -> TODO()
             Direction.BOTTOM -> {
                 while (current < SettingProvider.getCanvasWidth() && i < stabilizedMarks.size) {
-                    graphicsContext.strokeText(stabilizedMarks[i].toString(), WIDTH_AXIS + current,
-                        SettingProvider.getCanvasHeight() - WIDTH_AXIS + TEXT_ALIGN)
+                    graphicsContext.strokeText(
+                        stabilizedMarks[i].toString(), WIDTH_AXIS + current,
+                        SettingProvider.getCanvasHeight() - WIDTH_AXIS + TEXT_ALIGN
+                    )
                     i++
                     current += minDelta * DEFAULT_DELTA_SPACE
                 }

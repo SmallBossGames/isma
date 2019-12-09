@@ -4,9 +4,11 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
+import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.FormType
 import ru.nstu.grin.model.Point
+import ru.nstu.grin.model.Scalable
 import ru.nstu.grin.settings.SettingProvider
 import java.nio.ByteBuffer
 
@@ -19,6 +21,27 @@ data class Function(
     val yAxis: Axis,
     val functionColor: Color
 ) : FormType, Drawable {
+    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
+        return when (direction) {
+            CoordinateDirection.X -> {
+                Function(
+                    pointArray.map { Point(it.x * scale, it.y) },
+                    xAxis.scale(scale, direction) as Axis,
+                    yAxis,
+                    functionColor
+                )
+            }
+            CoordinateDirection.Y -> {
+                Function(
+                    pointArray.map { Point(it.x * scale, it.y) },
+                    xAxis,
+                    yAxis.scale(scale, direction) as Axis,
+                    functionColor
+                )
+            }
+        }
+    }
+
     override fun draw(context: GraphicsContext) {
         context.strokePolyline(
             pointArray.map { it.x + Axis.WIDTH_AXIS }.toDoubleArray(),

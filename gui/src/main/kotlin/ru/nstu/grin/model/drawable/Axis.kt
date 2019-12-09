@@ -25,6 +25,23 @@ class Axis(
         )
     }
 
+    override fun isOnIt(x: Double, y: Double): Boolean {
+        return when (position) {
+            Direction.LEFT -> {
+                x < WIDTH_AXIS
+            }
+            Direction.RIGHT -> {
+                x > (SettingProvider.getCanvasWidth() - WIDTH_AXIS)
+            }
+            Direction.TOP -> {
+                y < WIDTH_AXIS
+            }
+            Direction.BOTTOM -> {
+                y > SettingProvider.getCanvasHeight() - WIDTH_AXIS
+            }
+        }
+    }
+
     override fun draw(context: GraphicsContext) {
         drawRectangle(context)
         drawMinorDelimiters(context)

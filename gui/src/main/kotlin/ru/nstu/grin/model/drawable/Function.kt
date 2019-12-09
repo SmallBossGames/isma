@@ -88,4 +88,8 @@ data class Function(
         byteBuffer.putDouble(red)
         return byteBuffer.array()
     }
+
+    override fun isOnIt(x: Double, y: Double): Boolean {
+        return true
+    }
 }

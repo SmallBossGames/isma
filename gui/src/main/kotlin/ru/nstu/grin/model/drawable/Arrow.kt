@@ -38,6 +38,10 @@ class Arrow(
         }
     }
 
+    override fun isOnIt(x: Double, y: Double): Boolean {
+        return true
+    }
+
     override fun draw(context: GraphicsContext) {
         context.stroke = color
         context.strokeLine(x, y, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)

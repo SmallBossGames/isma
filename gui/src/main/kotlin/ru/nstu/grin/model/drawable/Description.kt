@@ -31,4 +31,9 @@ data class Description(
         context.stroke = color
         context.strokeText(text, x, y, size)
     }
+
+    override fun isOnIt(x: Double, y: Double): Boolean {
+        return true
+    }
 }
+

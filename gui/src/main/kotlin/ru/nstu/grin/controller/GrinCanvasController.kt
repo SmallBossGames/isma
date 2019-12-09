@@ -24,22 +24,20 @@ class GrinCanvasController : Controller() {
     init {
         subscribe<AddArrowEvent> {
             val arrow = ArrowConverter.convert(it.arrowDTO)
-            model.arrows.add(arrow)
+            model.drawings.add(arrow)
         }
         subscribe<AddFunctionEvent> {
             val function = FunctionConverter.merge(it.functionDTO, it.minAxisDelta)
-            model.functions.add(function)
+            model.drawings.add(function)
         }
         subscribe<AddDescriptionEvent> {
             val description = DescriptionConverter.convert(it.descriptionDTO)
-            model.descriptions.add(description)
+            model.drawings.add(description)
         }
         subscribe<ClearCanvasEvent> {
             view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
                 SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
-            model.functions.clear()
-            model.descriptions.clear()
-            model.arrows.clear()
+            model.drawings.clear()
         }
     }
 
@@ -67,6 +65,12 @@ class GrinCanvasController : Controller() {
                 DescriptionModalView::y to y
             )
         ).openModal(stageStyle = StageStyle.UTILITY)
+    }
+
+    fun clearCanvas() {
+        view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
+            SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
+        model.drawings.clear()
     }
 }
 

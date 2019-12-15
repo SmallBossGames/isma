@@ -8,7 +8,8 @@ import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.FormType
 import ru.nstu.grin.model.Point
-import ru.nstu.grin.model.Scalable
+import ru.nstu.grin.model.drawable.axis.AbstractAxis
+import ru.nstu.grin.model.drawable.axis.Axis
 import ru.nstu.grin.settings.SettingProvider
 import java.nio.ByteBuffer
 
@@ -17,8 +18,8 @@ import java.nio.ByteBuffer
  */
 data class Function(
     val pointArray: List<Point>,
-    val xAxis: Axis,
-    val yAxis: Axis,
+    val xAxis: AbstractAxis,
+    val yAxis: AbstractAxis,
     val functionColor: Color
 ) : FormType, Drawable {
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
@@ -26,7 +27,7 @@ data class Function(
             CoordinateDirection.X -> {
                 Function(
                     pointArray.map { Point(it.x * scale, it.y) },
-                    xAxis.scale(scale, direction) as Axis,
+                    xAxis.scale(scale, direction) as AbstractAxis,
                     yAxis,
                     functionColor
                 )
@@ -35,7 +36,7 @@ data class Function(
                 Function(
                     pointArray.map { Point(it.x * scale, it.y) },
                     xAxis,
-                    yAxis.scale(scale, direction) as Axis,
+                    yAxis.scale(scale, direction) as AbstractAxis,
                     functionColor
                 )
             }

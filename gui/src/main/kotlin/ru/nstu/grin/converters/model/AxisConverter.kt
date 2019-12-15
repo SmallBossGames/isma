@@ -1,16 +1,16 @@
 package ru.nstu.grin.converters.model
 
 import ru.nstu.grin.dto.AxisDTO
-import ru.nstu.grin.model.drawable.Axis
+import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.drawable.axis.AbstractAxis
 
 object AxisConverter {
-    fun merge(source: AxisDTO, minDelta: Double): Axis {
-        return Axis(
-            minDelta = minDelta,
-            deltaMarks = source.deltaMarks,
-            position = source.direction,
-            backGroundColor = source.color,
-            delimiterColor = source.delimeterColor
-        )
+    fun merge(source: AxisDTO, minDelta: Double, startPoint: Double): AbstractAxis {
+        return when (source.direction) {
+            Direction.LEFT -> LeftAxisConverter.merge(source, minDelta, startPoint)
+            Direction.RIGHT -> RightAxisConverter.merge(source, minDelta, startPoint)
+            Direction.TOP -> TopAxisConverter.merge(source, minDelta, startPoint)
+            Direction.BOTTOM -> BottomAxisConverter.merge(source, minDelta, startPoint)
+        }
     }
 }

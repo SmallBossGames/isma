@@ -7,7 +7,6 @@ import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.AnalyticFunctionModel
 import ru.nstu.grin.model.Point
-import ru.nstu.grin.model.drawable.Axis
 import ru.nstu.grin.parser.ExpressionConverter
 import ru.nstu.grin.parser.ExpressionParser
 import tornadofx.Controller

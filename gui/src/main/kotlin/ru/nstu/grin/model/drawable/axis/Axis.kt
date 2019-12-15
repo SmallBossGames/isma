@@ -1,4 +1,4 @@
-package ru.nstu.grin.model.drawable
+package ru.nstu.grin.model.drawable.axis
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
@@ -12,6 +12,7 @@ import ru.nstu.grin.settings.SettingProvider
  * This class is responsible to draw axis
  */
 class Axis(
+    private val startPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,
     private val position: Direction,
@@ -21,23 +22,25 @@ class Axis(
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
         val newDeltas = deltaMarks.map { it * scale }
         return Axis(
-            minDelta, newDeltas, position, backGroundColor, delimiterColor
+            startPoint, minDelta, newDeltas, position, backGroundColor, delimiterColor
         )
     }
 
     override fun isOnIt(x: Double, y: Double): Boolean {
         return when (position) {
             Direction.LEFT -> {
-                x < WIDTH_AXIS
+                x < WIDTH_AXIS + startPoint && x > startPoint
             }
             Direction.RIGHT -> {
-                x > (SettingProvider.getCanvasWidth() - WIDTH_AXIS)
+                x > (SettingProvider.getCanvasWidth() - WIDTH_AXIS - startPoint) &&
+                    x < (SettingProvider.getCanvasWidth() - WIDTH_AXIS)
             }
             Direction.TOP -> {
-                y < WIDTH_AXIS
+                y < WIDTH_AXIS + startPoint && y > startPoint
             }
             Direction.BOTTOM -> {
-                y > SettingProvider.getCanvasHeight() - WIDTH_AXIS
+                y > SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint &&
+                    y < SettingProvider.getCanvasHeight() - WIDTH_AXIS
             }
         }
     }
@@ -51,17 +54,17 @@ class Axis(
     private fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
         when (position) {
-            Direction.LEFT -> graphicsContext.fillRect(0.0, 0.0, WIDTH_AXIS, SettingProvider.getCanvasHeight())
+            Direction.LEFT -> graphicsContext.fillRect(startPoint, 0.0, WIDTH_AXIS, SettingProvider.getCanvasHeight())
             Direction.RIGHT -> graphicsContext.fillRect(
-                SettingProvider.getCanvasWidth() - WIDTH_AXIS,
+                SettingProvider.getCanvasWidth() - WIDTH_AXIS - startPoint,
                 0.0,
                 WIDTH_AXIS,
                 SettingProvider.getCanvasHeight()
             )
-            Direction.TOP -> graphicsContext.fillRect(0.0, 0.0, SettingProvider.getCanvasWidth(), WIDTH_AXIS)
+            Direction.TOP -> graphicsContext.fillRect(0.0, startPoint, SettingProvider.getCanvasWidth(), WIDTH_AXIS)
             Direction.BOTTOM -> graphicsContext.fillRect(
                 0.0,
-                SettingProvider.getCanvasHeight() - WIDTH_AXIS,
+                SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint,
                 SettingProvider.getCanvasWidth(),
                 SettingProvider.getCanvasHeight()
             )
@@ -72,16 +75,16 @@ class Axis(
         graphicsContext.stroke = delimiterColor
         var current = 0.0
         while (current < SettingProvider.getCanvasHeight() - WIDTH_AXIS) {
-            graphicsContext.strokeLine(WIDTH_AXIS - WIDTH_DELIMITER, current, WIDTH_AXIS, current)
+            graphicsContext.strokeLine(startPoint + WIDTH_AXIS - WIDTH_DELIMITER, current, startPoint + WIDTH_AXIS, current)
             current += minDelta
         }
         current = WIDTH_AXIS
         while (current < SettingProvider.getCanvasWidth()) {
             graphicsContext.strokeLine(
                 current,
-                SettingProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER),
+                SettingProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER) - startPoint,
                 current,
-                SettingProvider.getCanvasHeight() - WIDTH_AXIS
+                SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint
             )
             current += minDelta
         }

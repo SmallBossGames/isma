@@ -9,7 +9,6 @@ import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.FormType
 import ru.nstu.grin.model.Point
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
-import ru.nstu.grin.model.drawable.axis.Axis
 import ru.nstu.grin.settings.SettingProvider
 import java.nio.ByteBuffer
 
@@ -45,9 +44,9 @@ data class Function(
 
     override fun draw(context: GraphicsContext) {
         context.strokePolyline(
-            pointArray.map { it.x + Axis.WIDTH_AXIS }.toDoubleArray(),
+            pointArray.map { it.x + AbstractAxis.WIDTH_AXIS }.toDoubleArray(),
             pointArray.map {
-                SettingProvider.getCanvasHeight() - it.y - Axis.WIDTH_AXIS
+                SettingProvider.getCanvasHeight() - it.y - AbstractAxis.WIDTH_AXIS
             }.toDoubleArray(),
             pointArray.size
         )

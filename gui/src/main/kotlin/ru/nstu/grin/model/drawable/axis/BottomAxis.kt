@@ -27,7 +27,7 @@ class BottomAxis(
 
     override fun isOnIt(x: Double, y: Double): Boolean {
         return y > SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint &&
-            y < SettingProvider.getCanvasHeight() - WIDTH_AXIS
+            y < SettingProvider.getCanvasHeight() - startPoint
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {

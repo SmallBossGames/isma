@@ -8,7 +8,6 @@ object BottomAxisConverter {
         return BottomAxis(
             minDelta = minDelta,
             deltaMarks = source.deltaMarks,
-            position = source.direction,
             backGroundColor = source.color,
             delimiterColor = source.delimeterColor,
             startPoint = startPoint

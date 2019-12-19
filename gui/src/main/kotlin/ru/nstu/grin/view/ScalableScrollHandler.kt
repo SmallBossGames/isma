@@ -27,8 +27,10 @@ class ScalableScrollHandler(
                     }
                     it.yAxis.isOnIt(event.x, event.y) -> {
                         if (event.deltaY > 0) {
+                            println("Plus")
                             it.scale(1.1, CoordinateDirection.Y)
                         } else {
+                            println("Shrink")
                             it.scale(1.0 / 1.1, CoordinateDirection.Y)
                         }
                     }

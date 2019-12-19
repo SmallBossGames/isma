@@ -1,5 +1,6 @@
 package ru.nstu.grin
 
+import javafx.stage.Stage
 import tornadofx.App
 import tornadofx.UIComponent
 import tornadofx.launch
@@ -11,6 +12,11 @@ class MyApp : App() {
 
     init {
         reloadStylesheetsOnFocus()
+    }
+
+    override fun start(stage: Stage) {
+        stage.isResizable = false
+        super.start(stage)
     }
 }
 

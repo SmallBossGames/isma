@@ -3,7 +3,6 @@ package ru.nstu.grin.model.drawable.axis
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.CoordinateDirection
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 
@@ -25,7 +24,7 @@ class RightAxis(
 
     override fun isOnIt(x: Double, y: Double): Boolean {
         return x > (SettingProvider.getCanvasWidth() - WIDTH_AXIS - startPoint) &&
-            x < (SettingProvider.getCanvasWidth() - WIDTH_AXIS)
+            x < (SettingProvider.getCanvasWidth() - startPoint)
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
@@ -42,14 +41,24 @@ class RightAxis(
         graphicsContext.stroke = delimiterColor
         var current = 0.0
         while (current < SettingProvider.getCanvasHeight() - WIDTH_AXIS) {
-            graphicsContext.strokeLine(SettingProvider.getCanvasHeight() - startPoint - WIDTH_AXIS - WIDTH_DELIMITER, current,
-                SettingProvider.getCanvasHeight() - startPoint - WIDTH_AXIS, current)
+            graphicsContext.strokeLine(SettingProvider.getCanvasWidth() - startPoint - WIDTH_AXIS + WIDTH_DELIMITER, current,
+                SettingProvider.getCanvasWidth() - startPoint - WIDTH_AXIS, current)
             current += minDelta
         }
     }
 
     override fun drawDeltaMarks(graphicsContext: GraphicsContext) {
         val normalMarks = deltaMarks.reversed()
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        var current = 0.0
+        var i = 0
+        while (current < SettingProvider.getCanvasHeight() && i < normalMarks.size) {
+            graphicsContext.strokeText(
+                normalMarks[i].toString(), SettingProvider.getCanvasWidth() - TEXT_ALIGN,
+                current - WIDTH_AXIS
+            )
+            i++
+            current += minDelta * DEFAULT_DELTA_SPACE
+        }
     }
 }

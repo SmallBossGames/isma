@@ -28,7 +28,6 @@ abstract class AbstractAxis(
     internal companion object {
         const val WIDTH_AXIS = 50.0 // 100 px in default
         const val WIDTH_DELIMITER = 10.0
-        const val TEXT_ALIGN = 30.0
         const val DEFAULT_DELTA_SPACE = 5
     }
 }

@@ -48,11 +48,15 @@ class LeftAxis(
         var i = 0
         while (current < SettingProvider.getCanvasWidth() && i < normalMarks.size) {
             graphicsContext.strokeText(
-                normalMarks[i].toString(), WIDTH_AXIS - TEXT_ALIGN,
+                "%.2f".format(normalMarks[i]), startPoint + WIDTH_AXIS - TEXT_ALIGN,
                 current - WIDTH_AXIS
             )
             i++
             current += minDelta * DEFAULT_DELTA_SPACE
         }
+    }
+
+    private companion object {
+        const val TEXT_ALIGN = 45.0
     }
 }

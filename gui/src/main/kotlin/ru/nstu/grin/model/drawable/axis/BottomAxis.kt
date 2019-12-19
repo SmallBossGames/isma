@@ -36,7 +36,7 @@ class BottomAxis(
             0.0,
             SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint,
             SettingProvider.getCanvasWidth(),
-            SettingProvider.getCanvasHeight()
+            WIDTH_AXIS
         )
     }
 
@@ -60,11 +60,15 @@ class BottomAxis(
         var i = 0
         while (current < SettingProvider.getCanvasWidth() && i < deltaMarks.size) {
             graphicsContext.strokeText(
-                deltaMarks[i].toString(), WIDTH_AXIS + current,
-                SettingProvider.getCanvasHeight() - WIDTH_AXIS + TEXT_ALIGN
+                "%.2f".format(deltaMarks[i]), WIDTH_AXIS + current,
+                SettingProvider.getCanvasHeight() - WIDTH_AXIS + TEXT_ALIGN - startPoint
             )
             i++
             current += minDelta * DEFAULT_DELTA_SPACE
         }
+    }
+
+    private companion object {
+        const val TEXT_ALIGN = 30.0
     }
 }

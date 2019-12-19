@@ -5,6 +5,7 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
+import kotlin.math.min
 
 class TopAxis(
     private val startPoint: Double,
@@ -48,6 +49,17 @@ class TopAxis(
     override fun drawDeltaMarks(graphicsContext: GraphicsContext) {
         var current = 0.0
         var i = 0
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        while (current < SettingProvider.getCanvasWidth() && i < deltaMarks.size) {
+            graphicsContext.strokeText(
+                "%.2f".format(deltaMarks[i]), current,
+                TEXT_ALIGN + startPoint
+            )
+            i++;
+            current += minDelta * DEFAULT_DELTA_SPACE
+        }
+    }
+
+    private companion object {
+        const val TEXT_ALIGN = 30.0
     }
 }

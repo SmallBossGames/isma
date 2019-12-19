@@ -54,11 +54,15 @@ class RightAxis(
         var i = 0
         while (current < SettingProvider.getCanvasHeight() && i < normalMarks.size) {
             graphicsContext.strokeText(
-                normalMarks[i].toString(), SettingProvider.getCanvasWidth() - TEXT_ALIGN,
+                "%.2f".format(normalMarks[i]), SettingProvider.getCanvasWidth() - TEXT_ALIGN - startPoint,
                 current - WIDTH_AXIS
             )
             i++
             current += minDelta * DEFAULT_DELTA_SPACE
         }
+    }
+
+    private companion object {
+        const val TEXT_ALIGN = 30.0
     }
 }

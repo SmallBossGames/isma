@@ -2,24 +2,15 @@ package ru.nstu.grin.model.drawable.axis
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import ru.nstu.grin.model.CoordinateDirection
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
 
 abstract class AbstractAxis(
     private val startPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,
-    private val position: Direction,
     private val backGroundColor: Color,
     private val delimiterColor: Color
 ) : Drawable {
-    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
-        val newDeltas = deltaMarks.map { it * scale }
-        return Axis(
-            startPoint, minDelta, newDeltas, position, backGroundColor, delimiterColor
-        )
-    }
 
     override fun draw(context: GraphicsContext) {
         drawRectangle(context)

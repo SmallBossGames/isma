@@ -2,7 +2,8 @@ package ru.nstu.grin.model.drawable.axis
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.CoordinateDirection
+import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 
 /**
@@ -12,22 +13,28 @@ class BottomAxis(
     private val startPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,
-    position: Direction,
     private val backGroundColor: Color,
     private val delimiterColor: Color
 ) : AbstractAxis(
-    startPoint, minDelta, deltaMarks, position, backGroundColor, delimiterColor
+    startPoint, minDelta, deltaMarks, backGroundColor, delimiterColor
 ) {
+    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
+        val newDeltas = deltaMarks.map { it * scale }
+        return BottomAxis(
+            startPoint, minDelta, newDeltas, backGroundColor, delimiterColor
+        )
+    }
+
     override fun isOnIt(x: Double, y: Double): Boolean {
-        return y > SettingProvider.getCanvasHeight() - Axis.WIDTH_AXIS - startPoint &&
-            y < SettingProvider.getCanvasHeight() - Axis.WIDTH_AXIS
+        return y > SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint &&
+            y < SettingProvider.getCanvasHeight() - WIDTH_AXIS
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
         graphicsContext.fillRect(
             0.0,
-            SettingProvider.getCanvasHeight() - Axis.WIDTH_AXIS - startPoint,
+            SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint,
             SettingProvider.getCanvasWidth(),
             SettingProvider.getCanvasHeight()
         )
@@ -40,9 +47,9 @@ class BottomAxis(
         while (current < SettingProvider.getCanvasWidth()) {
             graphicsContext.strokeLine(
                 current,
-                SettingProvider.getCanvasHeight() - (Axis.WIDTH_AXIS - Axis.WIDTH_DELIMITER) - startPoint,
+                SettingProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER) - startPoint,
                 current,
-                SettingProvider.getCanvasHeight() - Axis.WIDTH_AXIS - startPoint
+                SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint
             )
             current += minDelta
         }
@@ -53,8 +60,8 @@ class BottomAxis(
         var i = 0
         while (current < SettingProvider.getCanvasWidth() && i < deltaMarks.size) {
             graphicsContext.strokeText(
-                deltaMarks[i].toString(), Axis.WIDTH_AXIS + current,
-                SettingProvider.getCanvasHeight() - Axis.WIDTH_AXIS + Axis.TEXT_ALIGN
+                deltaMarks[i].toString(), WIDTH_AXIS + current,
+                SettingProvider.getCanvasHeight() - WIDTH_AXIS + TEXT_ALIGN
             )
             i++
             current += minDelta * DEFAULT_DELTA_SPACE

@@ -2,26 +2,33 @@ package ru.nstu.grin.model.drawable.axis
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.CoordinateDirection
+import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 
 class LeftAxis(
     private val startPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,
-    position: Direction,
     private val backGroundColor: Color,
     private val delimiterColor: Color
 ) : AbstractAxis(
-    startPoint, minDelta, deltaMarks, position, backGroundColor, delimiterColor
+    startPoint, minDelta, deltaMarks, backGroundColor, delimiterColor
 ) {
+    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
+        val newDeltas = deltaMarks.map { it * scale }
+        return LeftAxis(
+            startPoint, minDelta, newDeltas, backGroundColor, delimiterColor
+        )
+    }
+
     override fun isOnIt(x: Double, y: Double): Boolean {
-        return x < Axis.WIDTH_AXIS + startPoint && x > startPoint
+        return x < WIDTH_AXIS + startPoint && x > startPoint
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
-        graphicsContext.fillRect(startPoint, 0.0, Axis.WIDTH_AXIS, SettingProvider.getCanvasHeight())
+        graphicsContext.fillRect(startPoint, 0.0, WIDTH_AXIS, SettingProvider.getCanvasHeight())
     }
 
     override fun drawMinorDelimiters(graphicsContext: GraphicsContext) {
@@ -41,8 +48,8 @@ class LeftAxis(
         var i = 0
         while (current < SettingProvider.getCanvasWidth() && i < normalMarks.size) {
             graphicsContext.strokeText(
-                normalMarks[i].toString(), Axis.WIDTH_AXIS - Axis.TEXT_ALIGN,
-                current - Axis.WIDTH_AXIS
+                normalMarks[i].toString(), WIDTH_AXIS - TEXT_ALIGN,
+                current - WIDTH_AXIS
             )
             i++
             current += minDelta * DEFAULT_DELTA_SPACE

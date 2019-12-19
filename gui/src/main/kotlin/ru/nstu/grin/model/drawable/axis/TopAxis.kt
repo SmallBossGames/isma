@@ -2,26 +2,33 @@ package ru.nstu.grin.model.drawable.axis
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.CoordinateDirection
+import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 
 class TopAxis(
     private val startPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,
-    position: Direction,
     private val backGroundColor: Color,
     private val delimiterColor: Color
 ) : AbstractAxis(
-    startPoint, minDelta, deltaMarks, position, backGroundColor, delimiterColor
+    startPoint, minDelta, deltaMarks, backGroundColor, delimiterColor
 ) {
+    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
+        val newDeltas = deltaMarks.map { it * scale }
+        return TopAxis(
+            startPoint, minDelta, newDeltas, backGroundColor, delimiterColor
+        )
+    }
+
     override fun isOnIt(x: Double, y: Double): Boolean {
-        return y < Axis.WIDTH_AXIS + startPoint && y > startPoint
+        return y < WIDTH_AXIS + startPoint && y > startPoint
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
-        graphicsContext.fillRect(0.0, startPoint, SettingProvider.getCanvasWidth(), Axis.WIDTH_AXIS)
+        graphicsContext.fillRect(0.0, startPoint, SettingProvider.getCanvasWidth(), WIDTH_AXIS)
     }
 
     override fun drawMinorDelimiters(graphicsContext: GraphicsContext) {

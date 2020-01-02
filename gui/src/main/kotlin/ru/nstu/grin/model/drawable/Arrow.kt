@@ -54,16 +54,15 @@ class Arrow(
      * y
      */
     override fun serializeTo(): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        val objOutputStream = ObjectOutputStream(outputStream)
-        objOutputStream.writeObject(color)
-        objOutputStream.writeDouble(x)
-        objOutputStream.writeDouble(y)
-        objOutputStream.flush()
-        objOutputStream.close()
-        val result = outputStream.toByteArray()
-        outputStream.close()
-        return result
+        return ByteArrayOutputStream().use { baos ->
+            ObjectOutputStream(baos).use {
+                it.writeObject(color)
+                it.writeDouble(x)
+                it.writeDouble(y)
+                it.flush()
+            }
+            baos
+        }.toByteArray()
     }
 
     private companion object {

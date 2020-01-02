@@ -39,19 +39,17 @@ data class Description(
     }
 
     override fun serializeTo(): ByteArray {
-        val baos = ByteArrayOutputStream()
-        val objectOutpuStream = ObjectOutputStream(baos)
-        objectOutpuStream.writeObject(text)
-        objectOutpuStream.writeDouble(size)
-        objectOutpuStream.writeDouble(x)
-        objectOutpuStream.writeDouble(y)
-        objectOutpuStream.writeObject(color)
-        objectOutpuStream.flush()
-        objectOutpuStream.close()
-        val result = baos.toByteArray()
-        baos.close()
-
-        return result
+        return ByteArrayOutputStream().use { baos ->
+            ObjectOutputStream(baos).use {
+                it.writeObject(text)
+                it.writeDouble(size)
+                it.writeDouble(x)
+                it.writeDouble(y)
+                it.writeObject(color)
+                it.flush()
+            }
+            baos
+        }.toByteArray()
     }
 }
 

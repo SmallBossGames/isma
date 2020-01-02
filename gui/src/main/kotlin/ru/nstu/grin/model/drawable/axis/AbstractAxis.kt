@@ -28,18 +28,17 @@ abstract class AbstractAxis(
     protected abstract fun drawDeltaMarks(graphicsContext: GraphicsContext)
 
     override fun serializeTo(): ByteArray {
-        val baos = ByteArrayOutputStream()
-        val oos = ObjectOutputStream(baos)
-        oos.writeDouble(startPoint)
-        oos.writeDouble(minDelta)
-        oos.writeObject(deltaMarks)
-        oos.writeObject(backGroundColor)
-        oos.writeObject(delimiterColor)
-        oos.flush()
-        oos.close()
-        val result = baos.toByteArray()
-        baos.close()
-        return result
+        return ByteArrayOutputStream().use { baos ->
+            ObjectOutputStream(baos).use {
+                it.writeDouble(startPoint)
+                it.writeDouble(minDelta)
+                it.writeObject(deltaMarks)
+                it.writeObject(backGroundColor)
+                it.writeObject(delimiterColor)
+                it.flush()
+            }
+            baos
+        }.toByteArray()
     }
 
     internal companion object {

@@ -4,41 +4,40 @@ import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.drawable.Arrow
 import ru.nstu.grin.model.drawable.Description
 import ru.nstu.grin.model.drawable.Function
-import ru.nstu.grin.model.drawable.axis.BottomAxis
-import ru.nstu.grin.model.drawable.axis.LeftAxis
-import ru.nstu.grin.model.drawable.axis.RightAxis
-import ru.nstu.grin.model.drawable.axis.TopAxis
+import java.io.File
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 
 /**
  * Write all figures to file
  */
-class DrawWriter {
+class DrawWriter(private val file: File) {
 
-
+    /**
+     * n -size, figures
+     * Descriptions
+     * Arrows
+     * Functions
+     */
     fun write(drawings: List<Drawable>) {
-        for (draw in drawings) {
-            when (draw) {
-                is BottomAxis -> {
+        val descriptions = drawings.filterIsInstance<Description>()
+        val arrows = drawings.filterIsInstance<Arrow>()
+        val functions = drawings.filterIsInstance<Function>()
 
-                }
-                is LeftAxis -> {
+        ObjectOutputStream(FileOutputStream(file)).use { oos ->
+            oos.writeInt(descriptions.size)
+            for (description in descriptions) {
+                oos.write(description.serializeTo())
+            }
 
-                }
-                is RightAxis -> {
+            oos.writeInt(arrows.size)
+            for (arrow in arrows) {
+                oos.write(arrow.serializeTo())
+            }
 
-                }
-                is TopAxis -> {
-
-                }
-                is Arrow -> {
-
-                }
-                is Description -> {
-
-                }
-                is Function -> {
-
-                }
+            oos.writeInt(functions.size)
+            for (function in functions) {
+                oos.write(function.serializeTo())
             }
         }
     }

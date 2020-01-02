@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
+import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
 import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
@@ -28,9 +29,12 @@ abstract class AbstractAxis(
 
     protected abstract fun drawDeltaMarks(graphicsContext: GraphicsContext)
 
-    override fun serializeTo(): ByteArray {
+    protected abstract fun getDirection(): Direction
+
+    override fun serialize(): ByteArray {
         return ByteArrayOutputStream().use { baos ->
             ObjectOutputStream(baos).use {
+                it.writeObject(getDirection())
                 it.writeDouble(startPoint)
                 it.writeDouble(minDelta)
                 it.writeObject(deltaMarks)

@@ -27,17 +27,17 @@ class DrawWriter(private val file: File) {
         ObjectOutputStream(FileOutputStream(file)).use { oos ->
             oos.writeInt(descriptions.size)
             for (description in descriptions) {
-                oos.write(description.serializeTo())
+                oos.write(description.serialize())
             }
 
             oos.writeInt(arrows.size)
             for (arrow in arrows) {
-                oos.write(arrow.serializeTo())
+                oos.write(arrow.serialize())
             }
 
             oos.writeInt(functions.size)
             for (function in functions) {
-                oos.write(function.serializeTo())
+                oos.write(function.serialize())
             }
         }
     }

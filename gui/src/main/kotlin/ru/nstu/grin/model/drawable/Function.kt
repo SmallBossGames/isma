@@ -5,6 +5,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
 import ru.nstu.grin.extensions.toByteArray
+import ru.nstu.grin.file.Reader
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
@@ -12,6 +13,7 @@ import ru.nstu.grin.model.Point
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.settings.SettingProvider
 import java.io.ByteArrayOutputStream
+import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
 /**
@@ -68,12 +70,12 @@ data class Function(
         return Line(0.0, 10.0, 0.0, 20.0)
     }
 
-    override fun serializeTo(): ByteArray {
+    override fun serialize(): ByteArray {
         return ByteArrayOutputStream().use { baos ->
             ObjectOutputStream(baos).use {
                 it.writeObject(pointArray)
-                it.write(xAxis.serializeTo())
-                it.write(yAxis.serializeTo())
+                it.write(xAxis.serialize())
+                it.write(yAxis.serialize())
                 it.write(functionColor.toByteArray())
                 it.flush()
             }

@@ -54,7 +54,7 @@ class TopAxis(
                 "%.2f".format(deltaMarks[i]), current,
                 TEXT_ALIGN + startPoint
             )
-            i++;
+            i++
             current += minDelta * DEFAULT_DELTA_SPACE
         }
     }

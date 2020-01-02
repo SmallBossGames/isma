@@ -1,21 +1,15 @@
 package ru.nstu.grin.view
 
-import javafx.event.EventHandler
 import javafx.event.EventTarget
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
-import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.Priority
-import ru.nstu.grin.controller.ClearCanvasEvent
 import ru.nstu.grin.controller.GrinCanvasController
 import ru.nstu.grin.extensions.drawListener
-import ru.nstu.grin.model.CoordinateDirection
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
 import tornadofx.*
 

@@ -4,7 +4,6 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
-import sun.security.krb5.internal.crypto.Des
 
 /**
  * @author kostya05983

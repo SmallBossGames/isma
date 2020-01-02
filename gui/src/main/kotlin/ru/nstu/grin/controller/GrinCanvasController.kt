@@ -81,7 +81,6 @@ class GrinCanvasController : Controller() {
         model.drawings.clear()
     }
 
-
     private fun getStartPointCoef(direction: Direction): Int {
         return when (direction) {
             Direction.LEFT -> model.drawings.mapNotNull {

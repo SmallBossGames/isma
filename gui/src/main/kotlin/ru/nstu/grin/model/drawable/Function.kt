@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
+import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
@@ -73,7 +74,7 @@ data class Function(
                 it.writeObject(pointArray)
                 it.write(xAxis.serializeTo())
                 it.write(yAxis.serializeTo())
-                it.writeObject(functionColor)
+                it.write(functionColor.toByteArray())
                 it.flush()
             }
             baos

@@ -2,10 +2,16 @@ package ru.nstu.grin.model.drawable
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
+import ru.nstu.grin.extensions.readColor
+import ru.nstu.grin.extensions.toByteArray
+import ru.nstu.grin.file.Reader
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
+import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
 /**
@@ -17,7 +23,7 @@ class Arrow(
     var color: Color,
     val x: Double,
     val y: Double
-) : Drawable, Writer {
+) : Drawable, Writer, Reader<Arrow> {
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
         return when (direction) {
             CoordinateDirection.X -> {
@@ -48,6 +54,16 @@ class Arrow(
         context.strokeLine(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH / 2)
     }
 
+    override fun deserialize(ois: ObjectInputStream): Arrow {
+        val color = readColor(ois)
+        val x = ois.readDouble()
+        val y = ois.readDouble()
+        return Arrow(
+            color, x, y
+        )
+    }
+
+
     /**
      * color
      * x
@@ -56,7 +72,7 @@ class Arrow(
     override fun serializeTo(): ByteArray {
         return ByteArrayOutputStream().use { baos ->
             ObjectOutputStream(baos).use {
-                it.writeObject(color)
+                it.write(color.toByteArray())
                 it.writeDouble(x)
                 it.writeDouble(y)
                 it.flush()

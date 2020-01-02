@@ -2,6 +2,7 @@ package ru.nstu.grin.model.drawable
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
+import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
@@ -45,7 +46,7 @@ data class Description(
                 it.writeDouble(size)
                 it.writeDouble(x)
                 it.writeDouble(y)
-                it.writeObject(color)
+                it.write(color.toByteArray())
                 it.flush()
             }
             baos

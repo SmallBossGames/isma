@@ -2,6 +2,7 @@ package ru.nstu.grin.model.drawable.axis
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
+import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.Drawable
 import java.io.ByteArrayOutputStream
@@ -33,8 +34,8 @@ abstract class AbstractAxis(
                 it.writeDouble(startPoint)
                 it.writeDouble(minDelta)
                 it.writeObject(deltaMarks)
-                it.writeObject(backGroundColor)
-                it.writeObject(delimiterColor)
+                it.write(backGroundColor.toByteArray())
+                it.write(delimiterColor.toByteArray())
                 it.flush()
             }
             baos

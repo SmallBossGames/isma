@@ -1,9 +1,7 @@
 package ru.nstu.grin.extensions
 
 import javafx.scene.paint.Color
-import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.nio.ByteBuffer
 
 fun Color.toByteArray(): ByteArray {

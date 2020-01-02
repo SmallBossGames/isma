@@ -7,6 +7,8 @@ import ru.nstu.grin.converters.model.FunctionConverter
 import ru.nstu.grin.dto.ArrowDTO
 import ru.nstu.grin.dto.DescriptionDTO
 import ru.nstu.grin.dto.FunctionDTO
+import ru.nstu.grin.file.DrawReader
+import ru.nstu.grin.file.DrawWriter
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.drawable.Function
@@ -19,6 +21,7 @@ import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.modal.DescriptionModalView
 import tornadofx.*
 import tornadofx.FXEvent
+import java.io.File
 
 class GrinCanvasController : Controller() {
     private val model: GrinCanvasModelViewModel by inject()
@@ -46,6 +49,15 @@ class GrinCanvasController : Controller() {
             view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
                 SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
             model.drawings.clear()
+        }
+        subscribe<SaveEvent> {
+            val writer = DrawWriter(it.file)
+            writer.write(model.drawings)
+        }
+        subscribe<LoadEvent> {
+            val reader = DrawReader()
+            val drawings = reader.read(it.file)
+            model.drawings.addAll(drawings)
         }
     }
 
@@ -149,3 +161,7 @@ class AddFunctionEvent(
 class AddDescriptionEvent(val descriptionDTO: DescriptionDTO) : FXEvent()
 
 class ClearCanvasEvent : FXEvent()
+
+class SaveEvent(val file: File) : FXEvent()
+
+class LoadEvent(val file: File) : FXEvent()

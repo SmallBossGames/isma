@@ -18,7 +18,7 @@ data class Description(
     val x: Double,
     val y: Double,
     val color: Color
-) : Drawable, Writer{
+) : Drawable, Writer {
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
         return when (direction) {
             CoordinateDirection.X -> Description(
@@ -42,12 +42,11 @@ data class Description(
     override fun serialize(): ByteArray {
         return ByteArrayOutputStream().use { baos ->
             ObjectOutputStream(baos).use {
-                it.writeObject(text)
+                it.writeUTF(text)
                 it.writeDouble(size)
                 it.writeDouble(x)
                 it.writeDouble(y)
                 it.write(color.toByteArray())
-                it.flush()
             }
             baos
         }.toByteArray()

@@ -4,16 +4,14 @@ import javafx.scene.paint.Color
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.nio.ByteBuffer
 
 fun Color.toByteArray(): ByteArray {
-    return ByteArrayOutputStream().use { baos ->
-        ObjectOutputStream(baos).use {
-            it.writeDouble(red)
-            it.writeDouble(green)
-            it.writeDouble(blue)
-        }
-        baos
-    }.toByteArray()
+    val byteBuffer = ByteBuffer.allocate(24)
+    byteBuffer.putDouble(red)
+    byteBuffer.putDouble(green)
+    byteBuffer.putDouble(blue)
+    return byteBuffer.array()
 }
 
 fun readColor(ois: ObjectInputStream): Color {

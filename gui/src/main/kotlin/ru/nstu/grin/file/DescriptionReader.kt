@@ -7,7 +7,7 @@ import java.io.ObjectInputStream
 class DescriptionReader : Reader<Description> {
     override fun deserialize(ois: ObjectInputStream): Description {
         return Description(
-            text = ois.readObject() as String,
+            text = ois.readUTF(),
             size = ois.readDouble(),
             x = ois.readDouble(),
             y = ois.readDouble(),

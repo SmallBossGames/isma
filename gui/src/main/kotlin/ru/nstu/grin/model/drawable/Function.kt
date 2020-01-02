@@ -4,13 +4,14 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
+import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
-import ru.nstu.grin.model.FormType
 import ru.nstu.grin.model.Point
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.settings.SettingProvider
-import java.nio.ByteBuffer
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutputStream
 
 /**
  * @author kostya05983
@@ -20,7 +21,7 @@ data class Function(
     val xAxis: AbstractAxis,
     val yAxis: AbstractAxis,
     val functionColor: Color
-) : FormType, Drawable {
+) : Drawable, Writer {
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
         return when (direction) {
             CoordinateDirection.X -> {
@@ -66,27 +67,17 @@ data class Function(
         return Line(0.0, 10.0, 0.0, 20.0)
     }
 
-    /**
-     * Format, next numbers of bytes
-     * | 0     - xDirection
-     * | 1     - yDirection
-     * | 2-6   - minDelta
-     * | 7-10  - delta
-     * | 11-22 - function Color
-     * | 23-34 - xAxisColor
-     * | 35-46 - yAxisColor
-     * | 47 -n - points array
-     */
-    override fun toByteArray(): ByteArray {
-        TODO("Not implemented")
-    }
-
-    private fun Color.toBytes(): ByteArray {
-        val byteBuffer = ByteBuffer.allocate(12)
-        byteBuffer.putDouble(blue)
-        byteBuffer.putDouble(green)
-        byteBuffer.putDouble(red)
-        return byteBuffer.array()
+    override fun serializeTo(): ByteArray {
+        return ByteArrayOutputStream().use { baos ->
+            ObjectOutputStream(baos).use {
+                it.writeObject(pointArray)
+                it.write(xAxis.serializeTo())
+                it.write(yAxis.serializeTo())
+                it.writeObject(functionColor)
+                it.flush()
+            }
+            baos
+        }.toByteArray()
     }
 
     override fun isOnIt(x: Double, y: Double): Boolean {

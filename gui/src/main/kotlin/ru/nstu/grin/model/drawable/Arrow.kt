@@ -1,13 +1,12 @@
 package ru.nstu.grin.model.drawable
 
-import javafx.scene.Node
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import javafx.scene.shape.LineTo
-import javafx.scene.shape.MoveTo
-import javafx.scene.shape.Path
+import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutputStream
 
 /**
  * @author kostya05983
@@ -18,7 +17,7 @@ class Arrow(
     var color: Color,
     val x: Double,
     val y: Double
-) : Drawable {
+) : Drawable, Writer {
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
         return when (direction) {
             CoordinateDirection.X -> {
@@ -49,19 +48,22 @@ class Arrow(
         context.strokeLine(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH / 2)
     }
 
-    fun getShape(): Node {
-        val path = Path()
-
-        val moveTo = MoveTo(x, y)
-        val base = LineTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
-
-        val leftMoveTo = MoveTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
-        val left = LineTo(x + DEFAULT_LENGTH / 2, y + DEFAULT_LENGTH)
-        val rightMoveTo = MoveTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
-        val right = LineTo(x + DEFAULT_LENGTH, y + DEFAULT_LENGTH / 2)
-
-        path.elements.addAll(moveTo, base, leftMoveTo, left, rightMoveTo, right)
-        return path
+    /**
+     * color
+     * x
+     * y
+     */
+    override fun serializeTo(): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        val objOutputStream = ObjectOutputStream(outputStream)
+        objOutputStream.writeObject(color)
+        objOutputStream.writeDouble(x)
+        objOutputStream.writeDouble(y)
+        objOutputStream.flush()
+        objOutputStream.close()
+        val result = outputStream.toByteArray()
+        outputStream.close()
+        return result
     }
 
     private companion object {

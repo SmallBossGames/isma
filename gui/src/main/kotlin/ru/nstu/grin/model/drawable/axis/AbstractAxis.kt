@@ -2,7 +2,10 @@ package ru.nstu.grin.model.drawable.axis
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
+import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.Drawable
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutputStream
 
 abstract class AbstractAxis(
     private val startPoint: Double,
@@ -10,7 +13,7 @@ abstract class AbstractAxis(
     private val deltaMarks: List<Double>,
     private val backGroundColor: Color,
     private val delimiterColor: Color
-) : Drawable {
+) : Drawable, Writer {
 
     override fun draw(context: GraphicsContext) {
         drawRectangle(context)
@@ -24,6 +27,20 @@ abstract class AbstractAxis(
 
     protected abstract fun drawDeltaMarks(graphicsContext: GraphicsContext)
 
+    override fun serializeTo(): ByteArray {
+        val baos = ByteArrayOutputStream()
+        val oos = ObjectOutputStream(baos)
+        oos.writeDouble(startPoint)
+        oos.writeDouble(minDelta)
+        oos.writeObject(deltaMarks)
+        oos.writeObject(backGroundColor)
+        oos.writeObject(delimiterColor)
+        oos.flush()
+        oos.close()
+        val result = baos.toByteArray()
+        baos.close()
+        return result
+    }
 
     internal companion object {
         const val WIDTH_AXIS = 50.0 // 100 px in default

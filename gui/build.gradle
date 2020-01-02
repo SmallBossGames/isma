@@ -2,7 +2,19 @@ apply plugin: "application"
 
 mainClassName = 'ru.nstu.grin.EntryPointKt'
 
+repositories {
+    maven {
+        url 'https://dl.bintray.com/kostya05983/kontur'
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
     implementation project(":analytic-fu")
+
+    testImplementation "ru.kontur.kinfra.kfixture:kfixture:0.4.6"
 }

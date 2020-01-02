@@ -3,6 +3,7 @@ package ru.nstu.grin.model.drawable.axis
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.CoordinateDirection
+import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 import kotlin.math.min
@@ -57,6 +58,10 @@ class TopAxis(
             i++
             current += minDelta * DEFAULT_DELTA_SPACE
         }
+    }
+
+    override fun getDirection(): Direction {
+        return Direction.TOP
     }
 
     private companion object {

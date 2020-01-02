@@ -15,6 +15,7 @@ import java.io.File
 @ExtendWith(FixtureParameterResolver::class)
 @FixtureGeneratorMeta(["ru.nstu.grin"])
 internal class DrawReaderTest {
+
     @Test
     fun `should read all figures`(
         @Fixture description: Description,
@@ -29,6 +30,4 @@ internal class DrawReaderTest {
         val result = reader.read(file)
         assertEquals(drawings, result)
     }
-
-
 }

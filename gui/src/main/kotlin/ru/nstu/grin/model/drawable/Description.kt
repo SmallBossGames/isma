@@ -39,17 +39,12 @@ data class Description(
         return true
     }
 
-    override fun serialize(): ByteArray {
-        return ByteArrayOutputStream().use { baos ->
-            ObjectOutputStream(baos).use {
-                it.writeUTF(text)
-                it.writeDouble(size)
-                it.writeDouble(x)
-                it.writeDouble(y)
-                it.write(color.toByteArray())
-            }
-            baos
-        }.toByteArray()
+    override fun serialize(oos: ObjectOutputStream) {
+        oos.writeUTF(text)
+        oos.writeDouble(size)
+        oos.writeDouble(x)
+        oos.writeDouble(y)
+        oos.write(color.toByteArray())
     }
 }
 

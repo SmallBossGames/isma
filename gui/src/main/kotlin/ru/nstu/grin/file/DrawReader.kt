@@ -24,15 +24,15 @@ class DrawReader {
         FileInputStream(file).use { fis ->
             ObjectInputStream(fis).use { ois ->
                 val descriptionSize = ois.readInt()
+                val arrowSize = ois.readInt()
+                val functionSize = ois.readInt()
+
                 for (i in 0 until descriptionSize) {
                     result.add(descriptionReader.deserialize(ois))
                 }
-                val arrowSize = ois.readInt()
                 for (i in 0 until arrowSize) {
                     result.add(arrowReader.deserialize(ois))
                 }
-
-                val functionSize = ois.readInt()
                 for (i in 0 until functionSize) {
                     result.add(functionReader.deserialize(ois))
                 }

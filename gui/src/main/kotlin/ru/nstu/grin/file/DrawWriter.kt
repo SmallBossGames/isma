@@ -23,22 +23,25 @@ class DrawWriter(private val file: File) {
         val descriptions = drawings.filterIsInstance<Description>()
         val arrows = drawings.filterIsInstance<Arrow>()
         val functions = drawings.filterIsInstance<Function>()
+        FileOutputStream(file).use {
+            ObjectOutputStream(it).use { oos ->
+                oos.writeInt(descriptions.size)
+                oos.writeInt(arrows.size)
+                oos.writeInt(functions.size)
 
-        ObjectOutputStream(FileOutputStream(file)).use { oos ->
-            oos.writeInt(descriptions.size)
-            for (description in descriptions) {
-                oos.write(description.serialize())
-            }
+                for (description in descriptions) {
+                    description.serialize(oos)
+                }
 
-            oos.writeInt(arrows.size)
-            for (arrow in arrows) {
-                oos.write(arrow.serialize())
-            }
+                for (arrow in arrows) {
+                    arrow.serialize(oos)
+                }
 
-            oos.writeInt(functions.size)
-            for (function in functions) {
-                oos.write(function.serialize())
+                for (function in functions) {
+                    function.serialize(oos)
+                }
             }
         }
+
     }
 }

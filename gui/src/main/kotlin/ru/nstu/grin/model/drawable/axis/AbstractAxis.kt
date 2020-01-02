@@ -31,19 +31,13 @@ abstract class AbstractAxis(
 
     protected abstract fun getDirection(): Direction
 
-    override fun serialize(): ByteArray {
-        return ByteArrayOutputStream().use { baos ->
-            ObjectOutputStream(baos).use {
-                it.writeObject(getDirection())
-                it.writeDouble(startPoint)
-                it.writeDouble(minDelta)
-                it.writeObject(deltaMarks)
-                it.write(backGroundColor.toByteArray())
-                it.write(delimiterColor.toByteArray())
-                it.flush()
-            }
-            baos
-        }.toByteArray()
+    override fun serialize(oos: ObjectOutputStream) {
+        oos.writeObject(getDirection())
+        oos.writeDouble(startPoint)
+        oos.writeDouble(minDelta)
+        oos.writeObject(deltaMarks)
+        oos.write(backGroundColor.toByteArray())
+        oos.write(delimiterColor.toByteArray())
     }
 
     internal companion object {

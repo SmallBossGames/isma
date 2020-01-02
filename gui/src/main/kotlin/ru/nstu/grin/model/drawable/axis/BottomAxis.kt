@@ -10,7 +10,7 @@ import ru.nstu.grin.settings.SettingProvider
 /**
  * @author Konstantin Volivach
  */
-class BottomAxis(
+data class BottomAxis(
     private val startPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,

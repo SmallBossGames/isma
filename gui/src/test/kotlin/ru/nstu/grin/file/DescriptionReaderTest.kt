@@ -1,6 +1,5 @@
 package ru.nstu.grin.file
 
-import javafx.scene.paint.Color
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -11,6 +10,7 @@ import ru.nstu.grin.model.drawable.Description
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 
 @ExtendWith(FixtureParameterResolver::class)
 @FixtureGeneratorMeta(["ru.nstu.grin"])
@@ -21,8 +21,11 @@ internal class DescriptionReaderTest {
         @Fixture description: Description
     ) {
         val baos = ByteArrayOutputStream()
-        baos.write(description.serialize())
+        val oos = ObjectOutputStream(baos)
+        description.serialize(oos)
+        oos.flush()
         val serialized = baos.toByteArray()
+        oos.close()
         baos.close()
         val bais = ByteArrayInputStream(serialized)
         val ois = ObjectInputStream(bais)

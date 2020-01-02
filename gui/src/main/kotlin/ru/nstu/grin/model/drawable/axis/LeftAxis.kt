@@ -7,7 +7,7 @@ import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 
-class LeftAxis(
+data class LeftAxis(
     private val startPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,

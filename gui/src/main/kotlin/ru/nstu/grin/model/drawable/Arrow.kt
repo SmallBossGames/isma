@@ -14,7 +14,7 @@ import java.io.ObjectOutputStream
  * Class represents arrow on plot
  * Help to show how description relative to function
  */
-class Arrow(
+data class Arrow(
     var color: Color,
     val x: Double,
     val y: Double
@@ -54,16 +54,10 @@ class Arrow(
      * x
      * y
      */
-    override fun serialize(): ByteArray {
-        return ByteArrayOutputStream().use { baos ->
-            ObjectOutputStream(baos).use {
-                it.write(color.toByteArray())
-                it.writeDouble(x)
-                it.writeDouble(y)
-                it.flush()
-            }
-            baos
-        }.toByteArray()
+    override fun serialize(oos: ObjectOutputStream) {
+        oos.write(color.toByteArray())
+        oos.writeDouble(x)
+        oos.writeDouble(y)
     }
 
     private companion object {

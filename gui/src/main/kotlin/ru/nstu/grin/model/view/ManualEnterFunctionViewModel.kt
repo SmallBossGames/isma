@@ -3,30 +3,35 @@ package ru.nstu.grin.model.view
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
+import ru.nstu.grin.model.Direction
+import ru.nstu.grin.utils.ColorUtils
 import tornadofx.*
 
 class ManualEnterFunctionViewModel : ViewModel() {
-    var textProperty = SimpleStringProperty()
-    var text: String by textProperty
+    var xPointsProperty = SimpleStringProperty(this, "xPoints")
+    var xPoins: String by xPointsProperty
 
-    var xDirectionProperty = SimpleStringProperty()
+    var yPointsProperty = SimpleStringProperty(this, "yPoints")
+    var yPoints: String by yPointsProperty
+
+    var xDirectionProperty = SimpleStringProperty(Direction.BOTTOM.name)
     var xDirection: String by xDirectionProperty
 
-    var yDirectionProperty = SimpleStringProperty()
+    var yDirectionProperty = SimpleStringProperty(Direction.LEFT.name)
     var yDirection: String by yDirectionProperty
 
-    var functionColorProperty = SimpleObjectProperty<Color>()
+    var functionColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var functionColor by functionColorProperty
 
-    var xAxisColorProperty = SimpleObjectProperty<Color>()
+    var xAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var xAxisColor by xAxisColorProperty
 
-    var xDelimeterColorProperty = SimpleObjectProperty<Color>()
+    var xDelimeterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var xDelimiterColor by xDelimeterColorProperty
 
-    var yAxisColorProperty = SimpleObjectProperty<Color>()
+    var yAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var yAxisColor by yAxisColorProperty
 
-    var yDelimiterColorProperty = SimpleObjectProperty<Color>()
+    var yDelimiterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var yDelimeterColor by yDelimiterColorProperty
 }

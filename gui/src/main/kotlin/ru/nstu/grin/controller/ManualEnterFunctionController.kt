@@ -13,7 +13,7 @@ class ManualEnterFunctionController : Controller() {
     private val model: ManualEnterFunctionViewModel by inject()
 
     fun parseFunction(): List<Point> {
-        val split = model.xPoins.split(" ")
+        val split = model.xPoints.split(" ")
 
         val result = mutableListOf<Point>()
         for (item in split) {

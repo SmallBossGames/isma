@@ -8,10 +8,10 @@ import ru.nstu.grin.utils.ColorUtils
 import tornadofx.*
 
 class ManualEnterFunctionViewModel : ViewModel() {
-    var xPointsProperty = SimpleStringProperty(this, "xPoints")
-    var xPoins: String by xPointsProperty
+    var xPointsProperty = SimpleStringProperty(this, "xPoints", "")
+    var xPoints: String by xPointsProperty
 
-    var yPointsProperty = SimpleStringProperty(this, "yPoints")
+    var yPointsProperty = SimpleStringProperty(this, "yPoints", "")
     var yPoints: String by yPointsProperty
 
     var xDirectionProperty = SimpleStringProperty(Direction.BOTTOM.name)

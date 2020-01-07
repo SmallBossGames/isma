@@ -1,5 +1,6 @@
 package ru.nstu.grin.controller
 
+import ru.nstu.grin.controller.events.AddDescriptionEvent
 import ru.nstu.grin.converters.dto.DescriptionDTOConverter
 import ru.nstu.grin.model.view.DescriptionViewModel
 import tornadofx.Controller

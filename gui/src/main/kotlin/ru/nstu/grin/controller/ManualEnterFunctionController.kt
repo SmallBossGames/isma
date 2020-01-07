@@ -1,5 +1,6 @@
 package ru.nstu.grin.controller
 
+import ru.nstu.grin.controller.events.AddFunctionEvent
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.Direction

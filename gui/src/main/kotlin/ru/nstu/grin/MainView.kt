@@ -1,9 +1,9 @@
 package ru.nstu.grin
 
 import javafx.scene.Parent
-import ru.nstu.grin.controller.ClearCanvasEvent
-import ru.nstu.grin.controller.LoadEvent
-import ru.nstu.grin.controller.SaveEvent
+import ru.nstu.grin.controller.events.ClearCanvasEvent
+import ru.nstu.grin.controller.events.LoadEvent
+import ru.nstu.grin.controller.events.SaveEvent
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.*

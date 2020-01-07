@@ -7,10 +7,7 @@ import ru.nstu.grin.converters.model.DescriptionConverter
 import ru.nstu.grin.converters.model.FunctionConverter
 import ru.nstu.grin.file.DrawReader
 import ru.nstu.grin.file.DrawWriter
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.drawable.Function
-import ru.nstu.grin.model.drawable.axis.*
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
 import ru.nstu.grin.settings.SettingProvider
 import ru.nstu.grin.view.GrinCanvas
@@ -22,6 +19,7 @@ import tornadofx.*
 class GrinCanvasController : Controller() {
     private val model: GrinCanvasModelViewModel by inject()
     private val view: GrinCanvas by inject()
+    private val pointCoefCalculator = PointCoefCalculator()
 
     init {
         subscribe<AddArrowEvent> {
@@ -32,8 +30,8 @@ class GrinCanvasController : Controller() {
             val function = FunctionConverter.merge(
                 it.functionDTO,
                 it.minAxisDelta,
-                getStartPointCoef(it.functionDTO.xAxis.direction) * AbstractAxis.WIDTH_AXIS,
-                getStartPointCoef(it.functionDTO.yAxis.direction) * AbstractAxis.WIDTH_AXIS
+                pointCoefCalculator.getStartPointCoef(it.functionDTO.xAxis.direction, model.drawings),
+                pointCoefCalculator.getStartPointCoef(it.functionDTO.yAxis.direction, model.drawings)
             )
             model.drawings.add(function)
         }
@@ -87,62 +85,5 @@ class GrinCanvasController : Controller() {
         view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
             SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
         model.drawings.clear()
-    }
-
-    private fun getStartPointCoef(direction: Direction): Int {
-        return when (direction) {
-            Direction.LEFT -> model.drawings.mapNotNull {
-                if (it is Function) {
-                    when {
-                        it.xAxis is LeftAxis -> {
-                            it.xAxis
-                        }
-                        it.yAxis is LeftAxis -> {
-                            it.yAxis
-                        }
-                    }
-                }
-            }.count()
-            Direction.RIGHT -> {
-                model.drawings.mapNotNull {
-                    if (it is Function) {
-                        when {
-                            it.xAxis is RightAxis -> {
-                                it.xAxis
-                            }
-                            it.yAxis is RightAxis -> {
-                                it.yAxis
-                            }
-                        }
-                    }
-                }.count()
-            }
-            Direction.TOP -> {
-                model.drawings.mapNotNull {
-                    if (it is Function) {
-                        when {
-                            it.xAxis is TopAxis -> {
-                                it.xAxis
-                            }
-                            it.yAxis is TopAxis -> {
-                                it.yAxis
-                            }
-                        }
-                    }
-                }.count()
-            }
-            Direction.BOTTOM -> model.drawings.mapNotNull {
-                if (it is Function) {
-                    when {
-                        it.xAxis is BottomAxis -> {
-                            it.xAxis
-                        }
-                        it.yAxis is BottomAxis -> {
-                            it.yAxis
-                        }
-                    }
-                }
-            }.count()
-        }
     }
 }

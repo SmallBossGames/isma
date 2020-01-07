@@ -4,6 +4,7 @@ import javafx.collections.FXCollections
 import javafx.scene.Parent
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.ManualEnterFunctionController
+import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.ManualEnterFunctionViewModel
 import tornadofx.*
 
@@ -11,6 +12,8 @@ import tornadofx.*
  * @author Konstantin Volivach
  */
 class ManualEnterFunctionModalView : View() {
+    val drawSize: DrawSize by param()
+
     private val model: ManualEnterFunctionViewModel by inject()
     private val controller: ManualEnterFunctionController by inject()
 
@@ -71,8 +74,8 @@ class ManualEnterFunctionModalView : View() {
         button("OK") {
             enableWhen(model.valid)
             action {
-                val function = controller.parseFunction()
-                controller.addFunction(function = function)
+                val points = controller.parsePoints()
+                controller.addFunction(points = points, drawSize = drawSize)
                 close()
             }
         }

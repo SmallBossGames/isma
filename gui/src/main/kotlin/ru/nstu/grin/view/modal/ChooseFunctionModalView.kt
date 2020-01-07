@@ -23,7 +23,11 @@ class ChooseFunctionModalView : View() {
         }
         button("Добавить функцию вручную по точкам") {
             action {
-                find<ManualEnterFunctionModalView>().openModal()
+                find<ManualEnterFunctionModalView>(
+                    mapOf(
+                        AnalyticFunctionModalView::drawSize to drawSize
+                    )
+                ).openModal()
                 close()
             }
         }

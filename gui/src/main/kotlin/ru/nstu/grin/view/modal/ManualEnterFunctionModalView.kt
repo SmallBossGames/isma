@@ -24,8 +24,6 @@ class ManualEnterFunctionModalView : View() {
                     validator {
                         if (it == null || !POINT_REGEX.matches(it)) {
                             error("Введите цифры в следующем формате 22.3, 23.4")
-                        } else if (it.split(",").size != model.yPoints.split(",").size) {
-                            error("Количество точек не совпадает с y")
                         } else {
                             null
                         }
@@ -37,8 +35,6 @@ class ManualEnterFunctionModalView : View() {
                     validator {
                         if (it == null || !POINT_REGEX.matches(it)) {
                             error("Введите цифры в следующем формате 22.3, 23.4")
-                        } else if (it.split(",").size != model.xPoints.split(",").size) {
-                            error("Количество точек не совпадает с x")
                         } else {
                             null
                         }
@@ -71,14 +67,24 @@ class ManualEnterFunctionModalView : View() {
                 colorpicker().bind(model.yAxisColorProperty)
             }
         }
+
         button("OK") {
             enableWhen(model.valid)
+
             action {
+                if(!checkSize()) {
+                    error("Размеры должны быть эквиваленты")
+                    return@action
+                }
                 val points = controller.parsePoints()
                 controller.addFunction(points = points, drawSize = drawSize)
                 close()
             }
         }
+    }
+
+    private fun checkSize(): Boolean {
+        return model.yPoints.split(",").size == model.xPoints.split(",").size
     }
 
     companion object {

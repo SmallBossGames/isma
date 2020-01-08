@@ -8,6 +8,9 @@ import ru.nstu.grin.utils.ColorUtils
 import tornadofx.*
 
 class ManualEnterFunctionViewModel : ViewModel() {
+    var functionNameProperty = SimpleStringProperty()
+    var functionName: String by functionNameProperty
+
     var xPointsProperty = SimpleStringProperty(this, "xPoints", "")
     var xPoints: String by xPointsProperty
 

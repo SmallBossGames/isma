@@ -10,6 +10,8 @@ import javafx.scene.layout.Priority
 import ru.nstu.grin.controller.GrinCanvasController
 import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.DrawSize
+import ru.nstu.grin.model.ExistDirection
+import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
 import tornadofx.*
 
@@ -39,7 +41,16 @@ class GrinCanvas : View() {
                             minY = 0.0,
                             maxY = this@canvas.height
                         )
-                        controller.openFunctionModal(drawSize)
+                        val directions = model.drawings.filterIsInstance<Function>().map {
+                            Pair(it.xAxis, it.yAxis)
+                        }
+                        val xDirections = directions.mapIndexed { index, pair ->
+                            ExistDirection(pair.first.getDirection(), "Функция $index")
+                        }
+                        val yDirections = directions.mapIndexed { index, pair ->
+                            ExistDirection(pair.second.getDirection(), "Функция $index")
+                        }
+                        controller.openFunctionModal(drawSize, xDirections, yDirections)
                     }
                     item("Add arrow").action {
                         controller.openArrowModal(outX, outY)

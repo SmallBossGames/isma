@@ -5,6 +5,7 @@ import javafx.scene.Parent
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.ManualEnterFunctionController
 import ru.nstu.grin.model.DrawSize
+import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.ManualEnterFunctionViewModel
 import tornadofx.*
 
@@ -13,11 +14,18 @@ import tornadofx.*
  */
 class ManualEnterFunctionModalView : View() {
     val drawSize: DrawSize by param()
+    val xExistDirections: List<ExistDirection> by param()
+    val yExistDirections: List<ExistDirection> by param()
 
     private val model: ManualEnterFunctionViewModel by inject()
     private val controller: ManualEnterFunctionController by inject()
 
     override val root: Parent = form {
+        fieldset {
+            field("Введите имя функции") {
+                textfield().bind(model.functionNameProperty)
+            }
+        }
         fieldset("Введите ниже точки") {
             field("Точки x") {
                 textfield(model.xPointsProperty) {
@@ -47,13 +55,19 @@ class ManualEnterFunctionModalView : View() {
                 val directions = FXCollections.observableArrayList(
                     Direction.values().map { it.name }
                 )
-                combobox<String>(model.xDirectionProperty, directions)
+                val existDirections = xExistDirections.map {
+                    "Направление ${it.direction.name} и функция ${it.functionName}"
+                }
+                combobox<String>(model.xDirectionProperty, directions + existDirections)
             }
             field("Ось y") {
                 val directions = FXCollections.observableArrayList(
                     Direction.values().map { it.name }
                 )
-                combobox<String>(model.yDirectionProperty, directions)
+                val existDirections = xExistDirections.map {
+                    "Направление ${it.direction.name} и функция ${it.functionName}"
+                }
+                combobox<String>(model.yDirectionProperty, directions + existDirections)
             }
         }
         fieldset("Цвета") {
@@ -72,7 +86,7 @@ class ManualEnterFunctionModalView : View() {
             enableWhen(model.valid)
 
             action {
-                if(!checkSize()) {
+                if (!checkSize()) {
                     error("Размеры должны быть эквиваленты")
                     return@action
                 }

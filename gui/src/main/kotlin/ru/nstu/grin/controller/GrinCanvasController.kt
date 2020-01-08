@@ -8,6 +8,7 @@ import ru.nstu.grin.converters.model.FunctionConverter
 import ru.nstu.grin.file.DrawReader
 import ru.nstu.grin.file.DrawWriter
 import ru.nstu.grin.model.DrawSize
+import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
 import ru.nstu.grin.settings.SettingProvider
 import ru.nstu.grin.view.GrinCanvas
@@ -55,10 +56,16 @@ class GrinCanvasController : Controller() {
         }
     }
 
-    fun openFunctionModal(drawSize: DrawSize) {
+    fun openFunctionModal(
+        drawSize: DrawSize,
+        xExistDirection: List<ExistDirection>,
+        yExistDirection: List<ExistDirection>
+    ) {
         find<ChooseFunctionModalView>(
             mapOf(
-                ChooseFunctionModalView::drawSize to drawSize
+                ChooseFunctionModalView::drawSize to drawSize,
+                ChooseFunctionModalView::xExistDirections to xExistDirection,
+                ChooseFunctionModalView::yExistDirections to yExistDirection
             )
         ).openModal()
     }

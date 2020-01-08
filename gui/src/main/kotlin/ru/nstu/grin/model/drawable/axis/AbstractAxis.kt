@@ -29,7 +29,7 @@ abstract class AbstractAxis(
 
     protected abstract fun drawDeltaMarks(graphicsContext: GraphicsContext)
 
-    protected abstract fun getDirection(): Direction
+    abstract fun getDirection(): Direction
 
     override fun serialize(oos: ObjectOutputStream) {
         oos.writeObject(getDirection())

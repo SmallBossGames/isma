@@ -2,17 +2,17 @@ package ru.nstu.grin.view.modal
 
 import javafx.scene.Parent
 import ru.nstu.grin.model.DrawSize
+import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.view.FileEnterFunctionView
-import tornadofx.View
-import tornadofx.action
-import tornadofx.button
-import tornadofx.vbox
+import tornadofx.*
 
 /**
  * @author Konstantin Volivach
  */
-class ChooseFunctionModalView : View() {
+class ChooseFunctionModalView : Fragment() {
     val drawSize: DrawSize by param()
+    val xExistDirections: List<ExistDirection> by param()
+    val yExistDirections: List<ExistDirection> by param()
 
     override val root: Parent = vbox {
         button("Добавить функцию из файла") {
@@ -25,7 +25,9 @@ class ChooseFunctionModalView : View() {
             action {
                 find<ManualEnterFunctionModalView>(
                     mapOf(
-                        AnalyticFunctionModalView::drawSize to drawSize
+                        ManualEnterFunctionModalView::drawSize to drawSize,
+                        ManualEnterFunctionModalView::xExistDirections to xExistDirections,
+                        ManualEnterFunctionModalView::yExistDirections to yExistDirections
                     )
                 ).openModal()
                 close()
@@ -35,7 +37,9 @@ class ChooseFunctionModalView : View() {
             action {
                 find<AnalyticFunctionModalView>(
                     mapOf(
-                        AnalyticFunctionModalView::drawSize to drawSize
+                        AnalyticFunctionModalView::drawSize to drawSize,
+                        AnalyticFunctionModalView::xExistDirections to xExistDirections,
+                        AnalyticFunctionModalView::yExistDirections to yExistDirections
                     )
                 ).openModal()
                 close()

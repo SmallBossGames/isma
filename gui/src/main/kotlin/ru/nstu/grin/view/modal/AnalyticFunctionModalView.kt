@@ -6,20 +6,28 @@ import javafx.scene.layout.Priority
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.AnalyticFunctionController
 import ru.nstu.grin.model.DrawSize
+import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.AnalyticFunctionModel
 import tornadofx.*
 
 /**
  * @author Konstantin Volivach
  */
-class AnalyticFunctionModalView : View() {
+class AnalyticFunctionModalView : Fragment() {
     val drawSize: DrawSize by param()
+    val xExistDirections: List<ExistDirection> by param()
+    val yExistDirections: List<ExistDirection> by param()
 
     private val model: AnalyticFunctionModel by inject()
 
     private val controller: AnalyticFunctionController by inject()
 
     override val root: Parent = form {
+        fieldset {
+            field("Введите имя функции") {
+                textfield().bind(model.functionNameProperty)
+            }
+        }
         fieldset("Введите формулу") {
             field("формула") {
                 textfield().bind(model.textProperty)
@@ -33,13 +41,19 @@ class AnalyticFunctionModalView : View() {
                 val directions = FXCollections.observableArrayList(
                     Direction.values().map { it.name }
                 )
-                combobox<String>(model.xDirectionProperty, directions)
+                val existDirections = xExistDirections.map {
+                    "Направление ${it.direction.name} и функция ${it.functionName}"
+                }
+                combobox<String>(model.xDirectionProperty, existDirections + directions)
             }
             field("Ось y") {
                 val directions = FXCollections.observableArrayList(
                     Direction.values().map { it.name }
                 )
-                combobox<String>(model.yDirectionProperty, directions)
+                val existDirections = yExistDirections.map {
+                    "Направление ${it.direction.name} и функция ${it.functionName}"
+                }
+                combobox<String>(model.yDirectionProperty, existDirections + directions)
             }
         }
         fieldset("Цвета") {

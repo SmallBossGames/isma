@@ -18,6 +18,7 @@ import java.io.ObjectOutputStream
  * @author kostya05983
  */
 data class Function(
+    val name: String,
     val pointArray: List<Point>,
     val xAxis: AbstractAxis,
     val yAxis: AbstractAxis,

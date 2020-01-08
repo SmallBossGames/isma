@@ -16,11 +16,6 @@ class MainView : View() {
 
     override val root: Parent = vbox {
         menubar {
-            menu("Add") {
-                item("Function").action {
-                    find<ChooseFunctionModalView>().openModal()
-                }
-            }
             menu("Save") {
                 item("Save").action {
 

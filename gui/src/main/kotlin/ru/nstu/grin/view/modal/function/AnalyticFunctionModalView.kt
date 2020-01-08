@@ -1,26 +1,19 @@
-package ru.nstu.grin.view.modal
+package ru.nstu.grin.view.modal.function
 
 import javafx.collections.FXCollections
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.AnalyticFunctionController
-import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.model.view.AnalyticFunctionModel
+import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.view.function.AnalyticFunctionModel
 import tornadofx.*
 
 /**
  * @author Konstantin Volivach
  */
-class AnalyticFunctionModalView : Fragment() {
-    val drawSize: DrawSize by param()
-    val xExistDirections: List<ExistDirection> by param()
-    val yExistDirections: List<ExistDirection> by param()
-
-    private val model: AnalyticFunctionModel by inject()
-
+class AnalyticFunctionModalView : AbstractAddFunctionModal() {
     private val controller: AnalyticFunctionController by inject()
+    private val model: AnalyticFunctionModel by inject()
 
     override val root: Parent = form {
         fieldset {

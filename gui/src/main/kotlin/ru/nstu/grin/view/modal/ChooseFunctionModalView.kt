@@ -4,6 +4,8 @@ import javafx.scene.Parent
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.view.FileEnterFunctionView
+import ru.nstu.grin.view.modal.function.AnalyticFunctionModalView
+import ru.nstu.grin.view.modal.function.ManualEnterFunctionModalView
 import tornadofx.*
 
 /**

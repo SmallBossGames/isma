@@ -1,21 +1,17 @@
-package ru.nstu.grin.model.view
+package ru.nstu.grin.model.view.function
 
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.utils.ColorUtils
-import tornadofx.*
+import tornadofx.ViewModel
+import tornadofx.getValue
+import tornadofx.setValue
 
-class ManualEnterFunctionViewModel : ViewModel() {
+abstract class AbstractAddFunctionModel : ViewModel() {
     var functionNameProperty = SimpleStringProperty()
     var functionName: String by functionNameProperty
-
-    var xPointsProperty = SimpleStringProperty(this, "xPoints", "")
-    var xPoints: String by xPointsProperty
-
-    var yPointsProperty = SimpleStringProperty(this, "yPoints", "")
-    var yPoints: String by yPointsProperty
 
     var xDirectionProperty = SimpleStringProperty(Direction.BOTTOM.name)
     var xDirection: String by xDirectionProperty

@@ -9,6 +9,7 @@ class FunctionReader : Reader<Function> {
 
     override fun deserialize(ois: ObjectInputStream): Function {
         return Function(
+            name = ois.readUTF(),
             pointArray = ois.readObject() as List<ru.nstu.grin.model.Point>,
             xAxis = axisReader.deserialize(ois),
             yAxis = axisReader.deserialize(ois),

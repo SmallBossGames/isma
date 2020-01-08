@@ -5,7 +5,7 @@ import ru.nstu.grin.model.Direction
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.view.AnalyticFunctionModel
+import ru.nstu.grin.model.view.function.AnalyticFunctionModel
 import tornadofx.Controller
 
 class AnalyticFunctionController : Controller() {
@@ -19,6 +19,7 @@ class AnalyticFunctionController : Controller() {
         val yDirection = Direction.valueOf(model.yDirection)
         val deltaMarksGenerator = DeltaMarksGenerator()
         val functionDto = FunctionDTO(
+            name = model.functionName,
             points = pointsBuilder.buildPoints(drawSize, model.text, model.delta),
             xAxis = AxisDTO(
                 color = model.xAxisColor,

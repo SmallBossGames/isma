@@ -5,7 +5,7 @@ import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.view.ManualEnterFunctionViewModel
+import ru.nstu.grin.model.view.function.ManualEnterFunctionViewModel
 import ru.nstu.grin.model.Point
 import tornadofx.Controller
 
@@ -34,6 +34,7 @@ class ManualEnterFunctionController : Controller() {
         val deltaMarksGenerator = DeltaMarksGenerator()
 
         val functionDto = FunctionDTO(
+            name = model.functionName,
             points = points,
             xAxis = AxisDTO(
                 color = model.xAxisColor,

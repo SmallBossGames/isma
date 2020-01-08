@@ -1,29 +1,31 @@
-package ru.nstu.grin.view.modal
+package ru.nstu.grin.view.modal.function
 
 import javafx.collections.FXCollections
 import javafx.scene.Parent
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.controller.ManualEnterFunctionController
-import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.model.view.ManualEnterFunctionViewModel
+import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.view.function.ManualEnterFunctionViewModel
 import tornadofx.*
 
 /**
  * @author Konstantin Volivach
  */
-class ManualEnterFunctionModalView : View() {
-    val drawSize: DrawSize by param()
-    val xExistDirections: List<ExistDirection> by param()
-    val yExistDirections: List<ExistDirection> by param()
-
-    private val model: ManualEnterFunctionViewModel by inject()
+class ManualEnterFunctionModalView : AbstractAddFunctionModal() {
     private val controller: ManualEnterFunctionController by inject()
+    private val model: ManualEnterFunctionViewModel by inject()
 
     override val root: Parent = form {
         fieldset {
             field("Введите имя функции") {
-                textfield().bind(model.functionNameProperty)
+                textfield(model.functionNameProperty) {
+                    validator {
+                        if (it.isNullOrBlank()) {
+                            error("Иия функции не может быть пустым")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
         }
         fieldset("Введите ниже точки") {
@@ -58,16 +60,16 @@ class ManualEnterFunctionModalView : View() {
                 val existDirections = xExistDirections.map {
                     "Направление ${it.direction.name} и функция ${it.functionName}"
                 }
-                combobox<String>(model.xDirectionProperty, directions + existDirections)
+                combobox<String>(model.xDirectionProperty, existDirections + directions)
             }
             field("Ось y") {
                 val directions = FXCollections.observableArrayList(
                     Direction.values().map { it.name }
                 )
-                val existDirections = xExistDirections.map {
+                val existDirections = yExistDirections.map {
                     "Направление ${it.direction.name} и функция ${it.functionName}"
                 }
-                combobox<String>(model.yDirectionProperty, directions + existDirections)
+                combobox<String>(model.yDirectionProperty, existDirections + directions)
             }
         }
         fieldset("Цвета") {
@@ -77,11 +79,16 @@ class ManualEnterFunctionModalView : View() {
             field("Цвет x оси") {
                 colorpicker().bind(model.xAxisColorProperty)
             }
+            field("Цвет дельт оси x") {
+                colorpicker().bind(model.xDelimeterColorProperty)
+            }
             field("Цвет y оси") {
                 colorpicker().bind(model.yAxisColorProperty)
             }
+            field("Цвте дельт оси y") {
+                colorpicker().bind(model.yDelimiterColorProperty)
+            }
         }
-
         button("OK") {
             enableWhen(model.valid)
 

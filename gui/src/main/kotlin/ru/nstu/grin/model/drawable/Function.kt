@@ -28,6 +28,7 @@ data class Function(
         return when (direction) {
             CoordinateDirection.X -> {
                 Function(
+                    name,
                     pointArray.map { Point(it.x * scale, it.y) },
                     xAxis.scale(scale, direction) as AbstractAxis,
                     yAxis,
@@ -36,6 +37,7 @@ data class Function(
             }
             CoordinateDirection.Y -> {
                 Function(
+                    name,
                     pointArray.map { Point(it.x * scale, it.y) },
                     xAxis,
                     yAxis.scale(scale, direction) as AbstractAxis,

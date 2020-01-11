@@ -32,7 +32,7 @@ class ManualEnterFunctionModalView : AbstractAddFunctionModal() {
             field("Точки x") {
                 textfield(model.xPointsProperty) {
                     validator {
-                        if (it == null || !POINT_REGEX.matches(it)) {
+                        if (it == null) {
                             error("Введите цифры в следующем формате 22.3, 23.4")
                         } else {
                             null
@@ -43,7 +43,7 @@ class ManualEnterFunctionModalView : AbstractAddFunctionModal() {
             field("Точки y") {
                 textfield(model.yPointsProperty) {
                     validator {
-                        if (it == null || !POINT_REGEX.matches(it)) {
+                        if (it == null) {
                             error("Введите цифры в следующем формате 22.3, 23.4")
                         } else {
                             null

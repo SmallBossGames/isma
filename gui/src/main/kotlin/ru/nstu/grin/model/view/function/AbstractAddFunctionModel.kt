@@ -11,7 +11,7 @@ import tornadofx.getValue
 import tornadofx.setValue
 
 abstract class AbstractAddFunctionModel : ViewModel() {
-    var functionNameProperty = SimpleStringProperty()
+    var functionNameProperty = SimpleStringProperty(this, "functionName", "")
     var functionName: String by functionNameProperty
 
     var xDirectionProperty = SimpleObjectProperty(ExistDirection(Direction.BOTTOM, null))

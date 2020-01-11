@@ -1,9 +1,9 @@
 package ru.nstu.grin.view.modal.function
 
-import javafx.collections.FXCollections
 import javafx.scene.Parent
 import ru.nstu.grin.controller.ManualEnterFunctionController
 import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.function.ManualEnterFunctionViewModel
 import tornadofx.*
 
@@ -54,22 +54,30 @@ class ManualEnterFunctionModalView : AbstractAddFunctionModal() {
         }
         fieldset("Направления осей") {
             field("Ось x") {
-                val directions = FXCollections.observableArrayList(
-                    Direction.values().map { it.name }
-                )
-                val existDirections = xExistDirections.map {
-                    "Направление ${it.direction.name} и функция ${it.functionName}"
+                val default = Direction.values().map { ExistDirection(it, null) }
+                val existDirections = xExistDirections
+                combobox(model.xDirectionProperty, default + existDirections) {
+                    cellFormat {
+                        text = if (it.functionName != null) {
+                            "Напрвление ${it.direction.name}, функция ${it.functionName}"
+                        } else {
+                            it.direction.name
+                        }
+                    }
                 }
-                combobox<String>(model.xDirectionProperty, existDirections + directions)
             }
             field("Ось y") {
-                val directions = FXCollections.observableArrayList(
-                    Direction.values().map { it.name }
-                )
-                val existDirections = yExistDirections.map {
-                    "Направление ${it.direction.name} и функция ${it.functionName}"
+                val default = Direction.values().map { ExistDirection(it, null) }
+                val existDirections = yExistDirections
+                combobox(model.yDirectionProperty, default + existDirections) {
+                    cellFormat {
+                        text = if (it.functionName != null) {
+                            "Напрвление ${it.direction.name}, функция ${it.functionName}"
+                        } else {
+                            it.direction.name
+                        }
+                    }
                 }
-                combobox<String>(model.yDirectionProperty, existDirections + directions)
             }
         }
         fieldset("Цвета") {

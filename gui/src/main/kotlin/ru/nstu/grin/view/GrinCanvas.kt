@@ -41,14 +41,11 @@ class GrinCanvas : View() {
                             minY = 0.0,
                             maxY = this@canvas.height
                         )
-                        val directions = model.drawings.filterIsInstance<Function>().map {
-                            Pair(it.xAxis, it.yAxis)
+                        val xDirections = model.drawings.filterIsInstance<Function>().map {
+                            ExistDirection(it.xAxis.getDirection(), it.name)
                         }
-                        val xDirections = directions.mapIndexed { index, pair ->
-                            ExistDirection(pair.first.getDirection(), "Функция $index")
-                        }
-                        val yDirections = directions.mapIndexed { index, pair ->
-                            ExistDirection(pair.second.getDirection(), "Функция $index")
+                        val yDirections = model.drawings.filterIsInstance<Function>().map {
+                            ExistDirection(it.yAxis.getDirection(), it.name)
                         }
                         controller.openFunctionModal(drawSize, xDirections, yDirections)
                     }

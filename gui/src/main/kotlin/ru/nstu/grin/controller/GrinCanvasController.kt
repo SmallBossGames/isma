@@ -16,6 +16,7 @@ import ru.nstu.grin.view.modal.ArrowModalView
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.modal.DescriptionModalView
 import tornadofx.*
+import ru.nstu.grin.model.drawable.Function
 
 class GrinCanvasController : Controller() {
     private val model: GrinCanvasModelViewModel by inject()
@@ -28,28 +29,41 @@ class GrinCanvasController : Controller() {
             model.drawings.add(arrow)
         }
         subscribe<AddFunctionEvent> {
+            val functionDTO = it.functionDTO
+            val xAxises = model.drawings.filterIsInstance<Function>()
+                .map { Pair(it.name, it.xAxis) }
+            val yAxises = model.drawings.filterIsInstance<Function>()
+                .map { Pair(it.name, it.yAxis) }
+
             val function = FunctionConverter.merge(
-                it.functionDTO,
+                functionDTO,
                 it.minAxisDelta,
-                pointCoefCalculator.getStartPointCoef(it.functionDTO.xAxis.direction, model.drawings),
-                pointCoefCalculator.getStartPointCoef(it.functionDTO.yAxis.direction, model.drawings)
+                pointCoefCalculator.getStartPointCoef(functionDTO.xAxis.direction.direction, model.drawings),
+                pointCoefCalculator.getStartPointCoef(functionDTO.yAxis.direction.direction, model.drawings),
+                xAxises,
+                yAxises
             )
             model.drawings.add(function)
         }
-        subscribe<AddDescriptionEvent> {
+
+        subscribe<AddDescriptionEvent>
+        {
             val description = DescriptionConverter.convert(it.descriptionDTO)
             model.drawings.add(description)
         }
-        subscribe<ClearCanvasEvent> {
+        subscribe<ClearCanvasEvent>
+        {
             view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
                 SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
             model.drawings.clear()
         }
-        subscribe<SaveEvent> {
+        subscribe<SaveEvent>
+        {
             val writer = DrawWriter(it.file)
             writer.write(model.drawings)
         }
-        subscribe<LoadEvent> {
+        subscribe<LoadEvent>
+        {
             val reader = DrawReader()
             val drawings = reader.read(it.file)
             model.drawings.addAll(drawings)

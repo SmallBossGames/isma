@@ -15,8 +15,6 @@ class AnalyticFunctionController : Controller() {
     fun addFunction(drawSize: DrawSize) {
         val delta = DeltaSizeCalculator().calculateDelta(drawSize)
 
-        val xDirection = Direction.valueOf(model.xDirection)
-        val yDirection = Direction.valueOf(model.yDirection)
         val deltaMarksGenerator = DeltaMarksGenerator()
         val functionDto = FunctionDTO(
             name = model.functionName,
@@ -24,14 +22,14 @@ class AnalyticFunctionController : Controller() {
             xAxis = AxisDTO(
                 color = model.xAxisColor,
                 delimeterColor = model.xDelimiterColor,
-                direction = xDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, xDirection)
+                direction = model.xDirection,
+                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction)
             ),
             yAxis = AxisDTO(
                 color = model.yAxisColor,
                 delimeterColor = model.yDelimeterColor,
-                direction = yDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, yDirection)
+                direction = model.yDirection,
+                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction)
             ),
             functionColor = model.functionColor
         )

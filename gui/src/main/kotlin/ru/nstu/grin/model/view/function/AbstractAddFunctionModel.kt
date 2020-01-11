@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.utils.ColorUtils
 import tornadofx.ViewModel
 import tornadofx.getValue
@@ -13,11 +14,11 @@ abstract class AbstractAddFunctionModel : ViewModel() {
     var functionNameProperty = SimpleStringProperty()
     var functionName: String by functionNameProperty
 
-    var xDirectionProperty = SimpleStringProperty(Direction.BOTTOM.name)
-    var xDirection: String by xDirectionProperty
+    var xDirectionProperty = SimpleObjectProperty(ExistDirection(Direction.BOTTOM, null))
+    var xDirection: ExistDirection by xDirectionProperty
 
-    var yDirectionProperty = SimpleStringProperty(Direction.LEFT.name)
-    var yDirection: String by yDirectionProperty
+    var yDirectionProperty = SimpleObjectProperty(ExistDirection(Direction.LEFT, null))
+    var yDirection: ExistDirection by yDirectionProperty
 
     var functionColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var functionColor by functionColorProperty

@@ -1,39 +1,26 @@
-package ru.nstu.grin.controller
+package ru.nstu.grin.controller.function
 
+import ru.nstu.grin.controller.DeltaMarksGenerator
+import ru.nstu.grin.controller.DeltaSizeCalculator
+import ru.nstu.grin.controller.PointsBuilder
 import ru.nstu.grin.controller.events.AddFunctionEvent
 import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.view.function.ManualEnterFunctionViewModel
-import ru.nstu.grin.model.Point
+import ru.nstu.grin.model.view.function.AnalyticFunctionModel
 import tornadofx.Controller
 
-/**
- * @author Konstantin Volivach
- */
-class ManualEnterFunctionController : Controller() {
-    private val model: ManualEnterFunctionViewModel by inject()
+class AnalyticFunctionController : Controller() {
+    private val model: AnalyticFunctionModel by inject()
+    private val pointsBuilder = PointsBuilder()
 
-    private companion object {
-        const val DELIMITER = ","
-    }
-
-    fun parsePoints(): List<Point> {
-        val x = model.xPoints.split(DELIMITER)
-        val y = model.yPoints.split(DELIMITER)
-        return x.zip(y) { a, b ->
-            Point(a.toDouble(), b.toDouble())
-        }
-    }
-
-    fun addFunction(points: List<Point>, drawSize: DrawSize) {
+    fun addFunction(drawSize: DrawSize) {
         val delta = DeltaSizeCalculator().calculateDelta(drawSize)
-        val deltaMarksGenerator = DeltaMarksGenerator()
 
+        val deltaMarksGenerator = DeltaMarksGenerator()
         val functionDto = FunctionDTO(
             name = model.functionName,
-            points = points,
+            points = pointsBuilder.buildPoints(drawSize, model.text, model.delta),
             xAxis = AxisDTO(
                 color = model.xAxisColor,
                 delimeterColor = model.xDelimiterColor,

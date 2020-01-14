@@ -3,8 +3,8 @@ package ru.nstu.grin.view.modal
 import javafx.scene.Parent
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.view.FileEnterFunctionView
 import ru.nstu.grin.view.modal.function.AnalyticFunctionModalView
+import ru.nstu.grin.view.modal.function.FileFunctionModalView
 import ru.nstu.grin.view.modal.function.ManualEnterFunctionModalView
 import tornadofx.*
 
@@ -19,7 +19,13 @@ class ChooseFunctionModalView : Fragment() {
     override val root: Parent = vbox {
         button("Добавить функцию из файла") {
             action {
-                find<FileEnterFunctionView>().openModal()
+                find<FileFunctionModalView>(
+                    mapOf(
+                        FileFunctionModalView::drawSize to drawSize,
+                        FileFunctionModalView::xExistDirections to xExistDirections,
+                        FileFunctionModalView::yExistDirections to yExistDirections
+                    )
+                ).openModal()
                 close()
             }
         }

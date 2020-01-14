@@ -15,7 +15,7 @@ class FileFunctionModalView : AbstractAddFunctionModal() {
 
     override val root: Parent = form {
         fieldset {
-            field("Введите имя функции") {
+            field("Введите название группы функций") {
                 textfield().bind(model.functionNameProperty)
             }
             field("Выберите файл") {
@@ -91,8 +91,7 @@ class FileFunctionModalView : AbstractAddFunctionModal() {
                     error("Необходимо выбрать файл")
                     return@action
                 }
-
-                //                controller.addFunction(drawSize)
+                controller.loadFunctions(drawSize)
                 close()
             }
         }

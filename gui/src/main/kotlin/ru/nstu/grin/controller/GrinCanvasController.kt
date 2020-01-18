@@ -17,6 +17,7 @@ import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.modal.DescriptionModalView
 import tornadofx.*
 import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.view.ChooseFunctionViewModel
 
 class GrinCanvasController : Controller() {
     private val model: GrinCanvasModelViewModel by inject()
@@ -77,9 +78,9 @@ class GrinCanvasController : Controller() {
     ) {
         find<ChooseFunctionModalView>(
             mapOf(
-                ChooseFunctionModalView::drawSize to drawSize,
-                ChooseFunctionModalView::xExistDirections to xExistDirection,
-                ChooseFunctionModalView::yExistDirections to yExistDirection
+                ChooseFunctionViewModel::drawSize to drawSize,
+                ChooseFunctionViewModel::xExistDirections to xExistDirection,
+                ChooseFunctionViewModel::yExistDirections to yExistDirection
             )
         ).openModal()
     }

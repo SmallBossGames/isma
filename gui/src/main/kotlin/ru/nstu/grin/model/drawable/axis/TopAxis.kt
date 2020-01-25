@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 import kotlin.math.min
@@ -26,6 +27,32 @@ data class TopAxis(
 
     override fun isOnIt(x: Double, y: Double): Boolean {
         return y < WIDTH_AXIS + startPoint && y > startPoint
+    }
+
+    override fun changeDeltas(value: Double, direction: DraggedDirection): AbstractAxis {
+        return when (direction) {
+            DraggedDirection.LEFT -> {
+                TopAxis(
+                    startPoint,
+                    minDelta,
+                    deltaMarks.map { it + value },
+                    backGroundColor,
+                    delimiterColor
+                )
+            }
+            DraggedDirection.RIGHT -> {
+                TopAxis(
+                    startPoint,
+                    minDelta,
+                    deltaMarks.map { it - value },
+                    backGroundColor,
+                    delimiterColor
+                )
+            }
+            DraggedDirection.UP, DraggedDirection.DOWN, DraggedDirection.UNDEFINED -> {
+                this
+            }
+        }
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {

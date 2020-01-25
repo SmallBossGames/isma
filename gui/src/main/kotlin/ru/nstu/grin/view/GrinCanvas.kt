@@ -34,31 +34,7 @@ class GrinCanvas : View() {
 
             onScroll = ScalableScrollHandler(model, controller)
 
-            onMouseDragged = object : EventHandler<MouseEvent> {
-                private var previousX: Double? = null
-                private var previousY: Double? = null
-
-                override fun handle(event: MouseEvent) {
-                    val currentPreviousX = previousX
-                    val currentPreviousY = previousY
-                    when {
-                        currentPreviousX != null && currentPreviousX < event.x -> {
-                            println("Right")
-                        }
-                        currentPreviousX != null && currentPreviousX > event.x -> {
-                            println("Left")
-                        }
-                        currentPreviousY != null && currentPreviousY < event.y -> {
-                            println("Down")
-                        }
-                        currentPreviousY != null && currentPreviousY > event.y -> {
-                            println("Up")
-                        }
-                    }
-                    previousX = event.x
-                    previousY = event.y
-                }
-            }
+            onMouseDragged = MoveAxisHandler(model, controller)
 
             setOnContextMenuRequested {
                 withCoordContextmenu {

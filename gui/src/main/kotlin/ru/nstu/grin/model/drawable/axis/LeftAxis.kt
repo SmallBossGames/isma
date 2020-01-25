@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
 
@@ -25,6 +26,32 @@ data class LeftAxis(
 
     override fun isOnIt(x: Double, y: Double): Boolean {
         return x < WIDTH_AXIS + startPoint && x > startPoint
+    }
+
+    override fun changeDeltas(value: Double, direction: DraggedDirection): AbstractAxis {
+        return when (direction) {
+            DraggedDirection.DOWN -> {
+                LeftAxis(
+                    startPoint,
+                    minDelta,
+                    deltaMarks.map { it + value },
+                    backGroundColor,
+                    delimiterColor
+                )
+            }
+            DraggedDirection.UP -> {
+                LeftAxis(
+                    startPoint,
+                    minDelta,
+                    deltaMarks.map { it - value },
+                    backGroundColor,
+                    delimiterColor
+                )
+            }
+            DraggedDirection.UNDEFINED, DraggedDirection.LEFT, DraggedDirection.RIGHT -> {
+                this
+            }
+        }
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {

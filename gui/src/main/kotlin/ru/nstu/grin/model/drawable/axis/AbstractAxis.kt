@@ -5,8 +5,8 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.Direction
+import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
-import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
 
 abstract class AbstractAxis(
@@ -30,6 +30,8 @@ abstract class AbstractAxis(
     protected abstract fun drawDeltaMarks(graphicsContext: GraphicsContext)
 
     abstract fun getDirection(): Direction
+
+    abstract fun changeDeltas(value: Double, direction: DraggedDirection): AbstractAxis
 
     override fun serialize(oos: ObjectOutputStream) {
         oos.writeObject(getDirection())

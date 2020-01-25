@@ -7,6 +7,7 @@ import javafx.scene.shape.Shape
 import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
+import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.Point
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
@@ -42,6 +43,52 @@ data class Function(
                     xAxis,
                     yAxis.scale(scale, direction) as AbstractAxis,
                     functionColor
+                )
+            }
+        }
+    }
+
+    fun moveFunctionOnPlot(value: Double, direction: DraggedDirection): Drawable {
+        return when (direction) {
+            DraggedDirection.LEFT -> {
+                Function(
+                    name,
+                    pointArray.map { Point(it.x - value, it.y) },
+                    xAxis.changeDeltas(value, direction),
+                    yAxis,
+                    functionColor
+                )
+            }
+            DraggedDirection.RIGHT -> {
+                Function(
+                    name,
+                    pointArray.map { Point(it.x + value, it.y) },
+                    xAxis.changeDeltas(value, direction),
+                    yAxis,
+                    functionColor
+                )
+            }
+            DraggedDirection.UP -> {
+                Function(
+                    name,
+                    pointArray.map { Point(it.x, it.y + value) },
+                    xAxis,
+                    yAxis.changeDeltas(value, direction),
+                    functionColor
+                )
+            }
+            DraggedDirection.DOWN -> {
+                Function(
+                    name,
+                    pointArray.map { Point(it.x, it.y - value) },
+                    xAxis,
+                    yAxis.changeDeltas(value, direction),
+                    functionColor
+                )
+            }
+            DraggedDirection.UNDEFINED -> {
+                Function(
+                    name, pointArray, xAxis, yAxis, functionColor
                 )
             }
         }

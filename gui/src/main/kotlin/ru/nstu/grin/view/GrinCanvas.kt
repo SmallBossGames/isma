@@ -1,11 +1,13 @@
 package ru.nstu.grin.view
 
+import javafx.event.EventHandler
 import javafx.event.EventTarget
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Priority
 import ru.nstu.grin.controller.GrinCanvasController
 import ru.nstu.grin.extensions.drawListener
@@ -31,6 +33,32 @@ class GrinCanvas : View() {
             drawListener(model.drawingsProperty, graphicsContext2D)
 
             onScroll = ScalableScrollHandler(model, controller)
+
+            onMouseDragged = object : EventHandler<MouseEvent> {
+                private var previousX: Double? = null
+                private var previousY: Double? = null
+
+                override fun handle(event: MouseEvent) {
+                    val currentPreviousX = previousX
+                    val currentPreviousY = previousY
+                    when {
+                        currentPreviousX != null && currentPreviousX < event.x -> {
+                            println("Right")
+                        }
+                        currentPreviousX != null && currentPreviousX > event.x -> {
+                            println("Left")
+                        }
+                        currentPreviousY != null && currentPreviousY < event.y -> {
+                            println("Down")
+                        }
+                        currentPreviousY != null && currentPreviousY > event.y -> {
+                            println("Up")
+                        }
+                    }
+                    previousX = event.x
+                    previousY = event.y
+                }
+            }
 
             setOnContextMenuRequested {
                 withCoordContextmenu {

@@ -14,7 +14,9 @@ import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.model.view.GrinCanvasModelViewModel
+import ru.nstu.grin.settings.SettingProvider
 import tornadofx.*
 
 class GrinCanvas : View() {
@@ -35,6 +37,19 @@ class GrinCanvas : View() {
             onScroll = ScalableScrollHandler(model, controller)
 
             onMouseDragged = MoveAxisHandler(model, controller)
+
+            onMouseClicked = object : EventHandler<MouseEvent> {
+                override fun handle(event: MouseEvent) {
+                    val functions = model.drawings.filterIsInstance<Function>()
+                    for (function in functions) {
+                        for (point in function.pointArray) {
+                            if (point.isNearBy(event.x + AbstractAxis.WIDTH_AXIS, SettingProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS)) {
+                                println("Show modal")
+                            }
+                        }
+                    }
+                }
+            }
 
             setOnContextMenuRequested {
                 withCoordContextmenu {

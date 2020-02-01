@@ -15,23 +15,17 @@ class MainView : View() {
 
     override val root: Parent = vbox {
         menubar {
-            menu("Save") {
-                item("Save").action {
-                }
+            menu("File") {
                 item("Save as").action {
                     val file = chooseFile("Файл", arrayOf(), FileChooserMode.Save).first()
-
                     fire(SaveEvent(file))
                 }
-            }
-            menu("load") {
-                item("load").action {
+                item("Load").action {
                     val file = chooseFile("Файл", arrayOf(), FileChooserMode.Single).first()
-
                     fire(LoadEvent(file))
                 }
             }
-            menu("Clear") {
+            menu("Canvas") {
                 item("Clear all").action {
                     fire(ClearCanvasEvent())
                 }

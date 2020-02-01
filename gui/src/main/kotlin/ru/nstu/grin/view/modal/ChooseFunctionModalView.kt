@@ -3,7 +3,6 @@ package ru.nstu.grin.view.modal
 import javafx.scene.Parent
 import ru.nstu.grin.controller.ChooseFunctionController
 import ru.nstu.grin.model.ChooseFunctionWay
-import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.view.ChooseFunctionViewModel
 import tornadofx.*
 

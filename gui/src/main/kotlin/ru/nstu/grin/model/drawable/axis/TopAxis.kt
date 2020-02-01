@@ -7,7 +7,6 @@ import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.settings.SettingProvider
-import kotlin.math.min
 
 data class TopAxis(
     private val startPoint: Double,

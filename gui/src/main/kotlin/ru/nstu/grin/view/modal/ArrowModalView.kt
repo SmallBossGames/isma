@@ -33,6 +33,5 @@ class ArrowModalView : Fragment() {
                 close()
             }
         }
-
     }
 }

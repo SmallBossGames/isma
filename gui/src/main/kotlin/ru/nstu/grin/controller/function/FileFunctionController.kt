@@ -19,10 +19,6 @@ import java.io.FileInputStream
 class FileFunctionController : Controller() {
     private val model: FileFunctionViewModel by inject()
 
-    private companion object {
-        const val DELIMITER = ","
-    }
-
     fun loadFunctions(drawSize: DrawSize) {
         val fileContent = readFile()
         val points = loadAllPoints(fileContent)
@@ -72,5 +68,9 @@ class FileFunctionController : Controller() {
         val bufferedReader = BufferedInputStream(inputStream)
         val array = bufferedReader.readBytes()
         return String(array)
+    }
+
+    private companion object {
+        const val DELIMITER = ","
     }
 }

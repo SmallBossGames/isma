@@ -5,12 +5,13 @@ import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 
 object FunctionConverter {
-    fun merge(source: FunctionDTO,
-              minDelta: Double,
-              xStartPoint: Double,
-              yStartPoint: Double,
-              xAxises: List<Pair<String, AbstractAxis>>,
-              yAxises: List<Pair<String, AbstractAxis>>
+    fun merge(
+        source: FunctionDTO,
+        minDelta: Double,
+        xStartPoint: Double,
+        yStartPoint: Double,
+        xAxises: List<Pair<String, AbstractAxis>>,
+        yAxises: List<Pair<String, AbstractAxis>>
     ): Function {
         val xAxis = source.xAxis.direction.functionName?.let { name ->
             xAxises.filter { it.first == name }.first().second

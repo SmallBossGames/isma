@@ -43,7 +43,11 @@ class GrinCanvas : View() {
                     val functions = model.drawings.filterIsInstance<Function>()
                     for (function in functions) {
                         for (point in function.pointArray) {
-                            if (point.isNearBy(event.x + AbstractAxis.WIDTH_AXIS, SettingProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS)) {
+                            if (point.isNearBy(
+                                    event.x + AbstractAxis.WIDTH_AXIS,
+                                    SettingProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS
+                                )
+                            ) {
                                 println("Show modal")
                             }
                         }
@@ -102,4 +106,3 @@ class GrinCanvas : View() {
         private const val HEIGHT = 800.0
     }
 }
-

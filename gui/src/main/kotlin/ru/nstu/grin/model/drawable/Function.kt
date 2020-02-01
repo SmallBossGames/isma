@@ -12,7 +12,6 @@ import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.Point
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.settings.SettingProvider
-import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
 
 /**

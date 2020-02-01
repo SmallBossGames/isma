@@ -6,7 +6,6 @@ import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Drawable
-import java.io.ByteArrayOutputStream
 import java.io.ObjectOutputStream
 
 /**
@@ -47,4 +46,3 @@ data class Description(
         oos.write(color.toByteArray())
     }
 }
-

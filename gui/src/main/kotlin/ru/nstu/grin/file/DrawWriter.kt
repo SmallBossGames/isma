@@ -42,6 +42,5 @@ class DrawWriter(private val file: File) {
                 }
             }
         }
-
     }
 }

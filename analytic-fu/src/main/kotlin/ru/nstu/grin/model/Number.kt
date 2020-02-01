@@ -6,5 +6,4 @@ data class Number(
     override fun calculate(x: Double): Double {
         return x
     }
-
 }

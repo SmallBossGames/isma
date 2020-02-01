@@ -4,7 +4,6 @@ import javafx.scene.Parent
 import ru.nstu.grin.controller.events.ClearCanvasEvent
 import ru.nstu.grin.controller.events.LoadEvent
 import ru.nstu.grin.controller.events.SaveEvent
-import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.GrinCanvas
 import tornadofx.*
 
@@ -18,7 +17,6 @@ class MainView : View() {
         menubar {
             menu("Save") {
                 item("Save").action {
-
                 }
                 item("Save as").action {
                     val file = chooseFile("Файл", arrayOf(), FileChooserMode.Save).first()

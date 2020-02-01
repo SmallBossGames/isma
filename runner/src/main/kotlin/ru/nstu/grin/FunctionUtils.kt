@@ -4,11 +4,11 @@ import java.util.function.Function
 
 object FunctionUtils {
     fun drawByFunction(min: Double, max: Double, step: Double, func: Function<Double, Double>): List<Double> {
-        var current = min;
+        var current = min
         val results = mutableListOf<Double>()
         while (current < max) {
             results.add(func.apply(current))
-            current += step;
+            current += step
         }
         return results
     }

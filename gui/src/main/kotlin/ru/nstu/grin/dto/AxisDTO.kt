@@ -1,7 +1,6 @@
 package ru.nstu.grin.dto
 
 import javafx.scene.paint.Color
-import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.ExistDirection
 
 data class AxisDTO(

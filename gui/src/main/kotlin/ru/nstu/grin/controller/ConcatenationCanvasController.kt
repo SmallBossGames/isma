@@ -9,9 +9,9 @@ import ru.nstu.grin.file.DrawReader
 import ru.nstu.grin.file.DrawWriter
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.model.view.GrinCanvasModelViewModel
+import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingProvider
-import ru.nstu.grin.view.GrinCanvas
+import ru.nstu.grin.view.ConcatenationCanvas
 import ru.nstu.grin.view.modal.ArrowModalView
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.modal.DescriptionModalView
@@ -19,9 +19,9 @@ import tornadofx.*
 import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.view.ChooseFunctionViewModel
 
-class GrinCanvasController : Controller() {
-    private val model: GrinCanvasModelViewModel by inject()
-    private val view: GrinCanvas by inject()
+class ConcatenationCanvasController : Controller() {
+    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val view: ConcatenationCanvas by inject()
     private val pointCoefCalculator = PointCoefCalculator()
 
     init {

@@ -2,14 +2,14 @@ package ru.nstu.grin.view
 
 import javafx.event.EventHandler
 import javafx.scene.input.ScrollEvent
-import ru.nstu.grin.controller.GrinCanvasController
+import ru.nstu.grin.controller.ConcatenationCanvasController
 import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.drawable.Function
-import ru.nstu.grin.model.view.GrinCanvasModelViewModel
+import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 
 class ScalableScrollHandler(
-    val model: GrinCanvasModelViewModel,
-    val controller: GrinCanvasController
+    val model: ConcatenationCanvasModelViewModel,
+    val controller: ConcatenationCanvasController
 ) : EventHandler<ScrollEvent> {
     override fun handle(event: ScrollEvent) {
         if (event.deltaY == 0.0) return

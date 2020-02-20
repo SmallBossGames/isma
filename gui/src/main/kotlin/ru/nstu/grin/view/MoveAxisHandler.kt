@@ -2,14 +2,14 @@ package ru.nstu.grin.view
 
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
-import ru.nstu.grin.controller.GrinCanvasController
+import ru.nstu.grin.controller.ConcatenationCanvasController
 import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.drawable.Function
-import ru.nstu.grin.model.view.GrinCanvasModelViewModel
+import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 
 class MoveAxisHandler(
-    val model: GrinCanvasModelViewModel,
-    val controller: GrinCanvasController
+    val model: ConcatenationCanvasModelViewModel,
+    val controller: ConcatenationCanvasController
 ) : EventHandler<MouseEvent> {
     private var previousX: Double? = null
     private var previousY: Double? = null

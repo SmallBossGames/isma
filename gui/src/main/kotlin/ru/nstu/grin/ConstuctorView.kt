@@ -4,14 +4,14 @@ import javafx.scene.Parent
 import ru.nstu.grin.controller.events.ClearCanvasEvent
 import ru.nstu.grin.controller.events.LoadEvent
 import ru.nstu.grin.controller.events.SaveEvent
-import ru.nstu.grin.view.GrinCanvas
+import ru.nstu.grin.view.ConcatenationCanvas
 import tornadofx.*
 
 /**
  * @author kostya05983
  * MainView contains all components for grin graphic builder
  */
-class MainView : View() {
+class ConstuctorView : View() {
 
     override val root: Parent = vbox {
         menubar {
@@ -31,6 +31,6 @@ class MainView : View() {
                 }
             }
         }
-        add<GrinCanvas>()
+        add<ConcatenationCanvas>()
     }
 }

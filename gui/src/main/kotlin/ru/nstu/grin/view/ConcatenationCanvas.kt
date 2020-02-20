@@ -9,19 +9,19 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Priority
-import ru.nstu.grin.controller.GrinCanvasController
+import ru.nstu.grin.controller.ConcatenationCanvasController
 import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
-import ru.nstu.grin.model.view.GrinCanvasModelViewModel
+import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingProvider
 import tornadofx.*
 
-class GrinCanvas : View() {
-    private val model: GrinCanvasModelViewModel by inject()
-    private val controller: GrinCanvasController by inject()
+class ConcatenationCanvas : View() {
+    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val controller: ConcatenationCanvasController by inject()
     private var outX = 0.0
     private var outY = 0.0
     lateinit var canvas: Canvas

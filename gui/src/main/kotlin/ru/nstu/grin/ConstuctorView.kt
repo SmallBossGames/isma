@@ -1,10 +1,14 @@
 package ru.nstu.grin
 
 import javafx.scene.Parent
+import javafx.scene.layout.Priority
+import javafx.stage.StageStyle
 import ru.nstu.grin.controller.events.ClearCanvasEvent
 import ru.nstu.grin.controller.events.LoadEvent
 import ru.nstu.grin.controller.events.SaveEvent
 import ru.nstu.grin.view.ConcatenationCanvas
+import ru.nstu.grin.view.ConcatenationView
+import ru.nstu.grin.view.modal.ArrowModalView
 import tornadofx.*
 
 /**
@@ -13,24 +17,32 @@ import tornadofx.*
  */
 class ConstuctorView : View() {
 
-    override val root: Parent = vbox {
-        menubar {
-            menu("File") {
-                item("Save as").action {
-                    val file = chooseFile("Файл", arrayOf(), FileChooserMode.Save).first()
-                    fire(SaveEvent(file))
-                }
-                item("Load").action {
-                    val file = chooseFile("Файл", arrayOf(), FileChooserMode.Single).first()
-                    fire(LoadEvent(file))
-                }
-            }
-            menu("Canvas") {
-                item("Clear all").action {
-                    fire(ClearCanvasEvent())
-                }
+    override val root: Parent = hbox {
+        imageview("concatenation_chart.png") {
+            vgrow = Priority.ALWAYS
+            fitHeight = 300.0
+            fitWidth = 300.0
+            shortpress {
+                find<ConcatenationView>(
+                ).openWindow(
+                    stageStyle = StageStyle.DECORATED
+                )
             }
         }
-        add<ConcatenationCanvas>()
+        imageview("usual_chart.png") {
+            vgrow = Priority.ALWAYS
+            fitHeight = 300.0
+            fitWidth = 300.0
+            shortpress {
+            }
+        }
+        imageview("3d_chart.png") {
+            vgrow = Priority.ALWAYS
+            fitHeight = 300.0
+            fitWidth = 300.0
+            shortpress {
+
+            }
+        }
     }
 }

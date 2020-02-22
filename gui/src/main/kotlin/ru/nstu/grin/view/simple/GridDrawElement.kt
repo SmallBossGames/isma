@@ -4,9 +4,12 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.view.ChainDrawElement
 
-class GridDrawElement : ChainDrawElement {
+class GridDrawElement(
+    private val size: Int,
+    private val color: Color
+) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
-        context.stroke = Color.valueOf("BBBBBB")
+        context.stroke = color
 
         val middleWidth = context.canvas.width / 2
         val middleHeight = context.canvas.height / 2
@@ -18,19 +21,19 @@ class GridDrawElement : ChainDrawElement {
             while (currentY > 0) {
                 context.strokeLine(
                     currentX,
-                    currentY - DEFAULT_KUBE_SIZE,
-                    currentX - DEFAULT_KUBE_SIZE,
-                    currentY - DEFAULT_KUBE_SIZE
+                    currentY - size,
+                    currentX - size,
+                    currentY - size
                 )
                 context.strokeLine(
-                    currentX - DEFAULT_KUBE_SIZE,
-                    currentY - DEFAULT_KUBE_SIZE,
-                    currentX - DEFAULT_KUBE_SIZE,
+                    currentX - size,
+                    currentY - size,
+                    currentX - size,
                     currentY
                 )
-                currentY -= DEFAULT_KUBE_SIZE
+                currentY -= size
             }
-            currentX -= DEFAULT_KUBE_SIZE
+            currentX -= size
         }
 
         //first quadrant
@@ -40,19 +43,19 @@ class GridDrawElement : ChainDrawElement {
             while (currentY > 0) {
                 context.strokeLine(
                     currentX,
-                    currentY - DEFAULT_KUBE_SIZE,
-                    currentX + DEFAULT_KUBE_SIZE,
-                    currentY - DEFAULT_KUBE_SIZE
+                    currentY - size,
+                    currentX + size,
+                    currentY - size
                 )
                 context.strokeLine(
-                    currentX + DEFAULT_KUBE_SIZE,
-                    currentY - DEFAULT_KUBE_SIZE,
-                    currentX + DEFAULT_KUBE_SIZE,
+                    currentX + size,
+                    currentY - size,
+                    currentX + size,
                     currentY
                 )
-                currentY -= DEFAULT_KUBE_SIZE
+                currentY -= size
             }
-            currentX += DEFAULT_KUBE_SIZE
+            currentX += size
         }
 
         //third quadrant
@@ -62,19 +65,19 @@ class GridDrawElement : ChainDrawElement {
             while (currentY < context.canvas.height) {
                 context.strokeLine(
                     currentX,
-                    currentY + DEFAULT_KUBE_SIZE,
-                    currentX - DEFAULT_KUBE_SIZE,
-                    currentY + DEFAULT_KUBE_SIZE
+                    currentY + size,
+                    currentX - size,
+                    currentY + size
                 )
                 context.strokeLine(
-                    currentX - DEFAULT_KUBE_SIZE,
-                    currentY + DEFAULT_KUBE_SIZE,
-                    currentX - DEFAULT_KUBE_SIZE,
+                    currentX - size,
+                    currentY + size,
+                    currentX - size,
                     currentY
                 )
-                currentY += DEFAULT_KUBE_SIZE
+                currentY += size
             }
-            currentX -= DEFAULT_KUBE_SIZE
+            currentX -= size
         }
 
         // fourth
@@ -84,23 +87,19 @@ class GridDrawElement : ChainDrawElement {
             while (currentY < context.canvas.height) {
                 context.strokeLine(
                     currentX,
-                    currentY + DEFAULT_KUBE_SIZE,
-                    currentX + DEFAULT_KUBE_SIZE,
-                    currentY + DEFAULT_KUBE_SIZE
+                    currentY + size,
+                    currentX + size,
+                    currentY + size
                 )
                 context.strokeLine(
-                    currentX + DEFAULT_KUBE_SIZE,
-                    currentY + DEFAULT_KUBE_SIZE,
-                    currentX + DEFAULT_KUBE_SIZE,
+                    currentX + size,
+                    currentY + size,
+                    currentX + size,
                     currentY
                 )
-                currentY += DEFAULT_KUBE_SIZE
+                currentY += size
             }
-            currentX += DEFAULT_KUBE_SIZE
+            currentX += size
         }
-    }
-
-    private companion object {
-        const val DEFAULT_KUBE_SIZE = 120
     }
 }

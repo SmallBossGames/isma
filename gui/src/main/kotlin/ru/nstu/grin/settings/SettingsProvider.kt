@@ -1,6 +1,6 @@
 package ru.nstu.grin.settings
 
-object SettingProvider {
+object SettingsProvider {
     private const val CANVAS_WIDTH = 1200.0
     private const val CANVAS_HEIGHT = 800.0
 

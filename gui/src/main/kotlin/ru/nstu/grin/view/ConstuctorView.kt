@@ -1,4 +1,4 @@
-package ru.nstu.grin
+package ru.nstu.grin.view
 
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
@@ -23,8 +23,7 @@ class ConstuctorView : View() {
             fitHeight = 300.0
             fitWidth = 300.0
             shortpress {
-                find<ConcatenationView>(
-                ).openWindow(
+                find<ConcatenationView>().openWindow(
                     stageStyle = StageStyle.DECORATED
                 )
             }
@@ -34,6 +33,9 @@ class ConstuctorView : View() {
             fitHeight = 300.0
             fitWidth = 300.0
             shortpress {
+                find<SimpleCanvasView>().openWindow(
+                    stageStyle = StageStyle.DECORATED
+                )
             }
         }
         imageview("3d_chart.png") {
@@ -41,7 +43,9 @@ class ConstuctorView : View() {
             fitHeight = 300.0
             fitWidth = 300.0
             shortpress {
-
+                find<KubeCanvasView>().openWindow(
+                    stageStyle = StageStyle.DECORATED
+                )
             }
         }
     }

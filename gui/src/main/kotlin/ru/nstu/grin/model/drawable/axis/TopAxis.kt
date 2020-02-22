@@ -6,7 +6,7 @@ import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
-import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.settings.SettingsProvider
 
 data class TopAxis(
     private val startPoint: Double,
@@ -56,13 +56,13 @@ data class TopAxis(
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
-        graphicsContext.fillRect(0.0, startPoint, SettingProvider.getCanvasWidth(), WIDTH_AXIS)
+        graphicsContext.fillRect(0.0, startPoint, SettingsProvider.getCanvasWidth(), WIDTH_AXIS)
     }
 
     override fun drawMinorDelimiters(graphicsContext: GraphicsContext) {
         graphicsContext.stroke = delimiterColor
         var current = 0.0
-        while (current < SettingProvider.getCanvasWidth()) {
+        while (current < SettingsProvider.getCanvasWidth()) {
             graphicsContext.strokeLine(
                 current,
                 startPoint + WIDTH_AXIS - WIDTH_DELIMITER,
@@ -76,7 +76,7 @@ data class TopAxis(
     override fun drawDeltaMarks(graphicsContext: GraphicsContext) {
         var current = 0.0
         var i = 0
-        while (current < SettingProvider.getCanvasWidth() && i < deltaMarks.size) {
+        while (current < SettingsProvider.getCanvasWidth() && i < deltaMarks.size) {
             graphicsContext.strokeText(
                 "%.2f".format(deltaMarks[i]), current,
                 TEXT_ALIGN + startPoint

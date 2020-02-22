@@ -11,7 +11,7 @@ import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.Point
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
-import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.settings.SettingsProvider
 import java.io.ObjectOutputStream
 
 /**
@@ -97,7 +97,7 @@ data class Function(
         context.strokePolyline(
             pointArray.map { it.x + AbstractAxis.WIDTH_AXIS }.toDoubleArray(),
             pointArray.map {
-                SettingProvider.getCanvasHeight() - it.y - AbstractAxis.WIDTH_AXIS
+                SettingsProvider.getCanvasHeight() - it.y - AbstractAxis.WIDTH_AXIS
             }.toDoubleArray(),
             pointArray.size
         )

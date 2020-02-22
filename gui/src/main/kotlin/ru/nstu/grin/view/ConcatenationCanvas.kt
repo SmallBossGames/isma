@@ -16,7 +16,7 @@ import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
-import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.settings.SettingsProvider
 import tornadofx.*
 
 class ConcatenationCanvas : View() {
@@ -28,7 +28,7 @@ class ConcatenationCanvas : View() {
 
     override val root: Parent = stackpane {
         println(controller.params)
-        canvas(WIDTH, HEIGHT) {
+        canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
             canvas = this
@@ -45,7 +45,7 @@ class ConcatenationCanvas : View() {
                         for (point in function.pointArray) {
                             if (point.isNearBy(
                                     event.x + AbstractAxis.WIDTH_AXIS,
-                                    SettingProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS
+                                    SettingsProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS
                                 )
                             ) {
                                 println("Show modal")
@@ -99,10 +99,5 @@ class ConcatenationCanvas : View() {
             }
         }
         return menu
-    }
-
-    private companion object {
-        private const val WIDTH = 1200.0
-        private const val HEIGHT = 800.0
     }
 }

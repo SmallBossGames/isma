@@ -6,7 +6,7 @@ import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
-import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.settings.SettingsProvider
 
 /**
  * @author Konstantin Volivach
@@ -54,16 +54,16 @@ data class BottomAxis(
     }
 
     override fun isOnIt(x: Double, y: Double): Boolean {
-        return y > SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint &&
-            y < SettingProvider.getCanvasHeight() - startPoint
+        return y > SettingsProvider.getCanvasHeight() - WIDTH_AXIS - startPoint &&
+            y < SettingsProvider.getCanvasHeight() - startPoint
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
         graphicsContext.fillRect(
             0.0,
-            SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint,
-            SettingProvider.getCanvasWidth(),
+            SettingsProvider.getCanvasHeight() - WIDTH_AXIS - startPoint,
+            SettingsProvider.getCanvasWidth(),
             WIDTH_AXIS
         )
     }
@@ -72,12 +72,12 @@ data class BottomAxis(
         graphicsContext.stroke = delimiterColor
 
         var current = WIDTH_AXIS
-        while (current < SettingProvider.getCanvasWidth()) {
+        while (current < SettingsProvider.getCanvasWidth()) {
             graphicsContext.strokeLine(
                 current,
-                SettingProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER) - startPoint,
+                SettingsProvider.getCanvasHeight() - (WIDTH_AXIS - WIDTH_DELIMITER) - startPoint,
                 current,
-                SettingProvider.getCanvasHeight() - WIDTH_AXIS - startPoint
+                SettingsProvider.getCanvasHeight() - WIDTH_AXIS - startPoint
             )
             current += minDelta
         }
@@ -86,10 +86,10 @@ data class BottomAxis(
     override fun drawDeltaMarks(graphicsContext: GraphicsContext) {
         var current = 0.0
         var i = 0
-        while (current < SettingProvider.getCanvasWidth() && i < deltaMarks.size) {
+        while (current < SettingsProvider.getCanvasWidth() && i < deltaMarks.size) {
             graphicsContext.strokeText(
                 "%.2f".format(deltaMarks[i]), WIDTH_AXIS + current,
-                SettingProvider.getCanvasHeight() - WIDTH_AXIS + TEXT_ALIGN - startPoint
+                SettingsProvider.getCanvasHeight() - WIDTH_AXIS + TEXT_ALIGN - startPoint
             )
             i++
             current += minDelta * DEFAULT_DELTA_SPACE

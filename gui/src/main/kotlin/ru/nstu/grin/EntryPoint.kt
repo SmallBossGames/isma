@@ -1,6 +1,7 @@
 package ru.nstu.grin
 
 import javafx.stage.Stage
+import ru.nstu.grin.view.ConstuctorView
 import tornadofx.App
 import tornadofx.UIComponent
 import tornadofx.launch

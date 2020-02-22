@@ -10,7 +10,7 @@ import ru.nstu.grin.file.DrawWriter
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
-import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.settings.SettingsProvider
 import ru.nstu.grin.view.ConcatenationCanvas
 import ru.nstu.grin.view.modal.ArrowModalView
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
@@ -47,24 +47,20 @@ class ConcatenationCanvasController : Controller() {
             model.drawings.add(function)
         }
 
-        subscribe<AddDescriptionEvent>
-        {
+        subscribe<AddDescriptionEvent> {
             val description = DescriptionConverter.convert(it.descriptionDTO)
             model.drawings.add(description)
         }
-        subscribe<ClearCanvasEvent>
-        {
+        subscribe<ClearCanvasEvent> {
             view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
-                SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
+                SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight())
             model.drawings.clear()
         }
-        subscribe<SaveEvent>
-        {
+        subscribe<SaveEvent> {
             val writer = DrawWriter(it.file)
             writer.write(model.drawings)
         }
-        subscribe<LoadEvent>
-        {
+        subscribe<LoadEvent> {
             val reader = DrawReader()
             val drawings = reader.read(it.file)
             model.drawings.addAll(drawings)
@@ -105,7 +101,7 @@ class ConcatenationCanvasController : Controller() {
 
     fun clearCanvas() {
         view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
-            SettingProvider.getCanvasWidth(), SettingProvider.getCanvasHeight())
+            SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight())
         model.drawings.clear()
     }
 }

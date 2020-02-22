@@ -6,7 +6,7 @@ import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
-import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.settings.SettingsProvider
 
 data class RightAxis(
     private val startPoint: Double,
@@ -51,26 +51,26 @@ data class RightAxis(
     }
 
     override fun isOnIt(x: Double, y: Double): Boolean {
-        return x > (SettingProvider.getCanvasWidth() - WIDTH_AXIS - startPoint) &&
-            x < (SettingProvider.getCanvasWidth() - startPoint)
+        return x > (SettingsProvider.getCanvasWidth() - WIDTH_AXIS - startPoint) &&
+            x < (SettingsProvider.getCanvasWidth() - startPoint)
     }
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
         graphicsContext.fillRect(
-            SettingProvider.getCanvasWidth() - WIDTH_AXIS - startPoint,
+            SettingsProvider.getCanvasWidth() - WIDTH_AXIS - startPoint,
             0.0,
             WIDTH_AXIS,
-            SettingProvider.getCanvasHeight()
+            SettingsProvider.getCanvasHeight()
         )
     }
 
     override fun drawMinorDelimiters(graphicsContext: GraphicsContext) {
         graphicsContext.stroke = delimiterColor
         var current = 0.0
-        while (current < SettingProvider.getCanvasHeight() - WIDTH_AXIS) {
-            graphicsContext.strokeLine(SettingProvider.getCanvasWidth() - startPoint - WIDTH_AXIS + WIDTH_DELIMITER, current,
-                SettingProvider.getCanvasWidth() - startPoint - WIDTH_AXIS, current)
+        while (current < SettingsProvider.getCanvasHeight() - WIDTH_AXIS) {
+            graphicsContext.strokeLine(SettingsProvider.getCanvasWidth() - startPoint - WIDTH_AXIS + WIDTH_DELIMITER, current,
+                SettingsProvider.getCanvasWidth() - startPoint - WIDTH_AXIS, current)
             current += minDelta
         }
     }
@@ -80,9 +80,9 @@ data class RightAxis(
 
         var current = 0.0
         var i = 0
-        while (current < SettingProvider.getCanvasHeight() && i < normalMarks.size) {
+        while (current < SettingsProvider.getCanvasHeight() && i < normalMarks.size) {
             graphicsContext.strokeText(
-                "%.2f".format(normalMarks[i]), SettingProvider.getCanvasWidth() - TEXT_ALIGN - startPoint,
+                "%.2f".format(normalMarks[i]), SettingsProvider.getCanvasWidth() - TEXT_ALIGN - startPoint,
                 current - WIDTH_AXIS
             )
             i++

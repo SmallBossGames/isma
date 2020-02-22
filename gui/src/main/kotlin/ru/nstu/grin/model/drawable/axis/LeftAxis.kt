@@ -6,7 +6,7 @@ import ru.nstu.grin.model.CoordinateDirection
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.Drawable
-import ru.nstu.grin.settings.SettingProvider
+import ru.nstu.grin.settings.SettingsProvider
 
 data class LeftAxis(
     private val startPoint: Double,
@@ -56,13 +56,13 @@ data class LeftAxis(
 
     override fun drawRectangle(graphicsContext: GraphicsContext) {
         graphicsContext.fill = backGroundColor
-        graphicsContext.fillRect(startPoint, 0.0, WIDTH_AXIS, SettingProvider.getCanvasHeight())
+        graphicsContext.fillRect(startPoint, 0.0, WIDTH_AXIS, SettingsProvider.getCanvasHeight())
     }
 
     override fun drawMinorDelimiters(graphicsContext: GraphicsContext) {
         graphicsContext.stroke = delimiterColor
         var current = 0.0
-        while (current < SettingProvider.getCanvasHeight() - WIDTH_AXIS) {
+        while (current < SettingsProvider.getCanvasHeight() - WIDTH_AXIS) {
             graphicsContext.strokeLine(startPoint + WIDTH_AXIS - WIDTH_DELIMITER, current,
                 startPoint + WIDTH_AXIS, current)
             current += minDelta
@@ -74,7 +74,7 @@ data class LeftAxis(
 
         var current = 0.0
         var i = 0
-        while (current < SettingProvider.getCanvasWidth() && i < normalMarks.size) {
+        while (current < SettingsProvider.getCanvasWidth() && i < normalMarks.size) {
             graphicsContext.strokeText(
                 "%.2f".format(normalMarks[i]), startPoint + WIDTH_AXIS - TEXT_ALIGN,
                 current - WIDTH_AXIS

@@ -10,9 +10,12 @@ class SimpleChainDrawer(
 ) : ChainDrawer {
     private val axisDrawElement = AxisDrawElement()
     private val functionsDrawElement = FunctionsDrawElement(model)
+    private val arrowDrawElement = ArrowDrawElement(model)
+
 
     override fun draw() {
         axisDrawElement.draw(canvas.graphicsContext2D)
         functionsDrawElement.draw(canvas.graphicsContext2D)
+        arrowDrawElement.draw(canvas.graphicsContext2D)
     }
 }

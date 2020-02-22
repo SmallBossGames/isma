@@ -7,12 +7,12 @@ import ru.nstu.grin.view.ChainDrawElement
 class FunctionsDrawElement(
     private val model: SimpleCanvasViewModel
 ) : ChainDrawElement {
-    override fun draw(graphicsContext: GraphicsContext) {
+    override fun draw(context: GraphicsContext) {
         for (function in model.functions) {
             val xPoints = function.pointArray.map { it.x }.toDoubleArray()
             val yPoints = function.pointArray.map { it.y }.toDoubleArray()
             val n = function.pointArray.size
-            graphicsContext.strokePolyline(xPoints, yPoints, n)
+            context.strokePolyline(xPoints, yPoints, n)
         }
     }
 }

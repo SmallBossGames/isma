@@ -4,11 +4,11 @@ import javafx.scene.canvas.GraphicsContext
 import ru.nstu.grin.view.ChainDrawElement
 
 class AxisDrawElement : ChainDrawElement {
-    override fun draw(graphicsContext: GraphicsContext) {
-        val middleHeight = graphicsContext.canvas.height / 2
-        graphicsContext.strokeLine(0.0, middleHeight, graphicsContext.canvas.width, middleHeight)
+    override fun draw(context: GraphicsContext) {
+        val middleHeight = context.canvas.height / 2
+        context.strokeLine(0.0, middleHeight, context.canvas.width, middleHeight)
 
-        val middleWith = graphicsContext.canvas.width / 2
-        graphicsContext.strokeLine(middleWith, 0.0, middleWith, graphicsContext.canvas.height)
+        val middleWith = context.canvas.width / 2
+        context.strokeLine(middleWith, 0.0, middleWith, context.canvas.height)
     }
 }

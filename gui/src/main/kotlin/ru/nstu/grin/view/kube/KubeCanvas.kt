@@ -1,4 +1,4 @@
-package ru.nstu.grin.view
+package ru.nstu.grin.view.kube
 
 import javafx.scene.Parent
 import tornadofx.View

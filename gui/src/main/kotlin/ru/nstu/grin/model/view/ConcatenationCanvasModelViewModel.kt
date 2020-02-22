@@ -3,7 +3,7 @@ package ru.nstu.grin.model.view
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import ru.nstu.grin.model.Drawable
-import ru.nstu.grin.view.ConcatenationCanvas
+import ru.nstu.grin.view.concatenation.ConcatenationCanvas
 import tornadofx.ItemViewModel
 import tornadofx.*
 

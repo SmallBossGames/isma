@@ -11,7 +11,7 @@ import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingsProvider
-import ru.nstu.grin.view.ConcatenationCanvas
+import ru.nstu.grin.view.concatenation.ConcatenationCanvas
 import ru.nstu.grin.view.modal.ArrowModalView
 import ru.nstu.grin.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.modal.DescriptionModalView

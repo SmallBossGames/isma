@@ -1,4 +1,4 @@
-package ru.nstu.grin.view
+package ru.nstu.grin.view.concatenation
 
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent

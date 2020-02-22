@@ -3,12 +3,9 @@ package ru.nstu.grin.view
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import javafx.stage.StageStyle
-import ru.nstu.grin.controller.events.ClearCanvasEvent
-import ru.nstu.grin.controller.events.LoadEvent
-import ru.nstu.grin.controller.events.SaveEvent
-import ru.nstu.grin.view.ConcatenationCanvas
-import ru.nstu.grin.view.ConcatenationView
-import ru.nstu.grin.view.modal.ArrowModalView
+import ru.nstu.grin.view.concatenation.ConcatenationView
+import ru.nstu.grin.view.kube.KubeCanvasView
+import ru.nstu.grin.view.simple.SimpleCanvasView
 import tornadofx.*
 
 /**

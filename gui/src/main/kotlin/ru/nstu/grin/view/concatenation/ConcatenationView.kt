@@ -1,19 +1,12 @@
-package ru.nstu.grin.view
+package ru.nstu.grin.view.concatenation
 
 import javafx.scene.Parent
 import ru.nstu.grin.controller.events.ClearCanvasEvent
 import ru.nstu.grin.controller.events.LoadEvent
 import ru.nstu.grin.controller.events.SaveEvent
-import tornadofx.FileChooserMode
-import tornadofx.View
-import tornadofx.action
-import tornadofx.chooseFile
-import tornadofx.item
-import tornadofx.menu
-import tornadofx.menubar
-import tornadofx.vbox
+import tornadofx.*
 
-class KubeCanvasView: View() {
+class ConcatenationView : View() {
     override val root: Parent = vbox {
         menubar {
             menu("File") {
@@ -32,7 +25,6 @@ class KubeCanvasView: View() {
                 }
             }
         }
-
-
+        add<ConcatenationCanvas>()
     }
 }

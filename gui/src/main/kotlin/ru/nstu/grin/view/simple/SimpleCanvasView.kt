@@ -12,7 +12,7 @@ import tornadofx.menubar
 import tornadofx.vbox
 
 class SimpleCanvasView : View() {
-    private lateinit var delegate: Canvas
+    private lateinit var chainDrawer: SimpleChainDrawer
 
     override val root: Parent = vbox {
         menubar {
@@ -28,12 +28,8 @@ class SimpleCanvasView : View() {
             }
         }
         canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
-            delegate = this
+            chainDrawer = SimpleChainDrawer(this)
+            chainDrawer.draw()
         }
     }
-
-    fun stokeDick() {
-        delegate.graphicsContext2D.strokeText("DICK", 20.0, 20.0)
-    }
-
 }

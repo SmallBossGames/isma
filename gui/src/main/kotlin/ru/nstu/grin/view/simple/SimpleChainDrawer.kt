@@ -13,5 +13,7 @@ class SimpleChainDrawer(
         AxisDrawElement().draw(context)
         FunctionsDrawElement(model.functions).draw(context)
         ArrowDrawElement(model.arrows).draw(context)
+        DescriptionDrawElement(model.descriptions).draw(context)
+        GridDrawElement().draw(context)
     }
 }

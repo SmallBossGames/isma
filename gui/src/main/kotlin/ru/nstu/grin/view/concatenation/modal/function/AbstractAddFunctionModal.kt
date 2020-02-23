@@ -1,4 +1,4 @@
-package ru.nstu.grin.view.modal.function
+package ru.nstu.grin.view.concatenation.modal.function
 
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection

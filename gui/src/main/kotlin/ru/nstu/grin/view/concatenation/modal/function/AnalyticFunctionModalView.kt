@@ -1,37 +1,32 @@
-package ru.nstu.grin.view.modal.function
+package ru.nstu.grin.view.concatenation.modal.function
 
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
-import javafx.stage.FileChooser
-import ru.nstu.grin.controller.function.FileFunctionController
+import ru.nstu.grin.controller.concatenation.function.AnalyticFunctionController
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.model.view.function.FileFunctionViewModel
+import ru.nstu.grin.model.concatenation.function.AnalyticFunctionModel
 import tornadofx.*
 
-class FileFunctionModalView : AbstractAddFunctionModal() {
-    private val controller: FileFunctionController by inject()
-    private val model: FileFunctionViewModel by inject()
+/**
+ * @author Konstantin Volivach
+ */
+class AnalyticFunctionModalView : AbstractAddFunctionModal() {
+    private val controller: AnalyticFunctionController by inject()
+    private val model: AnalyticFunctionModel by inject()
 
     override val root: Parent = form {
         fieldset {
-            field("Введите название группы функций") {
+            field("Введите имя функции") {
                 textfield().bind(model.functionNameProperty)
             }
-            field("Выберите файл") {
-                button("Файл") {
-                    action {
-                        val files = chooseFile(
-                            "Файл",
-                            arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.gf")),
-                            FileChooserMode.Single
-                        )
-                        if (files.isNotEmpty()) {
-                            val file = files[0]
-                            model.filePath = file.path
-                        }
-                    }
-                }
+        }
+        fieldset("Введите формулу") {
+            field("формула") {
+                textfield().bind(model.textProperty)
+            }
+            field("Delta") {
+                textfield().bind(model.deltaProperty)
             }
         }
         fieldset("Направления осей") {
@@ -87,11 +82,7 @@ class FileFunctionModalView : AbstractAddFunctionModal() {
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
             action {
-                if (model.filePath.isEmpty()) {
-                    error("Необходимо выбрать файл")
-                    return@action
-                }
-                controller.loadFunctions(drawSize)
+                controller.addFunction(drawSize)
                 close()
             }
         }

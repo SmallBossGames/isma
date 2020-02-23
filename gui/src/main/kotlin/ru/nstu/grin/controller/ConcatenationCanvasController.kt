@@ -12,9 +12,9 @@ import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingsProvider
 import ru.nstu.grin.view.concatenation.ConcatenationCanvas
-import ru.nstu.grin.view.modal.ArrowModalView
-import ru.nstu.grin.view.modal.ChooseFunctionModalView
-import ru.nstu.grin.view.modal.DescriptionModalView
+import ru.nstu.grin.view.concatenation.modal.ArrowModalView
+import ru.nstu.grin.view.concatenation.modal.ChooseFunctionModalView
+import ru.nstu.grin.view.concatenation.modal.DescriptionModalView
 import tornadofx.*
 import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.view.ChooseFunctionViewModel

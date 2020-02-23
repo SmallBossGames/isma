@@ -2,10 +2,10 @@ package ru.nstu.grin.controller
 
 import ru.nstu.grin.model.ChooseFunctionWay
 import ru.nstu.grin.model.view.ChooseFunctionViewModel
-import ru.nstu.grin.view.modal.function.AbstractAddFunctionModal
-import ru.nstu.grin.view.modal.function.AnalyticFunctionModalView
-import ru.nstu.grin.view.modal.function.FileFunctionModalView
-import ru.nstu.grin.view.modal.function.ManualEnterFunctionModalView
+import ru.nstu.grin.view.concatenation.modal.function.AbstractAddFunctionModal
+import ru.nstu.grin.view.concatenation.modal.function.AnalyticFunctionModalView
+import ru.nstu.grin.view.concatenation.modal.function.FileFunctionModalView
+import ru.nstu.grin.view.concatenation.modal.function.ManualEnterFunctionModalView
 import tornadofx.Controller
 
 class ChooseFunctionController : Controller() {

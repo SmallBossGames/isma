@@ -1,4 +1,4 @@
-package ru.nstu.grin.controller.function
+package ru.nstu.grin.controller.concatenation.function
 
 import ru.nstu.grin.controller.DeltaMarksGenerator
 import ru.nstu.grin.controller.DeltaSizeCalculator
@@ -7,7 +7,7 @@ import ru.nstu.grin.dto.AxisDTO
 import ru.nstu.grin.dto.FunctionDTO
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.Point
-import ru.nstu.grin.model.view.function.FileFunctionViewModel
+import ru.nstu.grin.model.concatenation.function.FileFunctionViewModel
 import tornadofx.Controller
 import java.io.BufferedInputStream
 import java.io.File

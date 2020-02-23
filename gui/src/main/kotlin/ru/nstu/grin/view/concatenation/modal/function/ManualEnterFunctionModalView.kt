@@ -1,10 +1,10 @@
-package ru.nstu.grin.view.modal.function
+package ru.nstu.grin.view.concatenation.modal.function
 
 import javafx.scene.Parent
-import ru.nstu.grin.controller.function.ManualEnterFunctionController
+import ru.nstu.grin.controller.concatenation.function.ManualEnterFunctionController
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.model.view.function.ManualEnterFunctionViewModel
+import ru.nstu.grin.model.concatenation.function.ManualEnterFunctionViewModel
 import tornadofx.*
 
 /**

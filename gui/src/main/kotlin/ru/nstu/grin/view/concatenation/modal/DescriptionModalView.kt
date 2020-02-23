@@ -1,4 +1,4 @@
-package ru.nstu.grin.view.modal
+package ru.nstu.grin.view.concatenation.modal
 
 import javafx.scene.Parent
 import ru.nstu.grin.controller.DescriptionModalController

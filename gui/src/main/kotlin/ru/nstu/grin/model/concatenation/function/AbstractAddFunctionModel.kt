@@ -1,4 +1,4 @@
-package ru.nstu.grin.model.view.function
+package ru.nstu.grin.model.concatenation.function
 
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty

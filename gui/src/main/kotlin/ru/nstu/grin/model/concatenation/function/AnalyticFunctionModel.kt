@@ -1,7 +1,8 @@
-package ru.nstu.grin.model.view.function
+package ru.nstu.grin.model.concatenation.function
 
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
+import ru.nstu.grin.model.concatenation.function.AbstractAddFunctionModel
 import tornadofx.*
 
 class AnalyticFunctionModel : AbstractAddFunctionModel() {

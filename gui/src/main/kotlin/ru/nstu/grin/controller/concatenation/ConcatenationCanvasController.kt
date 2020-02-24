@@ -19,7 +19,7 @@ import ru.nstu.grin.view.concatenation.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.concatenation.modal.DescriptionModalView
 import tornadofx.*
 import ru.nstu.grin.model.drawable.ConcatenationFunction
-import ru.nstu.grin.model.view.ChooseFunctionViewModel
+import ru.nstu.grin.model.concatenation.ChooseFunctionViewModel
 
 class ConcatenationCanvasController : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()

@@ -18,6 +18,9 @@ class SimpleCanvasView : View() {
                 }
             }
             menu("Canvas") {
+                item("Add function").action {
+
+                }
                 item("Clear all").action {
                 }
             }

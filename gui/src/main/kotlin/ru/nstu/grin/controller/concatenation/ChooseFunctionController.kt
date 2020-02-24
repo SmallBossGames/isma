@@ -1,7 +1,7 @@
-package ru.nstu.grin.controller
+package ru.nstu.grin.controller.concatenation
 
 import ru.nstu.grin.model.ChooseFunctionWay
-import ru.nstu.grin.model.view.ChooseFunctionViewModel
+import ru.nstu.grin.model.concatenation.ChooseFunctionViewModel
 import ru.nstu.grin.view.concatenation.modal.function.AbstractAddFunctionModal
 import ru.nstu.grin.view.concatenation.modal.function.AnalyticFunctionModalView
 import ru.nstu.grin.view.concatenation.modal.function.FileFunctionModalView
@@ -11,12 +11,12 @@ import tornadofx.Controller
 class ChooseFunctionController : Controller() {
     private val model: ChooseFunctionViewModel by inject(params = params)
 
-    fun getModal(): AbstractAddFunctionModal {
-        return when (model.way) {
+    fun openModal() {
+        when (model.way) {
             ChooseFunctionWay.FILE -> openFunctionModal<FileFunctionModalView>()
             ChooseFunctionWay.INPUT -> openFunctionModal<ManualEnterFunctionModalView>()
             ChooseFunctionWay.ANALYTIC -> openFunctionModal<AnalyticFunctionModalView>()
-        }
+        }.openModal()
     }
 
     private inline fun <reified T : AbstractAddFunctionModal> openFunctionModal(): AbstractAddFunctionModal {

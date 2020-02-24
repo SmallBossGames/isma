@@ -7,7 +7,7 @@ import ru.nstu.grin.controller.simple.function.FileFunctionController
 import ru.nstu.grin.model.simple.function.FileFunctionModel
 import tornadofx.*
 
-class FileFunctionModalVIew : View() {
+class FileFunctionModalView : View() {
     private val model: FileFunctionModel by inject()
     private val controller: FileFunctionController by inject()
 

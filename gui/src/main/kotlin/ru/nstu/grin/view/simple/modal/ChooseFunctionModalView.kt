@@ -1,17 +1,14 @@
-package ru.nstu.grin.view.concatenation.modal
+package ru.nstu.grin.view.simple.modal
 
 import javafx.scene.Parent
-import ru.nstu.grin.controller.concatenation.ChooseFunctionController
+import ru.nstu.grin.controller.simple.ChooseFunctionController
 import ru.nstu.grin.model.ChooseFunctionWay
-import ru.nstu.grin.model.concatenation.ChooseFunctionViewModel
+import ru.nstu.grin.model.simple.ChooseFunctionViewModel
 import tornadofx.*
 
-/**
- * @author Konstantin Volivach
- */
-class ChooseFunctionModalView : Fragment() {
-    private val model: ChooseFunctionViewModel by inject(params = params)
-    private val controller: ChooseFunctionController by inject(params = params)
+class ChooseFunctionModalView : View() {
+    private val model: ChooseFunctionViewModel by inject()
+    private val controller: ChooseFunctionController by inject()
 
     override val root: Parent = form {
         label("Добавить функцию из:")

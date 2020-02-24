@@ -4,6 +4,7 @@ import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.view.SimpleCanvasViewModel
 import ru.nstu.grin.view.ChainDrawer
+import ru.nstu.grin.view.simple.elements.*
 
 class SimpleChainDrawer(
     private val canvas: Canvas,

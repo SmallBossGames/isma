@@ -1,4 +1,4 @@
-package ru.nstu.grin.controller
+package ru.nstu.grin.controller.concatenation
 
 import ru.nstu.grin.model.Direction
 import ru.nstu.grin.model.Drawable

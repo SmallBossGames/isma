@@ -2,9 +2,9 @@ package ru.nstu.grin.controller.concatenation.function
 
 import ru.nstu.grin.controller.DeltaMarksGenerator
 import ru.nstu.grin.controller.DeltaSizeCalculator
-import ru.nstu.grin.controller.events.AddFunctionEvent
-import ru.nstu.grin.dto.AxisDTO
-import ru.nstu.grin.dto.FunctionDTO
+import ru.nstu.grin.events.concatenation.ConcatenationFunctionEvent
+import ru.nstu.grin.dto.concatenation.AxisDTO
+import ru.nstu.grin.dto.concatenation.FunctionDTO
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.concatenation.function.ManualEnterFunctionViewModel
 import ru.nstu.grin.model.Point
@@ -49,6 +49,11 @@ class ManualEnterFunctionController : Controller() {
             ),
             functionColor = model.functionColor
         )
-        fire(AddFunctionEvent(functionDTO = functionDto, minAxisDelta = delta))
+        fire(
+            ConcatenationFunctionEvent(
+                functionDTO = functionDto,
+                minAxisDelta = delta
+            )
+        )
     }
 }

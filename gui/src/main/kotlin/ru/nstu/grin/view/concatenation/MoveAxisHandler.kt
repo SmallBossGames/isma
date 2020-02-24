@@ -2,7 +2,7 @@ package ru.nstu.grin.view.concatenation
 
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
-import ru.nstu.grin.controller.ConcatenationCanvasController
+import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
 import ru.nstu.grin.model.DraggedDirection
 import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel

@@ -1,10 +1,10 @@
-package ru.nstu.grin.controller
+package ru.nstu.grin.controller.concatenation
 
 import javafx.stage.StageStyle
-import ru.nstu.grin.controller.events.*
 import ru.nstu.grin.converters.model.ArrowConverter
 import ru.nstu.grin.converters.model.DescriptionConverter
 import ru.nstu.grin.converters.model.FunctionConverter
+import ru.nstu.grin.events.concatenation.*
 import ru.nstu.grin.file.DrawReader
 import ru.nstu.grin.file.DrawWriter
 import ru.nstu.grin.model.DrawSize
@@ -25,11 +25,11 @@ class ConcatenationCanvasController : Controller() {
     private val pointCoefCalculator = PointCoefCalculator()
 
     init {
-        subscribe<AddArrowEvent> {
+        subscribe<ArrowEvent> {
             val arrow = ArrowConverter.convert(it.arrowDTO)
             model.drawings.add(arrow)
         }
-        subscribe<AddFunctionEvent> {
+        subscribe<ConcatenationFunctionEvent> {
             val functionDTO = it.functionDTO
             val xAxises = model.drawings.filterIsInstance<Function>()
                 .map { Pair(it.name, it.xAxis) }
@@ -47,7 +47,7 @@ class ConcatenationCanvasController : Controller() {
             model.drawings.add(function)
         }
 
-        subscribe<AddDescriptionEvent> {
+        subscribe<DescriptionEvent> {
             val description = DescriptionConverter.convert(it.descriptionDTO)
             model.drawings.add(description)
         }

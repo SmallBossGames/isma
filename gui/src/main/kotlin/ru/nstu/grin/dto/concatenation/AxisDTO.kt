@@ -1,4 +1,4 @@
-package ru.nstu.grin.dto
+package ru.nstu.grin.dto.concatenation
 
 import javafx.scene.paint.Color
 import ru.nstu.grin.model.ExistDirection

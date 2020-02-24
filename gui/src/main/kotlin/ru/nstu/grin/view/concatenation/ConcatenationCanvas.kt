@@ -9,7 +9,7 @@ import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Priority
-import ru.nstu.grin.controller.ConcatenationCanvasController
+import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
 import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection

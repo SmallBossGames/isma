@@ -17,4 +17,8 @@ class SimpleCanvas : View() {
             chainDrawer.draw()
         }
     }
+
+    init {
+
+    }
 }

@@ -1,6 +1,6 @@
 package ru.nstu.grin.converters.model
 
-import ru.nstu.grin.dto.FunctionDTO
+import ru.nstu.grin.dto.concatenation.FunctionDTO
 import ru.nstu.grin.model.drawable.Function
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 

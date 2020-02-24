@@ -1,4 +1,4 @@
-package ru.nstu.grin.controller.events
+package ru.nstu.grin.events.concatenation
 
 import tornadofx.FXEvent
 import java.io.File

@@ -1,6 +1,6 @@
 package ru.nstu.grin.converters.model
 
-import ru.nstu.grin.dto.AxisDTO
+import ru.nstu.grin.dto.concatenation.AxisDTO
 import ru.nstu.grin.model.drawable.axis.BottomAxis
 
 object BottomAxisConverter {

@@ -1,9 +1,9 @@
 package ru.nstu.grin.view.concatenation
 
 import javafx.scene.Parent
-import ru.nstu.grin.controller.events.ClearCanvasEvent
-import ru.nstu.grin.controller.events.LoadEvent
-import ru.nstu.grin.controller.events.SaveEvent
+import ru.nstu.grin.events.concatenation.ClearCanvasEvent
+import ru.nstu.grin.events.concatenation.LoadEvent
+import ru.nstu.grin.events.concatenation.SaveEvent
 import tornadofx.*
 
 class ConcatenationView : View() {

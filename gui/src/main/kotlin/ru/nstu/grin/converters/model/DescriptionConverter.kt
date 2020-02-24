@@ -1,7 +1,7 @@
 package ru.nstu.grin.converters.model
 
 import ru.nstu.grin.converters.Converter
-import ru.nstu.grin.dto.DescriptionDTO
+import ru.nstu.grin.dto.common.DescriptionDTO
 import ru.nstu.grin.model.drawable.Description
 
 object DescriptionConverter : Converter<DescriptionDTO, Description> {

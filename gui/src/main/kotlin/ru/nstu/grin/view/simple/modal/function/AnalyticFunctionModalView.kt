@@ -13,10 +13,10 @@ class AnalyticFunctionModalView : View() {
     override val root: Parent = form {
         fieldset("Функция") {
             field("Имя") {
-                textfield().bind(model.functionNameProperty)
+                textfield().bind(model.nameProperty)
             }
             field("Цвет") {
-                textfield().bind(model.functionColorProperty)
+                colorpicker().bind(model.colorProperty)
             }
         }
         fieldset("Введите формулу") {

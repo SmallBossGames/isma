@@ -1,15 +1,16 @@
 package ru.nstu.grin.view.simple
 
+import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import ru.nstu.grin.converters.model.ArrowConverter
 import ru.nstu.grin.converters.model.DescriptionConverter
 import ru.nstu.grin.converters.model.SimpleFunctionConverter
-import ru.nstu.grin.events.common.ArrowEvent
-import ru.nstu.grin.events.common.DescriptionEvent
 import ru.nstu.grin.events.common.SimpleArrowEvent
 import ru.nstu.grin.events.common.SimpleDescriptionEvent
 import ru.nstu.grin.events.simple.SimpleFunctionEvent
-import ru.nstu.grin.model.SimpleType
+import ru.nstu.grin.model.drawable.Arrow
+import ru.nstu.grin.model.drawable.Description
+import ru.nstu.grin.model.drawable.SimpleFunction
 import ru.nstu.grin.model.view.SimpleCanvasViewModel
 import ru.nstu.grin.settings.SettingsProvider
 import tornadofx.View
@@ -22,8 +23,12 @@ class SimpleCanvas : View() {
 
     override val root: Parent = stackpane {
         canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
-            chainDrawer = SimpleChainDrawer(this, model)
-            chainDrawer.draw()
+            chainDrawer = SimpleChainDrawer(
+                SimplePlotSettings(120.0, 120.0, 1.0), this, model
+            )
+            model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
+            model.descriptions.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
+            model.functions.addListener { _: ListChangeListener.Change<out SimpleFunction> -> chainDrawer.draw() }
         }
     }
 

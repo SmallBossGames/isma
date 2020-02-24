@@ -12,7 +12,7 @@ class ManualFunctionModalView : View() {
     override val root: Parent = form {
         fieldset {
             field("Введите имя функции") {
-                textfield(model.functionNameProperty) {
+                textfield(model.nameProperty) {
                     validator {
                         if (it.isNullOrBlank()) {
                             error("Иия функции не может быть пустым")
@@ -23,7 +23,7 @@ class ManualFunctionModalView : View() {
                 }
             }
             field("Цвет функции") {
-                colorpicker().bind(model.functionColorProperty)
+                colorpicker().bind(model.colorProperty)
             }
         }
         fieldset("Введите ниже точки") {

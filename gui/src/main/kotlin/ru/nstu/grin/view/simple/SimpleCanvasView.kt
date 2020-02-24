@@ -1,6 +1,7 @@
 package ru.nstu.grin.view.simple
 
 import javafx.scene.Parent
+import ru.nstu.grin.view.simple.modal.ChooseFunctionModalView
 import tornadofx.View
 import tornadofx.action
 import tornadofx.item
@@ -19,7 +20,7 @@ class SimpleCanvasView : View() {
             }
             menu("Canvas") {
                 item("Add function").action {
-
+                    find<ChooseFunctionModalView>().openModal()
                 }
                 item("Clear all").action {
                 }

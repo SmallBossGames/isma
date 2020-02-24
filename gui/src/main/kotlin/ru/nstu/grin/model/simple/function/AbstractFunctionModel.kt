@@ -9,9 +9,9 @@ import tornadofx.getValue
 import tornadofx.setValue
 
 abstract class AbstractFunctionModel: ViewModel() {
-    var functionNameProperty = SimpleStringProperty(this, "functionName", "")
-    var functionName: String by functionNameProperty
+    var nameProperty = SimpleStringProperty(this, "functionName", "")
+    var name: String by nameProperty
 
-    var functionColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
-    var functionColor: Color by functionColorProperty
+    var colorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var color: Color by colorProperty
 }

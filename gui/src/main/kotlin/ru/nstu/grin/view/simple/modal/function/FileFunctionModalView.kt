@@ -14,10 +14,10 @@ class FileFunctionModalView : View() {
     override val root: Parent = form {
         fieldset("Функция") {
             field("Имя") {
-                textfield().bind(model.functionNameProperty)
+                textfield().bind(model.nameProperty)
             }
             field("Цвет") {
-                colorpicker().bind(model.functionColorProperty)
+                colorpicker().bind(model.colorProperty)
             }
             field("Выберите файл") {
                 button("Файл") {

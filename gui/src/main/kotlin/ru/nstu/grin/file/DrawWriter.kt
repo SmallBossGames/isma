@@ -3,7 +3,7 @@ package ru.nstu.grin.file
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.drawable.Arrow
 import ru.nstu.grin.model.drawable.Description
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
 import java.io.File
 import java.io.FileOutputStream
 import java.io.ObjectOutputStream
@@ -22,7 +22,7 @@ class DrawWriter(private val file: File) {
     fun write(drawings: List<Drawable>) {
         val descriptions = drawings.filterIsInstance<Description>()
         val arrows = drawings.filterIsInstance<Arrow>()
-        val functions = drawings.filterIsInstance<Function>()
+        val functions = drawings.filterIsInstance<ConcatenationFunction>()
         FileOutputStream(file).use {
             ObjectOutputStream(it).use { oos ->
                 oos.writeInt(descriptions.size)

@@ -1,4 +1,8 @@
 package ru.nstu.grin.events.simple
 
-class SimpleFunctionEvent {
-}
+import ru.nstu.grin.dto.simple.SimpleFunctionDTO
+import tornadofx.FXEvent
+
+data class SimpleFunctionEvent(
+    val function: SimpleFunctionDTO
+) : FXEvent()

@@ -4,7 +4,7 @@ import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
 import ru.nstu.grin.model.DraggedDirection
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 
 class MoveAxisHandler(
@@ -17,7 +17,7 @@ class MoveAxisHandler(
     override fun handle(event: MouseEvent) {
         val direction = getDirection(event)
         val newDrawings = model.drawings.map {
-            if (it is Function) {
+            if (it is ConcatenationFunction) {
                 when {
                     (direction == DraggedDirection.LEFT || direction == DraggedDirection.RIGHT)
                         && it.xAxis.isOnIt(event.x, event.y) -> {

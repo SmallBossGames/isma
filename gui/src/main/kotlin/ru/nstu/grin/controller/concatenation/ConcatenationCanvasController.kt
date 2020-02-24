@@ -3,7 +3,7 @@ package ru.nstu.grin.controller.concatenation
 import javafx.stage.StageStyle
 import ru.nstu.grin.converters.model.ArrowConverter
 import ru.nstu.grin.converters.model.DescriptionConverter
-import ru.nstu.grin.converters.model.FunctionConverter
+import ru.nstu.grin.converters.model.ConcatenationFunctionConverter
 import ru.nstu.grin.events.concatenation.*
 import ru.nstu.grin.file.DrawReader
 import ru.nstu.grin.file.DrawWriter
@@ -16,7 +16,7 @@ import ru.nstu.grin.view.concatenation.modal.ArrowModalView
 import ru.nstu.grin.view.concatenation.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.concatenation.modal.DescriptionModalView
 import tornadofx.*
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
 import ru.nstu.grin.model.view.ChooseFunctionViewModel
 
 class ConcatenationCanvasController : Controller() {
@@ -30,13 +30,13 @@ class ConcatenationCanvasController : Controller() {
             model.drawings.add(arrow)
         }
         subscribe<ConcatenationFunctionEvent> {
-            val functionDTO = it.functionDTO
-            val xAxises = model.drawings.filterIsInstance<Function>()
+            val functionDTO = it.function
+            val xAxises = model.drawings.filterIsInstance<ConcatenationFunction>()
                 .map { Pair(it.name, it.xAxis) }
-            val yAxises = model.drawings.filterIsInstance<Function>()
+            val yAxises = model.drawings.filterIsInstance<ConcatenationFunction>()
                 .map { Pair(it.name, it.yAxis) }
 
-            val function = FunctionConverter.merge(
+            val function = ConcatenationFunctionConverter.merge(
                 functionDTO,
                 it.minAxisDelta,
                 pointCoefCalculator.getStartPointCoef(functionDTO.xAxis.direction.direction, model.drawings),

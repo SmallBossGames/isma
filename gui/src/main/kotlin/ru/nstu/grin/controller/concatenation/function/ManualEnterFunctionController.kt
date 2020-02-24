@@ -51,7 +51,7 @@ class ManualEnterFunctionController : Controller() {
         )
         fire(
             ConcatenationFunctionEvent(
-                functionDTO = functionDto,
+                function = functionDto,
                 minAxisDelta = delta
             )
         )

@@ -13,7 +13,7 @@ import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
 import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingsProvider
@@ -40,7 +40,7 @@ class ConcatenationCanvas : View() {
 
             onMouseClicked = object : EventHandler<MouseEvent> {
                 override fun handle(event: MouseEvent) {
-                    val functions = model.drawings.filterIsInstance<Function>()
+                    val functions = model.drawings.filterIsInstance<ConcatenationFunction>()
                     for (function in functions) {
                         for (point in function.pointArray) {
                             if (point.isNearBy(
@@ -64,10 +64,10 @@ class ConcatenationCanvas : View() {
                             minY = 0.0,
                             maxY = this@canvas.height
                         )
-                        val xDirections = model.drawings.filterIsInstance<Function>().map {
+                        val xDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
                             ExistDirection(it.xAxis.getDirection(), it.name)
                         }
-                        val yDirections = model.drawings.filterIsInstance<Function>().map {
+                        val yDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
                             ExistDirection(it.yAxis.getDirection(), it.name)
                         }
                         controller.openFunctionModal(drawSize, xDirections, yDirections)

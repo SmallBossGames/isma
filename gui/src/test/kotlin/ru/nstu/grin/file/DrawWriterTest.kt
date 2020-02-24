@@ -7,7 +7,7 @@ import ru.kontur.kinfra.kfixture.api.FixtureGeneratorMeta
 import ru.kontur.kinfra.kfixture.resolver.FixtureParameterResolver
 import ru.nstu.grin.model.drawable.Arrow
 import ru.nstu.grin.model.drawable.Description
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
 import java.io.File
 
 @ExtendWith(FixtureParameterResolver::class)
@@ -18,7 +18,7 @@ internal class DrawWriterTest {
     fun `should write all types of shapes`(
         @Fixture description: Description,
         @Fixture arrow: Arrow,
-        @Fixture function: Function
+        @Fixture function: ConcatenationFunction
     ) {
         val file = File.createTempFile("test", "draw")
         val writer = DrawWriter(file)

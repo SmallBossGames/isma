@@ -4,7 +4,7 @@ import javafx.event.EventHandler
 import javafx.scene.input.ScrollEvent
 import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
 import ru.nstu.grin.model.CoordinateDirection
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 
 class ScalableScrollHandler(
@@ -14,7 +14,7 @@ class ScalableScrollHandler(
     override fun handle(event: ScrollEvent) {
         if (event.deltaY == 0.0) return
         val newDrawings = model.drawings.map {
-            if (it is Function) {
+            if (it is ConcatenationFunction) {
                 when {
                     it.xAxis.isOnIt(event.x, event.y) -> {
                         if (event.deltaY > 0) {

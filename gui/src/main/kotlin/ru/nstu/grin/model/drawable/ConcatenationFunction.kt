@@ -17,7 +17,7 @@ import java.io.ObjectOutputStream
 /**
  * @author kostya05983
  */
-data class Function(
+data class ConcatenationFunction(
     val name: String,
     val pointArray: List<Point>,
     val xAxis: AbstractAxis,
@@ -27,7 +27,7 @@ data class Function(
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
         return when (direction) {
             CoordinateDirection.X -> {
-                Function(
+                ConcatenationFunction(
                     name,
                     pointArray.map { Point(it.x * scale, it.y) },
                     xAxis.scale(scale, direction) as AbstractAxis,
@@ -36,7 +36,7 @@ data class Function(
                 )
             }
             CoordinateDirection.Y -> {
-                Function(
+                ConcatenationFunction(
                     name,
                     pointArray.map { Point(it.x * scale, it.y) },
                     xAxis,
@@ -50,7 +50,7 @@ data class Function(
     fun moveFunctionOnPlot(value: Double, direction: DraggedDirection): Drawable {
         return when (direction) {
             DraggedDirection.LEFT -> {
-                Function(
+                ConcatenationFunction(
                     name,
                     pointArray.map { Point(it.x - value, it.y) },
                     xAxis.changeDeltas(value, direction),
@@ -59,7 +59,7 @@ data class Function(
                 )
             }
             DraggedDirection.RIGHT -> {
-                Function(
+                ConcatenationFunction(
                     name,
                     pointArray.map { Point(it.x + value, it.y) },
                     xAxis.changeDeltas(value, direction),
@@ -68,7 +68,7 @@ data class Function(
                 )
             }
             DraggedDirection.UP -> {
-                Function(
+                ConcatenationFunction(
                     name,
                     pointArray.map { Point(it.x, it.y + value) },
                     xAxis,
@@ -77,7 +77,7 @@ data class Function(
                 )
             }
             DraggedDirection.DOWN -> {
-                Function(
+                ConcatenationFunction(
                     name,
                     pointArray.map { Point(it.x, it.y - value) },
                     xAxis,
@@ -86,7 +86,7 @@ data class Function(
                 )
             }
             DraggedDirection.UNDEFINED -> {
-                Function(
+                ConcatenationFunction(
                     name, pointArray, xAxis, yAxis, functionColor
                 )
             }

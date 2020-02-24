@@ -1,10 +1,11 @@
 package ru.nstu.grin.converters.model
 
 import ru.nstu.grin.dto.concatenation.FunctionDTO
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
+import ru.nstu.grin.model.drawable.SimpleFunction
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 
-object FunctionConverter {
+object ConcatenationFunctionConverter {
     fun merge(
         source: FunctionDTO,
         minDelta: Double,
@@ -12,14 +13,14 @@ object FunctionConverter {
         yStartPoint: Double,
         xAxises: List<Pair<String, AbstractAxis>>,
         yAxises: List<Pair<String, AbstractAxis>>
-    ): Function {
+    ): ConcatenationFunction {
         val xAxis = source.xAxis.direction.functionName?.let { name ->
             xAxises.filter { it.first == name }.first().second
         } ?: AxisConverter.merge(source.xAxis, minDelta, xStartPoint)
         val yAxis = source.yAxis.direction.functionName?.let { name ->
             yAxises.filter { it.first == name }.first().second
         } ?: AxisConverter.merge(source.yAxis, minDelta, yStartPoint)
-        return Function(
+        return ConcatenationFunction(
             name = source.name,
             pointArray = source.points,
             xAxis = xAxis,

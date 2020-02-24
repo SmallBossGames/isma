@@ -9,7 +9,7 @@ import ru.kontur.kinfra.kfixture.resolver.FixtureParameterResolver
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.drawable.Arrow
 import ru.nstu.grin.model.drawable.Description
-import ru.nstu.grin.model.drawable.Function
+import ru.nstu.grin.model.drawable.ConcatenationFunction
 import java.io.File
 
 @ExtendWith(FixtureParameterResolver::class)
@@ -20,7 +20,7 @@ internal class DrawReaderTest {
     fun `should read all figures`(
         @Fixture description: Description,
         @Fixture arrow: Arrow,
-        @Fixture function: Function
+        @Fixture function: ConcatenationFunction
     ) {
         val file = File.createTempFile("test", "draw")
         val writer = DrawWriter(file)

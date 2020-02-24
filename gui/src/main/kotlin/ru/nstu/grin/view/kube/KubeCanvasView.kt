@@ -1,7 +1,6 @@
 package ru.nstu.grin.view.kube
 
 import javafx.scene.Parent
-import ru.nstu.grin.events.concatenation.ClearCanvasEvent
 import ru.nstu.grin.events.concatenation.LoadEvent
 import ru.nstu.grin.events.concatenation.SaveEvent
 import tornadofx.FileChooserMode
@@ -28,7 +27,6 @@ class KubeCanvasView: View() {
             }
             menu("Canvas") {
                 item("Clear all").action {
-                    fire(ClearCanvasEvent())
                 }
             }
         }

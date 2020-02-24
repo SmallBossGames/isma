@@ -1,6 +1,5 @@
 package ru.nstu.grin.controller
 
-import ru.nstu.grin.events.concatenation.DescriptionEvent
 import ru.nstu.grin.converters.dto.DescriptionDTOConverter
 import ru.nstu.grin.model.view.DescriptionViewModel
 import tornadofx.Controller
@@ -11,6 +10,6 @@ class DescriptionModalController : Controller() {
 
     fun addDescription() {
         val descriptionDTO = DescriptionDTOConverter.convert(model)
-        fire(DescriptionEvent(descriptionDTO))
+//        fire(DescriptionEvent(descriptionDTO))
     }
 }

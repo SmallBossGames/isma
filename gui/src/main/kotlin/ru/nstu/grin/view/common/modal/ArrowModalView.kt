@@ -1,7 +1,8 @@
-package ru.nstu.grin.view.concatenation.modal
+package ru.nstu.grin.view.common.modal
 
 import javafx.scene.Parent
 import ru.nstu.grin.controller.ArrowController
+import ru.nstu.grin.model.CanvasType
 import ru.nstu.grin.model.view.ArrowViewModel
 import tornadofx.*
 
@@ -9,11 +10,12 @@ import tornadofx.*
  * @author Konstantin Volivach
  */
 class ArrowModalView : Fragment() {
+    val type: CanvasType by param()
     val x: Double by param()
     val y: Double by param()
 
     private val model: ArrowViewModel by inject()
-    private val controller: ArrowController by inject()
+    private val controller: ArrowController = find(mapOf(ArrowController::type to type))
 
     init {
         println("x=$x y=$y")

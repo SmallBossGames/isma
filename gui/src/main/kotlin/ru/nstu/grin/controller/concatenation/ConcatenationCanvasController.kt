@@ -4,15 +4,17 @@ import javafx.stage.StageStyle
 import ru.nstu.grin.converters.model.ArrowConverter
 import ru.nstu.grin.converters.model.DescriptionConverter
 import ru.nstu.grin.converters.model.ConcatenationFunctionConverter
+import ru.nstu.grin.events.common.*
 import ru.nstu.grin.events.concatenation.*
 import ru.nstu.grin.file.DrawReader
 import ru.nstu.grin.file.DrawWriter
+import ru.nstu.grin.model.ConcatenationType
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingsProvider
 import ru.nstu.grin.view.concatenation.ConcatenationCanvas
-import ru.nstu.grin.view.concatenation.modal.ArrowModalView
+import ru.nstu.grin.view.common.modal.ArrowModalView
 import ru.nstu.grin.view.concatenation.modal.ChooseFunctionModalView
 import ru.nstu.grin.view.concatenation.modal.DescriptionModalView
 import tornadofx.*
@@ -25,8 +27,8 @@ class ConcatenationCanvasController : Controller() {
     private val pointCoefCalculator = PointCoefCalculator()
 
     init {
-        subscribe<ArrowEvent> {
-            val arrow = ArrowConverter.convert(it.arrowDTO)
+        subscribe<ConcatenationArrowEvent> {
+            val arrow = ArrowConverter.convert(it.arrow)
             model.drawings.add(arrow)
         }
         subscribe<ConcatenationFunctionEvent> {
@@ -47,13 +49,15 @@ class ConcatenationCanvasController : Controller() {
             model.drawings.add(function)
         }
 
-        subscribe<DescriptionEvent> {
-            val description = DescriptionConverter.convert(it.descriptionDTO)
+        subscribe<ConcatenationDescriptionEvent> {
+            val description = DescriptionConverter.convert(it.description)
             model.drawings.add(description)
         }
-        subscribe<ClearCanvasEvent> {
-            view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
-                SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight())
+        subscribe<ConcatenationClearCanvasEvent> {
+            view.canvas.graphicsContext2D.clearRect(
+                0.0, 0.0,
+                SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
+            )
             model.drawings.clear()
         }
         subscribe<SaveEvent> {
@@ -84,6 +88,7 @@ class ConcatenationCanvasController : Controller() {
     fun openArrowModal(x: Double, y: Double) {
         find<ArrowModalView>(
             mapOf(
+                ArrowModalView::type to ConcatenationType,
                 ArrowModalView::x to x,
                 ArrowModalView::y to y
             )
@@ -100,8 +105,10 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun clearCanvas() {
-        view.canvas.graphicsContext2D.clearRect(0.0, 0.0,
-            SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight())
+        view.canvas.graphicsContext2D.clearRect(
+            0.0, 0.0,
+            SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
+        )
         model.drawings.clear()
     }
 }

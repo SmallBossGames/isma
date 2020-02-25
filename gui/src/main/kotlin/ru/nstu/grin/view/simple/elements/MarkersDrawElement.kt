@@ -18,35 +18,35 @@ class MarkersDrawElement(
 
         context.strokeText("0", relativeX, relativeY)
 
-        var currentX = middleWidth + settings.xPixelCost
+        var currentX = middleWidth + settings.pixelCost
         var currentCount = settings.step
         while (currentX < context.canvas.width) {
             context.strokeText(currentCount.toString(), currentX, relativeY)
             currentCount += settings.step
-            currentX += settings.xPixelCost
+            currentX += settings.pixelCost
         }
 
-        currentX = middleWidth - settings.xPixelCost
+        currentX = middleWidth - settings.pixelCost
         currentCount = -settings.step
         while (currentX > 0) {
             context.strokeText(currentCount.toString(), currentX, relativeY)
             currentCount -= settings.step
-            currentX -= settings.xPixelCost
+            currentX -= settings.pixelCost
         }
 
-        var currentY = middleHeight - settings.yPixelCost
+        var currentY = middleHeight - settings.pixelCost
         currentCount = settings.step
         while (currentY > 0) {
             context.strokeText(currentCount.toString(), relativeX - 5, currentY)
-            currentY -= settings.yPixelCost
+            currentY -= settings.pixelCost
             currentCount += settings.step
         }
 
-        currentY = middleHeight + settings.yPixelCost
+        currentY = middleHeight + settings.pixelCost
         currentCount = -settings.step
         while (currentY < context.canvas.height) {
             context.strokeText(currentCount.toString(), relativeX - 10, currentY)
-            currentY += settings.yPixelCost
+            currentY += settings.pixelCost
             currentCount -= settings.step
         }
     }

@@ -29,11 +29,11 @@ class FunctionsDrawElement(
 
     private fun transformPoints(middleX: Double, middleY: Double, points: List<Point>): List<Point> {
         return points.map {
-            val x = middleX + it.x * settings.xPixelCost
+            val x = middleX + it.x * settings.pixelCost
             val y = if (it.y > 0) {
-                middleY - it.y * settings.yPixelCost
+                middleY - it.y * settings.pixelCost
             } else {
-                middleY + it.y * settings.yPixelCost
+                middleY + it.y * settings.pixelCost
             }
             Point(x, y)
         }

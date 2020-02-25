@@ -5,7 +5,7 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.view.ChainDrawElement
 
 class GridDrawElement(
-    private val size: Int,
+    private val size: Double,
     private val color: Color
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {

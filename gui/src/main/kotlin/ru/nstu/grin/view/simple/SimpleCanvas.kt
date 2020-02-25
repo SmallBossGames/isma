@@ -23,12 +23,12 @@ class SimpleCanvas : View() {
 
     override val root: Parent = stackpane {
         canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
-            chainDrawer = SimpleChainDrawer(
-                SimplePlotSettings(120.0, 120.0, 1.0), this, model
-            )
+            chainDrawer = SimpleChainDrawer(this, model)
             model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
             model.descriptions.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
             model.functions.addListener { _: ListChangeListener.Change<out SimpleFunction> -> chainDrawer.draw() }
+
+            onScroll = ScrollableHandler(model, chainDrawer)
         }
     }
 

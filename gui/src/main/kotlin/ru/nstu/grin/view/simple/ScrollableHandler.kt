@@ -8,9 +8,9 @@ class ScrollableHandler(
     private val model: SimpleCanvasViewModel,
     private val chainDrawer: SimpleChainDrawer
 ) : EventHandler<ScrollEvent> {
-    private var upRemaining: Long = DEFAULT_TIMES_TO_SCROLL
-    private var downRemaining: Long = DEFAULT_TIMES_TO_SCROLL
-    private var delta: Double = model.settings.pixelCost / DEFAULT_TIMES_TO_SCROLL
+    private var upRemaining: Long = TIMES_TO_SCROLL
+    private var downRemaining: Long = TIMES_TO_SCROLL
+    private var delta: Double = model.settings.pixelCost / TIMES_TO_SCROLL
 
     override fun handle(event: ScrollEvent) {
         if (event.deltaY > 0) {
@@ -20,10 +20,10 @@ class ScrollableHandler(
 
             if (upRemaining <= 0) {
                 model.settings.step = model.settings.step / 2
-                upRemaining = DEFAULT_TIMES_TO_SCROLL
-                downRemaining = DEFAULT_TIMES_TO_SCROLL
-                delta = model.settings.pixelCost / DEFAULT_TIMES_TO_SCROLL
-                model.settings.pixelCost /= DEFAULT_TIMES_TO_SCROLL
+                upRemaining = TIMES_TO_SCROLL
+                downRemaining = TIMES_TO_SCROLL
+                model.settings.pixelCost = PIXEL_COST
+                delta = model.settings.pixelCost / TIMES_TO_SCROLL
                 return
             }
             model.settings.pixelCost += delta
@@ -34,10 +34,10 @@ class ScrollableHandler(
 
             if (downRemaining <= 0) {
                 model.settings.step = model.settings.step * 2
-                downRemaining = DEFAULT_TIMES_TO_SCROLL
-                upRemaining = DEFAULT_TIMES_TO_SCROLL
-                delta = model.settings.pixelCost / DEFAULT_TIMES_TO_SCROLL
-                model.settings.pixelCost *= DEFAULT_TIMES_TO_SCROLL
+                downRemaining = TIMES_TO_SCROLL
+                upRemaining = TIMES_TO_SCROLL
+                model.settings.pixelCost = PIXEL_COST
+                delta = model.settings.pixelCost / DELTA_DELIMITER
                 return
             }
             model.settings.pixelCost -= delta
@@ -46,6 +46,8 @@ class ScrollableHandler(
     }
 
     private companion object {
-        const val DEFAULT_TIMES_TO_SCROLL = 5L
+        const val TIMES_TO_SCROLL = 5L
+        const val DELTA_DELIMITER = 10L
+        const val PIXEL_COST = 120.0
     }
 }

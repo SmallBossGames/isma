@@ -19,7 +19,7 @@ import java.io.ObjectOutputStream
  */
 data class ConcatenationFunction(
     val name: String,
-    val pointArray: List<Point>,
+    val points: List<Point>,
     val xAxis: AbstractAxis,
     val yAxis: AbstractAxis,
     val functionColor: Color
@@ -29,7 +29,7 @@ data class ConcatenationFunction(
             CoordinateDirection.X -> {
                 ConcatenationFunction(
                     name,
-                    pointArray.map { Point(it.x * scale, it.y) },
+                    points.map { Point(it.x * scale, it.y) },
                     xAxis.scale(scale, direction) as AbstractAxis,
                     yAxis,
                     functionColor
@@ -38,7 +38,7 @@ data class ConcatenationFunction(
             CoordinateDirection.Y -> {
                 ConcatenationFunction(
                     name,
-                    pointArray.map { Point(it.x * scale, it.y) },
+                    points.map { Point(it.x * scale, it.y) },
                     xAxis,
                     yAxis.scale(scale, direction) as AbstractAxis,
                     functionColor
@@ -52,7 +52,7 @@ data class ConcatenationFunction(
             DraggedDirection.LEFT -> {
                 ConcatenationFunction(
                     name,
-                    pointArray.map { Point(it.x - value, it.y) },
+                    points.map { Point(it.x - value, it.y) },
                     xAxis.changeDeltas(value, direction),
                     yAxis,
                     functionColor
@@ -61,7 +61,7 @@ data class ConcatenationFunction(
             DraggedDirection.RIGHT -> {
                 ConcatenationFunction(
                     name,
-                    pointArray.map { Point(it.x + value, it.y) },
+                    points.map { Point(it.x + value, it.y) },
                     xAxis.changeDeltas(value, direction),
                     yAxis,
                     functionColor
@@ -70,7 +70,7 @@ data class ConcatenationFunction(
             DraggedDirection.UP -> {
                 ConcatenationFunction(
                     name,
-                    pointArray.map { Point(it.x, it.y + value) },
+                    points.map { Point(it.x, it.y + value) },
                     xAxis,
                     yAxis.changeDeltas(value, direction),
                     functionColor
@@ -79,7 +79,7 @@ data class ConcatenationFunction(
             DraggedDirection.DOWN -> {
                 ConcatenationFunction(
                     name,
-                    pointArray.map { Point(it.x, it.y - value) },
+                    points.map { Point(it.x, it.y - value) },
                     xAxis,
                     yAxis.changeDeltas(value, direction),
                     functionColor
@@ -87,7 +87,7 @@ data class ConcatenationFunction(
             }
             DraggedDirection.UNDEFINED -> {
                 ConcatenationFunction(
-                    name, pointArray, xAxis, yAxis, functionColor
+                    name, points, xAxis, yAxis, functionColor
                 )
             }
         }
@@ -95,11 +95,11 @@ data class ConcatenationFunction(
 
     override fun draw(context: GraphicsContext) {
         context.strokePolyline(
-            pointArray.map { it.x + AbstractAxis.WIDTH_AXIS }.toDoubleArray(),
-            pointArray.map {
+            points.map { it.x + AbstractAxis.WIDTH_AXIS }.toDoubleArray(),
+            points.map {
                 SettingsProvider.getCanvasHeight() - it.y - AbstractAxis.WIDTH_AXIS
             }.toDoubleArray(),
-            pointArray.size
+            points.size
         )
         xAxis.draw(context)
         yAxis.draw(context)
@@ -118,7 +118,7 @@ data class ConcatenationFunction(
     }
 
     override fun serialize(oos: ObjectOutputStream) {
-        oos.writeObject(pointArray)
+        oos.writeObject(points)
         xAxis.serialize(oos)
         yAxis.serialize(oos)
         oos.write(functionColor.toByteArray())

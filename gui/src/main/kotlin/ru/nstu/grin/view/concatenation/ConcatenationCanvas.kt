@@ -11,7 +11,6 @@ import javafx.scene.control.Control
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Priority
 import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
-import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.drawable.Arrow
@@ -36,7 +35,7 @@ class ConcatenationCanvas : View() {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
             canvas = this
-            chainDrawer = ConcatenationChainDrawer()
+            chainDrawer = ConcatenationChainDrawer(this, model)
 
             model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
             model.functionsProperty.addListener { _: ListChangeListener.Change<out ConcatenationFunction> -> chainDrawer.draw() }
@@ -50,7 +49,7 @@ class ConcatenationCanvas : View() {
                 override fun handle(event: MouseEvent) {
                     val functions = model.drawings.filterIsInstance<ConcatenationFunction>()
                     for (function in functions) {
-                        for (point in function.pointArray) {
+                        for (point in function.points) {
                             if (point.isNearBy(
                                     event.x + AbstractAxis.WIDTH_AXIS,
                                     SettingsProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS

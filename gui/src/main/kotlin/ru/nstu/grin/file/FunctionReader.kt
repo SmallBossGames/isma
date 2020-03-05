@@ -10,7 +10,7 @@ class FunctionReader : Reader<ConcatenationFunction> {
     override fun deserialize(ois: ObjectInputStream): ConcatenationFunction {
         return ConcatenationFunction(
             name = ois.readUTF(),
-            pointArray = ois.readObject() as List<ru.nstu.grin.model.Point>,
+            points = ois.readObject() as List<ru.nstu.grin.model.Point>,
             xAxis = axisReader.deserialize(ois),
             yAxis = axisReader.deserialize(ois),
             functionColor = readColor(ois)

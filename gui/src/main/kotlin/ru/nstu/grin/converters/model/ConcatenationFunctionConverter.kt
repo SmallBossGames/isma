@@ -2,7 +2,6 @@ package ru.nstu.grin.converters.model
 
 import ru.nstu.grin.dto.concatenation.FunctionDTO
 import ru.nstu.grin.model.drawable.ConcatenationFunction
-import ru.nstu.grin.model.drawable.SimpleFunction
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 
 object ConcatenationFunctionConverter {
@@ -22,7 +21,7 @@ object ConcatenationFunctionConverter {
         } ?: AxisConverter.merge(source.yAxis, minDelta, yStartPoint)
         return ConcatenationFunction(
             name = source.name,
-            pointArray = source.points,
+            points = source.points,
             xAxis = xAxis,
             yAxis = yAxis,
             functionColor = source.functionColor

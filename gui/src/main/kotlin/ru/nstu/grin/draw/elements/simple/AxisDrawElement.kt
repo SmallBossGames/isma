@@ -1,4 +1,4 @@
-package ru.nstu.grin.view.simple.elements
+package ru.nstu.grin.draw.elements.simple
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color

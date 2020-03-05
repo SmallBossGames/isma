@@ -2,9 +2,15 @@ package ru.nstu.grin.view.simple
 
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
+import ru.nstu.grin.draw.elements.ArrowDrawElement
+import ru.nstu.grin.draw.elements.ClearDrawElement
+import ru.nstu.grin.draw.elements.DescriptionDrawElement
+import ru.nstu.grin.draw.elements.simple.AxisDrawElement
+import ru.nstu.grin.draw.elements.simple.FunctionsDrawElement
+import ru.nstu.grin.draw.elements.simple.GridDrawElement
+import ru.nstu.grin.draw.elements.simple.MarkersDrawElement
 import ru.nstu.grin.model.view.SimpleCanvasViewModel
 import ru.nstu.grin.view.ChainDrawer
-import ru.nstu.grin.view.simple.elements.*
 
 class SimpleChainDrawer(
     private val canvas: Canvas,

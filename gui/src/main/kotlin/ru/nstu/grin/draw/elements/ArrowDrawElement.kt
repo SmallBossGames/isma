@@ -1,4 +1,4 @@
-package ru.nstu.grin.view.simple.elements
+package ru.nstu.grin.draw.elements
 
 import javafx.scene.canvas.GraphicsContext
 import ru.nstu.grin.model.drawable.Arrow

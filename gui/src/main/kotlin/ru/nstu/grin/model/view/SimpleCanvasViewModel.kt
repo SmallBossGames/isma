@@ -20,5 +20,5 @@ class SimpleCanvasViewModel : ItemViewModel<SimpleCanvas>() {
     var descriptionProperty = SimpleListProperty<Description>(FXCollections.observableArrayList())
     var descriptions by descriptionProperty
 
-    val settings = SimplePlotSettings(120.0, 1.0)
+    val settings = SimplePlotSettings(120.0, 120.0, 1.0)
 }

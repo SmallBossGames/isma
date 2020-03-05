@@ -1,5 +1,6 @@
 package ru.nstu.grin.view.concatenation
 
+import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
 import javafx.event.EventTarget
 import javafx.scene.Node
@@ -13,7 +14,9 @@ import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
 import ru.nstu.grin.extensions.drawListener
 import ru.nstu.grin.model.DrawSize
 import ru.nstu.grin.model.ExistDirection
+import ru.nstu.grin.model.drawable.Arrow
 import ru.nstu.grin.model.drawable.ConcatenationFunction
+import ru.nstu.grin.model.drawable.Description
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingsProvider
@@ -25,6 +28,7 @@ class ConcatenationCanvas : View() {
     private var outX = 0.0
     private var outY = 0.0
     lateinit var canvas: Canvas
+    private lateinit var chainDrawer: ConcatenationChainDrawer
 
     override val root: Parent = stackpane {
         println(controller.params)
@@ -32,7 +36,11 @@ class ConcatenationCanvas : View() {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
             canvas = this
-            drawListener(model.drawingsProperty, graphicsContext2D)
+            chainDrawer = ConcatenationChainDrawer()
+
+            model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
+            model.functionsProperty.addListener { _: ListChangeListener.Change<out ConcatenationFunction> -> chainDrawer.draw() }
+            model.descriptionsProperty.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
 
             onScroll = ScalableScrollHandler(model, controller)
 

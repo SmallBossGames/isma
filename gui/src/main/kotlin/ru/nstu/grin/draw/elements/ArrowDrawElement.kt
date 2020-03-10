@@ -5,12 +5,14 @@ import ru.nstu.grin.model.drawable.Arrow
 import ru.nstu.grin.view.ChainDrawElement
 
 class ArrowDrawElement(
-    private val arrows: List<Arrow>
+    private val arrows: List<Arrow>,
+    private val pixelCost: Double
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         for (arrow in arrows) {
-            val x = arrow.x
-            val y = arrow.y
+            context.stroke = arrow.color
+            val x = arrow.x * pixelCost
+            val y = arrow.y * pixelCost
             context.strokeLine(x, y, x + DEFAULT_LENGTH, y + DEFAULT_LENGTH)
             context.strokeLine(
                 x + DEFAULT_LENGTH,

@@ -1,17 +1,12 @@
 package ru.nstu.grin.model.drawable
 
-import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
 import ru.nstu.grin.extensions.toByteArray
 import ru.nstu.grin.file.Writer
-import ru.nstu.grin.model.CoordinateDirection
-import ru.nstu.grin.model.DraggedDirection
-import ru.nstu.grin.model.Drawable
-import ru.nstu.grin.model.Point
+import ru.nstu.grin.model.*
 import ru.nstu.grin.model.drawable.axis.AbstractAxis
-import ru.nstu.grin.settings.SettingsProvider
 import java.io.ObjectOutputStream
 
 /**
@@ -23,7 +18,8 @@ data class ConcatenationFunction(
     val xAxis: AbstractAxis,
     val yAxis: AbstractAxis,
     val functionColor: Color
-) : Drawable, Writer {
+) : Scalable, Locationable, Writer {
+    //TODO move to draw scale
     override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
         return when (direction) {
             CoordinateDirection.X -> {
@@ -47,6 +43,7 @@ data class ConcatenationFunction(
         }
     }
 
+    // TODO move to draw chain
     fun moveFunctionOnPlot(value: Double, direction: DraggedDirection): Drawable {
         return when (direction) {
             DraggedDirection.LEFT -> {
@@ -91,18 +88,6 @@ data class ConcatenationFunction(
                 )
             }
         }
-    }
-
-    override fun draw(context: GraphicsContext) {
-        context.strokePolyline(
-            points.map { it.x + AbstractAxis.WIDTH_AXIS }.toDoubleArray(),
-            points.map {
-                SettingsProvider.getCanvasHeight() - it.y - AbstractAxis.WIDTH_AXIS
-            }.toDoubleArray(),
-            points.size
-        )
-        xAxis.draw(context)
-        yAxis.draw(context)
     }
 
     private fun List<Double>.toDoubleArray(): DoubleArray {

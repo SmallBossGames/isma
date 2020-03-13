@@ -18,31 +18,7 @@ data class ConcatenationFunction(
     val xAxis: AbstractAxis,
     val yAxis: AbstractAxis,
     val functionColor: Color
-) : Scalable, Locationable, Writer {
-    //TODO move to draw scale
-    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
-        return when (direction) {
-            CoordinateDirection.X -> {
-                ConcatenationFunction(
-                    name,
-                    points.map { Point(it.x * scale, it.y) },
-                    xAxis.scale(scale, direction) as AbstractAxis,
-                    yAxis,
-                    functionColor
-                )
-            }
-            CoordinateDirection.Y -> {
-                ConcatenationFunction(
-                    name,
-                    points.map { Point(it.x * scale, it.y) },
-                    xAxis,
-                    yAxis.scale(scale, direction) as AbstractAxis,
-                    functionColor
-                )
-            }
-        }
-    }
-
+) : Locationable, Writer {
     // TODO move to draw chain
     fun moveFunctionOnPlot(value: Double, direction: DraggedDirection): Drawable {
         return when (direction) {

@@ -2,6 +2,7 @@ package ru.nstu.grin.model.view
 
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
+import ru.nstu.grin.model.CanvasSettings
 import ru.nstu.grin.model.Drawable
 import ru.nstu.grin.model.drawable.Arrow
 import ru.nstu.grin.model.drawable.ConcatenationFunction
@@ -22,4 +23,6 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>() {
 
     var descriptionsProperty = SimpleListProperty<Description>(FXCollections.observableArrayList())
     var descriptions by descriptionsProperty
+
+    val settings = CanvasSettings()
 }

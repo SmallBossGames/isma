@@ -1,0 +1,24 @@
+package ru.nstu.grin.simple.model.view
+
+import javafx.beans.property.SimpleListProperty
+import javafx.collections.FXCollections
+import ru.nstu.grin.common.model.Arrow
+import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.simple.model.SimpleFunction
+import ru.nstu.grin.simple.view.SimpleCanvas
+import ru.nstu.grin.simple.view.SimplePlotSettings
+import tornadofx.ItemViewModel
+import tornadofx.*
+
+class SimpleCanvasViewModel : ItemViewModel<SimpleCanvas>() {
+    var functionsProperty = SimpleListProperty<SimpleFunction>(FXCollections.observableArrayList())
+    var functions by functionsProperty
+
+    var arrowsProperty = SimpleListProperty<Arrow>(FXCollections.observableArrayList())
+    var arrows by arrowsProperty
+
+    var descriptionProperty = SimpleListProperty<Description>(FXCollections.observableArrayList())
+    var descriptions by descriptionProperty
+
+    val settings = SimplePlotSettings(120.0, 120.0, 1.0)
+}

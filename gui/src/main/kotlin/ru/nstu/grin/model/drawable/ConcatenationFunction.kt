@@ -19,52 +19,54 @@ data class ConcatenationFunction(
     val yAxis: AbstractAxis,
     val functionColor: Color
 ) : Locationable, Writer {
+    //TODO move to draw scale
+
     // TODO move to draw chain
-    fun moveFunctionOnPlot(value: Double, direction: DraggedDirection): Drawable {
-        return when (direction) {
-            DraggedDirection.LEFT -> {
-                ConcatenationFunction(
-                    name,
-                    points.map { Point(it.x - value, it.y) },
-                    xAxis.changeDeltas(value, direction),
-                    yAxis,
-                    functionColor
-                )
-            }
-            DraggedDirection.RIGHT -> {
-                ConcatenationFunction(
-                    name,
-                    points.map { Point(it.x + value, it.y) },
-                    xAxis.changeDeltas(value, direction),
-                    yAxis,
-                    functionColor
-                )
-            }
-            DraggedDirection.UP -> {
-                ConcatenationFunction(
-                    name,
-                    points.map { Point(it.x, it.y + value) },
-                    xAxis,
-                    yAxis.changeDeltas(value, direction),
-                    functionColor
-                )
-            }
-            DraggedDirection.DOWN -> {
-                ConcatenationFunction(
-                    name,
-                    points.map { Point(it.x, it.y - value) },
-                    xAxis,
-                    yAxis.changeDeltas(value, direction),
-                    functionColor
-                )
-            }
-            DraggedDirection.UNDEFINED -> {
-                ConcatenationFunction(
-                    name, points, xAxis, yAxis, functionColor
-                )
-            }
-        }
-    }
+//    fun moveFunctionOnPlot(value: Double, direction: DraggedDirection): Drawable {
+//        return when (direction) {
+//            DraggedDirection.LEFT -> {
+//                ConcatenationFunction(
+//                    name,
+//                    points.map { Point(it.x - value, it.y) },
+//                    xAxis.changeDeltas(value, direction),
+//                    yAxis,
+//                    functionColor
+//                )
+//            }
+//            DraggedDirection.RIGHT -> {
+//                ConcatenationFunction(
+//                    name,
+//                    points.map { Point(it.x + value, it.y) },
+//                    xAxis.changeDeltas(value, direction),
+//                    yAxis,
+//                    functionColor
+//                )
+//            }
+//            DraggedDirection.UP -> {
+//                ConcatenationFunction(
+//                    name,
+//                    points.map { Point(it.x, it.y + value) },
+//                    xAxis,
+//                    yAxis.changeDeltas(value, direction),
+//                    functionColor
+//                )
+//            }
+//            DraggedDirection.DOWN -> {
+//                ConcatenationFunction(
+//                    name,
+//                    points.map { Point(it.x, it.y - value) },
+//                    xAxis,
+//                    yAxis.changeDeltas(value, direction),
+//                    functionColor
+//                )
+//            }
+//            DraggedDirection.UNDEFINED -> {
+//                ConcatenationFunction(
+//                    name, points, xAxis, yAxis, functionColor
+//                )
+//            }
+//        }
+//    }
 
     private fun List<Double>.toDoubleArray(): DoubleArray {
         val array = DoubleArray(this.size)

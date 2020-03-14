@@ -12,11 +12,9 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Priority
 import ru.nstu.grin.controller.concatenation.ConcatenationCanvasController
 import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.ExistDirection
 import ru.nstu.grin.model.drawable.Arrow
-import ru.nstu.grin.model.drawable.ConcatenationFunction
+import ru.nstu.grin.model.drawable.CartesianSpace
 import ru.nstu.grin.model.drawable.Description
-import ru.nstu.grin.model.drawable.axis.AbstractAxis
 import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.settings.SettingsProvider
 import tornadofx.*
@@ -38,7 +36,7 @@ class ConcatenationCanvas : View() {
             chainDrawer = ConcatenationChainDrawer(this, model)
 
             model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
-            model.functionsProperty.addListener { _: ListChangeListener.Change<out ConcatenationFunction> -> chainDrawer.draw() }
+            model.cartesianSpace.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
             model.descriptionsProperty.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
 
             onScroll = ScalableScrollHandler(model, controller)
@@ -47,18 +45,19 @@ class ConcatenationCanvas : View() {
 
             onMouseClicked = object : EventHandler<MouseEvent> {
                 override fun handle(event: MouseEvent) {
-                    val functions = model.drawings.filterIsInstance<ConcatenationFunction>()
-                    for (function in functions) {
-                        for (point in function.points) {
-                            if (point.isNearBy(
-                                    event.x + AbstractAxis.WIDTH_AXIS,
-                                    SettingsProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS
-                                )
-                            ) {
-                                println("Show modal")
-                            }
-                        }
-                    }
+                    println("Show modal with coordinates")
+//                    val functions = model.drawings.filterIsInstance<ConcatenationFunction>()
+//                    for (function in functions) {
+//                        for (point in function.points) {
+//                            if (point.isNearBy(
+//                                    event.x + AbstractAxis.WIDTH_AXIS,
+//                                    SettingsProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS
+//                                )
+//                            ) {
+//                                println("Show modal")
+//                            }
+//                        }
+//                    }
                 }
             }
 
@@ -71,13 +70,14 @@ class ConcatenationCanvas : View() {
                             minY = 0.0,
                             maxY = this@canvas.height
                         )
-                        val xDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
-                            ExistDirection(it.xAxis.getDirection(), it.name)
-                        }
-                        val yDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
-                            ExistDirection(it.yAxis.getDirection(), it.name)
-                        }
-                        controller.openFunctionModal(drawSize, xDirections, yDirections)
+//                        val xDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
+//                            ExistDirection(it.xAxis.getDirection(), it.name)
+//                        }
+//                        val yDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
+//                            ExistDirection(it.yAxis.getDirection(), it.name)
+//                        }
+                        // TODO add xDirection, yDirection
+                        controller.openFunctionModal(drawSize, listOf(), listOf())
                     }
                     item("Add arrow").action {
                         controller.openArrowModal(outX, outY)

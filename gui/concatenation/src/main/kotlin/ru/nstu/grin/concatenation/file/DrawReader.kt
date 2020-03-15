@@ -1,6 +1,8 @@
 package ru.nstu.grin.concatenation.file
 
-import ru.nstu.grin.concatenation.model.Drawable
+import ru.nstu.grin.common.model.Arrow
+import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.model.ConcatenationFunction
 import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
@@ -19,25 +21,31 @@ class DrawReader {
      * Arrows
      * Functions
      */
-    fun read(file: File): List<Drawable> {
-        val result = mutableListOf<Drawable>()
-        FileInputStream(file).use { fis ->
+    fun read(file: File): ConcatenationReaderResult {
+        return FileInputStream(file).use { fis ->
             ObjectInputStream(fis).use { ois ->
+                val descriptions = mutableListOf<Description>()
+                val arrows = mutableListOf<Arrow>()
+                val functions = mutableListOf<ConcatenationFunction>()
                 val descriptionSize = ois.readInt()
                 val arrowSize = ois.readInt()
                 val functionSize = ois.readInt()
 
                 for (i in 0 until descriptionSize) {
-                    result.add(descriptionReader.deserialize(ois))
+                    descriptions.add(descriptionReader.deserialize(ois))
                 }
                 for (i in 0 until arrowSize) {
-                    result.add(arrowReader.deserialize(ois))
+                    arrows.add(arrowReader.deserialize(ois))
                 }
                 for (i in 0 until functionSize) {
-                    result.add(functionReader.deserialize(ois))
+                    functions.add(functionReader.deserialize(ois))
                 }
+                ConcatenationReaderResult(
+                    descriptions = descriptions,
+                    arrows = arrows,
+                    functions = functions
+                )
             }
         }
-        return result
     }
 }

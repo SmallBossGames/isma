@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream
 
 abstract class AbstractAxis(
     // Точка откуда начинаем отрисовку
-    private val zeroPoint: Double,
+    val zeroPoint: Double,
     private val minDelta: Double,
     private val deltaMarks: List<Double>,
     private val backGroundColor: Color,

@@ -1,7 +1,7 @@
 package ru.nstu.grin.concatenation.draw.elements
 
 import javafx.scene.canvas.GraphicsContext
-import ru.nstu.grin.common.common.SettingsProvider
+import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.model.CanvasSettings
 import ru.nstu.grin.concatenation.model.ConcatenationFunction
@@ -9,21 +9,34 @@ import ru.nstu.grin.concatenation.model.axis.AbstractAxis
 
 class ConcatenationFunctionDrawElement(
     private val functions: List<ConcatenationFunction>,
+    private val xAxis: AbstractAxis,
+    private val yAxis: AbstractAxis,
     private val settings: CanvasSettings
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         for (function in functions) {
-            val points = function.points
+            val points = transformPoints(xAxis.zeroPoint, yAxis.zeroPoint, function.points)
 
+            val xPoints = points.map { it.x }.toDoubleArray()
+            val yPoints = points.map { it.y }.toDoubleArray()
+            val n = points.size
             context.strokePolyline(
-                points.map { (it.x * settings.scale) + AbstractAxis.WIDTH_AXIS }.toDoubleArray(),
-                points.map {
-                    SettingsProvider.getCanvasHeight() - (it.y * settings.scale) - AbstractAxis.WIDTH_AXIS
-                }.toDoubleArray(),
-                points.size
+                xPoints,
+                yPoints,
+                n
             )
-            function.xAxis.draw(context)
-            function.yAxis.draw(context)
+        }
+    }
+
+    private fun transformPoints(zeroPointX: Double, zeroPointY: Double, points: List<Point>): List<Point> {
+        return points.map {
+            val x = zeroPointX + it.x * settings.scale
+            val y = if (it.y > 0) {
+                zeroPointY - it.y * settings.scale
+            } else {
+                zeroPointY + it.y * settings.scale
+            }
+            Point(x, y)
         }
     }
 }

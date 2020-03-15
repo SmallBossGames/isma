@@ -15,8 +15,8 @@ import java.io.ObjectOutputStream
 data class ConcatenationFunction(
     val name: String,
     val points: List<Point>,
-    val xAxis: AbstractAxis,
-    val yAxis: AbstractAxis,
+//    val xAxis: AbstractAxis,
+//    val yAxis: AbstractAxis,
     val functionColor: Color
 ) : Locationable, Writer {
     //TODO move to draw scale
@@ -82,8 +82,8 @@ data class ConcatenationFunction(
 
     override fun serialize(oos: ObjectOutputStream) {
         oos.writeObject(points)
-        xAxis.serialize(oos)
-        yAxis.serialize(oos)
+//        xAxis.serialize(oos)
+//        yAxis.serialize(oos)
         oos.write(functionColor.toByteArray())
     }
 

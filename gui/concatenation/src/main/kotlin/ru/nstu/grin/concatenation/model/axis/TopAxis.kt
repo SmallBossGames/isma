@@ -1,16 +1,17 @@
 package ru.nstu.grin.concatenation.model.axis
 
 import javafx.scene.paint.Color
+import ru.nstu.grin.concatenation.marks.MarksProvider
 import ru.nstu.grin.concatenation.model.Direction
 
-data class TopAxis(
-    private val zeroPoint: Double,
-    private val minDelta: Double,
-    private val deltaMarks: List<Double>,
-    private val backGroundColor: Color,
-    private val delimiterColor: Color
+class TopAxis(
+    zeroPoint: Double,
+    minDelta: Double,
+    marksProvider: MarksProvider,
+    backGroundColor: Color,
+    delimiterColor: Color
 ) : AbstractAxis(
-    zeroPoint, minDelta, deltaMarks, backGroundColor, delimiterColor
+    zeroPoint, minDelta, marksProvider, backGroundColor, delimiterColor
 ) {
     override fun getDirection(): Direction {
         return Direction.TOP

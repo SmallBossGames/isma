@@ -7,21 +7,24 @@ import ru.nstu.grin.concatenation.marks.MarksProvider
 import ru.nstu.grin.concatenation.model.Direction
 import java.io.ObjectOutputStream
 
-abstract class AbstractAxis(
+/**
+ * @param zeroPoint - Точка нуля, где он располжен
+ * @param marksProvider - поставитель меток оси
+ * @param order -
+ */
+class ConcatenationAxis(
     // Точка откуда начинаем отрисовку
     val zeroPoint: Double,
-    private val minDelta: Double,
     val marksProvider: MarksProvider,
-    private val backGroundColor: Color,
-    private val delimiterColor: Color
+    val order: Int,
+    val direction: Direction,
+    val backGroundColor: Color,
+    val delimiterColor: Color
 ) : Writer {
 
-    abstract fun getDirection(): Direction
-
     override fun serialize(oos: ObjectOutputStream) {
-        oos.writeObject(getDirection())
+        oos.writeObject(direction)
         oos.writeDouble(zeroPoint)
-        oos.writeDouble(minDelta)
         oos.write(backGroundColor.toByteArray())
         oos.write(delimiterColor.toByteArray())
     }

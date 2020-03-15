@@ -9,16 +9,16 @@ class MarkersDrawElement(
     private val settings: SimplePlotSettings
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
-        val middleWidth = context.canvas.width / 2
-        val relativeX = middleWidth - MARKER_MARGIN
-        val middleHeight = context.canvas.height / 2
-        val relativeY = middleHeight + MARKER_MARGIN
+        val zeroX = context.canvas.width / 2
+        val relativeX = zeroX - MARKER_MARGIN
+        val zeroY = context.canvas.height / 2
+        val relativeY = zeroY + MARKER_MARGIN
 
         context.stroke = Color.valueOf("5F5F5F")
 
         context.strokeText("0", relativeX, relativeY)
 
-        var currentX = middleWidth + settings.pixelCost
+        var currentX = zeroX + settings.pixelCost
         var currentCount = settings.step
         while (currentX < context.canvas.width) {
             context.strokeText(currentCount.toString(), currentX, relativeY)
@@ -26,7 +26,7 @@ class MarkersDrawElement(
             currentX += settings.pixelCost
         }
 
-        currentX = middleWidth - settings.pixelCost
+        currentX = zeroX - settings.pixelCost
         currentCount = -settings.step
         while (currentX > 0) {
             context.strokeText(currentCount.toString(), currentX, relativeY)
@@ -34,7 +34,7 @@ class MarkersDrawElement(
             currentX -= settings.pixelCost
         }
 
-        var currentY = middleHeight - settings.pixelCost
+        var currentY = zeroY - settings.pixelCost
         currentCount = settings.step
         while (currentY > 0) {
             context.strokeText(currentCount.toString(), relativeX - 5, currentY)
@@ -42,7 +42,7 @@ class MarkersDrawElement(
             currentCount += settings.step
         }
 
-        currentY = middleHeight + settings.pixelCost
+        currentY = zeroY + settings.pixelCost
         currentCount = -settings.step
         while (currentY < context.canvas.height) {
             context.strokeText(currentCount.toString(), relativeX - 10, currentY)

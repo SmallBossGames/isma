@@ -4,8 +4,8 @@ import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.controller.DeltaMarksGenerator
 import ru.nstu.grin.concatenation.controller.DeltaSizeCalculator
-import ru.nstu.grin.concatenation.dto.AxisDTO
-import ru.nstu.grin.concatenation.dto.FunctionDTO
+import ru.nstu.grin.concatenation.dto.ConcatenationAxisDTO
+import ru.nstu.grin.concatenation.dto.ConcatenationFunctionDTO
 import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.model.function.ManualEnterFunctionViewModel
 import tornadofx.Controller
@@ -32,16 +32,16 @@ class ManualEnterFunctionController : Controller() {
         val delta = DeltaSizeCalculator().calculateDelta(drawSize)
         val deltaMarksGenerator = DeltaMarksGenerator()
 
-        val functionDto = FunctionDTO(
+        val functionDto = ConcatenationFunctionDTO(
             name = model.functionName,
             points = points,
-            xAxis = AxisDTO(
+            xAxis = ConcatenationAxisDTO(
                 backGroundColor = model.xAxisColor,
                 delimeterColor = model.xDelimiterColor,
                 direction = model.xDirection,
                 deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction)
             ),
-            yAxis = AxisDTO(
+            yAxis = ConcatenationAxisDTO(
                 backGroundColor = model.yAxisColor,
                 delimeterColor = model.yDelimeterColor,
                 direction = model.yDirection,

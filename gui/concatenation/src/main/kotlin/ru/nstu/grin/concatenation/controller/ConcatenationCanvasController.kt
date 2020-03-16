@@ -10,12 +10,16 @@ import ru.nstu.grin.common.events.ConcatenationDescriptionEvent
 import ru.nstu.grin.common.model.ConcatenationType
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.view.modal.ArrowModalView
+import ru.nstu.grin.concatenation.converters.model.CartesianSpaceConverter
+import ru.nstu.grin.concatenation.converters.model.ConcatenationAxisConverter
+import ru.nstu.grin.concatenation.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.events.LoadEvent
 import ru.nstu.grin.concatenation.events.SaveEvent
 import ru.nstu.grin.concatenation.file.DrawReader
 import ru.nstu.grin.concatenation.file.DrawWriter
 import ru.nstu.grin.concatenation.model.ChooseFunctionViewModel
+import ru.nstu.grin.concatenation.model.Direction
 import ru.nstu.grin.concatenation.model.ExistDirection
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.view.ConcatenationCanvas
@@ -52,7 +56,19 @@ class ConcatenationCanvasController : Controller() {
             model.arrows.add(arrow)
         }
         subscribe<ConcatenationFunctionEvent> {
-            val functionDTO = it.function
+            val cartesianSpace = it.cartesianSpace
+            val found = model.cartesianSpaces.firstOrNull {
+                it.xAxis.name == cartesianSpace.xAxis.name
+                    && it.yAxis.name == cartesianSpace.yAxis.name
+            }
+            if (found == null) {
+                val xAxis = it.cartesianSpace.xAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
+                val yAxis = it.cartesianSpace.yAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
+                val added = CartesianSpaceConverter.merge(it.cartesianSpace, xAxis, yAxis)
+                model.cartesianSpaces.add(added)
+            } else {
+                TODO("Logic for merge of cartisan spaces")
+            }
         }
 
         subscribe<ConcatenationDescriptionEvent> {
@@ -64,6 +80,7 @@ class ConcatenationCanvasController : Controller() {
                 0.0, 0.0,
                 SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
             )
+
             model.drawings.clear()
         }
         subscribe<SaveEvent> {
@@ -76,6 +93,27 @@ class ConcatenationCanvasController : Controller() {
             model.arrows.addAll(readResult.arrows)
             model.descriptions.addAll(readResult.descriptions)
             TODO("Add cartesians")
+        }
+    }
+
+    private fun ConcatenationAxisDTO.getOrder(): Int {
+        return when (direction.direction) {
+            Direction.LEFT -> {
+                model.cartesianSpaces.filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
+                    .size - 1
+            }
+            Direction.RIGHT -> {
+                model.cartesianSpaces.filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
+                    .size - 1
+            }
+            Direction.TOP -> {
+                model.cartesianSpaces.filter { it.xAxis.direction == Direction.TOP || it.yAxis.direction == Direction.TOP }
+                    .size - 1
+            }
+            Direction.BOTTOM -> {
+                model.cartesianSpaces.filter { it.xAxis.direction == Direction.BOTTOM || it.yAxis.direction == Direction.BOTTOM }
+                    .size - 1
+            }
         }
     }
 

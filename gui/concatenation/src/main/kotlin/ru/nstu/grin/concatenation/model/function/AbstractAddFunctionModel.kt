@@ -23,11 +23,17 @@ abstract class AbstractAddFunctionModel : ViewModel() {
     var functionColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var functionColor by functionColorProperty
 
+    var xAxisNameProperty = SimpleStringProperty()
+    var xAxisName by xAxisNameProperty
+
     var xAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var xAxisColor by xAxisColorProperty
 
     var xDelimeterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var xDelimiterColor by xDelimeterColorProperty
+
+    var yAxisNameProperty = SimpleStringProperty()
+    var yAxisName by yAxisNameProperty
 
     var yAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var yAxisColor by yAxisColorProperty

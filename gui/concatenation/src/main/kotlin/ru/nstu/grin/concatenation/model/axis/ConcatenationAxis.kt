@@ -13,7 +13,7 @@ import java.io.ObjectOutputStream
  * @param order -
  */
 class ConcatenationAxis(
-    // Точка откуда начинаем отрисовку
+    val name: String,
     val zeroPoint: Double,
     val marksProvider: MarksProvider,
     val order: Int,

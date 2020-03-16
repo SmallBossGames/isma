@@ -2,7 +2,6 @@ package ru.nstu.grin.concatenation.converters.model
 
 import ru.nstu.grin.concatenation.dto.FunctionDTO
 import ru.nstu.grin.concatenation.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.model.axis.AbstractAxis
 
 object ConcatenationFunctionConverter {
     fun merge(

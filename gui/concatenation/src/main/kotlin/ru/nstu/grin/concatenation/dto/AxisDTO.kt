@@ -4,7 +4,7 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.concatenation.model.ExistDirection
 
 data class AxisDTO(
-    val color: Color,
+    val backGroundColor: Color,
     val delimeterColor: Color,
     val direction: ExistDirection,
     val deltaMarks: List<Double>

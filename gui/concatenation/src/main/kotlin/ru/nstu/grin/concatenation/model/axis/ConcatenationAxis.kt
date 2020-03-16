@@ -28,8 +28,4 @@ class ConcatenationAxis(
         oos.write(backGroundColor.toByteArray())
         oos.write(delimiterColor.toByteArray())
     }
-
-    internal companion object {
-        const val WIDTH_AXIS = 50.0 // 100 px in default
-    }
 }

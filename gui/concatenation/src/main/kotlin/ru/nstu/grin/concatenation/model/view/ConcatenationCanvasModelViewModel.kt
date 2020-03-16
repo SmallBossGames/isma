@@ -11,7 +11,7 @@ import tornadofx.*
 
 class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>() {
     var cartesianSpaceProperty = SimpleListProperty<CartesianSpace>(FXCollections.observableArrayList())
-    var cartesianSpace by cartesianSpaceProperty
+    var cartesianSpaces by cartesianSpaceProperty
 
     var arrowsProperty = SimpleListProperty<Arrow>(FXCollections.observableArrayList())
     var arrows by arrowsProperty

@@ -19,7 +19,7 @@ class ConcatenationChainDrawer(
         ArrowDrawElement(model.arrows, 1.0).draw(context)
         DescriptionDrawElement(model.descriptions).draw(context)
 
-        for (cartesianSpace in model.cartesianSpace) {
+        for (cartesianSpace in model.cartesianSpaces) {
             AxisDrawElement(cartesianSpace.xAxis, cartesianSpace.yAxis).draw(context)
             ConcatenationFunctionDrawElement(cartesianSpace.functions, cartesianSpace.settings).draw(context)
         }

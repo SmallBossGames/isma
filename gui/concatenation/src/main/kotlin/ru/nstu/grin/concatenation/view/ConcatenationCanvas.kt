@@ -36,7 +36,7 @@ class ConcatenationCanvas : View() {
             chainDrawer = ConcatenationChainDrawer(this, model)
 
             model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
-            model.cartesianSpace.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
+            model.cartesianSpaces.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
             model.descriptionsProperty.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
 
             onScroll = ScalableScrollHandler(model, controller)

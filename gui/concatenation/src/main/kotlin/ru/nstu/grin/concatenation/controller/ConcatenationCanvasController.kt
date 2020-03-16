@@ -10,13 +10,12 @@ import ru.nstu.grin.common.events.ConcatenationDescriptionEvent
 import ru.nstu.grin.common.model.ConcatenationType
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.view.modal.ArrowModalView
-import ru.nstu.grin.concatenation.converters.model.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.events.LoadEvent
 import ru.nstu.grin.concatenation.events.SaveEvent
+import ru.nstu.grin.concatenation.file.DrawReader
 import ru.nstu.grin.concatenation.file.DrawWriter
 import ru.nstu.grin.concatenation.model.ChooseFunctionViewModel
-import ru.nstu.grin.concatenation.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.model.ExistDirection
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.view.ConcatenationCanvas
@@ -50,29 +49,15 @@ class ConcatenationCanvasController : Controller() {
     init {
         subscribe<ConcatenationArrowEvent> {
             val arrow = ArrowConverter.convert(it.arrow)
-            model.drawings.add(arrow)
+            model.arrows.add(arrow)
         }
         subscribe<ConcatenationFunctionEvent> {
             val functionDTO = it.function
-            val xAxises = model.drawings.filterIsInstance<ConcatenationFunction>()
-                .map { Pair(it.name, it.xAxis) }
-            val yAxises = model.drawings.filterIsInstance<ConcatenationFunction>()
-                .map { Pair(it.name, it.yAxis) }
-
-            val function = ConcatenationFunctionConverter.merge(
-                functionDTO,
-                it.minAxisDelta,
-                pointCoefCalculator.getStartPointCoef(functionDTO.xAxis.direction.direction, model.drawings),
-                pointCoefCalculator.getStartPointCoef(functionDTO.yAxis.direction.direction, model.drawings),
-                xAxises,
-                yAxises
-            )
-            model.drawings.add(function)
         }
 
         subscribe<ConcatenationDescriptionEvent> {
             val description = DescriptionConverter.convert(it.description)
-            model.drawings.add(description)
+            model.descriptions.add(description)
         }
         subscribe<ConcatenationClearCanvasEvent> {
             view.canvas.graphicsContext2D.clearRect(
@@ -87,8 +72,10 @@ class ConcatenationCanvasController : Controller() {
         }
         subscribe<LoadEvent> {
             val reader = DrawReader()
-            val drawings = reader.read(it.file)
-            model.drawings.addAll(drawings)
+            val readResult = reader.read(it.file)
+            model.arrows.addAll(readResult.arrows)
+            model.descriptions.addAll(readResult.descriptions)
+            TODO("Add cartesians")
         }
     }
 
@@ -130,6 +117,8 @@ class ConcatenationCanvasController : Controller() {
             0.0, 0.0,
             SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
         )
-        model.drawings.clear()
+        model.arrows.clear()
+        model.descriptions.clear()
+        model.cartesianSpaces.clear()
     }
 }

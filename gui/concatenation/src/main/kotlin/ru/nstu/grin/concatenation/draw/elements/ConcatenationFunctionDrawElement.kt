@@ -5,12 +5,12 @@ import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.model.CanvasSettings
 import ru.nstu.grin.concatenation.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.model.axis.AbstractAxis
+import ru.nstu.grin.concatenation.model.axis.ConcatenationAxis
 
 class ConcatenationFunctionDrawElement(
     private val functions: List<ConcatenationFunction>,
-    private val xAxis: AbstractAxis,
-    private val yAxis: AbstractAxis,
+    private val xAxis: ConcatenationAxis,
+    private val yAxis: ConcatenationAxis,
     private val settings: CanvasSettings
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {

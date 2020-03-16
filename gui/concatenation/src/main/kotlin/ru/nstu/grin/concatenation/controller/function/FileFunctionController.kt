@@ -31,13 +31,13 @@ class FileFunctionController : Controller() {
                 name = "${model.functionName}.$index",
                 points = list,
                 xAxis = AxisDTO(
-                    color = model.xAxisColor,
+                    backGroundColor = model.xAxisColor,
                     delimeterColor = model.xDelimiterColor,
                     direction = model.xDirection,
                     deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction)
                 ),
                 yAxis = AxisDTO(
-                    color = model.yAxisColor,
+                    backGroundColor = model.yAxisColor,
                     delimeterColor = model.yDelimeterColor,
                     direction = model.yDirection,
                     deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction)

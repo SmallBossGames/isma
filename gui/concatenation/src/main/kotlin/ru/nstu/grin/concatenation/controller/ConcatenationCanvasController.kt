@@ -25,25 +25,7 @@ import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.view.modal.ChooseFunctionModalView
 import ru.nstu.grin.concatenation.view.modal.DescriptionModalView
-import ru.nstu.grin.converters.model.ArrowConverter
-import ru.nstu.grin.converters.model.DescriptionConverter
-import ru.nstu.grin.converters.model.ConcatenationFunctionConverter
-import ru.nstu.grin.events.common.*
-import ru.nstu.grin.events.concatenation.*
-import ru.nstu.grin.file.DrawReader
-import ru.nstu.grin.file.DrawWriter
-import ru.nstu.grin.model.ConcatenationType
-import ru.nstu.grin.model.DrawSize
-import ru.nstu.grin.model.ExistDirection
-import ru.nstu.grin.model.view.ConcatenationCanvasModelViewModel
-import ru.nstu.grin.settings.SettingsProvider
-import ru.nstu.grin.view.concatenation.ConcatenationCanvas
-import ru.nstu.grin.view.common.modal.ArrowModalView
-import ru.nstu.grin.view.concatenation.modal.ChooseFunctionModalView
-import ru.nstu.grin.view.concatenation.modal.DescriptionModalView
 import tornadofx.*
-import ru.nstu.grin.model.drawable.ConcatenationFunction
-import ru.nstu.grin.model.concatenation.ChooseFunctionViewModel
 
 class ConcatenationCanvasController : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -81,7 +63,6 @@ class ConcatenationCanvasController : Controller() {
                 SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
             )
 
-            model.drawings.clear()
         }
         subscribe<SaveEvent> {
             val writer = DrawWriter(it.file)

@@ -6,7 +6,6 @@ import javafx.scene.shape.Shape
 import ru.nstu.grin.common.extensions.toByteArray
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.file.Writer
-import ru.nstu.grin.concatenation.model.axis.AbstractAxis
 import java.io.ObjectOutputStream
 
 /**

@@ -10,7 +10,7 @@ dependencies {
     implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
     implementation project(":analytic-fu")
     implementation project(":gui:simple")
-//    implementation project(":gui:concatenation")
+    implementation project(":gui:concatenation")
     implementation project(":gui:kube")
     api project(":gui:common")
 

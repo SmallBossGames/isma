@@ -3,6 +3,7 @@ package ru.nstu.grin.main.view
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import javafx.stage.StageStyle
+import ru.nstu.grin.concatenation.view.ConcatenationView
 import ru.nstu.grin.kube.view.KubeCanvasView
 import ru.nstu.grin.simple.view.SimpleCanvasView
 import tornadofx.*
@@ -19,9 +20,9 @@ class ConstuctorView : View() {
             fitHeight = 300.0
             fitWidth = 300.0
             shortpress {
-//                find<ConcatenationView>().openWindow(
-//                    stageStyle = StageStyle.DECORATED
-//                )
+                find<ConcatenationView>().openWindow(
+                    stageStyle = StageStyle.DECORATED
+                )
             }
         }
         imageview("usual_chart.png") {

@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.controller.function
 
+import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.controller.PointsBuilder
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.concatenation.controller.DeltaMarksGenerator
@@ -32,14 +33,16 @@ class AnalyticFunctionController : Controller() {
                 backGroundColor = model.xAxisColor,
                 delimeterColor = model.xDelimiterColor,
                 direction = model.xDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction)
+                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction),
+                zeroPoint = SettingsProvider.getCanvasWidth() / 2
             ),
             yAxis = ConcatenationAxisDTO(
                 name = model.yAxisName,
                 backGroundColor = model.yAxisColor,
                 delimeterColor = model.yDelimeterColor,
                 direction = model.yDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction)
+                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction),
+                zeroPoint = SettingsProvider.getCanvasHeight() / 2
             )
         )
         fire(

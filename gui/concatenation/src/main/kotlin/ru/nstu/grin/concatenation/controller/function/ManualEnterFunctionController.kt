@@ -1,9 +1,11 @@
 package ru.nstu.grin.concatenation.controller.function
 
+import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.controller.DeltaMarksGenerator
 import ru.nstu.grin.concatenation.controller.DeltaSizeCalculator
+import ru.nstu.grin.concatenation.dto.CartesianSpaceDTO
 import ru.nstu.grin.concatenation.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.dto.ConcatenationFunctionDTO
 import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
@@ -32,26 +34,36 @@ class ManualEnterFunctionController : Controller() {
         val delta = DeltaSizeCalculator().calculateDelta(drawSize)
         val deltaMarksGenerator = DeltaMarksGenerator()
 
-        val functionDto = ConcatenationFunctionDTO(
+        val function = ConcatenationFunctionDTO(
             name = model.functionName,
             points = points,
-            xAxis = ConcatenationAxisDTO(
-                backGroundColor = model.xAxisColor,
-                delimeterColor = model.xDelimiterColor,
-                direction = model.xDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction)
-            ),
-            yAxis = ConcatenationAxisDTO(
-                backGroundColor = model.yAxisColor,
-                delimeterColor = model.yDelimeterColor,
-                direction = model.yDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction)
-            ),
             functionColor = model.functionColor
         )
+        val xAxis = ConcatenationAxisDTO(
+            name = model.xAxisName,
+            backGroundColor = model.xAxisColor,
+            delimeterColor = model.xDelimiterColor,
+            direction = model.xDirection,
+            deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction),
+            zeroPoint = SettingsProvider.getCanvasWidth() / 2
+        )
+        val yAxis = ConcatenationAxisDTO(
+            name = model.yAxisName,
+            backGroundColor = model.yAxisColor,
+            delimeterColor = model.yDelimeterColor,
+            direction = model.yDirection,
+            deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction),
+            zeroPoint = SettingsProvider.getCanvasHeight() / 2
+        )
+        val cartesianSpace = CartesianSpaceDTO(
+            functions = listOf(function),
+            xAxis = xAxis,
+            yAxis = yAxis
+        )
+
         fire(
             ConcatenationFunctionEvent(
-                function = functionDto,
+                cartesianSpace = cartesianSpace,
                 minAxisDelta = delta
             )
         )

@@ -12,6 +12,7 @@ import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.view.modal.ArrowModalView
 import ru.nstu.grin.concatenation.converters.model.CartesianSpaceConverter
 import ru.nstu.grin.concatenation.converters.model.ConcatenationAxisConverter
+import ru.nstu.grin.concatenation.converters.model.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.events.LoadEvent
@@ -30,26 +31,29 @@ import tornadofx.*
 class ConcatenationCanvasController : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val view: ConcatenationCanvas by inject()
-    private val pointCoefCalculator = PointCoefCalculator()
 
     init {
         subscribe<ConcatenationArrowEvent> {
             val arrow = ArrowConverter.convert(it.arrow)
             model.arrows.add(arrow)
         }
-        subscribe<ConcatenationFunctionEvent> {
-            val cartesianSpace = it.cartesianSpace
+        subscribe<ConcatenationFunctionEvent> { event ->
+            val cartesianSpace = event.cartesianSpace
             val found = model.cartesianSpaces.firstOrNull {
                 it.xAxis.name == cartesianSpace.xAxis.name
                     && it.yAxis.name == cartesianSpace.yAxis.name
             }
             if (found == null) {
-                val xAxis = it.cartesianSpace.xAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
-                val yAxis = it.cartesianSpace.yAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
-                val added = CartesianSpaceConverter.merge(it.cartesianSpace, xAxis, yAxis)
+                val xAxis = cartesianSpace.xAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
+                val yAxis = cartesianSpace.yAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
+                val added = CartesianSpaceConverter.merge(cartesianSpace, xAxis, yAxis)
                 model.cartesianSpaces.add(added)
             } else {
-                TODO("Logic for merge of cartisan spaces")
+                model.cartesianSpaces.remove(found)
+
+                val functions = cartesianSpace.functions.map { ConcatenationFunctionConverter.convert(it) }
+                found.merge(functions)
+                model.cartesianSpaces.add(found)
             }
         }
 
@@ -58,15 +62,12 @@ class ConcatenationCanvasController : Controller() {
             model.descriptions.add(description)
         }
         subscribe<ConcatenationClearCanvasEvent> {
-            view.canvas.graphicsContext2D.clearRect(
-                0.0, 0.0,
-                SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
-            )
-
+            clearCanvas()
         }
+
+
         subscribe<SaveEvent> {
             val writer = DrawWriter(it.file)
-            writer.write(model.drawings)
         }
         subscribe<LoadEvent> {
             val reader = DrawReader()
@@ -131,7 +132,7 @@ class ConcatenationCanvasController : Controller() {
         ).openModal(stageStyle = StageStyle.UTILITY)
     }
 
-    fun clearCanvas() {
+    private fun clearCanvas() {
         view.canvas.graphicsContext2D.clearRect(
             0.0, 0.0,
             SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()

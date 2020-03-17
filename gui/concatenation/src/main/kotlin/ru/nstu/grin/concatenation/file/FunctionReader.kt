@@ -13,8 +13,6 @@ class FunctionReader : Reader<ConcatenationFunction> {
         return ConcatenationFunction(
             name = ois.readUTF(),
             points = ois.readObject() as List<Point>,
-            xAxis = axisReader.deserialize(ois),
-            yAxis = axisReader.deserialize(ois),
             functionColor = readColor(ois)
         )
     }

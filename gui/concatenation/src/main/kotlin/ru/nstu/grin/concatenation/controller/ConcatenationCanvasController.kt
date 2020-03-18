@@ -82,19 +82,19 @@ class ConcatenationCanvasController : Controller() {
         return when (direction.direction) {
             Direction.LEFT -> {
                 model.cartesianSpaces.filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
-                    .size - 1
+                    .size
             }
             Direction.RIGHT -> {
                 model.cartesianSpaces.filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
-                    .size - 1
+                    .size
             }
             Direction.TOP -> {
                 model.cartesianSpaces.filter { it.xAxis.direction == Direction.TOP || it.yAxis.direction == Direction.TOP }
-                    .size - 1
+                    .size
             }
             Direction.BOTTOM -> {
                 model.cartesianSpaces.filter { it.xAxis.direction == Direction.BOTTOM || it.yAxis.direction == Direction.BOTTOM }
-                    .size - 1
+                    .size
             }
         }
     }

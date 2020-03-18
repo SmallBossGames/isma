@@ -11,7 +11,7 @@ import tornadofx.getValue
 import tornadofx.setValue
 
 abstract class AbstractAddFunctionModel : ViewModel() {
-    var functionNameProperty = SimpleStringProperty(this, "functionName", "")
+    var functionNameProperty = SimpleStringProperty(this, "functionName", "Функция номер 1")
     var functionName: String by functionNameProperty
 
     var xDirectionProperty = SimpleObjectProperty(ExistDirection(Direction.BOTTOM, null))
@@ -23,7 +23,7 @@ abstract class AbstractAddFunctionModel : ViewModel() {
     var functionColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var functionColor by functionColorProperty
 
-    var xAxisNameProperty = SimpleStringProperty()
+    var xAxisNameProperty = SimpleStringProperty(this, "xAxisName", "Ось 1")
     var xAxisName by xAxisNameProperty
 
     var xAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
@@ -32,7 +32,7 @@ abstract class AbstractAddFunctionModel : ViewModel() {
     var xDelimeterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var xDelimiterColor by xDelimeterColorProperty
 
-    var yAxisNameProperty = SimpleStringProperty()
+    var yAxisNameProperty = SimpleStringProperty(this, "yAxisName", "Ось 2")
     var yAxisName by yAxisNameProperty
 
     var yAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())

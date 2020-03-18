@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.view
+package ru.nstu.grin.concatenation.draw
 
 import javafx.scene.canvas.Canvas
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement

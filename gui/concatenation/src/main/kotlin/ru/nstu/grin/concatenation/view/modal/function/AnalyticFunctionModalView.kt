@@ -29,8 +29,11 @@ class AnalyticFunctionModalView : AbstractAddFunctionModal() {
                 textfield().bind(model.deltaProperty)
             }
         }
-        fieldset("Направления осей") {
-            field("Ось x") {
+        fieldset("Ось x") {
+            field("Имя") {
+                textfield().bind(model.xAxisNameProperty)
+            }
+            field("Напрвление") {
                 val default = Direction.values().map { ExistDirection(it, null) }
                 val existDirections = xExistDirections
                 combobox(model.xDirectionProperty, default + existDirections) {
@@ -43,7 +46,12 @@ class AnalyticFunctionModalView : AbstractAddFunctionModal() {
                     }
                 }
             }
-            field("Ось y") {
+        }
+        fieldset("Ось y") {
+            field("Имя") {
+                textfield().bind(model.yAxisNameProperty)
+            }
+            field("Направление") {
                 val default = Direction.values().map { ExistDirection(it, null) }
                 val existDirections = yExistDirections
                 combobox(model.yDirectionProperty, default + existDirections) {

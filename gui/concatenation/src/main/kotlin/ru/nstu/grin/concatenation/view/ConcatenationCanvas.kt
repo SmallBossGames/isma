@@ -16,6 +16,7 @@ import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.DrawSize
+import ru.nstu.grin.concatenation.draw.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 import tornadofx.*
 

@@ -122,7 +122,7 @@ class AxisDrawElement(
             Direction.BOTTOM -> {
                 context.fillRect(
                     0.0,
-                    SettingsProvider.getCanvasHeight() - startPoint,
+                    SettingsProvider.getCanvasHeight() - startPoint - SettingsProvider.getAxisWidth(),
                     SettingsProvider.getCanvasWidth(),
                     SettingsProvider.getAxisWidth()
                 )

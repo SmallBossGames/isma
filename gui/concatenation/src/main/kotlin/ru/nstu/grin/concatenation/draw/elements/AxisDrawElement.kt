@@ -20,13 +20,14 @@ class AxisDrawElement(
     override fun draw(context: GraphicsContext) {
         drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
         drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
-        drawAxisMarks(context, xAxis.order, xAxis.direction, xAxis.marksProvider, xAxis.delimiterColor)
-        drawAxisMarks(context, yAxis.order, yAxis.direction, yAxis.marksProvider, yAxis.delimiterColor)
+        drawAxisMarks(context, xAxis.order, xAxis.zeroPoint, xAxis.direction, xAxis.marksProvider, xAxis.delimiterColor)
+        drawAxisMarks(context, yAxis.order, yAxis.zeroPoint, yAxis.direction, yAxis.marksProvider, yAxis.delimiterColor)
     }
 
     private fun drawAxisMarks(
         context: GraphicsContext,
         order: Int,
+        zeroPoint: Double,
         direction: Direction,
         marksProvider: MarksProvider,
         color: Color
@@ -37,60 +38,80 @@ class AxisDrawElement(
 
         when (direction) {
             Direction.LEFT -> {
-                var currentStepY = 0.0
-                var currentY = getTopAxisSize() * SettingsProvider.getAxisWidth()
-                val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-                while (currentY < maxY) {
-                    context.strokeText(
-                        marksProvider.getMark(currentStepY, canvasSettings.step),
-                        marksCoordinate,
-                        currentY
-                    )
-                    currentStepY += canvasSettings.step
-                    currentY += SettingsProvider.getMarksInterval()
-                }
+//                var currentStepY = 0.0
+//                var currentY = getTopAxisSize() * SettingsProvider.getAxisWidth()
+//                val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+//                while (currentY < maxY) {
+//                    context.strokeText(
+//                        marksProvider.getNextMark(, currentStepY, canvasSettings.step),
+//                        marksCoordinate,
+//                        currentY
+//                    )
+//                    currentStepY += canvasSettings.step
+//                    currentY += SettingsProvider.getMarksInterval()
+//                }
 
             }
             Direction.RIGHT -> {
-                var currentStepY = 0.0
-                var currentY = getTopAxisSize() * SettingsProvider.getAxisWidth()
-                val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-                while (currentY < maxY) {
-                    context.strokeText(
-                        marksProvider.getMark(currentStepY, canvasSettings.step),
-                        SettingsProvider.getCanvasWidth() - marksCoordinate,
-                        currentY
-                    )
-                    currentStepY += canvasSettings.step
-                    currentY += SettingsProvider.getMarksInterval()
-                }
+//                var currentStepY = 0.0
+//                var currentY = getTopAxisSize() * SettingsProvider.getAxisWidth()
+//                val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+//                while (currentY < maxY) {
+//                    context.strokeText(
+//                        marksProvider.getNextMark(, currentStepY, canvasSettings.step),
+//                        SettingsProvider.getCanvasWidth() - marksCoordinate,
+//                        currentY
+//                    )
+//                    currentStepY += canvasSettings.step
+//                    currentY += SettingsProvider.getMarksInterval()
+//                }
             }
             Direction.TOP -> {
-                var currentStepX = 0.0
-                var currentX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
-                val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
-                while (currentX < maxX) {
-                    context.strokeText(
-                        marksProvider.getMark(currentStepX, canvasSettings.step),
-                        currentX,
-                        marksCoordinate
-                    )
-                    currentStepX += canvasSettings.step
-                    currentX += SettingsProvider.getMarksInterval()
-                }
+//                var currentStepX = 0.0
+//                var currentX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
+//                val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
+//                while (currentX < maxX) {
+//                    context.strokeText(
+//                        marksProvider.getNextMark(, currentStepX, canvasSettings.step),
+//                        currentX,
+//                        marksCoordinate
+//                    )
+//                    currentStepX += canvasSettings.step
+//                    currentX += SettingsProvider.getMarksInterval()
+//                }
             }
             Direction.BOTTOM -> {
+                // TODO add condition do not draw on other axises
+//                TODO("Draw left and than right")
+
+                var drawStepX = "0.0"
                 var currentStepX = 0.0
-                var currentX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
-                val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
-                while (currentX < maxX) {
+                var currentX = zeroPoint
+                val minX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
+                while (currentX > minX) {
                     context.strokeText(
-                        marksProvider.getMark(currentStepX, canvasSettings.step),
+                        drawStepX,
                         currentX,
                         SettingsProvider.getCanvasHeight() - marksCoordinate
                     )
-                    currentStepX += canvasSettings.step
+                    currentStepX -= canvasSettings.step
+                    drawStepX = marksProvider.getNextMark(zeroPoint, currentStepX, canvasSettings.step)
+                    currentX -= SettingsProvider.getMarksInterval() //TODO так делатьт нельзя
+                }
+
+                currentX = zeroPoint
+                drawStepX = "0.0"
+                currentStepX = 0.0
+                val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
+                while (currentX < maxX) {
+                    context.strokeText(
+                        drawStepX,
+                        currentStepX,
+                        SettingsProvider.getCanvasHeight() - marksCoordinate
+                    )
+                    drawStepX = marksProvider.getNextMark(zeroPoint, currentX, canvasSettings.step)
                     currentX += SettingsProvider.getMarksInterval()
+                    currentStepX += canvasSettings.step
                 }
             }
         }

@@ -1,6 +1,7 @@
 package ru.nstu.grin.concatenation.draw.elements
 
 import javafx.scene.canvas.GraphicsContext
+import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.model.CanvasSettings
@@ -30,11 +31,11 @@ class ConcatenationFunctionDrawElement(
 
     private fun transformPoints(zeroPointX: Double, zeroPointY: Double, points: List<Point>): List<Point> {
         return points.map {
-            val x = zeroPointX + it.x * settings.scale
+            val x = zeroPointX + it.x * settings.scale*SettingsProvider.getMarksInterval()
             val y = if (it.y > 0) {
-                zeroPointY - it.y * settings.scale
+                zeroPointY - it.y * settings.scale*SettingsProvider.getMarksInterval()
             } else {
-                zeroPointY + it.y * settings.scale
+                zeroPointY + it.y * settings.scale*SettingsProvider.getMarksInterval()
             }
             Point(x, y)
         }

@@ -99,12 +99,14 @@ class ConcatenationCanvas : View() {
                     }
                 }
             }
-            addFunction(drawSize = DrawSize(
-                minX = 0.0,
-                maxX = this@canvas.width,
-                minY = 0.0,
-                maxY = this@canvas.height
-            ))
+            addFunction(
+                drawSize = DrawSize(
+                    minX = 0.0,
+                    maxX = this@canvas.width,
+                    minY = 0.0,
+                    maxY = this@canvas.height
+                )
+            )
         }
 
     }
@@ -134,7 +136,7 @@ class ConcatenationCanvas : View() {
         val deltaMarksGenerator = DeltaMarksGenerator()
         val function = ConcatenationFunctionDTO(
             name = "Test",
-            points = PointsBuilder().buildPoints(drawSize, "x*x", 0.01),
+            points = PointsBuilder().buildPoints(DrawSize(-1200.0, 1200.0, -800.0, 800.0), "x*x", 0.01),
             functionColor = Color.BLACK
         )
 
@@ -144,7 +146,7 @@ class ConcatenationCanvas : View() {
                 name = "Test",
                 backGroundColor = ColorUtils.getRandomColor(),
                 delimeterColor = Color.BLACK,
-                direction = ExistDirection(Direction.BOTTOM,null) ,
+                direction = ExistDirection(Direction.BOTTOM, null),
                 deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, Direction.BOTTOM),
                 zeroPoint = SettingsProvider.getCanvasWidth() / 2
             ),
@@ -152,7 +154,7 @@ class ConcatenationCanvas : View() {
                 name = "Test",
                 backGroundColor = ColorUtils.getRandomColor(),
                 delimeterColor = Color.BLACK,
-                direction = ExistDirection(Direction.LEFT,null) ,
+                direction = ExistDirection(Direction.LEFT, null),
                 deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, Direction.LEFT),
                 zeroPoint = SettingsProvider.getCanvasHeight() / 2
             )

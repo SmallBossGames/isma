@@ -5,7 +5,7 @@ import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
-import ru.nstu.grin.concatenation.draw.elements.AxisDrawElement
+import ru.nstu.grin.concatenation.draw.elements.axis.AxisDrawElement
 import ru.nstu.grin.concatenation.draw.elements.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 

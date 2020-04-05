@@ -38,19 +38,38 @@ class AxisDrawElement(
 
         when (direction) {
             Direction.LEFT -> {
-//                var currentStepY = 0.0
-//                var currentY = getTopAxisSize() * SettingsProvider.getAxisWidth()
-//                val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-//                while (currentY < maxY) {
-//                    context.strokeText(
-//                        marksProvider.getNextMark(, currentStepY, canvasSettings.step),
-//                        marksCoordinate,
-//                        currentY
-//                    )
-//                    currentStepY += canvasSettings.step
-//                    currentY += SettingsProvider.getMarksInterval()
-//                }
+                var drawStepY = "0.0"
+                var currentStepY = 0.0
+                var currentY = zeroPoint
+                val minY = getTopAxisSize() * SettingsProvider.getAxisWidth()
+                while (currentY > minY) {
+                    context.strokeText(
+                        drawStepY,
+                        marksCoordinate,
+                        currentY
+                    )
 
+                    currentY -= SettingsProvider.getMarksInterval()
+                    drawStepY = marksProvider.getInvertNextMark(currentY, zeroPoint, currentStepY, canvasSettings.step)
+                    currentStepY += canvasSettings.step
+                }
+
+                drawStepY = "0.0"
+                currentStepY = 0.0
+                currentY = zeroPoint
+                val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                while (currentY < maxY) {
+                    if (currentStepY != 0.0)
+                        context.strokeText(
+                            drawStepY,
+                            marksCoordinate - 5,
+                            currentY
+                        )
+
+                    currentY += SettingsProvider.getMarksInterval()
+                    drawStepY = marksProvider.getInvertNextMark(currentY, zeroPoint, currentStepY, canvasSettings.step)
+                    currentStepY -= canvasSettings.step
+                }
             }
             Direction.RIGHT -> {
 //                var currentStepY = 0.0
@@ -81,9 +100,6 @@ class AxisDrawElement(
 //                }
             }
             Direction.BOTTOM -> {
-                // TODO add condition do not draw on other axises
-//                TODO("Draw left and than right")
-
                 var drawStepX = "0.0"
                 var currentStepX = 0.0
                 var currentX = zeroPoint
@@ -94,23 +110,25 @@ class AxisDrawElement(
                         currentX,
                         SettingsProvider.getCanvasHeight() - marksCoordinate
                     )
+
+                    currentX -= SettingsProvider.getMarksInterval()
+                    drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
                     currentStepX -= canvasSettings.step
-                    drawStepX = marksProvider.getNextMark(zeroPoint, currentStepX, canvasSettings.step)
-                    currentX -= SettingsProvider.getMarksInterval() //TODO так делатьт нельзя
                 }
 
-                currentX = zeroPoint
                 drawStepX = "0.0"
                 currentStepX = 0.0
+                currentX = zeroPoint
                 val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
                 while (currentX < maxX) {
                     context.strokeText(
                         drawStepX,
-                        currentStepX,
+                        currentX,
                         SettingsProvider.getCanvasHeight() - marksCoordinate
                     )
-                    drawStepX = marksProvider.getNextMark(zeroPoint, currentX, canvasSettings.step)
+
                     currentX += SettingsProvider.getMarksInterval()
+                    drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
                     currentStepX += canvasSettings.step
                 }
             }

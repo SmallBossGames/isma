@@ -1,16 +1,35 @@
 package ru.nstu.grin.concatenation.marks
 
 class DoubleMarksProvider : MarksProvider {
-    override fun getNextMark(zeroPoint: Double, current: Double, step: Double): String {
+    override fun getNextMark(
+        current: Double,
+        zeroPoint: Double,
+        currentStep: Double,
+        step: Double
+    ): String {
         return when {
             current > zeroPoint -> {
-                (current + step).toString()
+                (currentStep + step).toString()
             }
             current < zeroPoint -> {
-                (current - step).toString()
+                (currentStep - step).toString()
             }
             else -> {
-                current.toString()
+                currentStep.toString()
+            }
+        }
+    }
+
+    override fun getInvertNextMark(current: Double, zeroPoint: Double, currentStep: Double, step: Double): String {
+        return when {
+            current < zeroPoint -> {
+                (currentStep + step).toString()
+            }
+            current > zeroPoint -> {
+                (currentStep - step).toString()
+            }
+            else -> {
+                currentStep.toString()
             }
         }
     }

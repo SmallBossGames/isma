@@ -1,6 +1,7 @@
 package ru.nstu.grin.main
 
 import javafx.stage.Stage
+import ru.nstu.grin.concatenation.view.ConcatenationView
 import ru.nstu.grin.main.view.ConstuctorView
 import tornadofx.App
 import tornadofx.UIComponent
@@ -9,7 +10,7 @@ import tornadofx.reloadStylesheetsOnFocus
 import kotlin.reflect.KClass
 
 class MyApp : App() {
-    override val primaryView: KClass<out UIComponent> = ConstuctorView::class
+    override val primaryView: KClass<out UIComponent> = ConcatenationView::class
 
     init {
         reloadStylesheetsOnFocus()

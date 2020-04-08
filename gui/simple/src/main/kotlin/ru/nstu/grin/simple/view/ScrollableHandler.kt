@@ -13,7 +13,7 @@ class ScrollableHandler(
     private var downRemaining: Long =
         TIMES_TO_SCROLL
     private var delta: Double = model.settings.pixelCost / DELTA_DELIMITER
-    private var functionDelta: Double = model.settings.functionPixelCost / TIMES_TO_SCROLL
+//    private var functionDelta: Double = model.settings.functionPixelCost / TIMES_TO_SCROLL
 
     override fun handle(event: ScrollEvent) {
         if (event.deltaY > 0) {
@@ -28,11 +28,9 @@ class ScrollableHandler(
                 model.settings.pixelCost =
                     PIXEL_COST
                 delta = model.settings.pixelCost / DELTA_DELIMITER
-                functionDelta = model.settings.functionPixelCost
                 return
             }
             model.settings.pixelCost += delta
-            model.settings.functionPixelCost += functionDelta
         } else {
             println("Minus")
             downRemaining--
@@ -45,11 +43,9 @@ class ScrollableHandler(
                 model.settings.pixelCost =
                     PIXEL_COST
                 delta = model.settings.pixelCost / DELTA_DELIMITER
-                functionDelta = model.settings.functionPixelCost / TIMES_TO_SCROLL
                 return
             }
             model.settings.pixelCost -= delta
-            model.settings.functionPixelCost -= functionDelta
         }
         chainDrawer.draw()
     }

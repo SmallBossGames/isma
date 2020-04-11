@@ -13,7 +13,7 @@ import ru.nstu.grin.concatenation.model.axis.ConcatenationAxis
 class AxisDrawElement(
     private val xAxis: ConcatenationAxis,
     private val yAxis: ConcatenationAxis,
-    canvasSettings: CanvasSettings,
+    private val canvasSettings: CanvasSettings,
     cartesianSpaces: List<CartesianSpace>
 ) : ChainDrawElement {
 
@@ -42,15 +42,19 @@ class AxisDrawElement(
         context.stroke = color
         val startPoint = order * SettingsProvider.getAxisWidth()
         val marksCoordinate = startPoint + MARKS_MARGIN
+        val correlatedZeroPoint = zeroPoint + when (direction) {
+            Direction.LEFT, Direction.RIGHT -> canvasSettings.yCorrelation
+            Direction.TOP, Direction.BOTTOM -> canvasSettings.xCorrelation
+        }
 
         when (direction) {
             Direction.LEFT -> {
-                verticalAxisDraw.drawMarks(context, zeroPoint, direction, marksProvider, marksCoordinate)
+                verticalAxisDraw.drawMarks(context, correlatedZeroPoint, direction, marksProvider, marksCoordinate)
             }
             Direction.RIGHT -> {
                 verticalAxisDraw.drawMarks(
                     context,
-                    zeroPoint,
+                    correlatedZeroPoint,
                     direction,
                     marksProvider,
                     SettingsProvider.getCanvasWidth() - marksCoordinate
@@ -58,13 +62,13 @@ class AxisDrawElement(
             }
             Direction.TOP -> {
                 horizontalAxisDraw.drawMarks(
-                    context, zeroPoint, direction, marksProvider, marksCoordinate
+                    context, correlatedZeroPoint, direction, marksProvider, marksCoordinate
                 )
             }
             Direction.BOTTOM -> {
                 horizontalAxisDraw.drawMarks(
                     context,
-                    zeroPoint,
+                    correlatedZeroPoint,
                     direction,
                     marksProvider,
                     SettingsProvider.getCanvasHeight() - marksCoordinate

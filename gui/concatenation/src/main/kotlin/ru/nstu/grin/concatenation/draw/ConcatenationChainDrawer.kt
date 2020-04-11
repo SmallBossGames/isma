@@ -20,17 +20,18 @@ class ConcatenationChainDrawer(
         DescriptionDrawElement(model.descriptions).draw(context)
 
         for (cartesianSpace in model.cartesianSpaces) {
-            AxisDrawElement(
-                cartesianSpace.xAxis,
-                cartesianSpace.yAxis,
-                cartesianSpace.settings,
-                model.cartesianSpaces
-            ).draw(context)
+
             ConcatenationFunctionDrawElement(
                 cartesianSpace.functions,
                 cartesianSpace.xAxis,
                 cartesianSpace.yAxis,
                 cartesianSpace.settings
+            ).draw(context)
+            AxisDrawElement(
+                cartesianSpace.xAxis,
+                cartesianSpace.yAxis,
+                cartesianSpace.settings,
+                model.cartesianSpaces
             ).draw(context)
         }
     }

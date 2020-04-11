@@ -53,7 +53,7 @@ class ConcatenationCanvas : View() {
 
             onScroll = ScalableScrollHandler(model, chainDrawer)
 
-            onMouseDragged = MoveAxisHandler(model, controller)
+            onMouseDragged = DraggedHandler(model, chainDrawer)
 
             onMouseClicked = object : EventHandler<MouseEvent> {
                 override fun handle(event: MouseEvent) {

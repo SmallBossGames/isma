@@ -37,7 +37,7 @@ class ConcatenationFunctionDrawElement(
             } else {
                 zeroPointY + it.y * settings.pixelCost / settings.step
             }
-            Point(x, y)
+            Point(x + settings.xCorrelation, y + settings.yCorrelation)
         }
     }
 }

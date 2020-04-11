@@ -13,11 +13,9 @@ class ScrollableHandler(
     private var downRemaining: Long =
         TIMES_TO_SCROLL
     private var delta: Double = model.settings.pixelCost / DELTA_DELIMITER
-//    private var functionDelta: Double = model.settings.functionPixelCost / TIMES_TO_SCROLL
 
     override fun handle(event: ScrollEvent) {
         if (event.deltaY > 0) {
-            println("Plus")
             upRemaining--
             downRemaining++
 
@@ -32,7 +30,6 @@ class ScrollableHandler(
             }
             model.settings.pixelCost += delta
         } else {
-            println("Minus")
             downRemaining--
             upRemaining++
 

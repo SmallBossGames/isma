@@ -3,5 +3,8 @@ package ru.nstu.grin.simple.view
 data class SimplePlotSettings(
     var pixelCost: Double,
 
+    var xCorrelation: Double = 0.0,
+    var yCorrelation: Double = 0.0,
+
     var step: Double
 )

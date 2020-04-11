@@ -29,6 +29,7 @@ class SimpleCanvas : View() {
             model.functions.addListener { _: ListChangeListener.Change<out SimpleFunction> -> chainDrawer.draw() }
 
             onScroll = ScrollableHandler(model, chainDrawer)
+            onMouseDragged = DraggedHandler(model, chainDrawer)
             chainDrawer.draw()
         }
     }

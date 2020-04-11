@@ -23,9 +23,9 @@ class SimpleChainDrawer(
         ClearDrawElement().draw(context)
         ArrowDrawElement(model.arrows, 1.0).draw(context)
         DescriptionDrawElement(model.descriptions).draw(context)
-        GridDrawElement(gridSize / 5, Color.valueOf("EDEDED")).draw(context)
-        GridDrawElement(gridSize, Color.valueOf("BBBBBB")).draw(context)
-        AxisDrawElement().draw(context)
+        GridDrawElement(gridSize / 5, Color.valueOf("EDEDED"), model.settings).draw(context)
+        GridDrawElement(gridSize, Color.valueOf("BBBBBB"), model.settings).draw(context)
+        AxisDrawElement(model.settings).draw(context)
         MarkersDrawElement(model.settings).draw(context)
         FunctionsDrawElement(model.settings, model.functions).draw(context)
     }

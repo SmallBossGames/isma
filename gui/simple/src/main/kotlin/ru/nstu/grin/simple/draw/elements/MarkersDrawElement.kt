@@ -9,9 +9,9 @@ class MarkersDrawElement(
     private val settings: SimplePlotSettings
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
-        val zeroX = context.canvas.width / 2
+        val zeroX = context.canvas.width / 2 + settings.xCorrelation
         val relativeX = zeroX - MARKER_MARGIN
-        val zeroY = context.canvas.height / 2
+        val zeroY = context.canvas.height / 2 + settings.yCorrelation
         val relativeY = zeroY + MARKER_MARGIN
 
         context.stroke = Color.valueOf("5F5F5F")

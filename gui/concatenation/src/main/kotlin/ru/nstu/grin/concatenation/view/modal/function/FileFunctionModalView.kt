@@ -2,7 +2,6 @@ package ru.nstu.grin.concatenation.view.modal.function
 
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
-import javafx.stage.FileChooser
 import ru.nstu.grin.concatenation.controller.function.FileFunctionController
 import ru.nstu.grin.concatenation.model.Direction
 import ru.nstu.grin.concatenation.model.ExistDirection
@@ -21,15 +20,7 @@ class FileFunctionModalView : AbstractAddFunctionModal() {
             field("Выберите файл") {
                 button("Файл") {
                     action {
-                        val files = chooseFile(
-                            "Файл",
-                            arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.gf")),
-                            FileChooserMode.Single
-                        )
-                        if (files.isNotEmpty()) {
-                            val file = files[0]
-                            model.filePath = file.path
-                        }
+                        controller.chooseFile()
                     }
                 }
             }
@@ -87,10 +78,6 @@ class FileFunctionModalView : AbstractAddFunctionModal() {
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
             action {
-                if (model.filePath.isEmpty()) {
-                    error("Необходимо выбрать файл")
-                    return@action
-                }
                 controller.loadFunctions(drawSize)
                 close()
             }

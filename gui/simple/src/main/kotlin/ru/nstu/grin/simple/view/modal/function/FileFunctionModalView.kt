@@ -2,7 +2,6 @@ package ru.nstu.grin.simple.view.modal.function
 
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
-import javafx.stage.FileChooser
 import ru.nstu.grin.simple.controller.function.FileFunctionController
 import ru.nstu.grin.simple.model.function.FileFunctionModel
 import tornadofx.*
@@ -22,15 +21,7 @@ class FileFunctionModalView : View() {
             field("Выберите файл") {
                 button("Файл") {
                     action {
-                        val files = chooseFile(
-                            "Файл",
-                            arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.gf")),
-                            FileChooserMode.Single
-                        )
-                        if (files.isNotEmpty()) {
-                            val file = files[0]
-                            model.filePath = file.path
-                        }
+                        controller.chooseFile()
                     }
                 }
             }
@@ -43,10 +34,7 @@ class FileFunctionModalView : View() {
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
             action {
-                if (model.filePath.isEmpty()) {
-                    error("Необходимо выбрать файл")
-                    return@action
-                }
+                controller.addFunction()
                 close()
             }
         }

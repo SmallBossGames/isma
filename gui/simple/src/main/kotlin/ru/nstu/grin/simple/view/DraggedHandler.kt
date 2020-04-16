@@ -12,6 +12,7 @@ class DraggedHandler(
     private var y = -1.0
 
     override fun handle(event: MouseEvent) {
+        if (model.pointToolTipSettings.isShow) return
         if (!event.isPrimaryButtonDown) return
         if (x == -1.0) x = event.x
         if (y == -1.0) y = event.y

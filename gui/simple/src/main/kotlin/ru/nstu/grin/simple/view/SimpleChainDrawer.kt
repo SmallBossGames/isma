@@ -28,6 +28,6 @@ class SimpleChainDrawer(
         AxisDrawElement(model.settings).draw(context)
         MarkersDrawElement(model.settings).draw(context)
         FunctionsDrawElement(model.settings, model.functions).draw(context)
-        TooltipsDrawElement(model.pointToolTipSettings, pointToolTip).draw(context)
+        TooltipsDrawElement(model.pointToolTipSettings, pointToolTip, model.primaryStage).draw(context)
     }
 }

@@ -10,16 +10,21 @@ class ShowPointHandler(
 ) : EventHandler<MouseEvent> {
     override fun handle(event: MouseEvent) {
         if (event.isPrimaryButtonDown.not()) return
-        val isNearFunction = model.functions.any {
+        val nearFunction = model.functions.firstOrNull {
             it.points.any { it.isNearBy(event.x, event.y) }
+        } ?: return
+
+        val nearPoint = nearFunction.points.first {
+            it.isNearBy(event.x, event.y)
         }
-        println("IsNear $isNearFunction")
-        if (isNearFunction.not()) return
 
         val pointTipSettings = model.pointToolTipSettings
         pointTipSettings.isShow = true
-        pointTipSettings.x = event.x
-        pointTipSettings.y = event.y
+        pointTipSettings.x = nearPoint.x
+        pointTipSettings.y = nearPoint.y
+
+        pointTipSettings.xGraphic = nearPoint.xGraphic ?: 0.0
+        pointTipSettings.yGraphic = nearPoint.yGraphic ?: 0.0
         chainDrawer.draw()
     }
 }

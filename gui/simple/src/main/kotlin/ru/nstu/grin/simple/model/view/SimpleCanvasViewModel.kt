@@ -2,6 +2,7 @@ package ru.nstu.grin.simple.model.view
 
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
+import javafx.stage.Stage
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.simple.model.PointToolTipSettings
@@ -23,5 +24,7 @@ class SimpleCanvasViewModel : ItemViewModel<SimpleCanvas>() {
 
     val settings = SimplePlotSettings(120.0, 0.0, 0.0, 1.0)
 
-    val pointToolTipSettings = PointToolTipSettings(false, 0.0, 0.0)
+    val pointToolTipSettings = PointToolTipSettings(false, 0.0, 0.0, 0.0, 0.0)
+
+//    var currentStage: Stage
 }

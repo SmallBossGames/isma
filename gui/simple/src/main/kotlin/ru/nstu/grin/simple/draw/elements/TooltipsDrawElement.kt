@@ -2,23 +2,32 @@ package ru.nstu.grin.simple.draw.elements
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Tooltip
+import javafx.scene.paint.Color
+import javafx.stage.Stage
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.simple.model.PointToolTipSettings
-import javax.swing.ToolTipManager
 
 class TooltipsDrawElement(
     private val pointTooltipSettings: PointToolTipSettings,
-    private val pointTooltip: Tooltip
+    private val pointTooltip: Tooltip,
+    private val stage: Stage
 ) : ChainDrawElement {
 
     override fun draw(context: GraphicsContext) {
-        pointTooltip.text = "x=${pointTooltipSettings.x}, y=${pointTooltipSettings.y}"
+        pointTooltip.text = "x=${pointTooltipSettings.x.round(5)}, y=${pointTooltipSettings.y.round(5)}"
         if (pointTooltipSettings.isShow) {
-            println("Show")
-            pointTooltip.show(context.canvas, pointTooltipSettings.x, pointTooltipSettings.y)
+            pointTooltip.show(
+                context.canvas,
+                stage.x + pointTooltipSettings.xGraphic,
+                stage.y + pointTooltipSettings.yGraphic
+            )
+            context.stroke = Color.BLACK
+            context.strokeRect(pointTooltipSettings.xGraphic, pointTooltipSettings.yGraphic, 1.0, 1.0)
         } else {
-            println("Hide")
             pointTooltip.hide()
         }
     }
+
+    private fun Double.round(decimals: Int = 2): Double =
+        String.format("%.${decimals}f", this).replace(",", ".").toDouble()
 }

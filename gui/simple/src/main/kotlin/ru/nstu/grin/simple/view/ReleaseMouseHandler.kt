@@ -10,7 +10,6 @@ class ReleaseMouseHandler(
     private val chainDrawer: SimpleChainDrawer
 ) : EventHandler<MouseEvent> {
     override fun handle(event: MouseEvent) {
-        println("Event blya ${event.isPrimaryButtonDown}")
         if (event.button == MouseButton.PRIMARY) model.pointToolTipSettings.isShow = false
         chainDrawer.draw()
     }

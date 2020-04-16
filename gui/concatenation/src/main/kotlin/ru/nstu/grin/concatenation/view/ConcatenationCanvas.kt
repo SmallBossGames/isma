@@ -56,23 +56,8 @@ class ConcatenationCanvas : View() {
 
             onMouseDragged = DraggedHandler(model, chainDrawer)
 
-            onMouseClicked = object : EventHandler<MouseEvent> {
-                override fun handle(event: MouseEvent) {
-                    println("Show modal with coordinates")
-//                    val functions = model.drawings.filterIsInstance<ConcatenationFunction>()
-//                    for (function in functions) {
-//                        for (point in function.points) {
-//                            if (point.isNearBy(
-//                                    event.x + AbstractAxis.WIDTH_AXIS,
-//                                    SettingsProvider.getCanvasHeight() - event.y - AbstractAxis.WIDTH_AXIS
-//                                )
-//                            ) {
-//                                println("Show modal")
-//                            }
-//                        }
-//                    }
-                }
-            }
+            onMousePressed = ShowPointHandler(model, chainDrawer)
+            onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
 
             setOnContextMenuRequested {
                 withCoordContextmenu {

@@ -16,10 +16,12 @@ class ConcatenationFunctionDrawElement(
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         for (function in functions) {
-            val points = transformPoints(xAxis.zeroPoint, yAxis.zeroPoint, function.points)
+            transformPoints(xAxis.zeroPoint, yAxis.zeroPoint, function.points)
 
-            val xPoints = points.map { it.x }.toDoubleArray()
-            val yPoints = points.map { it.y }.toDoubleArray()
+            val points = function.points
+
+            val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
+            val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
             val n = points.size
             context.strokePolyline(
                 xPoints,
@@ -29,15 +31,14 @@ class ConcatenationFunctionDrawElement(
         }
     }
 
-    private fun transformPoints(zeroPointX: Double, zeroPointY: Double, points: List<Point>): List<Point> {
-        return points.map {
-            val x = zeroPointX + it.x * settings.pixelCost / settings.step
-            val y = if (it.y > 0) {
+    private fun transformPoints(zeroPointX: Double, zeroPointY: Double, points: List<Point>) {
+        for (it in points) {
+            it.xGraphic = zeroPointX + it.x * settings.pixelCost / settings.step + settings.xCorrelation
+            it.yGraphic = if (it.y > 0) {
                 zeroPointY - it.y * settings.pixelCost / settings.step
             } else {
                 zeroPointY + it.y * settings.pixelCost / settings.step
-            }
-            Point(x + settings.xCorrelation, y + settings.yCorrelation)
+            } + settings.yCorrelation
         }
     }
 }

@@ -18,6 +18,7 @@ class HorizontalAxisDrawStrategy(
         marksProvider: MarksProvider,
         marksCoordinate: Double
     ) {
+        println("CurrentStep x ${canvasSettings.step}")
         var drawStepX = "0.0"
         var currentStepX = 0.0
         var currentX = zeroPoint

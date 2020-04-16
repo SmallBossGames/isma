@@ -5,6 +5,7 @@ import javafx.collections.FXCollections
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.model.PointToolTipSettings
 import ru.nstu.grin.concatenation.view.ConcatenationCanvas
 import tornadofx.ItemViewModel
 import tornadofx.*
@@ -18,4 +19,6 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>() {
 
     var descriptionsProperty = SimpleListProperty<Description>(FXCollections.observableArrayList())
     var descriptions by descriptionsProperty
+
+    val pointToolTipSettings = PointToolTipSettings(false, 0.0, 0.0, 0.0, 0.0)
 }

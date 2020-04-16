@@ -10,7 +10,7 @@ import ru.nstu.grin.concatenation.model.Direction
 class VerticalAxisDrawStrategy(
     private val canvasSettings: CanvasSettings,
     private val cartesianSpaces: List<CartesianSpace>
-): AxisMarksDrawStrategy {
+) : AxisMarksDrawStrategy {
     override fun drawMarks(
         context: GraphicsContext,
         zeroPoint: Double,
@@ -18,6 +18,7 @@ class VerticalAxisDrawStrategy(
         marksProvider: MarksProvider,
         marksCoordinate: Double
     ) {
+        println("Current step ${canvasSettings.step}")
         var drawStepY = "0.0"
         var currentStepY = 0.0
         var currentY = zeroPoint

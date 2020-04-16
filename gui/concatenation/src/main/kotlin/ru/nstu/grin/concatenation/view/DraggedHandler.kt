@@ -14,6 +14,7 @@ class DraggedHandler(
     private val currentCanvasSettings: MutableMap<CartesianSpace, DraggedSettings> = mutableMapOf()
 
     override fun handle(event: MouseEvent) {
+        if (model.pointToolTipSettings.isShow) return
         if (!event.isPrimaryButtonDown) return
 
         val axises = model.cartesianSpaces.map {

@@ -30,6 +30,8 @@ class SimpleCanvas : View() {
 
             onScroll = ScrollableHandler(model, chainDrawer)
             onMouseDragged = DraggedHandler(model, chainDrawer)
+            onMousePressed = ShowPointHandler(model, chainDrawer)
+            onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
             chainDrawer.draw()
         }
     }

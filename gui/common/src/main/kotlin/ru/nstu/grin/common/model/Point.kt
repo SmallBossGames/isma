@@ -2,11 +2,20 @@ package ru.nstu.grin.common.model
 
 import java.io.Serializable
 
-data class Point(val x: Double, val y: Double) : Serializable {
-    fun isNearBy(x: Double, y: Double): Boolean {
+data class Point(
+    val x: Double,
+    val y: Double,
+    var xGraphic: Double? = null,
+    var yGraphic: Double? = null
+) : Serializable {
+    fun isNearBy(eventX: Double, eventY: Double): Boolean {
+        val x = xGraphic
+        val y = yGraphic
+        if (x == null || y == null) return false
+
         return when {
-            (x < this.x + DELTA && x > this.x - DELTA) &&
-                (y < this.y + DELTA && y > this.y - DELTA) -> {
+            (eventX < x + DELTA && eventX > x - DELTA) &&
+                (eventY < y + DELTA && eventY > y - DELTA) -> {
                 true
             }
             else -> {
@@ -16,6 +25,6 @@ data class Point(val x: Double, val y: Double) : Serializable {
     }
 
     private companion object {
-        const val DELTA = 0.5
+        const val DELTA = 5
     }
 }

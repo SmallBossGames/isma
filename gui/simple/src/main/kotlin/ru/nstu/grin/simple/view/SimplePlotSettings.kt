@@ -9,5 +9,7 @@ data class SimplePlotSettings(
     var step: Double,
 
     var isXLogarithmic: Boolean = false,
-    var isYLogarithmic: Boolean = false
+    var isYLogarithmic: Boolean = false,
+
+    var logarithmBase: Double = 10.0
 )

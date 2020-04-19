@@ -4,6 +4,9 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.simple.view.SimplePlotSettings
+import java.lang.Math.abs
+import java.lang.Math.pow
+import kotlin.math.pow
 
 class MarkersDrawElement(
     private val settings: SimplePlotSettings
@@ -21,7 +24,8 @@ class MarkersDrawElement(
         var currentX = zeroX + settings.pixelCost
         var currentCount = settings.step
         while (currentX < context.canvas.width) {
-            context.strokeText(currentCount.toString(), currentX, relativeY)
+            val xGraphic = transformStepLogarithm(currentCount, settings.isXLogarithmic)
+            context.strokeText(xGraphic.toString(), currentX, relativeY)
             currentCount += settings.step
             currentX += settings.pixelCost
         }
@@ -29,7 +33,8 @@ class MarkersDrawElement(
         currentX = zeroX - settings.pixelCost
         currentCount = -settings.step
         while (currentX > 0) {
-            context.strokeText(currentCount.toString(), currentX, relativeY)
+            val xGraphic = transformStepLogarithm(currentCount, settings.isXLogarithmic)
+            context.strokeText(xGraphic.toString(), currentX, relativeY)
             currentCount -= settings.step
             currentX -= settings.pixelCost
         }
@@ -37,7 +42,8 @@ class MarkersDrawElement(
         var currentY = zeroY - settings.pixelCost
         currentCount = settings.step
         while (currentY > 0) {
-            context.strokeText(currentCount.toString(), relativeX - 5, currentY)
+            val graphicY = transformStepLogarithm(currentCount, settings.isYLogarithmic)
+            context.strokeText(graphicY.toString(), relativeX - 5, currentY)
             currentY -= settings.pixelCost
             currentCount += settings.step
         }
@@ -45,9 +51,18 @@ class MarkersDrawElement(
         currentY = zeroY + settings.pixelCost
         currentCount = -settings.step
         while (currentY < context.canvas.height) {
-            context.strokeText(currentCount.toString(), relativeX - 10, currentY)
+            val graphicY = transformStepLogarithm(currentCount, settings.isYLogarithmic)
+            context.strokeText(graphicY.toString(), relativeX - 10, currentY)
             currentY += settings.pixelCost
             currentCount -= settings.step
+        }
+    }
+
+    private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean): Double {
+        return if (isLogarithmic) {
+            settings.logarithmBase.pow(step)
+        } else {
+            step
         }
     }
 

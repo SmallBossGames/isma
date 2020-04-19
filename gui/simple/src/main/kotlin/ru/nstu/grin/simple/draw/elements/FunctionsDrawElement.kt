@@ -5,6 +5,9 @@ import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.simple.model.SimpleFunction
 import ru.nstu.grin.simple.view.SimplePlotSettings
+import kotlin.math.abs
+import kotlin.math.log
+import kotlin.math.log10
 
 class FunctionsDrawElement(
     private val settings: SimplePlotSettings,
@@ -30,11 +33,30 @@ class FunctionsDrawElement(
 
     private fun transformPoints(zeroPointX: Double, zeroPointY: Double, points: List<Point>) {
         for (it in points) {
-            it.xGraphic = zeroPointX + it.x * settings.pixelCost / settings.step + settings.xCorrelation
-            it.yGraphic = if (it.y > 0) {
-                zeroPointY - it.y * settings.pixelCost / settings.step
+            val x = if (settings.isXLogarithmic) {
+                if (it.x < 0) {
+                    it.xGraphic = 0.0
+                    continue
+                }
+                log10(it.x)
             } else {
-                zeroPointY + it.y * settings.pixelCost / settings.step
+                it.x
+            }
+            it.xGraphic = zeroPointX + x * settings.pixelCost / settings.step + settings.xCorrelation
+
+            val y = if (settings.isYLogarithmic) {
+                if (it.y < 0) {
+                    it.yGraphic = 0.0
+                    continue
+                }
+                log10(it.y)
+            } else {
+                it.y
+            }
+            it.yGraphic = if (y > 0) {
+                zeroPointY - y * settings.pixelCost / settings.step
+            } else {
+                zeroPointY + abs(y) * settings.pixelCost / settings.step
             } + settings.yCorrelation
         }
     }

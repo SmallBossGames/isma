@@ -6,5 +6,8 @@ data class SimplePlotSettings(
     var xCorrelation: Double = 0.0,
     var yCorrelation: Double = 0.0,
 
-    var step: Double
+    var step: Double,
+
+    var isXLogarithmic: Boolean = false,
+    var isYLogarithmic: Boolean = false
 )

@@ -7,6 +7,7 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.model.CanvasSettings
 import ru.nstu.grin.concatenation.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.model.axis.ConcatenationAxis
+import kotlin.math.abs
 
 class ConcatenationFunctionDrawElement(
     private val functions: List<ConcatenationFunction>,
@@ -37,7 +38,7 @@ class ConcatenationFunctionDrawElement(
             it.yGraphic = if (it.y > 0) {
                 zeroPointY - it.y * settings.pixelCost / settings.step
             } else {
-                zeroPointY + it.y * settings.pixelCost / settings.step
+                zeroPointY + abs(it.y) * settings.pixelCost / settings.step
             } + settings.yCorrelation
         }
     }

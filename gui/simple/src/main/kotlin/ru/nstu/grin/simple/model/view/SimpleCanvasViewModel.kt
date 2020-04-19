@@ -25,6 +25,4 @@ class SimpleCanvasViewModel : ItemViewModel<SimpleCanvas>() {
     val settings = SimplePlotSettings(120.0, 0.0, 0.0, 1.0)
 
     val pointToolTipSettings = PointToolTipSettings(false, 0.0, 0.0, 0.0, 0.0)
-
-//    var currentStage: Stage
 }

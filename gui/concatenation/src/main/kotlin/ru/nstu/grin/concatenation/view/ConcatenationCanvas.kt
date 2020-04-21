@@ -16,6 +16,7 @@ import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.DrawSize
+import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.utils.ColorUtils
 import ru.nstu.grin.concatenation.controller.DeltaMarksGenerator
 import ru.nstu.grin.concatenation.controller.DeltaSizeCalculator
@@ -28,6 +29,8 @@ import ru.nstu.grin.concatenation.model.Direction
 import ru.nstu.grin.concatenation.model.ExistDirection
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 import tornadofx.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 class ConcatenationCanvas : View() {
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -86,14 +89,32 @@ class ConcatenationCanvas : View() {
         return menu
     }
 
+    private fun generateCircle(radius: Double): List<Point> {
+        val result = mutableListOf<Point>()
+        for (i in 0 until 360) {
+            val x = radius * cos(i.toDouble())
+            val y = radius * sin(i.toDouble())
+            result.add(Point(x, y))
+        }
+        return result
+    }
+
 
     fun addFunction(drawSize: DrawSize) {
         val delta = DeltaSizeCalculator().calculateDelta(drawSize)
 
         val deltaMarksGenerator = DeltaMarksGenerator()
+
+
         val function = ConcatenationFunctionDTO(
             name = "Test",
-            points = PointsBuilder().buildPoints(DrawSize(-1200.0, 1200.0, -800.0, 800.0), "x*x", 0.01),
+            points = generateCircle(radius = 2.0),
+            functionColor = Color.BLACK
+        )
+
+        val function2 = ConcatenationFunctionDTO(
+            name = "Test",
+            points = generateCircle(radius = 2.0),
             functionColor = Color.BLACK
         )
 
@@ -116,9 +137,34 @@ class ConcatenationCanvas : View() {
                 zeroPoint = SettingsProvider.getCanvasHeight() / 2
             )
         )
+        val cartesianSpace2 = CartesianSpaceDTO(
+            functions = listOf(function),
+            xAxis = ConcatenationAxisDTO(
+                name = "Test2",
+                backGroundColor = ColorUtils.getRandomColor(),
+                delimeterColor = Color.BLACK,
+                direction = ExistDirection(Direction.BOTTOM, null),
+                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, Direction.BOTTOM),
+                zeroPoint = SettingsProvider.getCanvasWidth() / 2
+            ),
+            yAxis = ConcatenationAxisDTO(
+                name = "Test2",
+                backGroundColor = ColorUtils.getRandomColor(),
+                delimeterColor = Color.BLACK,
+                direction = ExistDirection(Direction.LEFT, null),
+                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, Direction.LEFT),
+                zeroPoint = SettingsProvider.getCanvasHeight() / 2
+            )
+        )
         fire(
             ConcatenationFunctionEvent(
                 cartesianSpace = cartesianSpace,
+                minAxisDelta = delta
+            )
+        )
+        fire(
+            ConcatenationFunctionEvent(
+                cartesianSpace = cartesianSpace2,
                 minAxisDelta = delta
             )
         )

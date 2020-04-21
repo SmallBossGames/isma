@@ -43,7 +43,7 @@ class ConcatenationCanvas : View() {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
             canvas = this
-            chainDrawer = ConcatenationChainDrawer(this, model)
+            chainDrawer = ConcatenationChainDrawer(this, model, controller)
 
             model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
             model.cartesianSpaces.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
@@ -56,54 +56,6 @@ class ConcatenationCanvas : View() {
             onMousePressed = ShowPointHandler(model, chainDrawer)
             onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
 
-
-
-
-//            setOnContextMenuRequested { event ->
-//                val axises = model.cartesianSpaces.map {
-//                    listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
-//                }.flatten()
-//                val cartesianSpace = axises.firstOrNull {
-//                    it.second.isLocated(event.x, event.y)
-//                }?.first
-//                if (cartesianSpace != null) {
-//                    withCoordContextmenu {
-//                        menu("Логарифмический масштаб") {
-//                            item("Включить по x").action {
-//                                cartesianSpace.settings.isXLogarithm = !cartesianSpace.settings.isXLogarithm
-//                            }
-//                            item("Включить по y").action {
-//                                cartesianSpace.settings.isYLogarithm = !cartesianSpace.settings.isYLogarithm
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    withCoordContextmenu {
-//                        item("Добавить функцию").action {
-//                            val drawSize = DrawSize(
-//                                minX = 0.0,
-//                                maxX = this@canvas.width,
-//                                minY = 0.0,
-//                                maxY = this@canvas.height
-//                            )
-////                        val xDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
-////                            ExistDirection(it.xAxis.getDirection(), it.name)
-////                        }
-////                        val yDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
-////                            ExistDirection(it.yAxis.getDirection(), it.name)
-////                        }
-//                            // TODO add xDirection, yDirection
-//                            controller.openFunctionModal(drawSize, listOf(), listOf())
-//                        }
-//                        item("Добавить указатель").action {
-//                            controller.openArrowModal(outX, outY)
-//                        }
-//                        item("Добавить описание").action {
-//                            controller.openDescriptionModal(outX, outY)
-//                        }
-//                    }
-//                }
-//            }
             addFunction(
                 drawSize = DrawSize(
                     minX = 0.0,

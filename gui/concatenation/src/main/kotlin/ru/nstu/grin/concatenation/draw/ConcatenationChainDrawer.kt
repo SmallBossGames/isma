@@ -7,6 +7,7 @@ import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
+import ru.nstu.grin.concatenation.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.draw.elements.axis.AxisDrawElement
 import ru.nstu.grin.concatenation.draw.elements.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.draw.elements.ContextMenuDrawElement
@@ -15,7 +16,8 @@ import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 
 class ConcatenationChainDrawer(
     private val canvas: Canvas,
-    private val model: ConcatenationCanvasModelViewModel
+    private val model: ConcatenationCanvasModelViewModel,
+    private val controller: ConcatenationCanvasController
 ) : ChainDrawer {
     private val pointToolTip = Tooltip()
     private val contextMenu = ContextMenu()
@@ -49,7 +51,8 @@ class ConcatenationChainDrawer(
 
         ContextMenuDrawElement(
             contextMenu,
-            model
+            model,
+            controller
         ).draw(context)
     }
 }

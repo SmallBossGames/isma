@@ -61,5 +61,6 @@ class ShowPointHandler(
         }
         model.contextMenuSettings.xGraphic = event.x
         model.contextMenuSettings.yGraphic = event.y
+        chainDrawer.draw()
     }
 }

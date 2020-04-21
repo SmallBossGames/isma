@@ -9,6 +9,7 @@ test {
 dependencies {
     implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
     implementation project(":analytic-fu")
+    implementation "de.sciss:jwave:${versions.jwave}"
 
     testImplementation "ru.kontur.kinfra.kfixture:kfixture:0.4.9"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"

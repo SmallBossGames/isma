@@ -3,7 +3,6 @@ package ru.nstu.grin.simple.view.modal
 import javafx.scene.Parent
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.simple.controller.PointsViewController
-import ru.nstu.grin.simple.events.FileCheckedEvent
 import ru.nstu.grin.simple.model.PointsViewModel
 import ru.nstu.grin.simple.model.WaveletTransformFun
 import tornadofx.*
@@ -32,10 +31,7 @@ class PointsView : View() {
         }
         button("Ok") {
             action {
-                val event = FileCheckedEvent(
-                    points = model.points
-                )
-                fire(event)
+                controller.fireCheckedEvent()
                 close()
             }
         }

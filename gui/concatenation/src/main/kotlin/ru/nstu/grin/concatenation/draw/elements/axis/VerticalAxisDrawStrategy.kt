@@ -6,6 +6,7 @@ import ru.nstu.grin.concatenation.marks.MarksProvider
 import ru.nstu.grin.concatenation.model.CanvasSettings
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.concatenation.model.Direction
+import kotlin.math.pow
 
 class VerticalAxisDrawStrategy(
     private val canvasSettings: CanvasSettings,
@@ -25,7 +26,7 @@ class VerticalAxisDrawStrategy(
         val minY = getTopAxisSize() * SettingsProvider.getAxisWidth()
         while (currentY > minY) {
             context.strokeText(
-                drawStepY,
+                transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic).toString(),
                 marksCoordinate,
                 currentY
             )
@@ -42,7 +43,7 @@ class VerticalAxisDrawStrategy(
         while (currentY < maxY) {
             if (currentStepY != 0.0)
                 context.strokeText(
-                    drawStepY,
+                    transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic).toString(),
                     marksCoordinate - 5,
                     currentY
                 )
@@ -64,5 +65,13 @@ class VerticalAxisDrawStrategy(
     private fun getTopAxisSize(): Int {
         return cartesianSpaces.filter { it.xAxis.direction == Direction.TOP || it.yAxis.direction == Direction.TOP }
             .size
+    }
+
+    private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean): Double {
+        return if (isLogarithmic) {
+            canvasSettings.logarithmBase.pow(step)
+        } else {
+            step
+        }
     }
 }

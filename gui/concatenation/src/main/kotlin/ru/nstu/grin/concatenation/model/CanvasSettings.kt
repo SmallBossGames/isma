@@ -6,7 +6,7 @@ data class CanvasSettings(
     var pixelCost: Double = 40.0,
     var step: Double = 1.0,
 
-    var isXLogarithm: Boolean = false,
-    var isYLogarithm: Boolean = false,
+    var isXLogarithmic: Boolean = false,
+    var isYLogarithmic: Boolean = false,
     var logarithmBase: Double = 10.0
 )

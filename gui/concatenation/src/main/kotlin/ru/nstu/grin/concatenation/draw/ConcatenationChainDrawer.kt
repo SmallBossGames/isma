@@ -1,6 +1,7 @@
 package ru.nstu.grin.concatenation.draw
 
 import javafx.scene.canvas.Canvas
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.Tooltip
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
@@ -8,6 +9,8 @@ import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.draw.elements.axis.AxisDrawElement
 import ru.nstu.grin.concatenation.draw.elements.ConcatenationFunctionDrawElement
+import ru.nstu.grin.concatenation.draw.elements.ContextMenuDrawElement
+import ru.nstu.grin.concatenation.draw.elements.TooltipsDrawElement
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 
 class ConcatenationChainDrawer(
@@ -15,6 +18,7 @@ class ConcatenationChainDrawer(
     private val model: ConcatenationCanvasModelViewModel
 ) : ChainDrawer {
     private val pointToolTip = Tooltip()
+    private val contextMenu = ContextMenu()
 
     override fun draw() {
         val context = canvas.graphicsContext2D
@@ -37,6 +41,15 @@ class ConcatenationChainDrawer(
             ).draw(context)
         }
 
-        TooltipsDrawElement(model.pointToolTipSettings, pointToolTip, model.primaryStage).draw(context)
+        TooltipsDrawElement(
+            model.pointToolTipSettings,
+            pointToolTip,
+            model.primaryStage
+        ).draw(context)
+
+        ContextMenuDrawElement(
+            contextMenu,
+            model
+        ).draw(context)
     }
 }

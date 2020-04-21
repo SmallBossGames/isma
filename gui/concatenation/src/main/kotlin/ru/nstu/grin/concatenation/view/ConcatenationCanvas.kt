@@ -1,15 +1,12 @@
 package ru.nstu.grin.concatenation.view
 
 import javafx.collections.ListChangeListener
-import javafx.event.EventHandler
 import javafx.event.EventTarget
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.canvas.Canvas
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Control
-import javafx.scene.control.Tooltip
-import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
@@ -59,32 +56,54 @@ class ConcatenationCanvas : View() {
             onMousePressed = ShowPointHandler(model, chainDrawer)
             onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
 
-            setOnContextMenuRequested {
-                withCoordContextmenu {
-                    item("Add function").action {
-                        val drawSize = DrawSize(
-                            minX = 0.0,
-                            maxX = this@canvas.width,
-                            minY = 0.0,
-                            maxY = this@canvas.height
-                        )
-//                        val xDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
-//                            ExistDirection(it.xAxis.getDirection(), it.name)
+
+
+
+//            setOnContextMenuRequested { event ->
+//                val axises = model.cartesianSpaces.map {
+//                    listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
+//                }.flatten()
+//                val cartesianSpace = axises.firstOrNull {
+//                    it.second.isLocated(event.x, event.y)
+//                }?.first
+//                if (cartesianSpace != null) {
+//                    withCoordContextmenu {
+//                        menu("Логарифмический масштаб") {
+//                            item("Включить по x").action {
+//                                cartesianSpace.settings.isXLogarithm = !cartesianSpace.settings.isXLogarithm
+//                            }
+//                            item("Включить по y").action {
+//                                cartesianSpace.settings.isYLogarithm = !cartesianSpace.settings.isYLogarithm
+//                            }
 //                        }
-//                        val yDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
-//                            ExistDirection(it.yAxis.getDirection(), it.name)
+//                    }
+//                } else {
+//                    withCoordContextmenu {
+//                        item("Добавить функцию").action {
+//                            val drawSize = DrawSize(
+//                                minX = 0.0,
+//                                maxX = this@canvas.width,
+//                                minY = 0.0,
+//                                maxY = this@canvas.height
+//                            )
+////                        val xDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
+////                            ExistDirection(it.xAxis.getDirection(), it.name)
+////                        }
+////                        val yDirections = model.drawings.filterIsInstance<ConcatenationFunction>().map {
+////                            ExistDirection(it.yAxis.getDirection(), it.name)
+////                        }
+//                            // TODO add xDirection, yDirection
+//                            controller.openFunctionModal(drawSize, listOf(), listOf())
 //                        }
-                        // TODO add xDirection, yDirection
-                        controller.openFunctionModal(drawSize, listOf(), listOf())
-                    }
-                    item("Add arrow").action {
-                        controller.openArrowModal(outX, outY)
-                    }
-                    item("Add description").action {
-                        controller.openDescriptionModal(outX, outY)
-                    }
-                }
-            }
+//                        item("Добавить указатель").action {
+//                            controller.openArrowModal(outX, outY)
+//                        }
+//                        item("Добавить описание").action {
+//                            controller.openDescriptionModal(outX, outY)
+//                        }
+//                    }
+//                }
+//            }
             addFunction(
                 drawSize = DrawSize(
                     minX = 0.0,

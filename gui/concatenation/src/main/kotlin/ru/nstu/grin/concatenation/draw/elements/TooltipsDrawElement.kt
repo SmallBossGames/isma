@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.draw
+package ru.nstu.grin.concatenation.draw.elements
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Tooltip

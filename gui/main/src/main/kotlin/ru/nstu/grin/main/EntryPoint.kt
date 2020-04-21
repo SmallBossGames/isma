@@ -13,7 +13,7 @@ import tornadofx.reloadStylesheetsOnFocus
 import kotlin.reflect.KClass
 
 class MyApp : App() {
-    override val primaryView: KClass<out UIComponent> = SimpleCanvasView::class
+    override val primaryView: KClass<out UIComponent> = ConcatenationCanvas::class
 
     init {
         reloadStylesheetsOnFocus()

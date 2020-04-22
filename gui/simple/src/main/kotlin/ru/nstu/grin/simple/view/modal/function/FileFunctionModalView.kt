@@ -18,6 +18,9 @@ class FileFunctionModalView : View() {
             field("Цвет") {
                 colorpicker().bind(model.colorProperty)
             }
+            field("Выберите шаг рисования") {
+                textfield().bind(model.stepProperty)
+            }
             field("Выберите файл") {
                 button("Файл") {
                     action {

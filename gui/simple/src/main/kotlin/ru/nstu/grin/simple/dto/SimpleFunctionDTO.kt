@@ -6,5 +6,6 @@ import ru.nstu.grin.common.model.Point
 data class SimpleFunctionDTO(
     val name: String,
     val points: List<Point>,
-    val color: Color
+    val color: Color,
+    val step: Int
 )

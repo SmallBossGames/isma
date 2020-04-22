@@ -18,6 +18,9 @@ class AnalyticFunctionModalView : View() {
             field("Цвет") {
                 colorpicker().bind(model.colorProperty)
             }
+            field("Введите шаг рисования") {
+                textfield().bind(model.stepProperty)
+            }
         }
         fieldset("Введите формулу") {
             field("формула") {

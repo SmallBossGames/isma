@@ -6,7 +6,6 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.simple.model.SimpleFunction
 import ru.nstu.grin.simple.view.SimplePlotSettings
 import kotlin.math.abs
-import kotlin.math.log
 import kotlin.math.log10
 
 class FunctionsDrawElement(
@@ -21,12 +20,19 @@ class FunctionsDrawElement(
             context.stroke = function.color
             context.lineWidth = 2.0
 
-            transformPoints(middleWidth, middleHeight, function.points)
-            val points = function.points
+            val points = function.points.mapIndexedNotNull { index, point ->
+                if (index % function.step == 0) {
+                    point
+                } else {
+                    null
+                }
+            }
+
+            transformPoints(middleWidth, middleHeight, points)
 
             val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
             val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
-            val n = function.points.size
+            val n = points.size
             context.strokePolyline(xPoints, yPoints, n)
         }
     }

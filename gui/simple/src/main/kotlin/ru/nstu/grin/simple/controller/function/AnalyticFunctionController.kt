@@ -15,7 +15,8 @@ class AnalyticFunctionController : Controller() {
         val function = SimpleFunctionDTO(
             name = model.name,
             points = pointsBuilder.buildPoints(DrawSize(-1200.0, 1200.0, -800.0, 800.0), model.text, 0.1),
-            color = model.color
+            color = model.color,
+            step = model.step
         )
 
         fire(

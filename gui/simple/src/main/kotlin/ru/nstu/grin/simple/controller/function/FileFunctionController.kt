@@ -5,10 +5,8 @@ import ru.nstu.grin.simple.dto.SimpleFunctionDTO
 import ru.nstu.grin.simple.events.FileCheckedEvent
 import ru.nstu.grin.simple.events.SimpleFunctionEvent
 import ru.nstu.grin.simple.model.FileOptionsModel
-import ru.nstu.grin.simple.model.PointsViewModel
 import ru.nstu.grin.simple.model.function.FileFunctionModel
 import ru.nstu.grin.simple.view.modal.FileOptionsModalView
-import ru.nstu.grin.simple.view.modal.PointsView
 import tornadofx.Controller
 import tornadofx.FileChooserMode
 
@@ -41,7 +39,8 @@ class FileFunctionController : Controller() {
         val function = SimpleFunctionDTO(
             name = model.name,
             points = points,
-            color = model.color
+            color = model.color,
+            step = model.step
         )
         fire(
             SimpleFunctionEvent(function)

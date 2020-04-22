@@ -45,7 +45,8 @@ class SimpleCanvas : View() {
                         Point(8.0, 5.0),
                         Point(20.0, 20.0)
                     ),
-                    color = Color.BLACK
+                    color = Color.BLACK,
+                    step = 1
                 )
             )
 

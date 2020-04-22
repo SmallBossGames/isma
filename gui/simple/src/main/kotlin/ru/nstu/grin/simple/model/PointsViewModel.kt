@@ -13,6 +13,7 @@ class PointsViewModel : ViewModel() {
     var points by pointsProperty
 
     val file: File by param()
+    val delimiter: String by param()
 
     var waveletTransformFunProperty = SimpleObjectProperty<WaveletTransformFun>()
     var waveletTransformFun by waveletTransformFunProperty

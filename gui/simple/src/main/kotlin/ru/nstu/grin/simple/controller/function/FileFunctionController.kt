@@ -4,8 +4,10 @@ import javafx.stage.FileChooser
 import ru.nstu.grin.simple.dto.SimpleFunctionDTO
 import ru.nstu.grin.simple.events.FileCheckedEvent
 import ru.nstu.grin.simple.events.SimpleFunctionEvent
+import ru.nstu.grin.simple.model.FileOptionsModel
 import ru.nstu.grin.simple.model.PointsViewModel
 import ru.nstu.grin.simple.model.function.FileFunctionModel
+import ru.nstu.grin.simple.view.modal.FileOptionsModalView
 import ru.nstu.grin.simple.view.modal.PointsView
 import tornadofx.Controller
 import tornadofx.FileChooserMode
@@ -23,9 +25,9 @@ class FileFunctionController : Controller() {
             tornadofx.error("Файл не был выбран")
             return
         }
-        find<PointsView>(
+        find<FileOptionsModalView>(
             mapOf(
-                PointsViewModel::file to files[0]
+                FileOptionsModel::file to files[0]
             )
         ).openModal()
     }

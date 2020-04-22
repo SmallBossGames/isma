@@ -27,18 +27,9 @@ class PointsViewController : Controller() {
 
     private fun readPoints(file: File): List<Point> = FileInputStream(file).use {
         val lines = String(it.readBytes()).split("\n")
-        lines.mapNotNull { line ->
-            when {
-                line.contains(",") -> {
-                    val coordinates = line.split(",")
-                    Point(coordinates[0].toDouble(), coordinates[1].toDouble())
-                }
-                line.contains(";") -> {
-                    val coordinates = line.split(";")
-                    Point(coordinates[0].toDouble(), coordinates[1].toDouble())
-                }
-                else -> null
-            }
+        lines.map { line ->
+            val coordinates = line.split(model.delimiter)
+            Point(coordinates[0].toDouble(), coordinates[1].toDouble())
         }
     }
 
@@ -75,7 +66,7 @@ class PointsViewController : Controller() {
             WaveletTransformFun.DISCRETE_MAYER -> DiscreteMayer()
             WaveletTransformFun.LEGENDRE3 -> Legendre3()
             else -> {
-                throw IllegalArgumentException("Somethind went wrong")
+                throw IllegalArgumentException("Something went wrong")
             }
         }
     }

@@ -1,5 +1,7 @@
 package ru.nstu.grin.concatenation.controller
 
+import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.concatenation.events.FileCheckedEvent
 import ru.nstu.grin.concatenation.model.PointsViewModel
 import tornadofx.Controller
 import java.io.File
@@ -25,5 +27,20 @@ class PointsViewController : Controller() {
             result.add(coordinates)
         }
         result
+    }
+
+    fun sendFireCheckedEvent() {
+        val points = model.pointsList.map {
+            it.zipWithNext { a, b ->
+                Point(a.toDouble(), b.toDouble())
+            }
+        }
+        fire(
+            FileCheckedEvent(
+                points = points,
+                addFunctionsMode = model.addFunctionsMode,
+                fileReaderMode = model.readerMode
+            )
+        )
     }
 }

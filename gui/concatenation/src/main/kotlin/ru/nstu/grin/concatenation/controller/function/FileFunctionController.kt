@@ -100,6 +100,8 @@ class FileFunctionController : Controller() {
     init {
         subscribe<FileCheckedEvent> {
             model.points = it.points.transpose()
+            model.readMode = it.fileReaderMode
+            model.addFunctionsMode = it.addFunctionsMode
         }
     }
 }

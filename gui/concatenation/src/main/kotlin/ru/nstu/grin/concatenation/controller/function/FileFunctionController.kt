@@ -10,9 +10,9 @@ import ru.nstu.grin.concatenation.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.dto.ConcatenationFunctionDTO
 import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.events.FileCheckedEvent
-import ru.nstu.grin.concatenation.model.PointsViewModel
+import ru.nstu.grin.concatenation.model.FileOptionsModel
 import ru.nstu.grin.concatenation.model.function.FileFunctionViewModel
-import ru.nstu.grin.concatenation.view.modal.PointsView
+import ru.nstu.grin.concatenation.view.FileOptionsView
 import tornadofx.Controller
 import tornadofx.FileChooserMode
 
@@ -32,9 +32,9 @@ class FileFunctionController : Controller() {
             tornadofx.error("Файл не был выбран")
             return
         }
-        find<PointsView>(
+        find<FileOptionsView>(
             mapOf(
-                PointsViewModel::file to files[0]
+                FileOptionsModel::file to files[0]
             )
         ).openModal()
     }

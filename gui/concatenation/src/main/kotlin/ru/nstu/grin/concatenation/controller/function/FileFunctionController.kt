@@ -10,6 +10,7 @@ import ru.nstu.grin.concatenation.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.dto.ConcatenationFunctionDTO
 import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.events.FileCheckedEvent
+import ru.nstu.grin.concatenation.model.AddFunctionsMode
 import ru.nstu.grin.concatenation.model.FileOptionsModel
 import ru.nstu.grin.concatenation.model.function.FileFunctionViewModel
 import ru.nstu.grin.concatenation.view.FileOptionsView
@@ -47,39 +48,79 @@ class FileFunctionController : Controller() {
         }
 
         val delta = DeltaSizeCalculator().calculateDelta(drawSize)
+
+        val addFunctionsMode = model.addFunctionsMode
+        if (addFunctionsMode == null) {
+            tornadofx.error("Что-то пошло не так, попробуйте сначала")
+            return
+        }
+
+        when (addFunctionsMode) {
+            AddFunctionsMode.ADD_TO_ONE_CARTESIAN_SPACE -> {
+                val xAxis = createXAxis(drawSize)
+                val yAxis = createYAxis(drawSize)
+                val functions = points.mapIndexed { index, list ->
+                    ConcatenationFunctionDTO(
+                        name = "${model.functionName}.$index",
+                        points = list,
+                        functionColor = model.functionColor
+                    )
+                }
+                val cartesianSpace = CartesianSpaceDTO(
+                    functions = functions,
+                    xAxis = xAxis,
+                    yAxis = yAxis
+                )
+                fire(ConcatenationFunctionEvent(cartesianSpace, delta))
+            }
+            AddFunctionsMode.ADD_TO_NEW_CARTESIAN_SPACES -> {
+                points.forEachIndexed { index, list ->
+                    val function = ConcatenationFunctionDTO(
+                        name = "${model.functionName}.$index",
+                        points = list,
+                        functionColor = model.functionColor
+                    )
+                    val xAxis = createXAxis(drawSize)
+                    val yAxis = createYAxis(drawSize)
+
+                    val cartesianSpace = CartesianSpaceDTO(
+                        functions = listOf(function),
+                        xAxis = xAxis,
+                        yAxis = yAxis
+                    )
+
+                    fire(ConcatenationFunctionEvent(cartesianSpace, delta))
+                }
+            }
+        }
+    }
+
+    private fun createXAxis(drawSize: DrawSize): ConcatenationAxisDTO {
+        val delta = DeltaSizeCalculator().calculateDelta(drawSize)
         val deltaMarksGenerator = DeltaMarksGenerator()
 
-        points.forEachIndexed { index, list ->
-            val function = ConcatenationFunctionDTO(
-                name = "${model.functionName}.$index",
-                points = list,
-                functionColor = model.functionColor
-            )
-            val xAxis = ConcatenationAxisDTO(
-                name = model.xAxisName,
-                backGroundColor = model.xAxisColor,
-                delimeterColor = model.xDelimiterColor,
-                direction = model.xDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction),
-                zeroPoint = SettingsProvider.getCanvasWidth() / 2
-            )
-            val yAxis = ConcatenationAxisDTO(
-                name = model.yAxisName,
-                backGroundColor = model.yAxisColor,
-                delimeterColor = model.yDelimeterColor,
-                direction = model.yDirection,
-                deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction),
-                zeroPoint = SettingsProvider.getCanvasHeight() / 2
-            )
+        return ConcatenationAxisDTO(
+            name = model.xAxisName,
+            backGroundColor = model.xAxisColor,
+            delimeterColor = model.xDelimiterColor,
+            direction = model.xDirection,
+            deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.xDirection.direction),
+            zeroPoint = SettingsProvider.getCanvasWidth() / 2
+        )
+    }
 
-            val cartesianSpace = CartesianSpaceDTO(
-                functions = listOf(function),
-                xAxis = xAxis,
-                yAxis = yAxis
-            )
+    private fun createYAxis(drawSize: DrawSize): ConcatenationAxisDTO {
+        val delta = DeltaSizeCalculator().calculateDelta(drawSize)
+        val deltaMarksGenerator = DeltaMarksGenerator()
 
-            fire(ConcatenationFunctionEvent(cartesianSpace, delta))
-        }
+        return ConcatenationAxisDTO(
+            name = model.yAxisName,
+            backGroundColor = model.yAxisColor,
+            delimeterColor = model.yDelimeterColor,
+            direction = model.yDirection,
+            deltaMarks = deltaMarksGenerator.getDeltaMarks(drawSize, delta, model.yDirection.direction),
+            zeroPoint = SettingsProvider.getCanvasHeight() / 2
+        )
     }
 
     private fun <T> List<List<T>>.transpose(): List<List<T>> {
@@ -100,7 +141,6 @@ class FileFunctionController : Controller() {
     init {
         subscribe<FileCheckedEvent> {
             model.points = it.points.transpose()
-            model.readMode = it.fileReaderMode
             model.addFunctionsMode = it.addFunctionsMode
         }
     }

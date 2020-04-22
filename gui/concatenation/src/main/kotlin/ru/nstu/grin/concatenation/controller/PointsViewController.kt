@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.controller
 
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.events.FileCheckedEvent
+import ru.nstu.grin.concatenation.model.FileReaderMode
 import ru.nstu.grin.concatenation.model.PointsViewModel
 import tornadofx.Controller
 import java.io.File
@@ -20,7 +21,7 @@ class PointsViewController : Controller() {
         val result = mutableListOf<List<String>>()
         for (line in lines) {
             val coordinates = line.split(model.delimiter)
-            if (coordinates.size % 2 != 0) {
+            if (model.readerMode == FileReaderMode.SEQUENCE && coordinates.size % 2 != 0) {
                 tornadofx.error("Неверное количество колонок")
                 return@use emptyList()
             }
@@ -30,16 +31,32 @@ class PointsViewController : Controller() {
     }
 
     fun sendFireCheckedEvent() {
-        val points = model.pointsList.map {
-            it.zipWithNext { a, b ->
-                Point(a.toDouble(), b.toDouble())
+        val points = when (model.readerMode) {
+            FileReaderMode.ONE_TO_MANY -> {
+                model.pointsList.map { list ->
+                    list.zipWithNext { a, b ->
+                        Point(
+                            list[0].replace(",", ".").toDouble(),
+                            b.replace(",", ".").toDouble()
+                        )
+                    }
+                }
+            }
+            FileReaderMode.SEQUENCE -> {
+                model.pointsList.map {
+                    it.zipWithNext { a, b ->
+                        Point(
+                            a.replace(",", ".").toDouble(),
+                            b.replace(",", ".").toDouble()
+                        )
+                    }
+                }
             }
         }
         fire(
             FileCheckedEvent(
                 points = points,
-                addFunctionsMode = model.addFunctionsMode,
-                fileReaderMode = model.readerMode
+                addFunctionsMode = model.addFunctionsMode
             )
         )
     }

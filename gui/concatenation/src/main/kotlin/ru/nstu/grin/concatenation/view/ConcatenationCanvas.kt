@@ -35,8 +35,6 @@ import kotlin.math.sin
 class ConcatenationCanvas : View() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val controller: ConcatenationCanvasController by inject()
-    private var outX = 0.0
-    private var outY = 0.0
     lateinit var canvas: Canvas
     private lateinit var chainDrawer: ConcatenationChainDrawer
 
@@ -59,34 +57,16 @@ class ConcatenationCanvas : View() {
             onMousePressed = ShowPointHandler(model, chainDrawer)
             onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
 
-//            addFunction(
-//                drawSize = DrawSize(
-//                    minX = 0.0,
-//                    maxX = this@canvas.width,
-//                    minY = 0.0,
-//                    maxY = this@canvas.height
-//                )
-//            )
+            addFunction(
+                drawSize = DrawSize(
+                    minX = 0.0,
+                    maxX = this@canvas.width,
+                    minY = 0.0,
+                    maxY = this@canvas.height
+                )
+            )
         }
 
-    }
-
-    private fun EventTarget.withCoordContextmenu(
-        op: ContextMenu.() -> Unit = {}
-    ): ContextMenu {
-        val menu = (this as? Control)?.contextMenu ?: ContextMenu()
-        op(menu)
-        if (this is Control) {
-            contextMenu = menu
-        } else (this as? Node)?.apply {
-            setOnContextMenuRequested { event ->
-                outX = event.x
-                outY = event.y
-                menu.show(this, event.screenX, event.screenY)
-                event.consume()
-            }
-        }
-        return menu
     }
 
     private fun generateCircle(radius: Double): List<Point> {

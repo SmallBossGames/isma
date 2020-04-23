@@ -6,6 +6,9 @@ import ru.nstu.grin.concatenation.marks.MarksProvider
 import ru.nstu.grin.concatenation.model.CanvasSettings
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.concatenation.model.Direction
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import kotlin.math.pow
 
 class HorizontalAxisDrawStrategy(
@@ -25,10 +28,12 @@ class HorizontalAxisDrawStrategy(
         var currentX = zeroPoint
         val minX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
         while (currentX > minX) {
+            val transformed = transformStepLogarithm(currentStepX, canvasSettings.isXLogarithmic)
             context.strokeText(
-                transformStepLogarithm(currentStepX, canvasSettings.isXLogarithmic).toString(),
+                format(transformed),
                 currentX,
-                marksCoordinate
+                marksCoordinate,
+                MAX_TEXT_WIDTH
             )
 
             currentX -= SettingsProvider.getMarksInterval()
@@ -41,16 +46,26 @@ class HorizontalAxisDrawStrategy(
         currentX = zeroPoint
         val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
         while (currentX < maxX) {
+            val transformed = transformStepLogarithm(currentStepX, canvasSettings.isXLogarithmic)
             context.strokeText(
-                transformStepLogarithm(currentStepX, canvasSettings.isXLogarithmic).toString(),
+                format(transformed),
                 currentX,
-                marksCoordinate
+                marksCoordinate,
+                MAX_TEXT_WIDTH
             )
 
             currentX += SettingsProvider.getMarksInterval()
             drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
             currentStepX += canvasSettings.step
         }
+    }
+
+    private fun format(number: Double): String {
+        val decimal = BigDecimal(number)
+        val formatter = DecimalFormat("0.0E0")
+        formatter.roundingMode = RoundingMode.HALF_DOWN
+        formatter.minimumFractionDigits = 2
+        return formatter.format(decimal)
     }
 
     private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean): Double {
@@ -69,5 +84,9 @@ class HorizontalAxisDrawStrategy(
     private fun getRightAxisSize(): Int {
         return cartesianSpaces.filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
             .size
+    }
+
+    private companion object {
+        const val MAX_TEXT_WIDTH = 30.0
     }
 }

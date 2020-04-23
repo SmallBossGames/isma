@@ -7,10 +7,13 @@ import tornadofx.App
 import tornadofx.UIComponent
 import tornadofx.launch
 import tornadofx.reloadStylesheetsOnFocus
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import kotlin.reflect.KClass
 
 class MyApp : App() {
-    override val primaryView: KClass<out UIComponent> = SimpleCanvasView::class
+    override val primaryView: KClass<out UIComponent> = ConcatenationCanvas::class
 
     init {
         reloadStylesheetsOnFocus()

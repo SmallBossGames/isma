@@ -6,6 +6,9 @@ import ru.nstu.grin.concatenation.marks.MarksProvider
 import ru.nstu.grin.concatenation.model.CanvasSettings
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.concatenation.model.Direction
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import kotlin.math.pow
 
 class VerticalAxisDrawStrategy(
@@ -25,10 +28,12 @@ class VerticalAxisDrawStrategy(
         var currentY = zeroPoint
         val minY = getTopAxisSize() * SettingsProvider.getAxisWidth()
         while (currentY > minY) {
+            val transformed = transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic)
             context.strokeText(
-                transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic).toString(),
-                marksCoordinate,
-                currentY
+                format(transformed),
+                marksCoordinate - 15.0,
+                currentY,
+                MAX_TEXT_WIDTH
             )
 
             currentY -= SettingsProvider.getMarksInterval()
@@ -41,12 +46,15 @@ class VerticalAxisDrawStrategy(
         currentY = zeroPoint
         val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
         while (currentY < maxY) {
-            if (currentStepY != 0.0)
+            if (currentStepY != 0.0) {
+                val transformed = transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic)
                 context.strokeText(
-                    transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic).toString(),
-                    marksCoordinate - 5,
-                    currentY
+                    format(transformed),
+                    marksCoordinate - 17.0,
+                    currentY,
+                    MAX_TEXT_WIDTH
                 )
+            }
 
             currentY += SettingsProvider.getMarksInterval()
             drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, canvasSettings.step)
@@ -73,5 +81,17 @@ class VerticalAxisDrawStrategy(
         } else {
             step
         }
+    }
+
+    private fun format(number: Double): String {
+        val decimal = BigDecimal(number)
+        val formatter = DecimalFormat("0.0E0")
+        formatter.roundingMode = RoundingMode.HALF_DOWN
+        formatter.minimumFractionDigits = 2
+        return formatter.format(decimal)
+    }
+
+    private companion object {
+        const val MAX_TEXT_WIDTH = 30.0
     }
 }

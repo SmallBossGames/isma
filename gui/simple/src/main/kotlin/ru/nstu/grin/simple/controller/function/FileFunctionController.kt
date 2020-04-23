@@ -31,7 +31,13 @@ class FileFunctionController : Controller() {
     }
 
     fun addFunction() {
-        val points = model.points
+        val points = model.points?.mapIndexedNotNull { index, point ->
+            if (index%model.step == 0) {
+                point
+            } else {
+                null
+            }
+        }
         if (points == null) {
             tornadofx.error("Необходимо загрузить точки")
             return
@@ -39,8 +45,7 @@ class FileFunctionController : Controller() {
         val function = SimpleFunctionDTO(
             name = model.name,
             points = points,
-            color = model.color,
-            step = model.step
+            color = model.color
         )
         fire(
             SimpleFunctionEvent(function)

@@ -9,8 +9,7 @@ object SimpleFunctionConverter : Converter<SimpleFunctionDTO, SimpleFunction> {
         return SimpleFunction(
             name = source.name,
             points = source.points,
-            color = source.color,
-            step = source.step
+            color = source.color
         )
     }
 }

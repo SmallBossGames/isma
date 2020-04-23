@@ -20,13 +20,7 @@ class FunctionsDrawElement(
             context.stroke = function.color
             context.lineWidth = 2.0
 
-            val points = function.points.mapIndexedNotNull { index, point ->
-                if (index % function.step == 0) {
-                    point
-                } else {
-                    null
-                }
-            }
+            val points = function.points
 
             transformPoints(middleWidth, middleHeight, points)
 

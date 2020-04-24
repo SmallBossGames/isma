@@ -2,11 +2,8 @@ package ru.nstu.grin.concatenation.view
 
 import javafx.event.EventHandler
 import javafx.scene.input.ScrollEvent
-import ru.nstu.grin.concatenation.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.draw.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.model.CartesianSpace
-import ru.nstu.grin.concatenation.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.model.CoordinateDirection
 import ru.nstu.grin.concatenation.model.ScaleSettings
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
 
@@ -32,28 +29,28 @@ class ScalableScrollHandler(
             println("Up")
 
             if (scaleSettings.upRemaining <= 0) {
-                cartesianSpace.settings.step = cartesianSpace.settings.step / 2
+                cartesianSpace.settings.xStep = cartesianSpace.settings.xStep / 2
                 scaleSettings.upRemaining = TIMES_TO_SCROLL
                 scaleSettings.downRemaining = TIMES_TO_SCROLL
-                cartesianSpace.settings.pixelCost = 40.0
-                scaleSettings.delta = cartesianSpace.settings.pixelCost / DELTA_DELIMITER
+                cartesianSpace.settings.xPixelCost = 40.0
+                scaleSettings.delta = cartesianSpace.settings.xPixelCost / DELTA_DELIMITER
                 return
             }
-            cartesianSpace.settings.pixelCost += scaleSettings.delta
+            cartesianSpace.settings.xPixelCost += scaleSettings.delta
         } else {
             println("Down")
             scaleSettings.downRemaining--
             scaleSettings.upRemaining++
 
             if (scaleSettings.downRemaining <= 0) {
-                cartesianSpace.settings.step = cartesianSpace.settings.step * 2
+                cartesianSpace.settings.xStep = cartesianSpace.settings.xStep * 2
                 scaleSettings.downRemaining = TIMES_TO_SCROLL
                 scaleSettings.upRemaining = TIMES_TO_SCROLL
-                cartesianSpace.settings.pixelCost = 40.0
-                scaleSettings.delta = cartesianSpace.settings.pixelCost / DELTA_DELIMITER
+                cartesianSpace.settings.xPixelCost = 40.0
+                scaleSettings.delta = cartesianSpace.settings.xPixelCost / DELTA_DELIMITER
                 return
             }
-            cartesianSpace.settings.pixelCost -= scaleSettings.delta
+            cartesianSpace.settings.xPixelCost -= scaleSettings.delta
         }
         currentCanvasSettings[cartesianSpace] = scaleSettings
         chainDrawer.draw()
@@ -61,7 +58,7 @@ class ScalableScrollHandler(
 
     private fun getScaleSettings(cartesianSpace: CartesianSpace): ScaleSettings {
         return currentCanvasSettings[cartesianSpace] ?: ScaleSettings(
-            delta = cartesianSpace.settings.pixelCost / DELTA_DELIMITER
+            delta = cartesianSpace.settings.xPixelCost / DELTA_DELIMITER
         )
     }
 

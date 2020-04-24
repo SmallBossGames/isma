@@ -22,7 +22,7 @@ class VerticalAxisDrawStrategy(
         marksProvider: MarksProvider,
         marksCoordinate: Double
     ) {
-        println("Current step ${canvasSettings.step}")
+        println("Current step ${canvasSettings.xStep}")
         var drawStepY = "0.0"
         var currentStepY = 0.0
         var currentY = zeroPoint
@@ -37,8 +37,8 @@ class VerticalAxisDrawStrategy(
             )
 
             currentY -= SettingsProvider.getMarksInterval()
-            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, canvasSettings.step)
-            currentStepY += canvasSettings.step
+            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, canvasSettings.xStep)
+            currentStepY += canvasSettings.xStep
         }
 
         drawStepY = "0.0"
@@ -57,8 +57,8 @@ class VerticalAxisDrawStrategy(
             }
 
             currentY += SettingsProvider.getMarksInterval()
-            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, canvasSettings.step)
-            currentStepY -= canvasSettings.step
+            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, canvasSettings.xStep)
+            currentStepY -= canvasSettings.xStep
         }
     }
 

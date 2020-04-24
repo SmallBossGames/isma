@@ -43,7 +43,7 @@ class ConcatenationFunctionDrawElement(
             } else {
                 it.x
             }
-            it.xGraphic = zeroPointX + x * settings.pixelCost / settings.step + settings.xCorrelation
+            it.xGraphic = zeroPointX + x * settings.xPixelCost / settings.xStep + settings.xCorrelation
 
             val y = if (settings.isYLogarithmic) {
                 if (it.y < 0) {
@@ -55,9 +55,9 @@ class ConcatenationFunctionDrawElement(
                 it.y
             }
             it.yGraphic = if (y > 0) {
-                zeroPointY - y * settings.pixelCost / settings.step
+                zeroPointY - y * settings.xPixelCost / settings.xStep
             } else {
-                zeroPointY + abs(y) * settings.pixelCost / settings.step
+                zeroPointY + abs(y) * settings.xPixelCost / settings.xStep
             } + settings.yCorrelation
         }
     }

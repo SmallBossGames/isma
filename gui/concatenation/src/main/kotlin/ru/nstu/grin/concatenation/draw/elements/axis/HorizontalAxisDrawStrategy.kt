@@ -22,7 +22,7 @@ class HorizontalAxisDrawStrategy(
         marksProvider: MarksProvider,
         marksCoordinate: Double
     ) {
-        println("CurrentStep x ${canvasSettings.step}")
+        println("CurrentStep x ${canvasSettings.xStep}")
         var drawStepX = "0.0"
         var currentStepX = 0.0
         var currentX = zeroPoint
@@ -37,8 +37,8 @@ class HorizontalAxisDrawStrategy(
             )
 
             currentX -= SettingsProvider.getMarksInterval()
-            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
-            currentStepX -= canvasSettings.step
+            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.xStep)
+            currentStepX -= canvasSettings.xStep
         }
 
         drawStepX = "0.0"
@@ -55,8 +55,8 @@ class HorizontalAxisDrawStrategy(
             )
 
             currentX += SettingsProvider.getMarksInterval()
-            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
-            currentStepX += canvasSettings.step
+            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.xStep)
+            currentStepX += canvasSettings.xStep
         }
     }
 

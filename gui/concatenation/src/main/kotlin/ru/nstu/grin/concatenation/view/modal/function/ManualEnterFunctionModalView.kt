@@ -27,6 +27,9 @@ class ManualEnterFunctionModalView : AbstractAddFunctionModal() {
                     }
                 }
             }
+            field("Шаг рисования") {
+                textfield().bind(model.stepProperty)
+            }
         }
         fieldset("Введите ниже точки") {
             field("Точки x") {

@@ -36,7 +36,13 @@ class ManualEnterFunctionController : Controller() {
 
         val function = ConcatenationFunctionDTO(
             name = model.functionName,
-            points = points,
+            points = points.mapIndexedNotNull { index, point ->
+                if (index % model.step == 0) {
+                    point
+                } else {
+                    null
+                }
+            },
             functionColor = model.functionColor
         )
         val xAxis = ConcatenationAxisDTO(

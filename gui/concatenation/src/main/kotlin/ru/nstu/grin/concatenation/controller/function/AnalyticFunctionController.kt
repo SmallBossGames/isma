@@ -22,7 +22,13 @@ class AnalyticFunctionController : Controller() {
         val deltaMarksGenerator = DeltaMarksGenerator()
         val function = ConcatenationFunctionDTO(
             name = model.functionName,
-            points = pointsBuilder.buildPoints(drawSize, model.text, model.delta),
+            points = pointsBuilder.buildPoints(drawSize, model.text, model.delta).mapIndexedNotNull { index, point ->
+                if (index % model.step == 0) {
+                    point
+                } else {
+                    null
+                }
+            },
             functionColor = model.functionColor
         )
 

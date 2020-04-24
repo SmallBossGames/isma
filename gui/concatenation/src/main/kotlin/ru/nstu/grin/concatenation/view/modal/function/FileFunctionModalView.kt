@@ -24,6 +24,9 @@ class FileFunctionModalView : AbstractAddFunctionModal() {
                     }
                 }
             }
+            field("Укажите шаг рисования") {
+                textfield().bind(model.stepProperty)
+            }
         }
         fieldset("Направления осей") {
             field("Ось x") {

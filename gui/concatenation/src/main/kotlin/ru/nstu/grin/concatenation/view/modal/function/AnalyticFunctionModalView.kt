@@ -20,6 +20,9 @@ class AnalyticFunctionModalView : AbstractAddFunctionModal() {
             field("Введите имя функции") {
                 textfield().bind(model.functionNameProperty)
             }
+            field("Шаг рисования") {
+                textfield().bind(model.stepProperty)
+            }
         }
         fieldset("Введите формулу") {
             field("формула") {

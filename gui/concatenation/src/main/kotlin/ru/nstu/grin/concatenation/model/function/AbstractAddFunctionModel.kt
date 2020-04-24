@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.model.function
 
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
@@ -40,4 +41,7 @@ abstract class AbstractAddFunctionModel : ViewModel() {
 
     var yDelimiterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
     var yDelimeterColor by yDelimiterColorProperty
+
+    var stepProperty = SimpleIntegerProperty(1)
+    var step by stepProperty
 }

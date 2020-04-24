@@ -62,7 +62,13 @@ class FileFunctionController : Controller() {
                 val functions = points.mapIndexed { index, list ->
                     ConcatenationFunctionDTO(
                         name = "${model.functionName}.$index",
-                        points = list,
+                        points = list.mapIndexedNotNull { index, point ->
+                            if (index % model.step == 0) {
+                                point
+                            } else {
+                                null
+                            }
+                        },
                         functionColor = model.functionColor
                     )
                 }
@@ -77,7 +83,13 @@ class FileFunctionController : Controller() {
                 points.forEachIndexed { index, list ->
                     val function = ConcatenationFunctionDTO(
                         name = "${model.functionName}.$index",
-                        points = list,
+                        points = list.mapIndexedNotNull { index, point ->
+                            if (index % model.step == 0) {
+                                point
+                            } else {
+                                null
+                            }
+                        },
                         functionColor = model.functionColor
                     )
                     val xAxis = createXAxis(drawSize)

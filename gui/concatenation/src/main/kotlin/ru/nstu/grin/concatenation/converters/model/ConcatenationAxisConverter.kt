@@ -4,7 +4,7 @@ import ru.nstu.grin.concatenation.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.marks.DoubleMarksProvider
 import ru.nstu.grin.concatenation.marks.InvertDoubleMarksProvider
 import ru.nstu.grin.concatenation.model.Direction
-import ru.nstu.grin.concatenation.model.axis.ConcatenationAxis
+import ru.nstu.grin.concatenation.model.ConcatenationAxis
 
 object ConcatenationAxisConverter {
     fun merge(source: ConcatenationAxisDTO, order: Int): ConcatenationAxis {

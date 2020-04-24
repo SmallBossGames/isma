@@ -32,13 +32,11 @@ class ConcatenationChainDrawer(
             ConcatenationFunctionDrawElement(
                 cartesianSpace.functions,
                 cartesianSpace.xAxis,
-                cartesianSpace.yAxis,
-                cartesianSpace.settings
+                cartesianSpace.yAxis
             ).draw(context)
             AxisDrawElement(
                 cartesianSpace.xAxis,
                 cartesianSpace.yAxis,
-                cartesianSpace.settings,
                 model.cartesianSpaces
             ).draw(context)
         }

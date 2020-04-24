@@ -1,16 +1,11 @@
 package ru.nstu.grin.concatenation.view
 
 import javafx.collections.ListChangeListener
-import javafx.event.EventTarget
-import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.canvas.Canvas
-import javafx.scene.control.ContextMenu
-import javafx.scene.control.Control
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.common.controller.PointsBuilder
 import ru.nstu.grin.concatenation.controller.ConcatenationCanvasController
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.model.CartesianSpace
@@ -28,6 +23,10 @@ import ru.nstu.grin.concatenation.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.model.Direction
 import ru.nstu.grin.concatenation.model.ExistDirection
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.view.handlers.DraggedHandler
+import ru.nstu.grin.concatenation.view.handlers.ReleaseMouseHandler
+import ru.nstu.grin.concatenation.view.handlers.ScalableScrollHandler
+import ru.nstu.grin.concatenation.view.handlers.ShowPointHandler
 import tornadofx.*
 import kotlin.math.cos
 import kotlin.math.sin
@@ -50,12 +49,16 @@ class ConcatenationCanvas : View() {
             model.cartesianSpaces.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
             model.descriptionsProperty.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
 
-            onScroll = ScalableScrollHandler(model, chainDrawer)
+            onScroll =
+                ScalableScrollHandler(model, chainDrawer)
 
-            onMouseDragged = DraggedHandler(model, chainDrawer)
+            onMouseDragged =
+                DraggedHandler(model, chainDrawer)
 
-            onMousePressed = ShowPointHandler(model, chainDrawer)
-            onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
+            onMousePressed =
+                ShowPointHandler(model, chainDrawer)
+            onMouseReleased =
+                ReleaseMouseHandler(model, chainDrawer)
 
 //            addFunction(
 //                drawSize = DrawSize(

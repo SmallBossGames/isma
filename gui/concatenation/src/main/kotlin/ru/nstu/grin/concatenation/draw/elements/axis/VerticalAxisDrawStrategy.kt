@@ -3,7 +3,7 @@ package ru.nstu.grin.concatenation.draw.elements.axis
 import javafx.scene.canvas.GraphicsContext
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.marks.MarksProvider
-import ru.nstu.grin.concatenation.model.CanvasSettings
+import ru.nstu.grin.concatenation.model.AxisSettings
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.concatenation.model.Direction
 import java.math.BigDecimal
@@ -12,7 +12,7 @@ import java.text.DecimalFormat
 import kotlin.math.pow
 
 class VerticalAxisDrawStrategy(
-    private val canvasSettings: CanvasSettings,
+    private val axisSettings: AxisSettings,
     private val cartesianSpaces: List<CartesianSpace>
 ) : AxisMarksDrawStrategy {
     override fun drawMarks(
@@ -22,13 +22,13 @@ class VerticalAxisDrawStrategy(
         marksProvider: MarksProvider,
         marksCoordinate: Double
     ) {
-        println("Current step ${canvasSettings.xStep}")
+        println("Current step ${axisSettings.step}")
         var drawStepY = "0.0"
         var currentStepY = 0.0
         var currentY = zeroPoint
         val minY = getTopAxisSize() * SettingsProvider.getAxisWidth()
         while (currentY > minY) {
-            val transformed = transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic)
+            val transformed = transformStepLogarithm(currentStepY, axisSettings.isLogarithmic)
             context.strokeText(
                 format(transformed),
                 marksCoordinate - 15.0,
@@ -37,8 +37,8 @@ class VerticalAxisDrawStrategy(
             )
 
             currentY -= SettingsProvider.getMarksInterval()
-            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, canvasSettings.xStep)
-            currentStepY += canvasSettings.xStep
+            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
+            currentStepY += axisSettings.step
         }
 
         drawStepY = "0.0"
@@ -47,7 +47,7 @@ class VerticalAxisDrawStrategy(
         val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
         while (currentY < maxY) {
             if (currentStepY != 0.0) {
-                val transformed = transformStepLogarithm(currentStepY, canvasSettings.isYLogarithmic)
+                val transformed = transformStepLogarithm(currentStepY, axisSettings.isLogarithmic)
                 context.strokeText(
                     format(transformed),
                     marksCoordinate - 17.0,
@@ -57,8 +57,8 @@ class VerticalAxisDrawStrategy(
             }
 
             currentY += SettingsProvider.getMarksInterval()
-            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, canvasSettings.xStep)
-            currentStepY -= canvasSettings.xStep
+            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
+            currentStepY -= axisSettings.step
         }
     }
 
@@ -77,7 +77,7 @@ class VerticalAxisDrawStrategy(
 
     private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean): Double {
         return if (isLogarithmic) {
-            canvasSettings.logarithmBase.pow(step)
+            axisSettings.logarithmBase.pow(step)
         } else {
             step
         }

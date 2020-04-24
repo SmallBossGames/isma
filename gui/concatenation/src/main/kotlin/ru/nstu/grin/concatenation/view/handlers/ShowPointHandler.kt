@@ -1,18 +1,11 @@
-package ru.nstu.grin.concatenation.view
+package ru.nstu.grin.concatenation.view.handlers
 
 import javafx.event.EventHandler
-import javafx.scene.control.ContextMenu
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuItem
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.draw.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.model.ContextMenuType
 import ru.nstu.grin.concatenation.model.view.ConcatenationCanvasModelViewModel
-import tornadofx.action
-import tornadofx.add
-import tornadofx.item
-import tornadofx.menu
 
 class ShowPointHandler(
     private val model: ConcatenationCanvasModelViewModel,

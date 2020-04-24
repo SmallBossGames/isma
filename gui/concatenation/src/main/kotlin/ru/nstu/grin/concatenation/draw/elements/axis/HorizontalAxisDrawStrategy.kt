@@ -3,7 +3,7 @@ package ru.nstu.grin.concatenation.draw.elements.axis
 import javafx.scene.canvas.GraphicsContext
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.marks.MarksProvider
-import ru.nstu.grin.concatenation.model.CanvasSettings
+import ru.nstu.grin.concatenation.model.AxisSettings
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.concatenation.model.Direction
 import java.math.BigDecimal
@@ -12,7 +12,7 @@ import java.text.DecimalFormat
 import kotlin.math.pow
 
 class HorizontalAxisDrawStrategy(
-    private val canvasSettings: CanvasSettings,
+    private val canvasSettings: AxisSettings,
     private val cartesianSpaces: List<CartesianSpace>
 ) : AxisMarksDrawStrategy {
     override fun drawMarks(
@@ -22,13 +22,13 @@ class HorizontalAxisDrawStrategy(
         marksProvider: MarksProvider,
         marksCoordinate: Double
     ) {
-        println("CurrentStep x ${canvasSettings.xStep}")
+        println("CurrentStep x ${canvasSettings.step}")
         var drawStepX = "0.0"
         var currentStepX = 0.0
         var currentX = zeroPoint
         val minX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
         while (currentX > minX) {
-            val transformed = transformStepLogarithm(currentStepX, canvasSettings.isXLogarithmic)
+            val transformed = transformStepLogarithm(currentStepX, canvasSettings.isLogarithmic)
             context.strokeText(
                 format(transformed),
                 currentX,
@@ -37,8 +37,8 @@ class HorizontalAxisDrawStrategy(
             )
 
             currentX -= SettingsProvider.getMarksInterval()
-            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.xStep)
-            currentStepX -= canvasSettings.xStep
+            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
+            currentStepX -= canvasSettings.step
         }
 
         drawStepX = "0.0"
@@ -46,7 +46,7 @@ class HorizontalAxisDrawStrategy(
         currentX = zeroPoint
         val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
         while (currentX < maxX) {
-            val transformed = transformStepLogarithm(currentStepX, canvasSettings.isXLogarithmic)
+            val transformed = transformStepLogarithm(currentStepX, canvasSettings.isLogarithmic)
             context.strokeText(
                 format(transformed),
                 currentX,
@@ -55,8 +55,8 @@ class HorizontalAxisDrawStrategy(
             )
 
             currentX += SettingsProvider.getMarksInterval()
-            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.xStep)
-            currentStepX += canvasSettings.xStep
+            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
+            currentStepX += canvasSettings.step
         }
     }
 

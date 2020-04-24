@@ -5,23 +5,22 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.marks.MarksProvider
-import ru.nstu.grin.concatenation.model.CanvasSettings
+import ru.nstu.grin.concatenation.model.AxisSettings
 import ru.nstu.grin.concatenation.model.CartesianSpace
 import ru.nstu.grin.concatenation.model.Direction
-import ru.nstu.grin.concatenation.model.axis.ConcatenationAxis
+import ru.nstu.grin.concatenation.model.ConcatenationAxis
 
 class AxisDrawElement(
     private val xAxis: ConcatenationAxis,
     private val yAxis: ConcatenationAxis,
-    private val canvasSettings: CanvasSettings,
     cartesianSpaces: List<CartesianSpace>
 ) : ChainDrawElement {
 
     private val verticalAxisDraw = VerticalAxisDrawStrategy(
-        canvasSettings, cartesianSpaces
+        yAxis.settings, cartesianSpaces
     )
     private val horizontalAxisDraw = HorizontalAxisDrawStrategy(
-        canvasSettings, cartesianSpaces
+        xAxis.settings, cartesianSpaces
     )
 
     override fun draw(context: GraphicsContext) {
@@ -43,8 +42,8 @@ class AxisDrawElement(
         val startPoint = order * SettingsProvider.getAxisWidth()
         val marksCoordinate = startPoint + MARKS_MARGIN
         val correlatedZeroPoint = zeroPoint + when (direction) {
-            Direction.LEFT, Direction.RIGHT -> canvasSettings.yCorrelation
-            Direction.TOP, Direction.BOTTOM -> canvasSettings.xCorrelation
+            Direction.LEFT, Direction.RIGHT -> yAxis.settings.correlation
+            Direction.TOP, Direction.BOTTOM -> xAxis.settings.correlation
         }
 
         when (direction) {

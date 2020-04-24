@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.view
+package ru.nstu.grin.concatenation.view.handlers
 
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton

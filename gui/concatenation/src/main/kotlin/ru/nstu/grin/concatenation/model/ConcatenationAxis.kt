@@ -1,13 +1,11 @@
-package ru.nstu.grin.concatenation.model.axis
+package ru.nstu.grin.concatenation.model
 
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.extensions.toByteArray
 import ru.nstu.grin.common.file.Writer
 import ru.nstu.grin.concatenation.marks.MarksProvider
-import ru.nstu.grin.concatenation.model.Direction
 import java.io.ObjectOutputStream
-import kotlin.math.min
 
 /**
  * @param zeroPoint - Точка нуля, где он располжен
@@ -21,7 +19,8 @@ class ConcatenationAxis(
     val order: Int,
     val direction: Direction,
     val backGroundColor: Color,
-    val delimiterColor: Color
+    val delimiterColor: Color,
+    val settings: AxisSettings = AxisSettings()
 ) : Writer {
     fun isLocated(x: Double, y: Double): Boolean {
         when (direction) {
@@ -49,6 +48,14 @@ class ConcatenationAxis(
                 return y > minY && y < maxY
             }
         }
+    }
+
+    fun isXAxis(): Boolean {
+        return direction == Direction.TOP || direction == Direction.BOTTOM
+    }
+
+    fun isYAxis(): Boolean {
+        return !isXAxis()
     }
 
     override fun serialize(oos: ObjectOutputStream) {

@@ -33,13 +33,13 @@ class ContextMenuDrawElement(
                 val menu = Menu("Логарифмический масштаб")
                 val xMenuItem = MenuItem("Включить по x")
                 xMenuItem.action {
-                    cartesianSpace.settings.isXLogarithmic = !cartesianSpace.settings.isXLogarithmic
+                    cartesianSpace.xAxis.settings.isLogarithmic = !cartesianSpace.xAxis.settings.isLogarithmic
                 }
                 menu.items.add(xMenuItem)
 
                 val yMenuItem = MenuItem("Включить по y")
                 yMenuItem.action {
-                    cartesianSpace.settings.isYLogarithmic = !cartesianSpace.settings.isYLogarithmic
+                    cartesianSpace.yAxis.settings.isLogarithmic = !cartesianSpace.yAxis.settings.isLogarithmic
                 }
                 menu.items.add(yMenuItem)
 

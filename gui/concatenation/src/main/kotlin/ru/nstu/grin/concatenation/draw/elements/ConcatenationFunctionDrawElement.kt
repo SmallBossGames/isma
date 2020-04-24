@@ -3,17 +3,15 @@ package ru.nstu.grin.concatenation.draw.elements
 import javafx.scene.canvas.GraphicsContext
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
-import ru.nstu.grin.concatenation.model.CanvasSettings
 import ru.nstu.grin.concatenation.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.model.axis.ConcatenationAxis
+import ru.nstu.grin.concatenation.model.ConcatenationAxis
 import kotlin.math.abs
 import kotlin.math.log10
 
 class ConcatenationFunctionDrawElement(
     private val functions: List<ConcatenationFunction>,
     private val xAxis: ConcatenationAxis,
-    private val yAxis: ConcatenationAxis,
-    private val settings: CanvasSettings
+    private val yAxis: ConcatenationAxis
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         for (function in functions) {
@@ -34,7 +32,7 @@ class ConcatenationFunctionDrawElement(
 
     private fun transformPoints(zeroPointX: Double, zeroPointY: Double, points: List<Point>) {
         for (it in points) {
-            val x = if (settings.isXLogarithmic) {
+            val x = if (xAxis.settings.isLogarithmic) {
                 if (it.x < 0) {
                     it.xGraphic = 0.0
                     continue
@@ -43,9 +41,9 @@ class ConcatenationFunctionDrawElement(
             } else {
                 it.x
             }
-            it.xGraphic = zeroPointX + x * settings.xPixelCost / settings.xStep + settings.xCorrelation
+            it.xGraphic = zeroPointX + x * xAxis.settings.pixelCost / xAxis.settings.step + xAxis.settings.correlation
 
-            val y = if (settings.isYLogarithmic) {
+            val y = if (yAxis.settings.isLogarithmic) {
                 if (it.y < 0) {
                     it.yGraphic = 0.0
                     continue
@@ -55,10 +53,10 @@ class ConcatenationFunctionDrawElement(
                 it.y
             }
             it.yGraphic = if (y > 0) {
-                zeroPointY - y * settings.xPixelCost / settings.xStep
+                zeroPointY - y * yAxis.settings.pixelCost / yAxis.settings.step
             } else {
-                zeroPointY + abs(y) * settings.xPixelCost / settings.xStep
-            } + settings.yCorrelation
+                zeroPointY + abs(y) * yAxis.settings.pixelCost / yAxis.settings.step
+            } + yAxis.settings.correlation
         }
     }
 }

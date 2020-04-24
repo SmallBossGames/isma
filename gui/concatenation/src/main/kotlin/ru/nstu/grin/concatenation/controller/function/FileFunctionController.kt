@@ -135,24 +135,9 @@ class FileFunctionController : Controller() {
         )
     }
 
-    private fun <T> List<List<T>>.transpose(): List<List<T>> {
-        if (this.isEmpty()) return this
-
-        val result = mutableListOf<List<T>>()
-        for (i in this[0].indices) {
-            val column = mutableListOf<T>()
-            for (row in this) {
-                if (row.size <= i) continue
-                column.add(row[i])
-            }
-            result.add(column)
-        }
-        return result
-    }
-
     init {
         subscribe<FileCheckedEvent> {
-            model.points = it.points.transpose()
+            model.points = it.points
             model.addFunctionsMode = it.addFunctionsMode
         }
     }

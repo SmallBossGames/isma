@@ -8,6 +8,8 @@ test {
 
 dependencies {
     implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
+    implementation "de.sciss:jwave:${versions.jwave}"
+
     implementation project(":analytic-fu")
     api project(":gui:common")
 

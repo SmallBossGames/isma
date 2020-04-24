@@ -1,4 +1,4 @@
-package ru.nstu.grin.simple.model
+package ru.nstu.grin.common.model
 
 enum class WaveletTransformFun {
     HAAR1,

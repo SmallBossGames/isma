@@ -2,6 +2,7 @@ package ru.nstu.grin.main
 
 import javafx.stage.Stage
 import ru.nstu.grin.concatenation.view.ConcatenationCanvas
+import ru.nstu.grin.concatenation.view.ConcatenationView
 import ru.nstu.grin.simple.view.SimpleCanvasView
 import tornadofx.App
 import tornadofx.UIComponent
@@ -13,7 +14,7 @@ import java.text.DecimalFormat
 import kotlin.reflect.KClass
 
 class MyApp : App() {
-    override val primaryView: KClass<out UIComponent> = ConcatenationCanvas::class
+    override val primaryView: KClass<out UIComponent> = ConcatenationView::class
 
     init {
         reloadStylesheetsOnFocus()

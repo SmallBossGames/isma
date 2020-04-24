@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.view.modal
 
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Parent
+import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.controller.PointsViewController
 import ru.nstu.grin.concatenation.model.AddFunctionsMode
 import ru.nstu.grin.concatenation.model.FileReaderMode
@@ -14,6 +15,18 @@ class PointsView : View() {
 
     override val root: Parent = form {
         controller.readPoints()
+        fieldset("Вейвлет преобразование") {
+            field("Включить") {
+                checkbox().bind(model.isWaveletProperty)
+            }
+            field("Тип вейвлета") {
+                combobox(model.waveletTransformFunProperty, WaveletTransformFun.values().toList()) {
+                    enableWhen {
+                        model.isWaveletProperty
+                    }
+                }
+            }
+        }
         fieldset("Как добавлять функции") {
             field("Режим") {
                 combobox(model.addFunctionsModeProperty, AddFunctionsMode.values().toList()) {

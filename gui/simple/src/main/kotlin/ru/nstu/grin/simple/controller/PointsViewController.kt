@@ -12,7 +12,7 @@ import jwave.transforms.wavelets.other.DiscreteMayer
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.simple.events.FileCheckedEvent
 import ru.nstu.grin.simple.model.PointsViewModel
-import ru.nstu.grin.simple.model.WaveletTransformFun
+import ru.nstu.grin.common.model.WaveletTransformFun
 import tornadofx.Controller
 import java.io.File
 import java.io.FileInputStream

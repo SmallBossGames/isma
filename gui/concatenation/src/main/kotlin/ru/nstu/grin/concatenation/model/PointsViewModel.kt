@@ -1,9 +1,10 @@
 package ru.nstu.grin.concatenation.model
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
-import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.common.model.WaveletTransformFun
 import tornadofx.*
 import java.io.File
 
@@ -17,4 +18,10 @@ class PointsViewModel : ViewModel() {
     val file: File by param()
     val delimiter: String by param()
     val readerMode: FileReaderMode by param()
+
+    var waveletTransformFunProperty = SimpleObjectProperty<WaveletTransformFun>()
+    var waveletTransformFun by waveletTransformFunProperty
+
+    var isWaveletProperty = SimpleBooleanProperty()
+    var isWavelet: Boolean by isWaveletProperty
 }

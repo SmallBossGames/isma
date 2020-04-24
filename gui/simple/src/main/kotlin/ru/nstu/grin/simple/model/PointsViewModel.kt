@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.common.model.WaveletTransformFun
 import tornadofx.*
 import java.io.File
 

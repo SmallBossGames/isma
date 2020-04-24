@@ -4,7 +4,7 @@ import javafx.scene.Parent
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.simple.controller.PointsViewController
 import ru.nstu.grin.simple.model.PointsViewModel
-import ru.nstu.grin.simple.model.WaveletTransformFun
+import ru.nstu.grin.common.model.WaveletTransformFun
 import tornadofx.*
 
 class PointsView : View() {

@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
-import ru.nstu.grin.common.utils.ColorUtils
 import ru.nstu.grin.concatenation.model.Direction
 import ru.nstu.grin.concatenation.model.ExistDirection
 import tornadofx.ViewModel
@@ -21,25 +20,25 @@ abstract class AbstractAddFunctionModel : ViewModel() {
     var yDirectionProperty = SimpleObjectProperty(ExistDirection(Direction.LEFT, null))
     var yDirection: ExistDirection by yDirectionProperty
 
-    var functionColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var functionColorProperty = SimpleObjectProperty(Color.BLACK)
     var functionColor by functionColorProperty
 
     var xAxisNameProperty = SimpleStringProperty(this, "xAxisName", "Ось 1")
     var xAxisName by xAxisNameProperty
 
-    var xAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var xAxisColorProperty = SimpleObjectProperty(Color.LIGHTGREY)
     var xAxisColor by xAxisColorProperty
 
-    var xDelimeterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var xDelimeterColorProperty = SimpleObjectProperty(Color.BLACK)
     var xDelimiterColor by xDelimeterColorProperty
 
     var yAxisNameProperty = SimpleStringProperty(this, "yAxisName", "Ось 2")
     var yAxisName by yAxisNameProperty
 
-    var yAxisColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var yAxisColorProperty = SimpleObjectProperty(Color.LIGHTGREY)
     var yAxisColor by yAxisColorProperty
 
-    var yDelimiterColorProperty = SimpleObjectProperty<Color>(ColorUtils.getRandomColor())
+    var yDelimiterColorProperty = SimpleObjectProperty(Color.BLACK)
     var yDelimeterColor by yDelimiterColorProperty
 
     var stepProperty = SimpleIntegerProperty(1)

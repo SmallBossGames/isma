@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.controller
 import jwave.Transform
 import jwave.transforms.AncientEgyptianDecomposition
 import jwave.transforms.FastWaveletTransform
+import jwave.transforms.WaveletPacketTransform
 import jwave.transforms.wavelets.Wavelet
 import jwave.transforms.wavelets.biorthogonal.BiOrthogonal68
 import jwave.transforms.wavelets.coiflet.Coiflet5
@@ -89,11 +90,11 @@ class PointsViewController : Controller() {
                 val xArray = functionPoints.map { it.x }.toDoubleArray()
                 val yArray = functionPoints.map { it.y }.toDoubleArray()
 
-                val xTransformed = transform.forward(xArray)
-                val yTransformed = transform.forward(yArray)
+                val xTransformed = transform.forward(xArray).sorted()
+//                val yTransformed = transform.forward(yArray).sorted()
 
                 xTransformed.mapIndexed { index, d ->
-                    Point(d, yTransformed[index])
+                    Point(d, yArray[index])
                 }
             }
         } else {

@@ -10,6 +10,7 @@ import jwave.transforms.wavelets.haar.Haar1
 import jwave.transforms.wavelets.legendre.Legendre3
 import jwave.transforms.wavelets.other.DiscreteMayer
 import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.simple.events.FileCheckedEvent
 import ru.nstu.grin.simple.model.PointsViewModel
 import ru.nstu.grin.common.model.WaveletTransformFun
@@ -35,20 +36,12 @@ class PointsViewController : Controller() {
 
     fun fireCheckedEvent() {
         val points = if (model.isWavelet) {
-            val transform = Transform(
-                AncientEgyptianDecomposition(
-                    FastWaveletTransform(getWavelet())
-                )
-            )
-            val xArray = model.points.map { it.x }.toDoubleArray()
-            val yArray = model.points.map { it.y }.toDoubleArray()
-
-            val xTransformed = transform.forward(xArray)
-            val yTransformed = transform.forward(yArray)
-
-            xTransformed.mapIndexed { index, d ->
-                Point(d, yTransformed[index])
+            val direction = model.waveletDirection
+            if (direction == null) {
+                tornadofx.error("Необходимо выбрать направление wavelet преобразования")
+                return
             }
+            transformWaveletPoints(direction)
         } else {
             model.points
         }
@@ -56,6 +49,41 @@ class PointsViewController : Controller() {
             points = points
         )
         fire(event)
+    }
+
+    private fun transformWaveletPoints(direction: WaveletDirection): List<Point> {
+        val transform = Transform(
+            AncientEgyptianDecomposition(
+                FastWaveletTransform(getWavelet())
+            )
+        )
+        val xArray = model.points.map { it.x }.toDoubleArray()
+        val yArray = model.points.map { it.y }.toDoubleArray()
+
+        return when (direction) {
+            WaveletDirection.X -> {
+                val xTransformed = transform.forward(xArray).sorted()
+
+                xTransformed.mapIndexed { index, d ->
+                    Point(d, yArray[index])
+                }
+            }
+            WaveletDirection.Y -> {
+                val yTransformed = transform.forward(yArray).sorted()
+
+                xArray.mapIndexed { index, d ->
+                    Point(d, yTransformed[index])
+                }
+            }
+            WaveletDirection.BOTH -> {
+                val xTransformed = transform.forward(xArray).sorted()
+                val yTransformed = transform.forward(yArray).sorted()
+
+                xTransformed.mapIndexed { index, d ->
+                    Point(d, yTransformed[index])
+                }
+            }
+        }
     }
 
     private fun getWavelet(): Wavelet {

@@ -3,7 +3,6 @@ package ru.nstu.grin.concatenation.controller
 import jwave.Transform
 import jwave.transforms.AncientEgyptianDecomposition
 import jwave.transforms.FastWaveletTransform
-import jwave.transforms.WaveletPacketTransform
 import jwave.transforms.wavelets.Wavelet
 import jwave.transforms.wavelets.biorthogonal.BiOrthogonal68
 import jwave.transforms.wavelets.coiflet.Coiflet5
@@ -15,6 +14,7 @@ import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.events.FileCheckedEvent
 import ru.nstu.grin.concatenation.model.FileReaderMode
 import ru.nstu.grin.concatenation.model.PointsViewModel
+import ru.nstu.grin.common.model.WaveletDirection
 import tornadofx.Controller
 import java.io.File
 import java.io.FileInputStream
@@ -81,22 +81,12 @@ class PointsViewController : Controller() {
         }.transpose()
 
         val transformed = if (model.isWavelet) {
-            val transform = Transform(
-                AncientEgyptianDecomposition(
-                    FastWaveletTransform(getWavelet())
-                )
-            )
-            points.map { functionPoints ->
-                val xArray = functionPoints.map { it.x }.toDoubleArray()
-                val yArray = functionPoints.map { it.y }.toDoubleArray()
-
-                val xTransformed = transform.forward(xArray).sorted()
-//                val yTransformed = transform.forward(yArray).sorted()
-
-                xTransformed.mapIndexed { index, d ->
-                    Point(d, yArray[index])
-                }
+            val direction = model.waveletDirection
+            if (direction == null) {
+                tornadofx.error("Необходимо выбрать направление преобразования")
+                return
             }
+            makeWaveletTransform(points, direction)
         } else {
             points
         }
@@ -108,6 +98,46 @@ class PointsViewController : Controller() {
                 addFunctionsMode = model.addFunctionsMode
             )
         )
+    }
+
+    private fun makeWaveletTransform(
+        points: List<List<Point>>,
+        direction: WaveletDirection
+    ): List<List<Point>> {
+        val transform = Transform(
+            AncientEgyptianDecomposition(
+                FastWaveletTransform(getWavelet())
+            )
+        )
+        return points.map { functionPoints ->
+            val xArray = functionPoints.map { it.x }.toDoubleArray()
+            val yArray = functionPoints.map { it.y }.toDoubleArray()
+
+            when (direction) {
+                WaveletDirection.X -> {
+                    val xTransformed = transform.forward(xArray).sorted()
+
+                    xTransformed.mapIndexed { index, d ->
+                        Point(d, yArray[index])
+                    }
+                }
+                WaveletDirection.Y -> {
+                    val yTransformed = transform.forward(yArray).sorted()
+
+                    xArray.mapIndexed { index, d ->
+                        Point(d, yTransformed[index])
+                    }
+                }
+                WaveletDirection.BOTH -> {
+                    val xTransformed = transform.forward(xArray).sorted()
+                    val yTransformed = transform.forward(yArray).sorted()
+
+                    xTransformed.mapIndexed { index, d ->
+                        Point(d, yTransformed[index])
+                    }
+                }
+            }
+        }
     }
 
     private fun getWavelet(): Wavelet {

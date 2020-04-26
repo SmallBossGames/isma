@@ -7,6 +7,7 @@ import ru.nstu.grin.concatenation.controller.PointsViewController
 import ru.nstu.grin.concatenation.model.AddFunctionsMode
 import ru.nstu.grin.concatenation.model.FileReaderMode
 import ru.nstu.grin.concatenation.model.PointsViewModel
+import ru.nstu.grin.common.model.WaveletDirection
 import tornadofx.*
 
 class PointsView : View() {
@@ -26,6 +27,27 @@ class PointsView : View() {
                     }
                 }
             }
+            field("Какую ось преобразовывать") {
+                combobox(model.waveletDirectionProperty, WaveletDirection.values().toList()) {
+                    cellFormat {
+                        text = when (it) {
+                            WaveletDirection.X -> {
+                                "Ось абсцисс"
+                            }
+                            WaveletDirection.Y -> {
+                                "Ось ординат"
+                            }
+                            WaveletDirection.BOTH -> {
+                                "Обе оси"
+                            }
+                        }
+                    }
+                    enableWhen {
+                        model.isWaveletProperty
+                    }
+                }
+            }
+
         }
         fieldset("Как добавлять функции") {
             field("Режим") {

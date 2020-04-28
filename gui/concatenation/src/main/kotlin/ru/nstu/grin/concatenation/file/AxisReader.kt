@@ -2,8 +2,8 @@ package ru.nstu.grin.concatenation.file
 
 import ru.nstu.grin.common.extensions.readColor
 import ru.nstu.grin.common.file.Reader
-import ru.nstu.grin.concatenation.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.model.Direction
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
 import java.io.ObjectInputStream
 
 class AxisReader : Reader<ConcatenationAxis> {

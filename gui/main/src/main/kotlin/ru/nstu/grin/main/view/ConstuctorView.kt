@@ -3,7 +3,7 @@ package ru.nstu.grin.main.view
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import javafx.stage.StageStyle
-import ru.nstu.grin.concatenation.view.ConcatenationView
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.kube.view.KubeCanvasView
 import ru.nstu.grin.simple.view.SimpleCanvasView
 import tornadofx.*

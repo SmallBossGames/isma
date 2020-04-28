@@ -15,6 +15,8 @@ class VerticalAxisDrawStrategy(
     private val axisSettings: AxisSettings,
     private val cartesianSpaces: List<CartesianSpace>
 ) : AxisMarksDrawStrategy {
+    private val numberFormatter = NumberFormatter()
+
     override fun drawMarks(
         context: GraphicsContext,
         zeroPoint: Double,
@@ -30,7 +32,7 @@ class VerticalAxisDrawStrategy(
         while (currentY > minY) {
             val transformed = transformStepLogarithm(currentStepY, axisSettings.isLogarithmic)
             context.strokeText(
-                format(transformed),
+                numberFormatter.format(transformed),
                 marksCoordinate - 15.0,
                 currentY,
                 MAX_TEXT_WIDTH
@@ -49,7 +51,7 @@ class VerticalAxisDrawStrategy(
             if (currentStepY != 0.0) {
                 val transformed = transformStepLogarithm(currentStepY, axisSettings.isLogarithmic)
                 context.strokeText(
-                    format(transformed),
+                    numberFormatter.format(transformed),
                     marksCoordinate - 17.0,
                     currentY,
                     MAX_TEXT_WIDTH
@@ -81,14 +83,6 @@ class VerticalAxisDrawStrategy(
         } else {
             step
         }
-    }
-
-    private fun format(number: Double): String {
-        val decimal = BigDecimal(number)
-        val formatter = DecimalFormat("0.0E0")
-        formatter.roundingMode = RoundingMode.HALF_DOWN
-        formatter.minimumFractionDigits = 2
-        return formatter.format(decimal)
     }
 
     private companion object {

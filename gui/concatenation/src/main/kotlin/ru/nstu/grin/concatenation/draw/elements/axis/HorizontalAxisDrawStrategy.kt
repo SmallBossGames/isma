@@ -15,6 +15,8 @@ class HorizontalAxisDrawStrategy(
     private val canvasSettings: AxisSettings,
     private val cartesianSpaces: List<CartesianSpace>
 ) : AxisMarksDrawStrategy {
+    private val numberFormatter = NumberFormatter()
+
     override fun drawMarks(
         context: GraphicsContext,
         zeroPoint: Double,
@@ -30,7 +32,7 @@ class HorizontalAxisDrawStrategy(
         while (currentX > minX) {
             val transformed = transformStepLogarithm(currentStepX, canvasSettings.isLogarithmic)
             context.strokeText(
-                format(transformed),
+                numberFormatter.format(transformed),
                 currentX,
                 marksCoordinate,
                 MAX_TEXT_WIDTH
@@ -48,7 +50,7 @@ class HorizontalAxisDrawStrategy(
         while (currentX < maxX) {
             val transformed = transformStepLogarithm(currentStepX, canvasSettings.isLogarithmic)
             context.strokeText(
-                format(transformed),
+                numberFormatter.format(transformed),
                 currentX,
                 marksCoordinate,
                 MAX_TEXT_WIDTH
@@ -58,14 +60,6 @@ class HorizontalAxisDrawStrategy(
             drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, canvasSettings.step)
             currentStepX += canvasSettings.step
         }
-    }
-
-    private fun format(number: Double): String {
-        val decimal = BigDecimal(number)
-        val formatter = DecimalFormat("0.0E0")
-        formatter.roundingMode = RoundingMode.HALF_DOWN
-        formatter.minimumFractionDigits = 2
-        return formatter.format(decimal)
     }
 
     private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean): Double {

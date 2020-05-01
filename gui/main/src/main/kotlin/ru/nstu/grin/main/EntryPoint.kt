@@ -2,10 +2,8 @@ package ru.nstu.grin.main
 
 import javafx.stage.Stage
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
-import tornadofx.App
-import tornadofx.UIComponent
-import tornadofx.launch
-import tornadofx.reloadStylesheetsOnFocus
+import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
+import tornadofx.*
 import kotlin.reflect.KClass
 
 class MyApp : App() {

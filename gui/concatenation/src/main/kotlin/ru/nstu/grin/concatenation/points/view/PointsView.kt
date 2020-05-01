@@ -10,7 +10,7 @@ import ru.nstu.grin.concatenation.points.model.PointsViewModel
 import ru.nstu.grin.common.model.WaveletDirection
 import tornadofx.*
 
-class PointsView : View() {
+class PointsView : Fragment() {
     private val controller: PointsViewController by inject(params = params)
     private val model: PointsViewModel by inject(params = params)
 

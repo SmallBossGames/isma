@@ -6,7 +6,7 @@ import ru.nstu.grin.concatenation.file.options.model.FileOptionsModel
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
 import tornadofx.*
 
-class FileOptionsView : View() {
+class FileOptionsView : Fragment() {
     private val model: FileOptionsModel by inject(params = params)
     private val controller: FileOptionsController by inject(params = params)
 

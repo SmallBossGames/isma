@@ -1,21 +1,40 @@
 package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.Parent
+import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
-import ru.nstu.grin.concatenation.function.controller.AnalyticFunctionController
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
-import ru.nstu.grin.concatenation.function.model.AnalyticFunctionModel
+import ru.nstu.grin.concatenation.function.controller.AddFunctionController
+import ru.nstu.grin.concatenation.function.model.AddFunctionModel
+import ru.nstu.grin.concatenation.function.model.FileFunctionModel
+import ru.nstu.grin.concatenation.function.model.InputWay
+import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import tornadofx.*
 
-/**
- * @author Konstantin Volivach
- */
-class AnalyticFunctionModalView : AbstractAddFunctionModal() {
-    private val controller: AnalyticFunctionController by inject()
-    private val model: AnalyticFunctionModel by inject()
+class AddFunctionModalView : Fragment() {
+    val xExistDirections: List<ExistDirection> by param()
+    val yExistDirections: List<ExistDirection> by param()
+    private val controller: AddFunctionController by inject()
+    private val model: AddFunctionModel by inject()
+    private val fileFunctionModel: FileFunctionModel by inject()
+    private lateinit var tabPane: TabPane
 
     override val root: Parent = form {
+        println(controller.params)
+        model.inputWayProperty.onChange {
+            when (model.inputWay) {
+                InputWay.FILE -> {
+                    tabPane.selectionModel.select(0)
+                }
+                InputWay.ANALYTIC -> {
+                    tabPane.selectionModel.select(1)
+                }
+                InputWay.MANUAL -> {
+                    tabPane.selectionModel.select(2)
+                }
+            }
+        }
         fieldset {
             field("Введите имя функции") {
                 textfield().bind(model.functionNameProperty)
@@ -24,14 +43,33 @@ class AnalyticFunctionModalView : AbstractAddFunctionModal() {
                 textfield().bind(model.stepProperty)
             }
         }
-        fieldset("Введите формулу") {
-            field("формула") {
-                textfield().bind(model.textProperty)
-            }
-            field("Delta") {
-                textfield().bind(model.deltaProperty)
+        fieldset {
+            field("Выберите способ ввода") {
+                combobox(model.inputWayProperty, InputWay.values().toList()) {
+                    cellFormat {
+                        text = when (it) {
+                            InputWay.FILE -> "Файл"
+                            InputWay.ANALYTIC -> "Аналитически"
+                            InputWay.MANUAL -> "Вручную"
+                        }
+                    }
+                }
             }
         }
+        tabpane {
+            tabPane = this
+            tab<FileFunctionFragment>()
+            tab<AnalyticFunctionFragment>()
+            tab<ManualFunctionFragment>()
+            tabMaxHeight = 0.0
+            tabMinHeight = 0.0
+            stylesheet {
+                Stylesheet.tabHeaderArea {
+                    visibility = FXVisibility.HIDDEN
+                }
+            }
+        }
+
         fieldset("Ось x") {
             field("Имя") {
                 textfield().bind(model.xAxisNameProperty)
@@ -103,9 +141,16 @@ class AnalyticFunctionModalView : AbstractAddFunctionModal() {
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
             action {
-                controller.addFunction(drawSize)
+                controller.addFunction()
                 close()
             }
+        }
+    }
+
+    init {
+        subscribe<FileCheckedEvent> {
+            fileFunctionModel.points = it.points
+            fileFunctionModel.addFunctionsMode = it.addFunctionsMode
         }
     }
 }

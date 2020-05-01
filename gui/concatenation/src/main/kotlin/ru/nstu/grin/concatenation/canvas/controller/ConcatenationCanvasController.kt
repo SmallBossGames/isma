@@ -24,8 +24,9 @@ import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
-import ru.nstu.grin.concatenation.function.view.ChooseFunctionModalView
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
+import ru.nstu.grin.concatenation.function.model.AddFunctionModel
+import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import tornadofx.*
 
 class ConcatenationCanvasController : Controller() {
@@ -100,15 +101,13 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun openFunctionModal(
-        drawSize: DrawSize,
         xExistDirection: List<ExistDirection>,
         yExistDirection: List<ExistDirection>
     ) {
-        find<ChooseFunctionModalView>(
+        find<AddFunctionModalView>(
             mapOf(
-                ChooseFunctionViewModel::drawSize to drawSize,
-                ChooseFunctionViewModel::xExistDirections to xExistDirection,
-                ChooseFunctionViewModel::yExistDirections to yExistDirection
+                AddFunctionModalView::xExistDirections to xExistDirection,
+                AddFunctionModalView::yExistDirections to yExistDirection
             )
         ).openModal()
     }

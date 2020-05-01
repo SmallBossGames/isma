@@ -49,13 +49,7 @@ class ContextMenuDrawElement(
             ContextMenuType.MAIN -> {
                 val functionItem = MenuItem("Добавить функцию")
                 functionItem.action {
-                    val drawSize = DrawSize(
-                        minX = 0.0,
-                        maxX = context.canvas.width,
-                        minY = 0.0,
-                        maxY = context.canvas.height
-                    )
-                    controller.openFunctionModal(drawSize, listOf(), listOf())
+                    controller.openFunctionModal(listOf(), listOf())
                 }
                 val arrowItem = MenuItem("Добавить указатель")
                 arrowItem.action {

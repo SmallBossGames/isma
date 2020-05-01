@@ -91,7 +91,6 @@ class PointsViewController : Controller() {
             points
         }
 
-
         fire(
             FileCheckedEvent(
                 points = transformed,

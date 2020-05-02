@@ -1,20 +1,21 @@
-package ru.nstu.grin.simple.draw.elements
+package ru.nstu.grin.common.draw.elements
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
-import ru.nstu.grin.simple.view.SimplePlotSettings
 
 class GridDrawElement(
     private val size: Double,
     private val color: Color,
-    private val settings: SimplePlotSettings
+    private val xCorrelation: Double,
+    private val yCorrelation: Double,
+    private val isFull: Boolean = false
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         context.stroke = color
 
-        val middleWidth = context.canvas.width / 2 + settings.xCorrelation
-        val middleHeight = context.canvas.height / 2 + settings.yCorrelation
+        val middleWidth = context.canvas.width / 2 + xCorrelation
+        val middleHeight = context.canvas.height / 2 + yCorrelation
 
         // Second quadrant
         var currentX = middleWidth
@@ -102,6 +103,11 @@ class GridDrawElement(
                 currentY += size
             }
             currentX += size
+        }
+
+        if (isFull) {
+            context.strokeLine(0.0, middleHeight, context.canvas.width, middleHeight)
+            context.strokeLine(middleWidth, 0.0, middleWidth, context.canvas.height)
         }
     }
 }

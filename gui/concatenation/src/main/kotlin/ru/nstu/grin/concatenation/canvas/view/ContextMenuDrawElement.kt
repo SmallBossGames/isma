@@ -14,7 +14,8 @@ import tornadofx.action
 class ContextMenuDrawElement(
     private val contextMenu: ContextMenu,
     private val model: ConcatenationCanvasModelViewModel,
-    private val controller: ConcatenationCanvasController
+    private val controller: ConcatenationCanvasController,
+    private val chainDrawer: ConcatenationChainDrawer
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         contextMenu.items.clear()
@@ -34,16 +35,25 @@ class ContextMenuDrawElement(
                 val xMenuItem = MenuItem("Включить по x")
                 xMenuItem.action {
                     cartesianSpace.xAxis.settings.isLogarithmic = !cartesianSpace.xAxis.settings.isLogarithmic
+                    chainDrawer.draw()
                 }
                 menu.items.add(xMenuItem)
 
                 val yMenuItem = MenuItem("Включить по y")
                 yMenuItem.action {
                     cartesianSpace.yAxis.settings.isLogarithmic = !cartesianSpace.yAxis.settings.isLogarithmic
+                    chainDrawer.draw()
                 }
                 menu.items.add(yMenuItem)
 
+                val gridItem = MenuItem("Включить/Выключить сетку")
+                gridItem.action {
+                    cartesianSpace.isShowGrid = !cartesianSpace.isShowGrid
+                    chainDrawer.draw()
+                }
+
                 contextMenu.items.add(menu)
+                contextMenu.items.add(gridItem)
                 contextMenu.show(context.canvas, stage.x + settings.xGraphic, stage.y + settings.yGraphic)
             }
             ContextMenuType.MAIN -> {

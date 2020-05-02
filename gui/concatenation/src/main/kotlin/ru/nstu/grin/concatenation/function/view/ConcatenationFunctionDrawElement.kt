@@ -15,6 +15,7 @@ class ConcatenationFunctionDrawElement(
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         for (function in functions) {
+            context.stroke = function.functionColor
             transformPoints(xAxis.zeroPoint, yAxis.zeroPoint, function.points)
 
             val points = function.points

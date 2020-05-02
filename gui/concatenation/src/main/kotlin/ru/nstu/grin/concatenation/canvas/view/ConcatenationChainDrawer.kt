@@ -6,6 +6,7 @@ import javafx.scene.control.Tooltip
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
+import ru.nstu.grin.common.draw.elements.PointTooltipsDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement

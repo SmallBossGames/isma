@@ -1,12 +1,12 @@
-package ru.nstu.grin.concatenation.canvas.view
+package ru.nstu.grin.common.draw.elements
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import ru.nstu.grin.common.model.PointSettings
+import ru.nstu.grin.common.model.PointToolTipsSettings
 import ru.nstu.grin.common.view.ChainDrawElement
-import ru.nstu.grin.concatenation.canvas.model.PointSettings
-import ru.nstu.grin.concatenation.canvas.model.PointToolTipsSettings
 
 class PointTooltipsDrawElement(
     private val pointTooltipSettings: PointToolTipsSettings,

@@ -6,6 +6,7 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
+import ru.nstu.grin.common.draw.elements.PointTooltipsDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.simple.draw.elements.*
 import ru.nstu.grin.simple.model.view.SimpleCanvasViewModel
@@ -28,6 +29,6 @@ class SimpleChainDrawer(
         AxisDrawElement(model.settings).draw(context)
         MarkersDrawElement(model.settings).draw(context)
         FunctionsDrawElement(model.settings, model.functions).draw(context)
-        TooltipsDrawElement(model.pointToolTipSettings, pointToolTips, model.primaryStage).draw(context)
+        PointTooltipsDrawElement(model.pointToolTipSettings, pointToolTips, model.primaryStage).draw(context)
     }
 }

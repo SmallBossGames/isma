@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.canvas.model
+package ru.nstu.grin.common.model
 
 data class PointSettings(
     var x: Double,

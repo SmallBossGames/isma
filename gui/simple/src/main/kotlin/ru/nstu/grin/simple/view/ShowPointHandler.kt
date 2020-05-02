@@ -3,7 +3,7 @@ package ru.nstu.grin.simple.view
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import ru.nstu.grin.simple.model.PointSettings
+import ru.nstu.grin.common.model.PointSettings
 import ru.nstu.grin.simple.model.view.SimpleCanvasViewModel
 
 class ShowPointHandler(

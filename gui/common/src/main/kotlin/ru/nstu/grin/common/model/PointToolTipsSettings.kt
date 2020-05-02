@@ -1,4 +1,6 @@
-package ru.nstu.grin.concatenation.canvas.model
+package ru.nstu.grin.common.model
+
+import ru.nstu.grin.common.model.PointSettings
 
 data class PointToolTipsSettings(
     var isShow: Boolean = false,

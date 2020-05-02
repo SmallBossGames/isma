@@ -6,7 +6,7 @@ import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
-import ru.nstu.grin.concatenation.canvas.model.PointSettings
+import ru.nstu.grin.common.model.PointSettings
 
 class ShowPointHandler(
     private val model: ConcatenationCanvasModelViewModel,

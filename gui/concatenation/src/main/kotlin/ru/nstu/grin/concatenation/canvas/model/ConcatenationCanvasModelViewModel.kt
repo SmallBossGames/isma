@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.common.model.PointToolTipsSettings
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import tornadofx.ItemViewModel
 import tornadofx.*

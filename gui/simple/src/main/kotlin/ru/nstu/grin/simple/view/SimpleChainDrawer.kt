@@ -14,7 +14,7 @@ class SimpleChainDrawer(
     private val canvas: Canvas,
     private val model: SimpleCanvasViewModel
 ) : ChainDrawer {
-    private val pointToolTip = Tooltip()
+    private val pointToolTips = mutableListOf<Tooltip>()
 
     override fun draw() {
         val gridSize = model.settings.pixelCost
@@ -28,6 +28,6 @@ class SimpleChainDrawer(
         AxisDrawElement(model.settings).draw(context)
         MarkersDrawElement(model.settings).draw(context)
         FunctionsDrawElement(model.settings, model.functions).draw(context)
-        TooltipsDrawElement(model.pointToolTipSettings, pointToolTip, model.primaryStage).draw(context)
+        TooltipsDrawElement(model.pointToolTipSettings, pointToolTips, model.primaryStage).draw(context)
     }
 }

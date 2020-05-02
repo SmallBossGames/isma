@@ -3,11 +3,12 @@ package ru.nstu.grin.main
 import javafx.stage.Stage
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
+import ru.nstu.grin.simple.view.SimpleCanvasView
 import tornadofx.*
 import kotlin.reflect.KClass
 
 class MyApp : App() {
-    override val primaryView: KClass<out UIComponent> = ConcatenationView::class
+    override val primaryView: KClass<out UIComponent> = SimpleCanvasView::class
 
     init {
         reloadStylesheetsOnFocus()

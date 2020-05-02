@@ -19,7 +19,7 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>() {
     var descriptions by descriptionsProperty
 
     val pointToolTipSettings =
-        PointToolTipSettings(false, 0.0, 0.0, 0.0, 0.0)
+        PointToolTipsSettings(false, mutableSetOf())
 
     val contextMenuSettings =
         ContextMenuSettings(ContextMenuType.NONE, 0.0, 0.0)

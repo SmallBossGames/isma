@@ -6,12 +6,18 @@ import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.PointSettings
 
 class ShowPointHandler(
     private val model: ConcatenationCanvasModelViewModel,
     private val chainDrawer: ConcatenationChainDrawer
 ) : EventHandler<MouseEvent> {
     override fun handle(event: MouseEvent) {
+        if (event.button == MouseButton.SECONDARY) {
+            println("Set to false")
+            model.pointToolTipSettings.isShow = false
+            model.pointToolTipSettings.pointsSettings.clear()
+        }
         showContextMenu(event)
         if (event.isPrimaryButtonDown.not()) return
         val nearFunction = model.cartesianSpaces.mapNotNull {
@@ -27,11 +33,13 @@ class ShowPointHandler(
 
         val pointToolTipSettings = model.pointToolTipSettings
         pointToolTipSettings.isShow = true
-        pointToolTipSettings.x = nearPoint.x
-        pointToolTipSettings.y = nearPoint.y
-
-        pointToolTipSettings.xGraphic = nearPoint.xGraphic ?: 0.0
-        pointToolTipSettings.yGraphic = nearPoint.yGraphic ?: 0.0
+        val pointSettings = PointSettings(
+            nearPoint.x,
+            nearPoint.y,
+            nearPoint.xGraphic ?: 0.0,
+            nearPoint.yGraphic ?: 0.0
+        )
+        pointToolTipSettings.pointsSettings.add(pointSettings)
         chainDrawer.draw()
     }
 

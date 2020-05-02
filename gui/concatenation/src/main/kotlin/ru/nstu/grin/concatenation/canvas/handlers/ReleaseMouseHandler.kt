@@ -11,7 +11,7 @@ class ReleaseMouseHandler(
     private val chainDrawer: ConcatenationChainDrawer
 ) : EventHandler<MouseEvent> {
     override fun handle(event: MouseEvent) {
-        if (event.button == MouseButton.PRIMARY) model.pointToolTipSettings.isShow = false
+//        if (event.button == MouseButton.PRIMARY) model.pointToolTipSettings.isShow = false
         chainDrawer.draw()
     }
 }

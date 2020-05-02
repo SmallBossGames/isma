@@ -28,7 +28,20 @@ class PointTooltipsDrawElement(
             )
             context.stroke = Color.BLACK
             pointTooltips.add(pointToolTip)
-            context.strokeRect(pointSettings.xGraphic, pointSettings.y, 1.0, 1.0)
+        }
+        for (pointSettings in pointTooltipSettings.pointsSettings) {
+            context.strokeLine(
+                pointSettings.xGraphic - SIZE_OF_CROSS,
+                pointSettings.yGraphic,
+                pointSettings.xGraphic + SIZE_OF_CROSS,
+                pointSettings.yGraphic
+            )
+            context.strokeLine(
+                pointSettings.xGraphic,
+                pointSettings.yGraphic - SIZE_OF_CROSS,
+                pointSettings.xGraphic,
+                pointSettings.yGraphic + SIZE_OF_CROSS
+            )
         }
         if (pointTooltipSettings.isShow.not()) {
             pointTooltips.forEach { it.hide() }
@@ -42,4 +55,8 @@ class PointTooltipsDrawElement(
 
     private fun Double.round(decimals: Int = 2): Double =
         String.format("%.${decimals}f", this).replace(",", ".").toDouble()
+
+    private companion object {
+        const val SIZE_OF_CROSS = 20.0
+    }
 }

@@ -1,10 +1,11 @@
 package ru.nstu.grin.concatenation.file.readers
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
 
 class XLSXReader {
-    fun read(file: String, sheet: String, excelRange: ExcelRange): List<List<String>> {
-        val book = XSSFWorkbook()
+    fun read(file: File, sheet: String, excelRange: ExcelRange): List<List<String>> {
+        val book = XSSFWorkbook(file)
         val excelSheet = book.getSheet(sheet)
         val result = mutableListOf<List<String>>()
 

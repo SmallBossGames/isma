@@ -15,8 +15,9 @@ import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
 import ru.nstu.grin.concatenation.points.model.PointsViewModel
 import ru.nstu.grin.common.model.WaveletDirection
-import ru.nstu.grin.concatenation.file.readers.FileRecognizer
-import ru.nstu.grin.concatenation.file.readers.XLSReader
+import ru.nstu.grin.concatenation.file.options.model.CsvDetails
+import ru.nstu.grin.concatenation.file.options.model.ExcelDetails
+import ru.nstu.grin.concatenation.file.readers.*
 import ru.nstu.grin.concatenation.function.model.FileType
 import tornadofx.Controller
 import java.io.File
@@ -32,11 +33,19 @@ class PointsViewController : Controller() {
 
     private fun readPoints(file: File): List<List<String>> {
         val fileType = FileRecognizer.recognize(file)
-        when (fileType) {
-            FileType.XLS -> TODO()
-            FileType.XLSX -> TODO()
-            FileType.CSV -> TODO()
-            FileType.UNKNOWN -> TODO()
+        return when (val details = model.details) {
+            is ExcelDetails -> {
+                if (fileType == FileType.XLSX) {
+                    return XLSXReader().read(file, details.sheetName, ExcelRange(details.range))
+                }
+                if (fileType == FileType.XLS) {
+                    return XLSReader().read(file, details.sheetName, ExcelRange(details.range))
+                }
+                throw IllegalArgumentException("Something went wrong can't match details and fileType")
+            }
+            is CsvDetails -> {
+                CsvReader().read(file, details.delimiter, model.readerMode)
+            }
         }
     }
 

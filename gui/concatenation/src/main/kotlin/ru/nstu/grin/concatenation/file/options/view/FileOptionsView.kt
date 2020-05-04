@@ -15,7 +15,7 @@ class FileOptionsView : Fragment() {
 
     init {
         when (controller.getType()) {
-            FileType.XLS -> {
+            FileType.XLS, FileType.XLSX -> {
                 model.details = ExcelDetails()
             }
             FileType.CSV -> {

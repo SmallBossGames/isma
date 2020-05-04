@@ -35,14 +35,13 @@ class AddFunctionController : Controller() {
                 DrawSize(-1200.0, 1200.0, -1200.0, 1200.0),
                 analyticFunctionModel.textFunction,
                 analyticFunctionModel.delta
-            )
-                .mapIndexedNotNull { index, point ->
-                    if (index % model.step == 0) {
-                        point
-                    } else {
-                        null
-                    }
-                },
+            ).mapIndexedNotNull { index, point ->
+                if (index % model.step == 0) {
+                    point
+                } else {
+                    null
+                }
+            },
             functionColor = model.functionColor
         )
 
@@ -207,7 +206,6 @@ class AddFunctionController : Controller() {
             ConcatenationFunctionEvent(cartesianSpace = cartesianSpace)
         )
     }
-
 
 
     private companion object {

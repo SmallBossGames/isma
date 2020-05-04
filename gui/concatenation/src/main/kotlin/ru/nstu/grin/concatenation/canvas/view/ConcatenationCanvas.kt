@@ -62,15 +62,6 @@ class ConcatenationCanvas : View() {
                 ShowPointHandler(model, chainDrawer)
             onMouseReleased =
                 ReleaseMouseHandler(model, chainDrawer)
-
-            addFunction(
-                drawSize = DrawSize(
-                    minX = 0.0,
-                    maxX = this@canvas.width,
-                    minY = 0.0,
-                    maxY = this@canvas.height
-                )
-            )
         }
 
     }

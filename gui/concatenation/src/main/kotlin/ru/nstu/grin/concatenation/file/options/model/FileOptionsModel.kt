@@ -7,8 +7,7 @@ import tornadofx.*
 import java.io.File
 
 class FileOptionsModel : ViewModel() {
-    val delimiterProperty = SimpleStringProperty()
-    var delimiter by delimiterProperty
+    lateinit var details: FileDetails
 
     val readerModeProperty = SimpleObjectProperty<FileReaderMode>()
     var readerMode by readerModeProperty

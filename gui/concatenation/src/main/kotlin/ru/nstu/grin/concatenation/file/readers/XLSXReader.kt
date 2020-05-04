@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.file.excel
+package ru.nstu.grin.concatenation.file.readers
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 

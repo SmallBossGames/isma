@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
+import ru.nstu.grin.concatenation.file.options.model.FileDetails
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
 import tornadofx.*
 import java.io.File
@@ -18,7 +19,7 @@ class PointsViewModel : ViewModel() {
     var addFunctionsMode by addFunctionsModeProperty
 
     val file: File by param()
-    val delimiter: String by param()
+    val details: FileDetails by param()
     val readerMode: FileReaderMode by param()
 
     var waveletTransformFunProperty = SimpleObjectProperty<WaveletTransformFun>()

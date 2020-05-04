@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.file.excel
+package ru.nstu.grin.concatenation.file.readers
 
 data class ExcelRange(
     val startCell: Int,

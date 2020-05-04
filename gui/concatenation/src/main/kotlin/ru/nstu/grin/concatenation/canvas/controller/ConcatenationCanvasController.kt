@@ -19,13 +19,11 @@ import ru.nstu.grin.concatenation.canvas.events.LoadEvent
 import ru.nstu.grin.concatenation.canvas.events.SaveEvent
 import ru.nstu.grin.concatenation.file.DrawReader
 import ru.nstu.grin.concatenation.file.DrawWriter
-import ru.nstu.grin.concatenation.function.model.ChooseFunctionViewModel
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
-import ru.nstu.grin.concatenation.function.model.AddFunctionModel
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import tornadofx.*
 

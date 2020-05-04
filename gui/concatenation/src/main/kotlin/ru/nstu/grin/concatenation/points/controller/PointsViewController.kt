@@ -15,6 +15,9 @@ import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
 import ru.nstu.grin.concatenation.points.model.PointsViewModel
 import ru.nstu.grin.common.model.WaveletDirection
+import ru.nstu.grin.concatenation.file.readers.FileRecognizer
+import ru.nstu.grin.concatenation.file.readers.XLSReader
+import ru.nstu.grin.concatenation.function.model.FileType
 import tornadofx.Controller
 import java.io.File
 import java.io.FileInputStream
@@ -27,18 +30,14 @@ class PointsViewController : Controller() {
         model.pointsListProperty.addAll(readPoints(model.file))
     }
 
-    private fun readPoints(file: File): List<List<String>> = FileInputStream(file).use {
-        val lines = String(it.readBytes()).split("\n")
-        val result = mutableListOf<List<String>>()
-        for (line in lines) {
-            val coordinates = line.split(model.delimiter)
-            if (model.readerMode == FileReaderMode.SEQUENCE && coordinates.size % 2 != 0) {
-                tornadofx.error("Неверное количество колонок")
-                return@use emptyList()
-            }
-            result.add(coordinates)
+    private fun readPoints(file: File): List<List<String>> {
+        val fileType = FileRecognizer.recognize(file)
+        when (fileType) {
+            FileType.XLS -> TODO()
+            FileType.XLSX -> TODO()
+            FileType.CSV -> TODO()
+            FileType.UNKNOWN -> TODO()
         }
-        result
     }
 
     private fun <T> List<List<T>>.transpose(): List<List<T>> {

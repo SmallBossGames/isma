@@ -10,7 +10,7 @@ class FileFragmentController : Controller() {
     fun chooseFile() {
         val files = tornadofx.chooseFile(
             "Файл",
-            arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.gf")),
+            arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.csv,*.xls,*.xlsx")),
             FileChooserMode.Single
         )
         if (files.isEmpty()) {

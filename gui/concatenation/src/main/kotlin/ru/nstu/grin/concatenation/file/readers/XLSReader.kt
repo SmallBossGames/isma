@@ -1,10 +1,11 @@
-package ru.nstu.grin.concatenation.file.excel
+package ru.nstu.grin.concatenation.file.readers
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import java.io.File
 import java.io.FileInputStream
 
 class XLSReader {
-    fun read(file: String, sheet: String, excelRange: ExcelRange): List<List<String>> {
+    fun read(file: File, sheet: String, excelRange: ExcelRange): List<List<String>> {
         val book = HSSFWorkbook(FileInputStream(file))
         val excelSheet = book.getSheet(sheet)
         val result = mutableListOf<List<String>>()

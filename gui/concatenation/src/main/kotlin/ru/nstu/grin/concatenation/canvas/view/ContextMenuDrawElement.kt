@@ -52,6 +52,11 @@ class ContextMenuDrawElement(
                     chainDrawer.draw()
                 }
 
+                val changeAxis = MenuItem("Изменить ось")
+                changeAxis.action {
+                    println("Тут мы должны сделать вызов окна изменения")
+                }
+
                 contextMenu.items.add(menu)
                 contextMenu.items.add(gridItem)
                 contextMenu.show(context.canvas, stage.x + settings.xGraphic, stage.y + settings.yGraphic)

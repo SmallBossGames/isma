@@ -15,18 +15,33 @@ data class ExcelRange(
 
     private companion object {
         fun parseStartCell(range: String): Int {
-            return range.substringBefore(":").filter {
+            val letters = range.substringBefore(":").filter {
                 it.isLetter()
-            }.sumBy {
-                parseLetter(it)
+            }
+            return if (letters.length > 1) {
+                val start = letters.dropLast(1)
+                val startSum = start.map {
+                    (parseLetter(it) + 1) * 26
+                }.sum()
+                startSum + parseLetter(letters.last())
+            } else {
+                letters.map { parseLetter(it) }.sum()
             }
         }
 
         fun parseEndCell(range: String): Int {
-            return range.substringAfter(":").filter {
+            val letters = range.substringAfter(":").filter {
                 it.isLetter()
-            }.sumBy {
-                parseLetter(it)
+            }
+
+            return if (letters.length > 1) {
+                val start = letters.dropLast(1)
+                val startSum = start.map {
+                    (parseLetter(it) + 1) * 26
+                }.sum()
+                startSum + parseLetter(letters.last())
+            } else {
+                letters.map { parseLetter(it) }.sum()
             }
         }
 

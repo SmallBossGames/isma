@@ -6,16 +6,21 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.view.ChainDrawElement
+import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import tornadofx.Scope
+import tornadofx.ScopedInstance
 import tornadofx.action
+import tornadofx.find
 
 class ContextMenuDrawElement(
     private val contextMenu: ContextMenu,
     private val model: ConcatenationCanvasModelViewModel,
     private val controller: ConcatenationCanvasController,
-    private val chainDrawer: ConcatenationChainDrawer
+    private val chainDrawer: ConcatenationChainDrawer,
+    private val scope: Scope
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
         contextMenu.items.clear()
@@ -54,11 +59,24 @@ class ContextMenuDrawElement(
 
                 val changeAxis = MenuItem("Изменить ось")
                 changeAxis.action {
-                    println("Тут мы должны сделать вызов окна изменения")
+                    if (cartesianSpace.xAxis.isLocated(settings.xGraphic, settings.yGraphic)) {
+                        find<AxisChangeFragment>(
+                            scope, mapOf(
+                                AxisChangeFragment::axisId.name to cartesianSpace.xAxis.id
+                            )
+                        ).openModal()
+                    } else {
+                        find<AxisChangeFragment>(
+                            scope, mapOf(
+                                AxisChangeFragment::axisId.name to cartesianSpace.yAxis.id
+                            )
+                        ).openModal()
+                    }
                 }
 
                 contextMenu.items.add(menu)
                 contextMenu.items.add(gridItem)
+                contextMenu.items.add(changeAxis)
                 contextMenu.show(context.canvas, stage.x + settings.xGraphic, stage.y + settings.yGraphic)
             }
             ContextMenuType.MAIN -> {

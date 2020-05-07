@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.function.view
 import javafx.scene.Parent
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
+import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.function.controller.AddFunctionController
@@ -21,7 +22,6 @@ class AddFunctionModalView : Fragment() {
     private lateinit var tabPane: TabPane
 
     override val root: Parent = form {
-        println(controller.params)
         model.inputWayProperty.onChange {
             when (model.inputWay) {
                 InputWay.FILE -> {
@@ -92,6 +92,15 @@ class AddFunctionModalView : Fragment() {
                     }
                 }
             }
+            field("расстояние между метками") {
+                textfield().bind(model.xDistanceBetweenMarksProperty)
+            }
+            field("Размер шрифта меток") {
+                textfield().bind(model.xTextSizeProperty)
+            }
+            field("Шрифт") {
+                combobox(model.xFontProperty, Font.getFamilies())
+            }
         }
         fieldset("Ось y") {
             field("Имя") {
@@ -114,6 +123,15 @@ class AddFunctionModalView : Fragment() {
                         }
                     }
                 }
+            }
+            field("Расстояние между метками") {
+                textfield().bind(model.yDistanceBetweenMarksProperty)
+            }
+            field("Размер шрифта меток") {
+                textfield().bind(model.yTextSizeProperty)
+            }
+            field("Шрифт") {
+                combobox(model.yFontProperty, Font.getFamilies())
             }
         }
         fieldset("Цвета") {

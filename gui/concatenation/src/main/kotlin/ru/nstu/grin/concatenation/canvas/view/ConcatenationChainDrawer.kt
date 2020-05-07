@@ -10,11 +10,13 @@ import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasControlle
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import tornadofx.Scope
 
 class ConcatenationChainDrawer(
     private val canvas: Canvas,
     private val model: ConcatenationCanvasModelViewModel,
-    private val controller: ConcatenationCanvasController
+    private val controller: ConcatenationCanvasController,
+    private val scope: Scope
 ) : ChainDrawer {
     private val pointToolTips = mutableListOf<Tooltip>()
     private val contextMenu = ContextMenu()
@@ -68,7 +70,8 @@ class ConcatenationChainDrawer(
             contextMenu,
             model,
             controller,
-            this
+            this,
+            scope
         ).draw(context)
     }
 }

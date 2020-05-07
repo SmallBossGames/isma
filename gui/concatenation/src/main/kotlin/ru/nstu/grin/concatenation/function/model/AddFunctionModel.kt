@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import tornadofx.ViewModel
 import tornadofx.getValue
 import tornadofx.setValue
+import java.awt.Font
 
 class AddFunctionModel : ViewModel() {
     var functionNameProperty = SimpleStringProperty(this, "functionName", "Функция номер 1")
@@ -42,6 +43,15 @@ class AddFunctionModel : ViewModel() {
     var xDelimeterColorProperty = SimpleObjectProperty(Color.BLACK)
     var xDelimiterColor by xDelimeterColorProperty
 
+    var xDistanceBetweenMarksProperty = SimpleStringProperty("40.0")
+    var xDistanceBetweenMarks by xDistanceBetweenMarksProperty
+
+    var xFontProperty = SimpleStringProperty(Font.SANS_SERIF)
+    var xFont by xFontProperty
+
+    var xTextSizeProperty = SimpleStringProperty("10.0")
+    var xTextSize by xTextSizeProperty
+
     var yAxisNameProperty = SimpleStringProperty(this, "yAxisName", "Ось 2")
     var yAxisName by yAxisNameProperty
 
@@ -50,6 +60,15 @@ class AddFunctionModel : ViewModel() {
 
     var yDelimiterColorProperty = SimpleObjectProperty(Color.BLACK)
     var yDelimeterColor by yDelimiterColorProperty
+
+    var yDistanceBetweenMarksProperty = SimpleStringProperty("40.0")
+    var yDistanceBetweenMarks by yDistanceBetweenMarksProperty
+
+    var yFontProperty = SimpleStringProperty(Font.SANS_SERIF)
+    var yFont by yFontProperty
+
+    var yTextSizeProperty = SimpleStringProperty("10.0")
+    var yTextSize by yTextSizeProperty
 
     var stepProperty = SimpleIntegerProperty(1)
     var step by stepProperty

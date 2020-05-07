@@ -27,8 +27,8 @@ class AxisDrawElement(
     override fun draw(context: GraphicsContext) {
         drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
         drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
-        drawAxisMarks(context, xAxis.order, xAxis.zeroPoint, xAxis.direction, xAxis.marksProvider, xAxis.delimiterColor)
-        drawAxisMarks(context, yAxis.order, yAxis.zeroPoint, yAxis.direction, yAxis.marksProvider, yAxis.delimiterColor)
+        drawAxisMarks(context, xAxis.order, xAxis.zeroPoint, xAxis.direction, xAxis.marksProvider, xAxis.fontColor)
+        drawAxisMarks(context, yAxis.order, yAxis.zeroPoint, yAxis.direction, yAxis.marksProvider, yAxis.fontColor)
     }
 
     private fun drawAxisMarks(

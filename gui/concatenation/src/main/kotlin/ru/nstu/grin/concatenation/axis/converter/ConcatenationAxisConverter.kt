@@ -23,7 +23,10 @@ object ConcatenationAxisConverter {
             order = order,
             direction = source.direction.direction,
             backGroundColor = source.backGroundColor,
-            delimiterColor = source.delimeterColor
+            fontColor = source.delimeterColor,
+            distanceBetweenMarks = source.distanceBetweenMarks,
+            textSize = source.textSize,
+            font = source.font
         )
     }
 }

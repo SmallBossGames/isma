@@ -12,6 +12,7 @@ import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasControlle
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.GenerateUtils
 import ru.nstu.grin.concatenation.canvas.events.*
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
@@ -22,6 +23,7 @@ import ru.nstu.grin.concatenation.canvas.handlers.ShowPointHandler
 import ru.nstu.grin.concatenation.file.DrawReader
 import ru.nstu.grin.concatenation.file.DrawWriter
 import tornadofx.*
+import java.util.*
 
 class ConcatenationCanvas : View() {
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -37,7 +39,8 @@ class ConcatenationCanvas : View() {
             chainDrawer = ConcatenationChainDrawer(
                 this,
                 model,
-                controller
+                controller,
+                scope
             )
 
             model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
@@ -51,51 +54,19 @@ class ConcatenationCanvas : View() {
             onMousePressed = ShowPointHandler(model, chainDrawer)
 
             onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
-        }
-    }
-
-    init {
-        subscribe<UpdateAxisEvent> {
-            controller.updateAxis(it)
-        }
-        subscribe<UpdateFunctionEvent> {
-            controller.updateFunction(it)
-        }
-        subscribe<ConcatenationArrowEvent> { event ->
-            controller.addArrow(event)
-        }
-        subscribe<ConcatenationFunctionEvent> { event ->
-            controller.addConcatenationFunction(event)
-        }
-        subscribe<ConcatenationDescriptionEvent> { event ->
-            controller.addDescription(event)
-        }
-        subscribe<ConcatenationClearCanvasEvent> {
-            controller.clearCanvas()
-        }
-        subscribe<SaveEvent> {
-            val writer = DrawWriter(it.file)
-        }
-        subscribe<LoadEvent> {
-            val reader = DrawReader()
-            val readResult = reader.read(it.file)
-            model.arrows.addAll(readResult.arrows)
-            model.descriptions.addAll(readResult.descriptions)
-            TODO("Add cartesians")
-        }
-    }
-
-    fun addFunction() {
-        val (cartesianSpace, cartesianSpace2) = GenerateUtils.generateTwoCartesianSpaces()
-        fire(
-            ConcatenationFunctionEvent(
-                cartesianSpace = cartesianSpace
+            val (cartesianSpace, cartesianSpace2) = GenerateUtils.generateTwoCartesianSpaces()
+            fire(
+                ConcatenationFunctionEvent(
+                    cartesianSpace = cartesianSpace
+                )
             )
-        )
-        fire(
-            ConcatenationFunctionEvent(
-                cartesianSpace = cartesianSpace2
+
+            fire(
+                ConcatenationFunctionEvent(
+                    cartesianSpace = cartesianSpace2
+                )
             )
-        )
+        }
+        controller.addFunction()
     }
 }

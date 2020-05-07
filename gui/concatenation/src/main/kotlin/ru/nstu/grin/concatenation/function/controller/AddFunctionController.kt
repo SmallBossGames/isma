@@ -54,7 +54,10 @@ class AddFunctionController : Controller() {
                 backGroundColor = model.xAxisColor,
                 delimeterColor = model.xDelimiterColor,
                 direction = model.xDirection,
-                zeroPoint = SettingsProvider.getCanvasWidth() / 2
+                zeroPoint = SettingsProvider.getCanvasWidth() / 2,
+                distanceBetweenMarks = model.xDistanceBetweenMarks.toDouble(),
+                textSize = model.xTextSize.toDouble(),
+                font = model.xFont
             ),
             yAxis = ConcatenationAxisDTO(
                 id = UUID.randomUUID(),
@@ -62,7 +65,10 @@ class AddFunctionController : Controller() {
                 backGroundColor = model.yAxisColor,
                 delimeterColor = model.yDelimeterColor,
                 direction = model.yDirection,
-                zeroPoint = SettingsProvider.getCanvasHeight() / 2
+                zeroPoint = SettingsProvider.getCanvasHeight() / 2,
+                distanceBetweenMarks = model.yDistanceBetweenMarks.toDouble(),
+                textSize = model.yTextSize.toDouble(),
+                font = model.yFont
             )
         )
         fire(
@@ -154,7 +160,10 @@ class AddFunctionController : Controller() {
             backGroundColor = model.xAxisColor,
             delimeterColor = model.xDelimiterColor,
             direction = model.xDirection,
-            zeroPoint = SettingsProvider.getCanvasWidth() / 2
+            zeroPoint = SettingsProvider.getCanvasWidth() / 2,
+            distanceBetweenMarks = model.xDistanceBetweenMarks.toDouble(),
+            font = model.xFont,
+            textSize = model.xTextSize.toDouble()
         )
     }
 
@@ -165,7 +174,10 @@ class AddFunctionController : Controller() {
             backGroundColor = model.yAxisColor,
             delimeterColor = model.yDelimeterColor,
             direction = model.yDirection,
-            zeroPoint = SettingsProvider.getCanvasHeight() / 2
+            zeroPoint = SettingsProvider.getCanvasHeight() / 2,
+            distanceBetweenMarks = model.yDistanceBetweenMarks.toDouble(),
+            font = model.yFont,
+            textSize = model.yTextSize.toDouble()
         )
     }
 
@@ -198,7 +210,10 @@ class AddFunctionController : Controller() {
             backGroundColor = model.xAxisColor,
             delimeterColor = model.xDelimiterColor,
             direction = model.xDirection,
-            zeroPoint = SettingsProvider.getCanvasWidth() / 2
+            zeroPoint = SettingsProvider.getCanvasWidth() / 2,
+            distanceBetweenMarks = model.xDistanceBetweenMarks.toDouble(),
+            font = model.xFont,
+            textSize = model.xTextSize.toDouble()
         )
         val yAxis = ConcatenationAxisDTO(
             id = UUID.randomUUID(),
@@ -206,7 +221,10 @@ class AddFunctionController : Controller() {
             backGroundColor = model.yAxisColor,
             delimeterColor = model.yDelimeterColor,
             direction = model.yDirection,
-            zeroPoint = SettingsProvider.getCanvasHeight() / 2
+            zeroPoint = SettingsProvider.getCanvasHeight() / 2,
+            distanceBetweenMarks = model.yDistanceBetweenMarks.toDouble(),
+            font = model.yFont,
+            textSize = model.yTextSize.toDouble()
         )
         val cartesianSpace = CartesianSpaceDTO(
             functions = listOf(function),

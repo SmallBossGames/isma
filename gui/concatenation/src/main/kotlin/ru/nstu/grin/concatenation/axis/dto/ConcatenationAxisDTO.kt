@@ -10,5 +10,8 @@ data class ConcatenationAxisDTO(
     val zeroPoint: Double,
     val backGroundColor: Color,
     val delimeterColor: Color,
+    val textSize: Double,
+    val font: String,
+    val distanceBetweenMarks: Double,
     val direction: ExistDirection
 )

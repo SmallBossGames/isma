@@ -13,55 +13,46 @@ import ru.nstu.grin.concatenation.canvas.converter.CartesianSpaceConverter
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
-import ru.nstu.grin.concatenation.file.DrawReader
-import ru.nstu.grin.concatenation.file.DrawWriter
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.canvas.GenerateUtils
 import ru.nstu.grin.concatenation.canvas.events.*
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
+import ru.nstu.grin.concatenation.file.DrawReader
+import ru.nstu.grin.concatenation.file.DrawWriter
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import tornadofx.*
+import java.util.*
 
 class ConcatenationCanvasController : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val view: ConcatenationCanvas by inject()
 
     init {
-        subscribe<ConcatenationArrowEvent> {
-            val arrow = ArrowConverter.convert(it.arrow)
-            model.arrows.add(arrow)
+        subscribe<ConcatenationFunctionEvent> { event ->
+            addConcatenationFunction(event)
+        }
+        subscribe<UpdateAxisEvent> {
+            updateAxis(it)
+        }
+        subscribe<UpdateFunctionEvent> {
+            updateFunction(it)
+        }
+        subscribe<ConcatenationArrowEvent> { event ->
+            addArrow(event)
         }
         subscribe<ConcatenationFunctionEvent> { event ->
-            val cartesianSpace = event.cartesianSpace
-            val found = model.cartesianSpaces.firstOrNull {
-                it.xAxis.name == cartesianSpace.xAxis.name
-                    && it.yAxis.name == cartesianSpace.yAxis.name
-            }
-            if (found == null) {
-                val xAxis = cartesianSpace.xAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
-                val yAxis = cartesianSpace.yAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
-                val added = CartesianSpaceConverter.merge(cartesianSpace, xAxis, yAxis)
-                model.cartesianSpaces.add(added)
-            } else {
-                model.cartesianSpaces.remove(found)
-
-                val functions = cartesianSpace.functions.map { ConcatenationFunctionConverter.convert(it) }
-                found.merge(functions)
-                model.cartesianSpaces.add(found)
-            }
+            addConcatenationFunction(event)
         }
-
-        subscribe<ConcatenationDescriptionEvent> {
-            val description = DescriptionConverter.convert(it.description)
-            model.descriptions.add(description)
+        subscribe<ConcatenationDescriptionEvent> { event ->
+            addDescription(event)
         }
         subscribe<ConcatenationClearCanvasEvent> {
             clearCanvas()
         }
-
-
         subscribe<SaveEvent> {
             val writer = DrawWriter(it.file)
         }
@@ -72,6 +63,31 @@ class ConcatenationCanvasController : Controller() {
             model.descriptions.addAll(readResult.descriptions)
             TODO("Add cartesians")
         }
+        subscribe<AxisQuery> {
+            val axis = findAxisById(it.id)
+            val event = GetAxisEvent(axis)
+            fire(event)
+        }
+    }
+
+    private fun findAxisById(id: UUID): ConcatenationAxis {
+        return model.cartesianSpaces.map {
+            listOf(it.xAxis, it.yAxis)
+        }.flatten().first { it.id == id }
+    }
+
+    fun addFunction() {
+        val (cartesianSpace, cartesianSpace2) = GenerateUtils.generateTwoCartesianSpaces()
+        fire(
+            ConcatenationFunctionEvent(
+                cartesianSpace = cartesianSpace
+            )
+        )
+        fire(
+            ConcatenationFunctionEvent(
+                cartesianSpace = cartesianSpace2
+            )
+        )
     }
 
     fun addArrow(event: ConcatenationArrowEvent) {

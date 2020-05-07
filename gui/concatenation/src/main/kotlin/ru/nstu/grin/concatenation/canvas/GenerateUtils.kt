@@ -12,6 +12,7 @@ import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.function.controller.DeltaMarksGenerator
 import ru.nstu.grin.concatenation.function.controller.DeltaSizeCalculator
 import ru.nstu.grin.concatenation.function.dto.ConcatenationFunctionDTO
+import java.awt.Font
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
@@ -53,7 +54,10 @@ object GenerateUtils {
                     Direction.BOTTOM,
                     null
                 ),
-                zeroPoint = SettingsProvider.getCanvasWidth() / 2
+                zeroPoint = SettingsProvider.getCanvasWidth() / 2,
+                textSize = 10.0,
+                distanceBetweenMarks = 40.0,
+                font = Font.SERIF
             ),
             yAxis = ConcatenationAxisDTO(
                 id = UUID.randomUUID(),
@@ -64,7 +68,10 @@ object GenerateUtils {
                     Direction.LEFT,
                     null
                 ),
-                zeroPoint = SettingsProvider.getCanvasHeight() / 2
+                zeroPoint = SettingsProvider.getCanvasHeight() / 2,
+                textSize = 10.0,
+                distanceBetweenMarks = 40.0,
+                font = Font.SERIF
             )
         )
         val cartesianSpace2 = CartesianSpaceDTO(
@@ -78,7 +85,10 @@ object GenerateUtils {
                     Direction.BOTTOM,
                     null
                 ),
-                zeroPoint = SettingsProvider.getCanvasWidth() / 2
+                zeroPoint = SettingsProvider.getCanvasWidth() / 2,
+                textSize = 10.0,
+                distanceBetweenMarks = 40.0,
+                font = Font.SERIF
             ),
             yAxis = ConcatenationAxisDTO(
                 id = UUID.randomUUID(),
@@ -89,7 +99,10 @@ object GenerateUtils {
                     Direction.LEFT,
                     null
                 ),
-                zeroPoint = SettingsProvider.getCanvasHeight() / 2
+                zeroPoint = SettingsProvider.getCanvasHeight() / 2,
+                textSize = 10.0,
+                distanceBetweenMarks = 40.0,
+                font = Font.SERIF
             )
         )
 

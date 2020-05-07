@@ -21,7 +21,10 @@ class ConcatenationAxis(
     val order: Int,
     val direction: Direction,
     val backGroundColor: Color,
-    val delimiterColor: Color,
+    val fontColor: Color,
+    val distanceBetweenMarks: Double,
+    val textSize: Double,
+    val font: String,
     val settings: AxisSettings = AxisSettings()
 ) : Writer {
     fun isLocated(x: Double, y: Double): Boolean {
@@ -64,6 +67,6 @@ class ConcatenationAxis(
         oos.writeObject(direction)
         oos.writeDouble(zeroPoint)
         oos.write(backGroundColor.toByteArray())
-        oos.write(delimiterColor.toByteArray())
+        oos.write(fontColor.toByteArray())
     }
 }

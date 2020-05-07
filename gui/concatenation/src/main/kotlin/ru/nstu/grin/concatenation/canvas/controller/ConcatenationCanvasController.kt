@@ -121,11 +121,19 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun updateAxis(event: UpdateAxisEvent) {
+        val axis = model.cartesianSpaces.map {
+            listOf(it.xAxis, it.yAxis)
+        }.flatten().first { it.id == event.id }
 
+        axis.distanceBetweenMarks = event.distance
+        axis.textSize = event.textSize
+        axis.font = event.font
+        axis.fontColor = event.fontColor
+        axis.backGroundColor = event.axisColor
+        view.redraw()
     }
 
     fun updateFunction(event: UpdateFunctionEvent) {
-
     }
 
     private fun ConcatenationAxisDTO.getOrder(): Int {

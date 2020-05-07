@@ -5,14 +5,10 @@ import javafx.scene.Parent
 import javafx.scene.canvas.Canvas
 import javafx.scene.layout.Priority
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.common.events.ConcatenationArrowEvent
-import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
-import ru.nstu.grin.common.events.ConcatenationDescriptionEvent
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.GenerateUtils
 import ru.nstu.grin.concatenation.canvas.events.*
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
@@ -20,10 +16,7 @@ import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ShowPointHandler
-import ru.nstu.grin.concatenation.file.DrawReader
-import ru.nstu.grin.concatenation.file.DrawWriter
 import tornadofx.*
-import java.util.*
 
 class ConcatenationCanvas : View() {
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -68,5 +61,9 @@ class ConcatenationCanvas : View() {
             )
         }
         controller.addFunction()
+    }
+
+    fun redraw() {
+        chainDrawer.draw()
     }
 }

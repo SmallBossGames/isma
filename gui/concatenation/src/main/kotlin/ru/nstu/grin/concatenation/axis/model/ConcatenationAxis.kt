@@ -20,11 +20,11 @@ class ConcatenationAxis(
     val marksProvider: MarksProvider,
     val order: Int,
     val direction: Direction,
-    val backGroundColor: Color,
-    val fontColor: Color,
-    val distanceBetweenMarks: Double,
-    val textSize: Double,
-    val font: String,
+    var backGroundColor: Color,
+    var fontColor: Color,
+    var distanceBetweenMarks: Double,
+    var textSize: Double,
+    var font: String,
     val settings: AxisSettings = AxisSettings()
 ) : Writer {
     fun isLocated(x: Double, y: Double): Boolean {

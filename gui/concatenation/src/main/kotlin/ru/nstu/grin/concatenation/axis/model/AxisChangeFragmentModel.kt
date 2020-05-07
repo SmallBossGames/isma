@@ -5,10 +5,10 @@ import javafx.scene.paint.Color
 import tornadofx.*
 
 class AxisChangeFragmentModel {
-    var distanceBetweenMarksProperty = SimpleDoubleProperty()
+    var distanceBetweenMarksProperty = SimpleStringProperty()
     var distanceBetweenMarks by distanceBetweenMarksProperty
 
-    var textSizeProperty = SimpleDoubleProperty()
+    var textSizeProperty = SimpleStringProperty()
     var textSize by textSizeProperty
 
     var fontProperty = SimpleStringProperty()

@@ -1,15 +1,12 @@
 package ru.nstu.grin.concatenation.axis.view
 
 import javafx.scene.canvas.GraphicsContext
-import ru.nstu.grin.concatenation.axis.marks.MarksProvider
-import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 
 interface AxisMarksDrawStrategy {
     fun drawMarks(
         context: GraphicsContext,
-        zeroPoint: Double,
-        direction: Direction,
-        marksProvider: MarksProvider,
+        axis: ConcatenationAxis,
         marksCoordinate: Double
     )
 }

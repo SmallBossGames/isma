@@ -1,12 +1,14 @@
 package ru.nstu.grin.concatenation.axis.view
 
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.text.Font
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.axis.marks.MarksProvider
 import ru.nstu.grin.concatenation.axis.model.AxisSettings
 import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import kotlin.math.pow
 
 class HorizontalAxisDrawStrategy(
@@ -17,14 +19,15 @@ class HorizontalAxisDrawStrategy(
 
     override fun drawMarks(
         context: GraphicsContext,
-        zeroPoint: Double,
-        direction: Direction,
-        marksProvider: MarksProvider,
+        axis: ConcatenationAxis,
         marksCoordinate: Double
     ) {
+        context.font = Font.font(axis.font)
         println("CurrentStep x ${canvasSettings.step}")
         var drawStepX = "0.0"
         var currentStepX = 0.0
+        val zeroPoint = axis.zeroPoint+axis.settings.correlation
+        val marksProvider = axis.marksProvider
         var currentX = zeroPoint
         val minX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
         while (currentX > minX) {

@@ -1,10 +1,12 @@
 package ru.nstu.grin.concatenation.axis.view
 
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.text.Font
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
 import ru.nstu.grin.concatenation.axis.marks.MarksProvider
 import ru.nstu.grin.concatenation.axis.model.AxisSettings
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.concatenation.axis.model.Direction
 import kotlin.math.pow
@@ -17,12 +19,12 @@ class VerticalAxisDrawStrategy(
 
     override fun drawMarks(
         context: GraphicsContext,
-        zeroPoint: Double,
-        direction: Direction,
-        marksProvider: MarksProvider,
+        axis: ConcatenationAxis,
         marksCoordinate: Double
     ) {
+        context.font = Font.font(axis.font)
         println("Current step ${axisSettings.step}")
+        val zeroPoint = axis.zeroPoint+axis.settings.correlation
         var drawStepY = "0.0"
         var currentStepY = 0.0
         var currentY = zeroPoint
@@ -37,7 +39,7 @@ class VerticalAxisDrawStrategy(
             )
 
             currentY -= SettingsProvider.getMarksInterval()
-            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
+            drawStepY = axis.marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
             currentStepY += axisSettings.step
         }
 
@@ -57,7 +59,7 @@ class VerticalAxisDrawStrategy(
             }
 
             currentY += SettingsProvider.getMarksInterval()
-            drawStepY = marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
+            drawStepY = axis.marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
             currentStepY -= axisSettings.step
         }
     }

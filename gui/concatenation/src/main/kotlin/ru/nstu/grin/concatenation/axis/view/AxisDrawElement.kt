@@ -27,50 +27,41 @@ class AxisDrawElement(
     override fun draw(context: GraphicsContext) {
         drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
         drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
-        drawAxisMarks(context, xAxis.order, xAxis.zeroPoint, xAxis.direction, xAxis.marksProvider, xAxis.fontColor)
-        drawAxisMarks(context, yAxis.order, yAxis.zeroPoint, yAxis.direction, yAxis.marksProvider, yAxis.fontColor)
+        drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
+        drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
     }
 
     private fun drawAxisMarks(
         context: GraphicsContext,
         order: Int,
-        zeroPoint: Double,
+        axis: ConcatenationAxis,
         direction: Direction,
-        marksProvider: MarksProvider,
         color: Color
     ) {
         context.stroke = color
         val startPoint = order * SettingsProvider.getAxisWidth()
         val marksCoordinate = startPoint + MARKS_MARGIN
-        val correlatedZeroPoint = zeroPoint + when (direction) {
-            Direction.LEFT, Direction.RIGHT -> yAxis.settings.correlation
-            Direction.TOP, Direction.BOTTOM -> xAxis.settings.correlation
-        }
 
         when (direction) {
             Direction.LEFT -> {
-                verticalAxisDraw.drawMarks(context, correlatedZeroPoint, direction, marksProvider, marksCoordinate)
+                verticalAxisDraw.drawMarks(context, axis, marksCoordinate)
             }
             Direction.RIGHT -> {
                 verticalAxisDraw.drawMarks(
                     context,
-                    correlatedZeroPoint,
-                    direction,
-                    marksProvider,
+                    axis,
                     SettingsProvider.getCanvasWidth() - marksCoordinate
                 )
             }
             Direction.TOP -> {
                 horizontalAxisDraw.drawMarks(
-                    context, correlatedZeroPoint, direction, marksProvider, marksCoordinate
+                    context, axis, marksCoordinate
                 )
             }
             Direction.BOTTOM -> {
                 horizontalAxisDraw.drawMarks(
                     context,
-                    correlatedZeroPoint,
-                    direction,
-                    marksProvider,
+                    axis,
                     SettingsProvider.getCanvasHeight() - marksCoordinate
                 )
             }

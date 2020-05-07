@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 object ConcatenationAxisConverter {
     fun merge(source: ConcatenationAxisDTO, order: Int): ConcatenationAxis {
         return ConcatenationAxis(
+            id = source.id,
             name = source.name,
             zeroPoint = source.zeroPoint,
             marksProvider = when (source.direction.direction) {

@@ -4,7 +4,7 @@ import javafx.beans.property.*
 import javafx.scene.paint.Color
 import tornadofx.*
 
-class AxisChangeFragmentModel {
+class AxisChangeFragmentModel : ViewModel() {
     var distanceBetweenMarksProperty = SimpleStringProperty()
     var distanceBetweenMarks by distanceBetweenMarksProperty
 

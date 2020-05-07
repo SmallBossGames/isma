@@ -11,6 +11,7 @@ import ru.nstu.grin.concatenation.canvas.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
 import tornadofx.Controller
+import java.util.*
 
 class AddFunctionController : Controller() {
     private val model: AddFunctionModel by inject()
@@ -29,6 +30,7 @@ class AddFunctionController : Controller() {
 
     private fun addAnalyticFunction() {
         val function = ConcatenationFunctionDTO(
+            id = UUID.randomUUID(),
             name = model.functionName,
             points = pointsBuilder.buildPoints(
                 DrawSize(-1200.0, 1200.0, -1200.0, 1200.0),
@@ -47,6 +49,7 @@ class AddFunctionController : Controller() {
         val cartesianSpace = CartesianSpaceDTO(
             functions = listOf(function),
             xAxis = ConcatenationAxisDTO(
+                id = UUID.randomUUID(),
                 name = model.xAxisName,
                 backGroundColor = model.xAxisColor,
                 delimeterColor = model.xDelimiterColor,
@@ -54,6 +57,7 @@ class AddFunctionController : Controller() {
                 zeroPoint = SettingsProvider.getCanvasWidth() / 2
             ),
             yAxis = ConcatenationAxisDTO(
+                id = UUID.randomUUID(),
                 name = model.yAxisName,
                 backGroundColor = model.yAxisColor,
                 delimeterColor = model.yDelimeterColor,
@@ -87,6 +91,7 @@ class AddFunctionController : Controller() {
                 val yAxis = createYAxis()
                 val functions = points.mapIndexed { index, list ->
                     ConcatenationFunctionDTO(
+                        id = UUID.randomUUID(),
                         name = "${model.functionName}.$index",
                         points = list.mapIndexedNotNull { index, point ->
                             if (index % model.step == 0) {
@@ -112,6 +117,7 @@ class AddFunctionController : Controller() {
             AddFunctionsMode.ADD_TO_NEW_CARTESIAN_SPACES -> {
                 points.forEachIndexed { index, list ->
                     val function = ConcatenationFunctionDTO(
+                        id = UUID.randomUUID(),
                         name = "${model.functionName}.$index",
                         points = list.mapIndexedNotNull { index, point ->
                             if (index % model.step == 0) {
@@ -143,6 +149,7 @@ class AddFunctionController : Controller() {
 
     private fun createXAxis(): ConcatenationAxisDTO {
         return ConcatenationAxisDTO(
+            id = UUID.randomUUID(),
             name = model.xAxisName,
             backGroundColor = model.xAxisColor,
             delimeterColor = model.xDelimiterColor,
@@ -153,6 +160,7 @@ class AddFunctionController : Controller() {
 
     private fun createYAxis(): ConcatenationAxisDTO {
         return ConcatenationAxisDTO(
+            id = UUID.randomUUID(),
             name = model.yAxisName,
             backGroundColor = model.yAxisColor,
             delimeterColor = model.yDelimeterColor,
@@ -173,6 +181,7 @@ class AddFunctionController : Controller() {
         val points = parsePoints()
 
         val function = ConcatenationFunctionDTO(
+            id = UUID.randomUUID(),
             name = model.functionName,
             points = points.mapIndexedNotNull { index, point ->
                 if (index % model.step == 0) {
@@ -184,6 +193,7 @@ class AddFunctionController : Controller() {
             functionColor = model.functionColor
         )
         val xAxis = ConcatenationAxisDTO(
+            id = UUID.randomUUID(),
             name = model.xAxisName,
             backGroundColor = model.xAxisColor,
             delimeterColor = model.xDelimiterColor,
@@ -191,6 +201,7 @@ class AddFunctionController : Controller() {
             zeroPoint = SettingsProvider.getCanvasWidth() / 2
         )
         val yAxis = ConcatenationAxisDTO(
+            id = UUID.randomUUID(),
             name = model.yAxisName,
             backGroundColor = model.yAxisColor,
             delimeterColor = model.yDelimeterColor,

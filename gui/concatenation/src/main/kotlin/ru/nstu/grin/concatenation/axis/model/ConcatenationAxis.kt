@@ -6,6 +6,7 @@ import ru.nstu.grin.common.extensions.toByteArray
 import ru.nstu.grin.common.file.Writer
 import ru.nstu.grin.concatenation.axis.marks.MarksProvider
 import java.io.ObjectOutputStream
+import java.util.*
 
 /**
  * @param zeroPoint - Точка нуля, где он располжен
@@ -13,6 +14,7 @@ import java.io.ObjectOutputStream
  * @param order -
  */
 class ConcatenationAxis(
+    val id: UUID,
     val name: String,
     val zeroPoint: Double,
     val marksProvider: MarksProvider,

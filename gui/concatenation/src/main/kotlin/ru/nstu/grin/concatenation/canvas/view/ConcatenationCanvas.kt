@@ -48,19 +48,19 @@ class ConcatenationCanvas : View() {
 
             onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
             val (cartesianSpace, cartesianSpace2) = GenerateUtils.generateTwoCartesianSpaces()
-            fire(
-                ConcatenationFunctionEvent(
-                    cartesianSpace = cartesianSpace
-                )
-            )
-
-            fire(
-                ConcatenationFunctionEvent(
-                    cartesianSpace = cartesianSpace2
-                )
-            )
+//            fire(
+//                ConcatenationFunctionEvent(
+//                    cartesianSpace = cartesianSpace
+//                )
+//            )
+//
+//            fire(
+//                ConcatenationFunctionEvent(
+//                    cartesianSpace = cartesianSpace2
+//                )
+//            )
         }
-        controller.addFunction()
+//        controller.addFunction()
     }
 
     fun redraw() {

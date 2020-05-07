@@ -24,13 +24,14 @@ class VerticalAxisDrawStrategy(
     ) {
         context.font = Font.font(axis.font, axis.textSize)
         println("Current step ${axisSettings.step}")
-        val zeroPoint = axis.zeroPoint+axis.settings.correlation
-        var drawStepY = "0.0"
+        val zeroPoint = axis.zeroPoint + axis.settings.correlation
         var currentStepY = 0.0
         var currentY = zeroPoint
         val minY = getTopAxisSize() * SettingsProvider.getAxisWidth()
         while (currentY > minY) {
-            val transformed = transformStepLogarithm(currentStepY, axisSettings.isLogarithmic)
+            val stepY = -(currentY - zeroPoint) / axisSettings.pixelCost * axisSettings.step
+            println(stepY)
+            val transformed = transformStepLogarithm(stepY, axisSettings.isLogarithmic)
             context.strokeText(
                 numberFormatter.format(transformed),
                 marksCoordinate - 15.0,
@@ -38,18 +39,17 @@ class VerticalAxisDrawStrategy(
                 MAX_TEXT_WIDTH
             )
 
-            currentY -= SettingsProvider.getMarksInterval()
-            drawStepY = axis.marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
+            currentY -= axis.distanceBetweenMarks
             currentStepY += axisSettings.step
         }
 
-        drawStepY = "0.0"
         currentStepY = 0.0
         currentY = zeroPoint
         val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
         while (currentY < maxY) {
-            if (currentStepY != 0.0) {
-                val transformed = transformStepLogarithm(currentStepY, axisSettings.isLogarithmic)
+            val stepY = -(currentY - zeroPoint) / axisSettings.pixelCost * axisSettings.step
+            if (stepY != 0.0) {
+                val transformed = transformStepLogarithm(stepY, axisSettings.isLogarithmic)
                 context.strokeText(
                     numberFormatter.format(transformed),
                     marksCoordinate - 17.0,
@@ -58,8 +58,7 @@ class VerticalAxisDrawStrategy(
                 )
             }
 
-            currentY += SettingsProvider.getMarksInterval()
-            drawStepY = axis.marksProvider.getNextMark(currentY, zeroPoint, currentStepY, axisSettings.step)
+            currentY += axis.distanceBetweenMarks
             currentStepY -= axisSettings.step
         }
     }

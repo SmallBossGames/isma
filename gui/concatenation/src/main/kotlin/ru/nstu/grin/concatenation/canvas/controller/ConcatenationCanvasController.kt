@@ -77,6 +77,36 @@ class ConcatenationCanvasController : Controller() {
         }
     }
 
+    fun addArrow(event: ConcatenationArrowEvent) {
+        val arrow = ArrowConverter.convert(event.arrow)
+        model.arrows.add(arrow)
+    }
+
+    fun addDescription(event: ConcatenationDescriptionEvent) {
+        val description = DescriptionConverter.convert(event.description)
+        model.descriptions.add(description)
+    }
+
+    fun addConcatenationFunction(event: ConcatenationFunctionEvent) {
+        val cartesianSpace = event.cartesianSpace
+        val found = model.cartesianSpaces.firstOrNull {
+            it.xAxis.name == cartesianSpace.xAxis.name
+                && it.yAxis.name == cartesianSpace.yAxis.name
+        }
+        if (found == null) {
+            val xAxis = cartesianSpace.xAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
+            val yAxis = cartesianSpace.yAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
+            val added = CartesianSpaceConverter.merge(cartesianSpace, xAxis, yAxis)
+            model.cartesianSpaces.add(added)
+        } else {
+            model.cartesianSpaces.remove(found)
+
+            val functions = cartesianSpace.functions.map { ConcatenationFunctionConverter.convert(it) }
+            found.merge(functions)
+            model.cartesianSpaces.add(found)
+        }
+    }
+
     private fun ConcatenationAxisDTO.getOrder(): Int {
         return when (direction.direction) {
             Direction.LEFT -> {
@@ -129,7 +159,7 @@ class ConcatenationCanvasController : Controller() {
         ).openModal(stageStyle = StageStyle.UTILITY)
     }
 
-    private fun clearCanvas() {
+    fun clearCanvas() {
         view.canvas.graphicsContext2D.clearRect(
             0.0, 0.0,
             SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()

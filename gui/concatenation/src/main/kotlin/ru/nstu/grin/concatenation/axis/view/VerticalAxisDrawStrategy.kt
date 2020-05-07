@@ -22,7 +22,7 @@ class VerticalAxisDrawStrategy(
         axis: ConcatenationAxis,
         marksCoordinate: Double
     ) {
-        context.font = Font.font(axis.font)
+        context.font = Font.font(axis.font, axis.textSize)
         println("Current step ${axisSettings.step}")
         val zeroPoint = axis.zeroPoint+axis.settings.correlation
         var drawStepY = "0.0"

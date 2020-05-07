@@ -22,11 +22,11 @@ class HorizontalAxisDrawStrategy(
         axis: ConcatenationAxis,
         marksCoordinate: Double
     ) {
-        context.font = Font.font(axis.font)
+        context.font = Font.font(axis.font, axis.textSize)
         println("CurrentStep x ${canvasSettings.step}")
         var drawStepX = "0.0"
         var currentStepX = 0.0
-        val zeroPoint = axis.zeroPoint+axis.settings.correlation
+        val zeroPoint = axis.zeroPoint + axis.settings.correlation
         val marksProvider = axis.marksProvider
         var currentX = zeroPoint
         val minX = getLeftAxisSize() * SettingsProvider.getAxisWidth()

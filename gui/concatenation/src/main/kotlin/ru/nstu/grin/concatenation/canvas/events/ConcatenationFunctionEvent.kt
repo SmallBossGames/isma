@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.function.events
+package ru.nstu.grin.concatenation.canvas.events
 
 import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
 import tornadofx.FXEvent

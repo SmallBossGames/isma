@@ -12,10 +12,8 @@ import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasControlle
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.concatenation.function.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.canvas.GenerateUtils
-import ru.nstu.grin.concatenation.canvas.events.LoadEvent
-import ru.nstu.grin.concatenation.canvas.events.SaveEvent
+import ru.nstu.grin.concatenation.canvas.events.*
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
@@ -54,24 +52,27 @@ class ConcatenationCanvas : View() {
 
             onMouseReleased = ReleaseMouseHandler(model, chainDrawer)
         }
-
     }
 
     init {
+        subscribe<UpdateAxisEvent> {
+            controller.updateAxis(it)
+        }
+        subscribe<UpdateFunctionEvent> {
+            controller.updateFunction(it)
+        }
         subscribe<ConcatenationArrowEvent> { event ->
             controller.addArrow(event)
         }
         subscribe<ConcatenationFunctionEvent> { event ->
             controller.addConcatenationFunction(event)
         }
-
         subscribe<ConcatenationDescriptionEvent> { event ->
             controller.addDescription(event)
         }
         subscribe<ConcatenationClearCanvasEvent> {
             controller.clearCanvas()
         }
-
         subscribe<SaveEvent> {
             val writer = DrawWriter(it.file)
         }

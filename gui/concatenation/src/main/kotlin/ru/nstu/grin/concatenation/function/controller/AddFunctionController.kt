@@ -7,9 +7,8 @@ import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
 import ru.nstu.grin.concatenation.function.dto.ConcatenationFunctionDTO
-import ru.nstu.grin.concatenation.function.events.ConcatenationFunctionEvent
+import ru.nstu.grin.concatenation.canvas.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
 import tornadofx.Controller
 
@@ -105,7 +104,9 @@ class AddFunctionController : Controller() {
                     yAxis = yAxis
                 )
                 fire(
-                    ConcatenationFunctionEvent(cartesianSpace)
+                    ConcatenationFunctionEvent(
+                        cartesianSpace
+                    )
                 )
             }
             AddFunctionsMode.ADD_TO_NEW_CARTESIAN_SPACES -> {

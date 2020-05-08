@@ -12,6 +12,7 @@ import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.function.controller.DeltaMarksGenerator
 import ru.nstu.grin.concatenation.function.controller.DeltaSizeCalculator
 import ru.nstu.grin.concatenation.function.dto.ConcatenationFunctionDTO
+import ru.nstu.grin.concatenation.function.model.LineType
 import java.awt.Font
 import java.util.*
 import kotlin.math.cos
@@ -33,14 +34,18 @@ object GenerateUtils {
             id = UUID.randomUUID(),
             name = "Test",
             points = generateCircle(radius = 2.0),
-            functionColor = Color.BLACK
+            functionColor = Color.BLACK,
+            lineSize = 20.0,
+            lineType = LineType.POLYNOM
         )
 
         val function2 = ConcatenationFunctionDTO(
             id = UUID.randomUUID(),
             name = "Test",
             points = generateCircle(radius = 2.0),
-            functionColor = Color.BLACK
+            functionColor = Color.BLACK,
+            lineSize = 20.0,
+            lineType = LineType.POLYNOM
         )
 
         val cartesianSpace = CartesianSpaceDTO(

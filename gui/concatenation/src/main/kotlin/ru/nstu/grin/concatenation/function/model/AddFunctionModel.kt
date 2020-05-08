@@ -15,6 +15,15 @@ class AddFunctionModel : ViewModel() {
     var functionNameProperty = SimpleStringProperty(this, "functionName", "Функция номер 1")
     var functionName: String by functionNameProperty
 
+    var functionColorProperty = SimpleObjectProperty(Color.BLACK)
+    var functionColor by functionColorProperty
+
+    var functionLineSizeProperty = SimpleStringProperty("4.0")
+    var functionLineSize by functionLineSizeProperty
+
+    var functionLineTypeProperty = SimpleObjectProperty<LineType>(LineType.POLYNOM)
+    var functionLineType by functionLineTypeProperty
+
     var xDirectionProperty = SimpleObjectProperty(
         ExistDirection(
             Direction.BOTTOM,
@@ -31,8 +40,6 @@ class AddFunctionModel : ViewModel() {
     )
     var yDirection: ExistDirection by yDirectionProperty
 
-    var functionColorProperty = SimpleObjectProperty(Color.BLACK)
-    var functionColor by functionColorProperty
 
     var xAxisNameProperty = SimpleStringProperty(this, "xAxisName", "Ось 1")
     var xAxisName by xAxisNameProperty

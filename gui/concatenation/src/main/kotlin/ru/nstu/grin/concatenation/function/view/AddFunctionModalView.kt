@@ -10,6 +10,7 @@ import ru.nstu.grin.concatenation.function.controller.AddFunctionController
 import ru.nstu.grin.concatenation.function.model.AddFunctionModel
 import ru.nstu.grin.concatenation.function.model.FileFunctionModel
 import ru.nstu.grin.concatenation.function.model.InputWay
+import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import tornadofx.*
 
@@ -38,6 +39,23 @@ class AddFunctionModalView : Fragment() {
         fieldset {
             field("Введите имя функции") {
                 textfield().bind(model.functionNameProperty)
+            }
+            field("Введите размер линий") {
+                textfield().bind(model.functionLineSizeProperty)
+            }
+            field("Выберите как отображать функцию") {
+                combobox(model.functionLineTypeProperty, LineType.values().toList()) {
+                    cellFormat {
+                        text = when (it) {
+                            LineType.POLYNOM -> "Полином"
+                            LineType.DOTES -> "Точки"
+                            LineType.SEGMENTS -> "Сегменты"
+                        }
+                    }
+                }
+            }
+            field("Цвет функций") {
+                colorpicker().bind(model.functionColorProperty)
             }
             field("Шаг рисования") {
                 textfield().bind(model.stepProperty)
@@ -69,86 +87,83 @@ class AddFunctionModalView : Fragment() {
                 }
             }
         }
-
-        fieldset("Ось x") {
-            field("Имя") {
-                textfield().bind(model.xAxisNameProperty)
-            }
-            field("Напрвление") {
-                val default = Direction.values().map {
-                    ExistDirection(
-                        it,
-                        null
-                    )
+        hbox {
+            fieldset("Ось x") {
+                field("Имя") {
+                    textfield().bind(model.xAxisNameProperty)
                 }
-                val existDirections = xExistDirections
-                combobox(model.xDirectionProperty, default + existDirections) {
-                    cellFormat {
-                        text = if (it.functionName != null) {
-                            "Напрвление ${it.direction.name}, функция ${it.functionName}"
-                        } else {
-                            it.direction.name
+                field("Напрвление") {
+                    val default = Direction.values().map {
+                        ExistDirection(
+                            it,
+                            null
+                        )
+                    }
+                    val existDirections = xExistDirections
+                    combobox(model.xDirectionProperty, default + existDirections) {
+                        cellFormat {
+                            text = if (it.functionName != null) {
+                                "Напрвление ${it.direction.name}, функция ${it.functionName}"
+                            } else {
+                                it.direction.name
+                            }
                         }
                     }
                 }
-            }
-            field("расстояние между метками") {
-                textfield().bind(model.xDistanceBetweenMarksProperty)
-            }
-            field("Размер шрифта меток") {
-                textfield().bind(model.xTextSizeProperty)
-            }
-            field("Шрифт") {
-                combobox(model.xFontProperty, Font.getFamilies())
-            }
-        }
-        fieldset("Ось y") {
-            field("Имя") {
-                textfield().bind(model.yAxisNameProperty)
-            }
-            field("Направление") {
-                val default = Direction.values().map {
-                    ExistDirection(
-                        it,
-                        null
-                    )
+                field("расстояние между метками") {
+                    textfield().bind(model.xDistanceBetweenMarksProperty)
                 }
-                val existDirections = yExistDirections
-                combobox(model.yDirectionProperty, default + existDirections) {
-                    cellFormat {
-                        text = if (it.functionName != null) {
-                            "Напрвление ${it.direction.name}, функция ${it.functionName}"
-                        } else {
-                            it.direction.name
+                field("Размер шрифта меток") {
+                    textfield().bind(model.xTextSizeProperty)
+                }
+                field("Шрифт") {
+                    combobox(model.xFontProperty, Font.getFamilies())
+                }
+                field("Цвет x оси") {
+                    colorpicker().bind(model.xAxisColorProperty)
+                }
+                field("Цвет дельт оси x") {
+                    colorpicker().bind(model.xDelimeterColorProperty)
+                }
+            }
+            spacing = 20.0
+            fieldset("Ось y") {
+                field("Имя") {
+                    textfield().bind(model.yAxisNameProperty)
+                }
+                field("Направление") {
+                    val default = Direction.values().map {
+                        ExistDirection(
+                            it,
+                            null
+                        )
+                    }
+                    val existDirections = yExistDirections
+                    combobox(model.yDirectionProperty, default + existDirections) {
+                        cellFormat {
+                            text = if (it.functionName != null) {
+                                "Напрвление ${it.direction.name}, функция ${it.functionName}"
+                            } else {
+                                it.direction.name
+                            }
                         }
                     }
                 }
-            }
-            field("Расстояние между метками") {
-                textfield().bind(model.yDistanceBetweenMarksProperty)
-            }
-            field("Размер шрифта меток") {
-                textfield().bind(model.yTextSizeProperty)
-            }
-            field("Шрифт") {
-                combobox(model.yFontProperty, Font.getFamilies())
-            }
-        }
-        fieldset("Цвета") {
-            field("Цвет функций") {
-                colorpicker().bind(model.functionColorProperty)
-            }
-            field("Цвет x оси") {
-                colorpicker().bind(model.xAxisColorProperty)
-            }
-            field("Цвет дельт оси x") {
-                colorpicker().bind(model.xDelimeterColorProperty)
-            }
-            field("Цвет y оси") {
-                colorpicker().bind(model.yAxisColorProperty)
-            }
-            field("Цвте дельт оси y") {
-                colorpicker().bind(model.yDelimiterColorProperty)
+                field("Расстояние между метками") {
+                    textfield().bind(model.yDistanceBetweenMarksProperty)
+                }
+                field("Размер шрифта меток") {
+                    textfield().bind(model.yTextSizeProperty)
+                }
+                field("Шрифт") {
+                    combobox(model.yFontProperty, Font.getFamilies())
+                }
+                field("Цвет y оси") {
+                    colorpicker().bind(model.yAxisColorProperty)
+                }
+                field("Цвте дельт оси y") {
+                    colorpicker().bind(model.yDelimiterColorProperty)
+                }
             }
         }
         button("OK") {

@@ -16,7 +16,9 @@ data class ConcatenationFunction(
     val id: UUID,
     val name: String,
     val points: List<Point>,
-    val functionColor: Color
+    val functionColor: Color,
+    val lineSize: Double,
+    val lineType: LineType
 ) : Writer {
     fun getShape(): Shape {
         return Line(0.0, 10.0, 0.0, 20.0)

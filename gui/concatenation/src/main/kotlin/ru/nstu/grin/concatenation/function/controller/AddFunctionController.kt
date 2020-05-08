@@ -43,7 +43,9 @@ class AddFunctionController : Controller() {
                     null
                 }
             },
-            functionColor = model.functionColor
+            functionColor = model.functionColor,
+            lineType = model.functionLineType,
+            lineSize = model.functionLineSize.toDouble()
         )
 
         val cartesianSpace = CartesianSpaceDTO(
@@ -106,7 +108,9 @@ class AddFunctionController : Controller() {
                                 null
                             }
                         },
-                        functionColor = model.functionColor
+                        functionColor = model.functionColor,
+                        lineType = model.functionLineType,
+                        lineSize = model.functionLineSize.toDouble()
                     )
                 }
                 val cartesianSpace = CartesianSpaceDTO(
@@ -132,7 +136,9 @@ class AddFunctionController : Controller() {
                                 null
                             }
                         },
-                        functionColor = model.functionColor
+                        functionColor = model.functionColor,
+                        lineType = model.functionLineType,
+                        lineSize = model.functionLineSize.toDouble()
                     )
                     val xAxis = createXAxis()
                     val yAxis = createYAxis()
@@ -202,7 +208,9 @@ class AddFunctionController : Controller() {
                     null
                 }
             },
-            functionColor = model.functionColor
+            functionColor = model.functionColor,
+            lineType = model.functionLineType,
+            lineSize = model.functionLineSize.toDouble()
         )
         val xAxis = ConcatenationAxisDTO(
             id = UUID.randomUUID(),

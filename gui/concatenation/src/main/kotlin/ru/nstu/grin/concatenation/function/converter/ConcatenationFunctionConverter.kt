@@ -10,7 +10,9 @@ object ConcatenationFunctionConverter : Converter<ConcatenationFunctionDTO, Conc
             id = source.id,
             name = source.name,
             points = source.points,
-            functionColor = source.functionColor
+            functionColor = source.functionColor,
+            lineSize = source.lineSize,
+            lineType = source.lineType
         )
     }
 }

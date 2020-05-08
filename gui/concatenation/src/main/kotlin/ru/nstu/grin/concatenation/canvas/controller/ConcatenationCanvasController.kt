@@ -68,6 +68,21 @@ class ConcatenationCanvasController : Controller() {
             val event = GetAxisEvent(axis)
             fire(event)
         }
+        subscribe<GetAllAxisQuery> {
+            val axises = model.cartesianSpaces.map {
+                listOf(it.xAxis, it.yAxis)
+            }.flatten()
+            val event = GetAllAxisesEvent(axises)
+            fire(event)
+        }
+        subscribe<GetAllFunctionsQuery> {
+            val functions = model.cartesianSpaces.map {
+                it.functions
+            }.flatten()
+            val event = GetAllFunctionsEvent(functions)
+            fire(event)
+        }
+        addFunction()
     }
 
     private fun findAxisById(id: UUID): ConcatenationAxis {

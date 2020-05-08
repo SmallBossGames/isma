@@ -16,19 +16,24 @@ class ConcatenationView : View() {
 
     override val root: Parent = vbox {
         menubar {
-            menu("File") {
-                item("Save as").action {
+            menu("Файл") {
+                item("Сохранить как").action {
                     val file = chooseFile("Файл", arrayOf(), FileChooserMode.Save).first()
                     fire(SaveEvent(file))
                 }
-                item("Load").action {
+                item("Загрузить").action {
                     val file = chooseFile("Файл", arrayOf(), FileChooserMode.Single).first()
                     fire(LoadEvent(file))
                 }
             }
-            menu("Canvas") {
-                item("Clear all").action {
+            menu("Канвас") {
+                item("Очистить все").action {
                     fire(ConcatenationClearCanvasEvent)
+                }
+            }
+            menu("Элементы") {
+                item("Открыть окно с элементами").action {
+                    find<ElementsView>().openModal()
                 }
             }
         }

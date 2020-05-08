@@ -68,6 +68,12 @@ class ConcatenationCanvasController : Controller() {
             val event = GetAxisEvent(axis)
             fire(event)
         }
+        subscribe<FunctionQuery> { event ->
+            val function = model.cartesianSpaces.map {
+                it.functions
+            }.flatten().first { it.id == event.id }
+            fire(GetFunctionEvent(function))
+        }
         subscribe<GetAllAxisQuery> {
             val axises = model.cartesianSpaces.map {
                 listOf(it.xAxis, it.yAxis)
@@ -149,6 +155,16 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun updateFunction(event: UpdateFunctionEvent) {
+        println("Function updated")
+        val function = model.cartesianSpaces.map {
+            it.functions
+        }.flatten().first { it.id == event.id }
+
+        function.name = event.name
+        function.functionColor = event.color
+        function.lineSize = event.lineSize
+        function.lineType = event.lineType
+        view.redraw()
     }
 
     private fun ConcatenationAxisDTO.getOrder(): Int {

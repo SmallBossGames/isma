@@ -14,11 +14,11 @@ import java.util.*
  */
 data class ConcatenationFunction(
     val id: UUID,
-    val name: String,
+    var name: String,
     val points: List<Point>,
-    val functionColor: Color,
-    val lineSize: Double,
-    val lineType: LineType
+    var functionColor: Color,
+    var lineSize: Double,
+    var lineType: LineType
 ) : Writer {
     fun getShape(): Shape {
         return Line(0.0, 10.0, 0.0, 20.0)

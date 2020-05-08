@@ -24,4 +24,6 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>() {
 
     val contextMenuSettings =
         ContextMenuSettings(ContextMenuType.NONE, 0.0, 0.0)
+
+    val selectionSettings = SelectionSettings()
 }

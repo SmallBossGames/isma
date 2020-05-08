@@ -73,5 +73,7 @@ class ConcatenationChainDrawer(
             this,
             scope
         ).draw(context)
+
+        SelectionDrawElement(model.selectionSettings).draw(context)
     }
 }

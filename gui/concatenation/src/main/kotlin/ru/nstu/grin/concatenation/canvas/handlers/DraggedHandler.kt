@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.canvas.handlers
 
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
+import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.model.DraggedSettings
@@ -14,8 +15,16 @@ class DraggedHandler(
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
 
     override fun handle(event: MouseEvent) {
+        if (event.isPrimaryButtonDown) {
+            println("Primary button down dragged")
+            model.selectionSettings.secondPoint = Point(event.x, event.y)
+            chainDrawer.draw()
+        }
         if (model.pointToolTipSettings.isShow) return
-        if (!event.isPrimaryButtonDown) return
+        if (!event.isPrimaryButtonDown) {
+            model.selectionSettings.isSelected = false
+            return
+        }
 
         val axises = model.cartesianSpaces.map {
             listOf(it.xAxis, it.yAxis)

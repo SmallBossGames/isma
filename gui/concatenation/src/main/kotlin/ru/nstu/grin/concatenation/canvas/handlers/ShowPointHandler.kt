@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
+import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
@@ -13,6 +14,11 @@ class ShowPointHandler(
     private val chainDrawer: ConcatenationChainDrawer
 ) : EventHandler<MouseEvent> {
     override fun handle(event: MouseEvent) {
+        if (event.button == MouseButton.PRIMARY) {
+            println("Pressed primary button")
+            model.selectionSettings.isSelected = true
+            model.selectionSettings.firstPoint = Point(event.x, event.y)
+        }
         if (event.button == MouseButton.SECONDARY) {
             println("Set to false")
             model.pointToolTipSettings.isShow = false

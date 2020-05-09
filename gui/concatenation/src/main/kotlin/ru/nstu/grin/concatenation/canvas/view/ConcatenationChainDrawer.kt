@@ -52,7 +52,8 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
             ConcatenationFunctionDrawElement(
                 cartesianSpace.functions,
                 cartesianSpace.xAxis,
-                cartesianSpace.yAxis
+                cartesianSpace.yAxis,
+                model.cartesianSpaces
             ).draw(context)
             AxisDrawElement(
                 cartesianSpace.xAxis,

@@ -7,6 +7,9 @@ data class AxisSettings(
 
     var step: Double = 1.0,
 
+    var min: Double = -14.0,
+    var max: Double = 14.0,
+
     var isLogarithmic: Boolean = false,
     var logarithmBase: Double = 10.0
 )

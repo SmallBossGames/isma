@@ -8,6 +8,9 @@ import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import kotlin.contracts.contract
+import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 class HorizontalAxisDrawStrategy(
@@ -24,12 +27,23 @@ class HorizontalAxisDrawStrategy(
         context.font = Font.font(axis.font, axis.textSize)
         val minPixelX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
         val maxPixelX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
-        val zeroPoint = axis.zeroPoint + axis.settings.correlation
+
+        val sum = axis.settings.max + abs(axisSettings.min)
+        val sumPixel = maxPixelX - minPixelX
+        val price = sumPixel / sum
+        val zeroPixel = axis.settings.min.absoluteValue * price + minPixelX
+
         var currentX = minPixelX
         while (currentX < maxPixelX) {
-            val stepX = (currentX - zeroPoint) / axisSettings.pixelCost * axisSettings.step
+            val stepX = axis.settings.min + (currentX - minPixelX) / price
+
             val transformed = transformStepLogarithm(stepX, axisSettings.isLogarithmic)
-            println(transformed)
+            if (axis.settings.max > 0 && axis.settings.min < 0) {
+                if ((currentX-zeroPixel).absoluteValue<axis.distanceBetweenMarks) {
+                    currentX += axis.distanceBetweenMarks
+                    continue
+                }
+            }
             context.strokeText(
                 numberFormatter.format(transformed),
                 currentX,
@@ -37,6 +51,16 @@ class HorizontalAxisDrawStrategy(
                 MAX_TEXT_WIDTH
             )
             currentX += axis.distanceBetweenMarks
+        }
+
+        if (axis.settings.max > 0 && axis.settings.min < 0) {
+            println("Draw zero")
+            context.strokeText(
+                numberFormatter.format(0.0),
+                zeroPixel,
+                marksCoordinate,
+                MAX_TEXT_WIDTH
+            )
         }
     }
 

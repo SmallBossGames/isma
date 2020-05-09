@@ -29,32 +29,30 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
             println("Up")
 
             if (scaleSettings.upRemaining <= 0) {
-                axis.settings.step = axis.settings.step / 2
+                axis.settings.min += DELTA
+                axis.settings.max -= DELTA
                 scaleSettings.upRemaining =
                     TIMES_TO_SCROLL
                 scaleSettings.downRemaining =
                     TIMES_TO_SCROLL
-                axis.settings.pixelCost = 40.0
                 scaleSettings.delta = axis.settings.pixelCost / DELTA_DELIMITER
                 return
             }
-            axis.settings.pixelCost += scaleSettings.delta
         } else {
             println("Down")
             scaleSettings.downRemaining--
             scaleSettings.upRemaining++
 
             if (scaleSettings.downRemaining <= 0) {
-                axis.settings.step = axis.settings.step * 2
+                axis.settings.min -= DELTA
+                axis.settings.max += DELTA
                 scaleSettings.downRemaining =
                     TIMES_TO_SCROLL
                 scaleSettings.upRemaining =
                     TIMES_TO_SCROLL
-                axis.settings.pixelCost = 40.0
                 scaleSettings.delta = axis.settings.pixelCost / DELTA_DELIMITER
                 return
             }
-            axis.settings.pixelCost -= scaleSettings.delta
         }
         currentCanvasSettings[axis] = scaleSettings
         chainDrawer.draw()
@@ -67,7 +65,8 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
     }
 
     private companion object {
-        const val TIMES_TO_SCROLL = 5L
+        const val DELTA = 0.3
+        const val TIMES_TO_SCROLL = 3L
         const val DELTA_DELIMITER = 10L
     }
 }

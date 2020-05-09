@@ -4,11 +4,13 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.text.Font
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
-import ru.nstu.grin.concatenation.axis.marks.MarksProvider
 import ru.nstu.grin.concatenation.axis.model.AxisSettings
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.concatenation.axis.model.Direction
+import java.lang.IllegalArgumentException
+import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 class VerticalAxisDrawStrategy(
@@ -24,14 +26,28 @@ class VerticalAxisDrawStrategy(
     ) {
         context.font = Font.font(axis.font, axis.textSize)
         println("Current step ${axisSettings.step}")
-        val zeroPoint = axis.zeroPoint + axis.settings.correlation
-        var currentStepY = 0.0
-        var currentY = zeroPoint
-        val minY = getTopAxisSize() * SettingsProvider.getAxisWidth()
-        while (currentY > minY) {
-            val stepY = -(currentY - zeroPoint) / axisSettings.pixelCost * axisSettings.step
-            println(stepY)
+        val minYPixel = getTopAxisSize() * SettingsProvider.getAxisWidth()
+        val maxYPixel = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+
+        val pixelLength = maxYPixel - minYPixel
+        val unitLength = axis.settings.max - axisSettings.min
+        val priceUnit = pixelLength / unitLength
+
+        var currentY = maxYPixel
+        val zeroPixel = axis.settings.min.absoluteValue * priceUnit + minYPixel
+
+        while (currentY > minYPixel) {
+            val stepY = (axis.settings.min + (maxYPixel - currentY) / priceUnit)
             val transformed = transformStepLogarithm(stepY, axisSettings.isLogarithmic)
+
+            if (axis.settings.max > 0 && axis.settings.min < 0) {
+                if ((currentY - zeroPixel).absoluteValue < (axis.distanceBetweenMarks/2)) {
+                    println("Handled")
+                    currentY -= axis.distanceBetweenMarks
+                    continue
+                }
+            }
+
             context.strokeText(
                 numberFormatter.format(transformed),
                 marksCoordinate - 15.0,
@@ -40,26 +56,16 @@ class VerticalAxisDrawStrategy(
             )
 
             currentY -= axis.distanceBetweenMarks
-            currentStepY += axisSettings.step
         }
 
-        currentStepY = 0.0
-        currentY = zeroPoint
-        val maxY = SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-        while (currentY < maxY) {
-            val stepY = -(currentY - zeroPoint) / axisSettings.pixelCost * axisSettings.step
-            if (stepY != 0.0) {
-                val transformed = transformStepLogarithm(stepY, axisSettings.isLogarithmic)
-                context.strokeText(
-                    numberFormatter.format(transformed),
-                    marksCoordinate - 17.0,
-                    currentY,
-                    MAX_TEXT_WIDTH
-                )
-            }
-
-            currentY += axis.distanceBetweenMarks
-            currentStepY -= axisSettings.step
+        if (axis.settings.max > 0 && axis.settings.min < 0) {
+            println("Draw zero")
+            context.strokeText(
+                numberFormatter.format(0.0),
+                marksCoordinate - 15.0,
+                    zeroPixel,
+                MAX_TEXT_WIDTH
+            )
         }
     }
 

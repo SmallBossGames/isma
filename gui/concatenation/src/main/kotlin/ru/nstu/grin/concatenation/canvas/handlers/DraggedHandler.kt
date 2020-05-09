@@ -52,10 +52,12 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         if (axis.isXAxis()) {
             when {
                 event.x < draggedSettings.lastX -> {
-                    axis.settings.correlation -= DELTA
+                    axis.settings.min -= DELTA
+                    axis.settings.max -= DELTA
                 }
                 event.x > draggedSettings.lastX -> {
-                    axis.settings.correlation += DELTA
+                    axis.settings.min += DELTA
+                    axis.settings.max += DELTA
                 }
                 else -> {
                 }
@@ -63,10 +65,12 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         } else {
             when {
                 event.y < draggedSettings.lastY -> {
-                    axis.settings.correlation -= DELTA
+                    axis.settings.min -= DELTA
+                    axis.settings.max -= DELTA
                 }
                 event.y > draggedSettings.lastY -> {
-                    axis.settings.correlation += DELTA
+                    axis.settings.min += DELTA
+                    axis.settings.max += DELTA
                 }
                 else -> {
                 }
@@ -83,6 +87,6 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private companion object {
-        const val DELTA = 2.5
+        const val DELTA = 0.5
     }
 }

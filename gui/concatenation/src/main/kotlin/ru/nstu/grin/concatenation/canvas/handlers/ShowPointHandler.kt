@@ -8,11 +8,15 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.common.model.PointSettings
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import tornadofx.Controller
 
-class ShowPointHandler(
-    private val model: ConcatenationCanvasModelViewModel,
-    private val chainDrawer: ConcatenationChainDrawer
-) : EventHandler<MouseEvent> {
+class ShowPointHandler : EventHandler<MouseEvent>, Controller() {
+    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val chainDrawer: ConcatenationChainDrawer by inject()
+    private val concatenationViewModel: ConcatenationViewModel by inject()
+
+
     override fun handle(event: MouseEvent) {
         if (event.button == MouseButton.PRIMARY) {
             println("Pressed primary button")

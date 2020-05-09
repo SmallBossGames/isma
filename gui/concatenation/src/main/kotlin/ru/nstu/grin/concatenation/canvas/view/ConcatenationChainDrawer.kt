@@ -8,20 +8,21 @@ import ru.nstu.grin.common.draw.elements.*
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
+import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
-import tornadofx.Scope
+import tornadofx.Controller
 
-class ConcatenationChainDrawer(
-    private val canvas: Canvas,
-    private val model: ConcatenationCanvasModelViewModel,
-    private val controller: ConcatenationCanvasController,
-    private val scope: Scope
-) : ChainDrawer {
+class ConcatenationChainDrawer : ChainDrawer, Controller() {
+    private val canvasModel: CanvasModel by inject()
+    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val controller: ConcatenationCanvasController by inject()
+
     private val pointToolTips = mutableListOf<Tooltip>()
     private val contextMenu = ContextMenu()
 
     override fun draw() {
+        val canvas = canvasModel.canvas
         val context = canvas.graphicsContext2D
         ClearDrawElement().draw(context)
         ArrowDrawElement(model.arrows, 1.0).draw(context)

@@ -17,6 +17,7 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.GenerateUtils
 import ru.nstu.grin.concatenation.canvas.events.*
+import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
@@ -28,6 +29,7 @@ import tornadofx.*
 import java.util.*
 
 class ConcatenationCanvasController : Controller() {
+    private val canvasModel: CanvasModel by inject()
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val view: ConcatenationCanvas by inject()
 
@@ -220,7 +222,7 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun clearCanvas() {
-        view.canvas.graphicsContext2D.clearRect(
+        canvasModel.canvas.graphicsContext2D.clearRect(
             0.0, 0.0,
             SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
         )

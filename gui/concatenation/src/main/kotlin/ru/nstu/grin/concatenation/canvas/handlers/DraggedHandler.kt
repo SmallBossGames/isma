@@ -7,11 +7,11 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.model.DraggedSettings
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import tornadofx.Controller
 
-class DraggedHandler(
-    val model: ConcatenationCanvasModelViewModel,
-    private val chainDrawer: ConcatenationChainDrawer
-) : EventHandler<MouseEvent> {
+class DraggedHandler : EventHandler<MouseEvent>, Controller() {
+    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val chainDrawer: ConcatenationChainDrawer by inject()
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
 
     override fun handle(event: MouseEvent) {

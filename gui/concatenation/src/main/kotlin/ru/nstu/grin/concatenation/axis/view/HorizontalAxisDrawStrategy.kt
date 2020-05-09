@@ -22,46 +22,21 @@ class HorizontalAxisDrawStrategy(
         marksCoordinate: Double
     ) {
         context.font = Font.font(axis.font, axis.textSize)
-        println("CurrentStep x ${axisSettings.step}")
-        var drawStepX = "0.0"
-        var currentStepX = 0.0
+        val minPixelX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
+        val maxPixelX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
         val zeroPoint = axis.zeroPoint + axis.settings.correlation
-        val marksProvider = axis.marksProvider
-        var currentX = zeroPoint
-        val minX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
-        while (currentX > minX) {
+        var currentX = minPixelX
+        while (currentX < maxPixelX) {
             val stepX = (currentX - zeroPoint) / axisSettings.pixelCost * axisSettings.step
             val transformed = transformStepLogarithm(stepX, axisSettings.isLogarithmic)
+            println(transformed)
             context.strokeText(
                 numberFormatter.format(transformed),
                 currentX,
                 marksCoordinate,
                 MAX_TEXT_WIDTH
             )
-
-            currentX -= axis.distanceBetweenMarks
-            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, axisSettings.step)
-            currentStepX -= axisSettings.step
-        }
-
-        drawStepX = "0.0"
-        currentStepX = 0.0
-        currentX = zeroPoint
-        val maxX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
-        while (currentX < maxX) {
-            val stepX = (currentX - zeroPoint) / axisSettings.pixelCost * axisSettings.step
-
-            val transformed = transformStepLogarithm(stepX, axisSettings.isLogarithmic)
-            context.strokeText(
-                numberFormatter.format(transformed),
-                currentX,
-                marksCoordinate,
-                MAX_TEXT_WIDTH
-            )
-
             currentX += axis.distanceBetweenMarks
-            drawStepX = marksProvider.getNextMark(currentX, zeroPoint, currentStepX, axisSettings.step)
-            currentStepX += axisSettings.step
         }
     }
 

@@ -26,7 +26,6 @@ class ConcatenationCanvas : View() {
     private val showPointHandler: ShowPointHandler by inject()
     private val releaseMouseHandler: ReleaseMouseHandler by inject()
 
-
     override val root: Parent = stackpane {
         canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
             vgrow = Priority.ALWAYS

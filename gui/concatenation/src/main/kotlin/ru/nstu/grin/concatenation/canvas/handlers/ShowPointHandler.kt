@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.common.model.PointSettings
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditMode
 import tornadofx.Controller
 
 class ShowPointHandler : EventHandler<MouseEvent>, Controller() {
@@ -16,13 +17,17 @@ class ShowPointHandler : EventHandler<MouseEvent>, Controller() {
     private val chainDrawer: ConcatenationChainDrawer by inject()
     private val concatenationViewModel: ConcatenationViewModel by inject()
 
-
     override fun handle(event: MouseEvent) {
-        if (event.button == MouseButton.PRIMARY) {
-            println("Pressed primary button")
-            model.selectionSettings.isSelected = true
-            model.selectionSettings.firstPoint = Point(event.x, event.y)
+        val editMode = concatenationViewModel.currentEditMode
+
+        if (editMode == EditMode.SCALE) {
+            if (event.button == MouseButton.PRIMARY) {
+                println("Pressed primary button")
+                model.selectionSettings.isSelected = true
+                model.selectionSettings.firstPoint = Point(event.x, event.y)
+            }
         }
+
         if (event.button == MouseButton.SECONDARY) {
             println("Set to false")
             model.pointToolTipSettings.isShow = false

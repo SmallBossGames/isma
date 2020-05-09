@@ -7,19 +7,29 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.model.DraggedSettings
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditMode
 import tornadofx.Controller
 
 class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
+    private val concatenationViewModel: ConcatenationViewModel by inject()
 
     override fun handle(event: MouseEvent) {
-        if (event.isPrimaryButtonDown) {
-            println("Primary button down dragged")
-            model.selectionSettings.secondPoint = Point(event.x, event.y)
-            chainDrawer.draw()
+        val editMode = concatenationViewModel.currentEditMode
+        if (editMode == EditMode.SCALE) {
+            if (event.isPrimaryButtonDown) {
+                println("Primary button down dragged")
+                model.selectionSettings.secondPoint = Point(event.x, event.y)
+                chainDrawer.draw()
+            }
+            if (!event.isPrimaryButtonDown) {
+                model.selectionSettings.isSelected = false
+            }
         }
+
         if (model.pointToolTipSettings.isShow) return
         if (!event.isPrimaryButtonDown) {
             model.selectionSettings.isSelected = false

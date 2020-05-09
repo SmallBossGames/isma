@@ -51,6 +51,18 @@ class ConcatenationView : View() {
                 }
             }
             button {
+                val image = Image("scale-tool.png")
+                val imageView = ImageView(image)
+                imageView.fitHeight = 20.0
+                imageView.fitWidth = 20.0
+                graphic = imageView
+                tooltip = Tooltip("Скалирование")
+
+                action {
+                    model.currentEditMode = EditMode.SCALE
+                }
+            }
+            button {
                 val image = Image("edit-tool.png")
                 val imageView = ImageView(image)
                 imageView.setFitHeight(20.0)

@@ -4,7 +4,6 @@ import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.axis.model.AxisSettings
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import tornadofx.Controller
 import java.lang.IllegalArgumentException
 import kotlin.math.absoluteValue
@@ -21,11 +20,11 @@ class MatrixTransformerController : Controller() {
         val sumPixel = maxPixel - minPixel
         val unitPrice = sumPixel / sumUnits
 
-        return when(direction) {
-            Direction.LEFT ,Direction.RIGHT -> {
-                min+(maxPixel-number)/unitPrice
+        return when (direction) {
+            Direction.LEFT, Direction.RIGHT -> {
+                min + (maxPixel - number) / unitPrice
             }
-            Direction.TOP ,Direction.BOTTOM -> {
+            Direction.TOP, Direction.BOTTOM -> {
                 min + (number - minPixel) / unitPrice
             }
         }

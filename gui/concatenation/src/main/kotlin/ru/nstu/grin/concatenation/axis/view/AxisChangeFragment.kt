@@ -5,7 +5,6 @@ import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.canvas.events.AxisQuery
-import ru.nstu.grin.concatenation.canvas.events.GetAxisEvent
 import ru.nstu.grin.concatenation.canvas.events.UpdateAxisEvent
 import tornadofx.*
 import java.util.*

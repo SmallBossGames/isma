@@ -10,7 +10,7 @@ data class SelectionSettings(
     fun dropToDefault() {
         isSelected = false
         firstPoint = Point(0.0, 0.0)
-        secondPoint = Point(0.0, 0.0)
+        secondPoint = Point(-1.0, -1.0)
     }
 
     fun getArea(): Double {

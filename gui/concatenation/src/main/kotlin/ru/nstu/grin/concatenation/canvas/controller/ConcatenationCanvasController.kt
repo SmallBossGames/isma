@@ -87,6 +87,7 @@ class ConcatenationCanvasController : Controller() {
             val event = GetAllFunctionsEvent(functions)
             fire(event)
         }
+        addFunction()
     }
 
     private fun findAxisById(id: UUID): ConcatenationAxis {

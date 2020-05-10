@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.scene.canvas.Canvas
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
@@ -17,6 +16,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val canvasModel: CanvasModel by inject()
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val controller: ConcatenationCanvasController by inject()
+    private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
 
     private val pointToolTips = mutableListOf<Tooltip>()
     private val contextMenu = ContextMenu()
@@ -48,13 +48,9 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
             }
         }
 
+        functionDrawElement.draw(context)
+
         for (cartesianSpace in model.cartesianSpaces) {
-            ConcatenationFunctionDrawElement(
-                cartesianSpace.functions,
-                cartesianSpace.xAxis,
-                cartesianSpace.yAxis,
-                model.cartesianSpaces
-            ).draw(context)
             AxisDrawElement(
                 cartesianSpace.xAxis,
                 cartesianSpace.yAxis,

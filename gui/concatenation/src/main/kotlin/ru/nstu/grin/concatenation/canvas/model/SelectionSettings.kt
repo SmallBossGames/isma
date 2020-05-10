@@ -12,4 +12,36 @@ data class SelectionSettings(
         firstPoint = Point(0.0, 0.0)
         secondPoint = Point(0.0, 0.0)
     }
+
+    fun getMinX(): Double {
+        return if (firstPoint.x < secondPoint.x) {
+            firstPoint.x
+        } else {
+            secondPoint.x
+        }
+    }
+
+    fun getMaxX(): Double {
+        return if (firstPoint.x > secondPoint.x) {
+            firstPoint.x
+        } else {
+            secondPoint.x
+        }
+    }
+
+    fun getMinY(): Double {
+        return if (firstPoint.y < secondPoint.y) {
+            firstPoint.y
+        } else {
+            secondPoint.y
+        }
+    }
+
+    fun getMaxY(): Double {
+        return if (firstPoint.y > secondPoint.y) {
+            firstPoint.y
+        } else {
+            secondPoint.y
+        }
+    }
 }

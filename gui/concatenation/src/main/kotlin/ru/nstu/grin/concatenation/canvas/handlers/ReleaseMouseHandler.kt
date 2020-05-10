@@ -19,6 +19,11 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
         if (editMode == EditMode.SCALE) {
             if (event.button == MouseButton.PRIMARY) {
                 println("Release primary button")
+
+                for(cartesianSpace in model.cartesianSpaces) {
+
+                }
+
                 model.selectionSettings.dropToDefault()
             }
         }

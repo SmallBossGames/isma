@@ -74,9 +74,18 @@ class ContextMenuDrawElement(
                     }
                 }
 
+                val hideMenu = MenuItem("Спрятать все функции")
+                hideMenu.action {
+                    for (function in cartesianSpace.functions) {
+                        function.isHide = true
+                    }
+                    chainDrawer.draw()
+                }
+
                 contextMenu.items.add(menu)
                 contextMenu.items.add(gridItem)
                 contextMenu.items.add(changeAxis)
+                contextMenu.items.add(hideMenu)
                 contextMenu.show(context.canvas, stage.x + settings.xGraphic, stage.y + settings.yGraphic)
             }
             ContextMenuType.MAIN -> {

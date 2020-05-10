@@ -31,6 +31,9 @@ class FunctionListView : Fragment() {
                     fieldset("Тип рисовки") {
                         label(it.lineType.toString())
                     }
+                    fieldset("Отображается") {
+                        label(if (it.isHide) "Нет" else "Да")
+                    }
                 }
                 button {
                     action {

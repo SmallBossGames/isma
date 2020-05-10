@@ -1,6 +1,8 @@
 package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.Parent
+import ru.nstu.grin.concatenation.canvas.events.AxisQuery
+import ru.nstu.grin.concatenation.canvas.events.FunctionQuery
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
 import ru.nstu.grin.concatenation.function.model.LineType
@@ -25,6 +27,9 @@ class ChangeFunctionFragment : Fragment() {
             field("Размер линии") {
                 textfield().bind(model.lineSizeProperty)
             }
+            field("Отображать ли функцию") {
+                checkbox().bind(model.isHideProperty)
+            }
             field("Вид линии") {
                 combobox(model.lineTypeProperty, LineType.values().toList()) {
                     cellFormat {
@@ -46,5 +51,9 @@ class ChangeFunctionFragment : Fragment() {
                 }
             }
         }
+    }
+
+    init {
+        fire(FunctionQuery(functionId))
     }
 }

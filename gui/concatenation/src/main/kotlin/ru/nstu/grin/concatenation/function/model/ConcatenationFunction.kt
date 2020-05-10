@@ -16,6 +16,7 @@ data class ConcatenationFunction(
     val id: UUID,
     var name: String,
     val points: List<Point>,
+    var isHide: Boolean = false,
     var functionColor: Color,
     var lineSize: Double,
     var lineType: LineType

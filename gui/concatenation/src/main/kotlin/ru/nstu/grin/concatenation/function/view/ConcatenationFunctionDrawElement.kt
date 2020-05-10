@@ -17,6 +17,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     override fun draw(context: GraphicsContext) {
         for (cartesianSpace in model.cartesianSpaces) {
             for (function in cartesianSpace.functions) {
+                if (function.isHide) continue
                 context.stroke = function.functionColor
                 transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis)
 

@@ -10,5 +10,6 @@ data class UpdateFunctionEvent(
     val name: String,
     val color: Color,
     val lineSize: Double,
-    val lineType: LineType
+    val lineType: LineType,
+    val isHide: Boolean
 ) : FXEvent()

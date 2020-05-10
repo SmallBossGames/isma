@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.function.model
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
@@ -18,4 +19,7 @@ class ChangeFunctionModel : ViewModel() {
 
     var lineTypeProperty = SimpleObjectProperty<LineType>()
     var lineType by lineTypeProperty
+
+    var isHideProperty = SimpleBooleanProperty()
+    var isHide by isHideProperty
 }

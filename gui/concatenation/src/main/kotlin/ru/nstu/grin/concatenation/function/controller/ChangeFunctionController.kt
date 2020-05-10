@@ -18,9 +18,9 @@ class ChangeFunctionController : Controller() {
                 model.functionColor = it.function.functionColor
                 model.lineSize = it.function.lineSize.toString()
                 model.lineType = it.function.lineType
+                model.isHide = !it.function.isHide
             }
         }
-        fire(FunctionQuery(functionId))
     }
 
     fun updateFunction() {
@@ -29,7 +29,8 @@ class ChangeFunctionController : Controller() {
             name = model.name,
             color = model.functionColor,
             lineType = model.lineType,
-            lineSize = model.lineSize.toDouble()
+            lineSize = model.lineSize.toDouble(),
+            isHide = !model.isHide
         )
         fire(event)
     }

@@ -161,6 +161,7 @@ class ConcatenationCanvasController : Controller() {
 
         function.name = event.name
         function.functionColor = event.color
+        function.isHide = event.isHide
         function.lineSize = event.lineSize
         function.lineType = event.lineType
         view.redraw()

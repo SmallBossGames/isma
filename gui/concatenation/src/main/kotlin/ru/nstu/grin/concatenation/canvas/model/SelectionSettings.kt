@@ -5,12 +5,17 @@ import ru.nstu.grin.common.model.Point
 data class SelectionSettings(
     var isSelected: Boolean = false,
     var firstPoint: Point = Point(0.0, 0.0),
-    var secondPoint: Point = Point(0.0, 0.0)
+    var secondPoint: Point = Point(-1.0, -1.0)
 ) {
     fun dropToDefault() {
         isSelected = false
         firstPoint = Point(0.0, 0.0)
         secondPoint = Point(0.0, 0.0)
+    }
+
+    fun getArea(): Double {
+        if (secondPoint.x == -1.0 || secondPoint.y == -1.0) return 0.0
+        return (getMaxY() - getMinY()) * (getMaxX() - getMinX())
     }
 
     fun getMinX(): Double {

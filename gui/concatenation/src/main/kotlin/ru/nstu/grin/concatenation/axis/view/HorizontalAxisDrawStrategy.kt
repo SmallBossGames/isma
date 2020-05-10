@@ -2,20 +2,14 @@ package ru.nstu.grin.concatenation.axis.view
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.text.Font
-import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.concatenation.axis.model.AxisSettings
-import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
-import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import kotlin.contracts.contract
-import kotlin.math.abs
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 
 class HorizontalAxisDrawStrategy(
-    private val axisSettings: AxisSettings,
-    private val cartesianSpaces: List<CartesianSpace>
+    private val matrixTransformerController: MatrixTransformerController
 ) : AxisMarksDrawStrategy {
     private val numberFormatter = NumberFormatter()
 
@@ -25,21 +19,17 @@ class HorizontalAxisDrawStrategy(
         marksCoordinate: Double
     ) {
         context.font = Font.font(axis.font, axis.textSize)
-        val minPixelX = getLeftAxisSize() * SettingsProvider.getAxisWidth()
-        val maxPixelX = SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
+        val (minPixel, maxPixel) = matrixTransformerController.getMinMaxPixel(axis.direction)
 
-        val sum = axis.settings.max + abs(axisSettings.min)
-        val sumPixel = maxPixelX - minPixelX
-        val price = sumPixel / sum
-        val zeroPixel = axis.settings.min.absoluteValue * price + minPixelX
+        val zeroPixel = matrixTransformerController.transformUnitsToPixel(0.0, axis.settings, axis.direction)
 
-        var currentX = minPixelX
-        while (currentX < maxPixelX) {
-            val stepX = axis.settings.min + (currentX - minPixelX) / price
+        var currentX = minPixel
+        while (currentX < maxPixel) {
+            val stepX = matrixTransformerController.transformPixelToUnits(currentX, axis.settings, axis.direction)
 
-            val transformed = transformStepLogarithm(stepX, axisSettings.isLogarithmic)
+            val transformed = transformStepLogarithm(stepX, axis.settings.isLogarithmic, axis.settings.logarithmBase)
             if (axis.settings.max > 0 && axis.settings.min < 0) {
-                if ((currentX-zeroPixel).absoluteValue<axis.distanceBetweenMarks) {
+                if ((currentX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {
                     currentX += axis.distanceBetweenMarks
                     continue
                 }
@@ -64,22 +54,12 @@ class HorizontalAxisDrawStrategy(
         }
     }
 
-    private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean): Double {
+    private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean, logarithmBase: Double): Double {
         return if (isLogarithmic) {
-            axisSettings.logarithmBase.pow(step)
+            logarithmBase.pow(step)
         } else {
             step
         }
-    }
-
-    private fun getLeftAxisSize(): Int {
-        return cartesianSpaces.filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
-            .size
-    }
-
-    private fun getRightAxisSize(): Int {
-        return cartesianSpaces.filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
-            .size
     }
 
     private companion object {

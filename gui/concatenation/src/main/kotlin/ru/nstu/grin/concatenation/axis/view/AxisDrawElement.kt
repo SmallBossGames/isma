@@ -4,25 +4,17 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.view.ChainDrawElement
-import ru.nstu.grin.concatenation.axis.marks.MarksProvider
-import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 
 class AxisDrawElement(
     private val xAxis: ConcatenationAxis,
     private val yAxis: ConcatenationAxis,
-    cartesianSpaces: List<CartesianSpace>
+    matrixTransformerController: MatrixTransformerController
 ) : ChainDrawElement {
-
-    private val verticalAxisDraw =
-        VerticalAxisDrawStrategy(
-            yAxis.settings, cartesianSpaces
-        )
-    private val horizontalAxisDraw =
-        HorizontalAxisDrawStrategy(
-            xAxis.settings, cartesianSpaces
-        )
+    private val verticalAxisDraw = VerticalAxisDrawStrategy(matrixTransformerController)
+    private val horizontalAxisDraw = HorizontalAxisDrawStrategy(matrixTransformerController)
 
     override fun draw(context: GraphicsContext) {
         drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)

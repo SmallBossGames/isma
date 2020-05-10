@@ -21,7 +21,14 @@ class MatrixTransformerController : Controller() {
         val sumPixel = maxPixel - minPixel
         val unitPrice = sumPixel / sumUnits
 
-        return min - (number - minPixel) / unitPrice
+        return when(direction) {
+            Direction.LEFT ,Direction.RIGHT -> {
+                min+(maxPixel-number)/unitPrice
+            }
+            Direction.TOP ,Direction.BOTTOM -> {
+                min + (number - minPixel) / unitPrice
+            }
+        }
     }
 
     fun transformUnitsToPixel(number: Double, axisSettings: AxisSettings, direction: Direction): Double {
@@ -66,7 +73,7 @@ class MatrixTransformerController : Controller() {
         }
     }
 
-    private fun getMinMaxPixel(direction: Direction): Pair<Double, Double> {
+    fun getMinMaxPixel(direction: Direction): Pair<Double, Double> {
         return when (direction) {
             Direction.LEFT, Direction.RIGHT -> {
                 Pair(

@@ -4,14 +4,14 @@ import javafx.scene.Parent
 import ru.nstu.grin.concatenation.file.options.controller.FileOptionsController
 import ru.nstu.grin.concatenation.file.options.model.CsvDetails
 import ru.nstu.grin.concatenation.file.options.model.ExcelDetails
-import ru.nstu.grin.concatenation.file.options.model.FileOptionsModel
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
+import ru.nstu.grin.concatenation.function.model.FileModel
 import ru.nstu.grin.concatenation.function.model.FileType
 import tornadofx.*
 
 class FileOptionsView : Fragment() {
-    private val model: FileOptionsModel by inject(params = params)
-    private val controller: FileOptionsController by inject(params = params)
+    private val model: FileModel by inject()
+    private val controller: FileOptionsController by inject()
 
     init {
         when (controller.getType()) {

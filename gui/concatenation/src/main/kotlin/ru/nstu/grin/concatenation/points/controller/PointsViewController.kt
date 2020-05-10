@@ -18,22 +18,23 @@ import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.concatenation.file.options.model.CsvDetails
 import ru.nstu.grin.concatenation.file.options.model.ExcelDetails
 import ru.nstu.grin.concatenation.file.readers.*
+import ru.nstu.grin.concatenation.function.model.FileModel
 import ru.nstu.grin.concatenation.function.model.FileType
 import tornadofx.Controller
 import java.io.File
-import java.io.FileInputStream
 
 class PointsViewController : Controller() {
-    private val model: PointsViewModel by inject(params = params)
+    private val model: PointsViewModel by inject()
+    private val fileModel: FileModel by inject()
 
     fun readPoints() {
         model.pointsListProperty.clear()
-        model.pointsListProperty.addAll(readPoints(model.file))
+        model.pointsListProperty.addAll(readPoints(fileModel.file))
     }
 
     private fun readPoints(file: File): List<List<String>> {
         val fileType = FileRecognizer.recognize(file)
-        return when (val details = model.details) {
+        return when (val details = fileModel.details) {
             is ExcelDetails -> {
                 if (fileType == FileType.XLSX) {
                     return XLSXReader().read(file, details.sheetName, ExcelRange(details.range))
@@ -44,7 +45,7 @@ class PointsViewController : Controller() {
                 throw IllegalArgumentException("Something went wrong can't match details and fileType")
             }
             is CsvDetails -> {
-                CsvReader().read(file, details.delimiter, model.readerMode)
+                CsvReader().read(file, details.delimiter, fileModel.readerMode)
             }
         }
     }
@@ -65,7 +66,7 @@ class PointsViewController : Controller() {
     }
 
     fun sendFireCheckedEvent() {
-        val points = when (model.readerMode) {
+        val points = when (fileModel.readerMode) {
             FileReaderMode.ONE_TO_MANY -> {
                 model.pointsList.map { list ->
                     list.zipWithNext { a, b ->

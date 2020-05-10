@@ -8,14 +8,19 @@ import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
 import ru.nstu.grin.concatenation.points.model.PointsViewModel
 import ru.nstu.grin.common.model.WaveletDirection
+import ru.nstu.grin.concatenation.function.model.FileModel
 import tornadofx.*
 
 class PointsView : Fragment() {
-    private val controller: PointsViewController by inject(params = params)
-    private val model: PointsViewModel by inject(params = params)
+    private val controller: PointsViewController by inject()
+    private val model: PointsViewModel by inject()
+    private val fileModel: FileModel by inject()
+
+    init {
+        controller.readPoints()
+    }
 
     override val root: Parent = form {
-        controller.readPoints()
         fieldset("Вейвлет преобразование") {
             field("Включить") {
                 checkbox().bind(model.isWaveletProperty)
@@ -63,7 +68,7 @@ class PointsView : Fragment() {
         }
         tableview(model.pointsList) {
             items.first().forEachIndexed { index, list ->
-                val name = when (model.readerMode) {
+                val name = when (fileModel.readerMode) {
                     FileReaderMode.ONE_TO_MANY -> if (index == 0) {
                         "x"
                     } else {

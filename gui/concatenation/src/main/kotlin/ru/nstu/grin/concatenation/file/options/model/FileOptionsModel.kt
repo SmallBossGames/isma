@@ -7,10 +7,6 @@ import tornadofx.*
 import java.io.File
 
 class FileOptionsModel : ViewModel() {
-    lateinit var details: FileDetails
-
     val readerModeProperty = SimpleObjectProperty<FileReaderMode>()
     var readerMode by readerModeProperty
-
-    val file: File by param()
 }

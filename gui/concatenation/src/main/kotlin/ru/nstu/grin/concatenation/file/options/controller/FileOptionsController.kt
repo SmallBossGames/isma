@@ -1,26 +1,19 @@
 package ru.nstu.grin.concatenation.file.options.controller
 
-import ru.nstu.grin.concatenation.file.options.model.FileOptionsModel
+import ru.nstu.grin.concatenation.function.model.FileModel
 import ru.nstu.grin.concatenation.function.model.FileType
-import ru.nstu.grin.concatenation.points.model.PointsViewModel
 import ru.nstu.grin.concatenation.points.view.PointsView
 import tornadofx.Controller
 
 class FileOptionsController : Controller() {
-    private val model: FileOptionsModel by inject(params = params)
+    private val fileModel: FileModel by inject()
 
     fun openPointsWindow() {
-        find<PointsView>(
-            mapOf(
-                PointsViewModel::file to model.file,
-                PointsViewModel::details to model.details,
-                PointsViewModel::readerMode to model.readerMode
-            )
-        ).openModal()
+        find<PointsView>().openModal()
     }
 
     fun getType(): FileType? {
-        val fileName = model.file.name.substringAfterLast(".")
+        val fileName = fileModel.file.name.substringAfterLast(".")
         return when (fileName) {
             "xls" -> {
                 FileType.XLS

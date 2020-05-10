@@ -18,10 +18,6 @@ class PointsViewModel : ViewModel() {
     val addFunctionsModeProperty = SimpleObjectProperty<AddFunctionsMode>()
     var addFunctionsMode by addFunctionsModeProperty
 
-    val file: File by param()
-    val details: FileDetails by param()
-    val readerMode: FileReaderMode by param()
-
     var waveletTransformFunProperty = SimpleObjectProperty<WaveletTransformFun>()
     var waveletTransformFun by waveletTransformFunProperty
 

@@ -49,6 +49,8 @@ object GenerateUtils {
         )
 
         val cartesianSpace = CartesianSpaceDTO(
+            id = UUID.randomUUID(),
+            name = "пространство 1",
             functions = listOf(function),
             xAxis = ConcatenationAxisDTO(
                 id = UUID.randomUUID(),
@@ -80,6 +82,8 @@ object GenerateUtils {
             )
         )
         val cartesianSpace2 = CartesianSpaceDTO(
+            id = UUID.randomUUID(),
+            name = "Пространство2",
             functions = listOf(function),
             xAxis = ConcatenationAxisDTO(
                 id = UUID.randomUUID(),

@@ -43,6 +43,9 @@ class ConcatenationCanvasController : Controller() {
         subscribe<UpdateFunctionEvent> {
             updateFunction(it)
         }
+        subscribe<UpdateCartesianEvent> {
+            updateCartesian(it)
+        }
         subscribe<ConcatenationArrowEvent> { event ->
             addArrow(event)
         }
@@ -73,6 +76,10 @@ class ConcatenationCanvasController : Controller() {
             }.flatten().first { it.id == event.id }
             fire(GetFunctionEvent(function))
         }
+        subscribe<CartesianQuery> { event ->
+            val cartesianSpace = model.cartesianSpaces.first { it.id == event.id }
+            fire(GetCartesianEvent(cartesianSpace))
+        }
         subscribe<GetAllAxisQuery> {
             val axises = model.cartesianSpaces.map {
                 listOf(it.xAxis, it.yAxis)
@@ -85,6 +92,10 @@ class ConcatenationCanvasController : Controller() {
                 it.functions
             }.flatten()
             val event = GetAllFunctionsEvent(functions)
+            fire(event)
+        }
+        subscribe<GetAllCartesiansQuery> {
+            val event = GetAllCartesiansEvent(model.cartesianSpaces)
             fire(event)
         }
 //        addFunction()
@@ -140,7 +151,7 @@ class ConcatenationCanvasController : Controller() {
         }
     }
 
-    fun updateAxis(event: UpdateAxisEvent) {
+    private fun updateAxis(event: UpdateAxisEvent) {
         val axis = model.cartesianSpaces.map {
             listOf(it.xAxis, it.yAxis)
         }.flatten().first { it.id == event.id }
@@ -153,7 +164,14 @@ class ConcatenationCanvasController : Controller() {
         view.redraw()
     }
 
-    fun updateFunction(event: UpdateFunctionEvent) {
+    private fun updateCartesian(event: UpdateCartesianEvent) {
+        val cartesian = model.cartesianSpaces.first { it.id == event.id }
+        cartesian.isShowGrid = event.isShowGrid
+        cartesian.name = event.name
+        view.redraw()
+    }
+
+    private fun updateFunction(event: UpdateFunctionEvent) {
         println("Function updated")
         val function = model.cartesianSpaces.map {
             it.functions

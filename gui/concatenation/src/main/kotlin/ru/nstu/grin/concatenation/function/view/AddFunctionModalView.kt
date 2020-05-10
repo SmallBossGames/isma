@@ -37,6 +37,9 @@ class AddFunctionModalView : Fragment() {
             }
         }
         fieldset {
+            field("Введите имя пространства") {
+                textfield().bind(model.cartesianSpaceNameProperty)
+            }
             field("Введите имя функции") {
                 textfield().bind(model.functionNameProperty)
             }

@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.canvas.events.FunctionQuery
 import ru.nstu.grin.concatenation.canvas.events.GetFunctionEvent
 import ru.nstu.grin.concatenation.canvas.events.UpdateFunctionEvent
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel

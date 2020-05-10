@@ -6,6 +6,8 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.canvas.controller.AxisListViewController
+import ru.nstu.grin.concatenation.canvas.events.GetAllAxisQuery
+import ru.nstu.grin.concatenation.canvas.events.GetAllAxisesEvent
 import ru.nstu.grin.concatenation.canvas.model.AxisListViewModel
 import tornadofx.*
 
@@ -56,5 +58,9 @@ class AxisListView : Fragment() {
                 }
             }
         }
+    }
+
+    init {
+        fire(GetAllAxisQuery())
     }
 }

@@ -49,6 +49,8 @@ class AddFunctionController : Controller() {
         )
 
         val cartesianSpace = CartesianSpaceDTO(
+            id = UUID.randomUUID(),
+            name = model.cartesianSpaceName,
             functions = listOf(function),
             xAxis = ConcatenationAxisDTO(
                 id = UUID.randomUUID(),
@@ -114,6 +116,8 @@ class AddFunctionController : Controller() {
                     )
                 }
                 val cartesianSpace = CartesianSpaceDTO(
+                    id = UUID.randomUUID(),
+                    name = model.cartesianSpaceName,
                     functions = functions,
                     xAxis = xAxis,
                     yAxis = yAxis
@@ -144,6 +148,8 @@ class AddFunctionController : Controller() {
                     val yAxis = createYAxis()
 
                     val cartesianSpace = CartesianSpaceDTO(
+                        id = UUID.randomUUID(),
+                        name = model.cartesianSpaceName,
                         functions = listOf(function),
                         xAxis = xAxis,
                         yAxis = yAxis
@@ -235,6 +241,8 @@ class AddFunctionController : Controller() {
             textSize = model.yTextSize.toDouble()
         )
         val cartesianSpace = CartesianSpaceDTO(
+            id = UUID.randomUUID(),
+            name = model.cartesianSpaceName,
             functions = listOf(function),
             xAxis = xAxis,
             yAxis = yAxis
@@ -244,7 +252,6 @@ class AddFunctionController : Controller() {
             ConcatenationFunctionEvent(cartesianSpace = cartesianSpace)
         )
     }
-
 
     private companion object {
         const val DELIMITER = ","

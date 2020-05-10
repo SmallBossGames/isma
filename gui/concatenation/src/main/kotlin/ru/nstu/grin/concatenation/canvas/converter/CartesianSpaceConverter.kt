@@ -8,6 +8,8 @@ import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConver
 object CartesianSpaceConverter {
     fun merge(source: CartesianSpaceDTO, xAxis: ConcatenationAxis, yAxis: ConcatenationAxis): CartesianSpace {
         return CartesianSpace(
+            id = source.id,
+            name = source.name,
             functions = source.functions.map {
                 ConcatenationFunctionConverter.convert(
                     it

@@ -12,6 +12,9 @@ import tornadofx.setValue
 import java.awt.Font
 
 class AddFunctionModel : ViewModel() {
+    var cartesianSpaceNameProperty = SimpleStringProperty(this, "cartesianSpaceName", "Пространство номер 1")
+    var cartesianSpaceName by cartesianSpaceNameProperty
+
     var functionNameProperty = SimpleStringProperty(this, "functionName", "Функция номер 1")
     var functionName: String by functionNameProperty
 

@@ -20,6 +20,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
             for (function in cartesianSpace.functions) {
                 if (function.isHide) continue
                 context.stroke = function.functionColor
+                context.fill = function.functionColor
                 context.lineWidth = function.lineSize
                 transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis)
 
@@ -41,7 +42,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                             val x = point.xGraphic
                             val y = point.yGraphic
                             if (x != null && y != null) {
-                                context.fillRect(x, y, 1.0, 1.0)
+                                context.fillRect(x, y, 2.0, 2.0)
                             }
                         }
                     }
@@ -74,7 +75,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                             val x = point.xGraphic
                             val y = point.yGraphic
                             if (x != null && y != null) {
-                                context.fillOval(x, y, 1.0, 1.0)
+                                context.fillOval(x, y, 2.0, 2.0)
                             }
                         }
                     }

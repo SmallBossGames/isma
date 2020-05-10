@@ -13,5 +13,8 @@ class ElementsView : Fragment() {
         tab("Оси") {
             add<AxisListView>()
         }
+        tab("Пространства") {
+            add<CartesianListView>()
+        }
     }
 }

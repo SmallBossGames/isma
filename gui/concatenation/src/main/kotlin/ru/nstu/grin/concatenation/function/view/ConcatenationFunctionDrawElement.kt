@@ -15,10 +15,12 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
 
     override fun draw(context: GraphicsContext) {
+        val previousLineSize = context.lineWidth
         for (cartesianSpace in model.cartesianSpaces) {
             for (function in cartesianSpace.functions) {
                 if (function.isHide) continue
                 context.stroke = function.functionColor
+                context.lineWidth = function.lineSize
                 transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis)
 
                 val points = function.points
@@ -88,6 +90,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                 }
             }
         }
+        context.lineWidth = previousLineSize
     }
 
     private fun transformPoints(points: List<Point>, xAxis: ConcatenationAxis, yAxis: ConcatenationAxis) {

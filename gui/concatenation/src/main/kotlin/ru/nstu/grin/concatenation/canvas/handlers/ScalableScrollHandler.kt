@@ -19,8 +19,20 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
         }.flatten()
         val axis = axises.firstOrNull {
             it.isLocated(event.x, event.y)
-        } ?: return
+        }
 
+        if (axis != null) {
+            handleScaleByAxis(event, axis)
+        } else {
+            for (cartesianSpace in model.cartesianSpaces) {
+                handleScaleByAxis(event, cartesianSpace.xAxis)
+                handleScaleByAxis(event, cartesianSpace.yAxis)
+            }
+        }
+        chainDrawer.draw()
+    }
+
+    private fun handleScaleByAxis(event: ScrollEvent, axis: ConcatenationAxis) {
         val scaleSettings = getScaleSettings(axis)
 
         if (event.deltaY > 0) {
@@ -55,7 +67,6 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
             }
         }
         currentCanvasSettings[axis] = scaleSettings
-        chainDrawer.draw()
     }
 
     private fun getScaleSettings(axis: ConcatenationAxis): ScaleSettings {

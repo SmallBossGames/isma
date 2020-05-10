@@ -48,8 +48,11 @@ class AddFunctionModalView : Fragment() {
                     cellFormat {
                         text = when (it) {
                             LineType.POLYNOM -> "Полином"
-                            LineType.DOTES -> "Точки"
+                            LineType.RECT_FILL_DOTES -> "Прямоугольник заполненные точки"
                             LineType.SEGMENTS -> "Сегменты"
+                            LineType.RECT_UNFIL_DOTES -> "Прямоуголник незаполненные точки"
+                            LineType.CIRCLE_FILL_DOTES -> "Круг заполненные точки"
+                            LineType.CIRCLE_UNFILL_DOTES -> "Круг незаполненные точки"
                         }
                     }
                 }

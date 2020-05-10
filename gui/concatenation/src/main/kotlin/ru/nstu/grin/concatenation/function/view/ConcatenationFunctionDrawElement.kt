@@ -6,6 +6,7 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.function.model.LineType
 import tornadofx.Controller
 import kotlin.math.log10
 
@@ -21,14 +22,69 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
 
                 val points = function.points
 
-                val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
-                val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
-                val n = points.size
-                context.strokePolyline(
-                    xPoints,
-                    yPoints,
-                    n
-                )
+                when (function.lineType) {
+                    LineType.POLYNOM -> {
+                        val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
+                        val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
+                        val n = points.size
+                        context.strokePolyline(
+                            xPoints,
+                            yPoints,
+                            n
+                        )
+                    }
+                    LineType.RECT_FILL_DOTES -> {
+                        for (point in points) {
+                            val x = point.xGraphic
+                            val y = point.yGraphic
+                            if (x != null && y != null) {
+                                context.fillRect(x, y, 1.0, 1.0)
+                            }
+                        }
+                    }
+                    LineType.SEGMENTS -> {
+                        var i = 0
+                        while (i < points.size - 1) {
+                            val x1 = points[i].xGraphic
+                            val y1 = points[i].yGraphic
+                            val x2 = points[i + 1].xGraphic
+                            val y2 = points[i + 1].yGraphic
+                            if (x1 != null && y1 != null && x2 != null && y2 != null) {
+                                context.strokeLine(
+                                    x1, y1, x2, y2
+                                )
+                            }
+                            i += 2
+                        }
+                    }
+                    LineType.RECT_UNFIL_DOTES -> {
+                        for (point in points) {
+                            val x = point.xGraphic
+                            val y = point.yGraphic
+                            if (x != null && y != null) {
+                                context.strokeRect(x, y, 1.0, 1.0)
+                            }
+                        }
+                    }
+                    LineType.CIRCLE_FILL_DOTES -> {
+                        for (point in points) {
+                            val x = point.xGraphic
+                            val y = point.yGraphic
+                            if (x != null && y != null) {
+                                context.fillOval(x, y, 1.0, 1.0)
+                            }
+                        }
+                    }
+                    LineType.CIRCLE_UNFILL_DOTES -> {
+                        for (point in points) {
+                            val x = point.xGraphic
+                            val y = point.yGraphic
+                            if (x != null && y != null) {
+                                context.strokeOval(x, y, 1.0, 1.0)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

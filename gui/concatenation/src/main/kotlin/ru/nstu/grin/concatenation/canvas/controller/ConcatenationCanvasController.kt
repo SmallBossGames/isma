@@ -46,9 +46,6 @@ class ConcatenationCanvasController : Controller() {
         subscribe<ConcatenationArrowEvent> { event ->
             addArrow(event)
         }
-        subscribe<ConcatenationFunctionEvent> { event ->
-            addConcatenationFunction(event)
-        }
         subscribe<ConcatenationDescriptionEvent> { event ->
             addDescription(event)
         }

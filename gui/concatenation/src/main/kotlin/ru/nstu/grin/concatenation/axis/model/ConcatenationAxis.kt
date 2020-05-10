@@ -13,7 +13,7 @@ import java.util.*
  * @param marksProvider - поставитель меток оси
  * @param order -
  */
-class ConcatenationAxis(
+data class ConcatenationAxis(
     val id: UUID,
     val name: String,
     val zeroPoint: Double,
@@ -26,7 +26,27 @@ class ConcatenationAxis(
     var textSize: Double,
     var font: String,
     val settings: AxisSettings = AxisSettings()
-) : Writer {
+) : Writer, Cloneable {
+
+    override fun clone(): Any {
+        return ConcatenationAxis(
+            id = id,
+            name = name,
+            zeroPoint = zeroPoint,
+            marksProvider = marksProvider,
+            order = order,
+            direction = direction,
+            backGroundColor = backGroundColor,
+            fontColor = fontColor,
+            distanceBetweenMarks = distanceBetweenMarks,
+            textSize = textSize,
+            font = font,
+            settings = settings.copy()
+        )
+    }
+
+
+
     fun isLocated(x: Double, y: Double): Boolean {
         when (direction) {
             Direction.LEFT -> {

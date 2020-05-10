@@ -7,7 +7,16 @@ data class Point(
     val y: Double,
     var xGraphic: Double? = null,
     var yGraphic: Double? = null
-) : Serializable {
+) : Serializable, Cloneable {
+    public override fun clone(): Any {
+        return Point(
+            x = x,
+            y = y,
+            xGraphic = xGraphic,
+            yGraphic = yGraphic
+        )
+    }
+
     fun isNearBy(eventX: Double, eventY: Double): Boolean {
         val x = xGraphic
         val y = yGraphic

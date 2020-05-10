@@ -20,7 +20,7 @@ class ShowPointHandler : EventHandler<MouseEvent>, Controller() {
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
 
-        if (editMode == EditMode.SCALE) {
+        if (editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) {
             if (event.button == MouseButton.PRIMARY) {
                 println("Pressed primary button")
                 model.selectionSettings.isSelected = true

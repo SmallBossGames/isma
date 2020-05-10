@@ -14,17 +14,29 @@ import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ShowPointHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasModel
+import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import tornadofx.*
 
 class ConcatenationCanvas : View() {
     private val model: ConcatenationCanvasModelViewModel by inject()
-    private val controller: ConcatenationCanvasController= find {  }
+    private val controller: ConcatenationCanvasController = find { }
     private val canvasModel: CanvasModel by inject()
-    private var chainDrawer: ConcatenationChainDrawer = find {  }
+    private var chainDrawer: ConcatenationChainDrawer = find { }
     private val scalableScrollHandler: ScalableScrollHandler by inject()
     private val draggedHandler: DraggedHandler by inject()
     private val showPointHandler: ShowPointHandler by inject()
     private val releaseMouseHandler: ReleaseMouseHandler by inject()
+
+    val initData: InitCanvasData? by param()
+
+    init {
+        val data = initData
+        if (data != null) {
+            model.cartesianSpaces = data.cartesianSpaces.toObservable()
+            model.arrows = data.arrows.toObservable()
+            model.descriptions = data.descriptions.toObservable()
+        }
+    }
 
     override val root: Parent = stackpane {
         canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
@@ -43,6 +55,8 @@ class ConcatenationCanvas : View() {
             onMousePressed = showPointHandler
 
             onMouseReleased = releaseMouseHandler
+
+            chainDrawer.draw()
         }
     }
 

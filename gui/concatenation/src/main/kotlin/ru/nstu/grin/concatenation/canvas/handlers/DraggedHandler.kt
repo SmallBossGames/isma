@@ -19,7 +19,7 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
-        if (editMode == EditMode.SCALE) {
+        if (editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) {
             if (event.isPrimaryButtonDown) {
                 println("Primary button down dragged")
                 model.selectionSettings.secondPoint = Point(event.x, event.y)

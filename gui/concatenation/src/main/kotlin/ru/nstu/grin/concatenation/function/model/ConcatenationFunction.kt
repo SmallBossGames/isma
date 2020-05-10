@@ -19,7 +19,18 @@ data class ConcatenationFunction(
     var functionColor: Color,
     var lineSize: Double,
     var lineType: LineType
-) : Writer {
+) : Writer, Cloneable {
+    public override fun clone(): Any {
+        return ConcatenationFunction(
+            id = id,
+            name = name,
+            points = points.map { it.clone() as Point },
+            functionColor = functionColor,
+            lineSize = lineSize,
+            lineType = lineType
+        )
+    }
+
     fun getShape(): Shape {
         return Line(0.0, 10.0, 0.0, 20.0)
     }

@@ -1,14 +1,16 @@
 package ru.nstu.grin.concatenation.canvas.handlers
 
+import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
-import ru.nstu.grin.concatenation.canvas.model.EditMode
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import tornadofx.Controller
+import tornadofx.Scope
+import tornadofx.find
 
 class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -18,7 +20,7 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
-        if (editMode == EditMode.SCALE) {
+        if (editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) {
             if (event.button == MouseButton.PRIMARY) {
                 println("Release primary button")
 
@@ -28,7 +30,13 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                     return
                 }
 
-                for (cartesianSpace in model.cartesianSpaces) {
+                val cartesianSpaces = if (editMode == EditMode.SCALE) {
+                    model.cartesianSpaces
+                } else {
+                    model.cartesianSpaces.map { it.clone() as CartesianSpace }
+                }
+
+                for (cartesianSpace in cartesianSpaces) {
                     val minX = matrixTransformer.transformPixelToUnits(
                         selectionSettings.getMinX(),
                         cartesianSpace.xAxis.settings,
@@ -57,10 +65,32 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                     cartesianSpace.yAxis.settings.max = minY
                     println("ySettings=${cartesianSpace.yAxis.settings}")
                 }
+                if (editMode == EditMode.WINDOWED) {
+                    val initData = InitCanvasData(
+                        cartesianSpaces = cartesianSpaces,
+                        arrows = model.arrows.toList(),
+                        descriptions = model.descriptions.toList()
+                    )
+                    val scope = Scope()
+                    find<ConcatenationView>(
+                        scope = scope,
+                        params = mapOf(
+                            ConcatenationView::initData to initData
+                        )
+                    ).openWindow()
+                }
 
                 model.selectionSettings.dropToDefault()
             }
         }
         chainDrawer.draw()
+    }
+
+    private fun copy(cartesianSpaces: List<CartesianSpace>): List<CartesianSpace> {
+        val list = mutableListOf<CartesianSpace>()
+        for (cartesianSpace in cartesianSpaces) {
+            list.add(cartesianSpace.copy())
+        }
+        return list
     }
 }

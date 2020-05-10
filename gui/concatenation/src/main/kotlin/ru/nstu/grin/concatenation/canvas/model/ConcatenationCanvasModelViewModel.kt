@@ -9,7 +9,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import tornadofx.ItemViewModel
 import tornadofx.*
 
-class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>() {
+class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>(), Cloneable {
     var cartesianSpaceProperty = SimpleListProperty<CartesianSpace>(FXCollections.observableArrayList())
     var cartesianSpaces by cartesianSpaceProperty
 

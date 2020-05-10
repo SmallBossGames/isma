@@ -9,10 +9,12 @@ import ru.nstu.grin.concatenation.canvas.events.LoadEvent
 import ru.nstu.grin.concatenation.canvas.events.SaveEvent
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.EditMode
+import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import tornadofx.*
 
 class ConcatenationView : View() {
     private val model: ConcatenationViewModel by inject()
+    val initData: InitCanvasData? by param()
 
     override val root: Parent = vbox {
         menubar {
@@ -87,6 +89,11 @@ class ConcatenationView : View() {
                 }
             }
         }
-        add<ConcatenationCanvas>()
+        val concatenationCanvas = find<ConcatenationCanvas>(
+            mapOf(
+                ConcatenationCanvas::initData to initData
+            )
+        ) { }
+        add(concatenationCanvas)
     }
 }

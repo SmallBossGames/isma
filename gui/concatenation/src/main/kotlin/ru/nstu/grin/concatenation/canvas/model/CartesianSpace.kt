@@ -8,7 +8,17 @@ data class CartesianSpace(
     val xAxis: ConcatenationAxis,
     val yAxis: ConcatenationAxis,
     var isShowGrid: Boolean = false
-) {
+) : Cloneable {
+
+    public override fun clone(): Any {
+        return CartesianSpace(
+            functions = functions.map { it.copy(points = it.points.map { it.copy() }) }.toMutableList(),
+            xAxis = xAxis.copy(settings = xAxis.settings.copy()),
+            yAxis = yAxis.copy(settings = yAxis.settings.copy()),
+            isShowGrid = isShowGrid
+        )
+    }
+
     fun merge(inFunctions: List<ConcatenationFunction>) {
         functions.addAll(inFunctions)
     }

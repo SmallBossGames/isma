@@ -1,6 +1,6 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.canvas.events.FunctionCopyQuery
+import ru.nstu.grin.concatenation.function.events.FunctionCopyQuery
 import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
 import tornadofx.Controller
 import java.util.*

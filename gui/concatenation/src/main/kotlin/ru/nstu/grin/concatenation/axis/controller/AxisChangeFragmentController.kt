@@ -1,7 +1,7 @@
 package ru.nstu.grin.concatenation.axis.controller
 
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
-import ru.nstu.grin.concatenation.canvas.events.GetAxisEvent
+import ru.nstu.grin.concatenation.axis.events.GetAxisEvent
 import tornadofx.Controller
 import java.util.*
 

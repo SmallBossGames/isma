@@ -9,15 +9,19 @@ import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
 import ru.nstu.grin.common.events.ConcatenationDescriptionEvent
 import ru.nstu.grin.common.model.ConcatenationType
 import ru.nstu.grin.common.view.modal.ArrowModalView
+import ru.nstu.grin.concatenation.axis.controller.AxisCanvasController
 import ru.nstu.grin.concatenation.canvas.GenerateUtils
 import ru.nstu.grin.concatenation.canvas.events.*
 import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
+import ru.nstu.grin.concatenation.cartesian.controller.CartesianCanvasController
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
 import ru.nstu.grin.concatenation.file.DrawReader
 import ru.nstu.grin.concatenation.file.DrawWriter
+import ru.nstu.grin.concatenation.function.controller.FunctionsCanvasController
+import ru.nstu.grin.concatenation.function.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import tornadofx.*
 

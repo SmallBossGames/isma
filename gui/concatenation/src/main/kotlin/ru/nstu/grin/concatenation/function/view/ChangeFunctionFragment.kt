@@ -1,7 +1,7 @@
 package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.Parent
-import ru.nstu.grin.concatenation.canvas.events.FunctionQuery
+import ru.nstu.grin.concatenation.function.events.FunctionQuery
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
 import ru.nstu.grin.concatenation.function.model.LineType

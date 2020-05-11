@@ -12,7 +12,7 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.handlers.ShowPointHandler
+import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import tornadofx.*
@@ -24,7 +24,7 @@ class ConcatenationCanvas : View() {
     private var chainDrawer: ConcatenationChainDrawer = find { }
     private val scalableScrollHandler: ScalableScrollHandler by inject()
     private val draggedHandler: DraggedHandler by inject()
-    private val showPointHandler: ShowPointHandler by inject()
+    private val pressedMouseHandle: PressedMouseHandler by inject()
     private val releaseMouseHandler: ReleaseMouseHandler by inject()
 
     val initData: InitCanvasData? by param()
@@ -52,7 +52,7 @@ class ConcatenationCanvas : View() {
 
             onMouseDragged = draggedHandler
 
-            onMousePressed = showPointHandler
+            onMousePressed = pressedMouseHandle
 
             onMouseReleased = releaseMouseHandler
 

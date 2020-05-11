@@ -39,56 +39,7 @@ class ConcatenationView : View() {
                 }
             }
         }
-        toolbar {
-            button {
-                val image = Image("view-tool.png")
-                val imageView = ImageView(image)
-                imageView.fitWidth = 20.0
-                imageView.fitHeight = 20.0
-                graphic = imageView
-                tooltip = Tooltip("Просмотр")
-
-                action {
-                    model.currentEditMode = EditMode.VIEW
-                }
-            }
-            button {
-                val image = Image("scale-tool.png")
-                val imageView = ImageView(image)
-                imageView.fitHeight = 20.0
-                imageView.fitWidth = 20.0
-                graphic = imageView
-                tooltip = Tooltip("Скалирование")
-
-                action {
-                    model.currentEditMode = EditMode.SCALE
-                }
-            }
-            button {
-                val image = Image("edit-tool.png")
-                val imageView = ImageView(image)
-                imageView.setFitHeight(20.0)
-                imageView.setFitWidth(20.0)
-                graphic = imageView
-                tooltip = Tooltip("Редактирование")
-
-                action {
-                    model.currentEditMode = EditMode.EDIT
-                }
-            }
-            button {
-                val image = Image("window-tool.png")
-                val imageView = ImageView(image)
-                imageView.fitHeight = 20.0
-                imageView.fitWidth = 20.0
-                graphic = imageView
-                tooltip = Tooltip("Открытие новых окон")
-
-                action {
-                    model.currentEditMode = EditMode.WINDOWED
-                }
-            }
-        }
+        add<CanvasWorkPanel>()
         val concatenationCanvas = find<ConcatenationCanvas>(
             mapOf(
                 ConcatenationCanvas::initData to initData

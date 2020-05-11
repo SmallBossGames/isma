@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.canvas.handlers
 
-import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
@@ -20,68 +19,71 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
-        if (editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) {
-            if (event.button == MouseButton.PRIMARY) {
-                println("Release primary button")
+        if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
+            println("Release primary button")
+            model.traceSettings = null
+        }
 
-                val selectionSettings = model.selectionSettings
-                val area = selectionSettings.getArea()
-                if (area < 10.0) {
-                    return
-                }
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && event.button == MouseButton.PRIMARY) {
+            println("Release primary button")
 
-                val cartesianSpaces = if (editMode == EditMode.SCALE) {
-                    model.cartesianSpaces
-                } else {
-                    model.cartesianSpaces.map { it.clone() as CartesianSpace }
-                }
-
-                for (cartesianSpace in cartesianSpaces) {
-                    val minX = matrixTransformer.transformPixelToUnits(
-                        selectionSettings.getMinX(),
-                        cartesianSpace.xAxis.settings,
-                        cartesianSpace.xAxis.direction
-                    )
-                    val maxX = matrixTransformer.transformPixelToUnits(
-                        selectionSettings.getMaxX(),
-                        cartesianSpace.xAxis.settings,
-                        cartesianSpace.xAxis.direction
-                    )
-                    println("MinX=$minX and maxX=$maxX")
-                    cartesianSpace.xAxis.settings.min = minX
-                    cartesianSpace.xAxis.settings.max = maxX
-
-                    val minY = matrixTransformer.transformPixelToUnits(
-                        selectionSettings.getMinY(),
-                        cartesianSpace.yAxis.settings,
-                        cartesianSpace.yAxis.direction
-                    )
-                    val maxY = matrixTransformer.transformPixelToUnits(
-                        selectionSettings.getMaxY(),
-                        cartesianSpace.yAxis.settings,
-                        cartesianSpace.yAxis.direction
-                    )
-                    cartesianSpace.yAxis.settings.min = maxY
-                    cartesianSpace.yAxis.settings.max = minY
-                    println("ySettings=${cartesianSpace.yAxis.settings}")
-                }
-                if (editMode == EditMode.WINDOWED) {
-                    val initData = InitCanvasData(
-                        cartesianSpaces = cartesianSpaces,
-                        arrows = model.arrows.toList(),
-                        descriptions = model.descriptions.toList()
-                    )
-                    val scope = Scope()
-                    find<ConcatenationView>(
-                        scope = scope,
-                        params = mapOf(
-                            ConcatenationView::initData to initData
-                        )
-                    ).openWindow()
-                }
-
-                model.selectionSettings.dropToDefault()
+            val selectionSettings = model.selectionSettings
+            val area = selectionSettings.getArea()
+            if (area < 10.0) {
+                return
             }
+
+            val cartesianSpaces = if (editMode == EditMode.SCALE) {
+                model.cartesianSpaces
+            } else {
+                model.cartesianSpaces.map { it.clone() as CartesianSpace }
+            }
+
+            for (cartesianSpace in cartesianSpaces) {
+                val minX = matrixTransformer.transformPixelToUnits(
+                    selectionSettings.getMinX(),
+                    cartesianSpace.xAxis.settings,
+                    cartesianSpace.xAxis.direction
+                )
+                val maxX = matrixTransformer.transformPixelToUnits(
+                    selectionSettings.getMaxX(),
+                    cartesianSpace.xAxis.settings,
+                    cartesianSpace.xAxis.direction
+                )
+                println("MinX=$minX and maxX=$maxX")
+                cartesianSpace.xAxis.settings.min = minX
+                cartesianSpace.xAxis.settings.max = maxX
+
+                val minY = matrixTransformer.transformPixelToUnits(
+                    selectionSettings.getMinY(),
+                    cartesianSpace.yAxis.settings,
+                    cartesianSpace.yAxis.direction
+                )
+                val maxY = matrixTransformer.transformPixelToUnits(
+                    selectionSettings.getMaxY(),
+                    cartesianSpace.yAxis.settings,
+                    cartesianSpace.yAxis.direction
+                )
+                cartesianSpace.yAxis.settings.min = maxY
+                cartesianSpace.yAxis.settings.max = minY
+                println("ySettings=${cartesianSpace.yAxis.settings}")
+            }
+            if (editMode == EditMode.WINDOWED) {
+                val initData = InitCanvasData(
+                    cartesianSpaces = cartesianSpaces,
+                    arrows = model.arrows.toList(),
+                    descriptions = model.descriptions.toList()
+                )
+                val scope = Scope()
+                find<ConcatenationView>(
+                    scope = scope,
+                    params = mapOf(
+                        ConcatenationView::initData to initData
+                    )
+                ).openWindow()
+            }
+
+            model.selectionSettings.dropToDefault()
         }
         chainDrawer.draw()
     }

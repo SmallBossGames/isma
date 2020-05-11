@@ -9,7 +9,6 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import tornadofx.Controller
-import java.util.*
 
 class FunctionCanvasService : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()

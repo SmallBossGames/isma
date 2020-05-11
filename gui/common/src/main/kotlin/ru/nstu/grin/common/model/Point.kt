@@ -3,8 +3,8 @@ package ru.nstu.grin.common.model
 import java.io.Serializable
 
 data class Point(
-    val x: Double,
-    val y: Double,
+    var x: Double,
+    var y: Double,
     var xGraphic: Double? = null,
     var yGraphic: Double? = null
 ) : Serializable, Cloneable {

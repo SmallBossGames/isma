@@ -5,11 +5,8 @@ import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
-import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.common.model.PointSettings
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
-import ru.nstu.grin.concatenation.canvas.model.EditMode
+import ru.nstu.grin.concatenation.canvas.model.*
 import tornadofx.Controller
 
 class ShowPointHandler : EventHandler<MouseEvent>, Controller() {
@@ -28,34 +25,61 @@ class ShowPointHandler : EventHandler<MouseEvent>, Controller() {
             }
         }
 
+        if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
+            handleEditMode(event)
+        }
+
         if (event.button == MouseButton.SECONDARY) {
             println("Set to false")
             model.pointToolTipSettings.isShow = false
             model.pointToolTipSettings.pointsSettings.clear()
         }
         showContextMenu(event)
-        if (event.isPrimaryButtonDown.not()) return
-        val nearFunction = model.cartesianSpaces.mapNotNull {
-            it.functions.firstOrNull {
-                it.points.any { it.isNearBy(event.x, event.y) }
+        if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
+            val nearFunction = model.cartesianSpaces.mapNotNull {
+                it.functions.firstOrNull {
+                    it.points.any { it.isNearBy(event.x, event.y) }
+                }
+            }.firstOrNull() ?: return
+
+            val nearPoint = nearFunction.points.first {
+                it.isNearBy(event.x, event.y)
+            }
+            println("Found nearPoint $nearPoint")
+
+            val pointToolTipSettings = model.pointToolTipSettings
+            pointToolTipSettings.isShow = true
+            val pointSettings = PointSettings(
+                nearPoint.x,
+                nearPoint.y,
+                nearPoint.xGraphic ?: 0.0,
+                nearPoint.yGraphic ?: 0.0
+            )
+            pointToolTipSettings.pointsSettings.add(pointSettings)
+        }
+        chainDrawer.draw()
+    }
+
+    private fun handleEditMode(event: MouseEvent) {
+        println("Pressed primary button")
+        val triple = model.cartesianSpaces.mapNotNull {
+            val point = it.functions.firstOrNull {
+                it.points.firstOrNull { it.isNearBy(event.x, event.y) } != null
+            }?.points?.first {
+                it.isNearBy(event.x, event.y)
+            }
+            if (point != null) {
+                Triple(it.xAxis, it.yAxis, point)
+            } else {
+                null
             }
         }.firstOrNull() ?: return
-
-        val nearPoint = nearFunction.points.first {
-            it.isNearBy(event.x, event.y)
-        }
-        println("Found nearPoint $nearPoint")
-
-        val pointToolTipSettings = model.pointToolTipSettings
-        pointToolTipSettings.isShow = true
-        val pointSettings = PointSettings(
-            nearPoint.x,
-            nearPoint.y,
-            nearPoint.xGraphic ?: 0.0,
-            nearPoint.yGraphic ?: 0.0
+        val (xAxis, yAxis, point) = triple
+        model.traceSettings = TraceSettings(
+            pressedPoint = point,
+            xAxis = xAxis,
+            yAxis = yAxis
         )
-        pointToolTipSettings.pointsSettings.add(pointSettings)
-        chainDrawer.draw()
     }
 
     private fun showContextMenu(event: MouseEvent) {

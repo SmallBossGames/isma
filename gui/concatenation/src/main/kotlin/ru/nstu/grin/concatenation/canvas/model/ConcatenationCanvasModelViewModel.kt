@@ -26,4 +26,6 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>(), 
         ContextMenuSettings(ContextMenuType.NONE, 0.0, 0.0)
 
     val selectionSettings = SelectionSettings()
+
+    var traceSettings: TraceSettings? = null
 }

@@ -24,10 +24,14 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
 import ru.nstu.grin.concatenation.file.DrawReader
 import ru.nstu.grin.concatenation.file.DrawWriter
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import tornadofx.*
 import java.util.*
 
+/**
+ * Разбить по нескольким контроллерам, один для функций, другой для осей и т.д
+ */
 class ConcatenationCanvasController : Controller() {
     private val canvasModel: CanvasModel by inject()
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -39,12 +43,15 @@ class ConcatenationCanvasController : Controller() {
         }
         subscribe<UpdateAxisEvent> {
             updateAxis(it)
+            getAllAxises()
         }
         subscribe<UpdateFunctionEvent> {
             updateFunction(it)
+            getAllFunctions()
         }
         subscribe<UpdateCartesianEvent> {
             updateCartesian(it)
+            getAllCartesianSpaces()
         }
         subscribe<ConcatenationArrowEvent> { event ->
             addArrow(event)
@@ -81,24 +88,44 @@ class ConcatenationCanvasController : Controller() {
             fire(GetCartesianEvent(cartesianSpace))
         }
         subscribe<GetAllAxisQuery> {
-            val axises = model.cartesianSpaces.map {
-                listOf(it.xAxis, it.yAxis)
-            }.flatten()
-            val event = GetAllAxisesEvent(axises)
-            fire(event)
+            getAllAxises()
         }
         subscribe<GetAllFunctionsQuery> {
-            val functions = model.cartesianSpaces.map {
-                it.functions
-            }.flatten()
-            val event = GetAllFunctionsEvent(functions)
-            fire(event)
+            getAllFunctions()
         }
         subscribe<GetAllCartesiansQuery> {
-            val event = GetAllCartesiansEvent(model.cartesianSpaces)
-            fire(event)
+            getAllCartesianSpaces()
+        }
+        subscribe<DeleteFunctionQuery> {
+            deleteFunction(it)
+            getAllFunctions()
+        }
+        subscribe<DeleteCartesianSpaceQuery> {
+            deleteCartesianSpace(it)
+            getAllCartesianSpaces()
         }
 //        addFunction()
+    }
+
+    private fun getAllCartesianSpaces() {
+        val event = GetAllCartesiansEvent(model.cartesianSpaces)
+        fire(event)
+    }
+
+    private fun getAllAxises() {
+        val axises = model.cartesianSpaces.map {
+            listOf(it.xAxis, it.yAxis)
+        }.flatten()
+        val event = GetAllAxisesEvent(axises)
+        fire(event)
+    }
+
+    private fun getAllFunctions() {
+        val functions = model.cartesianSpaces.map {
+            it.functions
+        }.flatten()
+        val event = GetAllFunctionsEvent(functions)
+        fire(event)
     }
 
     private fun findAxisById(id: UUID): ConcatenationAxis {
@@ -182,6 +209,23 @@ class ConcatenationCanvasController : Controller() {
         function.isHide = event.isHide
         function.lineSize = event.lineSize
         function.lineType = event.lineType
+        view.redraw()
+    }
+
+    private fun deleteCartesianSpace(event: DeleteCartesianSpaceQuery) {
+        model.cartesianSpaces.removeIf {
+            it.id == event.id
+        }
+        view.redraw()
+    }
+
+    private fun deleteFunction(event: DeleteFunctionQuery) {
+        for (cartesianSpace in model.cartesianSpaces) {
+            val function = cartesianSpace.functions.firstOrNull { it.id == event.id }
+            if (function != null) {
+                cartesianSpace.functions.remove(function)
+            }
+        }
         view.redraw()
     }
 

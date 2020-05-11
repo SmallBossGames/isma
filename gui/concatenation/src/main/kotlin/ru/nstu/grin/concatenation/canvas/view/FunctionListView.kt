@@ -45,6 +45,17 @@ class FunctionListView : Fragment() {
                     spacing = 20.0
                     button {
                         action {
+                            controller.openCopyModal(it.id)
+                        }
+                        val image = Image("copy.png")
+                        val imageView = ImageView(image)
+                        imageView.fitHeight = 20.0
+                        imageView.fitWidth = 20.0
+                        graphic = imageView
+                        tooltip = Tooltip("Скопировать")
+                    }
+                    button {
+                        action {
                             controller.openChangeModal(it.id)
                         }
                         val image = Image("edit-tool.png")

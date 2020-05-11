@@ -11,6 +11,9 @@ class FunctionsCanvasController : Controller() {
         subscribe<ConcatenationFunctionEvent> { event ->
             service.addFunction(event)
         }
+        subscribe<FunctionCopyQuery> {
+            service.copyFunction(it)
+        }
         subscribe<UpdateFunctionEvent> {
             service.updateFunction(it)
         }

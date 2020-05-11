@@ -4,5 +4,6 @@ import tornadofx.FXEvent
 import java.util.*
 
 data class FunctionCopyQuery(
-    val id: UUID
+    val id: UUID,
+    val name: String
 ) : FXEvent()

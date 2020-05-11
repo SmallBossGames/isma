@@ -33,7 +33,6 @@ class ConcatenationCanvasController : Controller() {
     private val cartesianController: CartesianCanvasController = find { }
 
     init {
-
         subscribe<ConcatenationArrowEvent> { event ->
             addArrow(event)
         }

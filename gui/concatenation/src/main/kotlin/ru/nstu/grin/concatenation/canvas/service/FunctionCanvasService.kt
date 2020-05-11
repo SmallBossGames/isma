@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import tornadofx.Controller
+import java.util.*
 
 class FunctionCanvasService : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -32,6 +33,14 @@ class FunctionCanvasService : Controller() {
             found.merge(functions)
             model.cartesianSpaces.add(found)
         }
+    }
+
+    fun copyFunction(event: FunctionCopyQuery) {
+        val oldFunction = model.cartesianSpaces.map { it.functions }.flatten().first { it.id == event.id }
+        val newFunction = oldFunction.clone().copy(id = UUID.randomUUID(), name = event.name)
+        val cartesianSpace = model.cartesianSpaces.first { it.functions.firstOrNull { it.id == event.id } != null }
+        cartesianSpace.functions.add(newFunction)
+        getAllFunctions()
     }
 
     fun updateFunction(event: UpdateFunctionEvent) {

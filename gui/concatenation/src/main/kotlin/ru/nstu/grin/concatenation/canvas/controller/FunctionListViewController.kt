@@ -5,6 +5,7 @@ import ru.nstu.grin.concatenation.canvas.events.GetAllFunctionsEvent
 import ru.nstu.grin.concatenation.canvas.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.canvas.model.FunctionListViewModel
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
+import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import tornadofx.Controller
 import tornadofx.asObservable
 import java.util.*
@@ -21,12 +22,20 @@ class FunctionListViewController : Controller() {
         }
     }
 
+    fun openCopyModal(id: UUID) {
+        find<CopyFunctionFragment>(
+            mapOf(
+                CopyFunctionFragment::functionId to id
+            )
+        ).openModal()
+    }
+
     fun openChangeModal(id: UUID) {
         find<ChangeFunctionFragment>(
             mapOf(
                 ChangeFunctionFragment::functionId to id
             )
-        ).openWindow()
+        ).openModal()
     }
 
     fun getAllFunctions() {

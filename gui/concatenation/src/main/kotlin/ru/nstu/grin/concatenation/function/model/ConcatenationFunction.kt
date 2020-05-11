@@ -21,7 +21,7 @@ data class ConcatenationFunction(
     var lineSize: Double,
     var lineType: LineType
 ) : Writer, Cloneable {
-    public override fun clone(): Any {
+    public override fun clone(): ConcatenationFunction {
         return ConcatenationFunction(
             id = id,
             name = name,

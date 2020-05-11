@@ -13,13 +13,14 @@ data class CartesianSpace(
     var isShowGrid: Boolean = false
 ) : Cloneable {
 
-    public override fun clone(): Any {
+    public override fun clone(): CartesianSpace {
         return CartesianSpace(
-            id = id,
+            id = UUID.randomUUID(),
             name = name,
-            functions = functions.map { it.copy(points = it.points.map { it.copy() }) }.toMutableList(),
-            xAxis = xAxis.copy(settings = xAxis.settings.copy()),
-            yAxis = yAxis.copy(settings = yAxis.settings.copy()),
+            functions = functions.map { it.copy(id = UUID.randomUUID(), points = it.points.map { it.copy() }) }
+                .toMutableList(),
+            xAxis = xAxis.copy(id = UUID.randomUUID(), settings = xAxis.settings.copy()),
+            yAxis = yAxis.copy(id = UUID.randomUUID(), settings = yAxis.settings.copy()),
             isShowGrid = isShowGrid
         )
     }

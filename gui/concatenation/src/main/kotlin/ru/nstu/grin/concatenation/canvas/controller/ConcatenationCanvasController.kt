@@ -56,7 +56,7 @@ class ConcatenationCanvasController : Controller() {
             model.descriptions.addAll(readResult.descriptions)
             TODO("Add cartesians")
         }
-//        addFunction()
+        addFunction()
     }
 
     fun addFunction() {

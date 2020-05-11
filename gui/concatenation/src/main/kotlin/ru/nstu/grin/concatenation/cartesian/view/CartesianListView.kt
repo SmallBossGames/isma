@@ -31,6 +31,21 @@ class CartesianListView : Fragment() {
                     spacing = 20.0
                     button {
                         action {
+                            find<CopyCartesianFragment>(
+                                mapOf(
+                                    CopyCartesianFragment::cartesianId to it.id
+                                )
+                            ).openModal()
+                            val image = Image("copy.png")
+                            val imageView = ImageView(image)
+                            imageView.fitHeight = 20.0
+                            imageView.fitWidth = 20.0
+                            graphic = imageView
+                            tooltip = Tooltip("Скопировать")
+                        }
+                    }
+                    button {
+                        action {
                             find<ChangeCartesianFragment>(
                                 mapOf(
                                     ChangeCartesianFragment::cartesianId to it.id

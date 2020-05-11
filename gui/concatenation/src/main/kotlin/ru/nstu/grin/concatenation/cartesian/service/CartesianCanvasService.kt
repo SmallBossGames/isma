@@ -6,10 +6,23 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.events.*
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
 import tornadofx.Controller
+import java.util.*
 
 class CartesianCanvasService : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val view: ConcatenationCanvas by inject()
+
+    fun copyCartesian(event: CartesianCopyQuery) {
+        val oldCartesian = model.cartesianSpaces.first { it.id == event.id }
+        val newCartesian = oldCartesian.clone().copy(
+            id = UUID.randomUUID(), name = event.name,
+            xAxis = oldCartesian.xAxis.copy(id = UUID.randomUUID(), name = event.xAxisName, order = oldCartesian.xAxis.order+1),
+            yAxis = oldCartesian.yAxis.copy(id = UUID.randomUUID(), name = event.yAxisName, order = oldCartesian.yAxis.order+1)
+        )
+        model.cartesianSpaces.add(newCartesian)
+        view.redraw()
+        getAllCartesianSpaces()
+    }
 
     fun getCartesian(event: CartesianQuery) {
         val cartesianSpace = model.cartesianSpaces.first { it.id == event.id }

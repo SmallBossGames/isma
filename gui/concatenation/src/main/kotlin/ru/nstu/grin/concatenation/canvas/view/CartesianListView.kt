@@ -17,6 +17,7 @@ class CartesianListView : Fragment() {
         cellFormat {
             graphic = form {
                 hbox {
+                    spacing = 20.0
                     fieldset("Имя") {
                         field {
                             label(it.name)
@@ -26,31 +27,34 @@ class CartesianListView : Fragment() {
                         label(if (it.isShowGrid) "Да" else "Нет")
                     }
                 }
-                button {
-                    action {
-                        find<ChangeCartesianFragment>(
-                            mapOf(
-                                ChangeCartesianFragment::cartesianId to it.id
-                            )
-                        ).openModal()
+                hbox {
+                    spacing = 20.0
+                    button {
+                        action {
+                            find<ChangeCartesianFragment>(
+                                mapOf(
+                                    ChangeCartesianFragment::cartesianId to it.id
+                                )
+                            ).openModal()
+                        }
+                        val image = Image("edit-tool.png")
+                        val imageView = ImageView(image)
+                        imageView.fitHeight = 20.0
+                        imageView.fitWidth = 20.0
+                        graphic = imageView
+                        tooltip = Tooltip("Отредактировать")
                     }
-                    val image = Image("edit-tool.png")
-                    val imageView = ImageView(image)
-                    imageView.fitHeight = 20.0
-                    imageView.fitWidth = 20.0
-                    graphic = imageView
-                    tooltip = Tooltip("Отредактировать")
-                }
-                button {
-                    action {
-                        controller.deleteCartesian(it.id)
+                    button {
+                        action {
+                            controller.deleteCartesian(it.id)
+                        }
+                        val image = Image("send-to-trash.png")
+                        val imageView = ImageView(image)
+                        imageView.fitHeight = 20.0
+                        imageView.fitWidth = 20.0
+                        graphic = imageView
+                        tooltip = Tooltip("Удалить")
                     }
-                    val image = Image("send-to-trash.png")
-                    val imageView = ImageView(image)
-                    imageView.fitHeight = 20.0
-                    imageView.fitWidth = 20.0
-                    graphic = imageView
-                    tooltip = Tooltip("Удалить")
                 }
             }
         }

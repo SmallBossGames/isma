@@ -41,6 +41,17 @@ class CartesianListView : Fragment() {
                     graphic = imageView
                     tooltip = Tooltip("Отредактировать")
                 }
+                button {
+                    action {
+                        controller.deleteCartesian(it.id)
+                    }
+                    val image = Image("send-to-trash.png")
+                    val imageView = ImageView(image)
+                    imageView.fitHeight = 20.0
+                    imageView.fitWidth = 20.0
+                    graphic = imageView
+                    tooltip = Tooltip("Удалить")
+                }
             }
         }
     }

@@ -1,36 +1,33 @@
-package ru.nstu.grin.concatenation.function.view
+package ru.nstu.grin.concatenation.description.view
 
 import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
-import ru.nstu.grin.concatenation.canvas.model.FunctionListViewModel
+import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
+import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import tornadofx.*
 
-class FunctionListView : Fragment() {
-    private val model: FunctionListViewModel by inject()
-    private val controller: FunctionListViewController = find { }
+class DescriptionListView : Fragment() {
+    private val model: DescriptionListViewModel by inject()
+    private val controller: DescriptionListViewController by inject()
 
-    override val root: Parent = listview(model.functionsProperty) {
+    override val root: Parent = listview(model.descriptionsProperty) {
         cellFormat {
             graphic = form {
                 hbox {
                     spacing = 20.0
-                    fieldset("Имя") {
-                        label(it.name)
+                    fieldset("Текст") {
+                        label(it.text)
                     }
-                    fieldset("цвет") {
-                        label(it.functionColor.toString())
+                    fieldset("Размер текста") {
+                        label(it.size.toString())
                     }
-                    fieldset("Размер линии") {
-                        label(it.lineSize.toString())
+                    fieldset("Цвет текста") {
+                        label(it.color.toString())
                     }
-                    fieldset("Тип рисовки") {
-                        label(it.lineType.toString())
-                    }
-                    fieldset("Отображается") {
-                        label(if (it.isHide) "Нет" else "Да")
+                    fieldset("Семейство шрифта") {
+                        label(it.font)
                     }
                 }
                 hbox {
@@ -59,7 +56,7 @@ class FunctionListView : Fragment() {
                     }
                     button {
                         action {
-                            controller.deleteFunction(it.id)
+                            controller.deleteDescription(it.id)
                         }
                         val image = Image("send-to-trash.png")
                         val imageView = ImageView(image)
@@ -71,9 +68,5 @@ class FunctionListView : Fragment() {
                 }
             }
         }
-    }
-
-    init {
-        controller.getAllFunctions()
     }
 }

@@ -4,16 +4,19 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.extensions.toByteArray
 import ru.nstu.grin.common.file.Writer
 import java.io.ObjectOutputStream
+import java.util.*
 
 /**
  * @author kostya05983
  */
 data class Description(
+    val id: UUID,
     val text: String,
     val size: Double,
     val x: Double,
     val y: Double,
-    val color: Color
+    val color: Color,
+    val font: String
 ) : Writer {
 //    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
 //        return when (direction) {

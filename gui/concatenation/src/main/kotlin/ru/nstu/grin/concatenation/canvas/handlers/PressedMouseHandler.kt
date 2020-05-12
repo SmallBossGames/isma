@@ -16,7 +16,6 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
-
         if (editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) {
             if (event.button == MouseButton.PRIMARY) {
                 println("Pressed primary button")
@@ -24,40 +23,43 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
                 model.selectionSettings.firstPoint = Point(event.x, event.y)
             }
         }
-
         if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
             handleEditMode(event)
         }
-
         if (event.button == MouseButton.SECONDARY) {
             println("Set to false")
             model.pointToolTipSettings.isShow = false
             model.pointToolTipSettings.pointsSettings.clear()
         }
-        showContextMenu(event)
         if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
-            val nearFunction = model.cartesianSpaces.mapNotNull {
-                it.functions.firstOrNull {
-                    it.points.any { it.isNearBy(event.x, event.y) }
-                }
-            }.firstOrNull() ?: return
-
-            val nearPoint = nearFunction.points.first {
-                it.isNearBy(event.x, event.y)
-            }
-            println("Found nearPoint $nearPoint")
-
-            val pointToolTipSettings = model.pointToolTipSettings
-            pointToolTipSettings.isShow = true
-            val pointSettings = PointSettings(
-                nearPoint.x,
-                nearPoint.y,
-                nearPoint.xGraphic ?: 0.0,
-                nearPoint.yGraphic ?: 0.0
-            )
-            pointToolTipSettings.pointsSettings.add(pointSettings)
+            handleViewMode(event)
         }
+
+        showContextMenu(event)
         chainDrawer.draw()
+    }
+
+    private fun handleViewMode(event: MouseEvent) {
+        val nearFunction = model.cartesianSpaces.mapNotNull {
+            it.functions.firstOrNull {
+                it.points.any { it.isNearBy(event.x, event.y) }
+            }
+        }.firstOrNull() ?: return
+
+        val nearPoint = nearFunction.points.first {
+            it.isNearBy(event.x, event.y)
+        }
+        println("Found nearPoint $nearPoint")
+
+        val pointToolTipSettings = model.pointToolTipSettings
+        pointToolTipSettings.isShow = true
+        val pointSettings = PointSettings(
+            nearPoint.x,
+            nearPoint.y,
+            nearPoint.xGraphic ?: 0.0,
+            nearPoint.yGraphic ?: 0.0
+        )
+        pointToolTipSettings.pointsSettings.add(pointSettings)
     }
 
     private fun handleEditMode(event: MouseEvent) {

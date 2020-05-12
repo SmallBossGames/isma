@@ -36,11 +36,15 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
             handleEditMode(event)
         }
 
-        if (model.pointToolTipSettings.isShow) return
-        if (!event.isPrimaryButtonDown) {
-            model.selectionSettings.isSelected = false
-            return
+        if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
+            handleDragged(event)
         }
+        chainDrawer.draw()
+    }
+
+    private fun handleDragged(event: MouseEvent) {
+        model.pointToolTipSettings.isShow = false
+        model.pointToolTipSettings.pointsSettings.clear()
 
         val axises = model.cartesianSpaces.map {
             listOf(it.xAxis, it.yAxis)
@@ -85,7 +89,6 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         draggedSettings.lastX = event.x
         draggedSettings.lastY = event.y
         currentCanvasSettings[axis] = draggedSettings
-        chainDrawer.draw()
     }
 
     private fun handleEditMode(event: MouseEvent) {

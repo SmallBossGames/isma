@@ -36,7 +36,7 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
             val cartesianSpaces = if (editMode == EditMode.SCALE) {
                 model.cartesianSpaces
             } else {
-                model.cartesianSpaces.map { it.clone() as CartesianSpace }
+                model.cartesianSpaces.map { it.clone() }
             }
 
             for (cartesianSpace in cartesianSpaces) {
@@ -86,13 +86,5 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
             model.selectionSettings.dropToDefault()
         }
         chainDrawer.draw()
-    }
-
-    private fun copy(cartesianSpaces: List<CartesianSpace>): List<CartesianSpace> {
-        val list = mutableListOf<CartesianSpace>()
-        for (cartesianSpace in cartesianSpaces) {
-            list.add(cartesianSpace.copy())
-        }
-        return list
     }
 }

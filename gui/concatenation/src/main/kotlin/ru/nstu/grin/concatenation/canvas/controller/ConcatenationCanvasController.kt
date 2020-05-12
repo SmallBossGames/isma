@@ -6,7 +6,6 @@ import ru.nstu.grin.common.converters.model.ArrowConverter
 import ru.nstu.grin.common.converters.model.DescriptionConverter
 import ru.nstu.grin.common.events.ConcatenationArrowEvent
 import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
-import ru.nstu.grin.common.events.ConcatenationDescriptionEvent
 import ru.nstu.grin.common.model.ConcatenationType
 import ru.nstu.grin.common.view.modal.ArrowModalView
 import ru.nstu.grin.concatenation.axis.controller.AxisCanvasController
@@ -17,6 +16,7 @@ import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianCanvasController
+import ru.nstu.grin.concatenation.description.controller.DescriptionCanvasController
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
 import ru.nstu.grin.concatenation.file.DrawReader
 import ru.nstu.grin.concatenation.file.DrawWriter
@@ -35,13 +35,11 @@ class ConcatenationCanvasController : Controller() {
     private val functionsController: FunctionsCanvasController = find { }
     private val axisCanvasController: AxisCanvasController = find { }
     private val cartesianController: CartesianCanvasController = find { }
+    private val descriptionController: DescriptionCanvasController = find { }
 
     init {
         subscribe<ConcatenationArrowEvent> { event ->
             addArrow(event)
-        }
-        subscribe<ConcatenationDescriptionEvent> { event ->
-            addDescription(event)
         }
         subscribe<ConcatenationClearCanvasEvent> {
             clearCanvas()
@@ -76,11 +74,6 @@ class ConcatenationCanvasController : Controller() {
     fun addArrow(event: ConcatenationArrowEvent) {
         val arrow = ArrowConverter.convert(event.arrow)
         model.arrows.add(arrow)
-    }
-
-    fun addDescription(event: ConcatenationDescriptionEvent) {
-        val description = DescriptionConverter.convert(event.description)
-        model.descriptions.add(description)
     }
 
     fun openFunctionModal(

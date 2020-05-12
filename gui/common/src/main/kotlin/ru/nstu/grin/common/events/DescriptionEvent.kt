@@ -7,10 +7,6 @@ sealed class DescriptionEvent(
     val description: DescriptionDTO
 ) : FXEvent()
 
-class ConcatenationDescriptionEvent(
-    description: DescriptionDTO
-) : DescriptionEvent(description)
-
 class SimpleDescriptionEvent(
     description: DescriptionDTO
 ) : DescriptionEvent(description)

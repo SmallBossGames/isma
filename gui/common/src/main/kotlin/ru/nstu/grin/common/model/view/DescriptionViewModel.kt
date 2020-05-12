@@ -19,4 +19,7 @@ class DescriptionViewModel : ViewModel() {
 
     var textColorProperty = SimpleObjectProperty<Color>(Color.BLACK)
     var textColor by textColorProperty
+
+    var fontProperty = SimpleStringProperty()
+    var font by fontProperty
 }

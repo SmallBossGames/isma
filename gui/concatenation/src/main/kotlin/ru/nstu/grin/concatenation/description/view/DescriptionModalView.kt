@@ -1,7 +1,8 @@
 package ru.nstu.grin.concatenation.description.view
 
 import javafx.scene.Parent
-import ru.nstu.grin.common.controller.DescriptionModalController
+import javafx.scene.text.Font
+import ru.nstu.grin.concatenation.description.controller.DescriptionModalController
 import ru.nstu.grin.common.model.view.DescriptionViewModel
 import tornadofx.*
 
@@ -28,6 +29,9 @@ class DescriptionModalView : Fragment() {
             }
             field("Цвет текста") {
                 colorpicker().bind(model.textColorProperty)
+            }
+            field("Шрифт") {
+                combobox(model.fontProperty, Font.getFamilies())
             }
         }
         button("Готово") {

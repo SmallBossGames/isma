@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.function.view
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import javafx.scene.canvas.GraphicsContext
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
@@ -7,6 +8,7 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.function.model.LineType
+import ru.nstu.grin.concatenation.function.model.MirrorSettings
 import tornadofx.Controller
 import kotlin.math.log10
 
@@ -22,7 +24,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                 context.stroke = function.functionColor
                 context.fill = function.functionColor
                 context.lineWidth = function.lineSize
-                transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis)
+                transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis, function.mirrorSettings)
 
                 val points = function.points
 
@@ -94,7 +96,12 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
         context.lineWidth = previousLineSize
     }
 
-    private fun transformPoints(points: List<Point>, xAxis: ConcatenationAxis, yAxis: ConcatenationAxis) {
+    private fun transformPoints(
+        points: List<Point>,
+        xAxis: ConcatenationAxis,
+        yAxis: ConcatenationAxis,
+        mirrorSettings: MirrorSettings
+    ) {
         for (it in points) {
             val x = if (xAxis.settings.isLogarithmic) {
                 if (it.x < 0) {
@@ -106,7 +113,10 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                 it.x
             }
 
-            it.xGraphic = matrixTransformer.transformUnitsToPixel(x, xAxis.settings, xAxis.direction)
+            it.xGraphic = matrixTransformer.transformUnitsToPixel(
+                mirrorTransform(x, mirrorSettings.isMirrorX),
+                xAxis.settings, xAxis.direction
+            )
 
             val y = if (yAxis.settings.isLogarithmic) {
                 if (it.y < 0) {
@@ -118,7 +128,21 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                 it.y
             }
 
-            it.yGraphic = matrixTransformer.transformUnitsToPixel(y, yAxis.settings, yAxis.direction)
+            it.yGraphic = matrixTransformer.transformUnitsToPixel(
+                mirrorTransform(y, mirrorSettings.isMirrorY),
+                yAxis.settings,
+                yAxis.direction
+            )
+        }
+    }
+
+    // TODO можно сильно упростить код, если сденлать цепочку трансформаций над точкой, перед тем как его рисовать,
+    //тогда получиться красиво
+    private fun mirrorTransform(number: Double, isMirror: Boolean): Double {
+        return if (isMirror) {
+            -number
+        } else {
+            number
         }
     }
 }

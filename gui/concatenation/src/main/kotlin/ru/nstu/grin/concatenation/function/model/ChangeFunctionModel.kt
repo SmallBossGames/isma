@@ -14,6 +14,12 @@ class ChangeFunctionModel : ViewModel() {
     var functionColorProperty = SimpleObjectProperty<Color>()
     var functionColor by functionColorProperty
 
+    var isMirrorXProperty = SimpleBooleanProperty()
+    var isMirrorX by isMirrorXProperty
+
+    var isMirrorYProperty = SimpleBooleanProperty()
+    var isMirrorY by isMirrorYProperty
+
     var lineSizeProperty = SimpleStringProperty()
     var lineSize by lineSizeProperty
 

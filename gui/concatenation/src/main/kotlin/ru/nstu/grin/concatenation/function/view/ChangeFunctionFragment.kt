@@ -29,6 +29,12 @@ class ChangeFunctionFragment : Fragment() {
             field("Отображать ли функцию") {
                 checkbox().bind(model.isHideProperty)
             }
+            field("Зеркларовать по x") {
+                checkbox().bind(model.isMirrorXProperty)
+            }
+            field("Зеркалировать по y") {
+                checkbox().bind(model.isMirrorYProperty)
+            }
             field("Вид линии") {
                 combobox(model.lineTypeProperty, LineType.values().toList()) {
                     cellFormat {

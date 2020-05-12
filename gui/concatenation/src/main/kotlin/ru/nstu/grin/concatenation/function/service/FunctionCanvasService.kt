@@ -54,6 +54,7 @@ class FunctionCanvasService : Controller() {
         function.isHide = event.isHide
         function.lineSize = event.lineSize
         function.lineType = event.lineType
+        function.mirrorSettings = event.mirrorSettings
         view.redraw()
         getAllFunctions()
     }

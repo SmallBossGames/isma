@@ -10,5 +10,6 @@ data class UpdateAxisEvent(
     val textSize: Double,
     val font: String,
     val fontColor: Color,
-    val axisColor: Color
+    val axisColor: Color,
+    val isHide: Boolean
 ) : FXEvent()

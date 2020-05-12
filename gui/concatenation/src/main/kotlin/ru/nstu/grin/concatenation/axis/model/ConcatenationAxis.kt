@@ -25,6 +25,7 @@ data class ConcatenationAxis(
     var distanceBetweenMarks: Double,
     var textSize: Double,
     var font: String,
+    var isHide: Boolean = false,
     val settings: AxisSettings = AxisSettings()
 ) : Writer, Cloneable {
 
@@ -44,8 +45,6 @@ data class ConcatenationAxis(
             settings = settings.copy()
         )
     }
-
-
 
     fun isLocated(x: Double, y: Double): Boolean {
         when (direction) {

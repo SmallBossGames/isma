@@ -8,7 +8,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import tornadofx.Controller
 import java.util.*
 
-class AxisCanvasService: Controller() {
+class AxisCanvasService : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val view: ConcatenationCanvas by inject()
 
@@ -39,6 +39,7 @@ class AxisCanvasService: Controller() {
         axis.font = event.font
         axis.fontColor = event.fontColor
         axis.backGroundColor = event.axisColor
+        axis.isHide = event.isHide
         view.redraw()
         getAllAxises()
     }

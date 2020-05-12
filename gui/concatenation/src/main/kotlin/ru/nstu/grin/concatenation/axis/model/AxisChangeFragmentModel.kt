@@ -17,6 +17,9 @@ class AxisChangeFragmentModel : ViewModel() {
     var fontColorProperty = SimpleObjectProperty<Color>()
     var fontColor by fontColorProperty
 
+    var isHideProperty = SimpleBooleanProperty()
+    var isHide by isHideProperty
+
     var axisColorProperty = SimpleObjectProperty<Color>()
     var axisColor by axisColorProperty
 }

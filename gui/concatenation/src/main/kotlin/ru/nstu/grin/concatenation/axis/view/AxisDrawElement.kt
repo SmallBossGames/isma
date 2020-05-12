@@ -17,10 +17,14 @@ class AxisDrawElement(
     private val horizontalAxisDraw = HorizontalAxisDrawStrategy(matrixTransformerController)
 
     override fun draw(context: GraphicsContext) {
-        drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
-        drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
-        drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
-        drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
+        if (xAxis.isHide.not()) {
+            drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
+            drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
+        }
+        if (yAxis.isHide.not()) {
+            drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
+            drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
+        }
     }
 
     private fun drawAxisMarks(

@@ -38,6 +38,11 @@ class AxisListView : Fragment() {
                             label(it.textSize.toString())
                         }
                     }
+                    fieldset("Спрятана") {
+                        field {
+                            label(if (it.isHide) "Да" else "Нет")
+                        }
+                    }
                 }
                 button {
                     action {

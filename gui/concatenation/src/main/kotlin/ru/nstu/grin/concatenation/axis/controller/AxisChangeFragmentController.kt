@@ -11,13 +11,13 @@ class AxisChangeFragmentController : Controller() {
 
     init {
         subscribe<GetAxisEvent> {
-            println("Test")
             if (it.axis.id == axisId) {
                 model.axisColor = it.axis.backGroundColor
                 model.distanceBetweenMarks = it.axis.distanceBetweenMarks.toString()
                 model.textSize = it.axis.textSize.toString()
                 model.font = it.axis.font
                 model.fontColor = it.axis.fontColor
+                model.isHide = it.axis.isHide
             }
         }
     }

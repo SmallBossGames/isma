@@ -34,6 +34,9 @@ class AxisChangeFragment : Fragment() {
             field("Цвет оси") {
                 colorpicker().bind(model.axisColorProperty)
             }
+            field("Спрятать ось") {
+                checkbox().bind(model.isHideProperty)
+            }
         }
         button("Ок") {
             action {
@@ -43,7 +46,8 @@ class AxisChangeFragment : Fragment() {
                     textSize = model.textSize.toDouble(),
                     font = model.font,
                     fontColor = model.fontColor,
-                    axisColor = model.axisColor
+                    axisColor = model.axisColor,
+                    isHide = model.isHide
                 )
                 fire(event)
                 close()

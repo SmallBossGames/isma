@@ -22,15 +22,22 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
-        if (editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) {
+        val isOnAxis = isOnAxis(event)
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {
             if (event.isPrimaryButtonDown) {
                 println("Primary button down dragged")
-                model.selectionSettings.secondPoint = Point(event.x, event.y)
-                chainDrawer.draw()
+                if (model.selectionSettings.firstPoint.x == -1.0) {
+                    println("I'm here mazahaka")
+                    model.selectionSettings.isSelected = true
+                    model.selectionSettings.firstPoint = Point(event.x, event.y)
+                } else {
+                    model.selectionSettings.secondPoint = Point(event.x, event.y)
+                }
             }
             if (!event.isPrimaryButtonDown) {
                 model.selectionSettings.isSelected = false
             }
+            chainDrawer.draw()
         }
         if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
             handleEditMode(event)
@@ -40,6 +47,10 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
             handleDragged(event)
         }
         chainDrawer.draw()
+    }
+
+    private fun isOnAxis(event: MouseEvent): Boolean {
+        return model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten().any { it.isLocated(event.x, event.y) }
     }
 
     private fun handleDragged(event: MouseEvent) {

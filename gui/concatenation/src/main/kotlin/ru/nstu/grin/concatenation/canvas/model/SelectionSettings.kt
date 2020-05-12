@@ -4,12 +4,12 @@ import ru.nstu.grin.common.model.Point
 
 data class SelectionSettings(
     var isSelected: Boolean = false,
-    var firstPoint: Point = Point(0.0, 0.0),
+    var firstPoint: Point = Point(-1.0, -1.0),
     var secondPoint: Point = Point(-1.0, -1.0)
 ) {
     fun dropToDefault() {
         isSelected = false
-        firstPoint = Point(0.0, 0.0)
+        firstPoint = Point(-1.0, -1.0)
         secondPoint = Point(-1.0, -1.0)
     }
 

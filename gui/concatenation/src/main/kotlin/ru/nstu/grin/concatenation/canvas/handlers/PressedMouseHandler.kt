@@ -16,7 +16,8 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
-        if (editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) {
+        val isOnAxis = isOnAxis(event)
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {
             if (event.button == MouseButton.PRIMARY) {
                 println("Pressed primary button")
                 model.selectionSettings.isSelected = true
@@ -37,6 +38,10 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
 
         showContextMenu(event)
         chainDrawer.draw()
+    }
+
+    private fun isOnAxis(event: MouseEvent): Boolean {
+        return model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten().any { it.isLocated(event.x, event.y) }
     }
 
     private fun handleViewMode(event: MouseEvent) {

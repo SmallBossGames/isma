@@ -33,6 +33,8 @@ class FunctionCanvasService : Controller() {
             found.merge(functions)
             model.cartesianSpaces.add(found)
         }
+        val firstFun = event.cartesianSpace.functions.first()
+        localizeFunction(LocalizeFunctionEvent(firstFun.id))
     }
 
     fun copyFunction(event: FunctionCopyQuery) {

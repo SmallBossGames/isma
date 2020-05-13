@@ -76,7 +76,7 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
     }
 
     private companion object {
-        const val DELTA = 0.3
+        const val DELTA = 2.0
         const val TIMES_TO_SCROLL = 3L
         const val DELTA_DELIMITER = 10L
     }

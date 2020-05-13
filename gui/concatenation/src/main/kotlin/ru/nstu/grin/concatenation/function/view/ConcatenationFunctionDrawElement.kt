@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.function.view
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import javafx.scene.canvas.GraphicsContext
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
@@ -9,7 +8,10 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.function.model.MirrorSettings
+import ru.nstu.grin.concatenation.function.transform.LogTransform
+import ru.nstu.grin.concatenation.function.transform.MirrorTransform
 import tornadofx.Controller
+import tornadofx.mapEach
 import kotlin.math.log10
 
 class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
@@ -28,11 +30,11 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
 
                 val points = function.points
 
+                val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
+                val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
+                val n = xPoints.size
                 when (function.lineType) {
                     LineType.POLYNOM -> {
-                        val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
-                        val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
-                        val n = points.size
                         context.strokePolyline(
                             xPoints,
                             yPoints,
@@ -50,7 +52,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                     }
                     LineType.SEGMENTS -> {
                         var i = 0
-                        while (i < points.size - 1) {
+                        while (i < n - 1) {
                             val x1 = points[i].xGraphic
                             val y1 = points[i].yGraphic
                             val x2 = points[i + 1].xGraphic
@@ -102,47 +104,30 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
         yAxis: ConcatenationAxis,
         mirrorSettings: MirrorSettings
     ) {
-        for (it in points) {
-            val x = if (xAxis.settings.isLogarithmic) {
-                if (it.x < 0) {
-                    it.xGraphic = 0.0
-                    continue
-                }
-                log10(it.x)
+        val transforms = listOf(
+            LogTransform(xAxis.settings.isLogarithmic, yAxis.settings.isLogarithmic),
+            MirrorTransform(mirrorSettings.isMirrorX, mirrorSettings.isMirrorY)
+        )
+        for (point in points) {
+            var temp: Point? = point
+            for (transform in transforms) {
+                temp = temp?.let { transform.transform(it) }
+            }
+            if (temp != null) {
+                point.xGraphic = matrixTransformer.transformUnitsToPixel(
+                    temp.x,
+                    xAxis.settings, xAxis.direction
+                )
+                point.yGraphic = matrixTransformer.transformUnitsToPixel(
+                    temp.y,
+                    yAxis.settings,
+                    yAxis.direction
+                )
             } else {
-                it.x
+                point.xGraphic = null
+                point.yGraphic = null
             }
 
-            it.xGraphic = matrixTransformer.transformUnitsToPixel(
-                mirrorTransform(x, mirrorSettings.isMirrorX),
-                xAxis.settings, xAxis.direction
-            )
-
-            val y = if (yAxis.settings.isLogarithmic) {
-                if (it.y < 0) {
-                    it.yGraphic = 0.0
-                    continue
-                }
-                log10(it.y)
-            } else {
-                it.y
-            }
-
-            it.yGraphic = matrixTransformer.transformUnitsToPixel(
-                mirrorTransform(y, mirrorSettings.isMirrorY),
-                yAxis.settings,
-                yAxis.direction
-            )
-        }
-    }
-
-    // TODO можно сильно упростить код, если сденлать цепочку трансформаций над точкой, перед тем как его рисовать,
-    //тогда получиться красиво
-    private fun mirrorTransform(number: Double, isMirror: Boolean): Double {
-        return if (isMirror) {
-            -number
-        } else {
-            number
         }
     }
 }

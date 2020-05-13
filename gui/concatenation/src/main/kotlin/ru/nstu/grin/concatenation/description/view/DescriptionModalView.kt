@@ -1,6 +1,8 @@
 package ru.nstu.grin.concatenation.description.view
 
+import javafx.geometry.Pos
 import javafx.scene.Parent
+import javafx.scene.layout.Priority
 import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.description.controller.DescriptionModalController
 import ru.nstu.grin.common.model.view.DescriptionViewModel
@@ -20,6 +22,7 @@ class DescriptionModalView : Fragment() {
     }
 
     override val root: Parent = form {
+        vgrow = Priority.ALWAYS
         fieldset {
             field("Текст") {
                 textfield().bind(model.textProperty)
@@ -34,14 +37,21 @@ class DescriptionModalView : Fragment() {
                 combobox(model.fontProperty, Font.getFamilies())
             }
         }
-        button("Готово") {
-            enableWhen {
-                model.valid
+        vbox {
+            hbox {
+                alignment = Pos.CENTER
+                button("Готово") {
+                    enableWhen {
+                        model.valid
+                    }
+                    action {
+                        controller.addDescription()
+                        close()
+                    }
+                }
             }
-            action {
-                controller.addDescription()
-                close()
-            }
+            spacing = 10.0
+            spacer()
         }
     }
 }

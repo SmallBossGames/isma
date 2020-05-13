@@ -1,14 +1,17 @@
 package ru.nstu.grin.concatenation.description.service
 
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.description.events.*
 import tornadofx.Controller
 
-class DescriptionService : Controller() {
+class DescriptionCanvasService : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
+    private val view: ConcatenationCanvas by inject()
 
     fun add(event: AddDescriptionEvent) {
         model.descriptions.add(event.description)
+        view.redraw()
     }
 
     fun update(event: UpdateDescriptionEvent) {
@@ -18,6 +21,7 @@ class DescriptionService : Controller() {
         description.color = event.color
         description.font = event.font
         getAll()
+        view.redraw()
     }
 
     fun get(event: GetDescriptionQuery) {
@@ -31,5 +35,7 @@ class DescriptionService : Controller() {
 
     fun delete(event: DeleteDescriptionQuery) {
         model.descriptions.removeIf { it.id == event.id }
+        getAll()
+        view.redraw()
     }
 }

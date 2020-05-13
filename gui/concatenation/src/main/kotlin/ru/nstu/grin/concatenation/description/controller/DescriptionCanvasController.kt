@@ -1,11 +1,11 @@
 package ru.nstu.grin.concatenation.description.controller
 
 import ru.nstu.grin.concatenation.description.events.*
-import ru.nstu.grin.concatenation.description.service.DescriptionService
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import tornadofx.Controller
 
 class DescriptionCanvasController : Controller() {
-    private val service: DescriptionService by inject()
+    private val service: DescriptionCanvasService by inject()
 
     init {
         subscribe<AddDescriptionEvent> { event ->

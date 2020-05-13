@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
+import javafx.scene.text.Font
 import tornadofx.ViewModel
 import tornadofx.*
 
@@ -14,12 +15,12 @@ class DescriptionViewModel : ViewModel() {
     var textProperty = SimpleStringProperty()
     var text: String by textProperty
 
-    var sizeProperty = SimpleDoubleProperty()
+    var sizeProperty = SimpleDoubleProperty(12.0)
     var size: Double by sizeProperty
 
-    var textColorProperty = SimpleObjectProperty<Color>(Color.BLACK)
+    var textColorProperty = SimpleObjectProperty(Color.BLACK)
     var textColor by textColorProperty
 
-    var fontProperty = SimpleStringProperty()
+    var fontProperty = SimpleStringProperty(Font.getDefault().family)
     var font by fontProperty
 }

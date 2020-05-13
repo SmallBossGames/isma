@@ -10,7 +10,7 @@ class DescriptionDrawElement(
     override fun draw(context: GraphicsContext) {
         for (description in descriptions) {
             context.stroke = description.color
-            context.strokeText(description.text, description.x, description.y, description.size)
+            context.strokeText(description.text, description.x, description.y, description.textSize)
         }
     }
 }

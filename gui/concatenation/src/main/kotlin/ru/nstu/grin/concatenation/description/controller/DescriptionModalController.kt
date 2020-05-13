@@ -14,7 +14,7 @@ class DescriptionModalController : Controller() {
         val description = Description(
             id = UUID.randomUUID(),
             text = model.text,
-            size = model.size,
+            textSize = model.size,
             x = model.x,
             y = model.y,
             color = model.textColor,

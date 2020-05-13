@@ -9,7 +9,7 @@ object DescriptionConverter : Converter<DescriptionDTO, Description> {
         return Description(
             id = source.id,
             text = source.text,
-            size = source.size,
+            textSize = source.size,
             x = source.x,
             y = source.y,
             color = source.textColor,

@@ -1,6 +1,6 @@
 package ru.nstu.grin.concatenation.description.controller
 
-import ru.nstu.grin.concatenation.description.events.AddDescriptionEvent
+import ru.nstu.grin.concatenation.description.events.*
 import ru.nstu.grin.concatenation.description.service.DescriptionService
 import tornadofx.Controller
 
@@ -9,7 +9,19 @@ class DescriptionCanvasController : Controller() {
 
     init {
         subscribe<AddDescriptionEvent> { event ->
-            service.addDescription(event)
+            service.add(event)
+        }
+        subscribe<UpdateDescriptionEvent> {
+            service.update(it)
+        }
+        subscribe<GetDescriptionQuery> {
+            service.get(it)
+        }
+        subscribe<GetAllDescriptionQuery> {
+            service.getAll()
+        }
+        subscribe<DeleteDescriptionQuery> {
+            service.delete(it)
         }
     }
 }

@@ -11,12 +11,12 @@ import java.util.*
  */
 data class Description(
     val id: UUID,
-    val text: String,
-    val size: Double,
-    val x: Double,
-    val y: Double,
-    val color: Color,
-    val font: String
+    var text: String,
+    var textSize: Double,
+    var x: Double,
+    var y: Double,
+    var color: Color,
+    var font: String
 ) : Writer {
 //    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
 //        return when (direction) {
@@ -40,7 +40,7 @@ data class Description(
 
     override fun serialize(oos: ObjectOutputStream) {
         oos.writeUTF(text)
-        oos.writeDouble(size)
+        oos.writeDouble(textSize)
         oos.writeDouble(x)
         oos.writeDouble(y)
         oos.write(color.toByteArray())

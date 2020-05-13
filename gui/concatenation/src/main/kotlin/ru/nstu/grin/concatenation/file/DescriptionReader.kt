@@ -11,7 +11,7 @@ class DescriptionReader : Reader<Description> {
         return Description(
             id = UUID.fromString(ois.readUTF()),
             text = ois.readUTF(),
-            size = ois.readDouble(),
+            textSize = ois.readDouble(),
             x = ois.readDouble(),
             y = ois.readDouble(),
             color = readColor(ois),

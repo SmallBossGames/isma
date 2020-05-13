@@ -43,6 +43,26 @@ class FunctionCanvasService : Controller() {
         getAllFunctions()
     }
 
+    fun localizeFunction(event: LocalizeFunctionEvent) {
+        val cartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
+        val function = model.cartesianSpaces.map { it.functions }.flatten().first { it.id == event.id }
+        val xPoints = function.points.map { it.x }
+        val yPoints = function.points.map { it.y }
+
+        val minY = yPoints.min() ?: return
+        val maxY = yPoints.max() ?: return
+        val minX = xPoints.min() ?: return
+        val maxX = xPoints.max() ?: return
+
+        cartesianSpace.yAxis.settings.min = minY
+        cartesianSpace.yAxis.settings.max = maxY
+
+        cartesianSpace.xAxis.settings.min = minX
+        cartesianSpace.xAxis.settings.max = maxX
+
+        view.redraw()
+    }
+
     fun updateFunction(event: UpdateFunctionEvent) {
         println("Function updated")
         val function = model.cartesianSpaces.map {

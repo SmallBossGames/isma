@@ -4,6 +4,7 @@ import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
 import tornadofx.Fragment
 import tornadofx.action
 import tornadofx.button
@@ -21,6 +22,18 @@ class TransformPanel : Fragment() {
 
             action {
 
+            }
+        }
+        button {
+            val image = Image("localize.png")
+            val imageView = ImageView(image)
+            imageView.fitWidth = 20.0
+            imageView.fitHeight = 20.0
+            graphic = imageView
+            tooltip = Tooltip("Локализовать")
+
+            action {
+                find<LocalizeFunctionFragment>().openModal()
             }
         }
     }

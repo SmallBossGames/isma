@@ -14,6 +14,9 @@ class FunctionsCanvasController : Controller() {
         subscribe<FunctionCopyQuery> {
             service.copyFunction(it)
         }
+        subscribe<LocalizeFunctionEvent> {
+            service.localizeFunction(it)
+        }
         subscribe<UpdateFunctionEvent> {
             service.updateFunction(it)
         }

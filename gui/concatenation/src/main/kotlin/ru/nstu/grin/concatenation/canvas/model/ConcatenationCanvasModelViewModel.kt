@@ -28,4 +28,15 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>(), 
     val selectionSettings = SelectionSettings()
 
     var traceSettings: TraceSettings? = null
+
+    fun unselectAll() {
+        for (cartesianSpace in cartesianSpaces) {
+            for (function in cartesianSpace.functions) {
+                function.isSelected = false
+            }
+        }
+        for (description in descriptions) {
+            description.isSelected = false
+        }
+    }
 }

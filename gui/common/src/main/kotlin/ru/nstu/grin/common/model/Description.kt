@@ -16,33 +16,18 @@ data class Description(
     var x: Double,
     var y: Double,
     var color: Color,
-    var font: String
+    var font: String,
+    var isSelected: Boolean = false
 ) : Writer {
-//    override fun scale(scale: Double, direction: CoordinateDirection): Drawable {
-//        return when (direction) {
-//            CoordinateDirection.X -> Description(
-//                text, size, x * scale, y, color
-//            )
-//            CoordinateDirection.Y -> Description(
-//                text, size, x, y * scale, color
-//            )
-//        }
-//    }
-//
-//    override fun draw(context: GraphicsContext) {
-//        context.stroke = color
-//        context.strokeText(text, x, y, size)
-//    }
-//
-//    override fun isOnIt(x: Double, y: Double): Boolean {
-//        return true
-//    }
-
     override fun serialize(oos: ObjectOutputStream) {
         oos.writeUTF(text)
         oos.writeDouble(textSize)
         oos.writeDouble(x)
         oos.writeDouble(y)
         oos.write(color.toByteArray())
+    }
+
+    fun isLocated(eventX: Double, eventY: Double): Boolean {
+        return x - textSize*2 < eventX && eventX < x + textSize*2 && y - textSize*2 < eventY && eventY < y + textSize*2
     }
 }

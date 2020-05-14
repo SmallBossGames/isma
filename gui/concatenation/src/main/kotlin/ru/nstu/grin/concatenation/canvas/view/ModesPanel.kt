@@ -11,10 +11,10 @@ import tornadofx.action
 import tornadofx.button
 import tornadofx.toolbar
 
-class ModesPanel: Fragment() {
+class ModesPanel : Fragment() {
     private val model: ConcatenationViewModel by inject()
 
-    override val root: Parent =  toolbar {
+    override val root: Parent = toolbar {
         button {
             val image = Image("view-tool.png")
             val imageView = ImageView(image)
@@ -25,6 +25,30 @@ class ModesPanel: Fragment() {
 
             action {
                 model.currentEditMode = EditMode.VIEW
+            }
+        }
+        button {
+            val image = Image("select.png")
+            val imageView = ImageView(image)
+            imageView.fitWidth = 20.0
+            imageView.fitHeight = 20.0
+            graphic = imageView
+            tooltip = Tooltip("Выбор")
+
+            action {
+                model.currentEditMode = EditMode.SELECTION
+            }
+        }
+        button {
+            val image = Image("move.png")
+            val imageView = ImageView(image)
+            imageView.fitWidth = 20.0
+            imageView.fitHeight = 20.0
+            graphic = imageView
+            tooltip = Tooltip("Двигать")
+
+            action {
+                model.currentEditMode = EditMode.MOVE
             }
         }
         button {

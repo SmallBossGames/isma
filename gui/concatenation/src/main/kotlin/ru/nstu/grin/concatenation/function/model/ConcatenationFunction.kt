@@ -17,6 +17,7 @@ data class ConcatenationFunction(
     var name: String,
     val points: List<Point>,
     var isHide: Boolean = false,
+    var isSelected: Boolean = false,
     var mirrorSettings: MirrorSettings = MirrorSettings(),
     var functionColor: Color,
     var lineSize: Double,

@@ -15,8 +15,14 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private val concatenationViewModel: ConcatenationViewModel by inject()
 
     override fun handle(event: MouseEvent) {
+        model.unselectAll()
         val editMode = concatenationViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
+        if (editMode == EditMode.SELECTION && event.button == MouseButton.PRIMARY) {
+            val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
+            description?.isSelected = true
+        }
+
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {
             if (event.button == MouseButton.PRIMARY) {
                 println("Pressed primary button")

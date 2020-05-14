@@ -4,5 +4,7 @@ enum class EditMode {
     VIEW,
     SCALE,
     EDIT,
-    WINDOWED
+    WINDOWED,
+    SELECTION,
+    MOVE
 }

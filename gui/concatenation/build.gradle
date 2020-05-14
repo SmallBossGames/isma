@@ -14,6 +14,7 @@ dependencies {
 
     implementation project(":analytic-fu")
     api project(":gui:common")
+    implementation project(":math")
 
     testImplementation "ru.kontur.kinfra.kfixture:kfixture:0.4.9"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"

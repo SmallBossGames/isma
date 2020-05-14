@@ -14,6 +14,9 @@ class FunctionsCanvasController : Controller() {
         subscribe<FunctionCopyQuery> {
             service.copyFunction(it)
         }
+        subscribe<ShowIntersectionsEvent> {
+            service.showInterSections(it)
+        }
         subscribe<LocalizeFunctionEvent> {
             service.localizeFunction(it)
         }
@@ -21,7 +24,8 @@ class FunctionsCanvasController : Controller() {
             service.updateFunction(it)
         }
         subscribe<FunctionQuery> { event ->
-            service.getFunction(event)
+            val function = service.getFunction(event.id)
+            fire(GetFunctionEvent(function))
         }
         subscribe<GetAllFunctionsQuery> {
             service.getAllFunctions()

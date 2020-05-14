@@ -1,19 +1,25 @@
 package ru.nstu.grin.concatenation.function.service
 
+import ru.nstu.grin.common.model.PointSettings
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.converter.CartesianSpaceConverter
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.function.events.*
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.math.IntersectionSearcher
+import ru.nstu.grin.model.Function
 import tornadofx.Controller
 import java.util.*
 
 class FunctionCanvasService : Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val view: ConcatenationCanvas by inject()
+    private val matrixTransformer: MatrixTransformerController by inject()
 
     fun addFunction(event: ConcatenationFunctionEvent) {
         val cartesianSpace = event.cartesianSpace
@@ -44,6 +50,64 @@ class FunctionCanvasService : Controller() {
         cartesianSpace.functions.add(newFunction)
         getAllFunctions()
     }
+
+    fun showInterSections(event: ShowIntersectionsEvent) {
+        val interactionSearcher = IntersectionSearcher()
+        val firstFunc = Function(
+            getFunction(event.id).points.map { Pair(it.x.round(), it.y.round()) }
+        )
+        val firstCartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
+        val secondFunc = Function(
+            getFunction(event.secondId).points.map { Pair(it.x.round(), it.y.round()) }
+        )
+        val secondCartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.secondId } }
+
+        val intersections = interactionSearcher.findIntersections(firstFunc, secondFunc)
+
+        val xArrays = intersections.map { it.first }
+        val yArrays = intersections.map { it.second }
+
+        val maxX = xArrays.max()!! + INTERSECTION_CORRELATION
+        val minX = xArrays.min()!! - INTERSECTION_CORRELATION
+        val maxY = yArrays.max()!! + INTERSECTION_CORRELATION
+        val minY = yArrays.min()!! - INTERSECTION_CORRELATION
+        firstCartesianSpace.xAxis.settings.min = minX
+        firstCartesianSpace.xAxis.settings.max = maxX
+        firstCartesianSpace.yAxis.settings.min = minY
+        firstCartesianSpace.yAxis.settings.max = maxY
+        secondCartesianSpace.xAxis.settings.min = minX
+        secondCartesianSpace.xAxis.settings.max = maxX
+        secondCartesianSpace.yAxis.settings.min = minY
+        secondCartesianSpace.yAxis.settings.max = maxY
+
+        val transformed = intersections
+            .map {
+                val xGraphic = matrixTransformer.transformUnitsToPixel(
+                    it.first,
+                    firstCartesianSpace.xAxis.settings,
+                    firstCartesianSpace.xAxis.direction
+                )
+                val yGraphic = matrixTransformer.transformUnitsToPixel(
+                    it.second,
+                    firstCartesianSpace.yAxis.settings,
+                    firstCartesianSpace.yAxis.direction
+                )
+                PointSettings(
+                    x = it.first,
+                    y = it.second,
+                    xGraphic = xGraphic,
+                    yGraphic = yGraphic
+                )
+            }
+
+        model.pointToolTipSettings.isShow = true
+        model.pointToolTipSettings.pointsSettings.addAll(transformed)
+
+        view.redraw()
+    }
+
+    private fun Double.round(decimals: Int = 2): Double =
+        String.format("%.${decimals}f", this).replace(",", ".").toDouble()
 
     fun localizeFunction(event: LocalizeFunctionEvent) {
         val cartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
@@ -81,12 +145,10 @@ class FunctionCanvasService : Controller() {
         getAllFunctions()
     }
 
-    fun getFunction(event: FunctionQuery) {
-        val function = model.cartesianSpaces.map {
-            it.functions
-        }.flatten().first { it.id == event.id }
-        fire(GetFunctionEvent(function))
-    }
+    fun getFunction(id: UUID): ConcatenationFunction = model.cartesianSpaces.map {
+        it.functions
+    }.flatten().first { it.id == id }
+
 
     fun getAllFunctions() {
         val functions = model.cartesianSpaces.map {
@@ -126,5 +188,9 @@ class FunctionCanvasService : Controller() {
                     .size
             }
         }
+    }
+
+    private companion object {
+        const val INTERSECTION_CORRELATION = 5.0
     }
 }

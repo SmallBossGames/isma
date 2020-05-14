@@ -33,6 +33,7 @@ class LocalizeFunctionFragment : Fragment() {
                     return@action
                 }
                 controller.localize(function.id)
+                close()
             }
         }
     }

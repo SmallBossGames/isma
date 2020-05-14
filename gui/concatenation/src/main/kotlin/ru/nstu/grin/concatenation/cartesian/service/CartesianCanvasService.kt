@@ -16,8 +16,18 @@ class CartesianCanvasService : Controller() {
         val oldCartesian = model.cartesianSpaces.first { it.id == event.id }
         val newCartesian = oldCartesian.clone().copy(
             id = UUID.randomUUID(), name = event.name,
-            xAxis = oldCartesian.xAxis.copy(id = UUID.randomUUID(), name = event.xAxisName, order = oldCartesian.xAxis.order+1),
-            yAxis = oldCartesian.yAxis.copy(id = UUID.randomUUID(), name = event.yAxisName, order = oldCartesian.yAxis.order+1)
+            xAxis = oldCartesian.xAxis.copy(
+                id = UUID.randomUUID(),
+                name = event.xAxisName,
+                order = oldCartesian.xAxis.order + 1,
+                settings = oldCartesian.xAxis.settings.copy()
+            ),
+            yAxis = oldCartesian.yAxis.copy(
+                id = UUID.randomUUID(),
+                name = event.yAxisName,
+                order = oldCartesian.yAxis.order + 1,
+                settings = oldCartesian.yAxis.settings.copy()
+            )
         )
         model.cartesianSpaces.add(newCartesian)
         view.redraw()

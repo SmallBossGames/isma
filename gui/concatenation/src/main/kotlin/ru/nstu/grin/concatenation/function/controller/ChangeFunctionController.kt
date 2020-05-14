@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.function.controller
 import ru.nstu.grin.concatenation.function.events.GetFunctionEvent
 import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
+import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.concatenation.function.model.MirrorSettings
 import tornadofx.Controller
 import java.util.*
@@ -19,8 +20,9 @@ class ChangeFunctionController : Controller() {
                 model.lineSize = it.function.lineSize.toString()
                 model.lineType = it.function.lineType
                 model.isHide = !it.function.isHide
-                model.isMirrorX = it.function.mirrorSettings.isMirrorX
-                model.isMirrorY = it.function.mirrorSettings.isMirrorY
+                val mirrorDetails = it.function.details.filterIsInstance<MirrorDetails>().first()
+                model.isMirrorX = mirrorDetails.isMirrorX
+                model.isMirrorY = mirrorDetails.isMirrorY
             }
         }
     }
@@ -33,7 +35,7 @@ class ChangeFunctionController : Controller() {
             lineType = model.lineType,
             lineSize = model.lineSize.toDouble(),
             isHide = !model.isHide,
-            mirrorSettings = MirrorSettings(isMirrorX = model.isMirrorX, isMirrorY = model.isMirrorY)
+            mirroDetails = MirrorDetails(isMirrorX = model.isMirrorX, isMirrorY = model.isMirrorY)
         )
         fire(event)
     }

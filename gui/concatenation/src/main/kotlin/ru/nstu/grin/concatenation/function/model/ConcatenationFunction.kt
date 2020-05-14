@@ -18,10 +18,10 @@ data class ConcatenationFunction(
     val points: List<Point>,
     var isHide: Boolean = false,
     var isSelected: Boolean = false,
-    var mirrorSettings: MirrorSettings = MirrorSettings(),
     var functionColor: Color,
     var lineSize: Double,
-    var lineType: LineType
+    var lineType: LineType,
+    val details: MutableList<ConcatenationFunctionDetails> = mutableListOf(MirrorDetails())
 ) : Writer, Cloneable {
     public override fun clone(): ConcatenationFunction {
         return ConcatenationFunction(
@@ -30,9 +30,21 @@ data class ConcatenationFunction(
             points = points.map { it.clone() as Point },
             functionColor = functionColor,
             lineSize = lineSize,
-            lineType = lineType
+            lineType = lineType,
+            details = details.map {
+                when (it) {
+                    is MirrorDetails -> it.copy()
+                }
+            }.toMutableList()
         )
     }
+
+    fun replaceMirrorDetails(details: MirrorDetails) {
+        this.details.removeIf { it is MirrorDetails }
+        this.details.add(details)
+    }
+
+    fun getMirrorDetails() = details.filterIsInstance<MirrorDetails>().first()
 
     fun getShape(): Shape {
         return Line(0.0, 10.0, 0.0, 20.0)

@@ -11,6 +11,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.function.events.*
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
 import tornadofx.Controller
@@ -140,7 +141,7 @@ class FunctionCanvasService : Controller() {
         function.isHide = event.isHide
         function.lineSize = event.lineSize
         function.lineType = event.lineType
-        function.mirrorSettings = event.mirrorSettings
+        function.replaceMirrorDetails(event.mirroDetails)
         view.redraw()
         getAllFunctions()
     }

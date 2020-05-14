@@ -24,6 +24,7 @@ class MirrorFunctionController : Controller() {
     }
 
     fun mirrorFunction(isY: Boolean, function: ConcatenationFunction) {
+        val mirrorDetails = function.getMirrorDetails()
         val mirrorEvent = UpdateFunctionEvent(
             id = function.id,
             name = function.name,
@@ -31,13 +32,13 @@ class MirrorFunctionController : Controller() {
             lineType = function.lineType,
             lineSize = function.lineSize,
             isHide = function.isHide,
-            mirrorSettings = if (isY) {
-                function.mirrorSettings.copy(
-                    isMirrorY = !function.mirrorSettings.isMirrorY
+            mirroDetails = if (isY) {
+                mirrorDetails.copy(
+                    isMirrorY = !mirrorDetails.isMirrorY
                 )
             } else {
-                function.mirrorSettings.copy(
-                    isMirrorX = !function.mirrorSettings.isMirrorX
+                mirrorDetails.copy(
+                    isMirrorX = !mirrorDetails.isMirrorX
                 )
             }
         )

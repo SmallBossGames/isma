@@ -7,12 +7,10 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.function.model.LineType
-import ru.nstu.grin.concatenation.function.model.MirrorSettings
+import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.concatenation.function.transform.LogTransform
 import ru.nstu.grin.concatenation.function.transform.MirrorTransform
 import tornadofx.Controller
-import tornadofx.mapEach
-import kotlin.math.log10
 
 class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     private val matrixTransformer: MatrixTransformerController by inject()
@@ -26,7 +24,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                 context.stroke = function.functionColor
                 context.fill = function.functionColor
                 context.lineWidth = function.lineSize
-                transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis, function.mirrorSettings)
+                transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis, function.getMirrorDetails())
 
                 val points = function.points
 
@@ -102,11 +100,11 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
         points: List<Point>,
         xAxis: ConcatenationAxis,
         yAxis: ConcatenationAxis,
-        mirrorSettings: MirrorSettings
+        mirrorDetails: MirrorDetails
     ) {
         val transforms = listOf(
             LogTransform(xAxis.settings.isLogarithmic, yAxis.settings.isLogarithmic),
-            MirrorTransform(mirrorSettings.isMirrorX, mirrorSettings.isMirrorY)
+            MirrorTransform(mirrorDetails.isMirrorX, mirrorDetails.isMirrorY)
         )
         for (point in points) {
             var temp: Point? = point

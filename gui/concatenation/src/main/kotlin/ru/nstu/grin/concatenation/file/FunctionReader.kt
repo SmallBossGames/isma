@@ -12,13 +12,14 @@ class FunctionReader : Reader<ConcatenationFunction> {
     private val axisReader = AxisReader()
 
     override fun deserialize(ois: ObjectInputStream): ConcatenationFunction {
-        return ConcatenationFunction(
-            id = UUID.fromString(ois.readUTF()),
-            name = ois.readUTF(),
-            points = ois.readObject() as List<Point>,
-            functionColor = readColor(ois),
-            lineSize = ois.readDouble(),
-            lineType = LineType.valueOf(ois.readUTF())
-        )
+        TODO()
+//        return ConcatenationFunction(
+//            id = UUID.fromString(ois.readUTF()),
+//            name = ois.readUTF(),
+//            points = ois.readObject() as List<Point>,
+//            functionColor = readColor(ois),
+//            lineSize = ois.readDouble(),
+//            lineType = LineType.valueOf(ois.readUTF())
+//        )
     }
 }

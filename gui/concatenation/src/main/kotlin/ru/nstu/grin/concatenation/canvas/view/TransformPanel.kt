@@ -5,6 +5,7 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
+import ru.nstu.grin.concatenation.function.view.MirrorFunctionFragment
 import tornadofx.Fragment
 import tornadofx.action
 import tornadofx.button
@@ -18,10 +19,26 @@ class TransformPanel : Fragment() {
             imageView.fitWidth = 20.0
             imageView.fitHeight = 20.0
             graphic = imageView
-            tooltip = Tooltip("Отзеркалировать")
+            tooltip = Tooltip("Отзеркалировать по X")
 
             action {
+                find<MirrorFunctionFragment>(
+                    mapOf(MirrorFunctionFragment::isMirrorY to false)
+                ).openModal()
+            }
+        }
+        button {
+            val image = Image("mirror-tool.png")
+            val imageView = ImageView(image)
+            imageView.fitWidth = 20.0
+            imageView.fitHeight = 20.0
+            graphic = imageView
+            tooltip = Tooltip("Отзеркалировать по Y")
 
+            action {
+                find<MirrorFunctionFragment>(
+                    mapOf(MirrorFunctionFragment::isMirrorY to true)
+                ).openModal()
             }
         }
         button {

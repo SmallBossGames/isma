@@ -1,6 +1,7 @@
 package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.paint.Color
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
@@ -24,13 +25,24 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                 context.stroke = function.functionColor
                 context.fill = function.functionColor
                 context.lineWidth = function.lineSize
-                transformPoints(function.points, cartesianSpace.xAxis, cartesianSpace.yAxis, function.getMirrorDetails())
+                transformPoints(
+                    function.points,
+                    cartesianSpace.xAxis,
+                    cartesianSpace.yAxis,
+                    function.getMirrorDetails()
+                )
 
                 val points = function.points
 
                 val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
                 val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
                 val n = xPoints.size
+
+                if (function.isSelected) {
+                    context.fill = Color.RED
+                    context.stroke = Color.RED
+                }
+
                 when (function.lineType) {
                     LineType.POLYNOM -> {
                         context.strokePolyline(

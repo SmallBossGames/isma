@@ -21,6 +21,10 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         if (editMode == EditMode.SELECTION && event.button == MouseButton.PRIMARY) {
             val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
             description?.isSelected = true
+
+            val function = model.cartesianSpaces.map { it.functions }.flatten()
+                .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } }
+            function?.isSelected = true
         }
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {

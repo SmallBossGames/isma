@@ -5,19 +5,48 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import ru.nstu.grin.concatenation.function.events.LocalizeFunctionEvent
 import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
+import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.MirrorFunctionFragment
-import tornadofx.Fragment
-import tornadofx.action
-import tornadofx.button
-import tornadofx.toolbar
+import tornadofx.*
 
 class TransformPanel : Fragment() {
     private val model: ConcatenationCanvasModelViewModel by inject()
 
     override val root: Parent = toolbar {
+        button {
+            val image = Image("edit-tool.png")
+            val imageView = ImageView(image)
+            imageView.fitWidth = 20.0
+            imageView.fitHeight = 20.0
+            graphic = imageView
+            tooltip = Tooltip("Отредактировать")
+
+            action {
+                val function = model.getSelectedFunction()
+                if (function != null) {
+                    find<ChangeFunctionFragment>(
+                        ChangeFunctionFragment::functionId to function.id
+                    ).openModal()
+                    return@action
+                }
+                val description = model.getSelectedDescription()
+                if (description != null) {
+                    find<ChangeDescriptionFragment>(
+                        ChangeDescriptionFragment::descriptionId to description.id
+                    ).openModal()
+                    return@action
+                }
+                enableWhen {
+                    val function = model.getSelectedFunction()
+                    val description = model.getSelectedDescription()
+                    (function != null || description != null).toProperty()
+                }
+            }
+        }
         button {
             val image = Image("mirror-tool.png")
             val imageView = ImageView(image)

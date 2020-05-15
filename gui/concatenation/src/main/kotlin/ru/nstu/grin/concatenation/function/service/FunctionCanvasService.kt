@@ -11,6 +11,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.function.events.*
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.function.model.DerivativeDetails
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
@@ -107,8 +108,14 @@ class FunctionCanvasService : Controller() {
         view.redraw()
     }
 
-    private fun Double.round(decimals: Int = 2): Double =
-        String.format("%.${decimals}f", this).replace(",", ".").toDouble()
+    fun derivativeFunction(event: DerivativeFunctionEvent) {
+        val function = getFunction(event.id)
+
+        val details = DerivativeDetails(degree = event.degree, type = event.type)
+        function.details.add(details)
+
+        view.redraw()
+    }
 
     fun localizeFunction(event: LocalizeFunctionEvent) {
         val cartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
@@ -190,6 +197,9 @@ class FunctionCanvasService : Controller() {
             }
         }
     }
+
+    private fun Double.round(decimals: Int = 2): Double =
+        String.format("%.${decimals}f", this).replace(",", ".").toDouble()
 
     private companion object {
         const val INTERSECTION_CORRELATION = 5.0

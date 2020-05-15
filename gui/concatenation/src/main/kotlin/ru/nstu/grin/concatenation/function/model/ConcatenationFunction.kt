@@ -34,6 +34,7 @@ data class ConcatenationFunction(
             details = details.map {
                 when (it) {
                     is MirrorDetails -> it.copy()
+                    is DerivativeDetails -> it.copy()
                 }
             }.toMutableList()
         )
@@ -45,6 +46,10 @@ data class ConcatenationFunction(
     }
 
     fun getMirrorDetails() = details.filterIsInstance<MirrorDetails>().first()
+
+    fun getDerivativeDetails() = details.filterIsInstance<DerivativeDetails>().firstOrNull()
+
+    fun removeDerivativeDetails() = details.removeIf { it is DerivativeDetails }
 
     fun getShape(): Shape {
         return Line(0.0, 10.0, 0.0, 20.0)

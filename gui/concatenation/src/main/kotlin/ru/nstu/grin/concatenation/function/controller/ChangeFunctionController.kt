@@ -4,7 +4,6 @@ import ru.nstu.grin.concatenation.function.events.GetFunctionEvent
 import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
-import ru.nstu.grin.concatenation.function.model.MirrorSettings
 import tornadofx.Controller
 import java.util.*
 

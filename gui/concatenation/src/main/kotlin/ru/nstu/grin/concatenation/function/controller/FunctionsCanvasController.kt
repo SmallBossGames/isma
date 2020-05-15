@@ -20,6 +20,9 @@ class FunctionsCanvasController : Controller() {
         subscribe<LocalizeFunctionEvent> {
             service.localizeFunction(it)
         }
+        subscribe<DerivativeFunctionEvent> {
+            service.derivativeFunction(it)
+        }
         subscribe<UpdateFunctionEvent> {
             service.updateFunction(it)
         }

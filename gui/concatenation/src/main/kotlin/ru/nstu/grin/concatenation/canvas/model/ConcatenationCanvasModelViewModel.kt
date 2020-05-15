@@ -6,6 +6,7 @@ import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.PointToolTipsSettings
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import tornadofx.ItemViewModel
 import tornadofx.*
 
@@ -38,5 +39,13 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>(), 
         for (description in descriptions) {
             description.isSelected = false
         }
+    }
+
+    fun getSelectedFunction(): ConcatenationFunction? {
+        return cartesianSpaces.map { it.functions }.flatten().firstOrNull { it.isSelected }
+    }
+
+    fun getSelectedDescription(): Description? {
+        return descriptions.firstOrNull { it.isSelected }
     }
 }

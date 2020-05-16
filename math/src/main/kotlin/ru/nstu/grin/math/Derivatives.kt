@@ -23,7 +23,7 @@ class Derivatives {
         val result = mutableListOf<MathPoint>()
         if (degree == 0) return current
 
-        for (i in 0 until current.size) {
+        for (i in 1 until current.size) {
             result.add(
                 MathPoint(
                     current[i].x,
@@ -40,7 +40,7 @@ class Derivatives {
 
         if (degree == 0) return current
 
-        for (i in 0 until current.size - 1) {
+        for (i in 1 until current.size - 1) {
             result.add(
                 MathPoint(
                     current[i].x,

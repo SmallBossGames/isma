@@ -7,10 +7,14 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.function.model.DerivativeDetails
+import ru.nstu.grin.concatenation.function.model.DerivativeType
 import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.concatenation.function.transform.LogTransform
 import ru.nstu.grin.concatenation.function.transform.MirrorTransform
+import ru.nstu.grin.math.Derivatives
+import ru.nstu.grin.model.MathPoint
 import tornadofx.Controller
 
 class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
@@ -29,7 +33,8 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                     function.points,
                     cartesianSpace.xAxis,
                     cartesianSpace.yAxis,
-                    function.getMirrorDetails()
+                    function.getMirrorDetails(),
+                    function.getDerivativeDetails()
                 )
 
                 val points = function.points
@@ -112,32 +117,43 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
         points: List<Point>,
         xAxis: ConcatenationAxis,
         yAxis: ConcatenationAxis,
-        mirrorDetails: MirrorDetails
+        mirrorDetails: MirrorDetails,
+        derivativeDetails: DerivativeDetails?
     ) {
         val transforms = listOf(
             LogTransform(xAxis.settings.isLogarithmic, yAxis.settings.isLogarithmic),
             MirrorTransform(mirrorDetails.isMirrorX, mirrorDetails.isMirrorY)
         )
-        for (point in points) {
-            var temp: Point? = point
+        val transformedPoints = derivativeDetails?.let { makeDerivative(points, it) } ?: points
+        for (i in transformedPoints.indices) {
+            var temp: Point? = transformedPoints[i]
             for (transform in transforms) {
                 temp = temp?.let { transform.transform(it) }
             }
             if (temp != null) {
-                point.xGraphic = matrixTransformer.transformUnitsToPixel(
+                points[i].xGraphic = matrixTransformer.transformUnitsToPixel(
                     temp.x,
                     xAxis.settings, xAxis.direction
                 )
-                point.yGraphic = matrixTransformer.transformUnitsToPixel(
+                points[i].yGraphic = matrixTransformer.transformUnitsToPixel(
                     temp.y,
                     yAxis.settings,
                     yAxis.direction
                 )
             } else {
-                point.xGraphic = null
-                point.yGraphic = null
+                points[i].xGraphic = null
+                points[i].yGraphic = null
             }
-
         }
+    }
+
+    private fun makeDerivative(points: List<Point>, details: DerivativeDetails): List<Point> {
+        val derivative = Derivatives()
+        val mathPoints = points.map { MathPoint(it.x, it.y) }
+        return when (details.type) {
+            DerivativeType.LEFT -> derivative.leftDeriviative(mathPoints, details.degree)
+            DerivativeType.RIGHT -> derivative.rightDerivative(mathPoints, details.degree)
+            DerivativeType.BOTH -> derivative.bothDerivatives(mathPoints, details.degree)
+        }.map { Point(it.x, it.y) }
     }
 }

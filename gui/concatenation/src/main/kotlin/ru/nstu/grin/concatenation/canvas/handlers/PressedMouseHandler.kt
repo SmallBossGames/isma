@@ -5,8 +5,8 @@ import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
-import ru.nstu.grin.common.model.PointSettings
 import ru.nstu.grin.concatenation.canvas.model.*
+import ru.nstu.grin.concatenation.points.model.PointSettings
 import tornadofx.Controller
 
 class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
@@ -55,6 +55,11 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun handleViewMode(event: MouseEvent) {
+        val cartesianSpace = model.cartesianSpaces.firstOrNull {
+            it.functions.any {
+                it.points.any { it.isNearBy(event.x, event.y) }
+            }
+        } ?: return
         val nearFunction = model.cartesianSpaces.mapNotNull {
             it.functions.firstOrNull {
                 it.points.any { it.isNearBy(event.x, event.y) }
@@ -69,8 +74,8 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         val pointToolTipSettings = model.pointToolTipSettings
         pointToolTipSettings.isShow = true
         val pointSettings = PointSettings(
-            nearPoint.x,
-            nearPoint.y,
+            cartesianSpace.xAxis.settings,
+            cartesianSpace.yAxis.settings,
             nearPoint.xGraphic ?: 0.0,
             nearPoint.yGraphic ?: 0.0
         )

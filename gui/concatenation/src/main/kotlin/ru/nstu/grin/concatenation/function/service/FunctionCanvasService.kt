@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.function.service
 
-import ru.nstu.grin.common.model.PointSettings
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.axis.model.Direction
@@ -13,6 +12,7 @@ import ru.nstu.grin.concatenation.function.events.*
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.DerivativeDetails
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
+import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
 import tornadofx.Controller
@@ -95,8 +95,8 @@ class FunctionCanvasService : Controller() {
                     firstCartesianSpace.yAxis.direction
                 )
                 PointSettings(
-                    x = it.first,
-                    y = it.second,
+                    firstCartesianSpace.xAxis.settings,
+                    firstCartesianSpace.yAxis.settings,
                     xGraphic = xGraphic,
                     yGraphic = yGraphic
                 )

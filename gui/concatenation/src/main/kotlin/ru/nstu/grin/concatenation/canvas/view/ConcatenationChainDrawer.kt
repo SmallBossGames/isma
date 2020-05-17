@@ -3,7 +3,10 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
-import ru.nstu.grin.common.draw.elements.*
+import ru.nstu.grin.common.draw.elements.ArrowDrawElement
+import ru.nstu.grin.common.draw.elements.ClearDrawElement
+import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
+import ru.nstu.grin.common.draw.elements.GridDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
@@ -11,6 +14,7 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Controller
 
 class ConcatenationChainDrawer : ChainDrawer, Controller() {
@@ -19,8 +23,8 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val controller: ConcatenationCanvasController by inject()
     private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
     private val matrixTransformerController: MatrixTransformerController by inject()
+    private val pointTooltipsDrawElement: PointTooltipsDrawElement by inject()
 
-    private val pointToolTips = mutableListOf<Tooltip>()
     private val contextMenu = ContextMenu()
 
     override fun draw() {
@@ -60,11 +64,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
             ).draw(context)
         }
 
-        PointTooltipsDrawElement(
-            model.pointToolTipSettings,
-            pointToolTips,
-            model.primaryStage
-        ).draw(context)
+        pointTooltipsDrawElement.draw(context)
 
         ContextMenuDrawElement(
             contextMenu,

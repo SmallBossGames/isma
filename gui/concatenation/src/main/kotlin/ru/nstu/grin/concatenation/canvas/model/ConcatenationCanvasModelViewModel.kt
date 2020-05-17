@@ -4,9 +4,9 @@ import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.common.model.PointToolTipsSettings
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.points.model.PointToolTipsSettings
 import tornadofx.ItemViewModel
 import tornadofx.*
 
@@ -20,8 +20,7 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>(), 
     var descriptionsProperty = SimpleListProperty<Description>(FXCollections.observableArrayList())
     var descriptions by descriptionsProperty
 
-    val pointToolTipSettings =
-        PointToolTipsSettings(false, mutableSetOf())
+    val pointToolTipSettings = PointToolTipsSettings(false, mutableSetOf())
 
     val contextMenuSettings =
         ContextMenuSettings(ContextMenuType.NONE, 0.0, 0.0)

@@ -51,7 +51,11 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
 
                 val xPoints = points.mapNotNull { it.xGraphic }.toDoubleArray()
                 val yPoints = points.mapNotNull { it.yGraphic }.toDoubleArray()
-                val n = xPoints.size
+                val n = if (function.getDerivativeDetails() != null) {
+                    xPoints.size - 2
+                } else {
+                    xPoints.size
+                }
 
                 if (function.isSelected) {
                     context.fill = Color.RED
@@ -67,9 +71,9 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                         )
                     }
                     LineType.RECT_FILL_DOTES -> {
-                        for (point in points) {
-                            val x = point.xGraphic
-                            val y = point.yGraphic
+                        for (i in 0 until n) {
+                            val x = points[i].xGraphic
+                            val y = points[i].yGraphic
                             if (x != null && y != null) {
                                 context.fillRect(x, y, 2.0, 2.0)
                             }
@@ -91,27 +95,27 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                         }
                     }
                     LineType.RECT_UNFIL_DOTES -> {
-                        for (point in points) {
-                            val x = point.xGraphic
-                            val y = point.yGraphic
+                        for (i in 0 until n) {
+                            val x = points[i].xGraphic
+                            val y = points[i].yGraphic
                             if (x != null && y != null) {
                                 context.strokeRect(x, y, 1.0, 1.0)
                             }
                         }
                     }
                     LineType.CIRCLE_FILL_DOTES -> {
-                        for (point in points) {
-                            val x = point.xGraphic
-                            val y = point.yGraphic
+                        for (i in 0 until n) {
+                            val x = points[i].xGraphic
+                            val y = points[i].yGraphic
                             if (x != null && y != null) {
                                 context.fillOval(x, y, 2.0, 2.0)
                             }
                         }
                     }
                     LineType.CIRCLE_UNFILL_DOTES -> {
-                        for (point in points) {
-                            val x = point.xGraphic
-                            val y = point.yGraphic
+                        for (i in 0 until n) {
+                            val x = points[i].xGraphic
+                            val y = points[i].yGraphic
                             if (x != null && y != null) {
                                 context.strokeOval(x, y, 1.0, 1.0)
                             }

@@ -11,6 +11,7 @@ import tornadofx.*
 
 class MathPanel : Fragment() {
     private val model: ConcatenationCanvasModelViewModel by inject()
+    private val drawer: ConcatenationChainDrawer by inject()
 
     override val root: Parent = toolbar {
         button {
@@ -40,6 +41,7 @@ class MathPanel : Fragment() {
                     val derivativeDetails = function.getDerivativeDetails()
                     if (derivativeDetails != null) {
                         function.removeDerivativeDetails()
+                        drawer.draw()
                         return@action
                     }
                     find<DerivativeFunctionFragment>(

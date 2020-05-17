@@ -16,10 +16,19 @@ import ru.nstu.grin.concatenation.function.transform.MirrorTransform
 import ru.nstu.grin.math.Derivatives
 import ru.nstu.grin.model.MathPoint
 import tornadofx.Controller
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     private val matrixTransformer: MatrixTransformerController by inject()
     private val model: ConcatenationCanvasModelViewModel by inject()
+    private val derivativesCache2: MutableMap<DerivativeCacheKey, List<Point>> = ConcurrentHashMap()
+
+    data class DerivativeCacheKey(
+        val functionId: UUID,
+        val type: DerivativeType,
+        val degree: Int
+    )
 
     override fun draw(context: GraphicsContext) {
         val previousLineSize = context.lineWidth
@@ -30,6 +39,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
                 context.fill = function.functionColor
                 context.lineWidth = function.lineSize
                 transformPoints(
+                    function.id,
                     function.points,
                     cartesianSpace.xAxis,
                     cartesianSpace.yAxis,
@@ -114,6 +124,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     }
 
     private fun transformPoints(
+        functionId: UUID,
         points: List<Point>,
         xAxis: ConcatenationAxis,
         yAxis: ConcatenationAxis,
@@ -124,7 +135,19 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
             LogTransform(xAxis.settings.isLogarithmic, yAxis.settings.isLogarithmic),
             MirrorTransform(mirrorDetails.isMirrorX, mirrorDetails.isMirrorY)
         )
-        val transformedPoints = derivativeDetails?.let { makeDerivative(points, it) } ?: points
+        val currentTime = System.currentTimeMillis()
+        val transformedPoints = derivativeDetails?.let {
+            val key = DerivativeCacheKey(functionId, it.type, it.degree)
+            val cached = derivativesCache2[key]
+            if (cached == null) {
+                val new = makeDerivative(points, it)
+                derivativesCache2[key] = new
+                new
+            } else {
+                cached
+            }
+        } ?: points
+        println("Passed time ${System.currentTimeMillis() - currentTime}")
         for (i in transformedPoints.indices) {
             var temp: Point? = transformedPoints[i]
             for (transform in transforms) {
@@ -151,7 +174,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
         val derivative = Derivatives()
         val mathPoints = points.map { MathPoint(it.x, it.y) }
         return when (details.type) {
-            DerivativeType.LEFT -> derivative.leftDeriviative(mathPoints, details.degree)
+            DerivativeType.LEFT -> derivative.leftDerivative(mathPoints, details.degree)
             DerivativeType.RIGHT -> derivative.rightDerivative(mathPoints, details.degree)
             DerivativeType.BOTH -> derivative.bothDerivatives(mathPoints, details.degree)
         }.map { Point(it.x, it.y) }

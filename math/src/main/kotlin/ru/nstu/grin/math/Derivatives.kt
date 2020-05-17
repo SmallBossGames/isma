@@ -3,7 +3,7 @@ package ru.nstu.grin.math
 import ru.nstu.grin.model.MathPoint
 
 class Derivatives {
-    fun leftDeriviative(current: List<MathPoint>, degree: Int): List<MathPoint> {
+    fun leftDerivative(current: List<MathPoint>, degree: Int): List<MathPoint> {
         val result = mutableListOf<MathPoint>()
         if (degree == 0) return current
 
@@ -16,7 +16,7 @@ class Derivatives {
             )
         }
 
-        return leftDeriviative(current, degree)
+        return leftDerivative(result, degree - 1)
     }
 
     fun rightDerivative(current: List<MathPoint>, degree: Int): List<MathPoint> {
@@ -32,7 +32,7 @@ class Derivatives {
             )
         }
 
-        return rightDerivative(current, degree)
+        return leftDerivative(result, degree - 1)
     }
 
     fun bothDerivatives(current: List<MathPoint>, degree: Int): List<MathPoint> {
@@ -48,16 +48,6 @@ class Derivatives {
                 )
             )
         }
-        return leftDeriviative(result, degree - 1)
+        return leftDerivative(result, degree - 1)
     }
-
-//    public double RightDerivativeFirst(double x)
-//    {
-//        return (_function(x) - _function(x - _step)) / (_step);
-//    }
-//
-//    public double DerivativesSecond(double x)
-//    {
-//        return (_function(x + 2 * _step) - 2 * _function(x) + _function(x - 2 * _step)) / (4 * _step * _step);
-//    }
 }

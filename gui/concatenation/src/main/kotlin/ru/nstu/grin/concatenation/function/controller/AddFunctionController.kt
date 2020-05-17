@@ -33,7 +33,7 @@ class AddFunctionController : Controller() {
             id = UUID.randomUUID(),
             name = model.functionName,
             points = pointsBuilder.buildPoints(
-                DrawSize(-1200.0, 1200.0, -1200.0, 1200.0),
+                DrawSize(-30.0, 30.0, -100.0, 100.0),
                 analyticFunctionModel.textFunction,
                 analyticFunctionModel.delta
             ).mapIndexedNotNull { index, point ->

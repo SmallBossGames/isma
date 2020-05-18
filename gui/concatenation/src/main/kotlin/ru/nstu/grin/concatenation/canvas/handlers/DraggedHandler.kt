@@ -7,10 +7,7 @@ import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import ru.nstu.grin.concatenation.canvas.model.DraggedSettings
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
-import ru.nstu.grin.concatenation.canvas.model.EditMode
+import ru.nstu.grin.concatenation.canvas.model.*
 import tornadofx.Controller
 
 class DraggedHandler : EventHandler<MouseEvent>, Controller() {
@@ -46,6 +43,10 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
             handleDragged(event)
         }
+        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+            handleMoveMode(event)
+        }
+
         chainDrawer.draw()
     }
 
@@ -118,6 +119,18 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         traceSettings.pressedPoint.x = x
         traceSettings.pressedPoint.y = y
         chainDrawer.draw()
+    }
+
+    private fun handleMoveMode(event: MouseEvent) {
+        val moveSettings = model.moveSettings ?: return
+        when (moveSettings.type) {
+            MovedElementType.FUNCTION -> TODO()
+            MovedElementType.DESCRIPTION -> {
+                val description = model.descriptions.firstOrNull { it.id == moveSettings.id } ?: return
+                description.x = event.x
+                description.y = event.y
+            }
+        }
     }
 
     private fun getDraggedSettings(axis: ConcatenationAxis): DraggedSettings {

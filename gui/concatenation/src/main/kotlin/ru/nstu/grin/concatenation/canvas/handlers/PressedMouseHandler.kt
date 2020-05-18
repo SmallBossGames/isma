@@ -18,7 +18,7 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         model.unselectAll()
         val editMode = concatenationViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
-        if (editMode == EditMode.SELECTION && event.button == MouseButton.PRIMARY) {
+        if ((editMode == EditMode.SELECTION || editMode == EditMode.MOVE) && event.button == MouseButton.PRIMARY) {
             val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
             description?.isSelected = true
 
@@ -44,6 +44,9 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         }
         if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
             handleViewMode(event)
+        }
+        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+            handleMoveMode(event)
         }
 
         showContextMenu(event)
@@ -101,6 +104,15 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
             pressedPoint = point,
             xAxis = xAxis,
             yAxis = yAxis
+        )
+    }
+
+    private fun handleMoveMode(event: MouseEvent) {
+        val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) } ?: return
+
+        model.moveSettings = MoveSettings(
+            id = description.id,
+            type = MovedElementType.DESCRIPTION
         )
     }
 

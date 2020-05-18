@@ -29,6 +29,8 @@ class ConcatenationCanvasModelViewModel : ItemViewModel<ConcatenationCanvas>(), 
 
     var traceSettings: TraceSettings? = null
 
+    var moveSettings: MoveSettings? = null
+
     fun unselectAll() {
         for (cartesianSpace in cartesianSpaces) {
             for (function in cartesianSpace.functions) {

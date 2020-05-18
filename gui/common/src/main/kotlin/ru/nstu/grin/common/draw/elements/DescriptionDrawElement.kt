@@ -17,8 +17,8 @@ class DescriptionDrawElement(
             context.stroke = Color.BLACK
             if (description.isSelected) {
                 context.strokeRect(
-                    description.x-description.textSize/5, description.y - description.textSize*1.25,
-                    description.textSize * 2, description.textSize * 2
+                    description.x - description.textSize / 5, description.y - description.textSize * 1.25,
+                    description.text.length * (description.textSize/2), description.textSize * 2
                 )
             }
         }

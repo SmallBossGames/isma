@@ -23,6 +23,9 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
             println("Release primary button")
             model.traceSettings = null
         }
+        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+            model.moveSettings = null
+        }
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && event.button == MouseButton.PRIMARY) {
             println("Release primary button")

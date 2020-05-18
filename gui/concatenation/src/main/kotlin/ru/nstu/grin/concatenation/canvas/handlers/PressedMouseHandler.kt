@@ -108,12 +108,30 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun handleMoveMode(event: MouseEvent) {
-        val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) } ?: return
+        val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
+        val function = model.cartesianSpaces.map { it.functions }.flatten()
+            .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } } ?: return
+        val cartesian =
+            model.cartesianSpaces.firstOrNull { it.functions.any { it.points.any { it.isNearBy(event.x, event.y) } } }
+                ?: return
 
-        model.moveSettings = MoveSettings(
-            id = description.id,
-            type = MovedElementType.DESCRIPTION
-        )
+        if (description != null) {
+            model.moveSettings = MoveSettings(
+                id = description.id,
+                type = MovedElementType.DESCRIPTION,
+                pressedX = event.x,
+                pressedY = event.y
+            )
+        } else {
+            model.moveSettings = MoveSettings(
+                id = function.id,
+                type = MovedElementType.FUNCTION,
+                xAxis = cartesian.xAxis,
+                yAxis = cartesian.yAxis,
+                pressedX = event.x,
+                pressedY = event.y
+            )
+        }
     }
 
     private fun showContextMenu(event: MouseEvent) {

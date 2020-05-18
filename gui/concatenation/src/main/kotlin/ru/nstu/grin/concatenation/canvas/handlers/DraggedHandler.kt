@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.*
 import tornadofx.Controller
+import kotlin.math.abs
 
 class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
@@ -124,7 +125,40 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleMoveMode(event: MouseEvent) {
         val moveSettings = model.moveSettings ?: return
         when (moveSettings.type) {
-            MovedElementType.FUNCTION -> TODO()
+            MovedElementType.FUNCTION -> {
+                val xAxis = requireNotNull(moveSettings.xAxis) { "Function move event can't have null axises" }
+                val yAxis = requireNotNull(moveSettings.yAxis) { "Function move event can't have null axises" }
+                val xLeft = matrixTransformer.transformPixelToUnits(
+                    moveSettings.pressedX,
+                    xAxis.settings,
+                    xAxis.direction
+                )
+                val yLeft = matrixTransformer.transformPixelToUnits(
+                    moveSettings.pressedY,
+                    yAxis.settings,
+                    yAxis.direction
+                )
+                val xRight = matrixTransformer.transformPixelToUnits(
+                    event.x,
+                    xAxis.settings,
+                    xAxis.direction
+                )
+                val yRight = matrixTransformer.transformPixelToUnits(
+                    event.y,
+                    yAxis.settings,
+                    yAxis.direction
+                )
+                val x = xLeft - xRight
+                val y = yLeft - yRight
+                println("Moved x=$x y=$y")
+                val function =
+                    model.cartesianSpaces.map { it.functions }.flatten().firstOrNull { it.id == moveSettings.id }
+                        ?: return
+                function.points.forEach {
+                    it.x -= x
+                    it.y -= y
+                }
+            }
             MovedElementType.DESCRIPTION -> {
                 val description = model.descriptions.firstOrNull { it.id == moveSettings.id } ?: return
                 description.x = event.x

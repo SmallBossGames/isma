@@ -13,8 +13,10 @@ import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.DerivativeDetails
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.concatenation.points.model.PointSettings
+import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
+import ru.nstu.grin.model.MathPoint
 import tornadofx.Controller
 import java.util.*
 
@@ -115,6 +117,24 @@ class FunctionCanvasService : Controller() {
         function.details.add(details)
 
         view.redraw()
+    }
+
+    fun calculateIntegral(event: CalculateIntegralEvent) {
+        val function = getFunction(event.functionId)
+        val min = function.points.map { it.x }.min()!!
+        val max = function.points.map { it.x }.max()!!
+        if (min > event.leftBorder) {
+            tornadofx.error("Левая граница не может быть меньше минимума функции")
+            return
+        }
+        if (event.rightBorder > max) {
+            tornadofx.error("Правя граница не может быть больше максимума функции")
+        }
+        val integration = Integration()
+        val integral =
+            integration.trapeze(function.points.filter { it.x > event.leftBorder && it.x < event.rightBorder }
+                .map { MathPoint(it.x, it.y) })
+        tornadofx.information("Интеграл равен $integral")
     }
 
     fun localizeFunction(event: LocalizeFunctionEvent) {

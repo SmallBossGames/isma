@@ -6,6 +6,7 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.function.view.DerivativeFunctionFragment
+import ru.nstu.grin.concatenation.function.view.FunctionIntegrationFragment
 import ru.nstu.grin.concatenation.function.view.IntersectionFunctionFragment
 import tornadofx.*
 
@@ -48,6 +49,23 @@ class MathPanel : Fragment() {
                         mapOf(
                             DerivativeFunctionFragment::functionId to function.id
                         )
+                    ).openModal()
+                }
+            }
+        }
+        button {
+            val image = Image("integral.png")
+            val imageView = ImageView(image)
+            imageView.fitHeight = 20.0
+            imageView.fitWidth = 20.0
+            graphic = imageView
+            tooltip = Tooltip("Найти сумму интегралла")
+
+            action {
+                val function = model.getSelectedFunction()
+                if (function != null) {
+                    find<FunctionIntegrationFragment>(
+                        mapOf(FunctionIntegrationFragment::functionId to function.id)
                     ).openModal()
                 }
             }

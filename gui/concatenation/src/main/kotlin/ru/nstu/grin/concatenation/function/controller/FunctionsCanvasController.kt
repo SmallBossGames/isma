@@ -23,6 +23,9 @@ class FunctionsCanvasController : Controller() {
         subscribe<DerivativeFunctionEvent> {
             service.derivativeFunction(it)
         }
+        subscribe<CalculateIntegralEvent> {
+            service.calculateIntegral(it)
+        }
         subscribe<UpdateFunctionEvent> {
             service.updateFunction(it)
         }

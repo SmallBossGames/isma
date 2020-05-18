@@ -7,7 +7,6 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import tornadofx.Controller
 import kotlin.math.absoluteValue
-import kotlin.math.pow
 
 class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
     private val numberFormatter = NumberFormatter()
@@ -19,9 +18,36 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         marksCoordinate: Double
     ) {
         context.font = Font.font(axis.font, axis.textSize)
-        val (minPixel, maxPixel) = matrixTransformerController.getMinMaxPixel(axis.direction)
-
         val zeroPixel = matrixTransformerController.transformUnitsToPixel(0.0, axis.settings, axis.direction)
+
+        if (axis.settings.isOnlyIntegerPow) {
+            drawOnlyIntegerMark(context, axis, marksCoordinate, zeroPixel)
+        } else {
+            drawDoubleMarks(context, axis, marksCoordinate, zeroPixel)
+        }
+
+        if (axis.settings.max > 0 && axis.settings.min < 0) {
+            val zeroText = if (axis.isLogarithmic()) {
+                numberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
+            } else {
+                numberFormatter.format(0.0)
+            }
+            context.strokeText(
+                zeroText,
+                zeroPixel,
+                marksCoordinate,
+                MAX_TEXT_WIDTH
+            )
+        }
+    }
+
+    private fun drawDoubleMarks(
+        context: GraphicsContext,
+        axis: ConcatenationAxis,
+        marksCoordinate: Double,
+        zeroPixel: Double
+    ) {
+        val (minPixel, maxPixel) = matrixTransformerController.getMinMaxPixel(axis.direction)
 
         var currentX = minPixel + 10.0
         while (currentX < maxPixel) {
@@ -46,19 +72,37 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
             )
             currentX += axis.distanceBetweenMarks
         }
+    }
 
-        if (axis.settings.max > 0 && axis.settings.min < 0) {
-            val zeroText = if (axis.isLogarithmic()) {
-                numberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
+    private fun drawOnlyIntegerMark(
+        context: GraphicsContext,
+        axis: ConcatenationAxis,
+        marksCoordinate: Double,
+        zeroPixel: Double
+    ) {
+        var currentX = axis.settings.min.toInt().toDouble()
+        val max = axis.settings.max
+        while (currentX < max) {
+            val stepX = matrixTransformerController.transformPixelToUnits(currentX, axis.settings, axis.direction)
+
+            if (axis.settings.max > 0 && axis.settings.min < 0) {
+                if ((stepX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {
+                    currentX += 1.0
+                    continue
+                }
+            }
+            val text = if (axis.isLogarithmic()) {
+                numberFormatter.formatLogarithmic(currentX, axis.settings.logarithmBase)
             } else {
-                numberFormatter.format(0.0)
+                numberFormatter.format(currentX)
             }
             context.strokeText(
-                zeroText,
-                zeroPixel,
+                text,
+                stepX,
                 marksCoordinate,
                 MAX_TEXT_WIDTH
             )
+            currentX += 1.0
         }
     }
 

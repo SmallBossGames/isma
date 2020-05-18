@@ -19,7 +19,7 @@ class LogarithmicTypeFragment : Fragment() {
                 textfield().bind(model.logarithmBaseProperty)
             }
             field("Только целые значение степеней") {
-                textfield().bind(model.onlyIntegerPowProperty)
+                checkbox().bind(model.onlyIntegerPowProperty)
             }
         }
     }

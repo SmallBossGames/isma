@@ -37,6 +37,11 @@ class AxisCanvasService : Controller() {
 
         axis.settings.isLogarithmic = event.axisMarkType == AxisMarkType.LOGARITHMIC
 
+        if (event.axisMarkType == AxisMarkType.LINEAR) {
+            axis.settings.isLogarithmic = false
+            axis.settings.isOnlyIntegerPow = false
+        }
+
         axis.axisMarkType = event.axisMarkType
         axis.distanceBetweenMarks = event.distance
         axis.textSize = event.textSize
@@ -44,6 +49,7 @@ class AxisCanvasService : Controller() {
         axis.fontColor = event.fontColor
         axis.backGroundColor = event.axisColor
         axis.settings.logarithmBase = event.logarithmBase
+        axis.settings.isOnlyIntegerPow = event.isOnlyIntegerPow
         axis.isHide = event.isHide
         view.redraw()
         getAllAxises()

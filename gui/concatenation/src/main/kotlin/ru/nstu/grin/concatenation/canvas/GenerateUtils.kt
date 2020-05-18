@@ -7,10 +7,7 @@ import ru.nstu.grin.common.utils.ColorUtils
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
-import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
-import ru.nstu.grin.concatenation.function.controller.DeltaMarksGenerator
-import ru.nstu.grin.concatenation.function.controller.DeltaSizeCalculator
 import ru.nstu.grin.concatenation.function.dto.ConcatenationFunctionDTO
 import ru.nstu.grin.concatenation.function.model.LineType
 import java.awt.Font

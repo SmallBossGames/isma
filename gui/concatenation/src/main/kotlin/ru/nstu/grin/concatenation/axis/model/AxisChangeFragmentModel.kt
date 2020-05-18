@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.axis.model
 
 import javafx.beans.property.*
 import javafx.scene.paint.Color
+import ru.nstu.grin.concatenation.function.model.LineType
 import tornadofx.*
 
 class AxisChangeFragmentModel : ViewModel() {
@@ -19,6 +20,9 @@ class AxisChangeFragmentModel : ViewModel() {
 
     var isHideProperty = SimpleBooleanProperty()
     var isHide by isHideProperty
+
+    var markTypeProperty = SimpleObjectProperty<AxisMarkType>(AxisMarkType.LINEAR)
+    var markType by markTypeProperty
 
     var axisColorProperty = SimpleObjectProperty<Color>()
     var axisColor by axisColorProperty

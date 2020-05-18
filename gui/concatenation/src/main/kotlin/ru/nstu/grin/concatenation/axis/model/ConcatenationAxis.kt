@@ -26,6 +26,7 @@ data class ConcatenationAxis(
     var textSize: Double,
     var font: String,
     var isHide: Boolean = false,
+    var axisMarkType: AxisMarkType = AxisMarkType.LINEAR,
     val settings: AxisSettings = AxisSettings()
 ) : Writer, Cloneable {
 

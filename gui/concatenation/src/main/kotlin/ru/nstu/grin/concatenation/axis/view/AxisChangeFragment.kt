@@ -6,6 +6,7 @@ import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.events.AxisQuery
 import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
+import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import tornadofx.*
 import java.util.*
 
@@ -36,6 +37,48 @@ class AxisChangeFragment : Fragment() {
             }
             field("Спрятать ось") {
                 checkbox().bind(model.isHideProperty)
+            }
+            field("Режим масштабирования") {
+                combobox(model.markTypeProperty, AxisMarkType.values().toList()) {
+                    cellFormat {
+                        text = when (it) {
+                            AxisMarkType.LINEAR -> "Линейный"
+                            AxisMarkType.LOGARITHMIC -> "Логарифмический"
+                        }
+                    }
+                }
+            }
+        }
+        tabpane {
+            model.markTypeProperty.onChange {
+                when (model.markType) {
+                    AxisMarkType.LINEAR -> {
+                        hide()
+                    }
+                    AxisMarkType.LOGARITHMIC -> {
+                        show()
+                        println("Show blya")
+                        currentStage?.height = 470.0
+                    }
+                }
+            }
+            when (model.markType) {
+                AxisMarkType.LINEAR -> {
+                    hide()
+                }
+                AxisMarkType.LOGARITHMIC -> {
+                    show()
+                    println("Hehe")
+                }
+            }
+            tab<LogarithmicTypeFragment>()
+
+            tabMaxHeight = 0.0
+            tabMinHeight = 0.0
+            stylesheet {
+                Stylesheet.tabHeaderArea {
+                    visibility = FXVisibility.HIDDEN
+                }
             }
         }
         button("Ок") {

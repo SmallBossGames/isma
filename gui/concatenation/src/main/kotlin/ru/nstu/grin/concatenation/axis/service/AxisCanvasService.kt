@@ -35,6 +35,8 @@ class AxisCanvasService : Controller() {
             listOf(it.xAxis, it.yAxis)
         }.flatten().first { it.id == event.id }
 
+        axis.settings.isLogarithmic = event.axisMarkType == AxisMarkType.LOGARITHMIC
+
         axis.axisMarkType = event.axisMarkType
         axis.distanceBetweenMarks = event.distance
         axis.textSize = event.textSize

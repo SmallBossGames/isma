@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import tornadofx.Controller
+import kotlin.math.pow
 
 class PointTooltipsDrawElement(
 ) : ChainDrawElement, Controller() {
@@ -55,8 +56,29 @@ class PointTooltipsDrawElement(
     }
 
     private fun formatText(pointSettings: PointSettings): String {
-        val x = transformer.transformPixelToUnits(pointSettings.xGraphic, pointSettings.xAxisSettings, Direction.BOTTOM)
-        val y = transformer.transformPixelToUnits(pointSettings.yGraphic, pointSettings.yAxisSettings, Direction.LEFT)
+        val x = if (pointSettings.xAxisSettings.isLogarithmic) {
+            pointSettings.xAxisSettings.logarithmBase.pow(
+                transformer.transformPixelToUnits(
+                    pointSettings.xGraphic,
+                    pointSettings.xAxisSettings,
+                    Direction.BOTTOM
+                )
+            )
+        } else {
+            transformer.transformPixelToUnits(
+                pointSettings.xGraphic,
+                pointSettings.xAxisSettings,
+                Direction.BOTTOM
+            )
+        }
+
+        val y = if (pointSettings.yAxisSettings.isLogarithmic) {
+            pointSettings.yAxisSettings.logarithmBase.pow(
+                transformer.transformPixelToUnits(pointSettings.yGraphic, pointSettings.yAxisSettings, Direction.LEFT)
+            )
+        } else {
+            transformer.transformPixelToUnits(pointSettings.yGraphic, pointSettings.yAxisSettings, Direction.LEFT)
+        }
         return "x=${x.round(5)}, y=${y.round(5)}"
     }
 

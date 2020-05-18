@@ -15,6 +15,14 @@ class NumberFormatter {
         return formatter.format(decimal)
     }
 
+    fun formatLogarithmic(number: Double, logBase: Double): String {
+        return if (number == 0.0) {
+            "1"
+        } else {
+            "$logBase^${number.round()}"
+        }
+    }
+
     private fun Double.round(decimals: Int = 2): Double =
         String.format("%.${decimals}f", this).replace(",", ".").toDouble()
 }

@@ -27,15 +27,19 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         while (currentX < maxPixel) {
             val stepX = matrixTransformerController.transformPixelToUnits(currentX, axis.settings, axis.direction)
 
-            val transformed = transformStepLogarithm(stepX, axis.settings.isLogarithmic, axis.settings.logarithmBase)
             if (axis.settings.max > 0 && axis.settings.min < 0) {
                 if ((currentX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {
                     currentX += axis.distanceBetweenMarks
                     continue
                 }
             }
+            val text = if (axis.settings.isLogarithmic) {
+                numberFormatter.formatLogarithmic(stepX, axis.settings.logarithmBase)
+            } else {
+                numberFormatter.format(stepX)
+            }
             context.strokeText(
-                numberFormatter.format(transformed),
+                text,
                 currentX,
                 marksCoordinate,
                 MAX_TEXT_WIDTH
@@ -45,20 +49,17 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
 
         if (axis.settings.max > 0 && axis.settings.min < 0) {
             println("Draw zero")
+            val zeroText = if (axis.settings.isLogarithmic) {
+                numberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
+            } else {
+                numberFormatter.format(0.0)
+            }
             context.strokeText(
-                numberFormatter.format(0.0),
+                zeroText,
                 zeroPixel,
                 marksCoordinate,
                 MAX_TEXT_WIDTH
             )
-        }
-    }
-
-    private fun transformStepLogarithm(step: Double, isLogarithmic: Boolean, logarithmBase: Double): Double {
-        return if (isLogarithmic) {
-            logarithmBase.pow(step)
-        } else {
-            step
         }
     }
 

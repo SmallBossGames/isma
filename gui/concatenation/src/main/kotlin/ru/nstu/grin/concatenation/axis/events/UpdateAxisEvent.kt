@@ -16,5 +16,7 @@ data class UpdateAxisEvent(
     val axisMarkType: AxisMarkType,
     val logarithmBase: Double,
     val isOnlyIntegerPow: Boolean,
-    val integerStep: Int
+    val integerStep: Int,
+    val min: Double,
+    val max: Double
 ) : FXEvent()

@@ -21,6 +21,8 @@ class AxisChangeFragmentController : Controller() {
                 model.font = it.axis.font
                 model.fontColor = it.axis.fontColor
                 model.isHide = it.axis.isHide
+                model.min = it.axis.settings.min
+                model.max = it.axis.settings.max
             }
         }
     }
@@ -37,7 +39,9 @@ class AxisChangeFragmentController : Controller() {
             axisMarkType = model.axisMarkType,
             logarithmBase = logarithmicTypeModel.logarithmBase,
             isOnlyIntegerPow = logarithmicTypeModel.isOnlyIntegerPow,
-            integerStep = logarithmicTypeModel.integerStep
+            integerStep = logarithmicTypeModel.integerStep,
+            min = model.min,
+            max = model.max
         )
         fire(event)
     }

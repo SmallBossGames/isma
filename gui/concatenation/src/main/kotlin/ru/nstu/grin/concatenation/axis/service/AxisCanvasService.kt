@@ -51,6 +51,8 @@ class AxisCanvasService : Controller() {
         axis.settings.logarithmBase = event.logarithmBase
         axis.settings.isOnlyIntegerPow = event.isOnlyIntegerPow
         axis.settings.integerStep = event.integerStep
+        axis.settings.min = event.min
+        axis.settings.max = event.max
         axis.isHide = event.isHide
         view.redraw()
         getAllAxises()

@@ -30,6 +30,12 @@ class AxisChangeFragment : Fragment() {
             field("Цвет шрифта") {
                 colorpicker().bind(model.fontColorProperty)
             }
+            field("Минимум") {
+                textfield().bind(model.minProperty)
+            }
+            field("Максимум") {
+                textfield().bind(model.maxProperty)
+            }
         }
         fieldset {
             field("Цвет оси") {
@@ -57,7 +63,6 @@ class AxisChangeFragment : Fragment() {
                     }
                     AxisMarkType.LOGARITHMIC -> {
                         show()
-                        println("Show blya")
                         currentStage?.height = 500.0
                     }
                 }
@@ -68,7 +73,6 @@ class AxisChangeFragment : Fragment() {
                 }
                 AxisMarkType.LOGARITHMIC -> {
                     show()
-                    println("Hehe")
                 }
             }
             val logFragment = find<LogarithmicTypeFragment>(params = params)

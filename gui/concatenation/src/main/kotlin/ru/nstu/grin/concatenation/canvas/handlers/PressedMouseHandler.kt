@@ -110,10 +110,9 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleMoveMode(event: MouseEvent) {
         val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
         val function = model.cartesianSpaces.map { it.functions }.flatten()
-            .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } } ?: return
+            .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } }
         val cartesian =
             model.cartesianSpaces.firstOrNull { it.functions.any { it.points.any { it.isNearBy(event.x, event.y) } } }
-                ?: return
 
         if (description != null) {
             model.moveSettings = MoveSettings(
@@ -122,7 +121,7 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
                 pressedX = event.x,
                 pressedY = event.y
             )
-        } else {
+        } else if (function != null && cartesian != null) {
             model.moveSettings = MoveSettings(
                 id = function.id,
                 type = MovedElementType.FUNCTION,

@@ -1,11 +1,12 @@
 package ru.nstu.grin.concatenation.axis.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.common.extensions.toByteArray
-import ru.nstu.grin.common.file.Writer
-import ru.nstu.grin.concatenation.axis.marks.MarksProvider
-import java.io.ObjectOutputStream
+import ru.nstu.grin.concatenation.file.json.ColorDeserializer
+import ru.nstu.grin.concatenation.file.json.ColorSerializer
 import java.util.*
 
 /**
@@ -17,29 +18,36 @@ data class ConcatenationAxis(
     val id: UUID,
     val name: String,
     val zeroPoint: Double,
-    val marksProvider: MarksProvider,
     val order: Int,
     val direction: Direction,
+
+    @field:JsonDeserialize(using = ColorDeserializer::class)
+    @field:JsonSerialize(using = ColorSerializer::class)
     var backGroundColor: Color,
+
+    @field:JsonDeserialize(using = ColorDeserializer::class)
+    @field:JsonSerialize(using = ColorSerializer::class)
     var fontColor: Color,
+
     var distanceBetweenMarks: Double,
     var textSize: Double,
     var font: String,
     var isHide: Boolean = false,
     var axisMarkType: AxisMarkType = AxisMarkType.LINEAR,
     val settings: AxisSettings = AxisSettings()
-) : Writer, Cloneable {
+) : Cloneable {
 
+    @JsonIgnore
     fun isLogarithmic(): Boolean {
         return axisMarkType == AxisMarkType.LOGARITHMIC
     }
 
+    @JsonIgnore
     override fun clone(): Any {
         return ConcatenationAxis(
             id = id,
             name = name,
             zeroPoint = zeroPoint,
-            marksProvider = marksProvider,
             order = order,
             direction = direction,
             backGroundColor = backGroundColor,
@@ -51,6 +59,7 @@ data class ConcatenationAxis(
         )
     }
 
+    @JsonIgnore
     fun isLocated(x: Double, y: Double): Boolean {
         when (direction) {
             Direction.LEFT -> {
@@ -79,18 +88,13 @@ data class ConcatenationAxis(
         }
     }
 
+    @JsonIgnore
     fun isXAxis(): Boolean {
         return direction == Direction.TOP || direction == Direction.BOTTOM
     }
 
+    @JsonIgnore
     fun isYAxis(): Boolean {
         return !isXAxis()
-    }
-
-    override fun serialize(oos: ObjectOutputStream) {
-        oos.writeObject(direction)
-        oos.writeDouble(zeroPoint)
-        oos.write(backGroundColor.toByteArray())
-        oos.write(fontColor.toByteArray())
     }
 }

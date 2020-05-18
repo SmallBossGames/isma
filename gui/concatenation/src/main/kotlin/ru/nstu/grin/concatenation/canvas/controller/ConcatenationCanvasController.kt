@@ -3,7 +3,6 @@ package ru.nstu.grin.concatenation.canvas.controller
 import javafx.stage.StageStyle
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.converters.model.ArrowConverter
-import ru.nstu.grin.common.converters.model.DescriptionConverter
 import ru.nstu.grin.common.events.ConcatenationArrowEvent
 import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
 import ru.nstu.grin.common.model.ConcatenationType
@@ -18,8 +17,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianCanvasController
 import ru.nstu.grin.concatenation.description.controller.DescriptionCanvasController
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
-import ru.nstu.grin.concatenation.file.DrawReader
-import ru.nstu.grin.concatenation.file.DrawWriter
+import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.function.controller.FunctionsCanvasController
 import ru.nstu.grin.concatenation.function.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
@@ -36,6 +34,7 @@ class ConcatenationCanvasController : Controller() {
     private val axisCanvasController: AxisCanvasController = find { }
     private val cartesianController: CartesianCanvasController = find { }
     private val descriptionController: DescriptionCanvasController = find { }
+    private val canvasProjectLoader: CanvasProjectLoader = find {  }
 
     init {
         subscribe<ConcatenationArrowEvent> { event ->
@@ -45,14 +44,10 @@ class ConcatenationCanvasController : Controller() {
             clearCanvas()
         }
         subscribe<SaveEvent> {
-            val writer = DrawWriter(it.file)
+            canvasProjectLoader.save(it.file.toPath())
         }
         subscribe<LoadEvent> {
-            val reader = DrawReader()
-            val readResult = reader.read(it.file)
-            model.arrows.addAll(readResult.arrows)
-            model.descriptions.addAll(readResult.descriptions)
-            TODO("Add cartesians")
+            canvasProjectLoader.load(it.file.toPath())
         }
 //        addFunction()
     }

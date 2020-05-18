@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.canvas.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import java.util.*
@@ -13,6 +14,7 @@ data class CartesianSpace(
     var isShowGrid: Boolean = false
 ) : Cloneable {
 
+    @JsonIgnore
     public override fun clone(): CartesianSpace {
         return CartesianSpace(
             id = UUID.randomUUID(),
@@ -25,6 +27,7 @@ data class CartesianSpace(
         )
     }
 
+    @JsonIgnore
     fun merge(inFunctions: List<ConcatenationFunction>) {
         functions.addAll(inFunctions)
     }

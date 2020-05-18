@@ -12,14 +12,6 @@ object ConcatenationAxisConverter {
             id = source.id,
             name = source.name,
             zeroPoint = source.zeroPoint,
-            marksProvider = when (source.direction.direction) {
-                Direction.LEFT, Direction.RIGHT -> {
-                    InvertDoubleMarksProvider()
-                }
-                Direction.TOP, Direction.BOTTOM -> {
-                    DoubleMarksProvider()
-                }
-            },
             order = order,
             direction = source.direction.direction,
             backGroundColor = source.backGroundColor,

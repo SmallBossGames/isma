@@ -21,6 +21,7 @@ class PointTooltipsDrawElement(
         val filteredPoints = model.pointToolTipSettings.pointsSettings.filter { pointSettings ->
             !pointTooltips.any { it.text == formatText(pointSettings) }
         }
+        context.stroke = Color.BLACK
         println("Filtered ${filteredPoints.size}")
         for (pointSettings in filteredPoints) {
             val pointToolTip = Tooltip()

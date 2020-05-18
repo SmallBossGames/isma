@@ -10,6 +10,7 @@ data class AxisSettings(
     var min: Double = -14.0,
     var max: Double = 14.0,
 
+    var isOnlyIntegerPow: Boolean = false,
     var isLogarithmic: Boolean = false,
     var logarithmBase: Double = 10.0
 )

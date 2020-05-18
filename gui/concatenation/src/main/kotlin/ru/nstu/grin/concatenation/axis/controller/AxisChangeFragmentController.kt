@@ -2,12 +2,15 @@ package ru.nstu.grin.concatenation.axis.controller
 
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.events.GetAxisEvent
+import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
+import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
 import tornadofx.Controller
 import java.util.*
 
 class AxisChangeFragmentController : Controller() {
     private val axisId: UUID by param()
     private val model: AxisChangeFragmentModel by inject()
+    private val logarithmicTypeModel: LogarithmicTypeModel by inject()
 
     init {
         subscribe<GetAxisEvent> {
@@ -20,5 +23,21 @@ class AxisChangeFragmentController : Controller() {
                 model.isHide = it.axis.isHide
             }
         }
+    }
+
+    fun updateAxis() {
+        val event = UpdateAxisEvent(
+            id = axisId,
+            distance = model.distanceBetweenMarks.toDouble(),
+            textSize = model.textSize.toDouble(),
+            font = model.font,
+            fontColor = model.fontColor,
+            axisColor = model.axisColor,
+            isHide = model.isHide,
+            axisMarkType = model.axisMarkType,
+            logarithmBase = logarithmicTypeModel.logarithmBase,
+            isOnlyIntegerPow = logarithmicTypeModel.isOnlyIntegerPow
+        )
+        fire(event)
     }
 }

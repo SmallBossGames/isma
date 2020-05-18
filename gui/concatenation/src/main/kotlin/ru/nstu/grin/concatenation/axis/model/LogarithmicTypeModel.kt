@@ -10,5 +10,5 @@ class LogarithmicTypeModel : ViewModel() {
     var logarithmBase by logarithmBaseProperty
 
     var onlyIntegerPowProperty = SimpleBooleanProperty(true)
-    var onlyIntegerPow by onlyIntegerPowProperty
+    var isOnlyIntegerPow by onlyIntegerPowProperty
 }

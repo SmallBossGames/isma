@@ -30,6 +30,10 @@ data class ConcatenationAxis(
     val settings: AxisSettings = AxisSettings()
 ) : Writer, Cloneable {
 
+    fun isLogarithmic(): Boolean {
+        return axisMarkType == AxisMarkType.LOGARITHMIC
+    }
+
     override fun clone(): Any {
         return ConcatenationAxis(
             id = id,

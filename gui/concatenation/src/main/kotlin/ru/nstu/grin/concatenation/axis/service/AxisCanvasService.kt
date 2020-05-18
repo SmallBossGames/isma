@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.axis.service
 import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
 import ru.nstu.grin.concatenation.axis.events.GetAxisEvent
 import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
+import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import tornadofx.Controller
@@ -34,11 +35,13 @@ class AxisCanvasService : Controller() {
             listOf(it.xAxis, it.yAxis)
         }.flatten().first { it.id == event.id }
 
+        axis.axisMarkType = event.axisMarkType
         axis.distanceBetweenMarks = event.distance
         axis.textSize = event.textSize
         axis.font = event.font
         axis.fontColor = event.fontColor
         axis.backGroundColor = event.axisColor
+        axis.settings.logarithmBase = event.logarithmBase
         axis.isHide = event.isHide
         view.redraw()
         getAllAxises()

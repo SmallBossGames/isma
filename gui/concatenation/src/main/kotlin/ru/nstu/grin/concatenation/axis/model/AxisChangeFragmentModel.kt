@@ -22,7 +22,7 @@ class AxisChangeFragmentModel : ViewModel() {
     var isHide by isHideProperty
 
     var markTypeProperty = SimpleObjectProperty<AxisMarkType>(AxisMarkType.LINEAR)
-    var markType by markTypeProperty
+    var axisMarkType by markTypeProperty
 
     var axisColorProperty = SimpleObjectProperty<Color>()
     var axisColor by axisColorProperty

@@ -5,7 +5,9 @@ import kotlin.math.log10
 
 class LogTransform(
     private val isXLogarithm: Boolean,
-    private val isYLogarithm: Boolean
+    private val xLogBase: Double,
+    private val isYLogarithm: Boolean,
+    private val yLogBase: Double
 ) : Transform {
     override fun transform(point: Point): Point? {
         val x = logarithmTransform(point.x, isXLogarithm) ?: return null
@@ -15,7 +17,7 @@ class LogTransform(
 
     private fun logarithmTransform(number: Double, condition: Boolean): Double? = when {
         condition -> {
-            if (number<0) {
+            if (number < 0) {
                 null
             } else {
                 log10(number)

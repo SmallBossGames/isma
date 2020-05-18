@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
+import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
@@ -136,7 +137,12 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
         derivativeDetails: DerivativeDetails?
     ) {
         val transforms = listOf(
-            LogTransform(xAxis.settings.isLogarithmic, yAxis.settings.isLogarithmic),
+            LogTransform(
+                xAxis.axisMarkType == AxisMarkType.LOGARITHMIC,
+                xAxis.settings.logarithmBase,
+                yAxis.axisMarkType == AxisMarkType.LOGARITHMIC,
+                yAxis.settings.logarithmBase
+            ),
             MirrorTransform(mirrorDetails.isMirrorX, mirrorDetails.isMirrorY)
         )
         val currentTime = System.currentTimeMillis()

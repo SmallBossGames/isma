@@ -35,7 +35,7 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
                     continue
                 }
             }
-            val text = if (axis.settings.isLogarithmic) {
+            val text = if (axis.isLogarithmic()) {
                 numberFormatter.formatLogarithmic(stepY, axis.settings.logarithmBase)
             } else {
                 numberFormatter.format(stepY)
@@ -52,8 +52,7 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         }
 
         if (axis.settings.max > 0 && axis.settings.min < 0) {
-            println("Draw zero")
-            val zeroText = if (axis.settings.isLogarithmic) {
+            val zeroText = if (axis.isLogarithmic()) {
                 numberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
             } else {
                 numberFormatter.format(0.0)

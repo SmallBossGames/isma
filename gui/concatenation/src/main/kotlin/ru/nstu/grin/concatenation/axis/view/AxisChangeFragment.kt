@@ -51,7 +51,7 @@ class AxisChangeFragment : Fragment() {
         }
         tabpane {
             model.markTypeProperty.onChange {
-                when (model.markType) {
+                when (model.axisMarkType) {
                     AxisMarkType.LINEAR -> {
                         hide()
                     }
@@ -62,7 +62,7 @@ class AxisChangeFragment : Fragment() {
                     }
                 }
             }
-            when (model.markType) {
+            when (model.axisMarkType) {
                 AxisMarkType.LINEAR -> {
                     hide()
                 }
@@ -71,7 +71,8 @@ class AxisChangeFragment : Fragment() {
                     println("Hehe")
                 }
             }
-            tab<LogarithmicTypeFragment>()
+            val logFragment = find<LogarithmicTypeFragment>(params = params)
+            tab(logFragment)
 
             tabMaxHeight = 0.0
             tabMinHeight = 0.0
@@ -83,16 +84,7 @@ class AxisChangeFragment : Fragment() {
         }
         button("Ок") {
             action {
-                val event = UpdateAxisEvent(
-                    id = axisId,
-                    distance = model.distanceBetweenMarks.toDouble(),
-                    textSize = model.textSize.toDouble(),
-                    font = model.font,
-                    fontColor = model.fontColor,
-                    axisColor = model.axisColor,
-                    isHide = model.isHide
-                )
-                fire(event)
+                controller.updateAxis()
                 close()
             }
         }

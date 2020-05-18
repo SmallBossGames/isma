@@ -85,7 +85,7 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleEditMode(event: MouseEvent) {
         println("Pressed primary button")
         val triple = model.cartesianSpaces.mapNotNull {
-            val point = it.functions.firstOrNull {
+            val point = it.functions.filter { it.isHide.not() }.firstOrNull {
                 it.points.firstOrNull { it.isNearBy(event.x, event.y) } != null
             }?.points?.first {
                 it.isNearBy(event.x, event.y)

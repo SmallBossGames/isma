@@ -2,16 +2,14 @@ package ru.nstu.grin.concatenation.canvas.view
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
-import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.view.ChainDrawElement
+import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import tornadofx.Scope
-import tornadofx.ScopedInstance
 import tornadofx.action
 import tornadofx.find
 
@@ -32,24 +30,23 @@ class ContextMenuDrawElement(
                 val axises = model.cartesianSpaces.map {
                     listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
                 }.flatten()
+                val axis =
+                    axises.firstOrNull { it.second.isLocated(settings.xGraphic, settings.yGraphic) }?.second ?: return
                 val cartesianSpace = axises.firstOrNull {
                     it.second.isLocated(settings.xGraphic, settings.yGraphic)
                 }?.first ?: return
 
-                val menu = Menu("Логарифмический масштаб")
-                val xMenuItem = MenuItem("Включить по x")
-                xMenuItem.action {
-                    cartesianSpace.xAxis.settings.isLogarithmic = !cartesianSpace.xAxis.settings.isLogarithmic
+                val logMenuItem = MenuItem("Включить логарифмический масштаб")
+                logMenuItem.action {
+                    axis.settings.isLogarithmic = !axis.settings.isLogarithmic
+                    axis.settings.logarithmBase = 10.0
+                    if (axis.axisMarkType == AxisMarkType.LINEAR) {
+                        axis.axisMarkType = AxisMarkType.LOGARITHMIC
+                    } else {
+                        axis.axisMarkType = AxisMarkType.LINEAR
+                    }
                     chainDrawer.draw()
                 }
-                menu.items.add(xMenuItem)
-
-                val yMenuItem = MenuItem("Включить по y")
-                yMenuItem.action {
-                    cartesianSpace.yAxis.settings.isLogarithmic = !cartesianSpace.yAxis.settings.isLogarithmic
-                    chainDrawer.draw()
-                }
-                menu.items.add(yMenuItem)
 
                 val gridItem = MenuItem("Включить/Выключить сетку")
                 gridItem.action {
@@ -82,7 +79,7 @@ class ContextMenuDrawElement(
                     chainDrawer.draw()
                 }
 
-                contextMenu.items.add(menu)
+                contextMenu.items.add(logMenuItem)
                 contextMenu.items.add(gridItem)
                 contextMenu.items.add(changeAxis)
                 contextMenu.items.add(hideMenu)

@@ -83,14 +83,15 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         var currentX = axis.settings.min.toInt().toDouble()
         val max = axis.settings.max
         while (currentX < max) {
-            val stepX = matrixTransformerController.transformPixelToUnits(currentX, axis.settings, axis.direction)
+            val stepX = matrixTransformerController.transformUnitsToPixel(currentX, axis.settings, axis.direction)
 
             if (axis.settings.max > 0 && axis.settings.min < 0) {
                 if ((stepX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {
-                    currentX += 1.0
+                    currentX += axis.settings.integerStep
                     continue
                 }
             }
+            println("stepX, currentX=$currentX")
             val text = if (axis.isLogarithmic()) {
                 numberFormatter.formatLogarithmic(currentX, axis.settings.logarithmBase)
             } else {
@@ -102,7 +103,7 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
                 marksCoordinate,
                 MAX_TEXT_WIDTH
             )
-            currentX += 1.0
+            currentX += axis.settings.integerStep
         }
     }
 

@@ -36,7 +36,8 @@ class AxisChangeFragmentController : Controller() {
             isHide = model.isHide,
             axisMarkType = model.axisMarkType,
             logarithmBase = logarithmicTypeModel.logarithmBase,
-            isOnlyIntegerPow = logarithmicTypeModel.isOnlyIntegerPow
+            isOnlyIntegerPow = logarithmicTypeModel.isOnlyIntegerPow,
+            integerStep = logarithmicTypeModel.integerStep
         )
         fire(event)
     }

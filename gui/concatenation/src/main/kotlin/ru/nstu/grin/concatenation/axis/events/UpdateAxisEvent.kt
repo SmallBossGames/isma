@@ -15,5 +15,6 @@ data class UpdateAxisEvent(
     val isHide: Boolean,
     val axisMarkType: AxisMarkType,
     val logarithmBase: Double,
-    val isOnlyIntegerPow: Boolean
+    val isOnlyIntegerPow: Boolean,
+    val integerStep: Int
 ) : FXEvent()

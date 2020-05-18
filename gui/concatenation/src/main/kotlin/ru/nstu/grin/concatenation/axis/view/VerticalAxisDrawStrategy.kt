@@ -93,7 +93,7 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
             if (axis.settings.max > 0 && axis.settings.min < 0) {
                 if ((stepY - zeroPixel).absoluteValue < (axis.distanceBetweenMarks / 2)) {
                     println("Handled")
-                    currentY -= 1.0
+                    currentY -= axis.settings.integerStep
                     continue
                 }
             }
@@ -110,7 +110,7 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
                 MAX_TEXT_WIDTH
             )
 
-            currentY -= 1.0
+            currentY -= axis.settings.integerStep
         }
     }
 

@@ -14,6 +14,7 @@ class LogarithmicTypeFragmentController : Controller() {
             if (it.axis.id == axisId) {
                 model.logarithmBase = it.axis.settings.logarithmBase
                 model.isOnlyIntegerPow = it.axis.settings.isOnlyIntegerPow
+                model.integerStep = it.axis.settings.integerStep
             }
         }
     }

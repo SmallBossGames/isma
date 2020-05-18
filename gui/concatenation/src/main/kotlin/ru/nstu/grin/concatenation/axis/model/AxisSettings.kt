@@ -11,6 +11,7 @@ data class AxisSettings(
     var max: Double = 14.0,
 
     var isOnlyIntegerPow: Boolean = false,
+    var integerStep: Int = 1,
     var isLogarithmic: Boolean = false,
     var logarithmBase: Double = 10.0
 )

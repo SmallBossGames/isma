@@ -50,6 +50,7 @@ class AxisCanvasService : Controller() {
         axis.backGroundColor = event.axisColor
         axis.settings.logarithmBase = event.logarithmBase
         axis.settings.isOnlyIntegerPow = event.isOnlyIntegerPow
+        axis.settings.integerStep = event.integerStep
         axis.isHide = event.isHide
         view.redraw()
         getAllAxises()

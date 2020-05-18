@@ -21,6 +21,9 @@ class LogarithmicTypeFragment : Fragment() {
             field("Только целые значение степеней") {
                 checkbox().bind(model.onlyIntegerPowProperty)
             }
+            field("Целочисленные шаг") {
+                textfield().bind(model.integerStepProperty)
+            }
         }
     }
 

@@ -58,7 +58,7 @@ class AxisChangeFragment : Fragment() {
                     AxisMarkType.LOGARITHMIC -> {
                         show()
                         println("Show blya")
-                        currentStage?.height = 470.0
+                        currentStage?.height = 500.0
                     }
                 }
             }

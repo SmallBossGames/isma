@@ -24,6 +24,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
     private val matrixTransformerController: MatrixTransformerController by inject()
     private val pointTooltipsDrawElement: PointTooltipsDrawElement by inject()
+    private val axisDrawElement: AxisDrawElement by inject()
 
     private val contextMenu = ContextMenu()
 
@@ -56,13 +57,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
 
         functionDrawElement.draw(context)
 
-        for (cartesianSpace in model.cartesianSpaces) {
-            AxisDrawElement(
-                cartesianSpace.xAxis,
-                cartesianSpace.yAxis,
-                matrixTransformerController
-            ).draw(context)
-        }
+        axisDrawElement.draw(context)
 
         pointTooltipsDrawElement.draw(context)
 

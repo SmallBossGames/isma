@@ -6,24 +6,27 @@ import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import tornadofx.Controller
 
-class AxisDrawElement(
-    private val xAxis: ConcatenationAxis,
-    private val yAxis: ConcatenationAxis,
-    matrixTransformerController: MatrixTransformerController
-) : ChainDrawElement {
-    private val verticalAxisDraw = VerticalAxisDrawStrategy(matrixTransformerController)
-    private val horizontalAxisDraw = HorizontalAxisDrawStrategy(matrixTransformerController)
+class AxisDrawElement : ChainDrawElement, Controller() {
+    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val verticalAxisDraw: VerticalAxisDrawStrategy by inject()
+    private val horizontalAxisDraw: HorizontalAxisDrawStrategy by inject()
 
     override fun draw(context: GraphicsContext) {
-        if (xAxis.isHide.not()) {
-            drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
-            drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
-        }
-        if (yAxis.isHide.not()) {
-            drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
-            drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
+        for (cartesianSpace in model.cartesianSpaces) {
+            val xAxis = cartesianSpace.xAxis
+            val yAxis = cartesianSpace.yAxis
+
+            if (xAxis.isHide.not()) {
+                drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
+                drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
+            }
+            if (yAxis.isHide.not()) {
+                drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
+                drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
+            }
         }
     }
 
@@ -69,34 +72,58 @@ class AxisDrawElement(
         val startPoint = order * SettingsProvider.getAxisWidth()
         when (direction) {
             Direction.LEFT -> {
-                context.fillRect(startPoint, 0.0, SettingsProvider.getAxisWidth(), SettingsProvider.getCanvasHeight())
+                context.fillRect(
+                    startPoint,
+                    getTopAxisSize() * SettingsProvider.getAxisWidth(),
+                    SettingsProvider.getAxisWidth(),
+                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                )
             }
             Direction.RIGHT -> {
                 context.fillRect(
                     SettingsProvider.getCanvasWidth() - startPoint,
-                    0.0,
+                    getTopAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight()
+                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
                 )
             }
             Direction.TOP -> {
                 context.fillRect(
-                    0.0,
+                    getLeftAxisSize() * SettingsProvider.getAxisWidth(),
                     startPoint,
-                    SettingsProvider.getCanvasWidth(),
+                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth()
                 )
             }
             Direction.BOTTOM -> {
                 context.fillRect(
-                    0.0,
+                    getLeftAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getCanvasHeight() - startPoint - SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasWidth(),
+                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth()
                 )
             }
         }
     }
+
+    private fun getTopAxisSize(): Int {
+        return filterAxis(Direction.TOP).size
+    }
+
+    private fun getBottomAxisSize(): Int {
+        return filterAxis(Direction.BOTTOM).size
+    }
+
+    private fun getLeftAxisSize(): Int {
+        return filterAxis(Direction.LEFT).size
+    }
+
+    private fun getRightAxisSize(): Int {
+        return filterAxis(Direction.RIGHT).size
+    }
+
+    private fun filterAxis(direction: Direction) = model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
+        .filter { it.direction == direction }
 
     private companion object {
         const val MARKS_MARGIN = 20.0

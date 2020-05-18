@@ -5,13 +5,13 @@ import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import tornadofx.Controller
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 
-class HorizontalAxisDrawStrategy(
-    private val matrixTransformerController: MatrixTransformerController
-) : AxisMarksDrawStrategy {
+class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
     private val numberFormatter = NumberFormatter()
+    private val matrixTransformerController: MatrixTransformerController by inject()
 
     override fun drawMarks(
         context: GraphicsContext,
@@ -23,7 +23,7 @@ class HorizontalAxisDrawStrategy(
 
         val zeroPixel = matrixTransformerController.transformUnitsToPixel(0.0, axis.settings, axis.direction)
 
-        var currentX = minPixel
+        var currentX = minPixel + 10.0
         while (currentX < maxPixel) {
             val stepX = matrixTransformerController.transformPixelToUnits(currentX, axis.settings, axis.direction)
 

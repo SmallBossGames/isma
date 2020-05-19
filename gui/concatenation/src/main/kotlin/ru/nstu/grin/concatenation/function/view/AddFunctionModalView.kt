@@ -20,22 +20,8 @@ class AddFunctionModalView : Fragment() {
     private val controller: AddFunctionController by inject()
     private val model: AddFunctionModel by inject()
     private val fileFunctionModel: FileFunctionModel by inject()
-    private lateinit var tabPane: TabPane
 
     override val root: Parent = form {
-        model.inputWayProperty.onChange {
-            when (model.inputWay) {
-                InputWay.FILE -> {
-                    tabPane.selectionModel.select(0)
-                }
-                InputWay.ANALYTIC -> {
-                    tabPane.selectionModel.select(1)
-                }
-                InputWay.MANUAL -> {
-                    tabPane.selectionModel.select(2)
-                }
-            }
-        }
         fieldset {
             field("Введите имя пространства") {
                 textfield().bind(model.cartesianSpaceNameProperty)
@@ -81,7 +67,30 @@ class AddFunctionModalView : Fragment() {
             }
         }
         tabpane {
-            tabPane = this
+            model.inputWayProperty.onChange {
+                when (model.inputWay) {
+                    InputWay.FILE -> {
+                        selectionModel.select(0)
+                    }
+                    InputWay.ANALYTIC -> {
+                        selectionModel.select(1)
+                    }
+                    InputWay.MANUAL -> {
+                        selectionModel.select(2)
+                    }
+                }
+            }
+            when (model.inputWay) {
+                InputWay.FILE -> {
+                    selectionModel.select(0)
+                }
+                InputWay.ANALYTIC -> {
+                    selectionModel.select(1)
+                }
+                InputWay.MANUAL -> {
+                    selectionModel.select(2)
+                }
+            }
             tab<FileFunctionFragment>()
             tab<AnalyticFunctionFragment>()
             tab<ManualFunctionFragment>()

@@ -6,7 +6,6 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
-import ru.nstu.grin.common.draw.elements.GridDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
@@ -22,9 +21,9 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val model: ConcatenationCanvasModelViewModel by inject()
     private val controller: ConcatenationCanvasController by inject()
     private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
-    private val matrixTransformerController: MatrixTransformerController by inject()
     private val pointTooltipsDrawElement: PointTooltipsDrawElement by inject()
     private val axisDrawElement: AxisDrawElement by inject()
+    private val matrixTransformerController: MatrixTransformerController by inject()
 
     private val contextMenu = ContextMenu()
 
@@ -37,20 +36,17 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
 
         for (cartesianSpace in model.cartesianSpaces) {
             if (cartesianSpace.isShowGrid) {
-                val pixelCost = cartesianSpace.xAxis.settings.pixelCost
                 GridDrawElement(
-                    pixelCost / 5,
-                    Color.valueOf("EDEDED"),
-                    cartesianSpace.xAxis.settings.correlation,
-                    cartesianSpace.yAxis.settings.correlation,
-                    true
+                    cartesianSpace.xAxis,
+                    cartesianSpace.yAxis,
+                    Color.valueOf("BBBBBB"),
+                    matrixTransformerController
                 ).draw(context)
                 GridDrawElement(
-                    pixelCost,
-                    Color.valueOf("BBBBBB"),
-                    cartesianSpace.xAxis.settings.correlation,
-                    cartesianSpace.yAxis.settings.correlation,
-                    true
+                    cartesianSpace.xAxis,
+                    cartesianSpace.yAxis,
+                    Color.valueOf("EDEDED"),
+                    matrixTransformerController
                 ).draw(context)
             }
         }

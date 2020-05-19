@@ -5,7 +5,6 @@ import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.events.AxisQuery
-import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import tornadofx.*
 import java.util.*
@@ -63,7 +62,7 @@ class AxisChangeFragment : Fragment() {
                     }
                     AxisMarkType.LOGARITHMIC -> {
                         show()
-                        currentStage?.height = 500.0
+                        currentStage?.height = 600.0
                     }
                 }
             }

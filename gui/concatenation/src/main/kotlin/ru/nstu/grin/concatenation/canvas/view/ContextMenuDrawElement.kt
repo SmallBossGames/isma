@@ -96,7 +96,7 @@ class ContextMenuDrawElement(
                 }
                 val descriptionItem = MenuItem("Добавить описание")
                 descriptionItem.action {
-                    controller.openDescriptionModal(stage.x + settings.xGraphic, stage.y + settings.yGraphic)
+                    controller.openDescriptionModal(settings.xGraphic, settings.yGraphic)
                 }
                 contextMenu.items.addAll(functionItem, arrowItem, descriptionItem)
                 contextMenu.show(context.canvas, stage.x + settings.xGraphic, stage.y + settings.yGraphic)

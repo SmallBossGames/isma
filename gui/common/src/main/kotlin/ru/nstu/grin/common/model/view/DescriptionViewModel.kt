@@ -21,6 +21,6 @@ class DescriptionViewModel : ViewModel() {
     var textColorProperty = SimpleObjectProperty(Color.BLACK)
     var textColor by textColorProperty
 
-    var fontProperty = SimpleStringProperty(Font.getDefault().family)
+    var fontProperty = SimpleStringProperty(Font.getFamilies().random())
     var font by fontProperty
 }

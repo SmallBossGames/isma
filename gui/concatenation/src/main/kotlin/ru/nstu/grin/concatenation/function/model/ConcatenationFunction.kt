@@ -6,12 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import javafx.scene.paint.Color
 import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
-import ru.nstu.grin.common.extensions.toByteArray
 import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.common.file.Writer
 import ru.nstu.grin.concatenation.file.json.ColorDeserializer
 import ru.nstu.grin.concatenation.file.json.ColorSerializer
-import java.io.ObjectOutputStream
 import java.util.*
 
 /**
@@ -45,6 +42,7 @@ data class ConcatenationFunction(
                 when (it) {
                     is MirrorDetails -> it.copy()
                     is DerivativeDetails -> it.copy()
+                    is WaveletDetails -> it.copy()
                 }
             }.toMutableList()
         )
@@ -63,7 +61,13 @@ data class ConcatenationFunction(
     fun getDerivativeDetails() = details.filterIsInstance<DerivativeDetails>().firstOrNull()
 
     @JsonIgnore
+    fun getWaveletDetails() = details.filterIsInstance<WaveletDetails>().firstOrNull()
+
+    @JsonIgnore
     fun removeDerivativeDetails() = details.removeIf { it is DerivativeDetails }
+
+    @JsonIgnore
+    fun removeWaveletDetails() = details.removeIf { it is WaveletDetails }
 
     @JsonIgnore
     fun getShape(): Shape {

@@ -23,6 +23,9 @@ class FunctionsCanvasController : Controller() {
         subscribe<DerivativeFunctionEvent> {
             service.derivativeFunction(it)
         }
+        subscribe<WaveletFunctionEvent> {
+            service.waveletFunction(it)
+        }
         subscribe<CalculateIntegralEvent> {
             service.calculateIntegral(it)
         }
@@ -41,3 +44,4 @@ class FunctionsCanvasController : Controller() {
         }
     }
 }
+

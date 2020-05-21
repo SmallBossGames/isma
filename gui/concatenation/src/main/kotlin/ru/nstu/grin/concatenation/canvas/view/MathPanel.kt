@@ -8,6 +8,7 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
 import ru.nstu.grin.concatenation.function.view.DerivativeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.FunctionIntegrationFragment
 import ru.nstu.grin.concatenation.function.view.IntersectionFunctionFragment
+import ru.nstu.grin.concatenation.function.view.WaveletFunctionFragment
 import tornadofx.*
 
 class MathPanel : Fragment() {
@@ -48,6 +49,31 @@ class MathPanel : Fragment() {
                     find<DerivativeFunctionFragment>(
                         mapOf(
                             DerivativeFunctionFragment::functionId to function.id
+                        )
+                    ).openModal()
+                }
+            }
+        }
+        button {
+            val image = Image("wavelet.png")
+            val imageView = ImageView(image)
+            imageView.fitHeight = 20.0
+            imageView.fitWidth = 20.0
+            graphic = imageView
+            tooltip = Tooltip("Применить вейвлет преобразование")
+
+            action {
+                val function = model.getSelectedFunction()
+                if (function != null) {
+                    val waveletDetails = function.getWaveletDetails()
+                    if (waveletDetails != null) {
+                        function.removeWaveletDetails()
+                        drawer.draw()
+                        return@action
+                    }
+                    find<WaveletFunctionFragment>(
+                        mapOf(
+                            WaveletFunctionFragment::functionId to function.id
                         )
                     ).openModal()
                 }

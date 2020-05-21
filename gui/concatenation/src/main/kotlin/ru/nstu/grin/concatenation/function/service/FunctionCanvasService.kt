@@ -12,6 +12,7 @@ import ru.nstu.grin.concatenation.function.events.*
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.DerivativeDetails
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
+import ru.nstu.grin.concatenation.function.model.WaveletDetails
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
@@ -119,6 +120,17 @@ class FunctionCanvasService : Controller() {
         view.redraw()
     }
 
+    fun waveletFunction(event: WaveletFunctionEvent) {
+        val function = getFunction(event.id)
+
+        val details =
+            WaveletDetails(waveletTransformFun = event.waveletTransformFun, waveletDirection = event.waveletDirection)
+        function.details.add(details)
+
+        view.redraw()
+        localizeFunction(LocalizeFunctionEvent(function.id))
+    }
+
     fun calculateIntegral(event: CalculateIntegralEvent) {
         val function = getFunction(event.functionId)
         val min = function.points.map { it.x }.min()!!
@@ -140,8 +152,24 @@ class FunctionCanvasService : Controller() {
     fun localizeFunction(event: LocalizeFunctionEvent) {
         val cartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
         val function = model.cartesianSpaces.map { it.functions }.flatten().first { it.id == event.id }
-        val xPoints = function.points.map { it.x }
-        val yPoints = function.points.map { it.y }
+        val xPoints = function.points.map {
+            it.xGraphic?.let {
+                matrixTransformer.transformPixelToUnits(
+                    it,
+                    cartesianSpace.xAxis.settings,
+                    cartesianSpace.xAxis.direction
+                )
+            } ?: it.x
+        }
+        val yPoints = function.points.map {
+            it.yGraphic?.let {
+                matrixTransformer.transformPixelToUnits(
+                    it,
+                    cartesianSpace.yAxis.settings,
+                    cartesianSpace.yAxis.direction
+                )
+            } ?: it.y
+        }
 
         val minY = yPoints.min() ?: return
         val maxY = yPoints.max() ?: return

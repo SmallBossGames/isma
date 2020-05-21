@@ -1,9 +1,6 @@
 package ru.nstu.grin.concatenation.axis.converter
 
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
-import ru.nstu.grin.concatenation.axis.marks.DoubleMarksProvider
-import ru.nstu.grin.concatenation.axis.marks.InvertDoubleMarksProvider
-import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 
 object ConcatenationAxisConverter {

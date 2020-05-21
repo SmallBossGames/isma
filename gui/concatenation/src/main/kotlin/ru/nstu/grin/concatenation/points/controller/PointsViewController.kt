@@ -89,75 +89,11 @@ class PointsViewController : Controller() {
             }
         }.transpose()
 
-        val transformed = if (model.isWavelet) {
-            val direction = model.waveletDirection
-            if (direction == null) {
-                tornadofx.error("Необходимо выбрать направление преобразования")
-                return
-            }
-            makeWaveletTransform(points, direction)
-        } else {
-            points
-        }
-
         fire(
             FileCheckedEvent(
-                points = transformed,
+                points = points,
                 addFunctionsMode = model.addFunctionsMode
             )
         )
-    }
-
-    private fun makeWaveletTransform(
-        points: List<List<Point>>,
-        direction: WaveletDirection
-    ): List<List<Point>> {
-        val transform = Transform(
-            AncientEgyptianDecomposition(
-                FastWaveletTransform(getWavelet())
-            )
-        )
-        return points.map { functionPoints ->
-            val xArray = functionPoints.map { it.x }.toDoubleArray()
-            val yArray = functionPoints.map { it.y }.toDoubleArray()
-
-            when (direction) {
-                WaveletDirection.X -> {
-                    val xTransformed = transform.forward(xArray).sorted()
-
-                    xTransformed.mapIndexed { index, d ->
-                        Point(d, yArray[index])
-                    }
-                }
-                WaveletDirection.Y -> {
-                    val yTransformed = transform.forward(yArray).sorted()
-
-                    xArray.mapIndexed { index, d ->
-                        Point(d, yTransformed[index])
-                    }
-                }
-                WaveletDirection.BOTH -> {
-                    val xTransformed = transform.forward(xArray).sorted()
-                    val yTransformed = transform.forward(yArray).sorted()
-
-                    xTransformed.mapIndexed { index, d ->
-                        Point(d, yTransformed[index])
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getWavelet(): Wavelet {
-        return when (model.waveletTransformFun) {
-            WaveletTransformFun.HAAR1 -> Haar1()
-            WaveletTransformFun.COIFLET5 -> Coiflet5()
-            WaveletTransformFun.BIORTHOGONAL68 -> BiOrthogonal68()
-            WaveletTransformFun.DISCRETE_MAYER -> DiscreteMayer()
-            WaveletTransformFun.LEGENDRE3 -> Legendre3()
-            else -> {
-                throw IllegalArgumentException("Something went wrong")
-            }
-        }
     }
 }

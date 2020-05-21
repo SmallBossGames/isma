@@ -26,6 +26,17 @@ object GenerateUtils {
         return result
     }
 
+    fun generateSin(): List<Point> {
+        val result = mutableListOf<Point>()
+        var i = -100.0
+        while (i < 100) {
+            val y = sin(i.toDouble())
+            result.add(Point(i.toDouble(), y))
+            i += 0.01
+        }
+        return result
+    }
+
     fun generateTwoCartesianSpaces(): Pair<CartesianSpaceDTO, CartesianSpaceDTO> {
         val function = ConcatenationFunctionDTO(
             id = UUID.randomUUID(),
@@ -39,9 +50,9 @@ object GenerateUtils {
         val function2 = ConcatenationFunctionDTO(
             id = UUID.randomUUID(),
             name = "Test",
-            points = generateCircle(radius = 2.0),
+            points = generateSin(),
             functionColor = Color.BLACK,
-            lineSize = 20.0,
+            lineSize = 1.0,
             lineType = LineType.POLYNOM
         )
 
@@ -81,7 +92,7 @@ object GenerateUtils {
         val cartesianSpace2 = CartesianSpaceDTO(
             id = UUID.randomUUID(),
             name = "Пространство2",
-            functions = listOf(function),
+            functions = listOf(function2),
             xAxis = ConcatenationAxisDTO(
                 id = UUID.randomUUID(),
                 name = "Test2",

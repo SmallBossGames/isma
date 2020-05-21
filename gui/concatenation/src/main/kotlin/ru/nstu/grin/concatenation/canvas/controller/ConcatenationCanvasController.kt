@@ -54,11 +54,11 @@ class ConcatenationCanvasController : Controller() {
 
     fun addFunction() {
         val (cartesianSpace, cartesianSpace2) = GenerateUtils.generateTwoCartesianSpaces()
-        fire(
-            ConcatenationFunctionEvent(
-                cartesianSpace = cartesianSpace
-            )
-        )
+//        fire(
+//            ConcatenationFunctionEvent(
+//                cartesianSpace = cartesianSpace
+//            )
+//        )
         fire(
             ConcatenationFunctionEvent(
                 cartesianSpace = cartesianSpace2

@@ -5,7 +5,7 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
-import ru.nstu.grin.concatenation.canvas.model.FunctionListViewModel
+import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import tornadofx.*
 
 class FunctionListView : Fragment() {

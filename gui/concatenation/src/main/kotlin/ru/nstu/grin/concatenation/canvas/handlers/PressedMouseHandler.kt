@@ -10,7 +10,7 @@ import ru.nstu.grin.concatenation.points.model.PointSettings
 import tornadofx.Controller
 
 class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
     private val concatenationViewModel: ConcatenationViewModel by inject()
 

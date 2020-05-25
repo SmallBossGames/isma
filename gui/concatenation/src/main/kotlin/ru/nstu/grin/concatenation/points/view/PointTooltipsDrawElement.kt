@@ -6,7 +6,7 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import tornadofx.Controller
 import kotlin.math.pow
@@ -14,7 +14,7 @@ import kotlin.math.pow
 class PointTooltipsDrawElement(
 ) : ChainDrawElement, Controller() {
     private val pointTooltips = mutableListOf<Tooltip>()
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val transformer: MatrixTransformerController by inject()
 
     override fun draw(context: GraphicsContext) {

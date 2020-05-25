@@ -5,11 +5,11 @@ import javafx.scene.input.ScrollEvent
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.model.ScaleSettings
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.Controller
 
 class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, ScaleSettings> = mutableMapOf()
 

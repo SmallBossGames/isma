@@ -2,7 +2,7 @@ package ru.nstu.grin.concatenation.file.model
 
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 
 data class SavedCanvas(
     val cartesians: List<CartesianSpace>,

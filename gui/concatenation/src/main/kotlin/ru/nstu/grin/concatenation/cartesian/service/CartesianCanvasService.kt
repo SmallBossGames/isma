@@ -1,7 +1,7 @@
 package ru.nstu.grin.concatenation.cartesian.service
 
 import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.events.*
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
@@ -9,7 +9,7 @@ import tornadofx.Controller
 import java.util.*
 
 class CartesianCanvasService : Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
     fun copyCartesian(event: CartesianCopyQuery) {

@@ -1,12 +1,12 @@
 package ru.nstu.grin.concatenation.description.service
 
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.description.events.*
 import tornadofx.Controller
 
 class DescriptionCanvasService : Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
     fun add(event: AddDescriptionEvent) {

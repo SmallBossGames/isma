@@ -6,9 +6,9 @@ import javafx.scene.layout.Priority
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.common.model.Arrow
-import ru.nstu.grin.concatenation.canvas.model.CartesianSpace
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
@@ -18,7 +18,7 @@ import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import tornadofx.*
 
 class ConcatenationCanvas : View() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val controller: ConcatenationCanvasController = find { }
     private val canvasModel: CanvasModel by inject()
     private var chainDrawer: ConcatenationChainDrawer = find { }

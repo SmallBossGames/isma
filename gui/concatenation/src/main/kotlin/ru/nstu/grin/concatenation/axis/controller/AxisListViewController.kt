@@ -1,7 +1,7 @@
 package ru.nstu.grin.concatenation.axis.controller
 
 import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
-import ru.nstu.grin.concatenation.canvas.model.AxisListViewModel
+import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
 import tornadofx.Controller
 import tornadofx.toObservable
 

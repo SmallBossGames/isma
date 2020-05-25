@@ -1,7 +1,6 @@
 package ru.nstu.grin.concatenation.canvas.view
 
 import javafx.scene.control.ContextMenu
-import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
@@ -12,13 +11,13 @@ import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Controller
 
 class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val canvasModel: CanvasModel by inject()
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val controller: ConcatenationCanvasController by inject()
     private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
     private val pointTooltipsDrawElement: PointTooltipsDrawElement by inject()

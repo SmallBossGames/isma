@@ -6,11 +6,11 @@ import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.Controller
 
 class AxisDrawElement : ChainDrawElement, Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val verticalAxisDraw: VerticalAxisDrawStrategy by inject()
     private val horizontalAxisDraw: HorizontalAxisDrawStrategy by inject()
 

@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.canvas.model
+package ru.nstu.grin.concatenation.cartesian.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis

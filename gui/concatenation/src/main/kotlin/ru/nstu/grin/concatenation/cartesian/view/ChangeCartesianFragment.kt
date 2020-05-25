@@ -3,7 +3,7 @@ package ru.nstu.grin.concatenation.cartesian.view
 import javafx.scene.Parent
 import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
 import ru.nstu.grin.concatenation.cartesian.events.CartesianQuery
-import ru.nstu.grin.concatenation.canvas.model.ChangeCartesianSpaceModel
+import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
 import tornadofx.*
 import java.util.*
 

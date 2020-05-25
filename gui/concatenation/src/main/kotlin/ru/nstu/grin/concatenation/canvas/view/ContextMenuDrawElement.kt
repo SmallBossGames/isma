@@ -8,14 +8,14 @@ import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.Scope
 import tornadofx.action
 import tornadofx.find
 
 class ContextMenuDrawElement(
     private val contextMenu: ContextMenu,
-    private val model: ConcatenationCanvasModelViewModel,
+    private val model: ConcatenationCanvasModel,
     private val controller: ConcatenationCanvasController,
     private val chainDrawer: ConcatenationChainDrawer,
     private val scope: Scope

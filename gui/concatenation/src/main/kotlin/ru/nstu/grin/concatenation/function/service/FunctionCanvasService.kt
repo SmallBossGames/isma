@@ -5,13 +5,12 @@ import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.converter.CartesianSpaceConverter
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.function.events.*
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.DerivativeDetails
-import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.concatenation.function.model.WaveletDetails
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
@@ -22,7 +21,7 @@ import tornadofx.Controller
 import java.util.*
 
 class FunctionCanvasService : Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
     private val matrixTransformer: MatrixTransformerController by inject()
 

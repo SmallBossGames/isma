@@ -4,7 +4,7 @@ import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import ru.nstu.grin.concatenation.function.events.LocalizeFunctionEvent
 import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
@@ -14,7 +14,7 @@ import ru.nstu.grin.concatenation.function.view.MirrorFunctionFragment
 import tornadofx.*
 
 class TransformPanel : Fragment() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
 
     override val root: Parent = toolbar {
         button {

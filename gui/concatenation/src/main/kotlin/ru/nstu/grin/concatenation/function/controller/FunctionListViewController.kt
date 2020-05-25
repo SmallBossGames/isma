@@ -3,7 +3,7 @@ package ru.nstu.grin.concatenation.function.controller
 import ru.nstu.grin.concatenation.function.events.DeleteFunctionQuery
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
-import ru.nstu.grin.concatenation.canvas.model.FunctionListViewModel
+import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import tornadofx.Controller

@@ -18,7 +18,7 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.function.transform.LogTransform
 import ru.nstu.grin.concatenation.function.transform.MirrorTransform
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     private val matrixTransformer: MatrixTransformerController by inject()
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val derivativesCache2: MutableMap<DerivativeCacheKey, List<Point>> = ConcurrentHashMap()
     private val waveletCache: MutableMap<WaveletCacheKey, List<Point>> = ConcurrentHashMap()
 

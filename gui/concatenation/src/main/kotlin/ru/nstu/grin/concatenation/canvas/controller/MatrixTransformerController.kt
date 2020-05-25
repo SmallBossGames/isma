@@ -3,13 +3,13 @@ package ru.nstu.grin.concatenation.canvas.controller
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.axis.model.AxisSettings
 import ru.nstu.grin.concatenation.axis.model.Direction
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.Controller
 import java.lang.IllegalArgumentException
 import kotlin.math.absoluteValue
 
 class MatrixTransformerController : Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
 
     fun transformPixelToUnits(number: Double, axisSettings: AxisSettings, direction: Direction): Double {
         val min = axisSettings.min

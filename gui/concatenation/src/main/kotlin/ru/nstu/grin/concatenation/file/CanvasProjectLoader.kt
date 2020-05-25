@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.file.model.SavedCanvas
 import tornadofx.Controller
 import java.io.FileInputStream
@@ -13,7 +13,7 @@ import java.io.FileOutputStream
 import java.nio.file.Path
 
 class CanvasProjectLoader : Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val mapper = createObjectMapper()
 
     fun save(path: Path) {

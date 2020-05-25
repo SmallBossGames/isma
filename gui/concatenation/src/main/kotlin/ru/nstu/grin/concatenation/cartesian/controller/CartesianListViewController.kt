@@ -2,7 +2,7 @@ package ru.nstu.grin.concatenation.cartesian.controller
 
 import ru.nstu.grin.concatenation.cartesian.events.DeleteCartesianSpaceQuery
 import ru.nstu.grin.concatenation.cartesian.events.GetAllCartesiansEvent
-import ru.nstu.grin.concatenation.canvas.model.CartesianListViewModel
+import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
 import tornadofx.Controller
 import tornadofx.toObservable
 import java.util.*

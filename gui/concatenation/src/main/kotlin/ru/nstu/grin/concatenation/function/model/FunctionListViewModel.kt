@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.canvas.model
+package ru.nstu.grin.concatenation.function.model
 
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections

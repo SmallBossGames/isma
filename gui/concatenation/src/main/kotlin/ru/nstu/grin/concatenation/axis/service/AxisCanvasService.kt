@@ -4,13 +4,13 @@ import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
 import ru.nstu.grin.concatenation.axis.events.GetAxisEvent
 import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import tornadofx.Controller
 import java.util.*
 
 class AxisCanvasService : Controller() {
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
     fun getAxis(id: UUID) {

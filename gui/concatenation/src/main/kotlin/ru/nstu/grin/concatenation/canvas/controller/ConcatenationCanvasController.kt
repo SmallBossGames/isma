@@ -12,7 +12,7 @@ import ru.nstu.grin.concatenation.canvas.GenerateUtils
 import ru.nstu.grin.concatenation.canvas.events.*
 import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModelViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianCanvasController
 import ru.nstu.grin.concatenation.description.controller.DescriptionCanvasController
@@ -28,7 +28,7 @@ import tornadofx.*
  */
 class ConcatenationCanvasController : Controller() {
     private val canvasModel: CanvasModel by inject()
-    private val model: ConcatenationCanvasModelViewModel by inject()
+    private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
     private val functionsController: FunctionsCanvasController = find { }
     private val axisCanvasController: AxisCanvasController = find { }

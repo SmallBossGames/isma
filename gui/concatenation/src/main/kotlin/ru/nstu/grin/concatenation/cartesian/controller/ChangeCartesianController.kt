@@ -2,7 +2,7 @@ package ru.nstu.grin.concatenation.cartesian.controller
 
 import ru.nstu.grin.concatenation.cartesian.events.GetCartesianEvent
 import ru.nstu.grin.concatenation.cartesian.events.UpdateCartesianEvent
-import ru.nstu.grin.concatenation.canvas.model.ChangeCartesianSpaceModel
+import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
 import tornadofx.Controller
 import java.util.*
 

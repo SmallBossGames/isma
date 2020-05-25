@@ -1,4 +1,4 @@
-package ru.nstu.grin.concatenation.canvas.model
+package ru.nstu.grin.concatenation.axis.model
 
 import javafx.beans.property.SimpleListProperty
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis

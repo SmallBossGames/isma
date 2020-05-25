@@ -181,7 +181,7 @@ class AddFunctionModalView : Fragment() {
                 }
             }
         }
-        button("OK") {
+        button("Добавить") {
             enableWhen {
                 model.valid
             }

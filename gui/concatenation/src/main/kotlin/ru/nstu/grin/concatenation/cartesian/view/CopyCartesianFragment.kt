@@ -22,7 +22,7 @@ class CopyCartesianFragment : Fragment() {
                 textfield().bind(model.yAxisNameProperty)
             }
         }
-        button("Ок") {
+        button("Скопировать") {
             action {
                 val event = CartesianCopyQuery(
                     id = cartesianId,

@@ -21,7 +21,7 @@ class ChangeCartesianFragment : Fragment() {
                 checkbox().bind(model.isShowGridProperty)
             }
         }
-        button("Ок") {
+        button("Сохранить") {
             action {
                 controller.updateCartesianSpace()
                 close()

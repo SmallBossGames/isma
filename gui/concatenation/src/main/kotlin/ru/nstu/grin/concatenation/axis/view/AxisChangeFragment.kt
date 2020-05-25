@@ -85,7 +85,7 @@ class AxisChangeFragment : Fragment() {
                 }
             }
         }
-        button("Ок") {
+        button("Сохранить") {
             action {
                 controller.updateAxis()
                 close()

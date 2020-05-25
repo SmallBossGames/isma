@@ -49,7 +49,7 @@ class ChangeFunctionFragment : Fragment() {
                     }
                 }
             }
-            button("Ок") {
+            button("Сохранить") {
                 action {
                     controller.updateFunction()
                     close()

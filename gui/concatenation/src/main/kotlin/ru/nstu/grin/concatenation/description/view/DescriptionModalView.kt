@@ -40,7 +40,7 @@ class DescriptionModalView : Fragment() {
         vbox {
             hbox {
                 alignment = Pos.CENTER
-                button("Готово") {
+                button("Добавить") {
                     enableWhen {
                         model.valid
                     }

@@ -17,7 +17,7 @@ class CopyFunctionFragment : Fragment() {
                 textfield().bind(model.nameProperty)
             }
         }
-        button("Ок") {
+        button("Скопировать") {
             action {
                 controller.copy()
                 close()

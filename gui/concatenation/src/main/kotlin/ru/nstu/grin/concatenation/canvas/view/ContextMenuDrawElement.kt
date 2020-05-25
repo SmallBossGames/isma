@@ -90,15 +90,15 @@ class ContextMenuDrawElement(
                 functionItem.action {
                     controller.openFunctionModal(listOf(), listOf())
                 }
-                val arrowItem = MenuItem("Добавить указатель")
-                arrowItem.action {
-                    controller.openArrowModal(stage.x + settings.xGraphic, stage.y + settings.yGraphic)
-                }
+//                val arrowItem = MenuItem("Добавить указатель")
+//                arrowItem.action {
+//                    controller.openArrowModal(stage.x + settings.xGraphic, stage.y + settings.yGraphic)
+//                }
                 val descriptionItem = MenuItem("Добавить описание")
                 descriptionItem.action {
                     controller.openDescriptionModal(settings.xGraphic, settings.yGraphic)
                 }
-                contextMenu.items.addAll(functionItem, arrowItem, descriptionItem)
+                contextMenu.items.addAll(functionItem, descriptionItem)
                 contextMenu.show(context.canvas, stage.x + settings.xGraphic, stage.y + settings.yGraphic)
             }
             ContextMenuType.NONE -> {

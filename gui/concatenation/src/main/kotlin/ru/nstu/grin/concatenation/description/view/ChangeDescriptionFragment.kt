@@ -34,7 +34,7 @@ class ChangeDescriptionFragment : Fragment() {
         vbox {
             hbox {
                 spacer()
-                button("Ок") {
+                button("Сохранить") {
                     alignment = Pos.BASELINE_CENTER
                     action {
                         controller.updateDescription()

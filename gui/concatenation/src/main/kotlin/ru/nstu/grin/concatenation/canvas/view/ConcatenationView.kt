@@ -28,7 +28,7 @@ class ConcatenationView : View() {
                     fire(LoadEvent(file))
                 }
             }
-            menu("Канвас") {
+            menu("Полотно") {
                 item("Очистить все").action {
                     fire(ConcatenationClearCanvasEvent)
                 }

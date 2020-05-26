@@ -28,7 +28,7 @@ class DerivativeFunctionFragment : Fragment() {
                     }
                 }
             }
-            button("Ок") {
+            button("Найти производную") {
                 action {
                     controller.enableDerivative()
                     close()

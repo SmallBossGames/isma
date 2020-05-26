@@ -36,7 +36,7 @@ class WaveletFunctionFragment : Fragment() {
                 }
             }
         }
-        button("Ок") {
+        button("Применить вейвлет преобразование") {
             action {
                 controller.enableWavelet()
                 close()

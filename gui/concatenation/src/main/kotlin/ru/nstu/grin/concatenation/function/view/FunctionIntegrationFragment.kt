@@ -32,7 +32,7 @@ class FunctionIntegrationFragment : Fragment() {
                 textfield().bind(model.rightBorderProperty)
             }
         }
-        button("Ок") {
+        button("Найти интеграл") {
             action {
                 controller.findIntegral()
                 close()

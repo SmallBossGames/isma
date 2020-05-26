@@ -53,7 +53,7 @@ class FileOptionsView : Fragment() {
                 }
             }
         }
-        button("ОК") {
+        button("Прочитать") {
             action {
                 controller.openPointsWindow()
                 close()

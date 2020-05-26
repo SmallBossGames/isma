@@ -54,7 +54,7 @@ class PointsView : Fragment() {
                 }
             }
         }
-        button("Ok") {
+        button("Подвердить") {
             action {
                 controller.sendFireCheckedEvent()
                 close()

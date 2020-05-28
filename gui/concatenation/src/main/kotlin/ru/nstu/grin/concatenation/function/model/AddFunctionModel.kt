@@ -27,21 +27,11 @@ class AddFunctionModel : ViewModel() {
     var functionLineTypeProperty = SimpleObjectProperty<LineType>(LineType.POLYNOM)
     var functionLineType by functionLineTypeProperty
 
-    var xDirectionProperty = SimpleObjectProperty(
-        ExistDirection(
-            Direction.BOTTOM,
-            null
-        )
-    )
-    var xDirection: ExistDirection by xDirectionProperty
+    var xDirectionProperty = SimpleObjectProperty(Direction.BOTTOM)
+    var xDirection: Direction by xDirectionProperty
 
-    var yDirectionProperty = SimpleObjectProperty(
-        ExistDirection(
-            Direction.LEFT,
-            null
-        )
-    )
-    var yDirection: ExistDirection by yDirectionProperty
+    var yDirectionProperty = SimpleObjectProperty(Direction.LEFT)
+    var yDirection: Direction by yDirectionProperty
 
 
     var xAxisNameProperty = SimpleStringProperty(this, "xAxisName", "Ось 1")

@@ -7,13 +7,11 @@ import tornadofx.*
 class FileFunctionFragment : Fragment() {
     private val controller: FileFragmentController by inject()
 
-    override val root: Parent = form {
-        fieldset("Работа с файлом") {
-            field("Выберите файл") {
-                button("Файл") {
-                    action {
-                        controller.chooseFile()
-                    }
+    override val root: Parent = fieldset("Работа с файлом") {
+        field("Выберите файл") {
+            button("Файл") {
+                action {
+                    controller.chooseFile()
                 }
             }
         }

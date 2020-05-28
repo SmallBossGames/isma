@@ -7,7 +7,7 @@ import tornadofx.*
 class ManualFunctionFragment : Fragment() {
     private val model: ManualFunctionModel by inject()
 
-    override val root: Parent = form {
+    override val root: Parent =
         fieldset("Введите ниже точки") {
             field("Точки x") {
                 textfield(model.xPointsProperty) {
@@ -32,5 +32,5 @@ class ManualFunctionFragment : Fragment() {
                 }
             }
         }
-    }
+
 }

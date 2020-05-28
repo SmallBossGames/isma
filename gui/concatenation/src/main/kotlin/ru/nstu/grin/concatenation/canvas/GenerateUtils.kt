@@ -65,10 +65,7 @@ object GenerateUtils {
                 name = "Test",
                 backGroundColor = ColorUtils.getRandomColor(),
                 delimeterColor = Color.BLACK,
-                direction = ExistDirection(
-                    Direction.BOTTOM,
-                    null
-                ),
+                direction = Direction.BOTTOM,
                 zeroPoint = SettingsProvider.getCanvasWidth() / 2,
                 textSize = 10.0,
                 distanceBetweenMarks = 40.0,
@@ -79,10 +76,7 @@ object GenerateUtils {
                 name = "Test",
                 backGroundColor = ColorUtils.getRandomColor(),
                 delimeterColor = Color.BLACK,
-                direction = ExistDirection(
-                    Direction.LEFT,
-                    null
-                ),
+                direction = Direction.LEFT,
                 zeroPoint = SettingsProvider.getCanvasHeight() / 2,
                 textSize = 10.0,
                 distanceBetweenMarks = 40.0,
@@ -98,10 +92,7 @@ object GenerateUtils {
                 name = "Test2",
                 backGroundColor = ColorUtils.getRandomColor(),
                 delimeterColor = Color.BLACK,
-                direction = ExistDirection(
-                    Direction.BOTTOM,
-                    null
-                ),
+                direction = Direction.BOTTOM,
                 zeroPoint = SettingsProvider.getCanvasWidth() / 2,
                 textSize = 10.0,
                 distanceBetweenMarks = 40.0,
@@ -112,10 +103,7 @@ object GenerateUtils {
                 name = "Test2",
                 backGroundColor = ColorUtils.getRandomColor(),
                 delimeterColor = Color.BLACK,
-                direction = ExistDirection(
-                    Direction.LEFT,
-                    null
-                ),
+                direction = Direction.LEFT,
                 zeroPoint = SettingsProvider.getCanvasHeight() / 2,
                 textSize = 10.0,
                 distanceBetweenMarks = 40.0,

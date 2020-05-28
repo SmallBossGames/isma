@@ -10,14 +10,12 @@ import tornadofx.*
 class AnalyticFunctionFragment : Fragment() {
     val model: AnalyticFunctionModel by inject()
 
-    override val root: Parent = form {
-        fieldset("Введите формулу") {
-            field("формула") {
-                textfield().bind(model.textFunctionProperty)
-            }
-            field("Delta") {
-                textfield().bind(model.deltaProperty)
-            }
+    override val root: Parent = fieldset("Введите формулу") {
+        field("формула") {
+            textfield().bind(model.textFunctionProperty)
+        }
+        field("Delta") {
+            textfield().bind(model.deltaProperty)
         }
     }
 }

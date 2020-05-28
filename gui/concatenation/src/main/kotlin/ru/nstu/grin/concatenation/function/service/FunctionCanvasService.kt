@@ -225,7 +225,7 @@ class FunctionCanvasService : Controller() {
     }
 
     private fun ConcatenationAxisDTO.getOrder(): Int {
-        return when (direction.direction) {
+        return when (direction) {
             Direction.LEFT -> {
                 model.cartesianSpaces.filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
                     .size

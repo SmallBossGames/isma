@@ -1,6 +1,7 @@
 package ru.nstu.grin.concatenation.axis.dto
 
 import javafx.scene.paint.Color
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import java.util.*
 
@@ -13,5 +14,5 @@ data class ConcatenationAxisDTO(
     val textSize: Double,
     val font: String,
     val distanceBetweenMarks: Double,
-    val direction: ExistDirection
+    val direction: Direction
 )

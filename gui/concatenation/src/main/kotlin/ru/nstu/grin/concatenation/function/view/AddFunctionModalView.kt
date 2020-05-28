@@ -108,20 +108,9 @@ class AddFunctionModalView : Fragment() {
                     textfield().bind(model.xAxisNameProperty)
                 }
                 field("Напрвление") {
-                    val default = Direction.values().map {
-                        ExistDirection(
-                            it,
-                            null
-                        )
-                    }
-                    val existDirections = xExistDirections
-                    combobox(model.xDirectionProperty, default + existDirections) {
+                    combobox(model.xDirectionProperty, listOf(Direction.BOTTOM, Direction.TOP)) {
                         cellFormat {
-                            text = if (it.functionName != null) {
-                                "Напрвление ${it.direction.name}, функция ${it.functionName}"
-                            } else {
-                                it.direction.name
-                            }
+                            text = it.name
                         }
                     }
                 }
@@ -147,20 +136,9 @@ class AddFunctionModalView : Fragment() {
                     textfield().bind(model.yAxisNameProperty)
                 }
                 field("Направление") {
-                    val default = Direction.values().map {
-                        ExistDirection(
-                            it,
-                            null
-                        )
-                    }
-                    val existDirections = yExistDirections
-                    combobox(model.yDirectionProperty, default + existDirections) {
+                    combobox(model.yDirectionProperty, listOf(Direction.LEFT, Direction.RIGHT)) {
                         cellFormat {
-                            text = if (it.functionName != null) {
-                                "Напрвление ${it.direction.name}, функция ${it.functionName}"
-                            } else {
-                                it.direction.name
-                            }
+                            text = it.name
                         }
                     }
                 }

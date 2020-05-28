@@ -10,7 +10,7 @@ object ConcatenationAxisConverter {
             name = source.name,
             zeroPoint = source.zeroPoint,
             order = order,
-            direction = source.direction.direction,
+            direction = source.direction,
             backGroundColor = source.backGroundColor,
             fontColor = source.delimeterColor,
             distanceBetweenMarks = source.distanceBetweenMarks,

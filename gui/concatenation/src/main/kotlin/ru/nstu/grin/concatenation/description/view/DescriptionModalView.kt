@@ -28,7 +28,15 @@ class DescriptionModalView : Fragment() {
                 textfield().bind(model.textProperty)
             }
             field("Размер текста") {
-                textfield().bind(model.sizeProperty)
+                textfield(model.sizeProperty) {
+                    validator {
+                        if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            error("Число должно быть плавающим 20,0 и больше нуля")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
             field("Цвет текста") {
                 colorpicker().bind(model.textColorProperty)

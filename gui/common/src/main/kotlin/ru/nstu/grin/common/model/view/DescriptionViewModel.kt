@@ -15,7 +15,7 @@ class DescriptionViewModel : ViewModel() {
     var textProperty = SimpleStringProperty()
     var text: String by textProperty
 
-    var sizeProperty = SimpleDoubleProperty(12.0)
+    var sizeProperty = SimpleDoubleProperty(this, "sizeProperty", 12.0)
     var size: Double by sizeProperty
 
     var textColorProperty = SimpleObjectProperty(Color.BLACK)

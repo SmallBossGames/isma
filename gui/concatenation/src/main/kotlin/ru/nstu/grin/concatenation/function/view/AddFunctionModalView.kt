@@ -24,13 +24,21 @@ class AddFunctionModalView : Fragment() {
     override val root: Parent = form {
         fieldset {
             field("Введите имя пространства") {
-                textfield().bind(model.cartesianSpaceNameProperty)
+                textfield(model.cartesianSpaceNameProperty).required()
             }
             field("Введите имя функции") {
-                textfield().bind(model.functionNameProperty)
+                textfield(model.functionNameProperty).required()
             }
             field("Введите размер линий") {
-                textfield().bind(model.functionLineSizeProperty)
+                textfield(model.functionLineSizeProperty) {
+                    validator {
+                        if (it?.toDoubleOrNull() == null) {
+                            error("Число должно быть плавающим, например 22,3")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
             field("Выберите как отображать функцию") {
                 combobox(model.functionLineTypeProperty, LineType.values().toList()) {
@@ -50,7 +58,15 @@ class AddFunctionModalView : Fragment() {
                 colorpicker().bind(model.functionColorProperty)
             }
             field("Шаг рисования") {
-                textfield().bind(model.stepProperty)
+                textfield(model.stepProperty) {
+                    validator {
+                        if (it?.toIntOrNull() == null || it?.toIntOrNull() ?: -1 < 0) {
+                            error("Число должно быть целым больше 0")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
         }
         fieldset {
@@ -107,18 +123,34 @@ class AddFunctionModalView : Fragment() {
                 field("Имя") {
                     textfield().bind(model.xAxisNameProperty)
                 }
-                field("Напрвление") {
+                field("Направление") {
                     combobox(model.xDirectionProperty, listOf(Direction.BOTTOM, Direction.TOP)) {
                         cellFormat {
                             text = it.name
                         }
                     }
                 }
-                field("расстояние между метками") {
-                    textfield().bind(model.xDistanceBetweenMarksProperty)
+                field("Расстояние между метками") {
+                    textfield(model.xDistanceBetweenMarksProperty) {
+                        validator {
+                            if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                                error("Число должно быть плавающим 20,0 и больше нуля")
+                            } else {
+                                null
+                            }
+                        }
+                    }
                 }
                 field("Размер шрифта меток") {
-                    textfield().bind(model.xTextSizeProperty)
+                    textfield(model.xTextSizeProperty) {
+                        validator {
+                            if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                                error("Число должно быть плавающим 20,0 и больше нуля")
+                            } else {
+                                null
+                            }
+                        }
+                    }
                 }
                 field("Шрифт") {
                     combobox(model.xFontProperty, Font.getFamilies())
@@ -143,10 +175,26 @@ class AddFunctionModalView : Fragment() {
                     }
                 }
                 field("Расстояние между метками") {
-                    textfield().bind(model.yDistanceBetweenMarksProperty)
+                    textfield(model.yDistanceBetweenMarksProperty) {
+                        validator {
+                            if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                                error("Число должно быть плавающим 20,0 и больше нуля")
+                            } else {
+                                null
+                            }
+                        }
+                    }
                 }
                 field("Размер шрифта меток") {
-                    textfield().bind(model.yTextSizeProperty)
+                    textfield(model.yTextSizeProperty) {
+                        validator {
+                            if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                                error("Число должно быть плавающим 20,0 и больше нуля")
+                            } else {
+                                null
+                            }
+                        }
+                    }
                 }
                 field("Шрифт") {
                     combobox(model.yFontProperty, Font.getFamilies())
@@ -160,9 +208,7 @@ class AddFunctionModalView : Fragment() {
             }
         }
         button("Добавить") {
-            enableWhen {
-                model.valid
-            }
+            enableWhen { model.valid }
 
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS

@@ -15,7 +15,15 @@ class DerivativeFunctionFragment : Fragment() {
     override val root: Parent = form {
         fieldset {
             field("Степень") {
-                textfield().bind(model.degreeProperty)
+                textfield(model.degreeProperty) {
+                    validator {
+                        if (it?.toIntOrNull() == null || it?.toIntOrNull() ?: -1 < 0) {
+                            error("Число должно быть плавающим 20,0 и больше нуля")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
             field("Тип производной") {
                 combobox(model.derivativeTypeProperty, DerivativeType.values().toList()) {
@@ -29,6 +37,7 @@ class DerivativeFunctionFragment : Fragment() {
                 }
             }
             button("Найти производную") {
+                enableWhen(model.isValid.toProperty())
                 action {
                     controller.enableDerivative()
                     close()

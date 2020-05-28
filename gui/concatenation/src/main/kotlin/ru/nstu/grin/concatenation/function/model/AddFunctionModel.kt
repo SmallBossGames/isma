@@ -21,7 +21,7 @@ class AddFunctionModel : ViewModel() {
     var functionColorProperty = SimpleObjectProperty(Color.BLACK)
     var functionColor by functionColorProperty
 
-    var functionLineSizeProperty = SimpleStringProperty("4.0")
+    var functionLineSizeProperty = SimpleStringProperty(this, "functionLineSize", "4.0")
     var functionLineSize by functionLineSizeProperty
 
     var functionLineTypeProperty = SimpleObjectProperty<LineType>(LineType.POLYNOM)
@@ -43,13 +43,13 @@ class AddFunctionModel : ViewModel() {
     var xDelimeterColorProperty = SimpleObjectProperty(Color.BLACK)
     var xDelimiterColor by xDelimeterColorProperty
 
-    var xDistanceBetweenMarksProperty = SimpleStringProperty("40.0")
+    var xDistanceBetweenMarksProperty = SimpleStringProperty(this, "xDistanceBetweenMarks", "40.0")
     var xDistanceBetweenMarks by xDistanceBetweenMarksProperty
 
     var xFontProperty = SimpleStringProperty(Font.SANS_SERIF)
     var xFont by xFontProperty
 
-    var xTextSizeProperty = SimpleStringProperty("10.0")
+    var xTextSizeProperty = SimpleStringProperty(this, "xTextSizeProperty", "10.0")
     var xTextSize by xTextSizeProperty
 
     var yAxisNameProperty = SimpleStringProperty(this, "yAxisName", "Ось 2")
@@ -61,16 +61,16 @@ class AddFunctionModel : ViewModel() {
     var yDelimiterColorProperty = SimpleObjectProperty(Color.BLACK)
     var yDelimeterColor by yDelimiterColorProperty
 
-    var yDistanceBetweenMarksProperty = SimpleStringProperty("40.0")
+    var yDistanceBetweenMarksProperty = SimpleStringProperty(this, "yDistanceBeetweenMarks", "40.0")
     var yDistanceBetweenMarks by yDistanceBetweenMarksProperty
 
     var yFontProperty = SimpleStringProperty(Font.SANS_SERIF)
     var yFont by yFontProperty
 
-    var yTextSizeProperty = SimpleStringProperty("10.0")
+    var yTextSizeProperty = SimpleStringProperty(this, "yTextSizeProperty", "10.0")
     var yTextSize by yTextSizeProperty
 
-    var stepProperty = SimpleIntegerProperty(1)
+    var stepProperty = SimpleIntegerProperty(this, "stepProperty", 1)
     var step by stepProperty
 
     var inputWayProperty = SimpleObjectProperty<InputWay>(InputWay.FILE)

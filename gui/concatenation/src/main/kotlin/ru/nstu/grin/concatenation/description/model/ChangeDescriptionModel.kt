@@ -10,7 +10,7 @@ class ChangeDescriptionModel : ViewModel() {
     var textProperty = SimpleStringProperty()
     var text by textProperty
 
-    var textSizeProperty = SimpleStringProperty()
+    var textSizeProperty = SimpleStringProperty(this, "textSizeProperty", "12.0")
     var textSize by textSizeProperty
 
     var colorProperty = SimpleObjectProperty<Color>()

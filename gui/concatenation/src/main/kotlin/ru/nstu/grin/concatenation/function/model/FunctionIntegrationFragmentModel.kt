@@ -10,9 +10,9 @@ class FunctionIntegrationFragmentModel : ViewModel() {
     var integrationMethod by integrationMethodProperty
 
 
-    var leftBorderProperty = SimpleDoubleProperty()
+    var leftBorderProperty = SimpleDoubleProperty(this, "leftBorderProperty", 0.0)
     var leftBorder by leftBorderProperty
 
-    var rightBorderProperty = SimpleDoubleProperty()
+    var rightBorderProperty = SimpleDoubleProperty(this, "rightBorderProperty", 0.0)
     var rightBorder by rightBorderProperty
 }

@@ -20,7 +20,7 @@ class ChangeFunctionModel : ViewModel() {
     var isMirrorYProperty = SimpleBooleanProperty()
     var isMirrorY by isMirrorYProperty
 
-    var lineSizeProperty = SimpleStringProperty()
+    var lineSizeProperty = SimpleStringProperty(this, "lineSize")
     var lineSize by lineSizeProperty
 
     var lineTypeProperty = SimpleObjectProperty<LineType>()

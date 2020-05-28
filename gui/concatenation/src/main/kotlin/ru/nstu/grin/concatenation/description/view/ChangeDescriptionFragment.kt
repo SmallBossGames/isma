@@ -21,7 +21,15 @@ class ChangeDescriptionFragment : Fragment() {
                 textfield().bind(model.textProperty)
             }
             field("Размер шрифта") {
-                textfield().bind(model.textSizeProperty)
+                textfield(model.textSizeProperty) {
+                    validator {
+                        if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            error("Число должно быть плавающим 20,0 и больше нуля")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
             field("Цвет шрифта") {
                 colorpicker().bind(model.colorProperty)
@@ -35,6 +43,7 @@ class ChangeDescriptionFragment : Fragment() {
             hbox {
                 spacer()
                 button("Сохранить") {
+                    enableWhen { model.valid }
                     alignment = Pos.BASELINE_CENTER
                     action {
                         controller.updateDescription()

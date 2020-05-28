@@ -24,7 +24,15 @@ class ChangeFunctionFragment : Fragment() {
                 colorpicker().bind(model.functionColorProperty)
             }
             field("Размер линии") {
-                textfield().bind(model.lineSizeProperty)
+                textfield(model.lineSizeProperty) {
+                    validator {
+                        if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            error("Число должно быть плавающим 20,0 и больше нуля")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
             field("Отображать ли функцию") {
                 checkbox().bind(model.isHideProperty)
@@ -50,6 +58,7 @@ class ChangeFunctionFragment : Fragment() {
                 }
             }
             button("Сохранить") {
+                enableWhen(model.isValid.toProperty())
                 action {
                     controller.updateFunction()
                     close()

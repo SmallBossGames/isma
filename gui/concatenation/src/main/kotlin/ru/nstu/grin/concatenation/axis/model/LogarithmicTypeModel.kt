@@ -7,12 +7,12 @@ import tornadofx.ViewModel
 import tornadofx.*
 
 class LogarithmicTypeModel : ViewModel() {
-    var logarithmBaseProperty = SimpleDoubleProperty(10.0)
+    var logarithmBaseProperty = SimpleDoubleProperty(this, "logarithmBaseProperty", 10.0)
     var logarithmBase by logarithmBaseProperty
 
     var onlyIntegerPowProperty = SimpleBooleanProperty(true)
     var isOnlyIntegerPow by onlyIntegerPowProperty
 
-    var integerStepProperty = SimpleIntegerProperty(1)
+    var integerStepProperty = SimpleIntegerProperty(this, "integerStepProperty", 1)
     var integerStep by integerStepProperty
 }

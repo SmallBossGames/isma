@@ -26,13 +26,30 @@ class FunctionIntegrationFragment : Fragment() {
             }
 
             field("Левая граница интеграла") {
-                textfield().bind(model.leftBorderProperty)
+                textfield(model.leftBorderProperty) {
+                    validator {
+                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            error("Число должно быть плавающим 20,0 и больше нуля")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
             field("Правая граница интеграла") {
-                textfield().bind(model.rightBorderProperty)
+                textfield(model.rightBorderProperty) {
+                    validator {
+                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            error("Число должно быть плавающим 20,0 и больше нуля")
+                        } else {
+                            null
+                        }
+                    }
+                }
             }
         }
         button("Найти интеграл") {
+            enableWhen(model.isValid.toProperty())
             action {
                 controller.findIntegral()
                 close()

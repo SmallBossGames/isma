@@ -33,7 +33,15 @@ class FileOptionsView : Fragment() {
                         textfield().bind(details.sheetNameProperty)
                     }
                     field("Диапозон ячеек") {
-                        textfield().bind(details.rangeProperty)
+                        textfield(details.rangeProperty) {
+//                            validator {
+//                                if (it == null || !it.contains(":")) {
+//                                    error("Формат должен быть записан в следующем виде A0:B2")
+//                                } else {
+//                                    null
+//                                }
+//                            }
+                        }
                     }
                 }
                 is CsvDetails -> {
@@ -55,8 +63,20 @@ class FileOptionsView : Fragment() {
         }
         button("Прочитать") {
             action {
-                controller.openPointsWindow()
-                close()
+                when (val details = model.details) {
+                    is ExcelDetails -> {
+                        if (details.range == null || !details.range.contains(":")) {
+                            tornadofx.error("Формат должен быть записан в следующем виде A0:B2")
+                        } else {
+                            controller.openPointsWindow()
+                            close()
+                        }
+                    }
+                    is CsvDetails -> {
+                        controller.openPointsWindow()
+                        close()
+                    }
+                }
             }
         }
     }

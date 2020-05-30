@@ -7,10 +7,7 @@ import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.function.controller.AddFunctionController
-import ru.nstu.grin.concatenation.function.model.AddFunctionModel
-import ru.nstu.grin.concatenation.function.model.FileFunctionModel
-import ru.nstu.grin.concatenation.function.model.InputWay
-import ru.nstu.grin.concatenation.function.model.LineType
+import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import tornadofx.*
 
@@ -20,6 +17,7 @@ class AddFunctionModalView : Fragment() {
     private val controller: AddFunctionController by inject()
     private val model: AddFunctionModel by inject()
     private val fileFunctionModel: FileFunctionModel by inject()
+    private val manualFunctionModel: ManualFunctionModel by inject()
 
     override val root: Parent = form {
         fieldset {
@@ -208,7 +206,15 @@ class AddFunctionModalView : Fragment() {
             }
         }
         button("Добавить") {
-            enableWhen { model.valid }
+            enableWhen {
+                when (model.inputWay) {
+                    InputWay.FILE -> model.valid
+                    InputWay.ANALYTIC -> model.valid
+                    InputWay.MANUAL -> {
+                        model.valid.and(manualFunctionModel.valid)
+                    }
+                }
+            }
 
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS

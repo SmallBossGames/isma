@@ -1,7 +1,9 @@
 rootProject.name = 'Grin'
+
 include 'gui'
 include 'analytic-fu'
 include 'math'
+
 include 'gui:simple'
 include 'gui:concatenation'
 include 'gui:kube'

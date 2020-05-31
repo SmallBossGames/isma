@@ -18,10 +18,10 @@ class AxisChangeFragmentModel : ViewModel() {
     var fontColorProperty = SimpleObjectProperty<Color>()
     var fontColor by fontColorProperty
 
-    var minProperty = SimpleDoubleProperty(this, "minProperty", 0.0)
+    var minProperty = SimpleStringProperty(this, "minProperty", "0.0")
     var min by minProperty
 
-    var maxProperty = SimpleDoubleProperty(this, "maxProperty", 0.0)
+    var maxProperty = SimpleStringProperty(this, "maxProperty", "0.0")
     var max by maxProperty
 
     var isHideProperty = SimpleBooleanProperty()

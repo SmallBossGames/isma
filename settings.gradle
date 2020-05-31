@@ -1,6 +1,5 @@
 rootProject.name = 'Grin'
 include 'gui'
-include 'operations'
 include 'analytic-fu'
 include 'math'
 include 'gui:simple'

@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.function.view
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import jwave.Transform
+import jwave.compressions.CompressorPeaksAverage
 import jwave.transforms.AncientEgyptianDecomposition
 import jwave.transforms.FastWaveletTransform
 import jwave.transforms.wavelets.Wavelet
@@ -225,6 +226,8 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
         points: List<Point>,
         waveletDetails: WaveletDetails
     ): List<Point> {
+        val compressor = CompressorPeaksAverage()
+
         val transform = Transform(
             AncientEgyptianDecomposition(
                 FastWaveletTransform(getWavelet(waveletDetails.waveletTransformFun))
@@ -235,22 +238,22 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
 
         return when (waveletDetails.waveletDirection) {
             WaveletDirection.X -> {
-                val xTransformed = transform.forward(xArray).sorted()
+                val xTransformed = transform.reverse(compressor.compress(transform.forward(xArray))).sorted()
 
                 xTransformed.mapIndexed { index, d ->
                     Point(d, yArray[index])
                 }
             }
             WaveletDirection.Y -> {
-                val yTransformed = transform.forward(yArray).sorted()
+                val yTransformed = transform.reverse(compressor.compress(transform.forward(yArray))).sorted()
 
                 xArray.mapIndexed { index, d ->
                     Point(d, yTransformed[index])
                 }
             }
             WaveletDirection.BOTH -> {
-                val xTransformed = transform.forward(xArray).sorted()
-                val yTransformed = transform.forward(yArray).sorted()
+                val xTransformed = transform.reverse(compressor.compress(transform.forward(xArray))).sorted()
+                val yTransformed = transform.reverse(compressor.compress(transform.forward(yArray))).sorted()
 
                 xTransformed.mapIndexed { index, d ->
                     Point(d, yTransformed[index])

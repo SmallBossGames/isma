@@ -1,0 +1,11 @@
+target
+.idea
+*.iml
+*.esd
+isma-intg-server.log
+lastModel.txt
+out.txt
+isma.properties
+export.csv
+result.csv
+model/

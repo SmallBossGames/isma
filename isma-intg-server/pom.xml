@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>isma</artifactId>
+		<groupId>ru.nstu.isma</groupId>
+		<version>1.0.0</version>
+	</parent>
+
+	<artifactId>isma-intg-server-parent</artifactId>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>isma-intg-server</module>
+		<module>isma-intg-server-api</module>
+		<module>isma-intg-server-client</module>
+		<module>isma-intg-server-tests</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Modules -->
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>isma-intg-server</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>isma-intg-server-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>isma-intg-server-client</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.esotericsoftware</groupId>
+				<artifactId>kryonet</artifactId>
+				<version>2.22.0-RC1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

@@ -1,0 +1,121 @@
+<mxStylesheet>
+	<include name="/basic-style.xml"/>
+		<add as="defaultEWVertex" extend="image">
+		<add as="fillColor" value="white"/>
+		<add as="gradientColor" value="white"/>
+		<add as="strokeColor" value="black"/>
+		<add as="fontSize" value="12"/>
+		<add as="fontColor" value="black"/>
+		<add as="fontFamily" value="Verdana"/>
+		<add as="portConstraint" value="west"/>
+	</add>
+	
+	<add as="defaultEWElem" extend="image">
+		<add as="resizable" value="false"/>
+	</add>
+
+	<add as="ismaTransform" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.trasform.png"/>
+	</add>
+	
+	<add as="ismaTreeTransform" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.3transform.png"/>
+	</add>
+	
+	<add as="ismaAutotransformer" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.autotransformer.png"/>
+	</add>
+	
+	<add as="ismaCommonLoad" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.commonLoad.png"/>
+	</add>
+	
+	<add as="ismaElectricalPowerSystem" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.electricalpowersystem.png"/>
+	</add>
+	
+	<add as="ismaGenerator" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.generator.png"/>
+	</add>
+	
+	<add as="ismaInductionMotor" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.inductionmotor.png"/>
+	</add>
+	
+	<add as="ismaKey" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.key.png"/>
+	</add>
+	
+	<add as="ismaLineDown" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.lineDown.png"/>
+	</add>
+	
+	<add as="ismaLineUP" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.lineUP.png"/>
+	</add>
+	
+	<add as="ismaReactor" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.reactor.png"/>
+	</add>
+	
+	<add as="ismaSwitch" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.switch.png"/>
+	</add>
+	
+	<add as="ismaSynchronousMotor" extend="defaultEWElem">
+		<add as="image" value="/images/isma.ew.synchronousMotor.png"/>
+	</add>
+	
+	<add as="ismaDiode" extend="defaultEWElem">
+		<add as="image" value="/images/diode.png"/>
+	</add>
+
+    <add as="macrosIn" extend="defaultEWElem">
+        <add as="image" value="/images/macros_in_big.png"/>
+    </add>
+    <add as="macrosOut" extend="defaultEWElem">
+        <add as="image" value="/images/macros_out_big.png"/>
+    </add>
+
+	<add as="ismaReversedDiode" extend="defaultEWElem">
+		<add as="image" value="/images/reversed_diode.png"/>
+	</add>
+	
+	<add as="defaultEdge" extend="defaultEdge">		
+		<add as="shape" value="connector"/>
+		<add as="labelBackgroundColor" value="white"/>
+		<add as="startArrow" value="none"/>
+		<add as="endArrow" value="none"/>
+		<add as="fontSize" value="10"/>
+		<add as="align" value="center"/>
+		<add as="verticalAlign" value="middle"/>
+		<add as="strokeColor" value="black"/>
+		<add as="rounded" value="0"/>
+		<add as="edgeStyle" value="elbowEdgeStyle"/>
+		<add as="fontColor" value="#1d258f"/>
+		<add as="fontFamily" value="Verdana"/>
+		<add as="strokeWidth" value="1"/>
+	</add>
+	<add as="boldEWEdge" extend = "defaultEWEdge">
+		<add as="strokeWidth" value="2"/>
+	</add>
+	
+	<add as="wireSouth">
+		<add as="shape" value="line"/>
+		<add as="strokeWidth" value="4"/>
+		<add as="strokeColor" value="black"/>
+		<add as="labelBackgroundColor" value="white"/>
+		<add as="verticalAlign" value="left"/>
+		<add as="direction" value="south"/>
+		<add as="resizable" value="false"/>
+	</add>
+	<add as="wireWest" extend = "wireSouth">
+		<add as="direction" value="west"/>
+	</add>
+	<add as="wireNorth" extend = "wireSouth">
+		<add as="direction" value="north"/>
+	</add>
+	<add as="wireEast" extend = "wireSouth">
+		<add as="direction" value="east"/>
+	</add>
+</mxStylesheet>

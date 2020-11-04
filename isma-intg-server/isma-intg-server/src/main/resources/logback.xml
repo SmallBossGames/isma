@@ -1,0 +1,28 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>isma-intg-server.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+	<logger name="ru.nstu.isma" level="${log.level:-INFO}"/>
+
+	<turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">
+		<Name>MPI_DATA_FILTER</Name>
+		<Marker>MPI_DATA</Marker>
+		<OnMatch>DENY</OnMatch>
+	</turboFilter>
+
+    <root level="${log.level:-INFO}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

@@ -1,0 +1,29 @@
+const L1 = 1.725;
+const L2 = -1.725;
+
+x1' = L1*x1;
+x2' = L2*x2;
+
+x1 (0)=0.001;
+x2 (0)=1;
+
+state st1 ( x1<1 && x2<0.0011 ){  // + -
+  set x1=0.001;
+  set x2=1;
+} from init, st4;
+
+state st2( x1>1 && x2<0.001) {    // - +
+  set x1=-0.001;
+  set x2=-1;
+} from st1;
+
+state st3 (x1<-1 && x2>-0.001) {  // + +
+  set x1=0.001;
+  set x2=-1;
+} from st2;
+
+state st4 ( x1>1 && x2>-0.001 ){  // - -
+  set x1=-0.001;
+  set x2=1;
+} from st3;
+

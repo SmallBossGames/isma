@@ -1,0 +1,30 @@
+const m = 1; // Масса тела
+const k = 2;
+const Vp = 2;
+const Fs = 5.88;
+const Fc = 2.94;
+const Ktr = 0.6;
+
+x'= 0;
+V'= 0;
+z = 0;
+
+state stick (V <= 0) {
+    x' = Vp;
+    z = 0;
+    
+    V' = 0;
+    set V = 0;
+} from init, slip_shtrib, slip_amolton;
+
+state slip_shtrib (((k * x >= Ktr * m * g) && z != 2) || ((V>0) && (V <= 1))) {
+    x'= Vp - V;
+    V'= (k * x - (Fs - Fc * V)) / m;
+    z = 1;
+} from stick, slip_amolton;
+
+state slip_amolton ((k * x >= Ktr * m * g) && (V > 1)) {
+    x' = Vp - V;
+    V' = (k * x - Fc) / m;
+    z = 2;
+} from slip_shtrib;

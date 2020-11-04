@@ -1,0 +1,45 @@
+<!--XML format for storing elements of palette-->
+<!--An element -->
+<item>
+	<name></name>
+    <!--name and style can be different -->
+	<style></style>
+	<img></img>
+    <!-- widht and height of an element at the canvas -->
+	<width></width>
+	<height></height>
+	<canvasimg></canvasimg>
+    <!-- vertice or edge? -->
+	<type></type>
+    <!-- in and out points of element -->
+	<ports>
+		<port>
+			<x></x>
+			<y></y>
+		</port>
+		...
+	</ports>
+    <!-- element can have multiple schemes and for each scheme there are separate cond and params-->
+	<schemes>
+        <scheme>
+		<name></name>
+		<!-- Scheme image here-->
+		<img></img>
+		<initialconds>
+			<cond>
+				<name></name>
+				<params></params>
+			</cond>
+			...
+		</initialconds>
+		<params>
+			<param>
+				<name></name>
+				<params></params>
+			</param>
+			...
+		</params>
+        </scheme>
+        ...
+	</schemes>
+</item>

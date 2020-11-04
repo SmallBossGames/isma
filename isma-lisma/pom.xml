@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>isma</artifactId>
+        <groupId>ru.nstu.isma</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>isma-lisma</artifactId>
+    <packaging>jar</packaging>
+
+    <name>isma-lisma</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.nstu.isma</groupId>
+            <artifactId>isma-hsm</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- ANTLR -->
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.1</version>
+                <configuration>
+                    <visitor>true</visitor>
+                    <sourceDirectory>${basedir}/src/main/resources/ru/nstu/isma/in/lisma/</sourceDirectory>
+                    <includes>
+                        <include>Lisma.g4</include>
+                    </includes>
+                    <outputDirectory>${basedir}/src/main/java/ru/nstu/isma/in/lisma/analysis/gen/</outputDirectory>
+                    <arguments>
+                        <argument>-package</argument>
+                        <argument>ru.nstu.isma.in.lisma.analysis.gen</argument>
+                    </arguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,41 @@
+const k1 = n1 = m1 = m2 =1;
+const k2 = n2  = 2;
+
+x1 '= 0;
+x2 '= 0;
+v1 '= 0;
+v2 '= 0;
+a1 = 0;
+a2 = 0;
+st '= 0;
+
+x1 (0) = 0;
+x2 (0) = 3; 
+
+state separate (st<abs(k1*n1-k2*n2-x1*(k1-k2))) {
+  x1'=v1;
+  v1'=k1*(n1-x1)/m1;
+  x2'=v2;
+  v2'=k2*(n2-x2)/m2;
+ 
+  set st = 10;
+  a1 = k1*(n1-x1)/m1;
+  a2 = k2*(n2-x2)/m2;
+  st '= 0;
+ 
+} from init, together;
+
+state together( x1>=x2 && v1>=v2 ) {
+  set st = 10;
+  set v1 = (m1*v1+m2*v2)/(m1+m2);
+  set v2 = v1;
+
+  v1' = (k1*n1+k2*n2-x1*(k1+k2))/(m1+m2);
+  v2' = (k1*n1+k2*n2-x2*(k1+k2))/(m1+m2);
+  x1' = v1;
+  x2' = v2;
+ 
+  a1 = (k1*n1+k2*n2-x1*(k1+k2))/(m1+m2);
+  a2 = (k1*n1+k2*n2-x2*(k1+k2))/(m1+m2);
+  st'=-st;
+} from init, separate;

@@ -1,0 +1,68 @@
+const H = 0.39;
+const d1 = 0.12; 
+const d2 = 0.05; 
+const TIME1 = 60; 
+const TIME2 = 85;
+
+const L_plus = 0.9;
+const L_minus = 0.3;
+
+VInput = 1.11111E-4;
+
+p1'=0; p2'=0;
+p1(0)= 80; p2(0)= 80;
+
+S1 = pi*pow(d1, 2)/4;
+S2 = pi*pow(d2, 2)/4;
+K1 = 0.000185*exp(-0.000006*pow(p1, 3))*L1;
+K2 = 0.000226*exp(-0.0000057*pow(p2, 3))*L2;
+V12 = K1*sqrt(h1-(h2-H)*B);
+Vout = K2*sqrt(h2);
+B = 0;
+L1 = 0;
+L2 = 0;
+
+h1'= (VInput - V12)/S1;
+h2'= (V12 - Vout)/S2;
+TIME'=1;
+st = 0;
+
+if (h2 >  H) { B = 1; }
+if (h2 <= H) { B = 0; }
+if (p1 <  80) { L1 = 1; }
+if (p1 >= 80) { L1 = 0; }
+if (p2 <  80) { L2 = 1; }
+if (p2 >= 80) { L2 = 0; }
+
+if (p1 < 0) {set p1=0.00001; p1'=0;}
+if (p2 < 0) {set p2=0.00001; p2'=0;}
+//p1 = max(0, min(p1, 80));
+//p2 = max(0, min(p2, 80));
+
+state V12closed (TIME > 0) {
+  p1'= 0;
+  st = 1;
+} from init;
+
+state V12open (TIME > TIME1) {
+  p1'= -1;
+  st = 2;
+} from V12closed;
+
+state VoutOpen (TIME > TIME2) {
+  p1'= -1;
+  p2'= -1;
+  st = 3;
+} from V12open;
+
+state full (h2 >= L_plus) {
+  p1'= -1;
+  p2'= -1;
+  st = 4;
+} from VoutOpen, empty;
+
+state empty (h2 <= L_minus) {
+  p1'= -1;
+  p2'= 1;
+  st = 5;
+} from full;

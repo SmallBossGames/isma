@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>isma</artifactId>
+        <groupId>ru.nstu.isma</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>isma-intg-parallel-ignite</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.nstu.isma</groupId>
+            <artifactId>isma-intg-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ignite</groupId>
+            <artifactId>ignite-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.nstu.isma</groupId>
+            <artifactId>isma-intg-demo-problems</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.nstu.isma</groupId>
+            <artifactId>isma-intg-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.nstu.isma</groupId>
+            <artifactId>isma-intg-lib</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

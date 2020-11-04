@@ -1,0 +1,143 @@
+const alpha = 0.0;
+const D0 = 0.091763;
+const D1 = 0.12;
+const D3 = 0.12;
+const d3 = 0.0;
+const deltaMd = 0.13;
+const f11 = 0.000033;
+const f42 = 0.000035;
+const hi = 1.2;
+const K2 = 0.2;
+const ksi1 = 2.0;
+const ksi4 = 2.0;
+const M = 9000.0;
+const m = 150.0;
+const mu = 0.1;
+const n1 = 2.0;
+const n2 = 2.0;
+const Omega01 = 0.0004;
+const p01 = 5000000;
+const Pmd = 155000;
+const ro = 850.0;
+
+TIME'=1;
+
+delta'=0;
+ddelta'= 0;
+s'=0;
+ds'=0;
+
+TIME(t0)=0;
+delta(t0)=0;
+ddelta(t0)=2;
+s(t0)=0;
+ds(t0)=0;
+
+Pk = k * delta / pow((1.0 - delta / deltaMax), alpha);
+p = p01 / pow ((1 - s * F / Omega01), hi);
+Psht = (1 + mu) * F * p + F3 * pj1_impact + F4 * pj2_impact;
+
+k = Pmd * pow(0.5, 0.1) / deltaMd;
+deltaMax = deltaMd / 0.95;
+F = Pi * pow(D0, 2.0) / 4.0;
+F3 = Pi * (pow(D3, 2.0) - pow (d3, 2.0)) / 4.0;
+pj1_impact = ksi1 * ro * pow((F3 * ds / 0.001), 2.0) / 2.0;
+F4 = Pi * (pow(D1, 2.0) - pow(D0, 2.0)) / 4.0;
+pj2_impact = ksi4 * ro * pow((F4 * ds / f42), 2.0) / 2.0;
+
+pj1_return = ksi1 * ro * pow((F3 * ds / 0.001), 2.0) / 2.0;
+pj2_return = ksi4 * ro * pow((F4 * ds / 0.001), 2.0) / 2.0;
+
+st=0;
+
+state PneumaticCompression (TIME > 0) {
+    delta' = ddelta;
+    ddelta' = g * K2 - n1 * Pk / (M + m);
+
+    /*Pk = k * delta / pow((1.0 - delta / deltaMax), alpha);
+    p = p01 / pow ((1 - s * F / Omega01), hi);
+    Psht = (1 + mu) * F * p + F3 * pj1_impact + F4 * pj2_impact;
+
+    k = Pmd * pow(0.5, 0.1) / deltaMd;
+    deltaMax = deltaMd / 0.95;
+    F = Pi * pow(D0, 2.0) / 4.0;
+    F3 = Pi * (pow(D3, 2.0) - pow (d3, 2.0)) / 4.0;
+    pj1_impact = ksi1 * ro * pow((F3 * ds / 0.001), 2.0) / 2.0;
+    F4 = Pi * (pow(D1, 2.0) - pow(D0, 2.0)) / 4.0;
+    pj2_impact = ksi4 * ro * pow((F4 * ds / f42), 2.0) / 2.0;*/
+
+    st = 1;
+} from init;
+
+state PneumaticAndShockCompression (Pk - n2 * Psht * (M + m) / (M * n1) >= m * g * (1 - K2) * (M + m)/(M * n1)) {
+    delta' = ddelta;
+    ddelta' = n2 * Psht / m - n1 * Pk / m + g;
+    s' = ds;
+    ds' = n1 * Pk / m - (1 + m / M) * n2 * Psht / m - (1 + m / M) * (1 - K2) * g;
+
+    Pk = k * delta / pow((1.0 - delta / deltaMax), alpha);
+    p = p01 / pow ((1 - s * F / Omega01), hi);
+    Psht = (1 + mu) * F * p + F3 * pj1_impact + F4 * pj2_impact;
+
+    k = Pmd * pow(0.5, 0.1) / deltaMd;
+    deltaMax = deltaMd / 0.95;
+    F = Pi * pow(D0, 2.0) / 4.0;
+    F3 = Pi * (pow(D3, 2.0) - pow (d3, 2.0)) / 4.0;
+    pj1_impact = ksi1 * ro * pow((F3 * ds / 0.001), 2.0) / 2.0;
+    F4 = Pi * (pow(D1, 2.0) - pow(D0, 2.0)) / 4.0;
+    pj2_impact = ksi4 * ro * pow((F4 * ds / f42), 2.0) / 2.0;
+
+    st = 2;
+} from PneumaticCompression;
+
+
+state PneumaticDamping (ds <= 0 and ddelta <= 0) {
+    delta' = ddelta;
+    ddelta' = g * K2 - n1 * Pk / (M + m);
+
+    Pk = k * delta / pow((1.0 - delta / deltaMax), alpha);
+    p = p01 / pow ((1 - s * F / Omega01), hi);
+    Psht = (1 - mu) * F * p - F3 * pj1_return - F4 * pj2_return;
+
+    k = Pmd * pow(0.5, 0.1) / deltaMd;
+    deltaMax = deltaMd / 0.95;
+    F = Pi * pow(D0, 2.0) / 4.0;
+    F3 = Pi * (pow(D3, 2.0) - pow (d3, 2.0)) / 4.0;
+    pj1_return = ksi1 * ro * pow((F3 * ds / 0.001), 2.0) / 2.0;
+    F4 = Pi * (pow(D1, 2.0) - pow(D0, 2.0)) / 4.0;
+    pj2_return = ksi4 * ro * pow((F4 * ds / 0.001), 2.0) / 2.0;
+
+    st = 1;
+} from PneumaticAndShockCompression;
+
+
+state PneumaticAndShockDamping (Pk - n2 * Psht * (M + m) / (M * n1) >= m * g * (1 - K2) * (M + m)/(M * n1)) {
+    delta' = ddelta;
+    ddelta' = n2 * Psht / m - n1 * Pk / m + g;
+    s' = ds;
+    ds' = n1 * Pk / m - (1 + m / M) * n2 * Psht / m - (1 + m / M) * (1 - K2) * g;
+
+    Pk = k * delta / pow((1.0 - delta / deltaMax), alpha);
+    p = p01 / pow ((1 - s * F / Omega01), hi);
+    Psht = (1 - mu) * F * p - F3 * pj1_return - F4 * pj2_return;
+
+    k = Pmd * pow(0.5, 0.1) / deltaMd;
+    deltaMax = deltaMd / 0.95;
+    F = Pi * pow(D0, 2.0) / 4.0;
+    F3 = Pi * (pow(D3, 2.0) - pow (d3, 2.0)) / 4.0;
+    pj1_return = ksi1 * ro * pow((F3 * ds / 0.001), 2.0) / 2.0;
+    F4 = Pi * (pow(D1, 2.0) - pow(D0, 2.0)) / 4.0;
+    pj2_return = ksi4 * ro * pow((F4 * ds / 0.001), 2.0) / 2.0;
+
+    st = 2;
+} from PneumaticDamping;
+
+
+state PneumaticDampingAndPlaneBouncing (s <= 0) {
+    delta' = ddelta + ds / (1 + m / M);
+    st = 1;
+} from PneumaticAndShockDamping;
+
+state TheEnd (delta <= 0) {
+    st = 2;
+} from PneumaticDampingAndPlaneBouncing;

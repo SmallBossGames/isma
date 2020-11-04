@@ -1,0 +1,34 @@
+const pi = 3.1415;
+
+const Rs1 = 0.4753;
+const Rs2 = 0.4623;
+const Rr3 = 0.2970;
+const Rr2 = 0.293;
+const tj = 26.87;
+const a2 = 6.5109;
+const Mc = 0;
+
+const w1 = 1.0;
+const Lr = 3.496;
+const Ls = 3.456;
+const Lu = 3.4;
+
+// equations
+t '=1;
+
+Fsx' = 1.0 - Rs1 * Fsx + Rs2 * Frx + Fsy;
+Fsy' = -Rs1 * Fsy + Rs2 * Fry - Fsx;
+Frx' = (1.0 - wp) * Fry - Rr3 * Frx + Rr2 * Fsx;
+Fry' = -(1.0 - wp)* Frx - Rr3 * Fry + Rr2 * Fsy;
+wp' = (1.0)/tj * (a2 * (Fsy*Frx - Fsx*Fry) - Mc);
+
+s = (w1-wp)/w1;
+d = (1.0)/(Lr*Ls - Lu*Lu);
+
+Isx = d * (Fsx*Lr - Frx*Lu);
+Isy = d * (Fsy*Lr - Fry*Lu);
+Irx = d * (Frx*Ls - Fsx*Lu);
+Iry = d * (Fry*Ls - Fsy*Lu);
+
+Is = Isx * sin(w1*t + pi/2) - Isy * sin(w1*t);
+Ir = Irx * sin(s*w1*t + pi/2) - Iry * sin(s*w1*t);

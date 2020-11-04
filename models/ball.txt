@@ -1,0 +1,17 @@
+const g = 9.81;
+
+v' = -g;
+y' = v;
+y (0) = 10;
+
+state vzlet (y<0) {
+  v' = -g;
+  y' = v;
+  set v = -v;
+} from init, padenie;  
+
+state padenie (v<0) {
+  v' = -g;
+  y' = v;
+} from init, vzlet;
+

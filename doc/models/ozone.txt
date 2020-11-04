@@ -1,0 +1,34 @@
+// Constants
+const k1 = 6.031;
+const k2 = 4.66* pow(10, -16); 
+const pi = 3.1416;
+
+// Variables to be sampling
+var z[30, 50] step 5;
+var x[0, 20] step 5;
+// Equations
+time '= 1;
+k3 = exp( - 22.62/sin(pi*time/43200));
+k4 = exp( - 7.601/sin(pi*time/43200));
+Kh = 4* pow(10, -6);
+Kv = pow(10, -8) * exp(z/5);
+C1 '= Kh* D(C1, x, 2) + /*D(DKV1, z) +*/ R1;
+C2 '= Kh* D(C2, x, 2) + /*D(DKV2, z) +*/ R2;
+//DKV1 = Kv * D(C1, z);
+//DKV2 = Kv * D(C2, z);
+R1 = - k1*C1 - k2*C1*C2 + 7.4*pow(10, 16) * k3 + k4*C2;
+R2 = k1*C1 - k2*C1*C2 - k4*C2;
+// Boundary conditions
+edge C1=0 on z both;
+edge C1=0 on x both;
+edge C2=0 on z both;
+edge C2=0 on x both;
+// Initial values
+C1 (0) = pow(10, 6) * (1 - pow(0.1*x - 1, 2) +
+pow(0.1*x - 1, 4)/2) * (1 - pow(0.1*z - 4, 2) + pow(0.1*z - 4, 4)/2 );
+C2 (0) = pow(10, 12) * (1 - pow(0.1*x - 1, 2) +
+pow(0.1*x - 1, 4)/2) * (1 - pow(0.1*z - 4, 2) + pow(0.1*z - 4, 4)/2 );
+// Change of state
+state st1 (time>43190) {
+k3=0; k4=0;
+} from init;

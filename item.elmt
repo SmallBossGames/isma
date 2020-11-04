@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<elements>
+  <item>
+    <name>Диод</name>
+    <style>ismaReversedDiode</style>
+    <img>iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACKklEQVR42u2aO68xURSGp3BNROXSCAoSdOLSoVaJX8A/0BISPRItBWqXn6BAgk4tLjVadyLWydqJk5NzxuVkxgnftyaZkL3etbKfbc3e7yS4QCAA6XT6rW9k4PDLu1/IQCAEQiAEQiAEQiAEQiAEIg7IarWCXC7H7LJOpwOpVAparRb8fj9ks1kWf3mQTqcDer0eOI67eiNcu90WdXKX2qKA9Ho9kMlkrKDL5YJqtQqz2QyOxyPM53Oo1+vg8XhYHHX9fv/1QA6HA5hMJlYsEonA6XTi1eE4xlFnNptZ3kuBlMtlVshut9+dHMZRh/pKpfKrCfHFb7Xxr0FCoRBLLBaLD61KoVBg+nA4/FogBoOBJY7H44dARqMR0xuNRsEgoraWQqFghXa73UPFttst0yuVSgJ5CsiltSaTyXu31l887Ofz+fkgl+3X4XAI2n7RzuD4crn8kTedTp8P8vVAjEajNw9EjKMO9d+hsdUw1mw2f+SmUqmrE5bL5VcXQJBFcbvdUKvVmDVBi7JYLKDRaIDX6/20KKj/fl1OfZvNBt1uFzabDXvukskkSCSSqyBWq5WN5/N5WK/Xwk0jmkE0hfdMY6vV4s0fDoegUql482Kx2FWQRCIhzoHIZ+PRtms0GraS+Onz+SCTydz9+QeDAQSDQVCr1Wx7djqdUCqVbj4L+/0e4vE4WCyWz64QDEJviARCIARCIARCIARCIARCIARCIP8DyL/yx7MPZy2IBO3HYhgAAAAASUVORK5CYII=</img>
+    <width>50</width>
+    <height>30</height>
+    <type>vertex</type>
+  </item>
+</elements>

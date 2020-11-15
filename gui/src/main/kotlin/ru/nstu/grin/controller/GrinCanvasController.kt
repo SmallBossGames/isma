@@ -21,7 +21,6 @@ class GrinCanvasController : Controller() {
 //            grinCanvasModel.functions.add()
         }
     }
-
 }
 
 class AddArrowEvent(val arrowDto: ArrowDTO) : FXEvent()

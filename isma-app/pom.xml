@@ -34,7 +34,7 @@
             <artifactId>isma-ui-graph</artifactId>
         </dependency>
 
-        <!--UI-->
+        <!--views-->
         <dependency>
             <groupId>de.sciss</groupId>
             <artifactId>weblaf-core</artifactId>

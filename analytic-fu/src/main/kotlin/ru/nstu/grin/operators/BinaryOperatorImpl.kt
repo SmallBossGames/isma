@@ -8,15 +8,13 @@ class BinaryOperatorImpl(val sign: Char) : BinaryOperator {
                 return x * y
             }
             '\\' -> {
-                return x//y
+                return x // y
             }
             '+' -> {
-
             }
             '-' -> {
-
             }
         }
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 }

@@ -1,0 +1,10 @@
+apply plugin: "application"
+
+mainClassName = 'ru.nstu.grin.main.EntryPointKt'
+
+dependencies {
+    implementation project(":gui:simple")
+    implementation project(":gui:concatenation")
+    implementation project(":gui:kube")
+    api project(":gui:common")
+}

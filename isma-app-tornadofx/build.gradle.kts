@@ -7,9 +7,6 @@ plugins {
 group = "me.smallboss"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
 
 javafx {
     version = "11.0.2"
@@ -19,6 +16,8 @@ javafx {
 dependencies {
     testImplementation(kotlin("test-junit"))
     implementation ("no.tornado:tornadofx:1.7.20")
+    implementation(project(":isma-hsm"))
+    implementation(project(":isma-lisma"))
 }
 
 tasks.withType<KotlinCompile>() {

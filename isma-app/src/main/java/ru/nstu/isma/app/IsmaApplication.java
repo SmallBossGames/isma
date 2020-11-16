@@ -7,7 +7,6 @@ import ru.nstu.isma.app.util.SpringContextHolder;
 import ru.nstu.isma.intg.lib.IntgMethodLibraryLoader;
 
 import javax.swing.*;
-import java.util.Locale;
 
 public class IsmaApplication {
     public static void main(String[] args) {

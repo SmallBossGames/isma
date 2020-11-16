@@ -1,5 +1,6 @@
 package models
 
-class SyntaxErrorModel(val startPosition: Int, val endPosition: Int, val message: String) {
-    val interval get() = "${startPosition}:${endPosition}"
-}
+data class SyntaxErrorModel(
+        override val row: Int,
+        override val position: Int,
+        override val message: String) : IErrorModel

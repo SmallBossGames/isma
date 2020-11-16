@@ -1,14 +1,20 @@
 package views
 
+import controllers.LismaPdeController
+import controllers.ProjectController
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
 import tornadofx.*
 
 class IsmaToolBar : View() {
+    val lismaPdeController: LismaPdeController by inject()
+    val projectController: ProjectController by inject()
+
     override val root = toolbar {
         button{
             graphic = ImageView("icons/new.png")
             tooltip = Tooltip("New model")
+            action { projectController.createNew("Some project") }
         }
         button{
             graphic = ImageView("icons/open.png")
@@ -39,6 +45,9 @@ class IsmaToolBar : View() {
         button{
             graphic = ImageView("icons/toolbar/checked.png")
             tooltip = Tooltip("Verify")
+            action {
+                lismaPdeController.tanslateLisma()
+            }
         }
         button{
             graphic = ImageView("icons/toolbar/play.png")

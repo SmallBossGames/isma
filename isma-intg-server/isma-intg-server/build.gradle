@@ -5,6 +5,8 @@
 dependencies {
     implementation project(':isma-intg-server-parent:isma-intg-server-api')
     implementation project(':isma-intg-core-solvers-parallel')
+    implementation project(':isma-intg-api')
+    implementation project(':isma-intg-core')
     implementation 'com.google.guava:guava:17.0'
     implementation 'commons-io:commons-io:2.4'
     implementation 'ch.qos.logback:logback-classic:1.1.3'

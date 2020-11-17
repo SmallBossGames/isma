@@ -6,6 +6,11 @@ dependencies {
     testImplementation project(':isma-intg-server-parent:isma-intg-server-api')
     testImplementation project(':isma-intg-server-parent:isma-intg-server-client')
     testImplementation project(':isma-intg-server-parent:isma-intg-server')
+    testImplementation project(':isma-intg-lib-parent:isma-intg-lib-rk2')
+    testImplementation project(':isma-intg-lib-parent:isma-intg-lib-rk3')
+    testImplementation project(':isma-intg-lib-parent:isma-intg-lib-rkmerson')
+    implementation project(':isma-intg-api')
+    implementation project(':isma-intg-core')
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.tngtech.java:junit-dataprovider:1.10.1'
     testImplementation project(':isma-intg-lib-parent:isma-intg-lib')

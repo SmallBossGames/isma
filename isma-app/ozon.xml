@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ismaProject>
+    <simulation>
+        <configuration>
+            <endTime>10.0</endTime>
+            <name>testConf1</name>
+            <startTime>0.0</startTime>
+            <step>0.1</step>
+        </configuration>
+        <configuration>
+            <endTime>10.0</endTime>
+            <name>testConf2</name>
+            <startTime>0.0</startTime>
+            <step>0.1</step>
+        </configuration>
+    </simulation>
+    <description>Test model for lisma_pde in ozon problem</description>
+    <name>Ozon problem</name>
+    <type>LISMA_EPS</type>
+</ismaProject>

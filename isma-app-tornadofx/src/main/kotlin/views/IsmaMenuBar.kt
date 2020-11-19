@@ -1,27 +1,31 @@
 package views
 
+import controllers.FileController
 import controllers.ProjectController
 import events.NewProjectEvent
 import models.IsmaProjectModel
 import tornadofx.*
 
 class IsmaMenuBar : View() {
-    val projectController: ProjectController by inject()
+    private val projectController: ProjectController by inject()
+    private val fileController: FileController by inject()
 
     override val root = menubar {
         menu("File") {
             item("New","Shortcut+N").action {
-                println("Saving!")
-                projectController.createNew("Dick and semen")
+                projectController.createNew()
             }
             item("Open","Shortcut+O").action {
-                println("Open!")
+                fileController.open()
             }
             item("Save","Shortcut+S").action {
-                println("Save!")
+                fileController.save()
             }
-            item("Save as...","Shortcut+Q").action {
-                println("Save!")
+            item("Save as...").action {
+                fileController.saveAs()
+            }
+            item("Save all").action {
+                fileController.saveAll()
             }
             separator()
             item("Model settings").action {

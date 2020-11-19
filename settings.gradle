@@ -4,7 +4,7 @@
 
 rootProject.name = 'isma'
 include('isma-app')
-//include('isma-app-tornadofx')
+include('isma-app-tornadofx')
 include('isma-core')
 include('isma-hsm')
 include('isma-intg-api')

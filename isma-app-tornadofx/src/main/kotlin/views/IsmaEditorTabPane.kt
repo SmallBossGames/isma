@@ -2,9 +2,7 @@ package views
 
 import controllers.ActiveProjectController
 import controllers.ProjectController
-import env.project.IsmaProject
 import events.NewProjectEvent
-import models.IsmaProjectModel
 import tornadofx.*
 
 class IsmaEditorTabPane: View() {
@@ -13,14 +11,20 @@ class IsmaEditorTabPane: View() {
 
     override val root = tabpane {
         subscribe<NewProjectEvent> { event->
-            tab(event.ismaProject.name){
-                textarea(event.ismaProject.projectText)
+            val thisTabProject = event.ismaProject
+            tab(thisTabProject.name) {
+                textarea(thisTabProject.projectTextProperty)
+
                 selectionModel.select(this)
-                activeProjectController.activeProject = event.ismaProject
+                activeProjectController.activeProject = thisTabProject
+
+                textProperty().bindBidirectional(thisTabProject.nameProperty)
+
 
                 setOnCloseRequest {
                     projectController.close(event.ismaProject)
                 }
+
                 setOnSelectionChanged {
                     if(this.isSelected){
                         activeProjectController.activeProject = event.ismaProject

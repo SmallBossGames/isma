@@ -8,14 +8,14 @@ import ru.nstu.isma.core.hsm.HSM
 import tornadofx.Controller
 
 class LismaPdeController : Controller() {
-    val activeProjectController: ActiveProjectController by inject()
-    val syntaxController: SyntaxErrorController by inject()
+    private val activeProjectController: ActiveProjectController by inject()
+    private val syntaxController: SyntaxErrorController by inject()
 
     fun tanslateLisma(): HSM {
         val project = activeProjectController.activeProject ?: return HSM()
 
         val errors = IsmaErrorList()
-        val translator: InputTranslator = LismaTranslator(project?.projectText?.value, errors)
+        val translator: InputTranslator = LismaTranslator(project?.projectText, errors)
         val translationResult = translator.translate()
 
         val errorModels = errors.map { x ->

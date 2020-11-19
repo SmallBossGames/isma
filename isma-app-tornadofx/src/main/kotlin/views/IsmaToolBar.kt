@@ -14,7 +14,7 @@ class IsmaToolBar : View() {
         button{
             graphic = ImageView("icons/new.png")
             tooltip = Tooltip("New model")
-            action { projectController.createNew("Some project") }
+            action { projectController.createNew() }
         }
         button{
             graphic = ImageView("icons/open.png")

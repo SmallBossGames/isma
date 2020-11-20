@@ -9,3 +9,13 @@ isma.properties
 export.csv
 result.csv
 model/
+.idea/
+.gradle/
+
+target/
+out/
+build/
+*private.resources
+*private.properties
+local.properties
+*.log

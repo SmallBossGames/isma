@@ -1,6 +1,6 @@
 package ru.nstu.isma.ui.common;
 
-import ru.nstu.isma.core.sim.controller.Controller;
+import ru.nstu.isma.core.sim.controller.SimulationCoreController;
 import ru.nstu.isma.core.sim.controller.HybridSystemIntgResult;
 import ru.nstu.isma.intg.api.IntgResultMemoryStore;
 import ru.nstu.isma.intg.api.IntgResultPointFileReader;
@@ -20,7 +20,7 @@ import java.util.LinkedList;
  * on 19.01.2015.
  */
 public class SimulationTask<W extends OutputAware> extends SwingWorker<Void, Void> implements PropertyChangeListener {
-    private Controller controller;
+    private SimulationCoreController simulationCoreController;
 
     private Double len;
 
@@ -36,9 +36,9 @@ public class SimulationTask<W extends OutputAware> extends SwingWorker<Void, Voi
 
     JProgressBar progressBar;
 
-    public SimulationTask(JProgressBar progressBar, Controller controller, W mw, LinkedList<String> toShow, double interval, double start) {
+    public SimulationTask(JProgressBar progressBar, SimulationCoreController simulationCoreController, W mw, LinkedList<String> toShow, double interval, double start) {
         this.progressBar = progressBar;
-        this.controller = controller;
+        this.simulationCoreController = simulationCoreController;
         this.mw = mw;
         this.len = interval;
         this.toShow = toShow;
@@ -49,14 +49,14 @@ public class SimulationTask<W extends OutputAware> extends SwingWorker<Void, Voi
     protected Void doInBackground() throws Exception {
         try {
             addPropertyChangeListener(this);
-            controller.addStepChangeListener(d -> {
+            simulationCoreController.addStepChangeListener(d -> {
                 progress = getProgress(d);
                 if (progress < 0) progress = 0;
                 if (progress > 100) progress = 100;
                 setProgress(progress);
             });
             setProgress(progress);
-            result = controller.simulate();
+            result = simulationCoreController.simulate();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

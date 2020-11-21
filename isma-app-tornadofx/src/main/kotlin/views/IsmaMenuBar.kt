@@ -2,6 +2,7 @@ package views
 
 import controllers.FileController
 import controllers.ProjectController
+import controllers.SimulationController
 import events.NewProjectEvent
 import models.IsmaProjectModel
 import tornadofx.*
@@ -9,6 +10,7 @@ import tornadofx.*
 class IsmaMenuBar : View() {
     private val projectController: ProjectController by inject()
     private val fileController: FileController by inject()
+    private val simulationController: SimulationController by inject()
 
     override val root = menubar {
         menu("File") {
@@ -59,7 +61,7 @@ class IsmaMenuBar : View() {
                 println("Cut!")
             }
             item("Run","Shortcut+F5").action {
-                println("Copying!")
+                simulationController.simulate()
             }
         }
         menu("Settings") {

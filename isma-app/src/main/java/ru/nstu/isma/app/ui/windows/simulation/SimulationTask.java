@@ -4,7 +4,7 @@ import ru.nstu.isma.app.ui.common.ExportService;
 import ru.nstu.isma.app.ui.common.OutputAware;
 import ru.nstu.isma.app.ui.common.out.IsmaChart;
 import ru.nstu.isma.app.util.Consts;
-import ru.nstu.isma.core.sim.controller.Controller;
+import ru.nstu.isma.core.sim.controller.SimulationCoreController;
 import ru.nstu.isma.core.sim.controller.HybridSystemIntgResult;
 import ru.nstu.isma.intg.api.IntgResultMemoryStore;
 import ru.nstu.isma.intg.api.IntgResultPointFileReader;
@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  * on 19.01.2015.
  */
 public class SimulationTask<W extends OutputAware> extends SwingWorker<Void, Integer> implements PropertyChangeListener {
-    private Controller controller;
+    private SimulationCoreController simulationCoreController;
 
     private Double len;
 
@@ -49,9 +49,9 @@ public class SimulationTask<W extends OutputAware> extends SwingWorker<Void, Int
     private List<Supplier> doneListeners = new LinkedList<>();
 
 
-    public SimulationTask(JProgressBar progressBar, Controller controller, W mw, LinkedList<String> toShow, double interval, double start, SimulationWindowController simulationWindowController) {
+    public SimulationTask(JProgressBar progressBar, SimulationCoreController simulationCoreController, W mw, LinkedList<String> toShow, double interval, double start, SimulationWindowController simulationWindowController) {
         this.progressBar = progressBar;
-        this.controller = controller;
+        this.simulationCoreController = simulationCoreController;
         this.mw = mw;
         this.len = interval;
         this.toShow = toShow;
@@ -64,7 +64,7 @@ public class SimulationTask<W extends OutputAware> extends SwingWorker<Void, Int
         try {
             addPropertyChangeListener(this);
 
-            controller.addStepChangeListener(d -> {
+            simulationCoreController.addStepChangeListener(d -> {
                 progress = getProgress(d);
                 if (progress < 0) progress = 0;
                 if (progress > 100) progress = 100;
@@ -76,7 +76,7 @@ public class SimulationTask<W extends OutputAware> extends SwingWorker<Void, Int
             setProgress(progress);
 
             // start
-            result = controller.simulate();
+            result = simulationCoreController.simulate();
 
         } catch (Exception e) {
             e.printStackTrace();

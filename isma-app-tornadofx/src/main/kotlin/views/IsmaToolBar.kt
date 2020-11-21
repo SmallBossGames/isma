@@ -4,11 +4,14 @@ import controllers.LismaPdeController
 import controllers.ProjectController
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
+import javafx.stage.Modality
 import tornadofx.*
 
 class IsmaToolBar : View() {
     val lismaPdeController: LismaPdeController by inject()
     val projectController: ProjectController by inject()
+
+    val simulationSettingView: SimulationSettingsView by inject()
 
     override val root = toolbar {
         button{
@@ -46,12 +49,17 @@ class IsmaToolBar : View() {
             graphic = ImageView("icons/toolbar/checked.png")
             tooltip = Tooltip("Verify")
             action {
-                lismaPdeController.tanslateLisma()
+                lismaPdeController.translateLisma()
             }
         }
         button{
             graphic = ImageView("icons/toolbar/play.png")
             tooltip = Tooltip("Play")
+            action {
+                simulationSettingView.openWindow(
+                        owner = currentWindow,
+                        modality = Modality.WINDOW_MODAL)
+            }
         }
         separator()
         button{

@@ -11,11 +11,11 @@ class LismaPdeController : Controller() {
     private val activeProjectController: ActiveProjectController by inject()
     private val syntaxController: SyntaxErrorController by inject()
 
-    fun tanslateLisma(): HSM {
-        val project = activeProjectController.activeProject ?: return HSM()
+    fun translateLisma(): HSM? {
+        val project = activeProjectController.activeProject ?: return null
 
         val errors = IsmaErrorList()
-        val translator: InputTranslator = LismaTranslator(project?.projectText, errors)
+        val translator: InputTranslator = LismaTranslator(project.projectText, errors)
         val translationResult = translator.translate()
 
         val errorModels = errors.map { x ->

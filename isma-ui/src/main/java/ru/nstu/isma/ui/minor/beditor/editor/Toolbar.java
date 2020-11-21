@@ -2,7 +2,7 @@ package ru.nstu.isma.ui.minor.beditor.editor;
 
 import ru.nstu.isma.core.common.SimulationResult;
 import ru.nstu.isma.core.sim.IsmaSimulator;
-import ru.nstu.isma.core.sim.controller.Controller;
+import ru.nstu.isma.core.sim.controller.SimulationCoreController;
 import ru.nstu.isma.core.sim.controller.HybridSystemIntgResult;
 import ru.nstu.isma.core.sim.engine0.E0SimulationContext;
 import ru.nstu.isma.core.sim.engine0.E0Simulator;
@@ -218,7 +218,7 @@ public class Toolbar extends JToolBar {
                 cauchyInitials.setStepSize(0.1);
                 IntgMethod intgMethod = new RkMersonIntgMethod();
 
-                Controller isma = new Controller(data.getModel(), cauchyInitials, intgMethod);
+                SimulationCoreController isma = new SimulationCoreController(data.getModel(), cauchyInitials, intgMethod);
                 HybridSystemIntgResult result = isma.simulate();
                 // TODO
 //                ismaChart.show(result);

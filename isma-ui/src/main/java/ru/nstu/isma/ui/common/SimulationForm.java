@@ -3,7 +3,7 @@ package ru.nstu.isma.ui.common;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import ru.nstu.isma.core.sim.controller.Controller;
+import ru.nstu.isma.core.sim.controller.SimulationCoreController;
 import ru.nstu.isma.core.sim.fdm.FDMNewConverter;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials;
 import ru.nstu.isma.intg.api.methods.AccuracyIntgController;
@@ -370,7 +370,7 @@ public class SimulationForm<W extends OutputAware> extends JFrame implements I18
                 eventDetectionStepBoundLow = Double.valueOf(eventDetectionStepBoundLowField.getText());
             }
 
-            Controller isma = new Controller(data.getModel(), cauchyInitials, intgMethod,
+            SimulationCoreController isma = new SimulationCoreController(data.getModel(), cauchyInitials, intgMethod,
                     isParallel, server, port,
                     resultFileName,
                     eventDetectionEnabled,

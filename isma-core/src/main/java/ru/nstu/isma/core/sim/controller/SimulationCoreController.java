@@ -29,7 +29,7 @@ import java.util.function.Consumer;
  * Created by Bessonov Alex
  * on 04.01.2015.
  */
-public class Controller {
+public class SimulationCoreController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -57,7 +57,7 @@ public class Controller {
     private final double eventDetectionStepBoundLow;
 
     // TODO: потом убрать, этот конструктор требуется только для minor.beditor
-    public Controller(HSM hsm, CauchyInitials initials, IntgMethod method) {
+    public SimulationCoreController(HSM hsm, CauchyInitials initials, IntgMethod method) {
         this.hsm = hsm;
         this.method = method;
         this.resultFileName = null;
@@ -68,10 +68,16 @@ public class Controller {
         this.eventDetectionStepBoundLow = Double.MIN_VALUE;
     }
 
-    public Controller(HSM hsm, CauchyInitials initials, IntgMethod method,
-                      boolean parallel, String intgServer, int intgPort,
-                      String resultFileName,
-                      boolean eventDetectionEnabled, double eventDetectionGamma, double eventDetectionStepBoundLow) {
+    public SimulationCoreController(HSM hsm,
+                                    CauchyInitials initials,
+                                    IntgMethod method,
+                                    boolean parallel,
+                                    String intgServer,
+                                    int intgPort,
+                                    String resultFileName,
+                                    boolean eventDetectionEnabled,
+                                    double eventDetectionGamma,
+                                    double eventDetectionStepBoundLow) {
         this.hsm = hsm;
         this.simulationInitials = new SimulationInitials(
                 initials.getY0(), initials.getStepSize(), initials.getStart(), initials.getEnd());

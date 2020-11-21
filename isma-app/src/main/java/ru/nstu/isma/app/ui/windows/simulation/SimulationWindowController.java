@@ -1,10 +1,9 @@
 package ru.nstu.isma.app.ui.windows.simulation;
 
-import com.alee.laf.rootpane.WebDialog;
 import ru.nstu.isma.app.env.project.RunConfiguration;
 import ru.nstu.isma.app.util.Consts;
 import ru.nstu.isma.core.hsm.HSM;
-import ru.nstu.isma.core.sim.controller.Controller;
+import ru.nstu.isma.core.sim.controller.SimulationCoreController;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials;
 import ru.nstu.isma.intg.api.methods.AccuracyIntgController;
 import ru.nstu.isma.intg.api.methods.IntgMethod;
@@ -82,7 +81,7 @@ public class SimulationWindowController {
                 eventDetectionStepBoundLow = conf.getEventDetectionStepBoundLowField();
             }
 
-            Controller isma = new Controller(model, cauchyInitials, intgMethod,
+            SimulationCoreController isma = new SimulationCoreController(model, cauchyInitials, intgMethod,
                     conf.getParallel(), conf.getIntgServer(), conf.getIntgPort(),
                     resultFileName,
                     eventDetectionEnabled,

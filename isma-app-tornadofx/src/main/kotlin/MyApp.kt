@@ -22,8 +22,8 @@ class MyView : View() {
     }
 
     override val root = borderpane {
-        minHeight = 600.0
-        minWidth = 400.0
+        minHeight = 480.0
+        minWidth = 640.0
 
         top = vbox {
             add(ismaMenuBar)

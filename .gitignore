@@ -8,7 +8,6 @@ out.txt
 isma.properties
 export.csv
 result.csv
-model/
 .idea/
 .gradle/
 

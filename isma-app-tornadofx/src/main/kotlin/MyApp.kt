@@ -37,14 +37,5 @@ class MyView : View() {
         bottom {
             add(ismaErrorListTable)
         }
-
-        syntaxErrorController.errors.add(SyntaxErrorModel(1, 2, "Dick"))
     }
-
-    /*textarea {
-            prefHeightProperty().bind(this@vbox.heightProperty())
-        }*/
-    /*textarea {
-            prefHeightProperty().bind(this@vbox.heightProperty())
-        }*/
 }

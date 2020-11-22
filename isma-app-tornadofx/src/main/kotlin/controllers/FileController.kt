@@ -25,7 +25,14 @@ class FileController : Controller() {
     }
 
     fun open() {
-        val file = chooseFile (filters = fileFilers, mode = FileChooserMode.Single).first()
+        val selectedFiles = chooseFile (filters = fileFilers, mode = FileChooserMode.Single)
+
+        if(selectedFiles.isEmpty())
+        {
+            return;
+        }
+
+        val file = selectedFiles.first()
 
         projectController.add(IsmaProjectModel(file))
     }
@@ -45,10 +52,14 @@ class FileController : Controller() {
     }
 
     private fun saveProjectAs(project: IsmaProjectModel){
-        val file = chooseFile (
-                filters = fileFilers,
-                mode = FileChooserMode.Save)
-                .first()
+        val selectedFiles = chooseFile (filters = fileFilers, mode = FileChooserMode.Save)
+
+        if(selectedFiles.isEmpty())
+        {
+            return;
+        }
+
+        val file = selectedFiles.first()
 
         println(file.path)
 

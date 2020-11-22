@@ -1,17 +1,21 @@
 package views
 
+import controllers.FileController
 import controllers.LismaPdeController
 import controllers.ProjectController
+import controllers.TextEditorController
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import tornadofx.*
 
 class IsmaToolBar : View() {
-    val lismaPdeController: LismaPdeController by inject()
-    val projectController: ProjectController by inject()
+    private val lismaPdeController: LismaPdeController by inject()
+    private val projectController: ProjectController by inject()
+    private val fileController: FileController by inject()
+    private val textEditorController: TextEditorController by inject()
 
-    val simulationSettingView: SimulationSettingsView by inject()
+    private val simulationSettingView: SimulationSettingsView by inject()
 
     override val root = toolbar {
         button{
@@ -22,35 +26,39 @@ class IsmaToolBar : View() {
         button{
             graphic = ImageView("icons/open.png")
             tooltip = Tooltip("Open model")
+            action { fileController.open() }
         }
         button{
             graphic = ImageView("icons/toolbar/save.png")
             tooltip = Tooltip("Save current model")
+            action { fileController.save() }
         }
         button{
             graphic = ImageView("icons/toolbar/saveall.png")
             tooltip = Tooltip("Save all models")
+            action { fileController.saveAll() }
         }
         separator()
         button{
             graphic = ImageView("icons/toolbar/cut.png")
             tooltip = Tooltip("Cut")
+            action { textEditorController.cut() }
         }
         button{
             graphic = ImageView("icons/toolbar/copy.png")
             tooltip = Tooltip("Copy")
+            action { textEditorController.copy() }
         }
         button{
             graphic = ImageView("icons/toolbar/paste.png")
             tooltip = Tooltip("Paste")
+            action { textEditorController.paste() }
         }
         separator()
         button{
             graphic = ImageView("icons/toolbar/checked.png")
             tooltip = Tooltip("Verify")
-            action {
-                lismaPdeController.translateLisma()
-            }
+            action { lismaPdeController.translateLisma() }
         }
         button{
             graphic = ImageView("icons/toolbar/play.png")

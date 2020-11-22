@@ -2,7 +2,10 @@ package views
 
 import controllers.ActiveProjectController
 import controllers.ProjectController
+import events.CopyTextInCurrentEditorEvent
+import events.CutTextInCurrentEditorEvent
 import events.NewProjectEvent
+import events.PasteTextInCurrentEditorEvent
 import tornadofx.*
 
 class IsmaEditorTabPane: View() {
@@ -13,7 +16,11 @@ class IsmaEditorTabPane: View() {
         subscribe<NewProjectEvent> { event->
             val thisTabProject = event.ismaProject
             tab(thisTabProject.name) {
-                textarea(thisTabProject.projectTextProperty)
+                textarea(thisTabProject.projectTextProperty) {
+                    subscribe<CutTextInCurrentEditorEvent> { if (this@tab.isSelected) cut() }
+                    subscribe<CopyTextInCurrentEditorEvent> { if (this@tab.isSelected) copy() }
+                    subscribe<PasteTextInCurrentEditorEvent> { if (this@tab.isSelected) paste() }
+                }
 
                 selectionModel.select(this)
                 activeProjectController.activeProject = thisTabProject

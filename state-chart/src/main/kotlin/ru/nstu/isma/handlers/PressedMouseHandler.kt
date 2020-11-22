@@ -6,6 +6,6 @@ import tornadofx.Controller
 
 class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     override fun handle(event: MouseEvent?) {
-        TODO("Not yet implemented")
+
     }
 }

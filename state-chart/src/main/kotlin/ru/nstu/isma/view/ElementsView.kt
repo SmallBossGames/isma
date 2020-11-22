@@ -1,7 +1,7 @@
 package ru.nstu.isma.view
 
 import javafx.scene.Parent
-import ru.nstu.isma.model.ElementType
+import ru.nstu.isma.model.entity.ElementType
 import ru.nstu.isma.model.ElementsViewModel
 import tornadofx.View
 import tornadofx.listview

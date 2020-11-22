@@ -12,7 +12,7 @@ class StateDrawer : Drawer, Controller() {
         val stateElements = model.stateElements
         for (stateElement in stateElements) {
             val center = stateElement.center
-            gc.fillOval(center.x, center.y, stateElement.size, stateElement.size)
+            gc.strokeOval(center.x, center.y, stateElement.size, stateElement.size)
         }
     }
 }

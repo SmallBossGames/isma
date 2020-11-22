@@ -1,9 +1,6 @@
 package views
 
-import controllers.FileController
-import controllers.LismaPdeController
-import controllers.ProjectController
-import controllers.TextEditorController
+import controllers.*
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
 import javafx.stage.Modality
@@ -14,8 +11,7 @@ class IsmaToolBar : View() {
     private val projectController: ProjectController by inject()
     private val fileController: FileController by inject()
     private val textEditorController: TextEditorController by inject()
-
-    private val simulationSettingView: SimulationSettingsView by inject()
+    private val simulationController: SimulationController by inject()
 
     override val root = toolbar {
         button{
@@ -63,11 +59,7 @@ class IsmaToolBar : View() {
         button{
             graphic = ImageView("icons/toolbar/play.png")
             tooltip = Tooltip("Play")
-            action {
-                simulationSettingView.openWindow(
-                        owner = currentWindow,
-                        modality = Modality.WINDOW_MODAL)
-            }
+            action { simulationController.simulate() }
         }
         separator()
         button{

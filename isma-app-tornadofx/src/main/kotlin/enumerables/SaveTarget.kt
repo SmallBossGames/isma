@@ -1,4 +1,4 @@
-package app.util
+package enumerables
 
 enum class SaveTarget {
     MEMORY, FILE

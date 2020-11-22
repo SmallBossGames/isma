@@ -1,6 +1,6 @@
 package controllers
 
-import app.util.SaveTarget
+import enumerables.SaveTarget
 import models.*
 import ru.nstu.isma.intg.lib.IntgMethodLibrary
 import tornadofx.Controller
@@ -27,7 +27,7 @@ class SimulationParametersController: Controller() {
         integrationMethod.selectedMethod = integrationMethods.first()
         resultProcessing.selectedSimplifyMethod = simplifyMethods.first()
 
-        cauchyInitialsModel.step = 1.0
+        cauchyInitialsModel.step = 0.1
         cauchyInitialsModel.startTime = 0.0
         cauchyInitialsModel.endTime = 10.0
 

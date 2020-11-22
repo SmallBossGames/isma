@@ -1,6 +1,6 @@
 package views
 
-import app.util.SaveTarget
+import enumerables.SaveTarget
 import controllers.SimulationParametersController
 import javafx.collections.FXCollections
 import tornadofx.*

@@ -1,6 +1,6 @@
 package models
 
-import app.util.SaveTarget
+import enumerables.SaveTarget
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.getValue
 import tornadofx.setValue

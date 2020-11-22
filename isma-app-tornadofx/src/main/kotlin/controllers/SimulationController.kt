@@ -1,15 +1,18 @@
 package controllers
 
-import app.util.SaveTarget
+import kotlinx.coroutines.*
+import enumerables.SaveTarget
 import ru.nstu.isma.core.sim.controller.SimulationCoreController
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.lib.IntgMethodLibrary
 import tornadofx.Controller
-import kotlin.math.roundToInt
+import kotlin.math.max
+import kotlin.math.min
 
 class SimulationController: Controller() {
-    val lismaPdeController: LismaPdeController by inject()
-    val simulationParametersController: SimulationParametersController by inject()
+    private val lismaPdeController: LismaPdeController by inject()
+    private val simulationParametersController: SimulationParametersController by inject()
+    private val simulationProgress by inject<SimulationProgressController>()
 
     fun simulate(){
         val hsm = lismaPdeController.translateLisma() ?: return
@@ -62,19 +65,22 @@ class SimulationController: Controller() {
                 simulationParametersController.integrationMethod.server,
                 simulationParametersController.integrationMethod.port,
                 resultFileName,
-                simulationParametersController.eventDetection.isEventDetectionInUse,
-                simulationParametersController.eventDetection.gamma,
+                eventDetectionEnabled,
+                eventDetectionGamma,
                 eventDetectionStepBoundLow
         )
 
         simulationController.addStepChangeListener {
-            val process = normalizeProgress(initials.start, initials.end, it)
+            simulationProgress.progress =
+                    normalizeProgress(initials.start, initials.end, it)
         }
 
-        simulationController.simulate()
+        GlobalScope.launch {
+                simulationController.simulate()
+        }
     }
 
-    fun normalizeProgress(start: Double, end: Double, current: Double): Int{
-        return (100.0 * (current - start) / (end-start)).roundToInt()
+    private fun normalizeProgress(start: Double, end: Double, current: Double): Double{
+        return max(0.0, min(1.0, (current - start) / (end-start)))
     }
 }

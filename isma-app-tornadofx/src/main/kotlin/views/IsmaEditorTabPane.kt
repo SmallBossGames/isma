@@ -6,13 +6,9 @@ import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent
 import events.NewProjectEvent
 import events.PasteTextInCurrentEditorEvent
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ChangeListener
-import javafx.beans.value.ObservableValue
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
-import java.text.MessageFormat
 
 
 
@@ -27,7 +23,7 @@ class IsmaEditorTabPane: View() {
             tab(thisTabProject.name) {
                 val codeArea = CodeArea()
 
-                codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea);
+                codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
                 codeArea.replaceText(thisTabProject.projectText)
 
                 subscribe<CutTextInCurrentEditorEvent> { if (isSelected) codeArea.cut() }
@@ -54,11 +50,5 @@ class IsmaEditorTabPane: View() {
                 add(codeArea)
             }
         }
-    }
-
-    fun addIsmaTab() {
-        val tab = IsmaProjectTab()
-        tab.title = "fiewwfe"
-        root.add(tab)
     }
 }

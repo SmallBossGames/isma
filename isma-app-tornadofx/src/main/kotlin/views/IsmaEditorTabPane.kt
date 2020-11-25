@@ -6,7 +6,16 @@ import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent
 import events.NewProjectEvent
 import events.PasteTextInCurrentEditorEvent
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
+import org.fxmisc.richtext.CodeArea
+import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
+import java.text.MessageFormat
+
+
+
 
 class IsmaEditorTabPane: View() {
     private val projectController: ProjectController by inject()
@@ -16,17 +25,21 @@ class IsmaEditorTabPane: View() {
         subscribe<NewProjectEvent> { event->
             val thisTabProject = event.ismaProject
             tab(thisTabProject.name) {
-                textarea(thisTabProject.projectTextProperty) {
-                    subscribe<CutTextInCurrentEditorEvent> { if (this@tab.isSelected) cut() }
-                    subscribe<CopyTextInCurrentEditorEvent> { if (this@tab.isSelected) copy() }
-                    subscribe<PasteTextInCurrentEditorEvent> { if (this@tab.isSelected) paste() }
-                }
+                val codeArea = CodeArea()
+
+                codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea);
+                codeArea.replaceText(thisTabProject.projectText)
+
+                subscribe<CutTextInCurrentEditorEvent> { if (isSelected) codeArea.cut() }
+                subscribe<CopyTextInCurrentEditorEvent> { if (isSelected) codeArea.copy() }
+                subscribe<PasteTextInCurrentEditorEvent> { if (isSelected) codeArea.paste() }
+
+                thisTabProject.projectTextProperty.bind(codeArea.textProperty())
 
                 selectionModel.select(this)
                 activeProjectController.activeProject = thisTabProject
 
-                textProperty().bindBidirectional(thisTabProject.nameProperty)
-
+                textProperty().bind(thisTabProject.nameProperty)
 
                 setOnCloseRequest {
                     projectController.close(event.ismaProject)
@@ -37,6 +50,8 @@ class IsmaEditorTabPane: View() {
                         activeProjectController.activeProject = event.ismaProject
                     }
                 }
+
+                add(codeArea)
             }
         }
     }

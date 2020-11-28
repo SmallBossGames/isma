@@ -1,8 +1,0 @@
-apply plugin: "application"
-
-mainClassName = 'ru.nstu.grin.EntryPointKt'
-
-dependencies {
-    implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
-    implementation project(":analytic-fu")
-}

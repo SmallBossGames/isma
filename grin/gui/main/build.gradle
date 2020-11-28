@@ -3,8 +3,8 @@ apply plugin: "application"
 mainClassName = 'ru.nstu.grin.main.EntryPointKt'
 
 dependencies {
-    implementation project(":gui:simple")
-    implementation project(":gui:concatenation")
-    implementation project(":gui:kube")
-    api project(":gui:common")
+    implementation project(":grin:gui:simple")
+    implementation project(":grin:gui:concatenation")
+    implementation project(":grin:gui:kube")
+    api project(":grin:gui:common")
 }

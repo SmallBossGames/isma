@@ -1,6 +1,16 @@
+plugins {
+    id("org.openjfx.javafxplugin") version "0.0.9"
+}
+
 subprojects {
+    apply plugin: "org.openjfx.javafxplugin"
+
+    javafx {
+        version = "11.0.2"
+        modules = ["javafx.controls", "javafx.graphics"]
+    }
     dependencies {
-        implementation project(":analytic-fu")
+        implementation project(":grin:analytic-fu")
         implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
         implementation "de.sciss:jwave:${versions.jwave}"
         testImplementation "ru.kontur.kinfra.kfixture:kfixture:0.4.9"

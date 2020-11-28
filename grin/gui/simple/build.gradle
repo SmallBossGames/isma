@@ -1,3 +1,3 @@
 dependencies {
-    api project(":gui:common")
+    api project(":grin:gui:common")
 }

@@ -7,6 +7,8 @@ import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent
 import events.NewProjectEvent
 import events.PasteTextInCurrentEditorEvent
+import javafx.scene.paint.Color
+import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
 import org.antlr.v4.runtime.Lexer
 import org.fxmisc.richtext.CodeArea
@@ -41,8 +43,22 @@ class IsmaEditorTabPane: View() {
                 }
 
                 codeArea.stylesheet {
-                    this.addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("test")))){
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("keyword")))){
+                        fill = Color.ORANGE
                         fontWeight = FontWeight.BOLD
+                    })
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("default")))){
+                        fill = Color.BLACK
+                        fontWeight = FontWeight.NORMAL
+                    })
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("decimal")))){
+                        fill = Color.BLUE
+                        fontWeight = FontWeight.NORMAL
+                    })
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("comment")))){
+                        fill = Color.GRAY
+                        fontWeight = FontWeight.NORMAL
+                        fontStyle = FontPosture.ITALIC
                     })
                 }
 
@@ -68,8 +84,25 @@ class IsmaEditorTabPane: View() {
 
     private fun highlightText(codeArea: CodeArea){
         lismaPdeController.getLismaTokens().forEach {
-            if(it.text == "for"){
-                codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("test"))
+            when {
+                it.text == "for" -> {
+                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("keyword"))
+                }
+                it.text == "state" -> {
+                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("keyword"))
+                }
+                it.text == "const" -> {
+                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("keyword"))
+                }
+                it.type == LismaLexer.COMMENT -> {
+                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("comment"))
+                }
+                it.type == LismaLexer.FloatingPointLiteral || it.type == LismaLexer.DecimalLiteral -> {
+                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("decimal"))
+                }
+                else -> {
+                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("default"))
+                }
             }
         }
     }

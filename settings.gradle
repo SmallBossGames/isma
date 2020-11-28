@@ -3,8 +3,11 @@
  */
 
 rootProject.name = 'isma'
-include('isma-app')
+//JAVA 11+ projects
 include('isma-app-tornadofx')
+include 'state-chart'
+
+include('isma-app')
 include('isma-core')
 include('isma-hsm')
 include('isma-intg-api')
@@ -31,7 +34,7 @@ include('isma-ui')
 include('isma-ui-graph')
 include('isma-intg-parallel-ignite')
 include('isma-distrib')
-include 'state-chart'
+
 project(':isma-intg-lib-parent:isma-intg-lib').projectDir = file('isma-intg-lib/isma-intg-lib')
 project(':isma-intg-lib-parent:isma-intg-lib-euler').projectDir = file('isma-intg-lib/isma-intg-lib-euler')
 project(':isma-intg-lib-parent:isma-intg-lib-rk2').projectDir = file('isma-intg-lib/isma-intg-lib-rk2')

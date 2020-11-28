@@ -18,6 +18,7 @@ dependencies {
     implementation ("no.tornado:tornadofx:1.7.20")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
     implementation ("org.fxmisc.richtext:richtextfx:0.10.5")
+    implementation ("org.antlr:antlr4-runtime:4.9")
     implementation(project(":isma-hsm"))
     implementation(project(":isma-lisma"))
     implementation(project(":isma-core"))

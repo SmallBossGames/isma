@@ -4,7 +4,7 @@
 
 dependencies {
     implementation project(':isma-hsm')
-    implementation 'org.antlr:antlr4-runtime:4.1'
+    implementation 'org.antlr:antlr4-runtime:4.9'
     testImplementation 'junit:junit:3.8.1'
 }
 

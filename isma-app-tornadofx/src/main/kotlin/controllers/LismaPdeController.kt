@@ -2,8 +2,11 @@ package controllers
 
 import error.IsmaErrorList
 import models.SyntaxErrorModel
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.Token
 import ru.nstu.isma.`in`.InputTranslator
 import ru.nstu.isma.`in`.lisma.LismaTranslator
+import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
 import ru.nstu.isma.core.hsm.HSM
 import tornadofx.Controller
 
@@ -25,5 +28,12 @@ class LismaPdeController : Controller() {
         syntaxController.setErrorList(errorModels)
 
         return translationResult
+    }
+
+    fun getLismaTokens(): List<Token>{
+        val project = activeProjectController.activeProject ?: return emptyList<Token>()
+        val inputStream = CharStreams.fromString(project.projectText)
+        val lexer = LismaLexer(inputStream)
+        return lexer.allTokens
     }
 }

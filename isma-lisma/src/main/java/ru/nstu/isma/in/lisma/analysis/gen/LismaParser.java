@@ -1,4 +1,4 @@
-// Generated from Lisma.g4 by ANTLR 4.1
+// Generated from C:/Users/SmallBoss/Documents/Projects/ISMA/isma-lisma/src/main/resources/ru/nstu/isma/in/lisma\Lisma.g4 by ANTLR 4.8
 package ru.nstu.isma.in.lisma.analysis.gen;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -11,17 +11,19 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class LismaParser extends Parser {
+	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
+
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__47=1, T__46=2, T__45=3, T__44=4, T__43=5, T__42=6, T__41=7, T__40=8, 
-		T__39=9, T__38=10, T__37=11, T__36=12, T__35=13, T__34=14, T__33=15, T__32=16, 
-		T__31=17, T__30=18, T__29=19, T__28=20, T__27=21, T__26=22, T__25=23, 
-		T__24=24, T__23=25, T__22=26, T__21=27, T__20=28, T__19=29, T__18=30, 
-		T__17=31, T__16=32, T__15=33, T__14=34, T__13=35, T__12=36, T__11=37, 
-		T__10=38, T__9=39, T__8=40, T__7=41, T__6=42, T__5=43, T__4=44, T__3=45, 
-		T__2=46, T__1=47, T__0=48, PDE=49, DecimalLiteral=50, FloatingPointLiteral=51, 
+		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
+		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
+		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
+		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
+		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, T__44=45, 
+		T__45=46, T__46=47, T__47=48, PDE=49, DecimalLiteral=50, FloatingPointLiteral=51, 
 		Identifier=52, WS=53, COMMENT=54, SL_COMMENT=55, LPAREN=56, RPAREN=57, 
 		LBRACE=58, RBRACE=59, LBRACK=60, RBRACK=61, SEMI=62, COMMA=63, DOT=64, 
 		QUOTE1=65, QUOTE2=66, ASSIGN=67, GT=68, LT=69, TILDE=70, QUESTION=71, 
@@ -29,20 +31,6 @@ public class LismaParser extends Parser {
 		SUB=80, MUL=81, DIV=82, BITAND=83, BITOR=84, CARET=85, MOD=86, ADD_ASSIGN=87, 
 		SUB_ASSIGN=88, MUL_ASSIGN=89, DIV_ASSIGN=90, AND_ASSIGN=91, OR_ASSIGN=92, 
 		XOR_ASSIGN=93, MOD_ASSIGN=94, LSHIFT_ASSIGN=95, RSHIFT_ASSIGN=96, URSHIFT_ASSIGN=97;
-	public static final String[] tokenNames = {
-		"<INVALID>", "'state'", "'dx4'", "'set'", "'t0'", "'&&'", "'for'", "'ls'", 
-		"'dy2'", "'dz4'", "'right'", "'dx3'", "'var'", "'macro'", "'both'", "'dz'", 
-		"'const'", "'init'", "'ic'", "'D'", "'dz3'", "'def'", "'dy4'", "'dy'", 
-		"'AND'", "'||'", "'on'", "'DD'", "'NOT'", "'if'", "'from'", "'dz2'", "'dx2'", 
-		"'dx'", "'out'", "'left'", "'apx'", "'OR'", "'or'", "'!'", "'start'", 
-		"'der'", "'else'", "'edge'", "'end'", "'and'", "'dy3'", "'step'", "'not'", 
-		"'pde'", "DecimalLiteral", "FloatingPointLiteral", "Identifier", "WS", 
-		"COMMENT", "SL_COMMENT", "'('", "')'", "'{'", "'}'", "'['", "']'", "';'", 
-		"','", "'.'", "'''", "'�'", "'='", "'>'", "'<'", "'~'", "'?'", "':'", 
-		"'=='", "'<='", "'>='", "'!='", "'++'", "'--'", "'+'", "'-'", "'*'", "'/'", 
-		"'&'", "'|'", "'^'", "'%'", "'+='", "'-='", "'*='", "'/='", "'&='", "'|='", 
-		"'^='", "'%='", "'<<='", "'>>='", "'>>>='"
-	};
 	public static final int
 		RULE_lisma = 0, RULE_statement = 1, RULE_constant = 2, RULE_constant_body = 3, 
 		RULE_init_const = 4, RULE_spatial_var = 5, RULE_spatial_var_bound = 6, 
@@ -74,40 +62,110 @@ public class LismaParser extends Parser {
 		RULE_setter = 82, RULE_linear_vars = 83, RULE_linear_eq = 84, RULE_linear_eq_b = 85, 
 		RULE_linear_eq_A = 86, RULE_linear_eq_A_elem = 87, RULE_linear_eq_A_elem_expr = 88, 
 		RULE_start = 89, RULE_end = 90, RULE_step = 91, RULE_out = 92;
-	public static final String[] ruleNames = {
-		"lisma", "statement", "constant", "constant_body", "init_const", "spatial_var", 
-		"spatial_var_bound", "spatial_var_tail", "spatial_var_tail_APX", "spatial_var_tail_STEP", 
-		"partial_operand", "partial_operand_common", "partial_operand_mixed", 
-		"partial_operand_spatial_common", "partial_operand_spatial_N", "partial_operand_func_spatial", 
-		"partial_operand_D", "partial_operand_mixed_D", "partial_operand_func_spatial_common", 
-		"partial_operand_func_spatial_2", "partial_operand_func_spatial_3", "partial_operand_func_spatial_4", 
-		"partial_operand_unknown_code", "partial_operand_spatial_var_code", "edge", 
-		"edge_eq", "edge_side", "init_cond", "init_cond_body", "equation", "ode_equation", 
-		"pde_equation", "pde_equation_param", "partial_operand_with_param", "pde_param", 
-		"pde_param_atom", "for_cycle", "for_cycle_interval", "for_cycle_body", 
-		"state", "state_body", "state_from", "state_name", "pseudo_state", "pseudo_state_body", 
-		"pseudo_state_elem", "pseudo_state_else", "func_and_math_mapping", "arg_list", 
-		"derivative_ident", "derivative_quote_operant", "variable", "var_ident", 
-		"cycle_index", "cycle_index_idx", "cycle_index_posfix", "parExpression", 
-		"parExpressionLeftPar", "parExpressionRightPar", "expression", "conditionalExpression", 
-		"conditionalOrExpression", "conditionalAndExpression", "equalityExpression", 
-		"equalityExpressionOperator", "relationalExpression", "relationalOp", 
-		"additiveExpression", "additiveExpressionOperator", "multiplicativeExpression", 
-		"multiplicativeExpressionOperator", "unaryExpression", "unaryExpressionOperator", 
-		"unaryExpressionNotPlusMinus", "primary", "primary_id", "literal", "or_operator", 
-		"and_operator", "not_operator", "macros", "macro_item", "setter", "linear_vars", 
-		"linear_eq", "linear_eq_b", "linear_eq_A", "linear_eq_A_elem", "linear_eq_A_elem_expr", 
-		"start", "end", "step", "out"
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"lisma", "statement", "constant", "constant_body", "init_const", "spatial_var", 
+			"spatial_var_bound", "spatial_var_tail", "spatial_var_tail_APX", "spatial_var_tail_STEP", 
+			"partial_operand", "partial_operand_common", "partial_operand_mixed", 
+			"partial_operand_spatial_common", "partial_operand_spatial_N", "partial_operand_func_spatial", 
+			"partial_operand_D", "partial_operand_mixed_D", "partial_operand_func_spatial_common", 
+			"partial_operand_func_spatial_2", "partial_operand_func_spatial_3", "partial_operand_func_spatial_4", 
+			"partial_operand_unknown_code", "partial_operand_spatial_var_code", "edge", 
+			"edge_eq", "edge_side", "init_cond", "init_cond_body", "equation", "ode_equation", 
+			"pde_equation", "pde_equation_param", "partial_operand_with_param", "pde_param", 
+			"pde_param_atom", "for_cycle", "for_cycle_interval", "for_cycle_body", 
+			"state", "state_body", "state_from", "state_name", "pseudo_state", "pseudo_state_body", 
+			"pseudo_state_elem", "pseudo_state_else", "func_and_math_mapping", "arg_list", 
+			"derivative_ident", "derivative_quote_operant", "variable", "var_ident", 
+			"cycle_index", "cycle_index_idx", "cycle_index_posfix", "parExpression", 
+			"parExpressionLeftPar", "parExpressionRightPar", "expression", "conditionalExpression", 
+			"conditionalOrExpression", "conditionalAndExpression", "equalityExpression", 
+			"equalityExpressionOperator", "relationalExpression", "relationalOp", 
+			"additiveExpression", "additiveExpressionOperator", "multiplicativeExpression", 
+			"multiplicativeExpressionOperator", "unaryExpression", "unaryExpressionOperator", 
+			"unaryExpressionNotPlusMinus", "primary", "primary_id", "literal", "or_operator", 
+			"and_operator", "not_operator", "macros", "macro_item", "setter", "linear_vars", 
+			"linear_eq", "linear_eq_b", "linear_eq_A", "linear_eq_A_elem", "linear_eq_A_elem_expr", 
+			"start", "end", "step", "out"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
+
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "'const'", "'def'", "'var'", "'apx'", "'step'", "'D'", "'DD'", 
+			"'dx'", "'dy'", "'dz'", "'dx2'", "'dy2'", "'dz2'", "'dx3'", "'dy3'", 
+			"'dz3'", "'dx4'", "'dy4'", "'dz4'", "'edge'", "'on'", "'left'", "'right'", 
+			"'both'", "'t0'", "'ic'", "'for'", "'state'", "'from'", "'init'", "'if'", 
+			"'else'", "'der'", "'||'", "'or'", "'OR'", "'&&'", "'and'", "'AND'", 
+			"'!'", "'not'", "'NOT'", "'macro'", "'set'", "'ls'", "'start'", "'end'", 
+			"'out'", "'pde'", null, null, null, null, null, null, "'('", "')'", "'{'", 
+			"'}'", "'['", "']'", "';'", "','", "'.'", "'''", "'\u043F\u0457\u0405'", 
+			"'='", "'>'", "'<'", "'~'", "'?'", "':'", "'=='", "'<='", "'>='", "'!='", 
+			"'++'", "'--'", "'+'", "'-'", "'*'", "'/'", "'&'", "'|'", "'^'", "'%'", 
+			"'+='", "'-='", "'*='", "'/='", "'&='", "'|='", "'^='", "'%='", "'<<='", 
+			"'>>='", "'>>>='"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, "PDE", "DecimalLiteral", "FloatingPointLiteral", "Identifier", 
+			"WS", "COMMENT", "SL_COMMENT", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
+			"LBRACK", "RBRACK", "SEMI", "COMMA", "DOT", "QUOTE1", "QUOTE2", "ASSIGN", 
+			"GT", "LT", "TILDE", "QUESTION", "COLON", "EQUAL", "LE", "GE", "NOTEQUAL", 
+			"INC", "DEC", "ADD", "SUB", "MUL", "DIV", "BITAND", "BITOR", "CARET", 
+			"MOD", "ADD_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN", "AND_ASSIGN", 
+			"OR_ASSIGN", "XOR_ASSIGN", "MOD_ASSIGN", "LSHIFT_ASSIGN", "RSHIFT_ASSIGN", 
+			"URSHIFT_ASSIGN"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
+	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+
+	/**
+	 * @deprecated Use {@link #VOCABULARY} instead.
+	 */
+	@Deprecated
+	public static final String[] tokenNames;
+	static {
+		tokenNames = new String[_SYMBOLIC_NAMES.length];
+		for (int i = 0; i < tokenNames.length; i++) {
+			tokenNames[i] = VOCABULARY.getLiteralName(i);
+			if (tokenNames[i] == null) {
+				tokenNames[i] = VOCABULARY.getSymbolicName(i);
+			}
+
+			if (tokenNames[i] == null) {
+				tokenNames[i] = "<INVALID>";
+			}
+		}
+	}
+
+	@Override
+	@Deprecated
+	public String[] getTokenNames() {
+		return tokenNames;
+	}
+
+	@Override
+
+	public Vocabulary getVocabulary() {
+		return VOCABULARY;
+	}
 
 	@Override
 	public String getGrammarFileName() { return "Lisma.g4"; }
 
 	@Override
-	public String[] getTokenNames() { return tokenNames; }
+	public String[] getRuleNames() { return ruleNames; }
 
 	@Override
-	public String[] getRuleNames() { return ruleNames; }
+	public String getSerializedATN() { return _serializedATN; }
 
 	@Override
 	public ATN getATN() { return _ATN; }
@@ -116,12 +174,13 @@ public class LismaParser extends Parser {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
+
 	public static class LismaContext extends ParserRuleContext {
-		public StatementContext statement(int i) {
-			return getRuleContext(StatementContext.class,i);
-		}
 		public List<StatementContext> statement() {
 			return getRuleContexts(StatementContext.class);
+		}
+		public StatementContext statement(int i) {
+			return getRuleContext(StatementContext.class,i);
 		}
 		public LismaContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -152,10 +211,11 @@ public class LismaParser extends Parser {
 			setState(189);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 1) | (1L << 2) | (1L << 6) | (1L << 7) | (1L << 8) | (1L << 9) | (1L << 11) | (1L << 12) | (1L << 13) | (1L << 15) | (1L << 16) | (1L << 18) | (1L << 19) | (1L << 20) | (1L << 21) | (1L << 22) | (1L << 23) | (1L << 27) | (1L << 29) | (1L << 31) | (1L << 32) | (1L << 33) | (1L << 34) | (1L << 40) | (1L << 41) | (1L << 43) | (1L << 44) | (1L << 46) | (1L << 47) | (1L << PDE) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__2) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__30) | (1L << T__32) | (1L << T__42) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << PDE) | (1L << Identifier))) != 0)) {
 				{
 				{
-				setState(186); statement();
+				setState(186);
+				statement();
 				}
 				}
 				setState(191);
@@ -176,53 +236,53 @@ public class LismaParser extends Parser {
 	}
 
 	public static class StatementContext extends ParserRuleContext {
-		public Linear_varsContext linear_vars() {
-			return getRuleContext(Linear_varsContext.class,0);
-		}
-		public EdgeContext edge() {
-			return getRuleContext(EdgeContext.class,0);
-		}
-		public Pseudo_stateContext pseudo_state() {
-			return getRuleContext(Pseudo_stateContext.class,0);
-		}
-		public OutContext out() {
-			return getRuleContext(OutContext.class,0);
-		}
-		public StartContext start() {
-			return getRuleContext(StartContext.class,0);
-		}
-		public Init_condContext init_cond() {
-			return getRuleContext(Init_condContext.class,0);
+		public ConstantContext constant() {
+			return getRuleContext(ConstantContext.class,0);
 		}
 		public Init_constContext init_const() {
 			return getRuleContext(Init_constContext.class,0);
 		}
-		public Spatial_varContext spatial_var() {
-			return getRuleContext(Spatial_varContext.class,0);
-		}
-		public ConstantContext constant() {
-			return getRuleContext(ConstantContext.class,0);
+		public Init_condContext init_cond() {
+			return getRuleContext(Init_condContext.class,0);
 		}
 		public EquationContext equation() {
 			return getRuleContext(EquationContext.class,0);
 		}
-		public EndContext end() {
-			return getRuleContext(EndContext.class,0);
+		public StateContext state() {
+			return getRuleContext(StateContext.class,0);
 		}
-		public Linear_eqContext linear_eq() {
-			return getRuleContext(Linear_eqContext.class,0);
+		public Pseudo_stateContext pseudo_state() {
+			return getRuleContext(Pseudo_stateContext.class,0);
 		}
-		public For_cycleContext for_cycle() {
-			return getRuleContext(For_cycleContext.class,0);
+		public Spatial_varContext spatial_var() {
+			return getRuleContext(Spatial_varContext.class,0);
 		}
-		public StepContext step() {
-			return getRuleContext(StepContext.class,0);
+		public EdgeContext edge() {
+			return getRuleContext(EdgeContext.class,0);
 		}
 		public MacrosContext macros() {
 			return getRuleContext(MacrosContext.class,0);
 		}
-		public StateContext state() {
-			return getRuleContext(StateContext.class,0);
+		public StartContext start() {
+			return getRuleContext(StartContext.class,0);
+		}
+		public EndContext end() {
+			return getRuleContext(EndContext.class,0);
+		}
+		public StepContext step() {
+			return getRuleContext(StepContext.class,0);
+		}
+		public OutContext out() {
+			return getRuleContext(OutContext.class,0);
+		}
+		public Linear_eqContext linear_eq() {
+			return getRuleContext(Linear_eqContext.class,0);
+		}
+		public Linear_varsContext linear_vars() {
+			return getRuleContext(Linear_varsContext.class,0);
+		}
+		public For_cycleContext for_cycle() {
+			return getRuleContext(For_cycleContext.class,0);
 		}
 		public StatementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -248,116 +308,118 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 2, RULE_statement);
 		try {
 			setState(208);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(192); constant();
+				setState(192);
+				constant();
 				}
 				break;
-
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(193); init_const();
+				setState(193);
+				init_const();
 				}
 				break;
-
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(194); init_cond();
+				setState(194);
+				init_cond();
 				}
 				break;
-
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(195); equation();
+				setState(195);
+				equation();
 				}
 				break;
-
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(196); state();
+				setState(196);
+				state();
 				}
 				break;
-
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(197); pseudo_state();
+				setState(197);
+				pseudo_state();
 				}
 				break;
-
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(198); spatial_var();
+				setState(198);
+				spatial_var();
 				}
 				break;
-
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(199); edge();
+				setState(199);
+				edge();
 				}
 				break;
-
 			case 9:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(200); macros();
+				setState(200);
+				macros();
 				}
 				break;
-
 			case 10:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(201); start();
+				setState(201);
+				start();
 				}
 				break;
-
 			case 11:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(202); end();
+				setState(202);
+				end();
 				}
 				break;
-
 			case 12:
 				enterOuterAlt(_localctx, 12);
 				{
-				setState(203); step();
+				setState(203);
+				step();
 				}
 				break;
-
 			case 13:
 				enterOuterAlt(_localctx, 13);
 				{
-				setState(204); out();
+				setState(204);
+				out();
 				}
 				break;
-
 			case 14:
 				enterOuterAlt(_localctx, 14);
 				{
-				setState(205); linear_eq();
+				setState(205);
+				linear_eq();
 				}
 				break;
-
 			case 15:
 				enterOuterAlt(_localctx, 15);
 				{
-				setState(206); linear_vars();
+				setState(206);
+				linear_vars();
 				}
 				break;
-
 			case 16:
 				enterOuterAlt(_localctx, 16);
 				{
-				setState(207); for_cycle();
+				setState(207);
+				for_cycle();
 				}
 				break;
 			}
@@ -374,11 +436,11 @@ public class LismaParser extends Parser {
 	}
 
 	public static class ConstantContext extends ParserRuleContext {
-		public Constant_bodyContext constant_body(int i) {
-			return getRuleContext(Constant_bodyContext.class,i);
-		}
 		public List<Constant_bodyContext> constant_body() {
 			return getRuleContexts(Constant_bodyContext.class);
+		}
+		public Constant_bodyContext constant_body(int i) {
+			return getRuleContext(Constant_bodyContext.class,i);
 		}
 		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
@@ -411,23 +473,28 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(210); match(16);
-			setState(211); constant_body();
+			setState(210);
+			match(T__0);
+			setState(211);
+			constant_body();
 			setState(216);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(212); match(COMMA);
-				setState(213); constant_body();
+				setState(212);
+				match(COMMA);
+				setState(213);
+				constant_body();
 				}
 				}
 				setState(218);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(219); match(SEMI);
+			setState(219);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -442,18 +509,18 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Constant_bodyContext extends ParserRuleContext {
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
 		public List<Var_identContext> var_ident() {
 			return getRuleContexts(Var_identContext.class);
+		}
+		public Var_identContext var_ident(int i) {
+			return getRuleContext(Var_identContext.class,i);
 		}
 		public List<TerminalNode> ASSIGN() { return getTokens(LismaParser.ASSIGN); }
 		public TerminalNode ASSIGN(int i) {
 			return getToken(LismaParser.ASSIGN, i);
-		}
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public Var_identContext var_ident(int i) {
-			return getRuleContext(Var_identContext.class,i);
 		}
 		public Constant_bodyContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -480,20 +547,23 @@ public class LismaParser extends Parser {
 		try {
 			int _alt;
 			setState(231);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,4,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(224); 
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
+				_alt = 1;
 				do {
 					switch (_alt) {
 					case 1:
 						{
 						{
-						setState(221); var_ident();
-						setState(222); match(ASSIGN);
+						setState(221);
+						var_ident();
+						setState(222);
+						match(ASSIGN);
 						}
 						}
 						break;
@@ -503,15 +573,16 @@ public class LismaParser extends Parser {
 					setState(226); 
 					_errHandler.sync(this);
 					_alt = getInterpreter().adaptivePredict(_input,3,_ctx);
-				} while ( _alt!=2 && _alt!=-1 );
-				setState(228); expression();
+				} while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER );
+				setState(228);
+				expression();
 				}
 				break;
-
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(230); var_ident();
+				setState(230);
+				var_ident();
 				}
 				break;
 			}
@@ -528,10 +599,10 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Init_constContext extends ParserRuleContext {
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public LiteralContext literal() {
 			return getRuleContext(LiteralContext.class,0);
 		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public Init_constContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -557,10 +628,14 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(233); match(21);
-			setState(234); match(16);
-			setState(235); literal();
-			setState(236); match(SEMI);
+			setState(233);
+			match(T__1);
+			setState(234);
+			match(T__0);
+			setState(235);
+			literal();
+			setState(236);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -578,18 +653,18 @@ public class LismaParser extends Parser {
 		public Var_identContext var_ident() {
 			return getRuleContext(Var_identContext.class,0);
 		}
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
-		public Spatial_var_tailContext spatial_var_tail() {
-			return getRuleContext(Spatial_var_tailContext.class,0);
-		}
-		public TerminalNode COMMA() { return getToken(LismaParser.COMMA, 0); }
-		public Spatial_var_boundContext spatial_var_bound(int i) {
-			return getRuleContext(Spatial_var_boundContext.class,i);
-		}
-		public TerminalNode RBRACK() { return getToken(LismaParser.RBRACK, 0); }
 		public TerminalNode LBRACK() { return getToken(LismaParser.LBRACK, 0); }
 		public List<Spatial_var_boundContext> spatial_var_bound() {
 			return getRuleContexts(Spatial_var_boundContext.class);
+		}
+		public Spatial_var_boundContext spatial_var_bound(int i) {
+			return getRuleContext(Spatial_var_boundContext.class,i);
+		}
+		public TerminalNode COMMA() { return getToken(LismaParser.COMMA, 0); }
+		public TerminalNode RBRACK() { return getToken(LismaParser.RBRACK, 0); }
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
+		public Spatial_var_tailContext spatial_var_tail() {
+			return getRuleContext(Spatial_var_tailContext.class,0);
 		}
 		public Spatial_varContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -617,22 +692,32 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(238); match(12);
-			setState(239); var_ident();
-			setState(240); match(LBRACK);
-			setState(241); spatial_var_bound();
-			setState(242); match(COMMA);
-			setState(243); spatial_var_bound();
-			setState(244); match(RBRACK);
+			setState(238);
+			match(T__2);
+			setState(239);
+			var_ident();
+			setState(240);
+			match(LBRACK);
+			setState(241);
+			spatial_var_bound();
+			setState(242);
+			match(COMMA);
+			setState(243);
+			spatial_var_bound();
+			setState(244);
+			match(RBRACK);
 			setState(246);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==36 || _la==47) {
+			if (_la==T__3 || _la==T__4) {
 				{
-				setState(245); spatial_var_tail();
+				setState(245);
+				spatial_var_tail();
 				}
 			}
 
-			setState(248); match(SEMI);
+			setState(248);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -647,11 +732,11 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Spatial_var_boundContext extends ParserRuleContext {
-		public TerminalNode Identifier() { return getToken(LismaParser.Identifier, 0); }
-		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
 		public LiteralContext literal() {
 			return getRuleContext(LiteralContext.class,0);
 		}
+		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
+		public TerminalNode Identifier() { return getToken(LismaParser.Identifier, 0); }
 		public Spatial_var_boundContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -677,6 +762,7 @@ public class LismaParser extends Parser {
 		int _la;
 		try {
 			setState(255);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case DecimalLiteral:
 			case FloatingPointLiteral:
@@ -684,20 +770,24 @@ public class LismaParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(251);
+				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==SUB) {
 					{
-					setState(250); match(SUB);
+					setState(250);
+					match(SUB);
 					}
 				}
 
-				setState(253); literal();
+				setState(253);
+				literal();
 				}
 				break;
 			case Identifier:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(254); match(Identifier);
+				setState(254);
+				match(Identifier);
 				}
 				break;
 			default:
@@ -716,15 +806,15 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Spatial_var_tailContext extends ParserRuleContext {
-		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
-		public LiteralContext literal() {
-			return getRuleContext(LiteralContext.class,0);
-		}
 		public Spatial_var_tail_APXContext spatial_var_tail_APX() {
 			return getRuleContext(Spatial_var_tail_APXContext.class,0);
 		}
+		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
 		public Spatial_var_tail_STEPContext spatial_var_tail_STEP() {
 			return getRuleContext(Spatial_var_tail_STEPContext.class,0);
+		}
+		public LiteralContext literal() {
+			return getRuleContext(LiteralContext.class,0);
 		}
 		public Spatial_var_tailContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -750,20 +840,25 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 14, RULE_spatial_var_tail);
 		try {
 			setState(263);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case 36:
+			case T__3:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(257); spatial_var_tail_APX();
-				setState(258); match(DecimalLiteral);
+				setState(257);
+				spatial_var_tail_APX();
+				setState(258);
+				match(DecimalLiteral);
 				}
 				break;
-			case 47:
+			case T__4:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(260); spatial_var_tail_STEP();
+				setState(260);
+				spatial_var_tail_STEP();
 				{
-				setState(261); literal();
+				setState(261);
+				literal();
 				}
 				}
 				break;
@@ -808,7 +903,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(265); match(36);
+			setState(265);
+			match(T__3);
 			}
 		}
 		catch (RecognitionException re) {
@@ -848,7 +944,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(267); match(47);
+			setState(267);
+			match(T__4);
 			}
 		}
 		catch (RecognitionException re) {
@@ -863,17 +960,17 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Partial_operandContext extends ParserRuleContext {
-		public Partial_operand_mixedContext partial_operand_mixed() {
-			return getRuleContext(Partial_operand_mixedContext.class,0);
-		}
 		public Partial_operand_commonContext partial_operand_common() {
 			return getRuleContext(Partial_operand_commonContext.class,0);
 		}
-		public Partial_operand_spatial_NContext partial_operand_spatial_N() {
-			return getRuleContext(Partial_operand_spatial_NContext.class,0);
+		public Partial_operand_mixedContext partial_operand_mixed() {
+			return getRuleContext(Partial_operand_mixedContext.class,0);
 		}
 		public Partial_operand_spatial_commonContext partial_operand_spatial_common() {
 			return getRuleContext(Partial_operand_spatial_commonContext.class,0);
+		}
+		public Partial_operand_spatial_NContext partial_operand_spatial_N() {
+			return getRuleContext(Partial_operand_spatial_NContext.class,0);
 		}
 		public Partial_operandContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -899,39 +996,44 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 20, RULE_partial_operand);
 		try {
 			setState(273);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case 19:
+			case T__5:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(269); partial_operand_common();
+				setState(269);
+				partial_operand_common();
 				}
 				break;
-			case 27:
+			case T__6:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(270); partial_operand_mixed();
+				setState(270);
+				partial_operand_mixed();
 				}
 				break;
-			case 15:
-			case 23:
-			case 33:
+			case T__7:
+			case T__8:
+			case T__9:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(271); partial_operand_spatial_common();
+				setState(271);
+				partial_operand_spatial_common();
 				}
 				break;
-			case 2:
-			case 8:
-			case 9:
-			case 11:
-			case 20:
-			case 22:
-			case 31:
-			case 32:
-			case 46:
+			case T__10:
+			case T__11:
+			case T__12:
+			case T__13:
+			case T__14:
+			case T__15:
+			case T__16:
+			case T__17:
+			case T__18:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(272); partial_operand_spatial_N();
+				setState(272);
+				partial_operand_spatial_N();
 				}
 				break;
 			default:
@@ -950,22 +1052,22 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Partial_operand_commonContext extends ParserRuleContext {
-		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
-		public Partial_operand_unknown_codeContext partial_operand_unknown_code() {
-			return getRuleContext(Partial_operand_unknown_codeContext.class,0);
-		}
-		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
 		public Partial_operand_DContext partial_operand_D() {
 			return getRuleContext(Partial_operand_DContext.class,0);
 		}
+		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
+		public Partial_operand_unknown_codeContext partial_operand_unknown_code() {
+			return getRuleContext(Partial_operand_unknown_codeContext.class,0);
+		}
 		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
+		public TerminalNode COMMA(int i) {
+			return getToken(LismaParser.COMMA, i);
+		}
 		public Partial_operand_spatial_var_codeContext partial_operand_spatial_var_code() {
 			return getRuleContext(Partial_operand_spatial_var_codeContext.class,0);
 		}
 		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
-		public TerminalNode COMMA(int i) {
-			return getToken(LismaParser.COMMA, i);
-		}
+		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
 		public Partial_operand_commonContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -992,21 +1094,30 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(275); partial_operand_D();
-			setState(276); match(LPAREN);
-			setState(277); partial_operand_unknown_code();
-			setState(278); match(COMMA);
-			setState(279); partial_operand_spatial_var_code();
+			setState(275);
+			partial_operand_D();
+			setState(276);
+			match(LPAREN);
+			setState(277);
+			partial_operand_unknown_code();
+			setState(278);
+			match(COMMA);
+			setState(279);
+			partial_operand_spatial_var_code();
 			setState(282);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==COMMA) {
 				{
-				setState(280); match(COMMA);
-				setState(281); match(DecimalLiteral);
+				setState(280);
+				match(COMMA);
+				setState(281);
+				match(DecimalLiteral);
 				}
 			}
 
-			setState(284); match(RPAREN);
+			setState(284);
+			match(RPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1021,25 +1132,25 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Partial_operand_mixedContext extends ParserRuleContext {
-		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
+		public Partial_operand_mixed_DContext partial_operand_mixed_D() {
+			return getRuleContext(Partial_operand_mixed_DContext.class,0);
+		}
+		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
 		public Partial_operand_unknown_codeContext partial_operand_unknown_code() {
 			return getRuleContext(Partial_operand_unknown_codeContext.class,0);
 		}
-		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
 		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
-		public Partial_operand_spatial_var_codeContext partial_operand_spatial_var_code(int i) {
-			return getRuleContext(Partial_operand_spatial_var_codeContext.class,i);
+		public TerminalNode COMMA(int i) {
+			return getToken(LismaParser.COMMA, i);
 		}
 		public List<Partial_operand_spatial_var_codeContext> partial_operand_spatial_var_code() {
 			return getRuleContexts(Partial_operand_spatial_var_codeContext.class);
 		}
+		public Partial_operand_spatial_var_codeContext partial_operand_spatial_var_code(int i) {
+			return getRuleContext(Partial_operand_spatial_var_codeContext.class,i);
+		}
 		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
-		public Partial_operand_mixed_DContext partial_operand_mixed_D() {
-			return getRuleContext(Partial_operand_mixed_DContext.class,0);
-		}
-		public TerminalNode COMMA(int i) {
-			return getToken(LismaParser.COMMA, i);
-		}
+		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
 		public Partial_operand_mixedContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1066,23 +1177,34 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(286); partial_operand_mixed_D();
-			setState(287); match(LPAREN);
-			setState(288); partial_operand_unknown_code();
-			setState(289); match(COMMA);
-			setState(290); partial_operand_spatial_var_code();
-			setState(291); match(COMMA);
-			setState(292); partial_operand_spatial_var_code();
+			setState(286);
+			partial_operand_mixed_D();
+			setState(287);
+			match(LPAREN);
+			setState(288);
+			partial_operand_unknown_code();
+			setState(289);
+			match(COMMA);
+			setState(290);
+			partial_operand_spatial_var_code();
+			setState(291);
+			match(COMMA);
+			setState(292);
+			partial_operand_spatial_var_code();
 			setState(295);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==COMMA) {
 				{
-				setState(293); match(COMMA);
-				setState(294); match(DecimalLiteral);
+				setState(293);
+				match(COMMA);
+				setState(294);
+				match(DecimalLiteral);
 				}
 			}
 
-			setState(297); match(RPAREN);
+			setState(297);
+			match(RPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1097,16 +1219,16 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Partial_operand_spatial_commonContext extends ParserRuleContext {
-		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
-		public Partial_operand_unknown_codeContext partial_operand_unknown_code() {
-			return getRuleContext(Partial_operand_unknown_codeContext.class,0);
-		}
-		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
-		public TerminalNode COMMA() { return getToken(LismaParser.COMMA, 0); }
-		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
 		public Partial_operand_func_spatial_commonContext partial_operand_func_spatial_common() {
 			return getRuleContext(Partial_operand_func_spatial_commonContext.class,0);
 		}
+		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
+		public Partial_operand_unknown_codeContext partial_operand_unknown_code() {
+			return getRuleContext(Partial_operand_unknown_codeContext.class,0);
+		}
+		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
+		public TerminalNode COMMA() { return getToken(LismaParser.COMMA, 0); }
+		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
 		public Partial_operand_spatial_commonContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1133,19 +1255,26 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(299); partial_operand_func_spatial_common();
-			setState(300); match(LPAREN);
-			setState(301); partial_operand_unknown_code();
+			setState(299);
+			partial_operand_func_spatial_common();
+			setState(300);
+			match(LPAREN);
+			setState(301);
+			partial_operand_unknown_code();
 			setState(304);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==COMMA) {
 				{
-				setState(302); match(COMMA);
-				setState(303); match(DecimalLiteral);
+				setState(302);
+				match(COMMA);
+				setState(303);
+				match(DecimalLiteral);
 				}
 			}
 
-			setState(306); match(RPAREN);
+			setState(306);
+			match(RPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1163,10 +1292,10 @@ public class LismaParser extends Parser {
 		public Partial_operand_func_spatialContext partial_operand_func_spatial() {
 			return getRuleContext(Partial_operand_func_spatialContext.class,0);
 		}
+		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
 		public Partial_operand_unknown_codeContext partial_operand_unknown_code() {
 			return getRuleContext(Partial_operand_unknown_codeContext.class,0);
 		}
-		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
 		public Partial_operand_spatial_NContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1193,10 +1322,14 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(308); partial_operand_func_spatial();
-			setState(309); match(LPAREN);
-			setState(310); partial_operand_unknown_code();
-			setState(311); match(RPAREN);
+			setState(308);
+			partial_operand_func_spatial();
+			setState(309);
+			match(LPAREN);
+			setState(310);
+			partial_operand_unknown_code();
+			setState(311);
+			match(RPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1211,14 +1344,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Partial_operand_func_spatialContext extends ParserRuleContext {
-		public Partial_operand_func_spatial_4Context partial_operand_func_spatial_4() {
-			return getRuleContext(Partial_operand_func_spatial_4Context.class,0);
-		}
 		public Partial_operand_func_spatial_2Context partial_operand_func_spatial_2() {
 			return getRuleContext(Partial_operand_func_spatial_2Context.class,0);
 		}
 		public Partial_operand_func_spatial_3Context partial_operand_func_spatial_3() {
 			return getRuleContext(Partial_operand_func_spatial_3Context.class,0);
+		}
+		public Partial_operand_func_spatial_4Context partial_operand_func_spatial_4() {
+			return getRuleContext(Partial_operand_func_spatial_4Context.class,0);
 		}
 		public Partial_operand_func_spatialContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1244,29 +1377,33 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 30, RULE_partial_operand_func_spatial);
 		try {
 			setState(316);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case 8:
-			case 31:
-			case 32:
+			case T__10:
+			case T__11:
+			case T__12:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(313); partial_operand_func_spatial_2();
+				setState(313);
+				partial_operand_func_spatial_2();
 				}
 				break;
-			case 11:
-			case 20:
-			case 46:
+			case T__13:
+			case T__14:
+			case T__15:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(314); partial_operand_func_spatial_3();
+				setState(314);
+				partial_operand_func_spatial_3();
 				}
 				break;
-			case 2:
-			case 9:
-			case 22:
+			case T__16:
+			case T__17:
+			case T__18:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(315); partial_operand_func_spatial_4();
+				setState(315);
+				partial_operand_func_spatial_4();
 				}
 				break;
 			default:
@@ -1310,7 +1447,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(318); match(19);
+			setState(318);
+			match(T__5);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1350,7 +1488,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(320); match(27);
+			setState(320);
+			match(T__6);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1393,10 +1532,14 @@ public class LismaParser extends Parser {
 			{
 			setState(322);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 15) | (1L << 23) | (1L << 33))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__7) | (1L << T__8) | (1L << T__9))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -1439,10 +1582,14 @@ public class LismaParser extends Parser {
 			{
 			setState(324);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 8) | (1L << 31) | (1L << 32))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__11) | (1L << T__12))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -1485,10 +1632,14 @@ public class LismaParser extends Parser {
 			{
 			setState(326);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 11) | (1L << 20) | (1L << 46))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__13) | (1L << T__14) | (1L << T__15))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -1531,10 +1682,14 @@ public class LismaParser extends Parser {
 			{
 			setState(328);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 2) | (1L << 9) | (1L << 22))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__16) | (1L << T__17) | (1L << T__18))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -1575,7 +1730,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(330); match(Identifier);
+			setState(330);
+			match(Identifier);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1616,7 +1772,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(332); match(Identifier);
+			setState(332);
+			match(Identifier);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1631,14 +1788,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class EdgeContext extends ParserRuleContext {
-		public TerminalNode Identifier() { return getToken(LismaParser.Identifier, 0); }
 		public Edge_eqContext edge_eq() {
 			return getRuleContext(Edge_eqContext.class,0);
 		}
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
+		public TerminalNode Identifier() { return getToken(LismaParser.Identifier, 0); }
 		public Edge_sideContext edge_side() {
 			return getRuleContext(Edge_sideContext.class,0);
 		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public EdgeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -1664,12 +1821,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(334); match(43);
-			setState(335); edge_eq();
-			setState(336); match(26);
-			setState(337); match(Identifier);
-			setState(338); edge_side();
-			setState(339); match(SEMI);
+			setState(334);
+			match(T__19);
+			setState(335);
+			edge_eq();
+			setState(336);
+			match(T__20);
+			setState(337);
+			match(Identifier);
+			setState(338);
+			edge_side();
+			setState(339);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1685,12 +1848,12 @@ public class LismaParser extends Parser {
 
 	public static class Edge_eqContext extends ParserRuleContext {
 		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
 		public TerminalNode Identifier() { return getToken(LismaParser.Identifier, 0); }
 		public Partial_operandContext partial_operand() {
 			return getRuleContext(Partial_operandContext.class,0);
-		}
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
 		}
 		public Edge_eqContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1718,35 +1881,40 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(343);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case Identifier:
 				{
-				setState(341); match(Identifier);
+				setState(341);
+				match(Identifier);
 				}
 				break;
-			case 2:
-			case 8:
-			case 9:
-			case 11:
-			case 15:
-			case 19:
-			case 20:
-			case 22:
-			case 23:
-			case 27:
-			case 31:
-			case 32:
-			case 33:
-			case 46:
+			case T__5:
+			case T__6:
+			case T__7:
+			case T__8:
+			case T__9:
+			case T__10:
+			case T__11:
+			case T__12:
+			case T__13:
+			case T__14:
+			case T__15:
+			case T__16:
+			case T__17:
+			case T__18:
 				{
-				setState(342); partial_operand();
+				setState(342);
+				partial_operand();
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
 			}
-			setState(345); match(ASSIGN);
-			setState(346); expression();
+			setState(345);
+			match(ASSIGN);
+			setState(346);
+			expression();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1789,10 +1957,14 @@ public class LismaParser extends Parser {
 			{
 			setState(348);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 10) | (1L << 14) | (1L << 35))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__21) | (1L << T__22) | (1L << T__23))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -1807,22 +1979,23 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Init_condContext extends ParserRuleContext {
-		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
-		public List<Init_cond_bodyContext> init_cond_body() {
-			return getRuleContexts(Init_cond_bodyContext.class);
-		}
-		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
-		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
-		public Init_cond_bodyContext init_cond_body(int i) {
-			return getRuleContext(Init_cond_bodyContext.class,i);
-		}
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
 		public VariableContext variable() {
 			return getRuleContext(VariableContext.class,0);
 		}
+		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
+		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
+		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
+		public List<Init_cond_bodyContext> init_cond_body() {
+			return getRuleContexts(Init_cond_bodyContext.class);
+		}
+		public Init_cond_bodyContext init_cond_body(int i) {
+			return getRuleContext(Init_cond_bodyContext.class,i);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
 		public TerminalNode COMMA(int i) {
 			return getToken(LismaParser.COMMA, i);
 		}
@@ -1851,40 +2024,53 @@ public class LismaParser extends Parser {
 		int _la;
 		try {
 			setState(369);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case 41:
+			case T__32:
 			case Identifier:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(350); variable();
-				setState(351); match(LPAREN);
-				setState(352); match(4);
-				setState(353); match(RPAREN);
-				setState(354); match(ASSIGN);
-				setState(355); expression();
-				setState(356); match(SEMI);
+				setState(350);
+				variable();
+				setState(351);
+				match(LPAREN);
+				setState(352);
+				match(T__24);
+				setState(353);
+				match(RPAREN);
+				setState(354);
+				match(ASSIGN);
+				setState(355);
+				expression();
+				setState(356);
+				match(SEMI);
 				}
 				break;
-			case 18:
+			case T__25:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(358); match(18);
-				setState(359); init_cond_body();
+				setState(358);
+				match(T__25);
+				setState(359);
+				init_cond_body();
 				setState(364);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==COMMA) {
 					{
 					{
-					setState(360); match(COMMA);
-					setState(361); init_cond_body();
+					setState(360);
+					match(COMMA);
+					setState(361);
+					init_cond_body();
 					}
 					}
 					setState(366);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(367); match(SEMI);
+				setState(367);
+				match(SEMI);
 				}
 				break;
 			default:
@@ -1903,12 +2089,12 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Init_cond_bodyContext extends ParserRuleContext {
+		public VariableContext variable() {
+			return getRuleContext(VariableContext.class,0);
+		}
 		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
-		}
-		public VariableContext variable() {
-			return getRuleContext(VariableContext.class,0);
 		}
 		public Init_cond_bodyContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1935,9 +2121,12 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(371); variable();
-			setState(372); match(ASSIGN);
-			setState(373); expression();
+			setState(371);
+			variable();
+			setState(372);
+			match(ASSIGN);
+			setState(373);
+			expression();
 			}
 		}
 		catch (RecognitionException re) {
@@ -1985,25 +2174,27 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 58, RULE_equation);
 		try {
 			setState(378);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,17,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(375); ode_equation();
+				setState(375);
+				ode_equation();
 				}
 				break;
-
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(376); pde_equation();
+				setState(376);
+				pde_equation();
 				}
 				break;
-
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(377); pde_equation_param();
+				setState(377);
+				pde_equation_param();
 				}
 				break;
 			}
@@ -2020,14 +2211,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Ode_equationContext extends ParserRuleContext {
-		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
 		public VariableContext variable() {
 			return getRuleContext(VariableContext.class,0);
 		}
+		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public Ode_equationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2053,10 +2244,14 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(380); variable();
-			setState(381); match(ASSIGN);
-			setState(382); expression();
-			setState(383); match(SEMI);
+			setState(380);
+			variable();
+			setState(381);
+			match(ASSIGN);
+			setState(382);
+			expression();
+			setState(383);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2071,22 +2266,22 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Pde_equationContext extends ParserRuleContext {
-		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public List<Partial_operandContext> partial_operand() {
 			return getRuleContexts(Partial_operandContext.class);
 		}
-		public List<TerminalNode> ADD() { return getTokens(LismaParser.ADD); }
 		public Partial_operandContext partial_operand(int i) {
 			return getRuleContext(Partial_operandContext.class,i);
 		}
-		public TerminalNode ADD(int i) {
-			return getToken(LismaParser.ADD, i);
-		}
+		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public TerminalNode PDE() { return getToken(LismaParser.PDE, 0); }
+		public List<TerminalNode> ADD() { return getTokens(LismaParser.ADD); }
+		public TerminalNode ADD(int i) {
+			return getToken(LismaParser.ADD, i);
+		}
 		public Pde_equationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2114,31 +2309,39 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(386);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==PDE) {
 				{
-				setState(385); match(PDE);
+				setState(385);
+				match(PDE);
 				}
 			}
 
-			setState(388); partial_operand();
+			setState(388);
+			partial_operand();
 			setState(393);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==ADD) {
 				{
 				{
-				setState(389); match(ADD);
-				setState(390); partial_operand();
+				setState(389);
+				match(ADD);
+				setState(390);
+				partial_operand();
 				}
 				}
 				setState(395);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(396); match(ASSIGN);
-			setState(397); expression();
-			setState(398); match(SEMI);
+			setState(396);
+			match(ASSIGN);
+			setState(397);
+			expression();
+			setState(398);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2153,22 +2356,22 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Pde_equation_paramContext extends ParserRuleContext {
+		public TerminalNode PDE() { return getToken(LismaParser.PDE, 0); }
+		public List<Partial_operand_with_paramContext> partial_operand_with_param() {
+			return getRuleContexts(Partial_operand_with_paramContext.class);
+		}
 		public Partial_operand_with_paramContext partial_operand_with_param(int i) {
 			return getRuleContext(Partial_operand_with_paramContext.class,i);
 		}
 		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
 		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public List<TerminalNode> ADD() { return getTokens(LismaParser.ADD); }
 		public TerminalNode ADD(int i) {
 			return getToken(LismaParser.ADD, i);
 		}
-		public List<Partial_operand_with_paramContext> partial_operand_with_param() {
-			return getRuleContexts(Partial_operand_with_paramContext.class);
-		}
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public TerminalNode PDE() { return getToken(LismaParser.PDE, 0); }
 		public Pde_equation_paramContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2195,25 +2398,32 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(400); match(PDE);
-			setState(401); partial_operand_with_param();
+			setState(400);
+			match(PDE);
+			setState(401);
+			partial_operand_with_param();
 			setState(406);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==ADD) {
 				{
 				{
-				setState(402); match(ADD);
-				setState(403); partial_operand_with_param();
+				setState(402);
+				match(ADD);
+				setState(403);
+				partial_operand_with_param();
 				}
 				}
 				setState(408);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(409); match(ASSIGN);
-			setState(410); expression();
-			setState(411); match(SEMI);
+			setState(409);
+			match(ASSIGN);
+			setState(410);
+			expression();
+			setState(411);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2261,14 +2471,17 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(414);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << DecimalLiteral) | (1L << FloatingPointLiteral) | (1L << Identifier) | (1L << LBRACK))) != 0)) {
 				{
-				setState(413); pde_param();
+				setState(413);
+				pde_param();
 				}
 			}
 
-			setState(416); partial_operand();
+			setState(416);
+			partial_operand();
 			}
 		}
 		catch (RecognitionException re) {
@@ -2312,8 +2525,10 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(418); pde_param_atom();
-			setState(419); match(MUL);
+			setState(418);
+			pde_param_atom();
+			setState(419);
+			match(MUL);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2328,15 +2543,15 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Pde_param_atomContext extends ParserRuleContext {
+		public TerminalNode LBRACK() { return getToken(LismaParser.LBRACK, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode RBRACK() { return getToken(LismaParser.RBRACK, 0); }
 		public TerminalNode Identifier() { return getToken(LismaParser.Identifier, 0); }
 		public LiteralContext literal() {
 			return getRuleContext(LiteralContext.class,0);
 		}
-		public TerminalNode RBRACK() { return getToken(LismaParser.RBRACK, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public TerminalNode LBRACK() { return getToken(LismaParser.LBRACK, 0); }
 		public Pde_param_atomContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2361,26 +2576,32 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 70, RULE_pde_param_atom);
 		try {
 			setState(427);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case LBRACK:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(421); match(LBRACK);
-				setState(422); expression();
-				setState(423); match(RBRACK);
+				setState(421);
+				match(LBRACK);
+				setState(422);
+				expression();
+				setState(423);
+				match(RBRACK);
 				}
 				break;
 			case Identifier:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(425); match(Identifier);
+				setState(425);
+				match(Identifier);
 				}
 				break;
 			case DecimalLiteral:
 			case FloatingPointLiteral:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(426); literal();
+				setState(426);
+				literal();
 				}
 				break;
 			default:
@@ -2404,13 +2625,13 @@ public class LismaParser extends Parser {
 		public List<For_cycle_intervalContext> for_cycle_interval() {
 			return getRuleContexts(For_cycle_intervalContext.class);
 		}
-		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
-		public For_cycle_bodyContext for_cycle_body() {
-			return getRuleContext(For_cycle_bodyContext.class,0);
-		}
 		public For_cycle_intervalContext for_cycle_interval(int i) {
 			return getRuleContext(For_cycle_intervalContext.class,i);
 		}
+		public For_cycle_bodyContext for_cycle_body() {
+			return getRuleContext(For_cycle_bodyContext.class,0);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
 		public TerminalNode COMMA(int i) {
 			return getToken(LismaParser.COMMA, i);
 		}
@@ -2440,25 +2661,32 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(429); match(6);
-			setState(430); match(Identifier);
-			setState(431); match(ASSIGN);
-			setState(432); for_cycle_interval();
+			setState(429);
+			match(T__26);
+			setState(430);
+			match(Identifier);
+			setState(431);
+			match(ASSIGN);
+			setState(432);
+			for_cycle_interval();
 			setState(437);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(433); match(COMMA);
-				setState(434); for_cycle_interval();
+				setState(433);
+				match(COMMA);
+				setState(434);
+				for_cycle_interval();
 				}
 				}
 				setState(439);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(440); for_cycle_body();
+			setState(440);
+			for_cycle_body();
 			}
 		}
 		catch (RecognitionException re) {
@@ -2473,13 +2701,13 @@ public class LismaParser extends Parser {
 	}
 
 	public static class For_cycle_intervalContext extends ParserRuleContext {
+		public List<LiteralContext> literal() {
+			return getRuleContexts(LiteralContext.class);
+		}
 		public LiteralContext literal(int i) {
 			return getRuleContext(LiteralContext.class,i);
 		}
 		public TerminalNode COLON() { return getToken(LismaParser.COLON, 0); }
-		public List<LiteralContext> literal() {
-			return getRuleContexts(LiteralContext.class);
-		}
 		public For_cycle_intervalContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -2506,13 +2734,17 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(442); literal();
+			setState(442);
+			literal();
 			setState(445);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==COLON) {
 				{
-				setState(443); match(COLON);
-				setState(444); literal();
+				setState(443);
+				match(COLON);
+				setState(444);
+				literal();
 				}
 			}
 
@@ -2530,37 +2762,37 @@ public class LismaParser extends Parser {
 	}
 
 	public static class For_cycle_bodyContext extends ParserRuleContext {
-		public Pseudo_stateContext pseudo_state(int i) {
-			return getRuleContext(Pseudo_stateContext.class,i);
-		}
+		public TerminalNode LBRACE() { return getToken(LismaParser.LBRACE, 0); }
 		public TerminalNode RBRACE() { return getToken(LismaParser.RBRACE, 0); }
-		public MacrosContext macros(int i) {
-			return getRuleContext(MacrosContext.class,i);
-		}
 		public List<EquationContext> equation() {
 			return getRuleContexts(EquationContext.class);
 		}
 		public EquationContext equation(int i) {
 			return getRuleContext(EquationContext.class,i);
 		}
-		public List<ConstantContext> constant() {
-			return getRuleContexts(ConstantContext.class);
-		}
-		public TerminalNode LBRACE() { return getToken(LismaParser.LBRACE, 0); }
-		public List<Pseudo_stateContext> pseudo_state() {
-			return getRuleContexts(Pseudo_stateContext.class);
+		public List<Init_condContext> init_cond() {
+			return getRuleContexts(Init_condContext.class);
 		}
 		public Init_condContext init_cond(int i) {
 			return getRuleContext(Init_condContext.class,i);
 		}
+		public List<ConstantContext> constant() {
+			return getRuleContexts(ConstantContext.class);
+		}
 		public ConstantContext constant(int i) {
 			return getRuleContext(ConstantContext.class,i);
+		}
+		public List<Pseudo_stateContext> pseudo_state() {
+			return getRuleContexts(Pseudo_stateContext.class);
+		}
+		public Pseudo_stateContext pseudo_state(int i) {
+			return getRuleContext(Pseudo_stateContext.class,i);
 		}
 		public List<MacrosContext> macros() {
 			return getRuleContexts(MacrosContext.class);
 		}
-		public List<Init_condContext> init_cond() {
-			return getRuleContexts(Init_condContext.class);
+		public MacrosContext macros(int i) {
+			return getRuleContext(MacrosContext.class,i);
 		}
 		public For_cycle_bodyContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -2588,41 +2820,44 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(447); match(LBRACE);
+			setState(447);
+			match(LBRACE);
 			setState(455);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 2) | (1L << 8) | (1L << 9) | (1L << 11) | (1L << 13) | (1L << 15) | (1L << 16) | (1L << 18) | (1L << 19) | (1L << 20) | (1L << 22) | (1L << 23) | (1L << 27) | (1L << 29) | (1L << 31) | (1L << 32) | (1L << 33) | (1L << 41) | (1L << 46) | (1L << PDE) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__25) | (1L << T__30) | (1L << T__32) | (1L << T__42) | (1L << PDE) | (1L << Identifier))) != 0)) {
 				{
 				setState(453);
+				_errHandler.sync(this);
 				switch ( getInterpreter().adaptivePredict(_input,25,_ctx) ) {
 				case 1:
 					{
-					setState(448); equation();
+					setState(448);
+					equation();
 					}
 					break;
-
 				case 2:
 					{
-					setState(449); init_cond();
+					setState(449);
+					init_cond();
 					}
 					break;
-
 				case 3:
 					{
-					setState(450); constant();
+					setState(450);
+					constant();
 					}
 					break;
-
 				case 4:
 					{
-					setState(451); pseudo_state();
+					setState(451);
+					pseudo_state();
 					}
 					break;
-
 				case 5:
 					{
-					setState(452); macros();
+					setState(452);
+					macros();
 					}
 					break;
 				}
@@ -2631,7 +2866,8 @@ public class LismaParser extends Parser {
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(458); match(RBRACE);
+			setState(458);
+			match(RBRACE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2646,20 +2882,20 @@ public class LismaParser extends Parser {
 	}
 
 	public static class StateContext extends ParserRuleContext {
-		public State_bodyContext state_body() {
-			return getRuleContext(State_bodyContext.class,0);
-		}
-		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public State_nameContext state_name() {
 			return getRuleContext(State_nameContext.class,0);
 		}
-		public State_fromContext state_from() {
-			return getRuleContext(State_fromContext.class,0);
-		}
-		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
+		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
+		public State_bodyContext state_body() {
+			return getRuleContext(State_bodyContext.class,0);
+		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
+		public State_fromContext state_from() {
+			return getRuleContext(State_fromContext.class,0);
 		}
 		public StateContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -2687,21 +2923,30 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(460); match(1);
-			setState(461); state_name();
-			setState(462); match(LPAREN);
-			setState(463); expression();
-			setState(464); match(RPAREN);
-			setState(465); state_body();
+			setState(460);
+			match(T__27);
+			setState(461);
+			state_name();
+			setState(462);
+			match(LPAREN);
+			setState(463);
+			expression();
+			setState(464);
+			match(RPAREN);
+			setState(465);
+			state_body();
 			setState(467);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==30) {
+			if (_la==T__28) {
 				{
-				setState(466); state_from();
+				setState(466);
+				state_from();
 				}
 			}
 
-			setState(469); match(SEMI);
+			setState(469);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2716,15 +2961,7 @@ public class LismaParser extends Parser {
 	}
 
 	public static class State_bodyContext extends ParserRuleContext {
-		public SetterContext setter(int i) {
-			return getRuleContext(SetterContext.class,i);
-		}
-		public For_cycleContext for_cycle(int i) {
-			return getRuleContext(For_cycleContext.class,i);
-		}
-		public List<SetterContext> setter() {
-			return getRuleContexts(SetterContext.class);
-		}
+		public TerminalNode LBRACE() { return getToken(LismaParser.LBRACE, 0); }
 		public TerminalNode RBRACE() { return getToken(LismaParser.RBRACE, 0); }
 		public List<EquationContext> equation() {
 			return getRuleContexts(EquationContext.class);
@@ -2732,9 +2969,17 @@ public class LismaParser extends Parser {
 		public EquationContext equation(int i) {
 			return getRuleContext(EquationContext.class,i);
 		}
-		public TerminalNode LBRACE() { return getToken(LismaParser.LBRACE, 0); }
+		public List<SetterContext> setter() {
+			return getRuleContexts(SetterContext.class);
+		}
+		public SetterContext setter(int i) {
+			return getRuleContext(SetterContext.class,i);
+		}
 		public List<For_cycleContext> for_cycle() {
 			return getRuleContexts(For_cycleContext.class);
+		}
+		public For_cycleContext for_cycle(int i) {
+			return getRuleContext(For_cycleContext.class,i);
 		}
 		public State_bodyContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -2762,43 +3007,48 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(471); match(LBRACE);
+			setState(471);
+			match(LBRACE);
 			setState(477);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 2) | (1L << 3) | (1L << 6) | (1L << 8) | (1L << 9) | (1L << 11) | (1L << 15) | (1L << 19) | (1L << 20) | (1L << 22) | (1L << 23) | (1L << 27) | (1L << 31) | (1L << 32) | (1L << 33) | (1L << 41) | (1L << 46) | (1L << PDE) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__26) | (1L << T__32) | (1L << T__43) | (1L << PDE) | (1L << Identifier))) != 0)) {
 				{
 				setState(475);
+				_errHandler.sync(this);
 				switch (_input.LA(1)) {
-				case 2:
-				case 8:
-				case 9:
-				case 11:
-				case 15:
-				case 19:
-				case 20:
-				case 22:
-				case 23:
-				case 27:
-				case 31:
-				case 32:
-				case 33:
-				case 41:
-				case 46:
+				case T__5:
+				case T__6:
+				case T__7:
+				case T__8:
+				case T__9:
+				case T__10:
+				case T__11:
+				case T__12:
+				case T__13:
+				case T__14:
+				case T__15:
+				case T__16:
+				case T__17:
+				case T__18:
+				case T__32:
 				case PDE:
 				case Identifier:
 					{
-					setState(472); equation();
+					setState(472);
+					equation();
 					}
 					break;
-				case 3:
+				case T__43:
 					{
-					setState(473); setter();
+					setState(473);
+					setter();
 					}
 					break;
-				case 6:
+				case T__26:
 					{
-					setState(474); for_cycle();
+					setState(474);
+					for_cycle();
 					}
 					break;
 				default:
@@ -2809,7 +3059,8 @@ public class LismaParser extends Parser {
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(480); match(RBRACE);
+			setState(480);
+			match(RBRACE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2824,13 +3075,13 @@ public class LismaParser extends Parser {
 	}
 
 	public static class State_fromContext extends ParserRuleContext {
-		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
 		public List<State_nameContext> state_name() {
 			return getRuleContexts(State_nameContext.class);
 		}
 		public State_nameContext state_name(int i) {
 			return getRuleContext(State_nameContext.class,i);
 		}
+		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
 		public TerminalNode COMMA(int i) {
 			return getToken(LismaParser.COMMA, i);
 		}
@@ -2860,16 +3111,20 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(482); match(30);
-			setState(483); state_name();
+			setState(482);
+			match(T__28);
+			setState(483);
+			state_name();
 			setState(488);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(484); match(COMMA);
-				setState(485); state_name();
+				setState(484);
+				match(COMMA);
+				setState(485);
+				state_name();
 				}
 				}
 				setState(490);
@@ -2919,10 +3174,14 @@ public class LismaParser extends Parser {
 			{
 			setState(491);
 			_la = _input.LA(1);
-			if ( !(_la==17 || _la==Identifier) ) {
+			if ( !(_la==T__29 || _la==Identifier) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -2937,13 +3196,13 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Pseudo_stateContext extends ParserRuleContext {
-		public Pseudo_state_bodyContext pseudo_state_body() {
-			return getRuleContext(Pseudo_state_bodyContext.class,0);
-		}
 		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
+		}
+		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
+		public Pseudo_state_bodyContext pseudo_state_body() {
+			return getRuleContext(Pseudo_state_bodyContext.class,0);
 		}
 		public Pseudo_state_elseContext pseudo_state_else() {
 			return getRuleContext(Pseudo_state_elseContext.class,0);
@@ -2974,16 +3233,23 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(493); match(29);
-			setState(494); match(LPAREN);
-			setState(495); expression();
-			setState(496); match(RPAREN);
-			setState(497); pseudo_state_body();
+			setState(493);
+			match(T__30);
+			setState(494);
+			match(LPAREN);
+			setState(495);
+			expression();
+			setState(496);
+			match(RPAREN);
+			setState(497);
+			pseudo_state_body();
 			setState(499);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==42) {
+			if (_la==T__31) {
 				{
-				setState(498); pseudo_state_else();
+				setState(498);
+				pseudo_state_else();
 				}
 			}
 
@@ -3001,8 +3267,8 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Pseudo_state_bodyContext extends ParserRuleContext {
-		public TerminalNode RBRACE() { return getToken(LismaParser.RBRACE, 0); }
 		public TerminalNode LBRACE() { return getToken(LismaParser.LBRACE, 0); }
+		public TerminalNode RBRACE() { return getToken(LismaParser.RBRACE, 0); }
 		public List<Pseudo_state_elemContext> pseudo_state_elem() {
 			return getRuleContexts(Pseudo_state_elemContext.class);
 		}
@@ -3035,21 +3301,24 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(501); match(LBRACE);
+			setState(501);
+			match(LBRACE);
 			setState(505);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 2) | (1L << 3) | (1L << 8) | (1L << 9) | (1L << 11) | (1L << 15) | (1L << 19) | (1L << 20) | (1L << 22) | (1L << 23) | (1L << 27) | (1L << 31) | (1L << 32) | (1L << 33) | (1L << 41) | (1L << 46) | (1L << PDE) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__32) | (1L << T__43) | (1L << PDE) | (1L << Identifier))) != 0)) {
 				{
 				{
-				setState(502); pseudo_state_elem();
+				setState(502);
+				pseudo_state_elem();
 				}
 				}
 				setState(507);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(508); match(RBRACE);
+			setState(508);
+			match(RBRACE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -3064,11 +3333,11 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Pseudo_state_elemContext extends ParserRuleContext {
-		public SetterContext setter() {
-			return getRuleContext(SetterContext.class,0);
-		}
 		public EquationContext equation() {
 			return getRuleContext(EquationContext.class,0);
+		}
+		public SetterContext setter() {
+			return getRuleContext(SetterContext.class,0);
 		}
 		public Pseudo_state_elemContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3094,33 +3363,36 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 90, RULE_pseudo_state_elem);
 		try {
 			setState(512);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case 2:
-			case 8:
-			case 9:
-			case 11:
-			case 15:
-			case 19:
-			case 20:
-			case 22:
-			case 23:
-			case 27:
-			case 31:
-			case 32:
-			case 33:
-			case 41:
-			case 46:
+			case T__5:
+			case T__6:
+			case T__7:
+			case T__8:
+			case T__9:
+			case T__10:
+			case T__11:
+			case T__12:
+			case T__13:
+			case T__14:
+			case T__15:
+			case T__16:
+			case T__17:
+			case T__18:
+			case T__32:
 			case PDE:
 			case Identifier:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(510); equation();
+				setState(510);
+				equation();
 				}
 				break;
-			case 3:
+			case T__43:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(511); setter();
+				setState(511);
+				setter();
 				}
 				break;
 			default:
@@ -3167,8 +3439,10 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(514); match(42);
-			setState(515); pseudo_state_body();
+			setState(514);
+			match(T__31);
+			setState(515);
+			pseudo_state_body();
 			}
 		}
 		catch (RecognitionException re) {
@@ -3214,10 +3488,14 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(517); match(Identifier);
-			setState(518); match(LPAREN);
-			setState(519); arg_list();
-			setState(520); match(RPAREN);
+			setState(517);
+			match(Identifier);
+			setState(518);
+			match(LPAREN);
+			setState(519);
+			arg_list();
+			setState(520);
+			match(RPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -3232,13 +3510,13 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Arg_listContext extends ParserRuleContext {
-		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
-		}
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
 		}
+		public ExpressionContext expression(int i) {
+			return getRuleContext(ExpressionContext.class,i);
+		}
+		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
 		public TerminalNode COMMA(int i) {
 			return getToken(LismaParser.COMMA, i);
 		}
@@ -3268,15 +3546,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(522); expression();
+			setState(522);
+			expression();
 			setState(527);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(523); match(COMMA);
-				setState(524); expression();
+				setState(523);
+				match(COMMA);
+				setState(524);
+				expression();
 				}
 				}
 				setState(529);
@@ -3300,12 +3581,12 @@ public class LismaParser extends Parser {
 		public Var_identContext var_ident() {
 			return getRuleContext(Var_identContext.class,0);
 		}
-		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
 		public Derivative_quote_operantContext derivative_quote_operant() {
 			return getRuleContext(Derivative_quote_operantContext.class,0);
 		}
 		public TerminalNode LPAREN() { return getToken(LismaParser.LPAREN, 0); }
 		public TerminalNode COMMA() { return getToken(LismaParser.COMMA, 0); }
+		public TerminalNode DecimalLiteral() { return getToken(LismaParser.DecimalLiteral, 0); }
 		public TerminalNode RPAREN() { return getToken(LismaParser.RPAREN, 0); }
 		public Derivative_identContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3331,23 +3612,32 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 98, RULE_derivative_ident);
 		try {
 			setState(540);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case Identifier:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(530); var_ident();
-				setState(531); derivative_quote_operant();
+				setState(530);
+				var_ident();
+				setState(531);
+				derivative_quote_operant();
 				}
 				break;
-			case 41:
+			case T__32:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(533); match(41);
-				setState(534); match(LPAREN);
-				setState(535); var_ident();
-				setState(536); match(COMMA);
-				setState(537); match(DecimalLiteral);
-				setState(538); match(RPAREN);
+				setState(533);
+				match(T__32);
+				setState(534);
+				match(LPAREN);
+				setState(535);
+				var_ident();
+				setState(536);
+				match(COMMA);
+				setState(537);
+				match(DecimalLiteral);
+				setState(538);
+				match(RPAREN);
 				}
 				break;
 			default:
@@ -3367,12 +3657,12 @@ public class LismaParser extends Parser {
 
 	public static class Derivative_quote_operantContext extends ParserRuleContext {
 		public List<TerminalNode> QUOTE1() { return getTokens(LismaParser.QUOTE1); }
+		public TerminalNode QUOTE1(int i) {
+			return getToken(LismaParser.QUOTE1, i);
+		}
 		public List<TerminalNode> QUOTE2() { return getTokens(LismaParser.QUOTE2); }
 		public TerminalNode QUOTE2(int i) {
 			return getToken(LismaParser.QUOTE2, i);
-		}
-		public TerminalNode QUOTE1(int i) {
-			return getToken(LismaParser.QUOTE1, i);
 		}
 		public Derivative_quote_operantContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3399,6 +3689,7 @@ public class LismaParser extends Parser {
 		int _la;
 		try {
 			setState(552);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case QUOTE1:
 				enterOuterAlt(_localctx, 1);
@@ -3409,7 +3700,8 @@ public class LismaParser extends Parser {
 				do {
 					{
 					{
-					setState(542); match(QUOTE1);
+					setState(542);
+					match(QUOTE1);
 					}
 					}
 					setState(545); 
@@ -3427,7 +3719,8 @@ public class LismaParser extends Parser {
 				do {
 					{
 					{
-					setState(547); match(QUOTE2);
+					setState(547);
+					match(QUOTE2);
 					}
 					}
 					setState(550); 
@@ -3482,18 +3775,20 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 102, RULE_variable);
 		try {
 			setState(556);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,39,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(554); var_ident();
+				setState(554);
+				var_ident();
 				}
 				break;
-
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(555); derivative_ident();
+				setState(555);
+				derivative_ident();
 				}
 				break;
 			}
@@ -3539,12 +3834,15 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(558); match(Identifier);
+			setState(558);
+			match(Identifier);
 			setState(560);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,40,_ctx) ) {
 			case 1:
 				{
-				setState(559); cycle_index();
+				setState(559);
+				cycle_index();
 				}
 				break;
 			}
@@ -3562,6 +3860,7 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Cycle_indexContext extends ParserRuleContext {
+		public TerminalNode LBRACK() { return getToken(LismaParser.LBRACK, 0); }
 		public Cycle_index_idxContext cycle_index_idx() {
 			return getRuleContext(Cycle_index_idxContext.class,0);
 		}
@@ -3569,7 +3868,6 @@ public class LismaParser extends Parser {
 		public Cycle_index_posfixContext cycle_index_posfix() {
 			return getRuleContext(Cycle_index_posfixContext.class,0);
 		}
-		public TerminalNode LBRACK() { return getToken(LismaParser.LBRACK, 0); }
 		public Cycle_indexContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -3595,14 +3893,19 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(562); match(LBRACK);
-			setState(563); cycle_index_idx();
-			setState(564); match(RBRACK);
+			setState(562);
+			match(LBRACK);
+			setState(563);
+			cycle_index_idx();
+			setState(564);
+			match(RBRACK);
 			setState(566);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,41,_ctx) ) {
 			case 1:
 				{
-				setState(565); cycle_index_posfix();
+				setState(565);
+				cycle_index_posfix();
 				}
 				break;
 			}
@@ -3621,11 +3924,11 @@ public class LismaParser extends Parser {
 
 	public static class Cycle_index_idxContext extends ParserRuleContext {
 		public TerminalNode Identifier() { return getToken(LismaParser.Identifier, 0); }
-		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
 		public LiteralContext literal() {
 			return getRuleContext(LiteralContext.class,0);
 		}
 		public TerminalNode ADD() { return getToken(LismaParser.ADD, 0); }
+		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
 		public Cycle_index_idxContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -3652,8 +3955,10 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(568); match(Identifier);
+			setState(568);
+			match(Identifier);
 			setState(571);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==ADD || _la==SUB) {
 				{
@@ -3662,8 +3967,13 @@ public class LismaParser extends Parser {
 				if ( !(_la==ADD || _la==SUB) ) {
 				_errHandler.recoverInline(this);
 				}
-				consume();
-				setState(570); literal();
+				else {
+					if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+					_errHandler.reportMatch(this);
+					consume();
+				}
+				setState(570);
+				literal();
 				}
 			}
 
@@ -3709,18 +4019,21 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 110, RULE_cycle_index_posfix);
 		try {
 			setState(575);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case Identifier:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(573); match(Identifier);
+				setState(573);
+				match(Identifier);
 				}
 				break;
 			case DecimalLiteral:
 			case FloatingPointLiteral:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(574); literal();
+				setState(574);
+				literal();
 				}
 				break;
 			default:
@@ -3739,14 +4052,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class ParExpressionContext extends ParserRuleContext {
-		public ParExpressionRightParContext parExpressionRightPar() {
-			return getRuleContext(ParExpressionRightParContext.class,0);
-		}
 		public ParExpressionLeftParContext parExpressionLeftPar() {
 			return getRuleContext(ParExpressionLeftParContext.class,0);
 		}
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
+		}
+		public ParExpressionRightParContext parExpressionRightPar() {
+			return getRuleContext(ParExpressionRightParContext.class,0);
 		}
 		public ParExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3773,9 +4086,12 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(577); parExpressionLeftPar();
-			setState(578); expression();
-			setState(579); parExpressionRightPar();
+			setState(577);
+			parExpressionLeftPar();
+			setState(578);
+			expression();
+			setState(579);
+			parExpressionRightPar();
 			}
 		}
 		catch (RecognitionException re) {
@@ -3816,7 +4132,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(581); match(LPAREN);
+			setState(581);
+			match(LPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -3857,7 +4174,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(583); match(RPAREN);
+			setState(583);
+			match(RPAREN);
 			}
 		}
 		catch (RecognitionException re) {
@@ -3900,7 +4218,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(585); conditionalExpression();
+			setState(585);
+			conditionalExpression();
 			}
 		}
 		catch (RecognitionException re) {
@@ -3943,7 +4262,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(587); conditionalOrExpression();
+			setState(587);
+			conditionalOrExpression();
 			}
 		}
 		catch (RecognitionException re) {
@@ -3958,17 +4278,17 @@ public class LismaParser extends Parser {
 	}
 
 	public static class ConditionalOrExpressionContext extends ParserRuleContext {
-		public Or_operatorContext or_operator(int i) {
-			return getRuleContext(Or_operatorContext.class,i);
+		public List<ConditionalAndExpressionContext> conditionalAndExpression() {
+			return getRuleContexts(ConditionalAndExpressionContext.class);
 		}
 		public ConditionalAndExpressionContext conditionalAndExpression(int i) {
 			return getRuleContext(ConditionalAndExpressionContext.class,i);
 		}
-		public List<ConditionalAndExpressionContext> conditionalAndExpression() {
-			return getRuleContexts(ConditionalAndExpressionContext.class);
-		}
 		public List<Or_operatorContext> or_operator() {
 			return getRuleContexts(Or_operatorContext.class);
+		}
+		public Or_operatorContext or_operator(int i) {
+			return getRuleContext(Or_operatorContext.class,i);
 		}
 		public ConditionalOrExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -3996,15 +4316,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(589); conditionalAndExpression();
+			setState(589);
+			conditionalAndExpression();
 			setState(595);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 25) | (1L << 37) | (1L << 38))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__33) | (1L << T__34) | (1L << T__35))) != 0)) {
 				{
 				{
-				setState(590); or_operator();
-				setState(591); conditionalAndExpression();
+				setState(590);
+				or_operator();
+				setState(591);
+				conditionalAndExpression();
 				}
 				}
 				setState(597);
@@ -4025,17 +4348,17 @@ public class LismaParser extends Parser {
 	}
 
 	public static class ConditionalAndExpressionContext extends ParserRuleContext {
+		public List<EqualityExpressionContext> equalityExpression() {
+			return getRuleContexts(EqualityExpressionContext.class);
+		}
+		public EqualityExpressionContext equalityExpression(int i) {
+			return getRuleContext(EqualityExpressionContext.class,i);
+		}
 		public List<And_operatorContext> and_operator() {
 			return getRuleContexts(And_operatorContext.class);
 		}
 		public And_operatorContext and_operator(int i) {
 			return getRuleContext(And_operatorContext.class,i);
-		}
-		public EqualityExpressionContext equalityExpression(int i) {
-			return getRuleContext(EqualityExpressionContext.class,i);
-		}
-		public List<EqualityExpressionContext> equalityExpression() {
-			return getRuleContexts(EqualityExpressionContext.class);
 		}
 		public ConditionalAndExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -4063,15 +4386,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(598); equalityExpression();
+			setState(598);
+			equalityExpression();
 			setState(604);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 5) | (1L << 24) | (1L << 45))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__36) | (1L << T__37) | (1L << T__38))) != 0)) {
 				{
 				{
-				setState(599); and_operator();
-				setState(600); equalityExpression();
+				setState(599);
+				and_operator();
+				setState(600);
+				equalityExpression();
 				}
 				}
 				setState(606);
@@ -4092,17 +4418,17 @@ public class LismaParser extends Parser {
 	}
 
 	public static class EqualityExpressionContext extends ParserRuleContext {
-		public List<EqualityExpressionOperatorContext> equalityExpressionOperator() {
-			return getRuleContexts(EqualityExpressionOperatorContext.class);
+		public List<RelationalExpressionContext> relationalExpression() {
+			return getRuleContexts(RelationalExpressionContext.class);
 		}
 		public RelationalExpressionContext relationalExpression(int i) {
 			return getRuleContext(RelationalExpressionContext.class,i);
 		}
+		public List<EqualityExpressionOperatorContext> equalityExpressionOperator() {
+			return getRuleContexts(EqualityExpressionOperatorContext.class);
+		}
 		public EqualityExpressionOperatorContext equalityExpressionOperator(int i) {
 			return getRuleContext(EqualityExpressionOperatorContext.class,i);
-		}
-		public List<RelationalExpressionContext> relationalExpression() {
-			return getRuleContexts(RelationalExpressionContext.class);
 		}
 		public EqualityExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -4130,15 +4456,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(607); relationalExpression();
+			setState(607);
+			relationalExpression();
 			setState(613);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==EQUAL || _la==NOTEQUAL) {
 				{
 				{
-				setState(608); equalityExpressionOperator();
-				setState(609); relationalExpression();
+				setState(608);
+				equalityExpressionOperator();
+				setState(609);
+				relationalExpression();
 				}
 				}
 				setState(615);
@@ -4192,7 +4521,11 @@ public class LismaParser extends Parser {
 			if ( !(_la==EQUAL || _la==NOTEQUAL) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -4207,14 +4540,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class RelationalExpressionContext extends ParserRuleContext {
+		public List<AdditiveExpressionContext> additiveExpression() {
+			return getRuleContexts(AdditiveExpressionContext.class);
+		}
 		public AdditiveExpressionContext additiveExpression(int i) {
 			return getRuleContext(AdditiveExpressionContext.class,i);
 		}
 		public List<RelationalOpContext> relationalOp() {
 			return getRuleContexts(RelationalOpContext.class);
-		}
-		public List<AdditiveExpressionContext> additiveExpression() {
-			return getRuleContexts(AdditiveExpressionContext.class);
 		}
 		public RelationalOpContext relationalOp(int i) {
 			return getRuleContext(RelationalOpContext.class,i);
@@ -4245,15 +4578,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(618); additiveExpression();
+			setState(618);
+			additiveExpression();
 			setState(624);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (((((_la - 68)) & ~0x3f) == 0 && ((1L << (_la - 68)) & ((1L << (GT - 68)) | (1L << (LT - 68)) | (1L << (LE - 68)) | (1L << (GE - 68)))) != 0)) {
 				{
 				{
-				setState(619); relationalOp();
-				setState(620); additiveExpression();
+				setState(619);
+				relationalOp();
+				setState(620);
+				additiveExpression();
 				}
 				}
 				setState(626);
@@ -4274,10 +4610,10 @@ public class LismaParser extends Parser {
 	}
 
 	public static class RelationalOpContext extends ParserRuleContext {
+		public TerminalNode LE() { return getToken(LismaParser.LE, 0); }
 		public TerminalNode GE() { return getToken(LismaParser.GE, 0); }
 		public TerminalNode LT() { return getToken(LismaParser.LT, 0); }
 		public TerminalNode GT() { return getToken(LismaParser.GT, 0); }
-		public TerminalNode LE() { return getToken(LismaParser.LE, 0); }
 		public RelationalOpContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -4309,7 +4645,11 @@ public class LismaParser extends Parser {
 			if ( !(((((_la - 68)) & ~0x3f) == 0 && ((1L << (_la - 68)) & ((1L << (GT - 68)) | (1L << (LT - 68)) | (1L << (LE - 68)) | (1L << (GE - 68)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -4324,9 +4664,6 @@ public class LismaParser extends Parser {
 	}
 
 	public static class AdditiveExpressionContext extends ParserRuleContext {
-		public AdditiveExpressionOperatorContext additiveExpressionOperator(int i) {
-			return getRuleContext(AdditiveExpressionOperatorContext.class,i);
-		}
 		public List<MultiplicativeExpressionContext> multiplicativeExpression() {
 			return getRuleContexts(MultiplicativeExpressionContext.class);
 		}
@@ -4335,6 +4672,9 @@ public class LismaParser extends Parser {
 		}
 		public List<AdditiveExpressionOperatorContext> additiveExpressionOperator() {
 			return getRuleContexts(AdditiveExpressionOperatorContext.class);
+		}
+		public AdditiveExpressionOperatorContext additiveExpressionOperator(int i) {
+			return getRuleContext(AdditiveExpressionOperatorContext.class,i);
 		}
 		public AdditiveExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -4362,15 +4702,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(629); multiplicativeExpression();
+			setState(629);
+			multiplicativeExpression();
 			setState(635);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==ADD || _la==SUB) {
 				{
 				{
-				setState(630); additiveExpressionOperator();
-				setState(631); multiplicativeExpression();
+				setState(630);
+				additiveExpressionOperator();
+				setState(631);
+				multiplicativeExpression();
 				}
 				}
 				setState(637);
@@ -4391,8 +4734,8 @@ public class LismaParser extends Parser {
 	}
 
 	public static class AdditiveExpressionOperatorContext extends ParserRuleContext {
-		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
 		public TerminalNode ADD() { return getToken(LismaParser.ADD, 0); }
+		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
 		public AdditiveExpressionOperatorContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -4424,7 +4767,11 @@ public class LismaParser extends Parser {
 			if ( !(_la==ADD || _la==SUB) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -4439,17 +4786,17 @@ public class LismaParser extends Parser {
 	}
 
 	public static class MultiplicativeExpressionContext extends ParserRuleContext {
-		public MultiplicativeExpressionOperatorContext multiplicativeExpressionOperator(int i) {
-			return getRuleContext(MultiplicativeExpressionOperatorContext.class,i);
-		}
 		public List<UnaryExpressionContext> unaryExpression() {
 			return getRuleContexts(UnaryExpressionContext.class);
+		}
+		public UnaryExpressionContext unaryExpression(int i) {
+			return getRuleContext(UnaryExpressionContext.class,i);
 		}
 		public List<MultiplicativeExpressionOperatorContext> multiplicativeExpressionOperator() {
 			return getRuleContexts(MultiplicativeExpressionOperatorContext.class);
 		}
-		public UnaryExpressionContext unaryExpression(int i) {
-			return getRuleContext(UnaryExpressionContext.class,i);
+		public MultiplicativeExpressionOperatorContext multiplicativeExpressionOperator(int i) {
+			return getRuleContext(MultiplicativeExpressionOperatorContext.class,i);
 		}
 		public MultiplicativeExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -4477,15 +4824,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(640); unaryExpression();
+			setState(640);
+			unaryExpression();
 			setState(646);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (((((_la - 81)) & ~0x3f) == 0 && ((1L << (_la - 81)) & ((1L << (MUL - 81)) | (1L << (DIV - 81)) | (1L << (MOD - 81)))) != 0)) {
 				{
 				{
-				setState(641); multiplicativeExpressionOperator();
-				setState(642); unaryExpression();
+				setState(641);
+				multiplicativeExpressionOperator();
+				setState(642);
+				unaryExpression();
 				}
 				}
 				setState(648);
@@ -4506,9 +4856,9 @@ public class LismaParser extends Parser {
 	}
 
 	public static class MultiplicativeExpressionOperatorContext extends ParserRuleContext {
-		public TerminalNode MOD() { return getToken(LismaParser.MOD, 0); }
-		public TerminalNode DIV() { return getToken(LismaParser.DIV, 0); }
 		public TerminalNode MUL() { return getToken(LismaParser.MUL, 0); }
+		public TerminalNode DIV() { return getToken(LismaParser.DIV, 0); }
+		public TerminalNode MOD() { return getToken(LismaParser.MOD, 0); }
 		public MultiplicativeExpressionOperatorContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -4540,7 +4890,11 @@ public class LismaParser extends Parser {
 			if ( !(((((_la - 81)) & ~0x3f) == 0 && ((1L << (_la - 81)) & ((1L << (MUL - 81)) | (1L << (DIV - 81)) | (1L << (MOD - 81)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -4555,11 +4909,11 @@ public class LismaParser extends Parser {
 	}
 
 	public static class UnaryExpressionContext extends ParserRuleContext {
-		public UnaryExpressionContext unaryExpression() {
-			return getRuleContext(UnaryExpressionContext.class,0);
-		}
 		public UnaryExpressionOperatorContext unaryExpressionOperator() {
 			return getRuleContext(UnaryExpressionOperatorContext.class,0);
+		}
+		public UnaryExpressionContext unaryExpression() {
+			return getRuleContext(UnaryExpressionContext.class,0);
 		}
 		public UnaryExpressionNotPlusMinusContext unaryExpressionNotPlusMinus() {
 			return getRuleContext(UnaryExpressionNotPlusMinusContext.class,0);
@@ -4588,39 +4942,43 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 142, RULE_unaryExpression);
 		try {
 			setState(655);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case ADD:
 			case SUB:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(651); unaryExpressionOperator();
-				setState(652); unaryExpression();
+				setState(651);
+				unaryExpressionOperator();
+				setState(652);
+				unaryExpression();
 				}
 				break;
-			case 2:
-			case 8:
-			case 9:
-			case 11:
-			case 15:
-			case 19:
-			case 20:
-			case 22:
-			case 23:
-			case 27:
-			case 28:
-			case 31:
-			case 32:
-			case 33:
-			case 39:
-			case 46:
-			case 48:
+			case T__5:
+			case T__6:
+			case T__7:
+			case T__8:
+			case T__9:
+			case T__10:
+			case T__11:
+			case T__12:
+			case T__13:
+			case T__14:
+			case T__15:
+			case T__16:
+			case T__17:
+			case T__18:
+			case T__39:
+			case T__40:
+			case T__41:
 			case DecimalLiteral:
 			case FloatingPointLiteral:
 			case Identifier:
 			case LPAREN:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(654); unaryExpressionNotPlusMinus();
+				setState(654);
+				unaryExpressionNotPlusMinus();
 				}
 				break;
 			default:
@@ -4639,8 +4997,8 @@ public class LismaParser extends Parser {
 	}
 
 	public static class UnaryExpressionOperatorContext extends ParserRuleContext {
-		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
 		public TerminalNode ADD() { return getToken(LismaParser.ADD, 0); }
+		public TerminalNode SUB() { return getToken(LismaParser.SUB, 0); }
 		public UnaryExpressionOperatorContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -4672,7 +5030,11 @@ public class LismaParser extends Parser {
 			if ( !(_la==ADD || _la==SUB) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -4687,14 +5049,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class UnaryExpressionNotPlusMinusContext extends ParserRuleContext {
+		public Not_operatorContext not_operator() {
+			return getRuleContext(Not_operatorContext.class,0);
+		}
 		public UnaryExpressionContext unaryExpression() {
 			return getRuleContext(UnaryExpressionContext.class,0);
 		}
 		public PrimaryContext primary() {
 			return getRuleContext(PrimaryContext.class,0);
-		}
-		public Not_operatorContext not_operator() {
-			return getRuleContext(Not_operatorContext.class,0);
 		}
 		public UnaryExpressionNotPlusMinusContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -4720,37 +5082,41 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 146, RULE_unaryExpressionNotPlusMinus);
 		try {
 			setState(663);
+			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case 28:
-			case 39:
-			case 48:
+			case T__39:
+			case T__40:
+			case T__41:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(659); not_operator();
-				setState(660); unaryExpression();
+				setState(659);
+				not_operator();
+				setState(660);
+				unaryExpression();
 				}
 				break;
-			case 2:
-			case 8:
-			case 9:
-			case 11:
-			case 15:
-			case 19:
-			case 20:
-			case 22:
-			case 23:
-			case 27:
-			case 31:
-			case 32:
-			case 33:
-			case 46:
+			case T__5:
+			case T__6:
+			case T__7:
+			case T__8:
+			case T__9:
+			case T__10:
+			case T__11:
+			case T__12:
+			case T__13:
+			case T__14:
+			case T__15:
+			case T__16:
+			case T__17:
+			case T__18:
 			case DecimalLiteral:
 			case FloatingPointLiteral:
 			case Identifier:
 			case LPAREN:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(662); primary();
+				setState(662);
+				primary();
 				}
 				break;
 			default:
@@ -4769,8 +5135,11 @@ public class LismaParser extends Parser {
 	}
 
 	public static class PrimaryContext extends ParserRuleContext {
-		public Func_and_math_mappingContext func_and_math_mapping() {
-			return getRuleContext(Func_and_math_mappingContext.class,0);
+		public ParExpressionContext parExpression() {
+			return getRuleContext(ParExpressionContext.class,0);
+		}
+		public Primary_idContext primary_id() {
+			return getRuleContext(Primary_idContext.class,0);
 		}
 		public LiteralContext literal() {
 			return getRuleContext(LiteralContext.class,0);
@@ -4778,11 +5147,8 @@ public class LismaParser extends Parser {
 		public Partial_operandContext partial_operand() {
 			return getRuleContext(Partial_operandContext.class,0);
 		}
-		public Primary_idContext primary_id() {
-			return getRuleContext(Primary_idContext.class,0);
-		}
-		public ParExpressionContext parExpression() {
-			return getRuleContext(ParExpressionContext.class,0);
+		public Func_and_math_mappingContext func_and_math_mapping() {
+			return getRuleContext(Func_and_math_mappingContext.class,0);
 		}
 		public PrimaryContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -4808,39 +5174,41 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 148, RULE_primary);
 		try {
 			setState(670);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,52,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(665); parExpression();
+				setState(665);
+				parExpression();
 				}
 				break;
-
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(666); primary_id();
+				setState(666);
+				primary_id();
 				}
 				break;
-
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(667); literal();
+				setState(667);
+				literal();
 				}
 				break;
-
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(668); partial_operand();
+				setState(668);
+				partial_operand();
 				}
 				break;
-
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(669); func_and_math_mapping();
+				setState(669);
+				func_and_math_mapping();
 				}
 				break;
 			}
@@ -4887,12 +5255,15 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(672); match(Identifier);
+			setState(672);
+			match(Identifier);
 			setState(674);
+			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==LBRACK) {
 				{
-				setState(673); cycle_index();
+				setState(673);
+				cycle_index();
 				}
 			}
 
@@ -4943,7 +5314,11 @@ public class LismaParser extends Parser {
 			if ( !(_la==DecimalLiteral || _la==FloatingPointLiteral) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -4986,10 +5361,14 @@ public class LismaParser extends Parser {
 			{
 			setState(678);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 25) | (1L << 37) | (1L << 38))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__33) | (1L << T__34) | (1L << T__35))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -5032,10 +5411,14 @@ public class LismaParser extends Parser {
 			{
 			setState(680);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 5) | (1L << 24) | (1L << 45))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__36) | (1L << T__37) | (1L << T__38))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -5078,10 +5461,14 @@ public class LismaParser extends Parser {
 			{
 			setState(682);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << 28) | (1L << 39) | (1L << 48))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__39) | (1L << T__40) | (1L << T__41))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
-			consume();
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -5096,14 +5483,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class MacrosContext extends ParserRuleContext {
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
-		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
-		public Macro_itemContext macro_item(int i) {
-			return getRuleContext(Macro_itemContext.class,i);
-		}
 		public List<Macro_itemContext> macro_item() {
 			return getRuleContexts(Macro_itemContext.class);
 		}
+		public Macro_itemContext macro_item(int i) {
+			return getRuleContext(Macro_itemContext.class,i);
+		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
+		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
 		public TerminalNode COMMA(int i) {
 			return getToken(LismaParser.COMMA, i);
 		}
@@ -5133,23 +5520,28 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(684); match(13);
-			setState(685); macro_item();
+			setState(684);
+			match(T__42);
+			setState(685);
+			macro_item();
 			setState(690);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(686); match(COMMA);
-				setState(687); macro_item();
+				setState(686);
+				match(COMMA);
+				setState(687);
+				macro_item();
 				}
 				}
 				setState(692);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(693); match(SEMI);
+			setState(693);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5164,10 +5556,10 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Macro_itemContext extends ParserRuleContext {
-		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
 		public Primary_idContext primary_id() {
 			return getRuleContext(Primary_idContext.class,0);
 		}
+		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
@@ -5196,9 +5588,12 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(695); primary_id();
-			setState(696); match(ASSIGN);
-			setState(697); expression();
+			setState(695);
+			primary_id();
+			setState(696);
+			match(ASSIGN);
+			setState(697);
+			expression();
 			}
 		}
 		catch (RecognitionException re) {
@@ -5217,10 +5612,10 @@ public class LismaParser extends Parser {
 			return getRuleContext(Var_identContext.class,0);
 		}
 		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public SetterContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -5246,11 +5641,16 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(699); match(3);
-			setState(700); var_ident();
-			setState(701); match(ASSIGN);
-			setState(702); expression();
-			setState(703); match(SEMI);
+			setState(699);
+			match(T__43);
+			setState(700);
+			var_ident();
+			setState(701);
+			match(ASSIGN);
+			setState(702);
+			expression();
+			setState(703);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5268,13 +5668,13 @@ public class LismaParser extends Parser {
 		public List<Var_identContext> var_ident() {
 			return getRuleContexts(Var_identContext.class);
 		}
+		public Var_identContext var_ident(int i) {
+			return getRuleContext(Var_identContext.class,i);
+		}
 		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public List<TerminalNode> COMMA() { return getTokens(LismaParser.COMMA); }
 		public TerminalNode COMMA(int i) {
 			return getToken(LismaParser.COMMA, i);
-		}
-		public Var_identContext var_ident(int i) {
-			return getRuleContext(Var_identContext.class,i);
 		}
 		public Linear_varsContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -5302,24 +5702,30 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(705); match(12);
-			setState(706); match(7);
-			setState(707); var_ident();
+			setState(705);
+			match(T__2);
+			setState(706);
+			match(T__44);
+			setState(707);
+			var_ident();
 			setState(712);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==COMMA) {
 				{
 				{
-				setState(708); match(COMMA);
-				setState(709); var_ident();
+				setState(708);
+				match(COMMA);
+				setState(709);
+				var_ident();
 				}
 				}
 				setState(714);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(715); match(SEMI);
+			setState(715);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5334,14 +5740,14 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Linear_eqContext extends ParserRuleContext {
-		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
-		public Linear_eq_bContext linear_eq_b() {
-			return getRuleContext(Linear_eq_bContext.class,0);
-		}
 		public Linear_eq_AContext linear_eq_A() {
 			return getRuleContext(Linear_eq_AContext.class,0);
 		}
+		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
+		public Linear_eq_bContext linear_eq_b() {
+			return getRuleContext(Linear_eq_bContext.class,0);
+		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public Linear_eqContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -5367,11 +5773,16 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(717); match(7);
-			setState(718); linear_eq_A();
-			setState(719); match(ASSIGN);
-			setState(720); linear_eq_b();
-			setState(721); match(SEMI);
+			setState(717);
+			match(T__44);
+			setState(718);
+			linear_eq_A();
+			setState(719);
+			match(ASSIGN);
+			setState(720);
+			linear_eq_b();
+			setState(721);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5414,7 +5825,8 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(723); expression();
+			setState(723);
+			expression();
 			}
 		}
 		catch (RecognitionException re) {
@@ -5429,15 +5841,15 @@ public class LismaParser extends Parser {
 	}
 
 	public static class Linear_eq_AContext extends ParserRuleContext {
+		public List<Linear_eq_A_elemContext> linear_eq_A_elem() {
+			return getRuleContexts(Linear_eq_A_elemContext.class);
+		}
 		public Linear_eq_A_elemContext linear_eq_A_elem(int i) {
 			return getRuleContext(Linear_eq_A_elemContext.class,i);
 		}
 		public List<TerminalNode> ADD() { return getTokens(LismaParser.ADD); }
 		public TerminalNode ADD(int i) {
 			return getToken(LismaParser.ADD, i);
-		}
-		public List<Linear_eq_A_elemContext> linear_eq_A_elem() {
-			return getRuleContexts(Linear_eq_A_elemContext.class);
 		}
 		public Linear_eq_AContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -5465,15 +5877,18 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(725); linear_eq_A_elem();
+			setState(725);
+			linear_eq_A_elem();
 			setState(730);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==ADD) {
 				{
 				{
-				setState(726); match(ADD);
-				setState(727); linear_eq_A_elem();
+				setState(726);
+				match(ADD);
+				setState(727);
+				linear_eq_A_elem();
 				}
 				}
 				setState(732);
@@ -5497,10 +5912,10 @@ public class LismaParser extends Parser {
 		public Var_identContext var_ident() {
 			return getRuleContext(Var_identContext.class,0);
 		}
+		public TerminalNode MUL() { return getToken(LismaParser.MUL, 0); }
 		public Linear_eq_A_elem_exprContext linear_eq_A_elem_expr() {
 			return getRuleContext(Linear_eq_A_elem_exprContext.class,0);
 		}
-		public TerminalNode MUL() { return getToken(LismaParser.MUL, 0); }
 		public Linear_eq_A_elemContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -5526,9 +5941,12 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(733); var_ident();
-			setState(734); match(MUL);
-			setState(735); linear_eq_A_elem_expr();
+			setState(733);
+			var_ident();
+			setState(734);
+			match(MUL);
+			setState(735);
+			linear_eq_A_elem_expr();
 			}
 		}
 		catch (RecognitionException re) {
@@ -5546,11 +5964,11 @@ public class LismaParser extends Parser {
 		public PrimaryContext primary() {
 			return getRuleContext(PrimaryContext.class,0);
 		}
-		public MultiplicativeExpressionContext multiplicativeExpression() {
-			return getRuleContext(MultiplicativeExpressionContext.class,0);
-		}
 		public ParExpressionContext parExpression() {
 			return getRuleContext(ParExpressionContext.class,0);
+		}
+		public MultiplicativeExpressionContext multiplicativeExpression() {
+			return getRuleContext(MultiplicativeExpressionContext.class,0);
 		}
 		public Linear_eq_A_elem_exprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -5576,25 +5994,27 @@ public class LismaParser extends Parser {
 		enterRule(_localctx, 176, RULE_linear_eq_A_elem_expr);
 		try {
 			setState(740);
+			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,57,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(737); primary();
+				setState(737);
+				primary();
 				}
 				break;
-
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(738); parExpression();
+				setState(738);
+				parExpression();
 				}
 				break;
-
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(739); multiplicativeExpression();
+				setState(739);
+				multiplicativeExpression();
 				}
 				break;
 			}
@@ -5612,10 +6032,10 @@ public class LismaParser extends Parser {
 
 	public static class StartContext extends ParserRuleContext {
 		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public StartContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -5641,10 +6061,14 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(742); match(40);
-			setState(743); match(ASSIGN);
-			setState(744); expression();
-			setState(745); match(SEMI);
+			setState(742);
+			match(T__45);
+			setState(743);
+			match(ASSIGN);
+			setState(744);
+			expression();
+			setState(745);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5660,10 +6084,10 @@ public class LismaParser extends Parser {
 
 	public static class EndContext extends ParserRuleContext {
 		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public EndContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -5689,10 +6113,14 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(747); match(44);
-			setState(748); match(ASSIGN);
-			setState(749); expression();
-			setState(750); match(SEMI);
+			setState(747);
+			match(T__46);
+			setState(748);
+			match(ASSIGN);
+			setState(749);
+			expression();
+			setState(750);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5708,10 +6136,10 @@ public class LismaParser extends Parser {
 
 	public static class StepContext extends ParserRuleContext {
 		public TerminalNode ASSIGN() { return getToken(LismaParser.ASSIGN, 0); }
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public StepContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -5737,10 +6165,14 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(752); match(47);
-			setState(753); match(ASSIGN);
-			setState(754); expression();
-			setState(755); match(SEMI);
+			setState(752);
+			match(T__4);
+			setState(753);
+			match(ASSIGN);
+			setState(754);
+			expression();
+			setState(755);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5755,10 +6187,10 @@ public class LismaParser extends Parser {
 	}
 
 	public static class OutContext extends ParserRuleContext {
+		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public List<Var_identContext> var_ident() {
 			return getRuleContexts(Var_identContext.class);
 		}
-		public TerminalNode SEMI() { return getToken(LismaParser.SEMI, 0); }
 		public Var_identContext var_ident(int i) {
 			return getRuleContext(Var_identContext.class,i);
 		}
@@ -5788,21 +6220,24 @@ public class LismaParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(757); match(34);
+			setState(757);
+			match(T__47);
 			setState(759); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(758); var_ident();
+				setState(758);
+				var_ident();
 				}
 				}
 				setState(761); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			} while ( _la==Identifier );
-			setState(763); match(SEMI);
+			setState(763);
+			match(SEMI);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5817,7 +6252,7 @@ public class LismaParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\uacf5\uee8c\u4f5d\u8b0d\u4a45\u78bd\u1b2f\u3378\3c\u0300\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3c\u0300\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -5866,18 +6301,17 @@ public class LismaParser extends Parser {
 		"\3T\3T\3T\3U\3U\3U\3U\3U\7U\u02c9\nU\fU\16U\u02cc\13U\3U\3U\3V\3V\3V\3"+
 		"V\3V\3V\3W\3W\3X\3X\3X\7X\u02db\nX\fX\16X\u02de\13X\3Y\3Y\3Y\3Y\3Z\3Z"+
 		"\3Z\5Z\u02e7\nZ\3[\3[\3[\3[\3[\3\\\3\\\3\\\3\\\3\\\3]\3]\3]\3]\3]\3^\3"+
-		"^\6^\u02fa\n^\r^\16^\u02fb\3^\3^\3^\2_\2\4\6\b\n\f\16\20\22\24\26\30\32"+
-		"\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLNPRTVXZ\\^`bdfhjlnprtvxz|~\u0080"+
+		"^\6^\u02fa\n^\r^\16^\u02fb\3^\3^\3^\2\2_\2\4\6\b\n\f\16\20\22\24\26\30"+
+		"\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLNPRTVXZ\\^`bdfhjlnprtvxz|~\u0080"+
 		"\u0082\u0084\u0086\u0088\u008a\u008c\u008e\u0090\u0092\u0094\u0096\u0098"+
 		"\u009a\u009c\u009e\u00a0\u00a2\u00a4\u00a6\u00a8\u00aa\u00ac\u00ae\u00b0"+
-		"\u00b2\u00b4\u00b6\u00b8\u00ba\2\20\5\2\21\21\31\31##\4\2\n\n!\"\5\2\r"+
-		"\r\26\26\60\60\5\2\4\4\13\13\30\30\5\2\f\f\20\20%%\4\2\23\23\66\66\3\2"+
-		"QR\4\2KKNN\4\2FGLM\4\2STXX\3\2\64\65\4\2\33\33\'(\5\2\7\7\32\32//\5\2"+
-		"\36\36))\62\62\u02f8\2\u00bf\3\2\2\2\4\u00d2\3\2\2\2\6\u00d4\3\2\2\2\b"+
-		"\u00e9\3\2\2\2\n\u00eb\3\2\2\2\f\u00f0\3\2\2\2\16\u0101\3\2\2\2\20\u0109"+
-		"\3\2\2\2\22\u010b\3\2\2\2\24\u010d\3\2\2\2\26\u0113\3\2\2\2\30\u0115\3"+
-		"\2\2\2\32\u0120\3\2\2\2\34\u012d\3\2\2\2\36\u0136\3\2\2\2 \u013e\3\2\2"+
-		"\2\"\u0140\3\2\2\2$\u0142\3\2\2\2&\u0144\3\2\2\2(\u0146\3\2\2\2*\u0148"+
+		"\u00b2\u00b4\u00b6\u00b8\u00ba\2\20\3\2\n\f\3\2\r\17\3\2\20\22\3\2\23"+
+		"\25\3\2\30\32\4\2  \66\66\3\2QR\4\2KKNN\4\2FGLM\4\2STXX\3\2\64\65\3\2"+
+		"$&\3\2\')\3\2*,\2\u02f8\2\u00bf\3\2\2\2\4\u00d2\3\2\2\2\6\u00d4\3\2\2"+
+		"\2\b\u00e9\3\2\2\2\n\u00eb\3\2\2\2\f\u00f0\3\2\2\2\16\u0101\3\2\2\2\20"+
+		"\u0109\3\2\2\2\22\u010b\3\2\2\2\24\u010d\3\2\2\2\26\u0113\3\2\2\2\30\u0115"+
+		"\3\2\2\2\32\u0120\3\2\2\2\34\u012d\3\2\2\2\36\u0136\3\2\2\2 \u013e\3\2"+
+		"\2\2\"\u0140\3\2\2\2$\u0142\3\2\2\2&\u0144\3\2\2\2(\u0146\3\2\2\2*\u0148"+
 		"\3\2\2\2,\u014a\3\2\2\2.\u014c\3\2\2\2\60\u014e\3\2\2\2\62\u0150\3\2\2"+
 		"\2\64\u0159\3\2\2\2\66\u015e\3\2\2\28\u0173\3\2\2\2:\u0175\3\2\2\2<\u017c"+
 		"\3\2\2\2>\u017e\3\2\2\2@\u0184\3\2\2\2B\u0192\3\2\2\2D\u01a0\3\2\2\2F"+
@@ -5907,32 +6341,32 @@ public class LismaParser extends Parser {
 		"\u00c7\3\2\2\2\u00d2\u00c8\3\2\2\2\u00d2\u00c9\3\2\2\2\u00d2\u00ca\3\2"+
 		"\2\2\u00d2\u00cb\3\2\2\2\u00d2\u00cc\3\2\2\2\u00d2\u00cd\3\2\2\2\u00d2"+
 		"\u00ce\3\2\2\2\u00d2\u00cf\3\2\2\2\u00d2\u00d0\3\2\2\2\u00d2\u00d1\3\2"+
-		"\2\2\u00d3\5\3\2\2\2\u00d4\u00d5\7\22\2\2\u00d5\u00da\5\b\5\2\u00d6\u00d7"+
+		"\2\2\u00d3\5\3\2\2\2\u00d4\u00d5\7\3\2\2\u00d5\u00da\5\b\5\2\u00d6\u00d7"+
 		"\7A\2\2\u00d7\u00d9\5\b\5\2\u00d8\u00d6\3\2\2\2\u00d9\u00dc\3\2\2\2\u00da"+
 		"\u00d8\3\2\2\2\u00da\u00db\3\2\2\2\u00db\u00dd\3\2\2\2\u00dc\u00da\3\2"+
 		"\2\2\u00dd\u00de\7@\2\2\u00de\7\3\2\2\2\u00df\u00e0\5j\66\2\u00e0\u00e1"+
 		"\7E\2\2\u00e1\u00e3\3\2\2\2\u00e2\u00df\3\2\2\2\u00e3\u00e4\3\2\2\2\u00e4"+
 		"\u00e2\3\2\2\2\u00e4\u00e5\3\2\2\2\u00e5\u00e6\3\2\2\2\u00e6\u00e7\5x"+
 		"=\2\u00e7\u00ea\3\2\2\2\u00e8\u00ea\5j\66\2\u00e9\u00e2\3\2\2\2\u00e9"+
-		"\u00e8\3\2\2\2\u00ea\t\3\2\2\2\u00eb\u00ec\7\27\2\2\u00ec\u00ed\7\22\2"+
-		"\2\u00ed\u00ee\5\u009aN\2\u00ee\u00ef\7@\2\2\u00ef\13\3\2\2\2\u00f0\u00f1"+
-		"\7\16\2\2\u00f1\u00f2\5j\66\2\u00f2\u00f3\7>\2\2\u00f3\u00f4\5\16\b\2"+
-		"\u00f4\u00f5\7A\2\2\u00f5\u00f6\5\16\b\2\u00f6\u00f8\7?\2\2\u00f7\u00f9"+
-		"\5\20\t\2\u00f8\u00f7\3\2\2\2\u00f8\u00f9\3\2\2\2\u00f9\u00fa\3\2\2\2"+
-		"\u00fa\u00fb\7@\2\2\u00fb\r\3\2\2\2\u00fc\u00fe\7R\2\2\u00fd\u00fc\3\2"+
-		"\2\2\u00fd\u00fe\3\2\2\2\u00fe\u00ff\3\2\2\2\u00ff\u0102\5\u009aN\2\u0100"+
-		"\u0102\7\66\2\2\u0101\u00fd\3\2\2\2\u0101\u0100\3\2\2\2\u0102\17\3\2\2"+
-		"\2\u0103\u0104\5\22\n\2\u0104\u0105\7\64\2\2\u0105\u010a\3\2\2\2\u0106"+
-		"\u0107\5\24\13\2\u0107\u0108\5\u009aN\2\u0108\u010a\3\2\2\2\u0109\u0103"+
-		"\3\2\2\2\u0109\u0106\3\2\2\2\u010a\21\3\2\2\2\u010b\u010c\7&\2\2\u010c"+
-		"\23\3\2\2\2\u010d\u010e\7\61\2\2\u010e\25\3\2\2\2\u010f\u0114\5\30\r\2"+
-		"\u0110\u0114\5\32\16\2\u0111\u0114\5\34\17\2\u0112\u0114\5\36\20\2\u0113"+
-		"\u010f\3\2\2\2\u0113\u0110\3\2\2\2\u0113\u0111\3\2\2\2\u0113\u0112\3\2"+
-		"\2\2\u0114\27\3\2\2\2\u0115\u0116\5\"\22\2\u0116\u0117\7:\2\2\u0117\u0118"+
-		"\5.\30\2\u0118\u0119\7A\2\2\u0119\u011c\5\60\31\2\u011a\u011b\7A\2\2\u011b"+
-		"\u011d\7\64\2\2\u011c\u011a\3\2\2\2\u011c\u011d\3\2\2\2\u011d\u011e\3"+
-		"\2\2\2\u011e\u011f\7;\2\2\u011f\31\3\2\2\2\u0120\u0121\5$\23\2\u0121\u0122"+
-		"\7:\2\2\u0122\u0123\5.\30\2\u0123\u0124\7A\2\2\u0124\u0125\5\60\31\2\u0125"+
+		"\u00e8\3\2\2\2\u00ea\t\3\2\2\2\u00eb\u00ec\7\4\2\2\u00ec\u00ed\7\3\2\2"+
+		"\u00ed\u00ee\5\u009aN\2\u00ee\u00ef\7@\2\2\u00ef\13\3\2\2\2\u00f0\u00f1"+
+		"\7\5\2\2\u00f1\u00f2\5j\66\2\u00f2\u00f3\7>\2\2\u00f3\u00f4\5\16\b\2\u00f4"+
+		"\u00f5\7A\2\2\u00f5\u00f6\5\16\b\2\u00f6\u00f8\7?\2\2\u00f7\u00f9\5\20"+
+		"\t\2\u00f8\u00f7\3\2\2\2\u00f8\u00f9\3\2\2\2\u00f9\u00fa\3\2\2\2\u00fa"+
+		"\u00fb\7@\2\2\u00fb\r\3\2\2\2\u00fc\u00fe\7R\2\2\u00fd\u00fc\3\2\2\2\u00fd"+
+		"\u00fe\3\2\2\2\u00fe\u00ff\3\2\2\2\u00ff\u0102\5\u009aN\2\u0100\u0102"+
+		"\7\66\2\2\u0101\u00fd\3\2\2\2\u0101\u0100\3\2\2\2\u0102\17\3\2\2\2\u0103"+
+		"\u0104\5\22\n\2\u0104\u0105\7\64\2\2\u0105\u010a\3\2\2\2\u0106\u0107\5"+
+		"\24\13\2\u0107\u0108\5\u009aN\2\u0108\u010a\3\2\2\2\u0109\u0103\3\2\2"+
+		"\2\u0109\u0106\3\2\2\2\u010a\21\3\2\2\2\u010b\u010c\7\6\2\2\u010c\23\3"+
+		"\2\2\2\u010d\u010e\7\7\2\2\u010e\25\3\2\2\2\u010f\u0114\5\30\r\2\u0110"+
+		"\u0114\5\32\16\2\u0111\u0114\5\34\17\2\u0112\u0114\5\36\20\2\u0113\u010f"+
+		"\3\2\2\2\u0113\u0110\3\2\2\2\u0113\u0111\3\2\2\2\u0113\u0112\3\2\2\2\u0114"+
+		"\27\3\2\2\2\u0115\u0116\5\"\22\2\u0116\u0117\7:\2\2\u0117\u0118\5.\30"+
+		"\2\u0118\u0119\7A\2\2\u0119\u011c\5\60\31\2\u011a\u011b\7A\2\2\u011b\u011d"+
+		"\7\64\2\2\u011c\u011a\3\2\2\2\u011c\u011d\3\2\2\2\u011d\u011e\3\2\2\2"+
+		"\u011e\u011f\7;\2\2\u011f\31\3\2\2\2\u0120\u0121\5$\23\2\u0121\u0122\7"+
+		":\2\2\u0122\u0123\5.\30\2\u0123\u0124\7A\2\2\u0124\u0125\5\60\31\2\u0125"+
 		"\u0126\7A\2\2\u0126\u0129\5\60\31\2\u0127\u0128\7A\2\2\u0128\u012a\7\64"+
 		"\2\2\u0129\u0127\3\2\2\2\u0129\u012a\3\2\2\2\u012a\u012b\3\2\2\2\u012b"+
 		"\u012c\7;\2\2\u012c\33\3\2\2\2\u012d\u012e\5&\24\2\u012e\u012f\7:\2\2"+
@@ -5941,152 +6375,153 @@ public class LismaParser extends Parser {
 		"\35\3\2\2\2\u0136\u0137\5 \21\2\u0137\u0138\7:\2\2\u0138\u0139\5.\30\2"+
 		"\u0139\u013a\7;\2\2\u013a\37\3\2\2\2\u013b\u013f\5(\25\2\u013c\u013f\5"+
 		"*\26\2\u013d\u013f\5,\27\2\u013e\u013b\3\2\2\2\u013e\u013c\3\2\2\2\u013e"+
-		"\u013d\3\2\2\2\u013f!\3\2\2\2\u0140\u0141\7\25\2\2\u0141#\3\2\2\2\u0142"+
-		"\u0143\7\35\2\2\u0143%\3\2\2\2\u0144\u0145\t\2\2\2\u0145\'\3\2\2\2\u0146"+
+		"\u013d\3\2\2\2\u013f!\3\2\2\2\u0140\u0141\7\b\2\2\u0141#\3\2\2\2\u0142"+
+		"\u0143\7\t\2\2\u0143%\3\2\2\2\u0144\u0145\t\2\2\2\u0145\'\3\2\2\2\u0146"+
 		"\u0147\t\3\2\2\u0147)\3\2\2\2\u0148\u0149\t\4\2\2\u0149+\3\2\2\2\u014a"+
 		"\u014b\t\5\2\2\u014b-\3\2\2\2\u014c\u014d\7\66\2\2\u014d/\3\2\2\2\u014e"+
-		"\u014f\7\66\2\2\u014f\61\3\2\2\2\u0150\u0151\7-\2\2\u0151\u0152\5\64\33"+
-		"\2\u0152\u0153\7\34\2\2\u0153\u0154\7\66\2\2\u0154\u0155\5\66\34\2\u0155"+
-		"\u0156\7@\2\2\u0156\63\3\2\2\2\u0157\u015a\7\66\2\2\u0158\u015a\5\26\f"+
-		"\2\u0159\u0157\3\2\2\2\u0159\u0158\3\2\2\2\u015a\u015b\3\2\2\2\u015b\u015c"+
-		"\7E\2\2\u015c\u015d\5x=\2\u015d\65\3\2\2\2\u015e\u015f\t\6\2\2\u015f\67"+
-		"\3\2\2\2\u0160\u0161\5h\65\2\u0161\u0162\7:\2\2\u0162\u0163\7\6\2\2\u0163"+
-		"\u0164\7;\2\2\u0164\u0165\7E\2\2\u0165\u0166\5x=\2\u0166\u0167\7@\2\2"+
-		"\u0167\u0174\3\2\2\2\u0168\u0169\7\24\2\2\u0169\u016e\5:\36\2\u016a\u016b"+
-		"\7A\2\2\u016b\u016d\5:\36\2\u016c\u016a\3\2\2\2\u016d\u0170\3\2\2\2\u016e"+
-		"\u016c\3\2\2\2\u016e\u016f\3\2\2\2\u016f\u0171\3\2\2\2\u0170\u016e\3\2"+
-		"\2\2\u0171\u0172\7@\2\2\u0172\u0174\3\2\2\2\u0173\u0160\3\2\2\2\u0173"+
-		"\u0168\3\2\2\2\u01749\3\2\2\2\u0175\u0176\5h\65\2\u0176\u0177\7E\2\2\u0177"+
-		"\u0178\5x=\2\u0178;\3\2\2\2\u0179\u017d\5> \2\u017a\u017d\5@!\2\u017b"+
-		"\u017d\5B\"\2\u017c\u0179\3\2\2\2\u017c\u017a\3\2\2\2\u017c\u017b\3\2"+
-		"\2\2\u017d=\3\2\2\2\u017e\u017f\5h\65\2\u017f\u0180\7E\2\2\u0180\u0181"+
-		"\5x=\2\u0181\u0182\7@\2\2\u0182?\3\2\2\2\u0183\u0185\7\63\2\2\u0184\u0183"+
-		"\3\2\2\2\u0184\u0185\3\2\2\2\u0185\u0186\3\2\2\2\u0186\u018b\5\26\f\2"+
-		"\u0187\u0188\7Q\2\2\u0188\u018a\5\26\f\2\u0189\u0187\3\2\2\2\u018a\u018d"+
-		"\3\2\2\2\u018b\u0189\3\2\2\2\u018b\u018c\3\2\2\2\u018c\u018e\3\2\2\2\u018d"+
-		"\u018b\3\2\2\2\u018e\u018f\7E\2\2\u018f\u0190\5x=\2\u0190\u0191\7@\2\2"+
-		"\u0191A\3\2\2\2\u0192\u0193\7\63\2\2\u0193\u0198\5D#\2\u0194\u0195\7Q"+
-		"\2\2\u0195\u0197\5D#\2\u0196\u0194\3\2\2\2\u0197\u019a\3\2\2\2\u0198\u0196"+
-		"\3\2\2\2\u0198\u0199\3\2\2\2\u0199\u019b\3\2\2\2\u019a\u0198\3\2\2\2\u019b"+
-		"\u019c\7E\2\2\u019c\u019d\5x=\2\u019d\u019e\7@\2\2\u019eC\3\2\2\2\u019f"+
-		"\u01a1\5F$\2\u01a0\u019f\3\2\2\2\u01a0\u01a1\3\2\2\2\u01a1\u01a2\3\2\2"+
-		"\2\u01a2\u01a3\5\26\f\2\u01a3E\3\2\2\2\u01a4\u01a5\5H%\2\u01a5\u01a6\7"+
-		"S\2\2\u01a6G\3\2\2\2\u01a7\u01a8\7>\2\2\u01a8\u01a9\5x=\2\u01a9\u01aa"+
-		"\7?\2\2\u01aa\u01ae\3\2\2\2\u01ab\u01ae\7\66\2\2\u01ac\u01ae\5\u009aN"+
-		"\2\u01ad\u01a7\3\2\2\2\u01ad\u01ab\3\2\2\2\u01ad\u01ac\3\2\2\2\u01aeI"+
-		"\3\2\2\2\u01af\u01b0\7\b\2\2\u01b0\u01b1\7\66\2\2\u01b1\u01b2\7E\2\2\u01b2"+
-		"\u01b7\5L\'\2\u01b3\u01b4\7A\2\2\u01b4\u01b6\5L\'\2\u01b5\u01b3\3\2\2"+
-		"\2\u01b6\u01b9\3\2\2\2\u01b7\u01b5\3\2\2\2\u01b7\u01b8\3\2\2\2\u01b8\u01ba"+
-		"\3\2\2\2\u01b9\u01b7\3\2\2\2\u01ba\u01bb\5N(\2\u01bbK\3\2\2\2\u01bc\u01bf"+
-		"\5\u009aN\2\u01bd\u01be\7J\2\2\u01be\u01c0\5\u009aN\2\u01bf\u01bd\3\2"+
-		"\2\2\u01bf\u01c0\3\2\2\2\u01c0M\3\2\2\2\u01c1\u01c9\7<\2\2\u01c2\u01c8"+
-		"\5<\37\2\u01c3\u01c8\58\35\2\u01c4\u01c8\5\6\4\2\u01c5\u01c8\5X-\2\u01c6"+
-		"\u01c8\5\u00a2R\2\u01c7\u01c2\3\2\2\2\u01c7\u01c3\3\2\2\2\u01c7\u01c4"+
-		"\3\2\2\2\u01c7\u01c5\3\2\2\2\u01c7\u01c6\3\2\2\2\u01c8\u01cb\3\2\2\2\u01c9"+
-		"\u01c7\3\2\2\2\u01c9\u01ca\3\2\2\2\u01ca\u01cc\3\2\2\2\u01cb\u01c9\3\2"+
-		"\2\2\u01cc\u01cd\7=\2\2\u01cdO\3\2\2\2\u01ce\u01cf\7\3\2\2\u01cf\u01d0"+
-		"\5V,\2\u01d0\u01d1\7:\2\2\u01d1\u01d2\5x=\2\u01d2\u01d3\7;\2\2\u01d3\u01d5"+
-		"\5R*\2\u01d4\u01d6\5T+\2\u01d5\u01d4\3\2\2\2\u01d5\u01d6\3\2\2\2\u01d6"+
-		"\u01d7\3\2\2\2\u01d7\u01d8\7@\2\2\u01d8Q\3\2\2\2\u01d9\u01df\7<\2\2\u01da"+
-		"\u01de\5<\37\2\u01db\u01de\5\u00a6T\2\u01dc\u01de\5J&\2\u01dd\u01da\3"+
-		"\2\2\2\u01dd\u01db\3\2\2\2\u01dd\u01dc\3\2\2\2\u01de\u01e1\3\2\2\2\u01df"+
-		"\u01dd\3\2\2\2\u01df\u01e0\3\2\2\2\u01e0\u01e2\3\2\2\2\u01e1\u01df\3\2"+
-		"\2\2\u01e2\u01e3\7=\2\2\u01e3S\3\2\2\2\u01e4\u01e5\7 \2\2\u01e5\u01ea"+
-		"\5V,\2\u01e6\u01e7\7A\2\2\u01e7\u01e9\5V,\2\u01e8\u01e6\3\2\2\2\u01e9"+
-		"\u01ec\3\2\2\2\u01ea\u01e8\3\2\2\2\u01ea\u01eb\3\2\2\2\u01ebU\3\2\2\2"+
-		"\u01ec\u01ea\3\2\2\2\u01ed\u01ee\t\7\2\2\u01eeW\3\2\2\2\u01ef\u01f0\7"+
-		"\37\2\2\u01f0\u01f1\7:\2\2\u01f1\u01f2\5x=\2\u01f2\u01f3\7;\2\2\u01f3"+
-		"\u01f5\5Z.\2\u01f4\u01f6\5^\60\2\u01f5\u01f4\3\2\2\2\u01f5\u01f6\3\2\2"+
-		"\2\u01f6Y\3\2\2\2\u01f7\u01fb\7<\2\2\u01f8\u01fa\5\\/\2\u01f9\u01f8\3"+
-		"\2\2\2\u01fa\u01fd\3\2\2\2\u01fb\u01f9\3\2\2\2\u01fb\u01fc\3\2\2\2\u01fc"+
-		"\u01fe\3\2\2\2\u01fd\u01fb\3\2\2\2\u01fe\u01ff\7=\2\2\u01ff[\3\2\2\2\u0200"+
-		"\u0203\5<\37\2\u0201\u0203\5\u00a6T\2\u0202\u0200\3\2\2\2\u0202\u0201"+
-		"\3\2\2\2\u0203]\3\2\2\2\u0204\u0205\7,\2\2\u0205\u0206\5Z.\2\u0206_\3"+
-		"\2\2\2\u0207\u0208\7\66\2\2\u0208\u0209\7:\2\2\u0209\u020a\5b\62\2\u020a"+
-		"\u020b\7;\2\2\u020ba\3\2\2\2\u020c\u0211\5x=\2\u020d\u020e\7A\2\2\u020e"+
-		"\u0210\5x=\2\u020f\u020d\3\2\2\2\u0210\u0213\3\2\2\2\u0211\u020f\3\2\2"+
-		"\2\u0211\u0212\3\2\2\2\u0212c\3\2\2\2\u0213\u0211\3\2\2\2\u0214\u0215"+
-		"\5j\66\2\u0215\u0216\5f\64\2\u0216\u021f\3\2\2\2\u0217\u0218\7+\2\2\u0218"+
-		"\u0219\7:\2\2\u0219\u021a\5j\66\2\u021a\u021b\7A\2\2\u021b\u021c\7\64"+
-		"\2\2\u021c\u021d\7;\2\2\u021d\u021f\3\2\2\2\u021e\u0214\3\2\2\2\u021e"+
-		"\u0217\3\2\2\2\u021fe\3\2\2\2\u0220\u0222\7C\2\2\u0221\u0220\3\2\2\2\u0222"+
-		"\u0223\3\2\2\2\u0223\u0221\3\2\2\2\u0223\u0224\3\2\2\2\u0224\u022b\3\2"+
-		"\2\2\u0225\u0227\7D\2\2\u0226\u0225\3\2\2\2\u0227\u0228\3\2\2\2\u0228"+
-		"\u0226\3\2\2\2\u0228\u0229\3\2\2\2\u0229\u022b\3\2\2\2\u022a\u0221\3\2"+
-		"\2\2\u022a\u0226\3\2\2\2\u022bg\3\2\2\2\u022c\u022f\5j\66\2\u022d\u022f"+
-		"\5d\63\2\u022e\u022c\3\2\2\2\u022e\u022d\3\2\2\2\u022fi\3\2\2\2\u0230"+
-		"\u0232\7\66\2\2\u0231\u0233\5l\67\2\u0232\u0231\3\2\2\2\u0232\u0233\3"+
-		"\2\2\2\u0233k\3\2\2\2\u0234\u0235\7>\2\2\u0235\u0236\5n8\2\u0236\u0238"+
-		"\7?\2\2\u0237\u0239\5p9\2\u0238\u0237\3\2\2\2\u0238\u0239\3\2\2\2\u0239"+
-		"m\3\2\2\2\u023a\u023d\7\66\2\2\u023b\u023c\t\b\2\2\u023c\u023e\5\u009a"+
-		"N\2\u023d\u023b\3\2\2\2\u023d\u023e\3\2\2\2\u023eo\3\2\2\2\u023f\u0242"+
-		"\7\66\2\2\u0240\u0242\5\u009aN\2\u0241\u023f\3\2\2\2\u0241\u0240\3\2\2"+
-		"\2\u0242q\3\2\2\2\u0243\u0244\5t;\2\u0244\u0245\5x=\2\u0245\u0246\5v<"+
-		"\2\u0246s\3\2\2\2\u0247\u0248\7:\2\2\u0248u\3\2\2\2\u0249\u024a\7;\2\2"+
-		"\u024aw\3\2\2\2\u024b\u024c\5z>\2\u024cy\3\2\2\2\u024d\u024e\5|?\2\u024e"+
-		"{\3\2\2\2\u024f\u0255\5~@\2\u0250\u0251\5\u009cO\2\u0251\u0252\5~@\2\u0252"+
-		"\u0254\3\2\2\2\u0253\u0250\3\2\2\2\u0254\u0257\3\2\2\2\u0255\u0253\3\2"+
-		"\2\2\u0255\u0256\3\2\2\2\u0256}\3\2\2\2\u0257\u0255\3\2\2\2\u0258\u025e"+
-		"\5\u0080A\2\u0259\u025a\5\u009eP\2\u025a\u025b\5\u0080A\2\u025b\u025d"+
-		"\3\2\2\2\u025c\u0259\3\2\2\2\u025d\u0260\3\2\2\2\u025e\u025c\3\2\2\2\u025e"+
-		"\u025f\3\2\2\2\u025f\177\3\2\2\2\u0260\u025e\3\2\2\2\u0261\u0267\5\u0084"+
-		"C\2\u0262\u0263\5\u0082B\2\u0263\u0264\5\u0084C\2\u0264\u0266\3\2\2\2"+
-		"\u0265\u0262\3\2\2\2\u0266\u0269\3\2\2\2\u0267\u0265\3\2\2\2\u0267\u0268"+
-		"\3\2\2\2\u0268\u0081\3\2\2\2\u0269\u0267\3\2\2\2\u026a\u026b\t\t\2\2\u026b"+
-		"\u0083\3\2\2\2\u026c\u0272\5\u0088E\2\u026d\u026e\5\u0086D\2\u026e\u026f"+
-		"\5\u0088E\2\u026f\u0271\3\2\2\2\u0270\u026d\3\2\2\2\u0271\u0274\3\2\2"+
-		"\2\u0272\u0270\3\2\2\2\u0272\u0273\3\2\2\2\u0273\u0085\3\2\2\2\u0274\u0272"+
-		"\3\2\2\2\u0275\u0276\t\n\2\2\u0276\u0087\3\2\2\2\u0277\u027d\5\u008cG"+
-		"\2\u0278\u0279\5\u008aF\2\u0279\u027a\5\u008cG\2\u027a\u027c\3\2\2\2\u027b"+
-		"\u0278\3\2\2\2\u027c\u027f\3\2\2\2\u027d\u027b\3\2\2\2\u027d\u027e\3\2"+
-		"\2\2\u027e\u0089\3\2\2\2\u027f\u027d\3\2\2\2\u0280\u0281\t\b\2\2\u0281"+
-		"\u008b\3\2\2\2\u0282\u0288\5\u0090I\2\u0283\u0284\5\u008eH\2\u0284\u0285"+
-		"\5\u0090I\2\u0285\u0287\3\2\2\2\u0286\u0283\3\2\2\2\u0287\u028a\3\2\2"+
-		"\2\u0288\u0286\3\2\2\2\u0288\u0289\3\2\2\2\u0289\u008d\3\2\2\2\u028a\u0288"+
-		"\3\2\2\2\u028b\u028c\t\13\2\2\u028c\u008f\3\2\2\2\u028d\u028e\5\u0092"+
-		"J\2\u028e\u028f\5\u0090I\2\u028f\u0292\3\2\2\2\u0290\u0292\5\u0094K\2"+
-		"\u0291\u028d\3\2\2\2\u0291\u0290\3\2\2\2\u0292\u0091\3\2\2\2\u0293\u0294"+
-		"\t\b\2\2\u0294\u0093\3\2\2\2\u0295\u0296\5\u00a0Q\2\u0296\u0297\5\u0090"+
-		"I\2\u0297\u029a\3\2\2\2\u0298\u029a\5\u0096L\2\u0299\u0295\3\2\2\2\u0299"+
-		"\u0298\3\2\2\2\u029a\u0095\3\2\2\2\u029b\u02a1\5r:\2\u029c\u02a1\5\u0098"+
-		"M\2\u029d\u02a1\5\u009aN\2\u029e\u02a1\5\26\f\2\u029f\u02a1\5`\61\2\u02a0"+
-		"\u029b\3\2\2\2\u02a0\u029c\3\2\2\2\u02a0\u029d\3\2\2\2\u02a0\u029e\3\2"+
-		"\2\2\u02a0\u029f\3\2\2\2\u02a1\u0097\3\2\2\2\u02a2\u02a4\7\66\2\2\u02a3"+
-		"\u02a5\5l\67\2\u02a4\u02a3\3\2\2\2\u02a4\u02a5\3\2\2\2\u02a5\u0099\3\2"+
-		"\2\2\u02a6\u02a7\t\f\2\2\u02a7\u009b\3\2\2\2\u02a8\u02a9\t\r\2\2\u02a9"+
-		"\u009d\3\2\2\2\u02aa\u02ab\t\16\2\2\u02ab\u009f\3\2\2\2\u02ac\u02ad\t"+
-		"\17\2\2\u02ad\u00a1\3\2\2\2\u02ae\u02af\7\17\2\2\u02af\u02b4\5\u00a4S"+
-		"\2\u02b0\u02b1\7A\2\2\u02b1\u02b3\5\u00a4S\2\u02b2\u02b0\3\2\2\2\u02b3"+
-		"\u02b6\3\2\2\2\u02b4\u02b2\3\2\2\2\u02b4\u02b5\3\2\2\2\u02b5\u02b7\3\2"+
-		"\2\2\u02b6\u02b4\3\2\2\2\u02b7\u02b8\7@\2\2\u02b8\u00a3\3\2\2\2\u02b9"+
-		"\u02ba\5\u0098M\2\u02ba\u02bb\7E\2\2\u02bb\u02bc\5x=\2\u02bc\u00a5\3\2"+
-		"\2\2\u02bd\u02be\7\5\2\2\u02be\u02bf\5j\66\2\u02bf\u02c0\7E\2\2\u02c0"+
-		"\u02c1\5x=\2\u02c1\u02c2\7@\2\2\u02c2\u00a7\3\2\2\2\u02c3\u02c4\7\16\2"+
-		"\2\u02c4\u02c5\7\t\2\2\u02c5\u02ca\5j\66\2\u02c6\u02c7\7A\2\2\u02c7\u02c9"+
-		"\5j\66\2\u02c8\u02c6\3\2\2\2\u02c9\u02cc\3\2\2\2\u02ca\u02c8\3\2\2\2\u02ca"+
-		"\u02cb\3\2\2\2\u02cb\u02cd\3\2\2\2\u02cc\u02ca\3\2\2\2\u02cd\u02ce\7@"+
-		"\2\2\u02ce\u00a9\3\2\2\2\u02cf\u02d0\7\t\2\2\u02d0\u02d1\5\u00aeX\2\u02d1"+
-		"\u02d2\7E\2\2\u02d2\u02d3\5\u00acW\2\u02d3\u02d4\7@\2\2\u02d4\u00ab\3"+
-		"\2\2\2\u02d5\u02d6\5x=\2\u02d6\u00ad\3\2\2\2\u02d7\u02dc\5\u00b0Y\2\u02d8"+
-		"\u02d9\7Q\2\2\u02d9\u02db\5\u00b0Y\2\u02da\u02d8\3\2\2\2\u02db\u02de\3"+
-		"\2\2\2\u02dc\u02da\3\2\2\2\u02dc\u02dd\3\2\2\2\u02dd\u00af\3\2\2\2\u02de"+
-		"\u02dc\3\2\2\2\u02df\u02e0\5j\66\2\u02e0\u02e1\7S\2\2\u02e1\u02e2\5\u00b2"+
-		"Z\2\u02e2\u00b1\3\2\2\2\u02e3\u02e7\5\u0096L\2\u02e4\u02e7\5r:\2\u02e5"+
-		"\u02e7\5\u008cG\2\u02e6\u02e3\3\2\2\2\u02e6\u02e4\3\2\2\2\u02e6\u02e5"+
-		"\3\2\2\2\u02e7\u00b3\3\2\2\2\u02e8\u02e9\7*\2\2\u02e9\u02ea\7E\2\2\u02ea"+
-		"\u02eb\5x=\2\u02eb\u02ec\7@\2\2\u02ec\u00b5\3\2\2\2\u02ed\u02ee\7.\2\2"+
-		"\u02ee\u02ef\7E\2\2\u02ef\u02f0\5x=\2\u02f0\u02f1\7@\2\2\u02f1\u00b7\3"+
-		"\2\2\2\u02f2\u02f3\7\61\2\2\u02f3\u02f4\7E\2\2\u02f4\u02f5\5x=\2\u02f5"+
-		"\u02f6\7@\2\2\u02f6\u00b9\3\2\2\2\u02f7\u02f9\7$\2\2\u02f8\u02fa\5j\66"+
-		"\2\u02f9\u02f8\3\2\2\2\u02fa\u02fb\3\2\2\2\u02fb\u02f9\3\2\2\2\u02fb\u02fc"+
-		"\3\2\2\2\u02fc\u02fd\3\2\2\2\u02fd\u02fe\7@\2\2\u02fe\u00bb\3\2\2\2=\u00bf"+
-		"\u00d2\u00da\u00e4\u00e9\u00f8\u00fd\u0101\u0109\u0113\u011c\u0129\u0132"+
-		"\u013e\u0159\u016e\u0173\u017c\u0184\u018b\u0198\u01a0\u01ad\u01b7\u01bf"+
-		"\u01c7\u01c9\u01d5\u01dd\u01df\u01ea\u01f5\u01fb\u0202\u0211\u021e\u0223"+
-		"\u0228\u022a\u022e\u0232\u0238\u023d\u0241\u0255\u025e\u0267\u0272\u027d"+
-		"\u0288\u0291\u0299\u02a0\u02a4\u02b4\u02ca\u02dc\u02e6\u02fb";
+		"\u014f\7\66\2\2\u014f\61\3\2\2\2\u0150\u0151\7\26\2\2\u0151\u0152\5\64"+
+		"\33\2\u0152\u0153\7\27\2\2\u0153\u0154\7\66\2\2\u0154\u0155\5\66\34\2"+
+		"\u0155\u0156\7@\2\2\u0156\63\3\2\2\2\u0157\u015a\7\66\2\2\u0158\u015a"+
+		"\5\26\f\2\u0159\u0157\3\2\2\2\u0159\u0158\3\2\2\2\u015a\u015b\3\2\2\2"+
+		"\u015b\u015c\7E\2\2\u015c\u015d\5x=\2\u015d\65\3\2\2\2\u015e\u015f\t\6"+
+		"\2\2\u015f\67\3\2\2\2\u0160\u0161\5h\65\2\u0161\u0162\7:\2\2\u0162\u0163"+
+		"\7\33\2\2\u0163\u0164\7;\2\2\u0164\u0165\7E\2\2\u0165\u0166\5x=\2\u0166"+
+		"\u0167\7@\2\2\u0167\u0174\3\2\2\2\u0168\u0169\7\34\2\2\u0169\u016e\5:"+
+		"\36\2\u016a\u016b\7A\2\2\u016b\u016d\5:\36\2\u016c\u016a\3\2\2\2\u016d"+
+		"\u0170\3\2\2\2\u016e\u016c\3\2\2\2\u016e\u016f\3\2\2\2\u016f\u0171\3\2"+
+		"\2\2\u0170\u016e\3\2\2\2\u0171\u0172\7@\2\2\u0172\u0174\3\2\2\2\u0173"+
+		"\u0160\3\2\2\2\u0173\u0168\3\2\2\2\u01749\3\2\2\2\u0175\u0176\5h\65\2"+
+		"\u0176\u0177\7E\2\2\u0177\u0178\5x=\2\u0178;\3\2\2\2\u0179\u017d\5> \2"+
+		"\u017a\u017d\5@!\2\u017b\u017d\5B\"\2\u017c\u0179\3\2\2\2\u017c\u017a"+
+		"\3\2\2\2\u017c\u017b\3\2\2\2\u017d=\3\2\2\2\u017e\u017f\5h\65\2\u017f"+
+		"\u0180\7E\2\2\u0180\u0181\5x=\2\u0181\u0182\7@\2\2\u0182?\3\2\2\2\u0183"+
+		"\u0185\7\63\2\2\u0184\u0183\3\2\2\2\u0184\u0185\3\2\2\2\u0185\u0186\3"+
+		"\2\2\2\u0186\u018b\5\26\f\2\u0187\u0188\7Q\2\2\u0188\u018a\5\26\f\2\u0189"+
+		"\u0187\3\2\2\2\u018a\u018d\3\2\2\2\u018b\u0189\3\2\2\2\u018b\u018c\3\2"+
+		"\2\2\u018c\u018e\3\2\2\2\u018d\u018b\3\2\2\2\u018e\u018f\7E\2\2\u018f"+
+		"\u0190\5x=\2\u0190\u0191\7@\2\2\u0191A\3\2\2\2\u0192\u0193\7\63\2\2\u0193"+
+		"\u0198\5D#\2\u0194\u0195\7Q\2\2\u0195\u0197\5D#\2\u0196\u0194\3\2\2\2"+
+		"\u0197\u019a\3\2\2\2\u0198\u0196\3\2\2\2\u0198\u0199\3\2\2\2\u0199\u019b"+
+		"\3\2\2\2\u019a\u0198\3\2\2\2\u019b\u019c\7E\2\2\u019c\u019d\5x=\2\u019d"+
+		"\u019e\7@\2\2\u019eC\3\2\2\2\u019f\u01a1\5F$\2\u01a0\u019f\3\2\2\2\u01a0"+
+		"\u01a1\3\2\2\2\u01a1\u01a2\3\2\2\2\u01a2\u01a3\5\26\f\2\u01a3E\3\2\2\2"+
+		"\u01a4\u01a5\5H%\2\u01a5\u01a6\7S\2\2\u01a6G\3\2\2\2\u01a7\u01a8\7>\2"+
+		"\2\u01a8\u01a9\5x=\2\u01a9\u01aa\7?\2\2\u01aa\u01ae\3\2\2\2\u01ab\u01ae"+
+		"\7\66\2\2\u01ac\u01ae\5\u009aN\2\u01ad\u01a7\3\2\2\2\u01ad\u01ab\3\2\2"+
+		"\2\u01ad\u01ac\3\2\2\2\u01aeI\3\2\2\2\u01af\u01b0\7\35\2\2\u01b0\u01b1"+
+		"\7\66\2\2\u01b1\u01b2\7E\2\2\u01b2\u01b7\5L\'\2\u01b3\u01b4\7A\2\2\u01b4"+
+		"\u01b6\5L\'\2\u01b5\u01b3\3\2\2\2\u01b6\u01b9\3\2\2\2\u01b7\u01b5\3\2"+
+		"\2\2\u01b7\u01b8\3\2\2\2\u01b8\u01ba\3\2\2\2\u01b9\u01b7\3\2\2\2\u01ba"+
+		"\u01bb\5N(\2\u01bbK\3\2\2\2\u01bc\u01bf\5\u009aN\2\u01bd\u01be\7J\2\2"+
+		"\u01be\u01c0\5\u009aN\2\u01bf\u01bd\3\2\2\2\u01bf\u01c0\3\2\2\2\u01c0"+
+		"M\3\2\2\2\u01c1\u01c9\7<\2\2\u01c2\u01c8\5<\37\2\u01c3\u01c8\58\35\2\u01c4"+
+		"\u01c8\5\6\4\2\u01c5\u01c8\5X-\2\u01c6\u01c8\5\u00a2R\2\u01c7\u01c2\3"+
+		"\2\2\2\u01c7\u01c3\3\2\2\2\u01c7\u01c4\3\2\2\2\u01c7\u01c5\3\2\2\2\u01c7"+
+		"\u01c6\3\2\2\2\u01c8\u01cb\3\2\2\2\u01c9\u01c7\3\2\2\2\u01c9\u01ca\3\2"+
+		"\2\2\u01ca\u01cc\3\2\2\2\u01cb\u01c9\3\2\2\2\u01cc\u01cd\7=\2\2\u01cd"+
+		"O\3\2\2\2\u01ce\u01cf\7\36\2\2\u01cf\u01d0\5V,\2\u01d0\u01d1\7:\2\2\u01d1"+
+		"\u01d2\5x=\2\u01d2\u01d3\7;\2\2\u01d3\u01d5\5R*\2\u01d4\u01d6\5T+\2\u01d5"+
+		"\u01d4\3\2\2\2\u01d5\u01d6\3\2\2\2\u01d6\u01d7\3\2\2\2\u01d7\u01d8\7@"+
+		"\2\2\u01d8Q\3\2\2\2\u01d9\u01df\7<\2\2\u01da\u01de\5<\37\2\u01db\u01de"+
+		"\5\u00a6T\2\u01dc\u01de\5J&\2\u01dd\u01da\3\2\2\2\u01dd\u01db\3\2\2\2"+
+		"\u01dd\u01dc\3\2\2\2\u01de\u01e1\3\2\2\2\u01df\u01dd\3\2\2\2\u01df\u01e0"+
+		"\3\2\2\2\u01e0\u01e2\3\2\2\2\u01e1\u01df\3\2\2\2\u01e2\u01e3\7=\2\2\u01e3"+
+		"S\3\2\2\2\u01e4\u01e5\7\37\2\2\u01e5\u01ea\5V,\2\u01e6\u01e7\7A\2\2\u01e7"+
+		"\u01e9\5V,\2\u01e8\u01e6\3\2\2\2\u01e9\u01ec\3\2\2\2\u01ea\u01e8\3\2\2"+
+		"\2\u01ea\u01eb\3\2\2\2\u01ebU\3\2\2\2\u01ec\u01ea\3\2\2\2\u01ed\u01ee"+
+		"\t\7\2\2\u01eeW\3\2\2\2\u01ef\u01f0\7!\2\2\u01f0\u01f1\7:\2\2\u01f1\u01f2"+
+		"\5x=\2\u01f2\u01f3\7;\2\2\u01f3\u01f5\5Z.\2\u01f4\u01f6\5^\60\2\u01f5"+
+		"\u01f4\3\2\2\2\u01f5\u01f6\3\2\2\2\u01f6Y\3\2\2\2\u01f7\u01fb\7<\2\2\u01f8"+
+		"\u01fa\5\\/\2\u01f9\u01f8\3\2\2\2\u01fa\u01fd\3\2\2\2\u01fb\u01f9\3\2"+
+		"\2\2\u01fb\u01fc\3\2\2\2\u01fc\u01fe\3\2\2\2\u01fd\u01fb\3\2\2\2\u01fe"+
+		"\u01ff\7=\2\2\u01ff[\3\2\2\2\u0200\u0203\5<\37\2\u0201\u0203\5\u00a6T"+
+		"\2\u0202\u0200\3\2\2\2\u0202\u0201\3\2\2\2\u0203]\3\2\2\2\u0204\u0205"+
+		"\7\"\2\2\u0205\u0206\5Z.\2\u0206_\3\2\2\2\u0207\u0208\7\66\2\2\u0208\u0209"+
+		"\7:\2\2\u0209\u020a\5b\62\2\u020a\u020b\7;\2\2\u020ba\3\2\2\2\u020c\u0211"+
+		"\5x=\2\u020d\u020e\7A\2\2\u020e\u0210\5x=\2\u020f\u020d\3\2\2\2\u0210"+
+		"\u0213\3\2\2\2\u0211\u020f\3\2\2\2\u0211\u0212\3\2\2\2\u0212c\3\2\2\2"+
+		"\u0213\u0211\3\2\2\2\u0214\u0215\5j\66\2\u0215\u0216\5f\64\2\u0216\u021f"+
+		"\3\2\2\2\u0217\u0218\7#\2\2\u0218\u0219\7:\2\2\u0219\u021a\5j\66\2\u021a"+
+		"\u021b\7A\2\2\u021b\u021c\7\64\2\2\u021c\u021d\7;\2\2\u021d\u021f\3\2"+
+		"\2\2\u021e\u0214\3\2\2\2\u021e\u0217\3\2\2\2\u021fe\3\2\2\2\u0220\u0222"+
+		"\7C\2\2\u0221\u0220\3\2\2\2\u0222\u0223\3\2\2\2\u0223\u0221\3\2\2\2\u0223"+
+		"\u0224\3\2\2\2\u0224\u022b\3\2\2\2\u0225\u0227\7D\2\2\u0226\u0225\3\2"+
+		"\2\2\u0227\u0228\3\2\2\2\u0228\u0226\3\2\2\2\u0228\u0229\3\2\2\2\u0229"+
+		"\u022b\3\2\2\2\u022a\u0221\3\2\2\2\u022a\u0226\3\2\2\2\u022bg\3\2\2\2"+
+		"\u022c\u022f\5j\66\2\u022d\u022f\5d\63\2\u022e\u022c\3\2\2\2\u022e\u022d"+
+		"\3\2\2\2\u022fi\3\2\2\2\u0230\u0232\7\66\2\2\u0231\u0233\5l\67\2\u0232"+
+		"\u0231\3\2\2\2\u0232\u0233\3\2\2\2\u0233k\3\2\2\2\u0234\u0235\7>\2\2\u0235"+
+		"\u0236\5n8\2\u0236\u0238\7?\2\2\u0237\u0239\5p9\2\u0238\u0237\3\2\2\2"+
+		"\u0238\u0239\3\2\2\2\u0239m\3\2\2\2\u023a\u023d\7\66\2\2\u023b\u023c\t"+
+		"\b\2\2\u023c\u023e\5\u009aN\2\u023d\u023b\3\2\2\2\u023d\u023e\3\2\2\2"+
+		"\u023eo\3\2\2\2\u023f\u0242\7\66\2\2\u0240\u0242\5\u009aN\2\u0241\u023f"+
+		"\3\2\2\2\u0241\u0240\3\2\2\2\u0242q\3\2\2\2\u0243\u0244\5t;\2\u0244\u0245"+
+		"\5x=\2\u0245\u0246\5v<\2\u0246s\3\2\2\2\u0247\u0248\7:\2\2\u0248u\3\2"+
+		"\2\2\u0249\u024a\7;\2\2\u024aw\3\2\2\2\u024b\u024c\5z>\2\u024cy\3\2\2"+
+		"\2\u024d\u024e\5|?\2\u024e{\3\2\2\2\u024f\u0255\5~@\2\u0250\u0251\5\u009c"+
+		"O\2\u0251\u0252\5~@\2\u0252\u0254\3\2\2\2\u0253\u0250\3\2\2\2\u0254\u0257"+
+		"\3\2\2\2\u0255\u0253\3\2\2\2\u0255\u0256\3\2\2\2\u0256}\3\2\2\2\u0257"+
+		"\u0255\3\2\2\2\u0258\u025e\5\u0080A\2\u0259\u025a\5\u009eP\2\u025a\u025b"+
+		"\5\u0080A\2\u025b\u025d\3\2\2\2\u025c\u0259\3\2\2\2\u025d\u0260\3\2\2"+
+		"\2\u025e\u025c\3\2\2\2\u025e\u025f\3\2\2\2\u025f\177\3\2\2\2\u0260\u025e"+
+		"\3\2\2\2\u0261\u0267\5\u0084C\2\u0262\u0263\5\u0082B\2\u0263\u0264\5\u0084"+
+		"C\2\u0264\u0266\3\2\2\2\u0265\u0262\3\2\2\2\u0266\u0269\3\2\2\2\u0267"+
+		"\u0265\3\2\2\2\u0267\u0268\3\2\2\2\u0268\u0081\3\2\2\2\u0269\u0267\3\2"+
+		"\2\2\u026a\u026b\t\t\2\2\u026b\u0083\3\2\2\2\u026c\u0272\5\u0088E\2\u026d"+
+		"\u026e\5\u0086D\2\u026e\u026f\5\u0088E\2\u026f\u0271\3\2\2\2\u0270\u026d"+
+		"\3\2\2\2\u0271\u0274\3\2\2\2\u0272\u0270\3\2\2\2\u0272\u0273\3\2\2\2\u0273"+
+		"\u0085\3\2\2\2\u0274\u0272\3\2\2\2\u0275\u0276\t\n\2\2\u0276\u0087\3\2"+
+		"\2\2\u0277\u027d\5\u008cG\2\u0278\u0279\5\u008aF\2\u0279\u027a\5\u008c"+
+		"G\2\u027a\u027c\3\2\2\2\u027b\u0278\3\2\2\2\u027c\u027f\3\2\2\2\u027d"+
+		"\u027b\3\2\2\2\u027d\u027e\3\2\2\2\u027e\u0089\3\2\2\2\u027f\u027d\3\2"+
+		"\2\2\u0280\u0281\t\b\2\2\u0281\u008b\3\2\2\2\u0282\u0288\5\u0090I\2\u0283"+
+		"\u0284\5\u008eH\2\u0284\u0285\5\u0090I\2\u0285\u0287\3\2\2\2\u0286\u0283"+
+		"\3\2\2\2\u0287\u028a\3\2\2\2\u0288\u0286\3\2\2\2\u0288\u0289\3\2\2\2\u0289"+
+		"\u008d\3\2\2\2\u028a\u0288\3\2\2\2\u028b\u028c\t\13\2\2\u028c\u008f\3"+
+		"\2\2\2\u028d\u028e\5\u0092J\2\u028e\u028f\5\u0090I\2\u028f\u0292\3\2\2"+
+		"\2\u0290\u0292\5\u0094K\2\u0291\u028d\3\2\2\2\u0291\u0290\3\2\2\2\u0292"+
+		"\u0091\3\2\2\2\u0293\u0294\t\b\2\2\u0294\u0093\3\2\2\2\u0295\u0296\5\u00a0"+
+		"Q\2\u0296\u0297\5\u0090I\2\u0297\u029a\3\2\2\2\u0298\u029a\5\u0096L\2"+
+		"\u0299\u0295\3\2\2\2\u0299\u0298\3\2\2\2\u029a\u0095\3\2\2\2\u029b\u02a1"+
+		"\5r:\2\u029c\u02a1\5\u0098M\2\u029d\u02a1\5\u009aN\2\u029e\u02a1\5\26"+
+		"\f\2\u029f\u02a1\5`\61\2\u02a0\u029b\3\2\2\2\u02a0\u029c\3\2\2\2\u02a0"+
+		"\u029d\3\2\2\2\u02a0\u029e\3\2\2\2\u02a0\u029f\3\2\2\2\u02a1\u0097\3\2"+
+		"\2\2\u02a2\u02a4\7\66\2\2\u02a3\u02a5\5l\67\2\u02a4\u02a3\3\2\2\2\u02a4"+
+		"\u02a5\3\2\2\2\u02a5\u0099\3\2\2\2\u02a6\u02a7\t\f\2\2\u02a7\u009b\3\2"+
+		"\2\2\u02a8\u02a9\t\r\2\2\u02a9\u009d\3\2\2\2\u02aa\u02ab\t\16\2\2\u02ab"+
+		"\u009f\3\2\2\2\u02ac\u02ad\t\17\2\2\u02ad\u00a1\3\2\2\2\u02ae\u02af\7"+
+		"-\2\2\u02af\u02b4\5\u00a4S\2\u02b0\u02b1\7A\2\2\u02b1\u02b3\5\u00a4S\2"+
+		"\u02b2\u02b0\3\2\2\2\u02b3\u02b6\3\2\2\2\u02b4\u02b2\3\2\2\2\u02b4\u02b5"+
+		"\3\2\2\2\u02b5\u02b7\3\2\2\2\u02b6\u02b4\3\2\2\2\u02b7\u02b8\7@\2\2\u02b8"+
+		"\u00a3\3\2\2\2\u02b9\u02ba\5\u0098M\2\u02ba\u02bb\7E\2\2\u02bb\u02bc\5"+
+		"x=\2\u02bc\u00a5\3\2\2\2\u02bd\u02be\7.\2\2\u02be\u02bf\5j\66\2\u02bf"+
+		"\u02c0\7E\2\2\u02c0\u02c1\5x=\2\u02c1\u02c2\7@\2\2\u02c2\u00a7\3\2\2\2"+
+		"\u02c3\u02c4\7\5\2\2\u02c4\u02c5\7/\2\2\u02c5\u02ca\5j\66\2\u02c6\u02c7"+
+		"\7A\2\2\u02c7\u02c9\5j\66\2\u02c8\u02c6\3\2\2\2\u02c9\u02cc\3\2\2\2\u02ca"+
+		"\u02c8\3\2\2\2\u02ca\u02cb\3\2\2\2\u02cb\u02cd\3\2\2\2\u02cc\u02ca\3\2"+
+		"\2\2\u02cd\u02ce\7@\2\2\u02ce\u00a9\3\2\2\2\u02cf\u02d0\7/\2\2\u02d0\u02d1"+
+		"\5\u00aeX\2\u02d1\u02d2\7E\2\2\u02d2\u02d3\5\u00acW\2\u02d3\u02d4\7@\2"+
+		"\2\u02d4\u00ab\3\2\2\2\u02d5\u02d6\5x=\2\u02d6\u00ad\3\2\2\2\u02d7\u02dc"+
+		"\5\u00b0Y\2\u02d8\u02d9\7Q\2\2\u02d9\u02db\5\u00b0Y\2\u02da\u02d8\3\2"+
+		"\2\2\u02db\u02de\3\2\2\2\u02dc\u02da\3\2\2\2\u02dc\u02dd\3\2\2\2\u02dd"+
+		"\u00af\3\2\2\2\u02de\u02dc\3\2\2\2\u02df\u02e0\5j\66\2\u02e0\u02e1\7S"+
+		"\2\2\u02e1\u02e2\5\u00b2Z\2\u02e2\u00b1\3\2\2\2\u02e3\u02e7\5\u0096L\2"+
+		"\u02e4\u02e7\5r:\2\u02e5\u02e7\5\u008cG\2\u02e6\u02e3\3\2\2\2\u02e6\u02e4"+
+		"\3\2\2\2\u02e6\u02e5\3\2\2\2\u02e7\u00b3\3\2\2\2\u02e8\u02e9\7\60\2\2"+
+		"\u02e9\u02ea\7E\2\2\u02ea\u02eb\5x=\2\u02eb\u02ec\7@\2\2\u02ec\u00b5\3"+
+		"\2\2\2\u02ed\u02ee\7\61\2\2\u02ee\u02ef\7E\2\2\u02ef\u02f0\5x=\2\u02f0"+
+		"\u02f1\7@\2\2\u02f1\u00b7\3\2\2\2\u02f2\u02f3\7\7\2\2\u02f3\u02f4\7E\2"+
+		"\2\u02f4\u02f5\5x=\2\u02f5\u02f6\7@\2\2\u02f6\u00b9\3\2\2\2\u02f7\u02f9"+
+		"\7\62\2\2\u02f8\u02fa\5j\66\2\u02f9\u02f8\3\2\2\2\u02fa\u02fb\3\2\2\2"+
+		"\u02fb\u02f9\3\2\2\2\u02fb\u02fc\3\2\2\2\u02fc\u02fd\3\2\2\2\u02fd\u02fe"+
+		"\7@\2\2\u02fe\u00bb\3\2\2\2=\u00bf\u00d2\u00da\u00e4\u00e9\u00f8\u00fd"+
+		"\u0101\u0109\u0113\u011c\u0129\u0132\u013e\u0159\u016e\u0173\u017c\u0184"+
+		"\u018b\u0198\u01a0\u01ad\u01b7\u01bf\u01c7\u01c9\u01d5\u01dd\u01df\u01ea"+
+		"\u01f5\u01fb\u0202\u0211\u021e\u0223\u0228\u022a\u022e\u0232\u0238\u023d"+
+		"\u0241\u0255\u025e\u0267\u0272\u027d\u0288\u0291\u0299\u02a0\u02a4\u02b4"+
+		"\u02ca\u02dc\u02e6\u02fb";
 	public static final ATN _ATN =
-		ATNSimulator.deserialize(_serializedATN.toCharArray());
+		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
 		_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 		for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {

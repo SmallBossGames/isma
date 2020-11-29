@@ -21,7 +21,7 @@ dependencies {
     implementation ("org.antlr:antlr4-runtime:4.9")
     implementation(project(":isma-hsm"))
     implementation(project(":isma-lisma"))
-    implementation(project(":isma-core"))
+    implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-lib-parent"))
     implementation(project(":isma-intg-lib-parent:isma-intg-lib"))

@@ -5,7 +5,8 @@
 rootProject.name = 'isma'
 //JAVA 11+ projects
 include('isma-app-tornadofx')
-include 'state-chart'
+include('state-chart')
+include('isma-next-core')
 
 include('isma-app')
 include('isma-core')
@@ -59,3 +60,5 @@ project(':isma-intg-server-parent:isma-intg-server-api').projectDir = file('isma
 project(':isma-intg-server-parent:isma-intg-server-client').projectDir = file('isma-intg-server/isma-intg-server-client')
 project(':isma-intg-server-parent:isma-intg-server-tests').projectDir = file('isma-intg-server/isma-intg-server-tests')
 project(':isma-intg-server-parent').projectDir = file('isma-intg-server')
+include 'isma-next-core'
+

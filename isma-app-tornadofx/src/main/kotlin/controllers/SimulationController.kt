@@ -18,6 +18,7 @@ class SimulationController: Controller() {
     private val lismaPdeController: LismaPdeController by inject()
     private val simulationParametersController: SimulationParametersController by inject()
     private val simulationProgress by inject<SimulationProgressController>()
+    private val simulationResult by inject<SimulationResultController>();
 
     private var currentSimulation: Job? = null
 
@@ -127,11 +128,7 @@ class SimulationController: Controller() {
     private fun startSimualtionJob(controller: SimulationCoreController) = GlobalScope.launch {
         try {
             val result = controller.simulate()
-            var resultList: List<IntgResultPoint>
-            val consumer = Consumer<List<IntgResultPoint>> {
-                resultList = it
-            }
-            result.resultPointProvider!!.read(consumer);
+            simulationResult.simulationResult = result
         } finally {
             simulationProgress.progress = 0.0
             currentSimulation = null

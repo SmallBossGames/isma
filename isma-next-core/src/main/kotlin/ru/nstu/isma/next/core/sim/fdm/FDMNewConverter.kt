@@ -233,7 +233,7 @@ class FDMNewConverter(private val model: HSM?) {
         val eq_idx_minus_1: HMEquation = vT.get(equationNameMappingSpecIndex(pde, av, idx.index!! - 1)) as HMEquation
         val eq_cur: HMEquation = vT.get(equationNameMapping(pde)) as HMEquation
         val uc: HMUnnamedConst
-        if (idx!!.isMax && pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).derOrder > 0) {
+        if (idx.isMax && pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).derOrder > 0) {
             pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
         } else if (idx.isFirst && pde.getBound(HMBoundaryCondition.SideType.LEFT, av).derOrder > 0) {
             pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })

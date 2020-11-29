@@ -7,6 +7,8 @@ import ru.nstu.isma.intg.api.IntgResultPoint
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.lib.IntgMethodLibrary
+import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
+import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import tornadofx.Controller
 import java.util.function.Consumer
 import kotlin.math.max
@@ -21,73 +23,6 @@ class SimulationController: Controller() {
 
     fun simulate(){
         val hsm = lismaPdeController.translateLisma() ?: return
-
-        val initials = CauchyInitials()
-        initials.start = simulationParametersController.cauchyInitialsModel.startTime
-        initials.end = simulationParametersController.cauchyInitialsModel.endTime
-        initials.stepSize = simulationParametersController.cauchyInitialsModel.step
-
-        val integrationMethod = IntgMethodLibrary
-                .getIntgMethod(simulationParametersController.integrationMethod.selectedMethod)
-
-        val accuracyController = integrationMethod.accuracyController
-        if (accuracyController != null) {
-            val accuracyInUse = simulationParametersController.integrationMethod.isAccuracyInUse
-            accuracyController.isEnabled = accuracyInUse
-            if (accuracyInUse){
-                accuracyController.accuracy = simulationParametersController.integrationMethod.accuracy
-            }
-        }
-
-        val stabilityController = integrationMethod.stabilityController
-        if (stabilityController != null) {
-            stabilityController.isEnabled = simulationParametersController.integrationMethod.isStableInUse
-        }
-
-
-        hsm.initTimeEquation(initials.start)
-
-        val resultFileName: String? =
-                if (simulationParametersController.resultSaving.savingTarget == SaveTarget.FILE)
-                    "temp.csv"
-                else null
-
-        val eventDetectionEnabled: Boolean = simulationParametersController.eventDetection.isEventDetectionInUse
-        val eventDetectionGamma = if (eventDetectionEnabled) simulationParametersController.eventDetection.gamma else 0.0
-
-        val eventDetectionStepBoundLow = if (simulationParametersController.eventDetection.isStepLimitInUse) {
-            simulationParametersController.eventDetection.lowBorder
-        }
-        else {
-            Double.MIN_VALUE
-        }
-
-        val simulationController = SimulationCoreController(
-                hsm,
-                initials,
-                integrationMethod,
-                simulationParametersController.integrationMethod.isParallelInUse,
-                simulationParametersController.integrationMethod.server,
-                simulationParametersController.integrationMethod.port,
-                resultFileName,
-                eventDetectionEnabled,
-                eventDetectionGamma,
-                eventDetectionStepBoundLow
-        )
-
-        simulationController.addStepChangeListener {
-            simulationProgress.progress =
-                    normalizeProgress(initials.start, initials.end, it)
-        }
-
-        currentSimulation?.cancel()
-        currentSimulation = null
-
-        currentSimulation = startSimualtionJob(simulationController)
-    }
-
-    fun simulateAsync() = GlobalScope.launch {
-        val hsm = lismaPdeController.translateLisma() ?: return@launch
         val initials = createCauchyInitials()
         val integrationMethod = createIntegrationMethod()
 
@@ -96,41 +31,18 @@ class SimulationController: Controller() {
 
         hsm.initTimeEquation(initials.start)
 
-        val resultFileName: String? =
-                if (simulationParametersController.resultSaving.savingTarget == SaveTarget.FILE)
-                    "temp.csv"
-                else null
-
-        val eventDetectionEnabled: Boolean = simulationParametersController.eventDetection.isEventDetectionInUse
-        val eventDetectionGamma = if (eventDetectionEnabled)
-            simulationParametersController.eventDetection.gamma
-        else
-            0.0
-
-        val eventDetectionStepBoundLow = if (simulationParametersController.eventDetection.isStepLimitInUse) {
-            simulationParametersController.eventDetection.lowBorder
-        }
-        else {
-            Double.MIN_VALUE
-        }
-
         val simulationController = SimulationCoreController(
                 hsm,
                 initials,
                 integrationMethod,
-                simulationParametersController.integrationMethod.isParallelInUse,
-                simulationParametersController.integrationMethod.server,
-                simulationParametersController.integrationMethod.port,
-                resultFileName,
-                eventDetectionEnabled,
-                eventDetectionGamma,
-                eventDetectionStepBoundLow
+                createParallelParameters(),
+                createFileResultParameters(),
+                createEventDetectionParameters()
         )
 
         initProgressTracking(simulationController, initials)
 
-        currentSimulation?.cancelAndJoin()
-        currentSimulation = null
+        currentSimulation?.cancel()
 
         currentSimulation = startSimualtionJob(simulationController)
     }
@@ -147,6 +59,38 @@ class SimulationController: Controller() {
     private fun createIntegrationMethod(): IntgMethod {
         val selectedMethod = simulationParametersController.integrationMethod.selectedMethod
         return IntgMethodLibrary.getIntgMethod(selectedMethod)
+    }
+
+    private fun createEventDetectionParameters(): EventDetectionParameters? {
+        return if (simulationParametersController.eventDetection.isEventDetectionInUse){
+            val stepLowerBound = if (simulationParametersController.eventDetection.isStepLimitInUse)
+                simulationParametersController.eventDetection.lowBorder
+            else
+                0.0
+
+            EventDetectionParameters(simulationParametersController.eventDetection.gamma, stepLowerBound)
+        }
+        else {
+            null
+        }
+    }
+
+    private fun createParallelParameters(): ParallelParameters? {
+        return if (simulationParametersController.integrationMethod.isParallelInUse){
+            ParallelParameters(
+                    simulationParametersController.integrationMethod.server,
+                    simulationParametersController.integrationMethod.port)
+        }
+        else {
+            null
+        }
+    }
+
+    private fun createFileResultParameters(): String? {
+        return if (simulationParametersController.resultSaving.savingTarget == SaveTarget.FILE)
+            "temp.csv"
+        else
+            null
     }
 
 
@@ -190,6 +134,7 @@ class SimulationController: Controller() {
             result.resultPointProvider!!.read(consumer);
         } finally {
             simulationProgress.progress = 0.0
+            currentSimulation = null
         }
     }
 }

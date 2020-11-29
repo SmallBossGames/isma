@@ -17,6 +17,8 @@ import ru.nstu.isma.intg.server.client.RemoteDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.gen.AnalyzedHybridSystemClassBuilder
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 import ru.nstu.isma.next.core.sim.controller.gen.SourceCodeCompiler
+import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
+import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import java.io.IOException
 import java.util.*
 import java.util.function.Consumer
@@ -26,15 +28,11 @@ import java.util.function.Consumer
  * on 04.01.2015.
  */
 class SimulationCoreController(
-        private var hsm: HSM, initials: CauchyInitials,
-        private var method: IntgMethod,
-        private var parallel: Boolean,
-        private var intgServer: String?,
-        private var intgPort: Int,
+        private val hsm: HSM, initials: CauchyInitials,
+        private val method: IntgMethod,
+        private val parallelParameters: ParallelParameters?,
         private val resultFileName: String?,
-        private val eventDetectionEnabled: Boolean,
-        private val eventDetectionGamma: Double,
-        private val eventDetectionStepBoundLow: Double) {
+        private val eventDetectionParameters: EventDetectionParameters?) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
     private var indexProvider: EquationIndexProvider? = null
@@ -94,27 +92,34 @@ class SimulationCoreController(
         var computeEngineClient: ComputeEngineClient? = null
         return try {
             var stepSolver: DaeSystemStepSolver = DefaultDaeSystemStepSolver(method, hybridSystem?.daeSystem)
-            if (parallel) {
+            if (parallelParameters != null) {
                 computeEngineClient = ComputeEngineClient(modelClassLoader)
-                computeEngineClient.connect(intgServer, intgPort)
+                computeEngineClient.connect(parallelParameters.server, parallelParameters.port)
                 computeEngineClient.loadIntgMethod(method)
                 computeEngineClient.loadDaeSystem(hybridSystem!!.daeSystem)
                 stepSolver = RemoteDaeSystemStepSolver(method, computeEngineClient)
             }
+
             val cauchyProblemSolver = HybridSystemSimulator()
             stepChangeListeners.forEach(Consumer { c: Consumer<Double> -> cauchyProblemSolver.addStepChangeListener(c) })
-            val eventDetector = EventDetectionIntgController(eventDetectionGamma)
-            eventDetector.isEnabled = eventDetectionEnabled
+
+            val eventDetector = if (eventDetectionParameters != null)
+                EventDetectionIntgController(eventDetectionParameters.gamma, true)
+            else
+                EventDetectionIntgController(0.0, false)
+
+            val stepBoundLow = eventDetectionParameters?.stepBoundLow ?: 0.0
+
             if (resultFileName != null) {
-                runSimulationWithResultFile(cauchyProblemSolver, stepSolver, eventDetector, eventDetectionStepBoundLow)
-            } else runSimulationInMemory(cauchyProblemSolver, stepSolver, eventDetector, eventDetectionStepBoundLow)
+                runSimulationWithResultFile(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow)
+            } else{
+                runSimulationInMemory(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             throw RuntimeException(e)
         } finally {
-            if (computeEngineClient != null) {
-                computeEngineClient.disconnect()
-            }
+            computeEngineClient?.disconnect()
         }
     }
 
@@ -123,7 +128,7 @@ class SimulationCoreController(
                                       eventDetector: EventDetectionIntgController,
                                       eventDetectionStepBoundLow: Double): HybridSystemIntgResult {
         val resultMemoryStore = IntgResultMemoryStore()
-        val metricData: IntgMetricData? = cauchyProblemSolver.run(
+        val metricData: IntgMetricData = cauchyProblemSolver.run(
                 hybridSystem, stepSolver, simulationInitials, eventDetector, eventDetectionStepBoundLow, resultMemoryStore)
         logCalculationStatistic(metricData, stepSolver)
         return HybridSystemIntgResult(indexProvider, metricData, resultMemoryStore)
@@ -134,7 +139,7 @@ class SimulationCoreController(
                                             stepSolver: DaeSystemStepSolver,
                                             eventDetector: EventDetectionIntgController,
                                             eventDetectionStepBoundLow: Double): HybridSystemIntgResult {
-        var metricData: IntgMetricData?
+        val metricData: IntgMetricData?
         val resultWriter = IntgResultPointFileWriter(resultFileName)
         metricData = cauchyProblemSolver.run(hybridSystem, stepSolver, simulationInitials,
                 eventDetector, eventDetectionStepBoundLow, resultWriter)

@@ -30,6 +30,15 @@ public class EventDetectionIntgController extends IntgController {
         this.gamma = gamma;
     }
 
+    public EventDetectionIntgController(double gamma, boolean isEnabled) {
+        if (gamma < 0.0 || gamma > 1.0) {
+            throw new IllegalArgumentException("Gamma should be >= 0 and <= 1.");
+        }
+
+        this.gamma = gamma;
+        this.setEnabled(isEnabled);
+    }
+
     public double getGamma() {
         return gamma;
     }

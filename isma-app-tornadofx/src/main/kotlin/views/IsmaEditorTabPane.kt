@@ -10,9 +10,9 @@ import events.PasteTextInCurrentEditorEvent
 import javafx.scene.paint.Color
 import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
-import org.antlr.v4.runtime.Lexer
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
+import org.fxmisc.richtext.model.StyleSpansBuilder
 import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
 import tornadofx.*
 import java.util.*
@@ -43,19 +43,19 @@ class IsmaEditorTabPane: View() {
                 }
 
                 codeArea.stylesheet {
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("keyword")))){
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("keyword")))) {
                         fill = Color.ORANGE
                         fontWeight = FontWeight.BOLD
                     })
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("default")))){
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("default")))) {
                         fill = Color.BLACK
                         fontWeight = FontWeight.NORMAL
                     })
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("decimal")))){
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("decimal")))) {
                         fill = Color.BLUE
                         fontWeight = FontWeight.NORMAL
                     })
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("comment")))){
+                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("comment")))) {
                         fill = Color.GRAY
                         fontWeight = FontWeight.NORMAL
                         fontStyle = FontPosture.ITALIC
@@ -83,27 +83,47 @@ class IsmaEditorTabPane: View() {
     }
 
     private fun highlightText(codeArea: CodeArea){
+        val spansBuilder = StyleSpansBuilder<Collection<String>>()
+        var lastKeyword = 0
+
         lismaPdeController.getLismaTokens().forEach {
             when {
                 it.text == "for" -> {
-                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("keyword"))
+                    spansBuilder
+                            .add(listOf("default"),  it.startIndex - lastKeyword)
+                            .add(listOf("keyword"), it.stopIndex - it.startIndex + 1)
+                    lastKeyword = it.stopIndex + 1
                 }
                 it.text == "state" -> {
-                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("keyword"))
+                    spansBuilder
+                            .add(listOf("default"),  it.startIndex - lastKeyword)
+                            .add(listOf("keyword"), it.stopIndex - it.startIndex + 1)
+                    lastKeyword = it.stopIndex + 1
                 }
                 it.text == "const" -> {
-                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("keyword"))
+                    spansBuilder
+                            .add(listOf("default"),  it.startIndex - lastKeyword)
+                            .add(listOf("keyword"), it.stopIndex - it.startIndex + 1)
+                    lastKeyword = it.stopIndex + 1
                 }
                 it.type == LismaLexer.COMMENT -> {
-                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("comment"))
+                    spansBuilder
+                            .add(listOf("default"),  it.startIndex - lastKeyword)
+                            .add(listOf("comment"), it.stopIndex - it.startIndex + 1)
+                    lastKeyword = it.stopIndex + 1
                 }
                 it.type == LismaLexer.FloatingPointLiteral || it.type == LismaLexer.DecimalLiteral -> {
-                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("decimal"))
+                    spansBuilder
+                            .add(listOf("default"),  it.startIndex - lastKeyword)
+                            .add(listOf("decimal"), it.stopIndex - it.startIndex + 1)
+                    lastKeyword = it.stopIndex + 1
                 }
                 else -> {
-                    codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("default"))
+                    //codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("default"))
                 }
             }
         }
+        spansBuilder.add(listOf("default"),  codeArea.text.length - lastKeyword)
+        codeArea.setStyleSpans(0, spansBuilder.create())
     }
 }

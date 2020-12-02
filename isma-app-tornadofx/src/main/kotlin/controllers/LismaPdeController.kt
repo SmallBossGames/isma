@@ -36,4 +36,11 @@ class LismaPdeController : Controller() {
         val lexer = LismaLexer(inputStream)
         return lexer.allTokens
     }
+
+    fun getLismaTokens(source: String): List<Token>{
+        val project = activeProjectController.activeProject ?: return emptyList<Token>()
+        val inputStream = CharStreams.fromString(source)
+        val lexer = LismaLexer(inputStream)
+        return lexer.allTokens
+    }
 }

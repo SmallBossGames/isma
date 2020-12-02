@@ -30,7 +30,7 @@ statement
 // 1.1  Constant
 // ------------------------------------------------------------------
     constant 
-        :   'const' constant_body (COMMA  constant_body)* SEMI
+        :   CONST_KEYWORD constant_body (COMMA  constant_body)* SEMI
 	    ;
 
 	constant_body
@@ -39,8 +39,10 @@ statement
 	    ;
 
     init_const
-        :   'def' 'const' literal SEMI
+        :   'def' CONST_KEYWORD literal SEMI
         ;
+
+    CONST_KEYWORD : 'const';
     
 // ------------------------------------------------------------------
 // 1.2 Partial
@@ -164,8 +166,10 @@ statement
             ;
 
     for_cycle
-        :   'for' Identifier ASSIGN for_cycle_interval (COMMA for_cycle_interval)* for_cycle_body
+        :   FOR_KEYWORD Identifier ASSIGN for_cycle_interval (COMMA for_cycle_interval)* for_cycle_body
         ;
+
+    FOR_KEYWORD : 'for';
 
     for_cycle_interval
         :   literal (COLON literal)?
@@ -179,8 +183,11 @@ statement
 // 1.5 State
 // ------------------------------------------------------------------ 
     state	
-        :	'state' state_name LPAREN expression RPAREN state_body  (state_from)? SEMI
+        :	STATE_KEYWORD state_name LPAREN expression RPAREN state_body  (state_from)? SEMI
         ;
+
+    STATE_KEYWORD : 'state';
+
     state_body
         :	LBRACE (equation | setter | for_cycle)* RBRACE
         ;
@@ -192,8 +199,10 @@ statement
         ;
 
     pseudo_state
-        :   'if' LPAREN expression RPAREN pseudo_state_body pseudo_state_else?
+        :   IF_KEYWORD LPAREN expression RPAREN pseudo_state_body pseudo_state_else?
         ;
+
+    IF_KEYWORD : 'if';
 
     pseudo_state_body
         :   LBRACE pseudo_state_elem* RBRACE

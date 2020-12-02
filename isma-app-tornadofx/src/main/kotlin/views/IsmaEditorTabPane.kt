@@ -3,6 +3,7 @@ package views
 import controllers.ActiveProjectController
 import controllers.LismaPdeController
 import controllers.ProjectController
+import controllers.SyntaxHighlightingController
 import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent
 import events.NewProjectEvent
@@ -22,6 +23,7 @@ class IsmaEditorTabPane: View() {
     private val projectController: ProjectController by inject()
     private val activeProjectController: ActiveProjectController by inject()
     private val lismaPdeController: LismaPdeController by inject()
+    private val highlightingController: SyntaxHighlightingController by inject()
 
     override val root = tabpane {
         subscribe<NewProjectEvent> { event->
@@ -39,7 +41,8 @@ class IsmaEditorTabPane: View() {
                 thisTabProject.projectTextProperty.bind(codeArea.textProperty())
 
                 codeArea.textProperty().onChange {
-                    highlightText(codeArea)
+                    val highlighting = highlightingController.createHighlightingStyleSpans(it ?: "")
+                    codeArea.setStyleSpans(0, highlighting)
                 }
 
                 codeArea.stylesheet {
@@ -80,50 +83,5 @@ class IsmaEditorTabPane: View() {
                 add(codeArea)
             }
         }
-    }
-
-    private fun highlightText(codeArea: CodeArea){
-        val spansBuilder = StyleSpansBuilder<Collection<String>>()
-        var lastKeyword = 0
-
-        lismaPdeController.getLismaTokens().forEach {
-            when {
-                it.text == "for" -> {
-                    spansBuilder
-                            .add(listOf("default"),  it.startIndex - lastKeyword)
-                            .add(listOf("keyword"), it.stopIndex - it.startIndex + 1)
-                    lastKeyword = it.stopIndex + 1
-                }
-                it.text == "state" -> {
-                    spansBuilder
-                            .add(listOf("default"),  it.startIndex - lastKeyword)
-                            .add(listOf("keyword"), it.stopIndex - it.startIndex + 1)
-                    lastKeyword = it.stopIndex + 1
-                }
-                it.text == "const" -> {
-                    spansBuilder
-                            .add(listOf("default"),  it.startIndex - lastKeyword)
-                            .add(listOf("keyword"), it.stopIndex - it.startIndex + 1)
-                    lastKeyword = it.stopIndex + 1
-                }
-                it.type == LismaLexer.COMMENT -> {
-                    spansBuilder
-                            .add(listOf("default"),  it.startIndex - lastKeyword)
-                            .add(listOf("comment"), it.stopIndex - it.startIndex + 1)
-                    lastKeyword = it.stopIndex + 1
-                }
-                it.type == LismaLexer.FloatingPointLiteral || it.type == LismaLexer.DecimalLiteral -> {
-                    spansBuilder
-                            .add(listOf("default"),  it.startIndex - lastKeyword)
-                            .add(listOf("decimal"), it.stopIndex - it.startIndex + 1)
-                    lastKeyword = it.stopIndex + 1
-                }
-                else -> {
-                    //codeArea.setStyle(it.startIndex, it.stopIndex + 1, listOf("default"))
-                }
-            }
-        }
-        spansBuilder.add(listOf("default"),  codeArea.text.length - lastKeyword)
-        codeArea.setStyleSpans(0, spansBuilder.create())
     }
 }

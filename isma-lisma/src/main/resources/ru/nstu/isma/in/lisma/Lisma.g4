@@ -192,8 +192,11 @@ statement
         :	LBRACE (equation | setter | for_cycle)* RBRACE
         ;
     state_from 
-        :	'from' state_name (COMMA state_name)*
+        :	FROM_KEYWORD state_name (COMMA state_name)*
         ;
+
+    FROM_KEYWORD : 'from';
+
     state_name
         :   Identifier | 'init'
         ;
@@ -476,7 +479,7 @@ statement
         :   '/*' .*? '*/' -> channel(HIDDEN)
         ;
 
-    SL_COMMENT : '//'.*?('\n'|EOF)->skip;
+    SL_COMMENT : '//'.*?('\n'|EOF)-> channel(HIDDEN);
 
 // ------------------------------------------------------------------
 //  Separators

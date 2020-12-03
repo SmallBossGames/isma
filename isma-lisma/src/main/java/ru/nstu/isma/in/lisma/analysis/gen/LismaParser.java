@@ -22,8 +22,8 @@ public class LismaParser extends Parser {
 		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
 		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, T__36=37, T__37=38, 
-		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, T__43=44, CONST_KEYWORD=45, 
-		PDE=46, FOR_KEYWORD=47, STATE_KEYWORD=48, IF_KEYWORD=49, DecimalLiteral=50, 
+		T__38=39, T__39=40, T__40=41, T__41=42, T__42=43, CONST_KEYWORD=44, PDE=45, 
+		FOR_KEYWORD=46, STATE_KEYWORD=47, FROM_KEYWORD=48, IF_KEYWORD=49, DecimalLiteral=50, 
 		FloatingPointLiteral=51, Identifier=52, WS=53, COMMENT=54, SL_COMMENT=55, 
 		LPAREN=56, RPAREN=57, LBRACE=58, RBRACE=59, LBRACK=60, RBRACK=61, SEMI=62, 
 		COMMA=63, DOT=64, QUOTE1=65, QUOTE2=66, ASSIGN=67, GT=68, LT=69, TILDE=70, 
@@ -97,15 +97,15 @@ public class LismaParser extends Parser {
 			null, "'def'", "'var'", "'apx'", "'step'", "'D'", "'DD'", "'dx'", "'dy'", 
 			"'dz'", "'dx2'", "'dy2'", "'dz2'", "'dx3'", "'dy3'", "'dz3'", "'dx4'", 
 			"'dy4'", "'dz4'", "'edge'", "'on'", "'left'", "'right'", "'both'", "'t0'", 
-			"'ic'", "'from'", "'init'", "'else'", "'der'", "'||'", "'or'", "'OR'", 
-			"'&&'", "'and'", "'AND'", "'!'", "'not'", "'NOT'", "'macro'", "'set'", 
-			"'ls'", "'start'", "'end'", "'out'", "'const'", "'pde'", "'for'", "'state'", 
-			"'if'", null, null, null, null, null, null, "'('", "')'", "'{'", "'}'", 
-			"'['", "']'", "';'", "','", "'.'", "'''", "'\u043F\u0457\u0405'", "'='", 
-			"'>'", "'<'", "'~'", "'?'", "':'", "'=='", "'<='", "'>='", "'!='", "'++'", 
-			"'--'", "'+'", "'-'", "'*'", "'/'", "'&'", "'|'", "'^'", "'%'", "'+='", 
-			"'-='", "'*='", "'/='", "'&='", "'|='", "'^='", "'%='", "'<<='", "'>>='", 
-			"'>>>='"
+			"'ic'", "'init'", "'else'", "'der'", "'||'", "'or'", "'OR'", "'&&'", 
+			"'and'", "'AND'", "'!'", "'not'", "'NOT'", "'macro'", "'set'", "'ls'", 
+			"'start'", "'end'", "'out'", "'const'", "'pde'", "'for'", "'state'", 
+			"'from'", "'if'", null, null, null, null, null, null, "'('", "')'", "'{'", 
+			"'}'", "'['", "']'", "';'", "','", "'.'", "'''", "'\u043F\u0457\u0405'", 
+			"'='", "'>'", "'<'", "'~'", "'?'", "':'", "'=='", "'<='", "'>='", "'!='", 
+			"'++'", "'--'", "'+'", "'-'", "'*'", "'/'", "'&'", "'|'", "'^'", "'%'", 
+			"'+='", "'-='", "'*='", "'/='", "'&='", "'|='", "'^='", "'%='", "'<<='", 
+			"'>>='", "'>>>='"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -114,8 +114,8 @@ public class LismaParser extends Parser {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			null, null, null, null, null, null, null, null, null, "CONST_KEYWORD", 
-			"PDE", "FOR_KEYWORD", "STATE_KEYWORD", "IF_KEYWORD", "DecimalLiteral", 
+			null, null, null, null, null, null, null, null, "CONST_KEYWORD", "PDE", 
+			"FOR_KEYWORD", "STATE_KEYWORD", "FROM_KEYWORD", "IF_KEYWORD", "DecimalLiteral", 
 			"FloatingPointLiteral", "Identifier", "WS", "COMMENT", "SL_COMMENT", 
 			"LPAREN", "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "SEMI", "COMMA", 
 			"DOT", "QUOTE1", "QUOTE2", "ASSIGN", "GT", "LT", "TILDE", "QUESTION", 
@@ -212,7 +212,7 @@ public class LismaParser extends Parser {
 			setState(189);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__24) | (1L << T__28) | (1L << T__38) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << CONST_KEYWORD) | (1L << PDE) | (1L << FOR_KEYWORD) | (1L << STATE_KEYWORD) | (1L << IF_KEYWORD) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__3) | (1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__24) | (1L << T__27) | (1L << T__37) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << CONST_KEYWORD) | (1L << PDE) | (1L << FOR_KEYWORD) | (1L << STATE_KEYWORD) | (1L << IF_KEYWORD) | (1L << Identifier))) != 0)) {
 				{
 				{
 				setState(186);
@@ -2029,7 +2029,7 @@ public class LismaParser extends Parser {
 			setState(369);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__28:
+			case T__27:
 			case Identifier:
 				enterOuterAlt(_localctx, 1);
 				{
@@ -2829,7 +2829,7 @@ public class LismaParser extends Parser {
 			setState(455);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__24) | (1L << T__28) | (1L << T__38) | (1L << CONST_KEYWORD) | (1L << PDE) | (1L << IF_KEYWORD) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__24) | (1L << T__27) | (1L << T__37) | (1L << CONST_KEYWORD) | (1L << PDE) | (1L << IF_KEYWORD) | (1L << Identifier))) != 0)) {
 				{
 				setState(453);
 				_errHandler.sync(this);
@@ -2943,7 +2943,7 @@ public class LismaParser extends Parser {
 			setState(467);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__25) {
+			if (_la==FROM_KEYWORD) {
 				{
 				setState(466);
 				state_from();
@@ -3017,7 +3017,7 @@ public class LismaParser extends Parser {
 			setState(477);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__28) | (1L << T__39) | (1L << PDE) | (1L << FOR_KEYWORD) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__27) | (1L << T__38) | (1L << PDE) | (1L << FOR_KEYWORD) | (1L << Identifier))) != 0)) {
 				{
 				setState(475);
 				_errHandler.sync(this);
@@ -3036,7 +3036,7 @@ public class LismaParser extends Parser {
 				case T__15:
 				case T__16:
 				case T__17:
-				case T__28:
+				case T__27:
 				case PDE:
 				case Identifier:
 					{
@@ -3044,7 +3044,7 @@ public class LismaParser extends Parser {
 					equation();
 					}
 					break;
-				case T__39:
+				case T__38:
 					{
 					setState(473);
 					setter();
@@ -3080,6 +3080,7 @@ public class LismaParser extends Parser {
 	}
 
 	public static class State_fromContext extends ParserRuleContext {
+		public TerminalNode FROM_KEYWORD() { return getToken(LismaParser.FROM_KEYWORD, 0); }
 		public List<State_nameContext> state_name() {
 			return getRuleContexts(State_nameContext.class);
 		}
@@ -3117,7 +3118,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(482);
-			match(T__25);
+			match(FROM_KEYWORD);
 			setState(483);
 			state_name();
 			setState(488);
@@ -3179,7 +3180,7 @@ public class LismaParser extends Parser {
 			{
 			setState(491);
 			_la = _input.LA(1);
-			if ( !(_la==T__26 || _la==Identifier) ) {
+			if ( !(_la==T__25 || _la==Identifier) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -3252,7 +3253,7 @@ public class LismaParser extends Parser {
 			setState(499);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__27) {
+			if (_la==T__26) {
 				{
 				setState(498);
 				pseudo_state_else();
@@ -3312,7 +3313,7 @@ public class LismaParser extends Parser {
 			setState(505);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__28) | (1L << T__39) | (1L << PDE) | (1L << Identifier))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__4) | (1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__27) | (1L << T__38) | (1L << PDE) | (1L << Identifier))) != 0)) {
 				{
 				{
 				setState(502);
@@ -3385,7 +3386,7 @@ public class LismaParser extends Parser {
 			case T__15:
 			case T__16:
 			case T__17:
-			case T__28:
+			case T__27:
 			case PDE:
 			case Identifier:
 				enterOuterAlt(_localctx, 1);
@@ -3394,7 +3395,7 @@ public class LismaParser extends Parser {
 				equation();
 				}
 				break;
-			case T__39:
+			case T__38:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(511);
@@ -3446,7 +3447,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(514);
-			match(T__27);
+			match(T__26);
 			setState(515);
 			pseudo_state_body();
 			}
@@ -3629,11 +3630,11 @@ public class LismaParser extends Parser {
 				derivative_quote_operant();
 				}
 				break;
-			case T__28:
+			case T__27:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(533);
-				match(T__28);
+				match(T__27);
 				setState(534);
 				match(LPAREN);
 				setState(535);
@@ -4327,7 +4328,7 @@ public class LismaParser extends Parser {
 			setState(595);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__29) | (1L << T__30) | (1L << T__31))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__28) | (1L << T__29) | (1L << T__30))) != 0)) {
 				{
 				{
 				setState(590);
@@ -4397,7 +4398,7 @@ public class LismaParser extends Parser {
 			setState(604);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__33) | (1L << T__34))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__31) | (1L << T__32) | (1L << T__33))) != 0)) {
 				{
 				{
 				setState(599);
@@ -4974,9 +4975,9 @@ public class LismaParser extends Parser {
 			case T__15:
 			case T__16:
 			case T__17:
+			case T__34:
 			case T__35:
 			case T__36:
-			case T__37:
 			case DecimalLiteral:
 			case FloatingPointLiteral:
 			case Identifier:
@@ -5090,9 +5091,9 @@ public class LismaParser extends Parser {
 			setState(663);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
+			case T__34:
 			case T__35:
 			case T__36:
-			case T__37:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(659);
@@ -5367,7 +5368,7 @@ public class LismaParser extends Parser {
 			{
 			setState(678);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__29) | (1L << T__30) | (1L << T__31))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__28) | (1L << T__29) | (1L << T__30))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -5417,7 +5418,7 @@ public class LismaParser extends Parser {
 			{
 			setState(680);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__33) | (1L << T__34))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__31) | (1L << T__32) | (1L << T__33))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -5467,7 +5468,7 @@ public class LismaParser extends Parser {
 			{
 			setState(682);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__35) | (1L << T__36) | (1L << T__37))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__34) | (1L << T__35) | (1L << T__36))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -5527,7 +5528,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(684);
-			match(T__38);
+			match(T__37);
 			setState(685);
 			macro_item();
 			setState(690);
@@ -5648,7 +5649,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(699);
-			match(T__39);
+			match(T__38);
 			setState(700);
 			var_ident();
 			setState(701);
@@ -5711,7 +5712,7 @@ public class LismaParser extends Parser {
 			setState(705);
 			match(T__1);
 			setState(706);
-			match(T__40);
+			match(T__39);
 			setState(707);
 			var_ident();
 			setState(712);
@@ -5780,7 +5781,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(717);
-			match(T__40);
+			match(T__39);
 			setState(718);
 			linear_eq_A();
 			setState(719);
@@ -6068,7 +6069,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(742);
-			match(T__41);
+			match(T__40);
 			setState(743);
 			match(ASSIGN);
 			setState(744);
@@ -6120,7 +6121,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(747);
-			match(T__42);
+			match(T__41);
 			setState(748);
 			match(ASSIGN);
 			setState(749);
@@ -6227,7 +6228,7 @@ public class LismaParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(757);
-			match(T__43);
+			match(T__42);
 			setState(759); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -6312,12 +6313,12 @@ public class LismaParser extends Parser {
 		"\u0082\u0084\u0086\u0088\u008a\u008c\u008e\u0090\u0092\u0094\u0096\u0098"+
 		"\u009a\u009c\u009e\u00a0\u00a2\u00a4\u00a6\u00a8\u00aa\u00ac\u00ae\u00b0"+
 		"\u00b2\u00b4\u00b6\u00b8\u00ba\2\20\3\2\t\13\3\2\f\16\3\2\17\21\3\2\22"+
-		"\24\3\2\27\31\4\2\35\35\66\66\3\2QR\4\2KKNN\4\2FGLM\4\2STXX\3\2\64\65"+
-		"\3\2 \"\3\2#%\3\2&(\2\u02f8\2\u00bf\3\2\2\2\4\u00d2\3\2\2\2\6\u00d4\3"+
-		"\2\2\2\b\u00e9\3\2\2\2\n\u00eb\3\2\2\2\f\u00f0\3\2\2\2\16\u0101\3\2\2"+
-		"\2\20\u0109\3\2\2\2\22\u010b\3\2\2\2\24\u010d\3\2\2\2\26\u0113\3\2\2\2"+
-		"\30\u0115\3\2\2\2\32\u0120\3\2\2\2\34\u012d\3\2\2\2\36\u0136\3\2\2\2 "+
-		"\u013e\3\2\2\2\"\u0140\3\2\2\2$\u0142\3\2\2\2&\u0144\3\2\2\2(\u0146\3"+
+		"\24\3\2\27\31\4\2\34\34\66\66\3\2QR\4\2KKNN\4\2FGLM\4\2STXX\3\2\64\65"+
+		"\3\2\37!\3\2\"$\3\2%\'\2\u02f8\2\u00bf\3\2\2\2\4\u00d2\3\2\2\2\6\u00d4"+
+		"\3\2\2\2\b\u00e9\3\2\2\2\n\u00eb\3\2\2\2\f\u00f0\3\2\2\2\16\u0101\3\2"+
+		"\2\2\20\u0109\3\2\2\2\22\u010b\3\2\2\2\24\u010d\3\2\2\2\26\u0113\3\2\2"+
+		"\2\30\u0115\3\2\2\2\32\u0120\3\2\2\2\34\u012d\3\2\2\2\36\u0136\3\2\2\2"+
+		" \u013e\3\2\2\2\"\u0140\3\2\2\2$\u0142\3\2\2\2&\u0144\3\2\2\2(\u0146\3"+
 		"\2\2\2*\u0148\3\2\2\2,\u014a\3\2\2\2.\u014c\3\2\2\2\60\u014e\3\2\2\2\62"+
 		"\u0150\3\2\2\2\64\u0159\3\2\2\2\66\u015e\3\2\2\28\u0173\3\2\2\2:\u0175"+
 		"\3\2\2\2<\u017c\3\2\2\2>\u017e\3\2\2\2@\u0184\3\2\2\2B\u0192\3\2\2\2D"+
@@ -6347,7 +6348,7 @@ public class LismaParser extends Parser {
 		"\2\2\u00d2\u00c7\3\2\2\2\u00d2\u00c8\3\2\2\2\u00d2\u00c9\3\2\2\2\u00d2"+
 		"\u00ca\3\2\2\2\u00d2\u00cb\3\2\2\2\u00d2\u00cc\3\2\2\2\u00d2\u00cd\3\2"+
 		"\2\2\u00d2\u00ce\3\2\2\2\u00d2\u00cf\3\2\2\2\u00d2\u00d0\3\2\2\2\u00d2"+
-		"\u00d1\3\2\2\2\u00d3\5\3\2\2\2\u00d4\u00d5\7/\2\2\u00d5\u00da\5\b\5\2"+
+		"\u00d1\3\2\2\2\u00d3\5\3\2\2\2\u00d4\u00d5\7.\2\2\u00d5\u00da\5\b\5\2"+
 		"\u00d6\u00d7\7A\2\2\u00d7\u00d9\5\b\5\2\u00d8\u00d6\3\2\2\2\u00d9\u00dc"+
 		"\3\2\2\2\u00da\u00d8\3\2\2\2\u00da\u00db\3\2\2\2\u00db\u00dd\3\2\2\2\u00dc"+
 		"\u00da\3\2\2\2\u00dd\u00de\7@\2\2\u00de\7\3\2\2\2\u00df\u00e0\5j\66\2"+
@@ -6355,7 +6356,7 @@ public class LismaParser extends Parser {
 		"\3\2\2\2\u00e4\u00e2\3\2\2\2\u00e4\u00e5\3\2\2\2\u00e5\u00e6\3\2\2\2\u00e6"+
 		"\u00e7\5x=\2\u00e7\u00ea\3\2\2\2\u00e8\u00ea\5j\66\2\u00e9\u00e2\3\2\2"+
 		"\2\u00e9\u00e8\3\2\2\2\u00ea\t\3\2\2\2\u00eb\u00ec\7\3\2\2\u00ec\u00ed"+
-		"\7/\2\2\u00ed\u00ee\5\u009aN\2\u00ee\u00ef\7@\2\2\u00ef\13\3\2\2\2\u00f0"+
+		"\7.\2\2\u00ed\u00ee\5\u009aN\2\u00ee\u00ef\7@\2\2\u00ef\13\3\2\2\2\u00f0"+
 		"\u00f1\7\4\2\2\u00f1\u00f2\5j\66\2\u00f2\u00f3\7>\2\2\u00f3\u00f4\5\16"+
 		"\b\2\u00f4\u00f5\7A\2\2\u00f5\u00f6\5\16\b\2\u00f6\u00f8\7?\2\2\u00f7"+
 		"\u00f9\5\20\t\2\u00f8\u00f7\3\2\2\2\u00f8\u00f9\3\2\2\2\u00f9\u00fa\3"+
@@ -6401,23 +6402,23 @@ public class LismaParser extends Parser {
 		"\5> \2\u017a\u017d\5@!\2\u017b\u017d\5B\"\2\u017c\u0179\3\2\2\2\u017c"+
 		"\u017a\3\2\2\2\u017c\u017b\3\2\2\2\u017d=\3\2\2\2\u017e\u017f\5h\65\2"+
 		"\u017f\u0180\7E\2\2\u0180\u0181\5x=\2\u0181\u0182\7@\2\2\u0182?\3\2\2"+
-		"\2\u0183\u0185\7\60\2\2\u0184\u0183\3\2\2\2\u0184\u0185\3\2\2\2\u0185"+
-		"\u0186\3\2\2\2\u0186\u018b\5\26\f\2\u0187\u0188\7Q\2\2\u0188\u018a\5\26"+
-		"\f\2\u0189\u0187\3\2\2\2\u018a\u018d\3\2\2\2\u018b\u0189\3\2\2\2\u018b"+
-		"\u018c\3\2\2\2\u018c\u018e\3\2\2\2\u018d\u018b\3\2\2\2\u018e\u018f\7E"+
-		"\2\2\u018f\u0190\5x=\2\u0190\u0191\7@\2\2\u0191A\3\2\2\2\u0192\u0193\7"+
-		"\60\2\2\u0193\u0198\5D#\2\u0194\u0195\7Q\2\2\u0195\u0197\5D#\2\u0196\u0194"+
-		"\3\2\2\2\u0197\u019a\3\2\2\2\u0198\u0196\3\2\2\2\u0198\u0199\3\2\2\2\u0199"+
-		"\u019b\3\2\2\2\u019a\u0198\3\2\2\2\u019b\u019c\7E\2\2\u019c\u019d\5x="+
-		"\2\u019d\u019e\7@\2\2\u019eC\3\2\2\2\u019f\u01a1\5F$\2\u01a0\u019f\3\2"+
-		"\2\2\u01a0\u01a1\3\2\2\2\u01a1\u01a2\3\2\2\2\u01a2\u01a3\5\26\f\2\u01a3"+
-		"E\3\2\2\2\u01a4\u01a5\5H%\2\u01a5\u01a6\7S\2\2\u01a6G\3\2\2\2\u01a7\u01a8"+
-		"\7>\2\2\u01a8\u01a9\5x=\2\u01a9\u01aa\7?\2\2\u01aa\u01ae\3\2\2\2\u01ab"+
-		"\u01ae\7\66\2\2\u01ac\u01ae\5\u009aN\2\u01ad\u01a7\3\2\2\2\u01ad\u01ab"+
-		"\3\2\2\2\u01ad\u01ac\3\2\2\2\u01aeI\3\2\2\2\u01af\u01b0\7\61\2\2\u01b0"+
-		"\u01b1\7\66\2\2\u01b1\u01b2\7E\2\2\u01b2\u01b7\5L\'\2\u01b3\u01b4\7A\2"+
-		"\2\u01b4\u01b6\5L\'\2\u01b5\u01b3\3\2\2\2\u01b6\u01b9\3\2\2\2\u01b7\u01b5"+
-		"\3\2\2\2\u01b7\u01b8\3\2\2\2\u01b8\u01ba\3\2\2\2\u01b9\u01b7\3\2\2\2\u01ba"+
+		"\2\u0183\u0185\7/\2\2\u0184\u0183\3\2\2\2\u0184\u0185\3\2\2\2\u0185\u0186"+
+		"\3\2\2\2\u0186\u018b\5\26\f\2\u0187\u0188\7Q\2\2\u0188\u018a\5\26\f\2"+
+		"\u0189\u0187\3\2\2\2\u018a\u018d\3\2\2\2\u018b\u0189\3\2\2\2\u018b\u018c"+
+		"\3\2\2\2\u018c\u018e\3\2\2\2\u018d\u018b\3\2\2\2\u018e\u018f\7E\2\2\u018f"+
+		"\u0190\5x=\2\u0190\u0191\7@\2\2\u0191A\3\2\2\2\u0192\u0193\7/\2\2\u0193"+
+		"\u0198\5D#\2\u0194\u0195\7Q\2\2\u0195\u0197\5D#\2\u0196\u0194\3\2\2\2"+
+		"\u0197\u019a\3\2\2\2\u0198\u0196\3\2\2\2\u0198\u0199\3\2\2\2\u0199\u019b"+
+		"\3\2\2\2\u019a\u0198\3\2\2\2\u019b\u019c\7E\2\2\u019c\u019d\5x=\2\u019d"+
+		"\u019e\7@\2\2\u019eC\3\2\2\2\u019f\u01a1\5F$\2\u01a0\u019f\3\2\2\2\u01a0"+
+		"\u01a1\3\2\2\2\u01a1\u01a2\3\2\2\2\u01a2\u01a3\5\26\f\2\u01a3E\3\2\2\2"+
+		"\u01a4\u01a5\5H%\2\u01a5\u01a6\7S\2\2\u01a6G\3\2\2\2\u01a7\u01a8\7>\2"+
+		"\2\u01a8\u01a9\5x=\2\u01a9\u01aa\7?\2\2\u01aa\u01ae\3\2\2\2\u01ab\u01ae"+
+		"\7\66\2\2\u01ac\u01ae\5\u009aN\2\u01ad\u01a7\3\2\2\2\u01ad\u01ab\3\2\2"+
+		"\2\u01ad\u01ac\3\2\2\2\u01aeI\3\2\2\2\u01af\u01b0\7\60\2\2\u01b0\u01b1"+
+		"\7\66\2\2\u01b1\u01b2\7E\2\2\u01b2\u01b7\5L\'\2\u01b3\u01b4\7A\2\2\u01b4"+
+		"\u01b6\5L\'\2\u01b5\u01b3\3\2\2\2\u01b6\u01b9\3\2\2\2\u01b7\u01b5\3\2"+
+		"\2\2\u01b7\u01b8\3\2\2\2\u01b8\u01ba\3\2\2\2\u01b9\u01b7\3\2\2\2\u01ba"+
 		"\u01bb\5N(\2\u01bbK\3\2\2\2\u01bc\u01bf\5\u009aN\2\u01bd\u01be\7J\2\2"+
 		"\u01be\u01c0\5\u009aN\2\u01bf\u01bd\3\2\2\2\u01bf\u01c0\3\2\2\2\u01c0"+
 		"M\3\2\2\2\u01c1\u01c9\7<\2\2\u01c2\u01c8\5<\37\2\u01c3\u01c8\58\35\2\u01c4"+
@@ -6425,14 +6426,14 @@ public class LismaParser extends Parser {
 		"\2\2\2\u01c7\u01c3\3\2\2\2\u01c7\u01c4\3\2\2\2\u01c7\u01c5\3\2\2\2\u01c7"+
 		"\u01c6\3\2\2\2\u01c8\u01cb\3\2\2\2\u01c9\u01c7\3\2\2\2\u01c9\u01ca\3\2"+
 		"\2\2\u01ca\u01cc\3\2\2\2\u01cb\u01c9\3\2\2\2\u01cc\u01cd\7=\2\2\u01cd"+
-		"O\3\2\2\2\u01ce\u01cf\7\62\2\2\u01cf\u01d0\5V,\2\u01d0\u01d1\7:\2\2\u01d1"+
+		"O\3\2\2\2\u01ce\u01cf\7\61\2\2\u01cf\u01d0\5V,\2\u01d0\u01d1\7:\2\2\u01d1"+
 		"\u01d2\5x=\2\u01d2\u01d3\7;\2\2\u01d3\u01d5\5R*\2\u01d4\u01d6\5T+\2\u01d5"+
 		"\u01d4\3\2\2\2\u01d5\u01d6\3\2\2\2\u01d6\u01d7\3\2\2\2\u01d7\u01d8\7@"+
 		"\2\2\u01d8Q\3\2\2\2\u01d9\u01df\7<\2\2\u01da\u01de\5<\37\2\u01db\u01de"+
 		"\5\u00a6T\2\u01dc\u01de\5J&\2\u01dd\u01da\3\2\2\2\u01dd\u01db\3\2\2\2"+
 		"\u01dd\u01dc\3\2\2\2\u01de\u01e1\3\2\2\2\u01df\u01dd\3\2\2\2\u01df\u01e0"+
 		"\3\2\2\2\u01e0\u01e2\3\2\2\2\u01e1\u01df\3\2\2\2\u01e2\u01e3\7=\2\2\u01e3"+
-		"S\3\2\2\2\u01e4\u01e5\7\34\2\2\u01e5\u01ea\5V,\2\u01e6\u01e7\7A\2\2\u01e7"+
+		"S\3\2\2\2\u01e4\u01e5\7\62\2\2\u01e5\u01ea\5V,\2\u01e6\u01e7\7A\2\2\u01e7"+
 		"\u01e9\5V,\2\u01e8\u01e6\3\2\2\2\u01e9\u01ec\3\2\2\2\u01ea\u01e8\3\2\2"+
 		"\2\u01ea\u01eb\3\2\2\2\u01ebU\3\2\2\2\u01ec\u01ea\3\2\2\2\u01ed\u01ee"+
 		"\t\7\2\2\u01eeW\3\2\2\2\u01ef\u01f0\7\63\2\2\u01f0\u01f1\7:\2\2\u01f1"+
@@ -6442,12 +6443,12 @@ public class LismaParser extends Parser {
 		"\u01f9\3\2\2\2\u01fb\u01fc\3\2\2\2\u01fc\u01fe\3\2\2\2\u01fd\u01fb\3\2"+
 		"\2\2\u01fe\u01ff\7=\2\2\u01ff[\3\2\2\2\u0200\u0203\5<\37\2\u0201\u0203"+
 		"\5\u00a6T\2\u0202\u0200\3\2\2\2\u0202\u0201\3\2\2\2\u0203]\3\2\2\2\u0204"+
-		"\u0205\7\36\2\2\u0205\u0206\5Z.\2\u0206_\3\2\2\2\u0207\u0208\7\66\2\2"+
+		"\u0205\7\35\2\2\u0205\u0206\5Z.\2\u0206_\3\2\2\2\u0207\u0208\7\66\2\2"+
 		"\u0208\u0209\7:\2\2\u0209\u020a\5b\62\2\u020a\u020b\7;\2\2\u020ba\3\2"+
 		"\2\2\u020c\u0211\5x=\2\u020d\u020e\7A\2\2\u020e\u0210\5x=\2\u020f\u020d"+
 		"\3\2\2\2\u0210\u0213\3\2\2\2\u0211\u020f\3\2\2\2\u0211\u0212\3\2\2\2\u0212"+
 		"c\3\2\2\2\u0213\u0211\3\2\2\2\u0214\u0215\5j\66\2\u0215\u0216\5f\64\2"+
-		"\u0216\u021f\3\2\2\2\u0217\u0218\7\37\2\2\u0218\u0219\7:\2\2\u0219\u021a"+
+		"\u0216\u021f\3\2\2\2\u0217\u0218\7\36\2\2\u0218\u0219\7:\2\2\u0219\u021a"+
 		"\5j\66\2\u021a\u021b\7A\2\2\u021b\u021c\7\64\2\2\u021c\u021d\7;\2\2\u021d"+
 		"\u021f\3\2\2\2\u021e\u0214\3\2\2\2\u021e\u0217\3\2\2\2\u021fe\3\2\2\2"+
 		"\u0220\u0222\7C\2\2\u0221\u0220\3\2\2\2\u0222\u0223\3\2\2\2\u0223\u0221"+
@@ -6496,16 +6497,16 @@ public class LismaParser extends Parser {
 		"\u02a4\u02a5\3\2\2\2\u02a5\u0099\3\2\2\2\u02a6\u02a7\t\f\2\2\u02a7\u009b"+
 		"\3\2\2\2\u02a8\u02a9\t\r\2\2\u02a9\u009d\3\2\2\2\u02aa\u02ab\t\16\2\2"+
 		"\u02ab\u009f\3\2\2\2\u02ac\u02ad\t\17\2\2\u02ad\u00a1\3\2\2\2\u02ae\u02af"+
-		"\7)\2\2\u02af\u02b4\5\u00a4S\2\u02b0\u02b1\7A\2\2\u02b1\u02b3\5\u00a4"+
+		"\7(\2\2\u02af\u02b4\5\u00a4S\2\u02b0\u02b1\7A\2\2\u02b1\u02b3\5\u00a4"+
 		"S\2\u02b2\u02b0\3\2\2\2\u02b3\u02b6\3\2\2\2\u02b4\u02b2\3\2\2\2\u02b4"+
 		"\u02b5\3\2\2\2\u02b5\u02b7\3\2\2\2\u02b6\u02b4\3\2\2\2\u02b7\u02b8\7@"+
 		"\2\2\u02b8\u00a3\3\2\2\2\u02b9\u02ba\5\u0098M\2\u02ba\u02bb\7E\2\2\u02bb"+
-		"\u02bc\5x=\2\u02bc\u00a5\3\2\2\2\u02bd\u02be\7*\2\2\u02be\u02bf\5j\66"+
+		"\u02bc\5x=\2\u02bc\u00a5\3\2\2\2\u02bd\u02be\7)\2\2\u02be\u02bf\5j\66"+
 		"\2\u02bf\u02c0\7E\2\2\u02c0\u02c1\5x=\2\u02c1\u02c2\7@\2\2\u02c2\u00a7"+
-		"\3\2\2\2\u02c3\u02c4\7\4\2\2\u02c4\u02c5\7+\2\2\u02c5\u02ca\5j\66\2\u02c6"+
+		"\3\2\2\2\u02c3\u02c4\7\4\2\2\u02c4\u02c5\7*\2\2\u02c5\u02ca\5j\66\2\u02c6"+
 		"\u02c7\7A\2\2\u02c7\u02c9\5j\66\2\u02c8\u02c6\3\2\2\2\u02c9\u02cc\3\2"+
 		"\2\2\u02ca\u02c8\3\2\2\2\u02ca\u02cb\3\2\2\2\u02cb\u02cd\3\2\2\2\u02cc"+
-		"\u02ca\3\2\2\2\u02cd\u02ce\7@\2\2\u02ce\u00a9\3\2\2\2\u02cf\u02d0\7+\2"+
+		"\u02ca\3\2\2\2\u02cd\u02ce\7@\2\2\u02ce\u00a9\3\2\2\2\u02cf\u02d0\7*\2"+
 		"\2\u02d0\u02d1\5\u00aeX\2\u02d1\u02d2\7E\2\2\u02d2\u02d3\5\u00acW\2\u02d3"+
 		"\u02d4\7@\2\2\u02d4\u00ab\3\2\2\2\u02d5\u02d6\5x=\2\u02d6\u00ad\3\2\2"+
 		"\2\u02d7\u02dc\5\u00b0Y\2\u02d8\u02d9\7Q\2\2\u02d9\u02db\5\u00b0Y\2\u02da"+
@@ -6514,11 +6515,11 @@ public class LismaParser extends Parser {
 		"\u02e1\7S\2\2\u02e1\u02e2\5\u00b2Z\2\u02e2\u00b1\3\2\2\2\u02e3\u02e7\5"+
 		"\u0096L\2\u02e4\u02e7\5r:\2\u02e5\u02e7\5\u008cG\2\u02e6\u02e3\3\2\2\2"+
 		"\u02e6\u02e4\3\2\2\2\u02e6\u02e5\3\2\2\2\u02e7\u00b3\3\2\2\2\u02e8\u02e9"+
-		"\7,\2\2\u02e9\u02ea\7E\2\2\u02ea\u02eb\5x=\2\u02eb\u02ec\7@\2\2\u02ec"+
-		"\u00b5\3\2\2\2\u02ed\u02ee\7-\2\2\u02ee\u02ef\7E\2\2\u02ef\u02f0\5x=\2"+
+		"\7+\2\2\u02e9\u02ea\7E\2\2\u02ea\u02eb\5x=\2\u02eb\u02ec\7@\2\2\u02ec"+
+		"\u00b5\3\2\2\2\u02ed\u02ee\7,\2\2\u02ee\u02ef\7E\2\2\u02ef\u02f0\5x=\2"+
 		"\u02f0\u02f1\7@\2\2\u02f1\u00b7\3\2\2\2\u02f2\u02f3\7\6\2\2\u02f3\u02f4"+
 		"\7E\2\2\u02f4\u02f5\5x=\2\u02f5\u02f6\7@\2\2\u02f6\u00b9\3\2\2\2\u02f7"+
-		"\u02f9\7.\2\2\u02f8\u02fa\5j\66\2\u02f9\u02f8\3\2\2\2\u02fa\u02fb\3\2"+
+		"\u02f9\7-\2\2\u02f8\u02fa\5j\66\2\u02f9\u02f8\3\2\2\2\u02fa\u02fb\3\2"+
 		"\2\2\u02fb\u02f9\3\2\2\2\u02fb\u02fc\3\2\2\2\u02fc\u02fd\3\2\2\2\u02fd"+
 		"\u02fe\7@\2\2\u02fe\u00bb\3\2\2\2=\u00bf\u00d2\u00da\u00e4\u00e9\u00f8"+
 		"\u00fd\u0101\u0109\u0113\u011c\u0129\u0132\u013e\u0159\u016e\u0173\u017c"+

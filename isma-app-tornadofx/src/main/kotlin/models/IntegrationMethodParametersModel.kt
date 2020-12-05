@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.getValue
+import tornadofx.onChange
 import tornadofx.setValue
 
 class IntegrationMethodParametersModel {
@@ -17,6 +18,9 @@ class IntegrationMethodParametersModel {
     val isAccuracyInUseProperty = SimpleBooleanProperty()
     var isAccuracyInUse by isAccuracyInUseProperty
 
+    val isStableAllowedProperty = SimpleBooleanProperty()
+    var isStableAllowedInUse by isStableAllowedProperty
+
     val isStableInUseProperty = SimpleBooleanProperty()
     var isStableInUse by isStableInUseProperty
 
@@ -28,4 +32,10 @@ class IntegrationMethodParametersModel {
 
     val portProperty = SimpleIntegerProperty()
     var port by portProperty
+
+    init {
+        selectedMethodProperty.onChange {
+
+        }
+    }
 }

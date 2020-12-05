@@ -8,6 +8,7 @@ import ru.nstu.isma.`in`.InputTranslator
 import ru.nstu.isma.`in`.lisma.LismaTranslator
 import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
 import ru.nstu.isma.core.hsm.HSM
+import ru.nstu.isma.next.core.sim.fdm.FDMNewConverter
 import tornadofx.Controller
 
 class LismaPdeController : Controller() {
@@ -19,15 +20,17 @@ class LismaPdeController : Controller() {
 
         val errors = IsmaErrorList()
         val translator: InputTranslator = LismaTranslator(project.projectText, errors)
-        val translationResult = translator.translate()
+        val model = translator.translate()
 
-        val errorModels = errors.map { x ->
-            SyntaxErrorModel(x.row ?: 0, x.col ?: 0, x.msg)
+        val processedModel = if (model.isPDE) model else FDMNewConverter(model).convert()
+
+        val errorModels = errors.map {
+            SyntaxErrorModel(it.row ?: 0, it.col ?: 0, it.msg)
         }
 
         syntaxController.setErrorList(errorModels)
 
-        return translationResult
+        return processedModel
     }
 
     fun getLismaTokens(): List<Token>{

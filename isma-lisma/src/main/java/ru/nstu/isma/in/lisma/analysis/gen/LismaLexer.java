@@ -1,4 +1,4 @@
-// Generated from C:/Users/SmallBoss/Documents/Projects/ISMA/isma-lisma/src/main/resources/ru/nstu/isma/in/lisma\Lisma.g4 by ANTLR 4.8
+// Generated from C:/Users/SmallBoss/Documents/Projects/ISMA/isma-lisma/src/main/resources/ru/nstu/isma/in/lisma\Lisma.g4 by ANTLR 4.9
 package ru.nstu.isma.in.lisma.analysis.gen;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class LismaLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.9", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =

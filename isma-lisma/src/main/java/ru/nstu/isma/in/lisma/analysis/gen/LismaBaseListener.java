@@ -1,4 +1,4 @@
-// Generated from C:/Users/SmallBoss/Documents/Projects/ISMA/isma-lisma/src/main/resources/ru/nstu/isma/in/lisma\Lisma.g4 by ANTLR 4.8
+// Generated from C:/Users/SmallBoss/Documents/Projects/ISMA/isma-lisma/src/main/resources/ru/nstu/isma/in/lisma\Lisma.g4 by ANTLR 4.9
 package ru.nstu.isma.in.lisma.analysis.gen;
 
 import org.antlr.v4.runtime.ParserRuleContext;

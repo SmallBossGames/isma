@@ -2,15 +2,25 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
+    application
     id("org.openjfx.javafxplugin") version "0.0.9"
 }
+
 group = "me.smallboss"
 version = "1.0-SNAPSHOT"
+
 
 
 javafx {
     version = "11.0.2"
     modules("javafx.controls", "javafx.graphics")
+}
+
+application {
+    mainClass.set("IsmaApp")
+    applicationDefaultJvmArgs = listOf(
+        "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
 }
 
 dependencies {

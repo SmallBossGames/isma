@@ -1,0 +1,6 @@
+dependencies {
+    implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
+    api project(":grin:gui:simple")
+    api project(":grin:gui:concatenation")
+    api project(":grin:gui:common")
+}

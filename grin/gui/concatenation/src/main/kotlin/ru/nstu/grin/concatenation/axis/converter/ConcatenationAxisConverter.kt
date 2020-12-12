@@ -8,7 +8,6 @@ object ConcatenationAxisConverter {
         return ConcatenationAxis(
             id = source.id,
             name = source.name,
-            zeroPoint = source.zeroPoint,
             order = order,
             direction = source.direction,
             backGroundColor = source.backGroundColor,

@@ -46,6 +46,7 @@ include 'grin:gui:concatenation'
 include 'grin:gui:kube'
 include 'grin:gui:main'
 include 'grin:gui:common'
+include 'grin:integration'
 
 project(':isma-intg-lib-parent:isma-intg-lib').projectDir = file('isma-intg-lib/isma-intg-lib')
 project(':isma-intg-lib-parent:isma-intg-lib-euler').projectDir = file('isma-intg-lib/isma-intg-lib-euler')

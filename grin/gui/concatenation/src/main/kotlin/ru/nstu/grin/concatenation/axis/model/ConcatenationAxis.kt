@@ -17,7 +17,6 @@ import java.util.*
 data class ConcatenationAxis(
     val id: UUID,
     val name: String,
-    val zeroPoint: Double,
     val order: Int,
     val direction: Direction,
 
@@ -47,7 +46,6 @@ data class ConcatenationAxis(
         return ConcatenationAxis(
             id = id,
             name = name,
-            zeroPoint = zeroPoint,
             order = order,
             direction = direction,
             backGroundColor = backGroundColor,

@@ -35,8 +35,8 @@ class SimulationCoreController(
         private val eventDetectionParameters: EventDetectionParameters?) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
-    private var indexProvider: EquationIndexProvider? = null
-    private var hybridSystem: HybridSystem? = null
+    private lateinit var indexProvider: EquationIndexProvider
+    private lateinit var hybridSystem: HybridSystem
     private var simulationInitials: SimulationInitials
     private val stepChangeListeners: MutableList<Consumer<Double>> = LinkedList()
     private var modelClassLoader: ClassLoader? = null
@@ -63,11 +63,11 @@ class SimulationCoreController(
      */
     private fun prepareSimulation() {
         indexProvider = EquationIndexProvider(hsm)
-        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider!!, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
+        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
         val hsSourceCode = hsClassBuilder.buildSourceCode()
         hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
                 DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode, true)
-        modelClassLoader = hybridSystem!!.javaClass.classLoader
+        modelClassLoader = hybridSystem.javaClass.classLoader
 
         // подготовка СЛАУ
         //HMLinearSystem linearSystem = hsm.getLinearSystem();
@@ -78,7 +78,7 @@ class SimulationCoreController(
         // заполняем начальные значения для ДУ
         val odeInitials = DoubleArray(hsm.variableTable.odes.size)
         for (ode in hsm.variableTable.odes) {
-            val idx = indexProvider!!.getDifferentialEquationIndex(ode.code)!!
+            val idx = indexProvider.getDifferentialEquationIndex(ode.code)!!
             odeInitials[idx] = ode.initialValue
         }
         simulationInitials = SimulationInitials(odeInitials, simulationInitials.step,
@@ -91,13 +91,14 @@ class SimulationCoreController(
     private fun runSimulation(): HybridSystemIntgResult {
         var computeEngineClient: ComputeEngineClient? = null
         return try {
-            var stepSolver: DaeSystemStepSolver = DefaultDaeSystemStepSolver(method, hybridSystem?.daeSystem)
-            if (parallelParameters != null) {
+            val stepSolver: DaeSystemStepSolver = if (parallelParameters != null) {
                 computeEngineClient = ComputeEngineClient(modelClassLoader)
                 computeEngineClient.connect(parallelParameters.server, parallelParameters.port)
                 computeEngineClient.loadIntgMethod(method)
-                computeEngineClient.loadDaeSystem(hybridSystem!!.daeSystem)
-                stepSolver = RemoteDaeSystemStepSolver(method, computeEngineClient)
+                computeEngineClient.loadDaeSystem(hybridSystem.daeSystem)
+                RemoteDaeSystemStepSolver(method, computeEngineClient)
+            } else {
+                DefaultDaeSystemStepSolver(method, hybridSystem.daeSystem)
             }
 
             val cauchyProblemSolver = HybridSystemSimulator()

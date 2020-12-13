@@ -22,9 +22,11 @@ class HybridSystemSimulator {
         stepChangeListeners.add(c)
     }
 
-    fun run(hybridSystem: HybridSystem?, stepSolver: DaeSystemStepSolver,
+    fun run(hybridSystem: HybridSystem,
+            stepSolver: DaeSystemStepSolver,
             simulationInitials: SimulationInitials,
-            eventDetector: EventDetectionIntgController, eventDetectionStepBoundLow: Double,
+            eventDetector: EventDetectionIntgController,
+            eventDetectionStepBoundLow: Double,
             resultPointConsumer: Consumer<IntgResultPoint?>): IntgMetricData {
         val metricData = IntgMetricData()
         metricData.setStartTime(System.currentTimeMillis())
@@ -33,10 +35,10 @@ class HybridSystemSimulator {
         var step = simulationInitials.step
         var yForDe = simulationInitials.differentialEquationInitials
         var changeSet: HybridSystemChangeSet
-        var rhs: Array<DoubleArray?> = stepSolver.calculateRhs(yForDe)
+        var rhs = stepSolver.calculateRhs(yForDe)
         var isLastStep = false
         while (x < end && !Thread.currentThread().isInterrupted) {
-            changeSet = hybridSystem!!.checkTransitions(yForDe, rhs)
+            changeSet = hybridSystem.checkTransitions(yForDe, rhs)
             if (!changeSet.isEmpty) {
                 changeInitials(yForDe, changeSet)
                 stepSolver.apply(changeSet)
@@ -44,15 +46,13 @@ class HybridSystemSimulator {
             }
             resultPointConsumer.accept(IntgResultPoint(x, yForDe.copyOf(yForDe.size), rhs))
             val fromPoint = IntgPoint(step, yForDe, rhs)
-            val toPoint: IntgPoint = stepSolver.step(fromPoint)
+            val toPoint = stepSolver.step(fromPoint)
 
             // TODO: сделать правильно, чтобы первый шаг тоже оценивался.
             if (eventDetector.isEnabled) {
-                val guards: List<Guard> = hybridSystem.currentState.guards
-                val eventFunctionGroups: List<EventFunctionGroup> = guards.stream()
-                        .map { obj: Guard -> obj.eventFunctionGroup }
-                        .collect(Collectors.toList())
-                val predictedStep: Double = eventDetector.predictNextStep(toPoint, eventFunctionGroups)
+                val guards = hybridSystem.currentState.guards
+                val eventFunctionGroups = guards.map { it.eventFunctionGroup }
+                val predictedStep = eventDetector.predictNextStep(toPoint, eventFunctionGroups)
                 // TODO: если так, то шагов около 8500
                 //double nextStep = Math.min(Math.max(predictedStep, eventDetectionStepBoundLow), toPoint.getNextStep());
                 // TODO: а если так, то 170
@@ -63,7 +63,7 @@ class HybridSystemSimulator {
             step = toPoint.nextStep
             yForDe = toPoint.y
             rhs = toPoint.rhs
-            if (isLastStep) { // Если мы прошли весь интервал, то запоминаем последние значения и выходим.
+            if (isLastStep) {
                 resultPointConsumer.accept(IntgResultPoint(x, yForDe.copyOf(yForDe.size), rhs))
                 break
             } else if (x + step > end) { // Если нам нужно сделать последний шаг, то меняем значение
@@ -71,17 +71,17 @@ class HybridSystemSimulator {
                 isLastStep = true
             }
             val finalX = x
-            stepChangeListeners.stream().forEach { l: Consumer<Double> -> l.accept(finalX) }
+            stepChangeListeners.forEach { it.accept(finalX) }
         }
         metricData.setEndTime(System.currentTimeMillis())
         return metricData
     }
 
-    private fun changeInitials(yForDe: DoubleArray?, changeSet: HybridSystemChangeSet) {
-        val emptyRhs = arrayOfNulls<DoubleArray>(0)
-        changeSet.initialValueSetters.entries.stream().forEach { entry ->
-            val setter: DifferentialEquation = entry.value.value
-            yForDe!![entry.key] = setter.apply(yForDe, emptyRhs)
+    private fun changeInitials(yForDe: DoubleArray, changeSet: HybridSystemChangeSet) {
+        val emptyRhs = emptyArray<DoubleArray>()
+        changeSet.initialValueSetters.entries.forEach {
+            val setter: DifferentialEquation = it.value.value
+            yForDe[it.key] = setter.apply(yForDe, emptyRhs)
         }
     }
 }

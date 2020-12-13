@@ -15,9 +15,9 @@ class FileFunctionController : Controller() {
 
     fun chooseFile() {
         val files = tornadofx.chooseFile(
-            "Файл",
-            arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.gf")),
-            FileChooserMode.Single
+            title = "Файл",
+            filters = arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.gf")),
+            mode = FileChooserMode.Single
         )
         if (files.isEmpty()) {
             tornadofx.error("Файл не был выбран")

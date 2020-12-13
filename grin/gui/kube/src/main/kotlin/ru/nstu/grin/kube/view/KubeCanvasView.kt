@@ -15,11 +15,17 @@ class KubeCanvasView: View() {
         menubar {
             menu("File") {
                 item("Save as").action {
-                    val file = chooseFile("Файл", arrayOf(), FileChooserMode.Save).first()
+                    val file = chooseFile(
+                        title = "Файл",
+                        filters = arrayOf(),
+                        mode = FileChooserMode.Save).first()
 //                    fire(SaveEvent(file))
                 }
                 item("Load").action {
-                    val file = chooseFile("Файл", arrayOf(), FileChooserMode.Single).first()
+                    val file = chooseFile(
+                        title = "Файл",
+                        filters = arrayOf(),
+                        mode = FileChooserMode.Single).first()
 //                    fire(LoadEvent(file))
                 }
             }

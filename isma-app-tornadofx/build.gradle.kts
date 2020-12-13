@@ -9,8 +9,6 @@ plugins {
 group = "me.smallboss"
 version = "1.0-SNAPSHOT"
 
-
-
 javafx {
     version = "11.0.2"
     modules("javafx.controls", "javafx.graphics")
@@ -35,6 +33,7 @@ dependencies {
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-lib-parent"))
     implementation(project(":isma-intg-lib-parent:isma-intg-lib"))
+    implementation(project(":grin:integration"))
 }
 
 tasks.withType<KotlinCompile>() {

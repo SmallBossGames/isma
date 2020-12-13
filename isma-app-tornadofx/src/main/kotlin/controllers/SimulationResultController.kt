@@ -1,7 +1,14 @@
 package controllers
 
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.paint.Color
 import javafx.stage.FileChooser
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.function.model.LineType
+import ru.nstu.grin.integration.IntegrationController
 import ru.nstu.isma.intg.api.IntgResultPoint
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import ru.nstu.isma.next.core.sim.controller.HybridSystemIntgResult
@@ -10,6 +17,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
+import java.util.*
 import java.util.function.Consumer
 
 class SimulationResultController : Controller() {
@@ -19,9 +27,51 @@ class SimulationResultController : Controller() {
             FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
 
+    private val grinIntegrationController by inject<IntegrationController>()
+
     val simulationResultProperty = SimpleObjectProperty<HybridSystemIntgResult>(null)
     var simulationResult by simulationResultProperty
 
+
+    fun showChart() {
+        val xAxis = ConcatenationAxis(
+            UUID.randomUUID(),
+            "xAxis",
+            0,
+            Direction.RIGHT,
+            Color.BLUE,
+            Color.BLACK,
+            40.0,
+            12.0,
+            "Arial"
+        )
+
+        val yAxis = ConcatenationAxis(
+            UUID.randomUUID(),
+            "yAxis",
+            0,
+            Direction.TOP,
+            Color.BLUE,
+            Color.BLACK,
+            40.0,
+            12.0,
+            "Arial")
+
+        val conctainationFunction = ConcatenationFunction(
+            UUID.randomUUID(),
+            "SomeName",
+            listOf(),
+            false,
+            false,
+            Color.BLUE,
+            0.1,
+            LineType.CIRCLE_FILL_DOTES,
+        )
+
+        val cartesianSpace = CartesianSpace(UUID.randomUUID(), "SomeSpace", mutableListOf(conctainationFunction), xAxis, yAxis)
+        val spaces = listOf(cartesianSpace)
+        grinIntegrationController.integrate(spaces)
+    }
 
     fun exportToFile(){
         val selectedFiles = chooseFile (filters = fileFilers, mode = FileChooserMode.Save)

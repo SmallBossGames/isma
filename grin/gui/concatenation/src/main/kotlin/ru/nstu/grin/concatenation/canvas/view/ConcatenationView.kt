@@ -16,11 +16,11 @@ class ConcatenationView : View() {
         menubar {
             menu("Файл") {
                 item("Сохранить как").action {
-                    val file = chooseFile("Файл", arrayOf(), FileChooserMode.Save).first()
+                    val file = chooseFile(title="File", filters = arrayOf(), mode = FileChooserMode.Save).first()
                     fire(SaveEvent(file))
                 }
                 item("Загрузить").action {
-                    val file = chooseFile("Файл", arrayOf(), FileChooserMode.Single).first()
+                    val file = chooseFile(title="File", filters = arrayOf(), mode = FileChooserMode.Single).first()
                     fire(LoadEvent(file))
                 }
             }

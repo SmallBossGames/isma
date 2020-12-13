@@ -1,5 +1,16 @@
+plugins {
+    id("org.openjfx.javafxplugin") version "0.0.9"
+}
+
+apply plugin: "org.openjfx.javafxplugin"
+
+javafx {
+    version = "11.0.2"
+    modules = ["javafx.controls", "javafx.graphics"]
+}
+
 dependencies {
-    implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.19'
+    implementation group: 'no.tornado', name: 'tornadofx', version: '1.7.20'
     api project(":grin:gui:simple")
     api project(":grin:gui:concatenation")
     api project(":grin:gui:common")

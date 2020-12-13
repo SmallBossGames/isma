@@ -28,6 +28,9 @@ class SimulationProcessView : View() {
         hbox(5) {
             button {
                 text = "Show chart"
+                action {
+                    simulationResult.showChart()
+                }
             }
             button {
                 text = "Export results"

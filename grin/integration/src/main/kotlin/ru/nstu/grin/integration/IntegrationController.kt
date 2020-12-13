@@ -19,7 +19,7 @@ class IntegrationController : Controller() {
         find<ConcatenationView>(
             scope = scope,
             params = mapOf(
-                ConcatenationView::initData to initData
+                ConcatenationView:: initData to initData
             )
         ).openWindow()
     }

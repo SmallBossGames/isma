@@ -10,10 +10,6 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
-    repositories {
-        mavenCentral()
-    }
-
     version = rootProject.version
 
     dependencies {

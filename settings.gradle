@@ -8,6 +8,19 @@ include('isma-app-tornadofx')
 include('state-chart')
 include('isma-next-core')
 
+include 'grin:gui'
+include 'grin:analytic-fu'
+include 'grin:math'
+
+include 'grin:gui:simple'
+include 'grin:gui:concatenation'
+include 'grin:gui:kube'
+include 'grin:gui:main'
+include 'grin:gui:common'
+include 'grin:integration'
+
+//Java 8 projects
+
 include('isma-app')
 include('isma-core')
 include('isma-hsm')
@@ -35,18 +48,6 @@ include('isma-ui')
 include('isma-ui-graph')
 include('isma-intg-parallel-ignite')
 include('isma-distrib')
-
-
-include 'grin:gui'
-include 'grin:analytic-fu'
-include 'grin:math'
-
-include 'grin:gui:simple'
-include 'grin:gui:concatenation'
-include 'grin:gui:kube'
-include 'grin:gui:main'
-include 'grin:gui:common'
-include 'grin:integration'
 
 project(':isma-intg-lib-parent:isma-intg-lib').projectDir = file('isma-intg-lib/isma-intg-lib')
 project(':isma-intg-lib-parent:isma-intg-lib-euler').projectDir = file('isma-intg-lib/isma-intg-lib-euler')

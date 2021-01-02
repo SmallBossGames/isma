@@ -6,16 +6,13 @@ plugins {
     id("org.openjfx.javafxplugin") version "0.0.9"
 }
 
-group = "me.smallboss"
-version = "1.0-SNAPSHOT"
-
 javafx {
     version = "11.0.2"
-    modules("javafx.controls", "javafx.graphics")
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 application {
-    mainClass.set("IsmaApp")
+    mainClassName = "IsmaApp"
     applicationDefaultJvmArgs = listOf(
         "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
         "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")

@@ -4,8 +4,8 @@
 
 dependencies {
     implementation project(':isma-core')
-    implementation project(':isma-intg-lib-parent:isma-intg-lib')
-    implementation project(':isma-intg-lib-parent:isma-intg-lib-rkmerson')
+    implementation project(':isma-intg-lib:isma-intg-lib-common')
+    implementation project(':isma-intg-lib:isma-intg-lib-rkmerson')
     implementation project(":isma-hsm")
     implementation project(":isma-lisma")
     implementation project(':isma-intg-api')

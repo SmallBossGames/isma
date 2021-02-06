@@ -15,6 +15,6 @@ dependencies {
     implementation 'jgraph:jgraph:5.13.0.0'
     implementation 'com.intellij:forms_rt:6.0.5'
     implementation 'org.jscience:jscience:4.3.1'
-    implementation 'commons-io:commons-io:2.4'
+    implementation 'commons-io:commons-io:2.8.0'
     testImplementation 'junit:junit:4.12'
 }

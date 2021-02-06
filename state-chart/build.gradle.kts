@@ -11,7 +11,7 @@ javafx {
 }
 
 dependencies {
-    implementation("no.tornado:tornadofx:1.7.19")
+    implementation("no.tornado:tornadofx:1.7.20")
 }
 
 tasks.withType<KotlinCompile>() {

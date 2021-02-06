@@ -22,11 +22,11 @@ include 'grin:integration'
 //Java 8 projects
 
 //include('isma-app')
-include('isma-core')
 include('isma-hsm')
 include('isma-intg-api')
 include('isma-intg-core')
 include('isma-intg-core-solvers-parallel')
+include('isma-intg-demo-problems')
 include('isma-intg-lib:isma-intg-lib-common')
 include('isma-intg-lib:isma-intg-lib-euler')
 include('isma-intg-lib:isma-intg-lib-rk2')
@@ -48,5 +48,5 @@ include('isma-intg-parallel-ignite')
 //include('isma-ui-graph')
 //include('isma-distrib')
 //include('isma-intg-demo')
-//include('isma-intg-demo-problems')
+//include('isma-core')
 

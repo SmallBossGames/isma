@@ -21,7 +21,6 @@ include 'grin:integration'
 
 //Java 8 projects
 
-//include('isma-app')
 include('isma-hsm')
 include('isma-intg-api')
 include('isma-intg-core')
@@ -44,6 +43,7 @@ include('isma-intg-parallel-ignite')
 
 
 // Java 8 legacy
+//include('isma-app')
 //include('isma-ui')
 //include('isma-ui-graph')
 //include('isma-distrib')

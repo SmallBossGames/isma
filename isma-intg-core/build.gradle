@@ -5,5 +5,5 @@
 dependencies {
     implementation project(':isma-intg-api')
     implementation 'org.slf4j:slf4j-api:1.7.12'
-    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'org.apache.commons:commons-lang3:3.11'
 }

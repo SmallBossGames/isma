@@ -24,7 +24,7 @@ dependencies {
     implementation (project(":isma-intg-lib:isma-intg-lib-euler"))
     testImplementation (project(":isma-intg-lib:isma-intg-lib-common"))
 
-    implementation ("org.apache.commons:commons-lang3:3.4")
+    implementation ("org.apache.commons:commons-lang3:3.11")
     implementation ("org.slf4j:slf4j-api:1.7.7")
     implementation ("com.google.guava:guava:30.0-jre")
 

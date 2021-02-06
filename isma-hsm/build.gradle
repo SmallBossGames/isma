@@ -4,7 +4,7 @@
 
 dependencies {
     implementation project(':isma-tools')
-    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'ch.qos.logback:logback-classic:1.1.3'
     testImplementation 'junit:junit:4.12'
 }

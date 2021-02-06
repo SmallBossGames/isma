@@ -1,20 +1,6 @@
 package ru.nstu.isma.next.core.sim.controller.gen
 
 import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
-import java.lang.IllegalStateException
-import java.util.stream.Collectors
-import common.IndexMapper
-import ru.nstu.isma.core.hsm.HSM
-import common.JavaClassBuilder
-import javax.tools.JavaFileManager
-import java.util.Arrays
-import javax.tools.JavaFileObject
-import java.lang.RuntimeException
-import java.lang.ClassNotFoundException
-import java.lang.IllegalAccessException
-import java.util.HashMap
-import common.IndexProvider
-import org.apache.commons.lang3.text.StrSubstitutor
 import ru.nstu.isma.intg.api.calcmodel.*
 import java.util.ArrayList
 
@@ -22,9 +8,9 @@ import java.util.ArrayList
  * @author Maria Nasyrova
  * @since 14.07.2016
  */
-class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, parent: GuardBuilder) {
-    private val parent: GuardBuilder
-    private val eventFunctions: ArrayList<EventFunction>
+class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, private val parent: GuardBuilder) {
+    private val eventFunctions = ArrayList<EventFunction>()
+
     fun addState(name: String?): StateBuilder? {
         return parent.addState(name)
     }
@@ -53,7 +39,7 @@ class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, par
     // public EventFunctionGroupBuilder addEventFunctionGroup(EventFunctionGroup.StepChoiceRule stepChoiceRule) {
     // }
     fun addEventFunction(eventFunction: EventFunction): EventFunctionGroupBuilder {
-        StateBuilder.Companion.add<EventFunction>(eventFunction, eventFunctions)
+        StateBuilder.add(eventFunction, eventFunctions)
         return this
     }
 
@@ -73,8 +59,4 @@ class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, par
         return EventFunctionGroup(stepChoiceRule, eventFunctions)
     }
 
-    init {
-        eventFunctions = ArrayList<EventFunction>()
-        this.parent = parent
-    }
 }

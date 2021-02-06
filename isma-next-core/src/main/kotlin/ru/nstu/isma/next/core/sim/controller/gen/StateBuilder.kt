@@ -1,22 +1,11 @@
 package ru.nstu.isma.next.core.sim.controller.gen
 
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
-import java.lang.IllegalStateException
+import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquation
+import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation
+import ru.nstu.isma.intg.api.calcmodel.Guard
+import ru.nstu.isma.intg.api.calcmodel.HybridSystem
+import java.util.*
 import java.util.stream.Collectors
-import common.IndexMapper
-import ru.nstu.isma.core.hsm.HSM
-import common.JavaClassBuilder
-import javax.tools.JavaFileManager
-import java.util.Arrays
-import javax.tools.JavaFileObject
-import java.lang.RuntimeException
-import java.lang.ClassNotFoundException
-import java.lang.IllegalAccessException
-import java.util.HashMap
-import common.IndexProvider
-import org.apache.commons.lang3.text.StrSubstitutor
-import ru.nstu.isma.intg.api.calcmodel.*
-import java.util.ArrayList
 
 /**
  * @author Maria Nasyrova

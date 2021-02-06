@@ -5,7 +5,6 @@ import common.HMExpressionBuilder
 import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
 import java.util.stream.Collectors
 import ru.nstu.isma.core.hsm.HSM
-import java.util.Arrays
 import ru.nstu.isma.core.hsm.`var`.HMAlgebraicEquation
 import ru.nstu.isma.core.hsm.`var`.HMDerivativeEquation
 import ru.nstu.isma.core.hsm.events.HSMEventFunctionGroup
@@ -17,8 +16,6 @@ import ru.nstu.isma.core.hsm.hybrid.HMState
 import ru.nstu.isma.core.hsm.hybrid.HMTransaction
 import ru.nstu.isma.intg.api.calcmodel.*
 import java.lang.IllegalArgumentException
-import java.util.function.Function
-import java.util.function.Predicate
 
 import org.apache.commons.text.StringSubstitutor
 

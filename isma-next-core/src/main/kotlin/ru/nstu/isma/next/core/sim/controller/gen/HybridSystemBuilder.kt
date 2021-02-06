@@ -1,25 +1,9 @@
 package ru.nstu.isma.next.core.sim.controller.gen
 
-import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation
-import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquation
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
-import java.lang.IllegalStateException
-import ru.nstu.isma.intg.api.calcmodel.HybridSystem
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup
-import java.util.stream.Collectors
-import common.IndexMapper
 import ru.nstu.isma.core.hsm.HSM
-import common.JavaClassBuilder
-import javax.tools.JavaFileManager
-import java.util.Arrays
-import javax.tools.JavaFileObject
-import java.lang.RuntimeException
-import java.lang.ClassNotFoundException
-import java.lang.IllegalAccessException
-import java.util.HashMap
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
-import common.IndexProvider
-import org.apache.commons.lang3.text.StrSubstitutor
+import ru.nstu.isma.intg.api.calcmodel.HybridSystem
+import java.util.*
 
 /**
  * Компоновщик гибридной системы.
@@ -72,14 +56,14 @@ class HybridSystemBuilder {
         val states: MutableMap<String, HybridSystem.State?> = HashMap()
         for (stateBuilder in stateBuilders.values) {
             val state = stateBuilder.toHybridSystemState()
-            states[state!!.name] = state
+            states[state.name] = state
         }
 
         // Компонуем псевдосостояния ГС.
         val pseudoStates: MutableMap<String, HybridSystem.State?> = HashMap()
         for (stateBuilder in pseudoStateBuilders.values) {
             val pseudoState = stateBuilder.toHybridSystemState()
-            pseudoStates[pseudoState!!.name] = pseudoState
+            pseudoStates[pseudoState.name] = pseudoState
         }
 
         // Компонуем основную систему ДАУ.

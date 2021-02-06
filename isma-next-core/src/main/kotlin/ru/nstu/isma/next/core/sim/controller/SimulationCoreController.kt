@@ -66,7 +66,8 @@ class SimulationCoreController(
         val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
         val hsSourceCode = hsClassBuilder.buildSourceCode()
         hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
-                DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode, true)
+            DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode
+        )
         modelClassLoader = hybridSystem.javaClass.classLoader
 
         // подготовка СЛАУ

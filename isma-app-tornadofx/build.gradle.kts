@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.4.30"
     application
     id("org.openjfx.javafxplugin") version "0.0.9"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 javafx {
@@ -12,14 +13,13 @@ javafx {
 }
 
 application {
-    mainClassName = "IsmaApp"
+    mainClassName = "launcher.LauncherKt"
     applicationDefaultJvmArgs = listOf(
         "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
         "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
 }
 
 dependencies {
-
     implementation ("no.tornado:tornadofx:1.7.20")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
     implementation ("org.fxmisc.richtext:richtextfx:0.10.5")

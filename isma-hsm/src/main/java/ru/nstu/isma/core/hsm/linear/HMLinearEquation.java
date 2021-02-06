@@ -10,9 +10,9 @@ import java.util.ArrayList;
  * on 13.03.2015.
  */
 public class HMLinearEquation implements Serializable {
-    private ArrayList<HMExpression> leftPart;
+    private final ArrayList<HMExpression> leftPart;
     private HMExpression rightPart;
-    private Integer size;
+    private final Integer size;
 
     public HMLinearEquation(Integer size) {
         this.size = size;

@@ -19,7 +19,7 @@ public class MpiService {
 	private static final int MASTER_RANK = 0;
 
 	private final Logger logger = LoggerFactory.getLogger(MpiService.class);
-	private ExecutorService executor;
+	private final ExecutorService executor;
     private int rank;
     private int rankCount;
 

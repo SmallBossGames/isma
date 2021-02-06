@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class HybridSystemChangeSet extends DaeSystemChangeSet {
 
-    private Map<Integer, Change<DifferentialEquation>> initialValueSetters = new HashMap<>();
+    private final Map<Integer, Change<DifferentialEquation>> initialValueSetters = new HashMap<>();
 
     public Map<Integer, Change<DifferentialEquation>> getInitialValueSetters() {
         return initialValueSetters;

@@ -12,8 +12,8 @@ public class EventFunction implements BiFunction<double[], double[][], Double>, 
     public interface EventFunctionExpression extends BiFunction<double[], double[][], Double>, Serializable {
     }
 
-    private EventFunctionExpression expression;
-    private String description;
+    private final EventFunctionExpression expression;
+    private final String description;
 
     public EventFunction(EventFunctionExpression expression, String description) {
         this.expression = expression;

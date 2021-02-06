@@ -1,4 +1,3 @@
 package models
 
-class SemanticErrorModel {
-}
+class SemanticErrorModel

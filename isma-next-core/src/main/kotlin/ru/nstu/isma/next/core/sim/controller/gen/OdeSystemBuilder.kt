@@ -10,8 +10,8 @@ import ru.nstu.isma.intg.api.calcmodel.HybridSystem
  * Created by Bessonov Alex on 07.01.15.
  */
 class OdeSystemBuilder : ClassBuilder<HybridSystem?> {
-    constructor(modelContext: IndexMapper?) : super(modelContext) {}
-    constructor(hsm: HSM?) : super(hsm) {}
+    constructor(modelContext: IndexMapper?) : super(modelContext)
+    constructor(hsm: HSM?) : super(hsm)
 
     fun build(name: String?, printJava: Boolean): HybridSystem {
         return super.build(name, "ru.nstu.isma.core.simulation.controller.", printJava)!!

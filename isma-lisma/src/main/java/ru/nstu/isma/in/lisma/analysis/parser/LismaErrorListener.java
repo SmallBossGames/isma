@@ -17,7 +17,7 @@ import java.util.BitSet;
  * Time: 22:01
  */
 public class LismaErrorListener implements ANTLRErrorListener {
-    private IsmaErrorList errors;
+    private final IsmaErrorList errors;
 
     public LismaErrorListener(IsmaErrorList errors) {
         this.errors = errors;

@@ -14,7 +14,7 @@ import ru.nstu.isma.intg.core.methods.utils.MathUtils;
  */
 public abstract class BaseAccuracyIntgController extends AccuracyIntgController {
 
-    private static Logger logger = LoggerFactory.getLogger(BaseAccuracyIntgController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseAccuracyIntgController.class);
 
     private static final double R = 1.0;
 

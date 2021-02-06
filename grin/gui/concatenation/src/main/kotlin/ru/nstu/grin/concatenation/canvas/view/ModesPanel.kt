@@ -66,8 +66,8 @@ class ModesPanel : Fragment() {
         button {
             val image = Image("edit-tool.png")
             val imageView = ImageView(image)
-            imageView.setFitHeight(20.0)
-            imageView.setFitWidth(20.0)
+            imageView.fitHeight = 20.0
+            imageView.fitWidth = 20.0
             graphic = imageView
             tooltip = Tooltip("Редактирование")
 

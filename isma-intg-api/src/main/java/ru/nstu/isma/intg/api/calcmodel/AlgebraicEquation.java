@@ -11,7 +11,7 @@ public class AlgebraicEquation implements BiFunction<double[], AlgebraicEquation
     private final int index;
     private final String name;
     private final String description;
-    private AeFunction function;
+    private final AeFunction function;
 
     public AlgebraicEquation(int index, AeFunction function) {
         this("", index, function, "");

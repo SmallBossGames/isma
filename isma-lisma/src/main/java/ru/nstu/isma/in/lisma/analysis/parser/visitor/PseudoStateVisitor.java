@@ -21,15 +21,15 @@ public class PseudoStateVisitor extends BaseVisitor {
 
     private HMVariableTable table;
 
-    private HMStateAutomata automata;
+    private final HMStateAutomata automata;
 
     private HMPseudoState current;
 
-    private HMLinearSystem linearSystem;
+    private final HMLinearSystem linearSystem;
 
-    private HMVariableTable baseTable;
+    private final HMVariableTable baseTable;
 
-    private HSM hsm;
+    private final HSM hsm;
 
     public PseudoStateVisitor(HSM hsm, HMVariableTable table, HMStateAutomata automata, HMLinearSystem linearSystem, ParserContext pc) {
         super(pc);

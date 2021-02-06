@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  */
 public class DefaultCauchyProblemSolver implements CauchyProblemSolver {
 
-    private Logger logger = LoggerFactory.getLogger(DefaultCauchyProblemSolver.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultCauchyProblemSolver.class);
 
     @Override
     public IntgMetricData solve(CauchyProblem cauchyProblem, DaeSystemStepSolver stepSolver, Consumer<IntgResultPoint> resultConsumer) {

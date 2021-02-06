@@ -207,7 +207,7 @@ class FDMNewConverter(private val model: HSM?) {
             pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
         } else if (idx.isFirst && pde.getBound(HMBoundaryCondition.SideType.LEFT, av).derOrder > 0) {
             pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
-        } else if (o.getOrder() == EXPPDEOperand.Order.ONE) {
+        } else if (o.order == EXPPDEOperand.Order.ONE) {
 //            if (eq_idx_plus_1 == null || eq_idx_minus_1 == null || eq_cur == null) {
 //                throw new RuntimeException("FDM: all is bad");
 //            }

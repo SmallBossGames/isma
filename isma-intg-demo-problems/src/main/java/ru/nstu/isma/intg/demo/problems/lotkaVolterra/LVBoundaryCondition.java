@@ -2,10 +2,10 @@ package ru.nstu.isma.intg.demo.problems.lotkaVolterra;
 
 public class LVBoundaryCondition {
 
-    private int bottomBoundary;
-    private int bottomBounder;
-    private int topBoundary;
-    private int topBounder;
+    private final int bottomBoundary;
+    private final int bottomBounder;
+    private final int topBoundary;
+    private final int topBounder;
 
     public LVBoundaryCondition(int bottomBoundary, int bottomBounder, int topBoundary, int topBounder) {
         this.bottomBoundary = bottomBoundary;

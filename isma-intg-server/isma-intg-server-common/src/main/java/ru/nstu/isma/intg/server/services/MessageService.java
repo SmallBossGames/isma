@@ -29,7 +29,7 @@ public class MessageService {
     private final Multimap<MessageType, Consumer<Message>> messageListeners =
             Multimaps.synchronizedMultimap(HashMultimap.create());
     private ScheduledExecutorService messagePumpExecutor;
-    private ExecutorService messageDispatcherExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService messageDispatcherExecutor = Executors.newSingleThreadExecutor();
 
     public MessageService(MpiService mpiService) {
         this.mpiService = mpiService;

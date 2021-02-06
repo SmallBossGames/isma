@@ -11,5 +11,4 @@ import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 class HybridSystemIntgResult(
         var equationIndexProvider: EquationIndexProvider? = null,
         var metricData: IntgMetricData? = null,
-        var resultPointProvider: IntgResultPointProvider? = null) {
-}
+        var resultPointProvider: IntgResultPointProvider? = null)

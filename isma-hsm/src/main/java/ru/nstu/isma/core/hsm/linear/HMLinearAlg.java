@@ -8,9 +8,9 @@ import java.util.function.Function;
  * on 25.03.2015.
  */
 public class HMLinearAlg implements Serializable {
-    private int index;
+    private final int index;
 
-    private Function<double[], Double> function;
+    private final Function<double[], Double> function;
 
     private String description;
 

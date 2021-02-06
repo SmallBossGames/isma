@@ -13,13 +13,13 @@ public class HybridSystem implements Serializable {
     public static final String INIT_PSEUDO_STATE = "initPseudo";
 
     /** Основная система уравнений */
-    private DaeSystem daeSystem;
+    private final DaeSystem daeSystem;
 
     /** Состояния */
-    private Map<String, State> states;
+    private final Map<String, State> states;
 
     /** Псевдосостояния (например, предикаты условных блоков) */
-    private Map<String, State> pseudoStates;
+    private final Map<String, State> pseudoStates;
 
     /** Текущее состояние */
     // private String currentState = HSM.INIT_STATE; // TODO
@@ -97,10 +97,10 @@ public class HybridSystem implements Serializable {
     public static class State {
 
         private final String name;
-        private List<DifferentialEquation> differentialEquations;
-        private List<AlgebraicEquation> algebraicEquations;
-        private List<Guard> guards;
-        private List<DifferentialEquation> setters;
+        private final List<DifferentialEquation> differentialEquations;
+        private final List<AlgebraicEquation> algebraicEquations;
+        private final List<Guard> guards;
+        private final List<DifferentialEquation> setters;
 
         public State(String name, List<DifferentialEquation> differentialEquations,
                      List<AlgebraicEquation> algebraicEquations, List<Guard> guards) {

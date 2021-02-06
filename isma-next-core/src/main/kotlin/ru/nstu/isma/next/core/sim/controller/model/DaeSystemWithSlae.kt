@@ -27,8 +27,8 @@ class DaeSystemWithSlae(differentialEquations: Array<DifferentialEquation?>?, al
         val rhs: Array<DoubleArray> = createEmptyRhs()
 
         // Вычисляем алгебраические функции
-        val calc = AlgebraicEquationCalculator(yForDe, getAlgebraicEquations())
-        val rhsForAe: DoubleArray = calc.getValues()
+        val calc = AlgebraicEquationCalculator(yForDe, algebraicEquations)
+        val rhsForAe: DoubleArray = calc.values
         rhs[DaeSystem.RHS_AE_PART_IDX] = rhsForAe
 
         // Вычисялем СЛАУ
@@ -45,9 +45,9 @@ class DaeSystemWithSlae(differentialEquations: Array<DifferentialEquation?>?, al
         rhs[RHS_SLAE_PART_IDX] = rhsForSlae
 
         // Вычисляем ОДУ
-        val rhsForOde = DoubleArray(getDifferentialEquationCount())
-        for (i in 0 until getDifferentialEquationCount()) {
-            rhsForOde[i] = getDifferentialEquations().get(i).apply(yForDe, rhs)
+        val rhsForOde = DoubleArray(differentialEquationCount)
+        for (i in 0 until differentialEquationCount) {
+            rhsForOde[i] = differentialEquations.get(i).apply(yForDe, rhs)
         }
         rhs[DaeSystem.RHS_DE_PART_IDX] = rhsForOde
         return rhs

@@ -78,7 +78,7 @@ class SimulationResultController : Controller() {
 
         if(selectedFiles.isEmpty())
         {
-            return;
+            return
         }
 
         val file = selectedFiles.first()

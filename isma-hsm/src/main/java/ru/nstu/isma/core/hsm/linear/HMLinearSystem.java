@@ -15,8 +15,8 @@ import java.util.Map;
  * on 13.03.2015.
  */
 public class HMLinearSystem implements Calculateable, Serializable {
-    private HSM hms;
-    private Map<String, HMLinearVar> vars = new HashMap<>();
+    private final HSM hms;
+    private final Map<String, HMLinearVar> vars = new HashMap<>();
     private List<HMLinearEquation> equations;
     private IndexMapper indexMapper;
     private LinearSystemMatrix matrix;

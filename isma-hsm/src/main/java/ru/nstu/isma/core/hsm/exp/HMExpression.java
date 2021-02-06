@@ -16,7 +16,7 @@ import java.util.List;
 public class HMExpression implements Serializable {
     private Type type = Type.INFIX;
 
-    private List<EXPToken> tokens = new LinkedList<>();
+    private final List<EXPToken> tokens = new LinkedList<>();
 
     public List<EXPToken> add(EXPToken t) {
         tokens.add(t);

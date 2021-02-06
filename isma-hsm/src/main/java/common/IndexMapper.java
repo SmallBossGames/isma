@@ -14,11 +14,11 @@ import java.util.Map;
 public class IndexMapper implements IndexProvider, Serializable {
     static final String odeArrayName = "y";
     // HSM equation name -> ODE index
-    private Map<String, Integer> indexMap = new HashMap<>();
+    private final Map<String, Integer> indexMap = new HashMap<>();
 
-    private Map<Integer ,String> codeMap = new HashMap<>();
+    private final Map<Integer ,String> codeMap = new HashMap<>();
 
-    private HSM hsm;
+    private final HSM hsm;
 
     public IndexMapper(HSM hsm) {
         this.hsm = hsm;

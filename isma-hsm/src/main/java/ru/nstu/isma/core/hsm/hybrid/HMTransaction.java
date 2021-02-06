@@ -49,9 +49,7 @@ public class HMTransaction implements Serializable {
         HMTransaction that = (HMTransaction) o;
 
         if (!source.equals(that.source)) return false;
-        if (!target.equals(that.target)) return false;
-
-        return true;
+        return target.equals(that.target);
     }
 
     @Override

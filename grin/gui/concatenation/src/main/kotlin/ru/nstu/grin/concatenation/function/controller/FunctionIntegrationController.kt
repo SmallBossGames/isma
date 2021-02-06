@@ -14,8 +14,8 @@ class FunctionIntegrationController : Controller() {
     init {
         subscribe<GetFunctionEvent> {
             if (functionId == it.function.id) {
-                model.leftBorder = it.function.points.map { it.x }.min() ?: 0.0
-                model.rightBorder = it.function.points.map { it.x }.max() ?: 0.0
+                model.leftBorder = it.function.points.map { it.x }.minOrNull() ?: 0.0
+                model.rightBorder = it.function.points.map { it.x }.maxOrNull() ?: 0.0
             }
         }
     }

@@ -25,13 +25,13 @@ import java.util.Map;
  * Time: 15:33
  */
 public class ExpressionVisitor extends LismaBaseVisitor<Object> {
-    private ParserContext pc;
+    private final ParserContext pc;
 
-    private static Map<String, EXPOperator> unaryOperators = new HashMap<String, EXPOperator>();
+    private static final Map<String, EXPOperator> unaryOperators = new HashMap<String, EXPOperator>();
 
-    private static Map<String, EXPOperator> binaryOperators = new HashMap<String, EXPOperator>();
+    private static final Map<String, EXPOperator> binaryOperators = new HashMap<String, EXPOperator>();
 
-    private HMVariableTable table;
+    private final HMVariableTable table;
 
     private HMExpression infix;
 

@@ -15,9 +15,9 @@ import java.util.Date;
  */
 public class JavaClassBuilder {
 
-    private IndexMapper context;
+    private final IndexMapper context;
 
-    private HMExpressionBuilder hmExpressionBuilder;
+    private final HMExpressionBuilder hmExpressionBuilder;
 
     public JavaClassBuilder(IndexMapper context) {
         this.context = context;

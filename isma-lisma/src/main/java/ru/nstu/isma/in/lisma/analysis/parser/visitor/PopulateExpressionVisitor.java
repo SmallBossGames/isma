@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
  */
 public class PopulateExpressionVisitor extends BaseVisitor {
 
-    private HMVariableTable table;
+    private final HMVariableTable table;
 
-    private HMStateAutomata automata;
+    private final HMStateAutomata automata;
 
     private HMLinearEquation currentEquation;
 
-    private HSM hsm;
+    private final HSM hsm;
 
     public PopulateExpressionVisitor(HSM hsm, HMVariableTable table, HMStateAutomata automata, ParserContext pc) {
         super(pc);

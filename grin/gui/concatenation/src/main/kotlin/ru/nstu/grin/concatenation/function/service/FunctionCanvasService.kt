@@ -71,10 +71,10 @@ class FunctionCanvasService : Controller() {
         val xArrays = intersections.map { it.first }
         val yArrays = intersections.map { it.second }
 
-        val maxX = xArrays.max()!! + INTERSECTION_CORRELATION
-        val minX = xArrays.min()!! - INTERSECTION_CORRELATION
-        val maxY = yArrays.max()!! + INTERSECTION_CORRELATION
-        val minY = yArrays.min()!! - INTERSECTION_CORRELATION
+        val maxX = xArrays.maxOrNull()!! + INTERSECTION_CORRELATION
+        val minX = xArrays.minOrNull()!! - INTERSECTION_CORRELATION
+        val maxY = yArrays.maxOrNull()!! + INTERSECTION_CORRELATION
+        val minY = yArrays.minOrNull()!! - INTERSECTION_CORRELATION
         firstCartesianSpace.xAxis.settings.min = minX
         firstCartesianSpace.xAxis.settings.max = maxX
         firstCartesianSpace.yAxis.settings.min = minY
@@ -132,8 +132,8 @@ class FunctionCanvasService : Controller() {
 
     fun calculateIntegral(event: CalculateIntegralEvent) {
         val function = getFunction(event.functionId)
-        val min = function.points.map { it.x }.min()!!
-        val max = function.points.map { it.x }.max()!!
+        val min = function.points.map { it.x }.minOrNull()!!
+        val max = function.points.map { it.x }.maxOrNull()!!
         if (min > event.leftBorder) {
             tornadofx.error("Левая граница не может быть меньше минимума функции")
             return
@@ -170,10 +170,10 @@ class FunctionCanvasService : Controller() {
             } ?: it.y
         }
 
-        val minY = yPoints.min() ?: return
-        val maxY = yPoints.max() ?: return
-        val minX = xPoints.min() ?: return
-        val maxX = xPoints.max() ?: return
+        val minY = yPoints.minOrNull() ?: return
+        val maxY = yPoints.maxOrNull() ?: return
+        val minX = xPoints.minOrNull() ?: return
+        val maxX = xPoints.maxOrNull() ?: return
 
         cartesianSpace.yAxis.settings.min = minY
         cartesianSpace.yAxis.settings.max = maxY

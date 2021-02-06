@@ -2,8 +2,8 @@ package ru.nstu.isma.intg.demo.problems.lotkaVolterra;
 
 public class LVOdeIndexGenerator {
 
-    private int J;
-    private LVBoundaryCondition boundaryCondition;
+    private final int J;
+    private final LVBoundaryCondition boundaryCondition;
 
     public LVOdeIndexGenerator(int J, LVBoundaryCondition boundaryCondition) {
         this.J = J;

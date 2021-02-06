@@ -29,7 +29,7 @@ class FileController : Controller() {
 
         if(selectedFiles.isEmpty())
         {
-            return;
+            return
         }
 
         val file = selectedFiles.first()
@@ -56,7 +56,7 @@ class FileController : Controller() {
 
         if(selectedFiles.isEmpty())
         {
-            return;
+            return
         }
 
         val file = selectedFiles.first()

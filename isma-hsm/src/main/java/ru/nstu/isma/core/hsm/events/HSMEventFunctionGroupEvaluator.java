@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class HSMEventFunctionGroupEvaluator {
 
-    private static Logger logger = LoggerFactory.getLogger(HSMEventFunctionGroupEvaluator.class);
+    private static final Logger logger = LoggerFactory.getLogger(HSMEventFunctionGroupEvaluator.class);
 
     /**
      * Вычисляет событийные функции по условию перехода.

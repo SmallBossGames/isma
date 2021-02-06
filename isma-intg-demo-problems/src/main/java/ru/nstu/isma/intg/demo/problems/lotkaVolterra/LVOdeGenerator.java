@@ -2,12 +2,12 @@ package ru.nstu.isma.intg.demo.problems.lotkaVolterra;
 
 public class LVOdeGenerator {
 
-    private LVOdeIndexGenerator odeIndexGenerator;
-    private int speciesType;
-    private double gridStepOnX;
-    private double gridStepOnZ;
-    private double d;
-    private LVFunction f;
+    private final LVOdeIndexGenerator odeIndexGenerator;
+    private final int speciesType;
+    private final double gridStepOnX;
+    private final double gridStepOnZ;
+    private final double d;
+    private final LVFunction f;
 
     public LVOdeGenerator(LVOdeIndexGenerator odeIndexGenerator, int speciesType, double gridStepOnX, double gridStepOnZ, double d, LVFunction f) {
         this.odeIndexGenerator = odeIndexGenerator;

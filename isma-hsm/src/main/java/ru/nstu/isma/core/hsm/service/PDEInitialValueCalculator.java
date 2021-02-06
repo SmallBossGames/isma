@@ -17,7 +17,7 @@ import java.util.Stack;
  */
 public class PDEInitialValueCalculator {
 
-    private static HashSet<String> availableFunctions = new HashSet<String>();
+    private static final HashSet<String> availableFunctions = new HashSet<String>();
 
     static {
         availableFunctions.add("cos");

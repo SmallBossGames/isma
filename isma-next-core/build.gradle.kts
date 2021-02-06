@@ -31,7 +31,7 @@ dependencies {
 
     testImplementation ("junit:junit:4.13.1")
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")
-    testImplementation ("com.github.jbellis:jamm:0.4.0")
+    testImplementation ("com.github.jbellis:jamm:0.3.3")
 }
 
 tasks.withType<KotlinCompile>() {

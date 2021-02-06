@@ -10,7 +10,7 @@ public class CycleIndex implements Iterable<Integer> {
 
     private String name;
 
-    private Set<Integer> indexes = new HashSet<>();
+    private final Set<Integer> indexes = new HashSet<>();
 
     public CycleIndex(String name) {
         this.name = name;
@@ -47,9 +47,9 @@ public class CycleIndex implements Iterable<Integer> {
 
     private class CycleIndexIterator implements Iterator<Integer> {
 
-        private CycleIndex idx;
+        private final CycleIndex idx;
 
-        private List<Integer> indexes;
+        private final List<Integer> indexes;
 
         private int current = -1;
 

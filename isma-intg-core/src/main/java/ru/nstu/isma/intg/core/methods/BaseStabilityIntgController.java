@@ -12,7 +12,7 @@ import ru.nstu.isma.intg.api.methods.StabilityIntgController;
  */
 public abstract class BaseStabilityIntgController extends StabilityIntgController {
 
-    private static Logger logger = LoggerFactory.getLogger(BaseStabilityIntgController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseStabilityIntgController.class);
 
     public double predictNextStepSize(IntgPoint toPoint) {
         double nextStepSize = toPoint.getNextStep();

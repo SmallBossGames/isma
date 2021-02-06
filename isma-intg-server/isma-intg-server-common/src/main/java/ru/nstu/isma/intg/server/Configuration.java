@@ -9,7 +9,7 @@ public class Configuration {
 
 	private static final int DEFAULT_RMI_REGISTRY_PORT = 7890;
 
-	private int rmiRegistryPort;
+	private final int rmiRegistryPort;
 
 	public Configuration(Properties properties) {
 		this.rmiRegistryPort = getIntProperty(properties, PORT_PROPERTY, DEFAULT_RMI_REGISTRY_PORT);

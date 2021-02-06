@@ -76,7 +76,7 @@ class SimulationSettingsView: View("Simulation settings") {
                     }
                 }
                 fieldset("Result saving") {
-                    togglegroup() {
+                    togglegroup {
                         radiobutton("Memory", value = SaveTarget.MEMORY)
                         radiobutton("File", value = SaveTarget.FILE)
                         parametersController.resultSaving.savingTargetProperty.bind(selectedValueProperty())

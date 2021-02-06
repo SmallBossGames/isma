@@ -11,8 +11,7 @@ import ru.nstu.grin.concatenation.points.model.PointSettings
 import tornadofx.Controller
 import kotlin.math.pow
 
-class PointTooltipsDrawElement(
-) : ChainDrawElement, Controller() {
+class PointTooltipsDrawElement : ChainDrawElement, Controller() {
     private val pointTooltips = mutableListOf<Tooltip>()
     private val model: ConcatenationCanvasModel by inject()
     private val transformer: MatrixTransformerController by inject()

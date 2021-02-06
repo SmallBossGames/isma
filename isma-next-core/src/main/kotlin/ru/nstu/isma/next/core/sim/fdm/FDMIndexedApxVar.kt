@@ -16,17 +16,17 @@ class FDMIndexedApxVar(v: HMSampledSpatialVariable) : HMSampledSpatialVariable()
     // связываем текущий объект с объектом HMApproximateVariable
     // все изменения в базовых полях индекса дожны отразиьться в предке
     fun linkWithHMApproximateVariable(v: HMSampledSpatialVariable) {
-        valFrom = v.getValFrom()
-        valTo = v.getValTo()
-        type = v.getType()
-        apxVal = v.getApxVal()
-        code = v.getCode()
+        valFrom = v.valFrom
+        valTo = v.valTo
+        type = v.type
+        apxVal = v.apxVal
+        code = v.code
     }
 
     fun setIndex(index: Int) {
         if (!validate(index)) {
             throw RuntimeException("index is not valid! index ="
-                    + index.toString() + " but range = [1; " + getPointsCount().toString() + "].")
+                    + index.toString() + " but range = [1; " + pointsCount.toString() + "].")
         }
         this.index = index
     }
@@ -36,11 +36,11 @@ class FDMIndexedApxVar(v: HMSampledSpatialVariable) : HMSampledSpatialVariable()
         get() = validate(index!!)
 
     private fun validate(idx: Int): Boolean {
-        return idx > 0 && idx <= getPointsCount()
+        return idx > 0 && idx <= pointsCount
     }
 
     val isMax: Boolean
-        get() = index == getPointsCount()
+        get() = index == pointsCount
     val isFirst: Boolean
         get() = index == 1
 
@@ -49,11 +49,11 @@ class FDMIndexedApxVar(v: HMSampledSpatialVariable) : HMSampledSpatialVariable()
     }
 
     val value: Double
-        get() = getValFrom().getValue() + (index!! - 1) * getStepSize()
+        get() = getValFrom().value + (index!! - 1) * stepSize
 
     fun toConst(): HMConst {
         val hmConst = HMConst(constCode)
-        hmConst.setValue(value)
+        hmConst.value = value
         return hmConst
     }
 

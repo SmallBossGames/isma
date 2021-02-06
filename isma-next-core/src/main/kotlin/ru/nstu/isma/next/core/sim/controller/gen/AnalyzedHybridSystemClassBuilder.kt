@@ -3,20 +3,9 @@ package ru.nstu.isma.next.core.sim.controller.gen
 import com.google.common.collect.ImmutableMap
 import common.HMExpressionBuilder
 import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
-import java.lang.IllegalStateException
 import java.util.stream.Collectors
-import common.IndexMapper
 import ru.nstu.isma.core.hsm.HSM
-import common.JavaClassBuilder
-import javax.tools.JavaFileManager
 import java.util.Arrays
-import javax.tools.JavaFileObject
-import java.lang.RuntimeException
-import java.lang.ClassNotFoundException
-import java.lang.IllegalAccessException
-import java.util.HashMap
-import common.IndexProvider
-import org.apache.commons.lang3.text.StrSubstitutor
 import ru.nstu.isma.core.hsm.`var`.HMAlgebraicEquation
 import ru.nstu.isma.core.hsm.`var`.HMDerivativeEquation
 import ru.nstu.isma.core.hsm.events.HSMEventFunctionGroup
@@ -31,12 +20,15 @@ import java.lang.IllegalArgumentException
 import java.util.function.Function
 import java.util.function.Predicate
 
+import org.apache.commons.text.StringSubstitutor
+
 /**
  * @author Maria Nasyrova
  * @since 05.10.2015
  */
 class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexProvider: EquationIndexProvider, private val packageName: String, private val className: String) {
-    private val hmExpressionBuilder: HMExpressionBuilder
+    private val hmExpressionBuilder: HMExpressionBuilder = HMExpressionBuilder(indexProvider)
+
     fun buildSourceCode(): String {
         val values = ImmutableMap.of(
                 "packageName", packageName,
@@ -44,7 +36,8 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
                 "className", className,
                 "hsbBody", renderHsbBody()
         )
-        return StrSubstitutor.replace(GENERATED_CLASS_TEMPLATE, values)
+
+        return StringSubstitutor(values).replace(GENERATED_CLASS_TEMPLATE)
     }
 
     private fun renderImports(classes: Collection<Class<*>>): String {
@@ -61,12 +54,15 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
                 "\${states}" +
                 "\${initPseudoState}" +
                 "\${pseudoStates}"
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "initState", renderInitState(),
                 "states", renderStates(),
                 "initPseudoState", renderInitPseudoState(),
                 "pseudoStates", renderPseudoStates()
         ))
+
+        return sub.replace(template)
     }
 
     private fun renderInitState(): String {
@@ -76,19 +72,22 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
                 "\${algebraicEquations}" +
                 "\${guards}" +
                 "\${setters};"
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "stateCode", HSM.INIT_STATE,
                 "differentialEquations", renderDifferentialEquations(hsm.variableTable.odes),
                 "algebraicEquations", renderAlgebraicEquations(hsm.variableTable.algs),
                 "guards", renderGuards(getTransactions(HSM.INIT_STATE)),
                 "setters", renderSetters(hsm.variableTable.setters)
         ))
+
+        return sub.replace(template)
     }
 
     private fun renderStates(): String {
         return hsm.automata.states.values.stream()
-                .filter(Predicate { state: HMState -> HSM.INIT_STATE != state.code })
-                .map(Function { state: HMState -> renderState(state) })
+                .filter { state: HMState -> HSM.INIT_STATE != state.code }
+                .map { state: HMState -> renderState(state) }
                 .collect(Collectors.joining())
     }
 
@@ -96,14 +95,16 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
         val template = """
 
 		hsb.addState("${"$"}{stateCode}")${"$"}{differentialEquations}${"$"}{algebraicEquations}${"$"}{guards}${"$"}{setters};"""
-        return StrSubstitutor.replace(template, ImmutableMap.builder<String, String>()
+
+        val sub = StringSubstitutor(ImmutableMap.builder<String, String>()
                 .put("stateCode", state.code)
                 .put("differentialEquations", renderDifferentialEquations(state.variables.odes))
                 .put("algebraicEquations", renderAlgebraicEquations(state.variables.algs))
                 .put("guards", renderGuards(getTransactions(state.code)))
                 .put("setters", renderSetters(state.variables.setters))
-                .build()
-        )
+                .build())
+
+        return sub.replace(template)
     }
 
     private fun renderInitPseudoState(): String {
@@ -114,17 +115,19 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
 
 		hsb.addPseudoState("${"$"}{stateCode}")${"$"}{guards};"""
         val guards = hsm.automata.allPseudoStates.stream()
-                .map(Function { ps: HMPseudoState -> renderGuard(HybridSystem.INIT_PSEUDO_STATE, ps.code, ps.condition) })
+                .map { ps: HMPseudoState -> renderGuard(HybridSystem.INIT_PSEUDO_STATE, ps.code, ps.condition) }
                 .collect(Collectors.joining())
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "stateCode", HybridSystem.INIT_PSEUDO_STATE,
-                "guards", guards
-        ))
+                "guards", guards))
+
+        return sub.replace(template)
     }
 
     private fun renderPseudoStates(): String {
         return hsm.automata.allPseudoStates.stream()
-                .map(Function { state: HMPseudoState -> renderPseudoState(state) })
+                .map { state: HMPseudoState -> renderPseudoState(state) }
                 .collect(Collectors.joining())
     }
 
@@ -132,90 +135,101 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
         val template = """
 
 		hsb.addPseudoState("${"$"}{stateCode}")${"$"}{differentialEquations}${"$"}{algebraicEquations}${"$"}{setters};"""
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "stateCode", state.code,
                 "differentialEquations", renderDifferentialEquations(state.variables.odes),
                 "algebraicEquations", renderAlgebraicEquations(state.variables.algs),
                 "setters", renderSetters(state.variables.setters)
         ))
+
+        return sub.replace(template)
     }
 
     private fun getTransactions(fromStateCode: String): Collection<HMTransaction> {
         return hsm.automata.transactions.stream()
-                .filter(Predicate { t: HMTransaction -> t.source.code == fromStateCode })
+                .filter { t: HMTransaction -> t.source.code == fromStateCode }
                 .collect(Collectors.toSet())
     }
 
     private fun renderDifferentialEquations(odes: Collection<HMDerivativeEquation>): String {
         val template = """
 			.add${"$"}{deClassName}(${"$"}{de})"""
-        return odes.stream().map(Function<HMDerivativeEquation, String> { ode: HMDerivativeEquation ->
-            StrSubstitutor.replace(template, ImmutableMap.of(
+
+        return odes.stream().map {
+            val sub = StringSubstitutor(ImmutableMap.of(
                     "deClassName", DifferentialEquation::class.java.simpleName,
-                    "de", renderDifferentialEquation(ode.code, ode.rightPart)
+                    "de", renderDifferentialEquation(it.code, it.rightPart)
             ))
-        }).collect(Collectors.joining())
+            sub.replace(template)
+        }.collect(Collectors.joining())
     }
 
     private fun renderDifferentialEquation(code: String, rightPart: HMExpression): String {
         val template = "new \${deClassName}(\"\${name}\", \${index}, \${de})"
         val de = renderWithRhs(rightPart)
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "deClassName", DifferentialEquation::class.java.simpleName,
-                "index", Integer.toString(indexProvider.getDifferentialEquationIndex(code)!!),
+                "index", (indexProvider.getDifferentialEquationIndex(code)!!).toString(),
                 "name", code,
                 "de", de
         ))
+
+        return sub.replace(template)
     }
 
     private fun renderWithRhs(rightPart: HMExpression): String {
         val template = "(y, rhs) -> (\${expression}), \"\${desc}\""
         val expression: String = hmExpressionBuilder.buildExpression(rightPart, false, true)
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "expression", expression,
                 "desc", expression
         ))
+        return sub.replace(template)
     }
 
     private fun renderAlgebraicEquations(algEquations: Collection<HMAlgebraicEquation>): String {
         val template = """
 			.add${"$"}{aeClassName}(new ${"$"}{aeClassName}("${"$"}{name}", ${"$"}{index}, (y, a) -> (${"$"}{expression}), "${"$"}{desc}"))"""
-        return algEquations.stream().map(Function<HMAlgebraicEquation, String> { ae: HMAlgebraicEquation ->
-            val expression: String = hmExpressionBuilder.buildExpression(ae.rightPart, true)
-            StrSubstitutor.replace(template, ImmutableMap.of(
+        return algEquations.stream().map {
+            val expression = hmExpressionBuilder.buildExpression(it.rightPart, true)
+            val sub = StringSubstitutor(ImmutableMap.of(
                     "aeClassName", AlgebraicEquation::class.java.simpleName,
-                    "index", Integer.toString(indexProvider.getAlgebraicEquationIndex(ae.code)!!),
-                    "name", ae.code,
+                    "index", (indexProvider.getAlgebraicEquationIndex(it.code)!!).toString(),
+                    "name", it.code,
                     "expression", expression,
                     "desc", expression
             ))
-        }).collect(Collectors.joining())
+            sub.replace(template)
+        }.collect(Collectors.joining())
     }
 
     private fun renderGuards(transactions: Collection<HMTransaction>): String {
         return transactions.stream()
-                .map(Function<HMTransaction, String> { t: HMTransaction -> renderGuard(t.source.code, t.target.code, t.condition) })
+                .map { renderGuard(it.source.code, it.target.code, it.condition) }
                 .collect(Collectors.joining())
     }
 
     private fun renderGuard(fromState: String, toState: String, rightPart: HMExpression): String {
         val template = """
 			.addGuard(new Guard("${"$"}{from}", "${"$"}{to}", ${"$"}{condition}))${"$"}{eventFunctionGroup}"""
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "from", fromState,
                 "to", toState,
                 "condition", renderWithRhs(rightPart),
                 "eventFunctionGroup", renderEventFunctionGroup(rightPart)
         ))
+        return sub.replace(template)
     }
 
     private fun renderSetters(setters: Map<String, HMExpression>): String {
         val template = """
 			.addSetter(${"$"}{de})"""
         return setters.entries.stream().map {
-            StrSubstitutor.replace(template, ImmutableMap.of(
+            val sub = StringSubstitutor(ImmutableMap.of(
                     "de", renderDifferentialEquation(it.key, it.value)
             ))
+            sub.replace(template)
         }.collect(Collectors.joining())
     }
 
@@ -223,23 +237,27 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
         val template = """
 				.addEventFunctionGroup(${"$"}{stepChoiceRule})${"$"}{eventFunctions}"""
         val eventFunctionGroup: HSMEventFunctionGroup = HSMEventFunctionGroupEvaluator.evaluate(guard)
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "stepChoiceRule", renderStepChoiceRule(eventFunctionGroup),
                 "eventFunctions", renderEventFunctions(eventFunctionGroup)
         ))
+        return sub.replace(template)
     }
 
     private fun renderStepChoiceRule(eventFunctionGroup: HSMEventFunctionGroup): String {
-        val operatorCode = eventFunctionGroup.operatorCode
-        var ruleValue: String? = null
-        ruleValue = if (operatorCode == null) {
-            StepChoiceRule.NONE.name
-        } else if (operatorCode == EXPOperator.Code.AND) {
-            StepChoiceRule.MAX.name
-        } else if (operatorCode == EXPOperator.Code.OR) {
-            StepChoiceRule.MIN.name
-        } else {
-            throw IllegalArgumentException("Unknown operator code \"$operatorCode\"")
+        val ruleValue = when (val operatorCode = eventFunctionGroup.operatorCode) {
+            null -> {
+                StepChoiceRule.NONE.name
+            }
+            EXPOperator.Code.AND -> {
+                StepChoiceRule.MAX.name
+            }
+            EXPOperator.Code.OR -> {
+                StepChoiceRule.MIN.name
+            }
+            else -> {
+                throw IllegalArgumentException("Unknown operator code \"$operatorCode\"")
+            }
         }
         return EventFunctionGroup::class.java.simpleName + "." +
                 StepChoiceRule::class.java.simpleName + "." +
@@ -248,20 +266,21 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
 
     private fun renderEventFunctions(eventFunctionGroup: HSMEventFunctionGroup): String {
         return eventFunctionGroup.expressions.stream()
-                .map<String>(Function<HMExpression, String> { eventFunctionExpression: HMExpression -> renderEventFunction(eventFunctionExpression) })
+                .map { renderEventFunction(it) }
                 .collect(Collectors.joining())
     }
 
     private fun renderEventFunction(eventFunctionExpression: HMExpression): String {
         val template = """
 					.addEventFunction(new EventFunction(${"$"}{expression}))"""
-        return StrSubstitutor.replace(template, ImmutableMap.of(
+        val sub = StringSubstitutor(ImmutableMap.of(
                 "expression", renderWithRhs(eventFunctionExpression)
         ))
+        return sub.replace(template)
     }
 
     companion object {
-        private val IMPORT_CLASSES = Arrays.asList(
+        private val IMPORT_CLASSES = listOf(
                 DifferentialEquation::class.java,
                 AlgebraicEquation::class.java,
                 HybridSystem::class.java,
@@ -293,7 +312,4 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
                 "}\n"
     }
 
-    init {
-        hmExpressionBuilder = HMExpressionBuilder(indexProvider)
-    }
 }

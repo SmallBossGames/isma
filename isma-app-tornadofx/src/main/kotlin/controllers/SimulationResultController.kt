@@ -108,13 +108,13 @@ class SimulationResultController : Controller() {
         val equationIndexProvider = result.equationIndexProvider!!
 
         // Дифференциальные переменные
-        val deCount = equationIndexProvider.differentialEquationCount
+        val deCount = equationIndexProvider.getDifferentialEquationCount()
         for (i in 0 until deCount) {
             header.append(equationIndexProvider.getDifferentialEquationCode(i)).append(commaAndSpace)
         }
 
         // Алгебраические переменные
-        val aeCount: Int = equationIndexProvider.algebraicEquationCount
+        val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
         for (i in 0 until aeCount) {
             header.append(equationIndexProvider.getAlgebraicEquationCode(i)).append(commaAndSpace)
         }

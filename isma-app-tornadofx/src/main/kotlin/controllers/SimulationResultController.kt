@@ -3,6 +3,7 @@ package controllers
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser
+import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
@@ -38,7 +39,7 @@ class SimulationResultController : Controller() {
             UUID.randomUUID(),
             "xAxis",
             0,
-            Direction.RIGHT,
+            Direction.LEFT,
             Color.BLUE,
             Color.BLACK,
             40.0,
@@ -50,7 +51,7 @@ class SimulationResultController : Controller() {
             UUID.randomUUID(),
             "yAxis",
             0,
-            Direction.TOP,
+            Direction.BOTTOM,
             Color.BLUE,
             Color.BLACK,
             40.0,
@@ -60,14 +61,13 @@ class SimulationResultController : Controller() {
         val conctainationFunction = ConcatenationFunction(
             UUID.randomUUID(),
             "SomeName",
-            listOf(),
-            false,
-            false,
-            Color.BLUE,
-            0.1,
-            LineType.CIRCLE_FILL_DOTES,
+            listOf(Point(0.5, 0.5), Point(5.0, 5.0), Point(9.0, 3.0)),
+            isHide = false,
+            isSelected = false,
+            functionColor = Color.BLUE,
+            lineSize = 5.0,
+            lineType = LineType.CIRCLE_FILL_DOTES,
         )
-
         val cartesianSpace = CartesianSpace(UUID.randomUUID(), "SomeSpace", mutableListOf(conctainationFunction), xAxis, yAxis)
         val spaces = listOf(cartesianSpace)
         grinIntegrationController.integrate(spaces)

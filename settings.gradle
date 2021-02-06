@@ -20,7 +20,6 @@ include 'grin:gui:common'
 include 'grin:integration'
 
 //Java 8 projects
-
 include('isma-hsm')
 include('isma-intg-api')
 include('isma-intg-core')

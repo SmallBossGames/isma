@@ -14,7 +14,7 @@ dependencies {
     implementation 'de.sciss:weblaf-ui:1.28'
     implementation 'com.fifesoft:rsyntaxtextarea:2.5.0'
     implementation 'de.jflex:maven-jflex-plugin:1.4.3'
-    implementation 'org.slf4j:slf4j-api:1.7.12'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.springframework:spring-core:4.3.2.RELEASE'
     implementation 'org.springframework:spring-context:4.3.2.RELEASE'
     implementation 'org.springframework:spring-aspects:4.3.2.RELEASE'

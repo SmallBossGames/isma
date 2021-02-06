@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "1.4.30"
     id("org.openjfx.javafxplugin") version "0.0.9"
 }
 
@@ -11,6 +11,7 @@ javafx {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.30")
     implementation("no.tornado:tornadofx:1.7.20")
 }
 

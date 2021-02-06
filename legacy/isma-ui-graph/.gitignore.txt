@@ -1,0 +1,5 @@
+/.idea
+/target
+.iml
+NewModel.class
+NewModel.java

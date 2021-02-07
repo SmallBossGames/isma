@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm")
     application
-    id("org.openjfx.javafxplugin") version "0.0.9"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("org.openjfx.javafxplugin")
+    id("com.github.johnrengelman.shadow")
 }
 
 javafx {

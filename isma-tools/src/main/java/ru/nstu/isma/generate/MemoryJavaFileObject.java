@@ -9,7 +9,7 @@ import java.net.URI;
  */
 public class MemoryJavaFileObject extends SimpleJavaFileObject {
 
-    private CharSequence content;
+    private final CharSequence content;
 
     public MemoryJavaFileObject(String className, CharSequence content) {
         super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);

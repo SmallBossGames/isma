@@ -26,7 +26,7 @@ public class LVDifferentialEquation extends DifferentialEquation {
         this.setFunction(this::calculateRightMember);
     }
 
-    private double calculateRightMember(double[] y, double rhs[][]) {
+    private double calculateRightMember(double[] y, double[][] rhs) {
         // Возведение в степень с помощью Math.pow в 300-600 раз медленнее, поэтому делаем так.
         return d / (stepOnX * stepOnX)
                 * (y[jNextK] - 2 * y[jK] + y[jPrevK])

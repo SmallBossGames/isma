@@ -11,7 +11,7 @@ import kotlin.concurrent.thread
 
 class SimulationProcessView : View() {
     private val simulationProgressController by inject<SimulationProgressController>()
-    private val simulationResult by inject<SimulationResultController>();
+    private val simulationResult by inject<SimulationResultController>()
 
     override val root = vbox(10) {
         padding = Insets(10.0)

@@ -15,7 +15,7 @@ import ru.nstu.isma.in.lisma.analysis.parser.ParserContext;
  * Time: 23:48
  */
 public class VariableVisitor extends LismaBaseVisitor<HMEquation> {
-    private ParserContext pc;
+    private final ParserContext pc;
 
     boolean isDer = false;
 

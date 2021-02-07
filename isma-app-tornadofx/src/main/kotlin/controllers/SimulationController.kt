@@ -18,7 +18,7 @@ class SimulationController: Controller() {
     private val lismaPdeController: LismaPdeController by inject()
     private val simulationParametersController: SimulationParametersController by inject()
     private val simulationProgress by inject<SimulationProgressController>()
-    private val simulationResult by inject<SimulationResultController>();
+    private val simulationResult by inject<SimulationResultController>()
 
     private var currentSimulation: Job? = null
 

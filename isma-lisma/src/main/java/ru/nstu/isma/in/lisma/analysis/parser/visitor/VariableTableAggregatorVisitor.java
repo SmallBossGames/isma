@@ -28,9 +28,9 @@ public class VariableTableAggregatorVisitor extends BaseVisitor {
 
     protected HMVariableTable table;
 
-    private HMStateAutomata automata;
+    private final HMStateAutomata automata;
 
-    private HMLinearSystem linearSystem;
+    private final HMLinearSystem linearSystem;
 
 
     public VariableTableAggregatorVisitor(HMVariableTable table, HMStateAutomata automata, HMLinearSystem linearSystem, ParserContext pc) {

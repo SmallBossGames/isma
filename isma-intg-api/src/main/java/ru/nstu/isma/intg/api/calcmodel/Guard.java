@@ -13,7 +13,7 @@ public class Guard implements BiFunction<double[], double[][], Boolean>, Seriali
 
     private final String fromStateName;
     private final String toStateName;
-    private GuardPredicate predicate;
+    private final GuardPredicate predicate;
     private final String description;
     private EventFunctionGroup eventFunctionGroup;
 

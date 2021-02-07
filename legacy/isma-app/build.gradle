@@ -1,0 +1,31 @@
+plugins {
+    id("application")
+}
+
+dependencies {
+    implementation project(':isma-ui-graph')
+    implementation project('::isma-intg-lib:isma-intg-lib-common')
+    implementation project(":isma-hsm")
+    implementation project(":isma-lisma")
+    implementation project(':isma-ui')
+    implementation project(':isma-core')
+    implementation project(':isma-intg-api')
+    implementation 'de.sciss:weblaf-core:1.28'
+    implementation 'de.sciss:weblaf-ui:1.28'
+    implementation 'com.fifesoft:rsyntaxtextarea:2.5.0'
+    implementation 'de.jflex:maven-jflex-plugin:1.4.3'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'org.springframework:spring-core:4.3.2.RELEASE'
+    implementation 'org.springframework:spring-context:4.3.2.RELEASE'
+    implementation 'org.springframework:spring-aspects:4.3.2.RELEASE'
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'com.google.guava:guava:30.1-jre'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.2.11'
+    implementation 'com.sun.xml.bind:jaxb-core:2.2.11'
+    implementation 'com.goebl:simplify:1.0.0'
+    implementation "org.jfree:jfreechart:1.5.0"
+    implementation "com.jgoodies:jgoodies-forms:1.6.0"
+    testImplementation 'junit:junit:4.12'
+}
+
+description = 'isma-app'

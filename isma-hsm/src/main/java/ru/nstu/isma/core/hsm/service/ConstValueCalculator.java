@@ -18,7 +18,7 @@ import java.util.Stack;
  * Date: 14.11.13 Time: 0:21
  */
 public class ConstValueCalculator {
-    private IsmaErrorList errors;
+    private final IsmaErrorList errors;
 
     public ConstValueCalculator(IsmaErrorList errors) {
         this.errors = errors;

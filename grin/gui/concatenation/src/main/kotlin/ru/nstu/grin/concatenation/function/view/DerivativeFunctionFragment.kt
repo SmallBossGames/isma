@@ -17,7 +17,7 @@ class DerivativeFunctionFragment : Fragment() {
             field("Степень") {
                 textfield(model.degreeProperty) {
                     validator {
-                        if (it?.toIntOrNull() == null || it?.toIntOrNull() ?: -1 < 0) {
+                        if (it?.toIntOrNull() == null || it.toIntOrNull() ?: -1 < 0) {
                             error("Число должно быть плавающим 20,0 и больше нуля")
                         } else {
                             null

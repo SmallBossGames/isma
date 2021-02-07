@@ -38,9 +38,7 @@ public class HMState implements Serializable {
 
         HMState hmState = (HMState) o;
 
-        if (!code.equals(hmState.code)) return false;
-
-        return true;
+        return code.equals(hmState.code);
     }
 
     @Override

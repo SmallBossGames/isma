@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.misc.NotNull;
  * Time: 0:13
  */
 public class StateVisitor extends LismaBaseVisitor<HMState> {
-    private HMStateAutomata automata;
+    private final HMStateAutomata automata;
 
     public StateVisitor(HMStateAutomata automata) {
         this.automata = automata;

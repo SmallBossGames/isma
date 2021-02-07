@@ -19,9 +19,9 @@ import ru.nstu.isma.in.lisma.analysis.parser.ParserContext;
  * Date: 04.12.13 Time: 1:07
  */
 public class BoundInfoVisitor extends LismaBaseVisitor<HMBoundaryCondition> {
-    private HMVariableTable table;
+    private final HMVariableTable table;
 
-    private ParserContext pc;
+    private final ParserContext pc;
 
     public BoundInfoVisitor(HMVariableTable table, ParserContext pc) {
         this.table = table;

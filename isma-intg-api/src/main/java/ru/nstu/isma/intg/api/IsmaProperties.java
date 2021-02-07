@@ -16,7 +16,7 @@ public class IsmaProperties {
     private static final String INTG_RESULT_FILE = "intg.result.file";
     private static final String INTG_RESULT_FILE_SEPARATOR = "intg.result.file.separator";
 
-    private static IsmaProperties INSTANCE = new IsmaProperties();
+    private static final IsmaProperties INSTANCE = new IsmaProperties();
 
     private final Properties properties;
 

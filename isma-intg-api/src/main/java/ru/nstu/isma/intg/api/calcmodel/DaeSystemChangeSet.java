@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public class DaeSystemChangeSet implements Serializable {
 
-    private Map<Integer, Change<DifferentialEquation>> differentialEquations = new HashMap<>();
-    private Map<Integer, Change<AlgebraicEquation>> algebraicEquations = new HashMap<>();
+    private final Map<Integer, Change<DifferentialEquation>> differentialEquations = new HashMap<>();
+    private final Map<Integer, Change<AlgebraicEquation>> algebraicEquations = new HashMap<>();
 
     public Map<Integer, Change<DifferentialEquation>> getDifferentialEquations() {
         return differentialEquations;

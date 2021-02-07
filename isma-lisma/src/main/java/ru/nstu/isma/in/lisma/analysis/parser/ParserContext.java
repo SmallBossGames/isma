@@ -12,9 +12,9 @@ import java.util.Map;
  * Created by Alex on 08.12.2015.
  */
 public class ParserContext {
-    private Map<String, Integer> indexMap = new HashMap<>();
+    private final Map<String, Integer> indexMap = new HashMap<>();
 
-    private IsmaErrorList errors;
+    private final IsmaErrorList errors;
 
     private Double defaultConstInitialValue = 0.0;
 
@@ -30,7 +30,7 @@ public class ParserContext {
         indexMap.put(idxName, value);
     }
 
-    private Map<String, HMExpression> macro = new HashMap<>();
+    private final Map<String, HMExpression> macro = new HashMap<>();
 
     public Integer getIdxValue(String idxName) {
         if (!indexMap.containsKey(idxName)) {

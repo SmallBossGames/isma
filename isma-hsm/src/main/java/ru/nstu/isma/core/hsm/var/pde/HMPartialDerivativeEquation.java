@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
  */
 public class HMPartialDerivativeEquation extends HMDerivativeEquation implements Serializable {
 
-    private List<HMBoundaryCondition> boundaries = new LinkedList<HMBoundaryCondition>();
+    private final List<HMBoundaryCondition> boundaries = new LinkedList<HMBoundaryCondition>();
 
-    private Map<HMSpatialVariable, Integer> variables = new HashMap<>();
+    private final Map<HMSpatialVariable, Integer> variables = new HashMap<>();
 
-    private Map<HMSpatialVariable, HMConst> params = new HashMap<>();
+    private final Map<HMSpatialVariable, HMConst> params = new HashMap<>();
 
     public HMPartialDerivativeEquation(String code) {
         super(code);

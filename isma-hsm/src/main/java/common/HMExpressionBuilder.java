@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class HMExpressionBuilder {
 
-    private IndexProvider context;
+    private final IndexProvider context;
 
     public HMExpressionBuilder(IndexProvider context) {
         this.context = context;

@@ -29,9 +29,9 @@ public class ComputeNode {
     private DaeSystem daeSystem;
     private ParallelDaeSystemStepSolver stepSolver;
     private boolean recreateStepSolver = true;
-    private Map<String, byte[]> cachedProvidedClassData = new HashMap<>();
+    private final Map<String, byte[]> cachedProvidedClassData = new HashMap<>();
 
-    private ClassDataProvider classDataProvider = cachedProvidedClassData::get;
+    private final ClassDataProvider classDataProvider = cachedProvidedClassData::get;
     private RemoteClassLoader remoteClassLoader =
             new RemoteClassLoader(this.getClass().getClassLoader(), classDataProvider);
 

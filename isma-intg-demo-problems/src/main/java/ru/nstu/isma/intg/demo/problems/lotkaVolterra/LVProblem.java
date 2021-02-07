@@ -12,7 +12,7 @@ public class LVProblem {
     public static final int FIRST_SPECIES = 1;
     public static final int SECOND_SPECIES = 2;
 
-    private LVInitialData initialData;
+    private final LVInitialData initialData;
 
     private int N;
     private double[] y0;

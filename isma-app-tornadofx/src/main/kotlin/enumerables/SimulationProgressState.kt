@@ -1,5 +1,3 @@
 package enumerables
 
-enum class SimulationProgressState {
-
-}
+enum class SimulationProgressState

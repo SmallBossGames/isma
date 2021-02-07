@@ -6,9 +6,9 @@ package ru.nstu.isma.intg.api.calcmodel;
  */
 public class AlgebraicEquationCalculator implements AlgebraicEquationResultProvider {
 
-    private double[] y;
-    private Double[] calcResults;
-    private AlgebraicEquation[] algebraicEquations;
+    private final double[] y;
+    private final Double[] calcResults;
+    private final AlgebraicEquation[] algebraicEquations;
 
     public AlgebraicEquationCalculator(double[] y, AlgebraicEquation[] algebraicEquations) {
         this.y = y;

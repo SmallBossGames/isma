@@ -22,9 +22,9 @@ import java.util.HashSet;
  * Time: 23:24
  */
 public class ASTTreeTranslator {
-    private ParserContext pc;
+    private final ParserContext pc;
 
-    private ParseTree tree;
+    private final ParseTree tree;
 
     private HMStateAutomata automata;
 

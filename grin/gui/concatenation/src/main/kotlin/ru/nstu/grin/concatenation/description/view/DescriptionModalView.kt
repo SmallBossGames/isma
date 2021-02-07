@@ -30,7 +30,7 @@ class DescriptionModalView : Fragment() {
             field("Размер текста") {
                 textfield(model.sizeProperty) {
                     validator {
-                        if (it?.toDoubleOrNull() == null || it?.toDoubleOrNull() ?: -1.0 < 0.0) {
+                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
                             error("Число должно быть плавающим 20,0 и больше нуля")
                         } else {
                             null

@@ -1,5 +1,6 @@
 package ru.nstu.isma.core.hsm.events;
 
+import org.jetbrains.annotations.Nullable;
 import ru.nstu.isma.core.hsm.exp.EXPOperator;
 import ru.nstu.isma.core.hsm.exp.HMExpression;
 
@@ -49,6 +50,7 @@ public class HSMEventFunctionGroup {
         return expressions;
     }
 
+    @Nullable
     public EXPOperator.Code getOperatorCode() {
         return operatorCode;
     }

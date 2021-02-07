@@ -72,8 +72,8 @@ public class MPIUtils {
 
         for (int i = 0; i < buff.length; i++) {
             msg.append("\t");
-            msg.append("idx=").append(String.valueOf(i)).append(", ");
-            msg.append("val=").append(String.valueOf(buff[i])).append("\n");
+            msg.append("idx=").append(i).append(", ");
+            msg.append("val=").append(buff[i]).append("\n");
 
         }
         msg.append("]");

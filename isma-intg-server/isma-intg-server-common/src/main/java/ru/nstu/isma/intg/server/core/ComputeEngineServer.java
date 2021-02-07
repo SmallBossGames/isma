@@ -40,7 +40,7 @@ public class ComputeEngineServer implements ComputeEngine, Serializable {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ServiceFacade serviceFacade;
     private Server server;
-    private Map<Integer, ClientContext> clientContexts = new HashMap<>();
+    private final Map<Integer, ClientContext> clientContexts = new HashMap<>();
 
     public ComputeEngineServer(ServiceFacade serviceFacade) {
         this.serviceFacade = serviceFacade;

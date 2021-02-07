@@ -9,7 +9,7 @@ class ProjectController : Controller() {
     private val projects = mutableSetOf<IsmaProjectModel>()
 
     fun createNew(name: String){
-        val project = IsmaProjectModel(name);
+        val project = IsmaProjectModel(name)
         add(project)
     }
 

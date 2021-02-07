@@ -19,11 +19,11 @@ import java.util.List;
  * Time: 1:18
  */
 public class PopulateStateInfoVisitor extends LismaBaseVisitor<Object> {
-    private HMVariableTable table;
+    private final HMVariableTable table;
 
-    private HMStateAutomata automata;
+    private final HMStateAutomata automata;
 
-    private ParserContext pc;
+    private final ParserContext pc;
 
     public PopulateStateInfoVisitor(HMVariableTable table, HMStateAutomata automata, ParserContext pc) {
         this.table = table;

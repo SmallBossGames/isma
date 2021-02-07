@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class ComputeEngineClientIT {
 
-	private ComputeEngineClient client = new ComputeEngineClient();
+	private final ComputeEngineClient client = new ComputeEngineClient();
 
 	@Before
 	public void connectClient() throws ComputeEngineClientException {

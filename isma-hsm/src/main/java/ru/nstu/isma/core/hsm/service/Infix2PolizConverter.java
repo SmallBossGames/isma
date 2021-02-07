@@ -87,18 +87,14 @@ public class Infix2PolizConverter {
 
     private boolean isUnaryOperandToken(EXPToken t) {
         if (t instanceof EXPOperator) {
-            if (((EXPOperator)t).getArity() == EXPOperator.ArityType.UNARY) {
-                return true;
-            }
+            return ((EXPOperator) t).getArity() == EXPOperator.ArityType.UNARY;
         }
         return false;
     }
 
     private boolean isBinaryOperandToken(EXPToken t) {
         if (t instanceof EXPOperator) {
-            if (((EXPOperator)t).getArity() == EXPOperator.ArityType.BINARY) {
-                return true;
-            }
+            return ((EXPOperator) t).getArity() == EXPOperator.ArityType.BINARY;
         }
         return false;
     }

@@ -11,6 +11,7 @@ subprojects {
     }
     dependencies {
         implementation project(":grin:analytic-fu")
+        implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.30"
         implementation "no.tornado:tornadofx:1.7.20"
         implementation "de.sciss:jwave:1.0.3"
         testImplementation "ru.kontur.kinfra.kfixture:kfixture:0.4.9"

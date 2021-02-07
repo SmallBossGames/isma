@@ -18,9 +18,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
  */
 public class LismaTranslator implements InputTranslator {
 
-    private String text;
+    private final String text;
 
-    private IsmaErrorList errors;
+    private final IsmaErrorList errors;
 
     public LismaTranslator(String text, IsmaErrorList errors) {
         this.text = text;

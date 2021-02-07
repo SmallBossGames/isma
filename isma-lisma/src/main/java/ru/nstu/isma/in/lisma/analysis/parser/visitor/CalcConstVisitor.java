@@ -17,7 +17,7 @@ import ru.nstu.isma.in.lisma.analysis.parser.ParserContext;
  * Time: 0:35
  */
 public class CalcConstVisitor extends BaseVisitor {
-    private HMVariableTable table;
+    private final HMVariableTable table;
 
     public CalcConstVisitor(HMVariableTable table, IsmaErrorList errors, ParserContext pc) {
         super(pc);

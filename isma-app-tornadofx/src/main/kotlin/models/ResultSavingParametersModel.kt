@@ -6,6 +6,6 @@ import tornadofx.getValue
 import tornadofx.setValue
 
 class ResultSavingParametersModel {
-    val savingTargetProperty = SimpleObjectProperty<SaveTarget>()
-    var savingTarget by savingTargetProperty
+    val savingTargetProperty = SimpleObjectProperty(SaveTarget.MEMORY)
+    var savingTarget: SaveTarget by savingTargetProperty
 }

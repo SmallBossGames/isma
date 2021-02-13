@@ -1,20 +1,18 @@
 import controllers.SyntaxErrorController
+import javafx.geometry.Side
 import javafx.scene.control.ToggleGroup
 import models.SyntaxErrorModel
 import tornadofx.*
 import views.*
+import views.simulation.settings.SettingsPanelView
 
 class MainView : View() {
-
-    private val syntaxErrorController: SyntaxErrorController by inject()
     private val ismaMenuBar: IsmaMenuBar by inject()
     private val ismaToolBar: IsmaToolBar by inject()
     private val ismaErrorListTable: IsmaErrorListTable by inject()
     private val ismaEditorTabPane: IsmaEditorTabPane by inject()
     private val simulationProcess: SimulationProcessView by inject()
-    private val simulationSettingView: SimulationSettingsView by inject()
-
-    private val toggleGroup = ToggleGroup()
+    private val settingsPanel: SettingsPanelView by inject()
 
     init {
         title = "ISMA Next"
@@ -24,9 +22,11 @@ class MainView : View() {
         minHeight = 480.0
         minWidth = 640.0
 
-        top = vbox {
-            add(ismaMenuBar)
-            add(ismaToolBar)
+        top {
+            vbox {
+                add(ismaMenuBar)
+                add(ismaToolBar)
+            }
         }
 
         center {
@@ -34,21 +34,18 @@ class MainView : View() {
         }
 
         bottom {
-            tabpane {
-                tab("Error list") {
+            drawer {
+                item("Error list") {
                     add(ismaErrorListTable)
-                    isClosable = false
                 }
-                tab("Simulation") {
+                item("Simulation") {
                     add(simulationProcess)
-                    isClosable = false
                 }
             }
-
         }
 
-        right{
-            add(simulationSettingView)
+        right {
+            add(settingsPanel)
         }
     }
 }

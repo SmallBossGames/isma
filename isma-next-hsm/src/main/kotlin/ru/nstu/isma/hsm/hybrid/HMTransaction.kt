@@ -1,61 +1,27 @@
-package ru.nstu.isma.hsm.hybrid;
+package ru.nstu.isma.hsm.hybrid
 
-import ru.nstu.isma.hsm.exp.HMExpression;
-
-import java.io.Serializable;
+import ru.nstu.isma.hsm.exp.HMExpression
+import java.io.Serializable
 
 /**
  * Created by Bessonov Alex
  * Date: 24.10.13
  * Time: 23:46
  */
-public class HMTransaction implements Serializable {
-    protected HMState source;
-
-    protected HMState target;
-
-    protected HMExpression condition;
-
-    public HMState getSource() {
-        return source;
+class HMTransaction : Serializable {
+    var source: HMState? = null
+    var target: HMState? = null
+    var condition: HMExpression? = null
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val that = other as HMTransaction
+        return if (source != that.source) false else target == that.target
     }
 
-    public void setSource(HMState source) {
-        this.source = source;
-    }
-
-    public HMState getTarget() {
-        return target;
-    }
-
-    public void setTarget(HMState target) {
-        this.target = target;
-    }
-
-    public HMExpression getCondition() {
-        return condition;
-    }
-
-    public void setCondition(HMExpression condition) {
-        this.condition = condition;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        HMTransaction that = (HMTransaction) o;
-
-        if (!source.equals(that.source)) return false;
-        return target.equals(that.target);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = source.hashCode();
-        result = 31 * result + target.hashCode();
-        return result;
+    override fun hashCode(): Int {
+        var result = source.hashCode()
+        result = 31 * result + target.hashCode()
+        return result
     }
 }

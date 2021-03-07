@@ -1,191 +1,177 @@
-package ru.nstu.isma.hsm.service;
+package ru.nstu.isma.hsm.service
 
-import ru.nstu.isma.hsm.error.IsmaError;
-import ru.nstu.isma.hsm.error.IsmaErrorList;
-import ru.nstu.isma.hsm.var.HMConst;
-import ru.nstu.isma.hsm.var.HMUnnamedConst;
-import ru.nstu.isma.hsm.var.HMVariable;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-
-import ru.nstu.isma.hsm.exp.*;
+import java.lang.RuntimeException
+import ru.nstu.isma.hsm.`var`.HMConst
+import ru.nstu.isma.hsm.`var`.HMUnnamedConst
+import ru.nstu.isma.hsm.error.IsmaError
+import ru.nstu.isma.hsm.error.IsmaErrorList
+import ru.nstu.isma.hsm.exp.EXPFunctionOperand
+import ru.nstu.isma.hsm.exp.EXPOperand
+import ru.nstu.isma.hsm.exp.EXPOperator
+import ru.nstu.isma.hsm.exp.HMExpression
+import java.lang.Exception
+import java.util.*
+import kotlin.math.*
 
 /**
  * by
  * Bessonov Alex.
  * Date: 14.11.13 Time: 0:21
  */
-public class ConstValueCalculator {
-    private final IsmaErrorList errors;
-
-    public ConstValueCalculator(IsmaErrorList errors) {
-        this.errors = errors;
+class ConstValueCalculator(private val errors: IsmaErrorList?) {
+    fun calculateConst(expression: HMExpression?): Double? {
+        val c = HMConst("cc")
+        c.rightPart = expression
+        return calculateConst(c)
     }
 
-    public Double calculateConst(HMExpression expression) {
-        HMConst c = new HMConst("cc");
-        c.setRightPart(expression);
-        return calculateConst(c);
-    }
-
-    public Double calculateConst(HMConst c) {
+    fun calculateConst(c: HMConst?): Double? {
         if (isCalculated(c)) {
-            return c.getValue();
+            return c?.value
         }
-        Double value = null;
+        var value: Double?
         try {
-            validateExpression(c.getRightPart());
-            avoidLoopCheck(c, null);
-            value = runCaltulator(c.getRightPart());
-            c.setValue(value);
-        } catch (Exception e) {
-            e.printStackTrace();
-            IsmaError err = new IsmaError("ошибка при рассчете константы: " + c.getCode() + "  " + e.getMessage());
-            err.setType(IsmaError.Type.SEM);
-            if (errors != null)
-                errors.add(err);
-            value = 0d;
+            validateExpression(c?.rightPart)
+            avoidLoopCheck(c!!, null)
+            value = runCaltulator(c.rightPart)
+            c.setValue(value!!)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val err = IsmaError("ошибка при рассчете константы: " + c!!.code + "  " + e.message)
+            err.type = IsmaError.Type.SEM
+            errors?.add(err)
+            value = 0.0
         }
-
-        return value;
+        return value
     }
 
-    public void validateExpression(HMExpression expression) {
+    fun validateExpression(expression: HMExpression?) {
         // проверяем что все токены - константы
-        for (EXPToken t : expression.getTokens()) {
-            if (t instanceof EXPFunctionOperand) {
-                ((EXPFunctionOperand) t).getArgs().stream()
-                        .forEach(exp -> validateExpression(exp));
-            } else if (t instanceof EXPOperand) {
-                HMVariable var = ((EXPOperand) t).getVariable();
-                if (!(var instanceof HMConst)) {
-                    String c = var != null ? var.getCode() : "NULL";
-                    throw new RuntimeException("в выражении содержится не константное значение: " + c);
+        for (t in expression!!.tokens) {
+            if (t is EXPFunctionOperand) {
+                t.args.stream()
+                    .forEach { exp: HMExpression? -> validateExpression(exp) }
+            } else if (t is EXPOperand) {
+                val `var` = t.variable
+                if (`var` !is HMConst) {
+                    val c = if (`var` != null) `var`.code else "NULL"
+                    throw RuntimeException("в выражении содержится не константное значение: $c")
                 }
             }
         }
     }
 
-    private void avoidLoopCheck(HMConst c, HashSet<String> prevCheck) {
-
-        if (c instanceof HMUnnamedConst) {
-            return;
+    private fun avoidLoopCheck(c: HMConst, prevCheck: HashSet<String?>?) {
+        if (c is HMUnnamedConst) {
+            return
         }
-        HashSet<String> current = new HashSet<String>();
-        current.add(c.getCode());
+        val current = HashSet<String?>()
+        current.add(c.code)
         if (prevCheck != null) {
-            for (String s : prevCheck) {
-                current.add(s);
+            for (s in prevCheck) {
+                current.add(s)
             }
         }
-        List<EXPToken> tokens = c.getRightPart().getTokens();
-        for (EXPToken token : tokens) {
-            if (token instanceof EXPOperand && !(token instanceof EXPFunctionOperand)) {
-                HMConst var = (HMConst) ((EXPOperand) token).getVariable();
-
-                if (current.contains(var.getCode())) {
+        val tokens = c.rightPart!!.tokens
+        for (token in tokens) {
+            if (token is EXPOperand && token !is EXPFunctionOperand) {
+                var `var` = token.variable as HMConst
+                if (current.contains(`var`.code)) {
                     // получили петлю -  семантика обработка ошибки
                     // TODO тщательно проверить
-                    if (var instanceof HMUnnamedConst)
-                        var = c;
-                    throw new RuntimeException("в выражении содержится петля из-за переменной " + var.getCode());
+                    if (`var` is HMUnnamedConst) `var` = c
+                    throw RuntimeException("в выражении содержится петля из-за переменной " + `var`.code)
                 } else {
 //                    current.add(var.getCode());
-                    avoidLoopCheck(var, current);
+                    avoidLoopCheck(`var`, current)
                 }
             }
         }
     }
 
-    private Double runCaltulator(HMExpression expression) {
-        Stack<Double> stack = new Stack<Double>();
-        for (EXPToken token : expression.getTokens()) {
-            if (token instanceof EXPFunctionOperand) {
-                Double f = calculateFunction((EXPFunctionOperand) token);
-                stack.push(f);
-            } else if (token instanceof EXPOperand) {
-                HMVariable var = ((EXPOperand) token).getVariable();
-                stack.push(calculateConst((HMConst) var));
-            } else if (token instanceof EXPOperator) {
-                doOperation(stack, (EXPOperator) token);
+    private fun runCaltulator(expression: HMExpression?): Double? {
+        val stack = Stack<Double>()
+        for (token in expression!!.tokens) {
+            if (token is EXPFunctionOperand) {
+                val f = calculateFunction(token)
+                stack.push(f)
+            } else if (token is EXPOperand) {
+                val `var` = token.variable
+                stack.push(calculateConst(`var` as HMConst))
+            } else if (token is EXPOperator) {
+                doOperation(stack, token)
             }
         }
-        return stack.pop();
+        return stack.pop()
     }
 
-    private void doOperation(Stack<Double> values, EXPOperator o) {
-        double result = 0;
-        if (o.getType() != EXPOperator.Type.ALGEBRAIC) {
+    private fun doOperation(values: Stack<Double>, o: EXPOperator) {
+        var result = 0.0
+        if (o.type != EXPOperator.Type.ALGEBRAIC) {
             // семантическая ошибка
-            throw new RuntimeException("в выражении содержится не алгебраический оператор " + o.toString());
+            throw RuntimeException("в выражении содержится не алгебраический оператор $o")
         }
-        if (o.getArity() == EXPOperator.ArityType.BINARY) {
-            double v1 = values.pop();
-            double v2 = values.pop();
-            EXPOperator.Code c = o.getCode();
-            switch (c) {
-                case ADDITION:
-                    result = v1 + v2;
-                    break;
-                case DIVISION:
-                    result = v2 / v1;
-                    break;
-                case SUBTRACTION:
-                    result = v2 - v1;
-                    break;
-                case MULTIPLICATION:
-                    result = v1 * v2;
-                    break;
-                default:
-                    throw new RuntimeException("в выражении содержится неизвестный  оператор " + o.toString());
+        if (o.arity == EXPOperator.ArityType.BINARY) {
+            val v1 = values.pop()
+            val v2 = values.pop()
+            val c = o.code
+            result = when (c) {
+                EXPOperator.Code.ADDITION -> v1 + v2
+                EXPOperator.Code.DIVISION -> v2 / v1
+                EXPOperator.Code.SUBTRACTION -> v2 - v1
+                EXPOperator.Code.MULTIPLICATION -> v1 * v2
+                else -> throw RuntimeException("в выражении содержится неизвестный  оператор $o")
             }
-
-        } else if (o.getArity() == EXPOperator.ArityType.UNARY) {
-            double v1 = values.pop();
-            EXPOperator.Code c = o.getCode();
-            switch (c) {
-                case ADDITION:
-                    result = +v1;
-                case SUBTRACTION:
-                    result = -v1;
-                    break;
+        } else if (o.arity == EXPOperator.ArityType.UNARY) {
+            val v1 = values.pop()
+            when (o.code) {
+                EXPOperator.Code.ADDITION -> {
+                    result = +v1
+                }
+                EXPOperator.Code.SUBTRACTION -> {
+                    result = -v1
+                }
+                else -> {}
             }
         }
-        values.push(result);
+        values.push(result)
     }
 
-    private static boolean isCalculated(HMConst c) {
-        if (c == null)
-            System.out.println();
-        return c.getValue() != null;
-    }
-
-
-    private Double calculateFunction(EXPFunctionOperand function) {
-        List<Double> args = new LinkedList<>();
-        for (HMExpression exp : function.getArgs()) {
-            args.add(runCaltulator(exp));
+    private fun calculateFunction(function: EXPFunctionOperand): Double {
+        val args: MutableList<Double?> = LinkedList()
+        for (exp in function.args) {
+            args.add(runCaltulator(exp))
         }
-        Double result;
-        if (function.getName().equals("cos")) {
-            result = Math.cos(args.get(0));//Math.cos(Math.toRadians(args.get(0)));
-        } else if (function.getName().equals("sin")) {
-            result = Math.sin(args.get(0)); //Math.sin(Math.toRadians(args.get(0)));
-        } else if (function.getName().equals("exp")) {
-            result = Math.exp(args.get(0));
-        } else if (function.getName().equals("pow")) {
-            result = Math.pow(args.get(0), args.get(1));
-        } else if (function.getName().equals("abs")) {
-            result = Math.abs(args.get(0));
-        } else if (function.getName().equals("sqrt")) {
-            result = Math.sqrt(args.get(0));
-        } else {
-            throw new RuntimeException("I understand function " + function.getName());
+        val result = when (function.name) {
+            "cos" -> {
+                cos(args[0]!!) //Math.cos(Math.toRadians(args.get(0)));
+            }
+            "sin" -> {
+                sin(args[0]!!) //Math.sin(Math.toRadians(args.get(0)));
+            }
+            "exp" -> {
+                exp(args[0]!!)
+            }
+            "pow" -> {
+                (args[0]!!).pow(args[1]!!)
+            }
+            "abs" -> {
+                abs(args[0]!!)
+            }
+            "sqrt" -> {
+                sqrt(args[0]!!)
+            }
+            else -> {
+                throw RuntimeException("I understand function " + function.name)
+            }
         }
-        return result;
+        return result
     }
 
+    companion object {
+        private fun isCalculated(c: HMConst?): Boolean {
+            if (c == null) println()
+            return c!!.value != null
+        }
+    }
 }

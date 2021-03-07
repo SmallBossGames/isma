@@ -1,124 +1,106 @@
-package ru.nstu.isma.hsm.exp;
+package ru.nstu.isma.hsm.exp
 
-import ru.nstu.isma.hsm.service.Poliz2InfixConverter;
-import ru.nstu.isma.hsm.var.HMUnnamedConst;
-import ru.nstu.isma.hsm.var.HMVariable;
-
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import ru.nstu.isma.hsm.`var`.HMUnnamedConst
+import ru.nstu.isma.hsm.`var`.HMVariable
+import ru.nstu.isma.hsm.service.Poliz2InfixConverter
+import java.io.Serializable
+import java.util.*
 
 /**
  * Created by Bessonov Alex
  * Date: 29.11.13
  * Time: 1:00
  */
-public class HMExpression implements Serializable {
-    private Type type = Type.INFIX;
+open class HMExpression : Serializable {
+    var type: Type? = Type.INFIX
+    val tokens: MutableList<EXPToken?> = LinkedList()
 
-    private final List<EXPToken> tokens = new LinkedList<>();
-
-    public List<EXPToken> add(EXPToken t) {
-        tokens.add(t);
-        return getTokens();
+    fun add(t: EXPToken?): List<EXPToken?> {
+        tokens.add(t)
+        return tokens
     }
 
-    public List<EXPToken> addOperand(HMVariable v) {
-        tokens.add(new EXPOperand(v));
-        return getTokens();
+    fun addOperand(v: HMVariable?): List<EXPToken?> {
+        tokens.add(EXPOperand(v))
+        return tokens
     }
 
-    public List<EXPToken> addUnnamedConst(double v) {
-        tokens.add(new EXPOperand(new HMUnnamedConst(v)));
-        return getTokens();
+    fun addUnnamedConst(v: Double): List<EXPToken?> {
+        tokens.add(EXPOperand(HMUnnamedConst(v)))
+        return tokens
     }
 
-    public List<EXPToken> openParenthesis() {
-        tokens.add(new EXPParenthesis(EXPParenthesis.Type.OPEN));
-        return getTokens();
+    fun openParenthesis(): List<EXPToken?> {
+        tokens.add(EXPParenthesis(EXPParenthesis.Type.OPEN))
+        return tokens
     }
 
-    public List<EXPToken> closeParenthesis() {
-        tokens.add(new EXPParenthesis(EXPParenthesis.Type.CLOSE));
-        return getTokens();
+    fun closeParenthesis(): List<EXPToken?> {
+        tokens.add(EXPParenthesis(EXPParenthesis.Type.CLOSE))
+        return tokens
     }
 
-    public List<EXPToken> getTokens() {
-        return tokens;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public StringBuilder toString(StringBuilder sb, boolean toInfix) {
-
-        HMExpression exp = this;
+    fun toString(sb: StringBuilder, toInfix: Boolean): StringBuilder {
+        var exp = this
         if (toInfix == true) {
-            Poliz2InfixConverter converter = new Poliz2InfixConverter(exp);
-            exp = converter.convert();
+            val converter = Poliz2InfixConverter(exp)
+            exp = converter.convert()
         }
-
-        for (EXPToken t : exp.getTokens()) {
-            if (t instanceof EXPOperator) {
-                sb.append(t.toString());
-
-            } else if (t instanceof EXPParenthesis) {
-                switch (((EXPParenthesis) t).getType()) {
-                    case CLOSE:
-                        sb.append(")");
-                        break;
-                    case OPEN:
-                        sb.append("(");
-                        break;
+        for (t in exp.tokens) {
+            when (t) {
+                is EXPOperator -> {
+                    sb.append(t.toString())
                 }
-            } else if (t instanceof EXPFunctionOperand) {
-                sb.append(((EXPFunctionOperand) t).getName());
-                sb.append("(");
-                int cnt = 0;
-                for (HMExpression e : ((EXPFunctionOperand) t).getArgs()) {
-                    if (cnt > 0) {
-                        sb.append(",");
+                is EXPParenthesis -> {
+                    when (t.type) {
+                        EXPParenthesis.Type.CLOSE -> sb.append(")")
+                        EXPParenthesis.Type.OPEN -> sb.append("(")
                     }
-                    StringBuilder sbArg = new StringBuilder();
-                    sb.append(e.toString(sbArg, true).toString());
-                    cnt++;
                 }
-                sb.append(")");
-            } else if (t instanceof EXPPDEOperand) {
-                EXPPDEOperand e = (EXPPDEOperand) t;
-                sb.append("D(");
-                sb.append(e.getVariable().getCode());
-                sb.append(", ");
-                sb.append(e.getFirstSpatialVariable().getCode());
-                sb.append(")");
-            } else if (t instanceof EXPOperand) {
-                HMVariable vv = ((EXPOperand) t).getVariable();
-                if (vv instanceof HMUnnamedConst) {
-                    sb.append(((HMUnnamedConst) vv).getValue());
-                } else sb.append(vv.getCode());
+                is EXPFunctionOperand -> {
+                    sb.append(t.name)
+                    sb.append("(")
+                    for ((cnt, e) in t.args.withIndex()) {
+                        if (cnt > 0) {
+                            sb.append(",")
+                        }
+                        val sbArg = StringBuilder()
+                        sb.append(e!!.toString(sbArg, true).toString())
+                    }
+                    sb.append(")")
+                }
+                is EXPPDEOperand -> {
+                    val e = t
+                    sb.append("D(")
+                    sb.append(e.variable!!.code)
+                    sb.append(", ")
+                    sb.append(e.firstSpatialVariable!!.code)
+                    sb.append(")")
+                }
+                is EXPOperand -> {
+                    val vv = t.variable
+                    if (vv is HMUnnamedConst) {
+                        sb.append(vv.value)
+                    } else sb.append(vv!!.code)
+                }
             }
-            sb.append(" ");
+            sb.append(" ")
         }
-        return sb;
+        return sb
     }
 
-    public enum Type implements Serializable {
+    enum class Type : Serializable {
         INFIX, POLIZ
     }
 
-    public static HMExpression getConst(double value) {
-        HMExpression exp = new HMExpression();
-        exp.add(new EXPOperand(new HMUnnamedConst(value)));
-        return exp;
-    }
+    companion object {
+        fun getConst(value: Double): HMExpression {
+            val exp = HMExpression()
+            exp.add(EXPOperand(HMUnnamedConst(value)))
+            return exp
+        }
 
-    public static HMExpression getZero() {
-        return getConst(0);
+        val zero: HMExpression
+            get() = getConst(0.0)
     }
-
 }

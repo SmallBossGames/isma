@@ -1,44 +1,16 @@
-package ru.nstu.isma.hsm.exp.cond;
+package ru.nstu.isma.hsm.exp.cond
 
-import ru.nstu.isma15.hsm.exp.EXPOperator;
-import ru.nstu.isma15.hsm.var.HMVariable;
-
-import java.io.Serializable;
+import ru.nstu.isma.hsm.exp.*
+import ru.nstu.isma.hsm.`var`.*
+import java.io.Serializable
 
 /**
  * Created by Bessonov Alex
  * Date: 24.10.13
  * Time: 23:56
  */
-public class HMAtom extends HMVariable implements Serializable {
-
-    protected HMVariable left;
-
-    protected HMVariable right;
-
-    protected EXPOperator op;
-
-    public HMVariable getLeft() {
-        return left;
-    }
-
-    public void setLeft(HMVariable left) {
-        this.left = left;
-    }
-
-    public HMVariable getRight() {
-        return right;
-    }
-
-    public void setRight(HMVariable right) {
-        this.right = right;
-    }
-
-    public EXPOperator getOp() {
-        return op;
-    }
-
-    public void setOp(EXPOperator op) {
-        this.op = op;
-    }
+class HMAtom : HMVariable(), Serializable {
+    var left: HMVariable? = null
+    var right: HMVariable? = null
+    var op: EXPOperator? = null
 }

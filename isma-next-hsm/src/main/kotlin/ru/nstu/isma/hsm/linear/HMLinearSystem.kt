@@ -1,103 +1,85 @@
-package ru.nstu.isma.hsm.linear;
+package ru.nstu.isma.hsm.linear
 
-import ru.nstu.isma.hsm.common.Calculateable;
-import ru.nstu.isma.hsm.common.IndexMapper;
-import ru.nstu.isma.hsm.HSM;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.RuntimeException
+import java.util.HashMap
+import ru.nstu.isma.hsm.HSM
+import ru.nstu.isma.hsm.common.Calculateable
+import ru.nstu.isma.hsm.common.IndexMapper
+import java.io.Serializable
+import java.util.ArrayList
 
 /**
  * Created by Bessonov Alex
  * on 13.03.2015.
  */
-public class HMLinearSystem implements Calculateable, Serializable {
-    private final HSM hms;
-    private final Map<String, HMLinearVar> vars = new HashMap<>();
-    private List<HMLinearEquation> equations;
-    private IndexMapper indexMapper;
-    private LinearSystemMatrix matrix;
-    private boolean readyForCalc = false;
+class HMLinearSystem(private val hms: HSM) : Calculateable, Serializable {
+    private var innerVars: MutableMap<String?, HMLinearVar> = HashMap()
+    private var innerEquations: MutableList<HMLinearEquation?>? = null
+    private var indexMapper: IndexMapper? = null
+    private var matrix: LinearSystemMatrix? = null
+    private var readyForCalc = false
+    private var size: Int? = null
 
-    private Integer size;
-
-    public HMLinearSystem(HSM hms) {
-        this.hms = hms;
+    private fun init() {
+        size = innerVars.size
+        innerEquations = ArrayList(size!!)
     }
 
-    private void init() {
-        this.size = vars.size();
-        equations = new ArrayList<>(size);
+    fun addVar(name: String?) {
+        val `var` = HMLinearVar(name)
+        addVar(`var`)
     }
 
-    public void addVar(String name) {
-        HMLinearVar var = new HMLinearVar(name);
-        addVar(var);
+    fun addVar(`var`: HMLinearVar) {
+        if (`var`.columnIndex == null) `var`.columnIndex = innerVars.size
+        innerVars[`var`.code] = `var`
+        init()
+        hms.variableTable.add(`var`)
     }
 
-    public void addVar(HMLinearVar var) {
-        if (var.getColumnIndex() == null)
-            var.setColumnIndex(vars.size());
-        vars.put(var.getCode(), var);
-        init();
-        hms.getVariableTable().add(var);
+    fun getLinearVariable(code: String?): HMLinearVar? {
+        return innerVars[code]
     }
 
-    public HMLinearVar getLinearVariable(String code) {
-        return vars.get(code);
-    }
-
-    public HMLinearVar getLinearVariable(Integer index) {
-        for (HMLinearVar v : vars.values()) {
-            if (v.getColumnIndex() == index)
-                return v;
+    fun getLinearVariable(index: Int): HMLinearVar? {
+        for (v in innerVars.values) {
+            if (v.columnIndex == index) return v
         }
-        return null;
+        return null
     }
 
-    public HMLinearEquation createEquation() {
-        if (size == null)
-            throw new RuntimeException("Empty variable list");
-
-        HMLinearEquation equation = new HMLinearEquation(size);
-        equations.add(equation);
-        return equation;
+    fun createEquation(): HMLinearEquation {
+        if (size == null) throw RuntimeException("Empty variable list")
+        val equation = HMLinearEquation(size!!)
+        innerEquations!!.add(equation)
+        return equation
     }
 
-    public boolean isEmpty() {
-        return size == null || size == 0;
+    val isEmpty: Boolean
+        get() = size == null || size == 0
+
+    val vars: Map<String?, HMLinearVar>
+        get() = innerVars
+
+    val equations: List<HMLinearEquation?>?
+        get() = innerEquations
+
+    fun getVarCalulationIndex(v: HMLinearVar): Int {
+        return indexMapper!!.indexMap[v.code]!!
     }
 
-    public Map<String, HMLinearVar> getVars() {
-        return vars;
+    override fun prepareForCalculation(indexMapper: IndexMapper?) {
+        this.indexMapper = indexMapper
+        val matrixBuilder = LinearSystemMatrixBuilder(indexMapper)
+        matrix = matrixBuilder.build("DefaultLinearSystemMatrix", true)
+        readyForCalc = true
     }
 
-    public List<HMLinearEquation> getEquations() {
-        return equations;
+    override fun calculate(y: DoubleArray): DoubleArray {
+        if (!readyForCalc) throw RuntimeException("Linear system is not ready")
+        val solver = LinearEquationsSolver(
+            matrix!!.getA(y)
+        )
+        return solver.solve(matrix!!.getB(y))
     }
-
-    public int getVarCalulationIndex(HMLinearVar v) {
-        return indexMapper.getIndexMap().get(v.getCode());
-    }
-
-    @Override
-    public void prepareForCalculation(IndexMapper indexMapper) {
-        this.indexMapper = indexMapper;
-        LinearSystemMatrixBuilder matrixBuilder = new LinearSystemMatrixBuilder(indexMapper);
-        matrix = matrixBuilder.build("DefaultLinearSystemMatrix", true);
-        readyForCalc = true;
-    }
-
-    @Override
-    public double[] calculate(double[] y) {
-        if (!readyForCalc)
-            throw new RuntimeException("Linear system is not ready");
-
-        LinearEquationsSolver solver = new LinearEquationsSolver(matrix.getA(y));
-        return solver.solve(matrix.getB(y));
-    }
-
 }

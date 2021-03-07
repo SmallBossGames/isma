@@ -1,88 +1,75 @@
-package ru.nstu.isma.hsm.var.pde;
+package ru.nstu.isma.hsm.`var`.pde
 
-import ru.nstu.isma.hsm.var.HMConst;
-import ru.nstu.isma.hsm.var.HMDerivativeEquation;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import ru.nstu.isma.hsm.`var`.HMConst
+import ru.nstu.isma.hsm.`var`.HMDerivativeEquation
+import java.io.Serializable
+import java.util.*
 
 /**
  * Bessonov Alex.
  * Date: 04.12.13 Time: 0:25
  */
-public class HMPartialDerivativeEquation extends HMDerivativeEquation implements Serializable {
+class HMPartialDerivativeEquation : HMDerivativeEquation, Serializable {
+    private val innerBoundaries: MutableList<HMBoundaryCondition> = LinkedList()
+    private val innerVariables: MutableMap<HMSpatialVariable?, Int> = HashMap()
+    private val innerParams: MutableMap<HMSpatialVariable, HMConst> = HashMap()
 
-    private final List<HMBoundaryCondition> boundaries = new LinkedList<HMBoundaryCondition>();
-
-    private final Map<HMSpatialVariable, Integer> variables = new HashMap<>();
-
-    private final Map<HMSpatialVariable, HMConst> params = new HashMap<>();
-
-    public HMPartialDerivativeEquation(String code) {
-        super(code);
+    constructor(code: String?) : super(code) {}
+    constructor(eq: HMDerivativeEquation) : super(eq.code) {
+        initial = eq.initial
+        rightPart = eq.rightPart
     }
 
-    public HMPartialDerivativeEquation(HMDerivativeEquation eq) {
-        super(eq.getCode());
-        setInitial(eq.getInitial());
-        setRightPart(eq.getRightPart());
+    fun addBound(bb: HMBoundaryCondition) {
+        innerBoundaries.add(bb)
     }
 
-    public void addBound(HMBoundaryCondition bb) {
-        boundaries.add(bb);
+    fun addSpatialVar(vv: HMSpatialVariable?, order: Int) {
+        innerVariables[vv] = order
     }
 
-    public void addSpatialVar(HMSpatialVariable vv, Integer order) {
-        variables.put(vv, order);
+    val boundaries: List<HMBoundaryCondition>
+        get() = innerBoundaries
+
+    val variables: List<HMSpatialVariable?>
+        get() = innerVariables.keys.toList()
+
+    fun getVariableOrder(`var`: HMSpatialVariable?): Int? {
+        return innerVariables[`var`]
     }
 
-    public List<HMBoundaryCondition> getBoundaries() {
-        return boundaries;
-    }
-
-    public List<HMSpatialVariable> getVariables() {
-        return variables.keySet().stream().collect(Collectors.toList());
-    }
-
-    public Integer getVariableOrder(HMSpatialVariable var) {return variables.get(var);}
-
-    public boolean isContains(HMSpatialVariable v) {
-        for (HMSpatialVariable vvv : getVariables()) {
-            if (vvv.getCode().equals(v.getCode())) {
-                return true;
+    fun isContains(v: HMSpatialVariable): Boolean {
+        for (vvv in variables) {
+            if (vvv?.code == v.code) {
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public Map<HMSpatialVariable, HMConst> getParams() {
-        return params;
+    val params: Map<HMSpatialVariable, HMConst>
+        get() = innerParams
+
+    fun addParam(sv: HMSpatialVariable, c: HMConst) {
+        innerParams[sv] = c
     }
 
-    public void addParam(HMSpatialVariable sv, HMConst c) {
-        params.put(sv, c);
+    fun getParam(sv: HMSpatialVariable) {
+        innerParams[sv]
     }
 
-    public void getParam(HMSpatialVariable sv) {
-        params.get(sv);
-    }
-
-    public HMBoundaryCondition getBound(HMBoundaryCondition.SideType sideType, HMSpatialVariable apx) {
-        List<HMBoundaryCondition> left = new LinkedList<HMBoundaryCondition>();
-        for (HMBoundaryCondition b : boundaries) {
-            if (b.getSide() == sideType || b.getSide() == HMBoundaryCondition.SideType.BOTH) {
-                if (b.getSpatialVar().getCode().equals(apx.getCode())) {
-                    left.add(b);
+    fun getBound(sideType: HMBoundaryCondition.SideType, apx: HMSpatialVariable): HMBoundaryCondition {
+        val left: MutableList<HMBoundaryCondition> = LinkedList()
+        for (b in innerBoundaries) {
+            if (b.side == sideType || b.side == HMBoundaryCondition.SideType.BOTH) {
+                if (b.spatialVar.code == apx.code) {
+                    left.add(b)
                 }
             }
         }
-        if (left.size() != 1) {
-            throw new RuntimeException("Incorrect count of boundaries for " + sideType.name() + " side(s) of " + getCode() + ": " + left.size());
+        if (left.size != 1) {
+            throw RuntimeException("Incorrect count of boundaries for " + sideType.name + " side(s) of " + code + ": " + left.size)
         }
-        return left.get(0);
+        return left[0]
     }
 }

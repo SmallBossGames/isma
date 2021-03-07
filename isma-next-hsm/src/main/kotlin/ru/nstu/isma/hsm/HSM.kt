@@ -1,120 +1,70 @@
-package ru.nstu.isma.hsm;
+package ru.nstu.isma.hsm
 
-import ru.nstu.isma.hsm.exp.HMExpression;
-import ru.nstu.isma.hsm.hybrid.HMState;
-import ru.nstu.isma.hsm.hybrid.HMStateAutomata;
-import ru.nstu.isma.hsm.linear.HMLinearSystem;
-import ru.nstu.isma.hsm.var.HMDerivativeEquation;
-import ru.nstu.isma.hsm.var.HMVariable;
-import ru.nstu.isma.hsm.var.HMVariableTable;
-
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import ru.nstu.isma.hsm.`var`.HMDerivativeEquation
+import ru.nstu.isma.hsm.`var`.HMVariable
+import ru.nstu.isma.hsm.`var`.HMVariableTable
+import ru.nstu.isma.hsm.exp.HMExpression
+import ru.nstu.isma.hsm.hybrid.HMState
+import ru.nstu.isma.hsm.hybrid.HMStateAutomata
+import ru.nstu.isma.hsm.linear.HMLinearSystem
+import java.io.Serializable
+import java.util.*
 
 /**
  * Created by Bessonov Alex
  * Date: 25.10.13
  * Time: 0:04
  */
-public class HSM implements Serializable {
-    public final static String INIT_STATE = "init";
+class HSM : Serializable {
+    var variableTable: HMVariableTable
+        protected set
 
-    protected HMVariableTable variables;
+    var automata: HMStateAutomata
 
-    protected HMStateAutomata automata;
+    var linearSystem: HMLinearSystem
+        protected set
 
-    protected HMLinearSystem linearSystem;
+    var startTime = 0.0
+    var endTime = 1.0
+    var stepTime = 0.1
 
-    protected Double startTime = 0d;
+    var out: List<String> = LinkedList()
 
-    protected Double endTime = 1d;
-
-    protected Double stepTime = 0.1;
-
-    protected List<String> out = new LinkedList<>();
-
-    public HSM() {
-        variables = new HMVariableTable();
-        automata = new HMStateAutomata(this);
-        linearSystem = new HMLinearSystem(this);
-
-        HMState init = new HMState(INIT_STATE);
-        automata.setInit(init);
-        automata.addState(init);
+    fun getVariables(): List<HMVariable?>? {
+        return variableTable.variables()
     }
 
-    public HMVariableTable getVariableTable() {
-        return variables;
+    fun setVariables(variables: HMVariableTable) {
+        variableTable = variables
     }
 
-    public List<HMVariable> getVariables() {
-        return variables.variables();
-    }
+    val isPDE: Boolean
+        get() = variableTable.pdes.isNotEmpty()
 
-    public void setVariables(HMVariableTable variables) {
-        this.variables = variables;
-    }
-
-    public HMStateAutomata getAutomata() {
-        return automata;
-    }
-
-    public void setAutomata(HMStateAutomata automata) {
-        this.automata = automata;
-    }
-
-    public Double getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Double startTime) {
-        this.startTime = startTime;
-    }
-
-    public Double getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Double endTime) {
-        this.endTime = endTime;
-    }
-
-    public Double getStepTime() {
-        return stepTime;
-    }
-
-    public void setStepTime(Double stepTime) {
-        this.stepTime = stepTime;
-    }
-
-    public List<String> getOut() {
-        return out;
-    }
-
-    public void setOut(List<String> out) {
-        this.out = out;
-    }
-
-    public HMLinearSystem getLinearSystem() {
-        return linearSystem;
-    }
-
-    public boolean isPDE() {
-        return variables.getPdes().size() > 0;
-    }
-
-    public HSM initTimeEquation(double start) {
-        final String TIME = "TIME";
-        HMVariableTable baseTable = getVariableTable();
+    fun initTimeEquation(start: Double): HSM {
+        val TIME = "TIME"
+        val baseTable = variableTable
         if (!baseTable.contain(TIME)) {
-            HMDerivativeEquation time = new HMDerivativeEquation(TIME);
-            time.setRightPart(HMExpression.getConst(1));
-            time.setInitial(start);
-            baseTable.add(time);
+            val time = HMDerivativeEquation(TIME)
+            time.rightPart = HMExpression.Companion.getConst(1.0)
+            time.setInitial(start)
+            baseTable.add(time)
         } else {
-            ((HMDerivativeEquation) baseTable.get(TIME)).setInitial(start);
+            (baseTable[TIME] as HMDerivativeEquation).setInitial(start)
         }
-        return this;
+        return this
+    }
+
+    companion object {
+        const val INIT_STATE = "init"
+    }
+
+    init {
+        variableTable = HMVariableTable()
+        automata = HMStateAutomata(this)
+        linearSystem = HMLinearSystem(this)
+        val init = HMState(INIT_STATE)
+        automata.init = init
+        automata.addState(init)
     }
 }

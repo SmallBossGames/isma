@@ -1,39 +1,32 @@
-package ru.nstu.isma.hsm.var;
+package ru.nstu.isma.hsm.`var`
 
-import java.io.Serializable;
+import java.io.Serializable
 
 /**
  * Created by Bessonov Alex
  * Date: 24.10.13
  * Time: 23:31
  */
-public class HMDerivativeEquation extends HMEquation implements Serializable {
-    protected HMConst initial;
+open class HMDerivativeEquation(code: String?) : HMEquation(), Serializable {
+    var initial: HMConst?
+    val initialValue: Double?
+        get() {
+            if (initial == null) {
+                return 0.0
+            }
+            return if (initial?.value == null) {
+                0.0
+            } else {
+                initial!!.value
+            }
+        }
 
-    public HMDerivativeEquation(String code) {
-        this.code = code;
-        initial = new HMUnnamedConst(0);
+    fun setInitial(initial: Double) {
+        this.initial = HMUnnamedConst(initial)
     }
 
-    public HMConst getInitial() {
-        return initial;
-    }
-
-    public Double getInitialValue() {
-        if (initial == null)
-            return 0d;
-
-        if (initial.getValue() == null)
-            return 0d;
-
-        return initial.getValue();
-    }
-
-    public void setInitial(HMConst initial) {
-        this.initial = initial;
-    }
-
-    public void setInitial(double initial) {
-        this.initial = new HMUnnamedConst(initial);
+    init {
+        this.code = code
+        initial = HMUnnamedConst(0.0)
     }
 }

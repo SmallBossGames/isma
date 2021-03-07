@@ -1,80 +1,72 @@
-package ru.nstu.isma.hsm.common;
+package ru.nstu.isma.hsm.common
 
-import ru.nstu.isma.hsm.HSM;
-import ru.nstu.isma.hsm.var.pde.HMPartialDerivativeEquation;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import ru.nstu.isma.hsm.HSM
+import ru.nstu.isma.hsm.`var`.HMAlgebraicEquation
+import ru.nstu.isma.hsm.`var`.HMDerivativeEquation
+import ru.nstu.isma.hsm.`var`.pde.HMPartialDerivativeEquation
+import ru.nstu.isma.hsm.linear.HMLinearVar
+import java.io.Serializable
+import java.util.*
+import java.util.function.Consumer
 
 /**
  * Created by Bessonov Alex
  * on 04.01.2015.
  */
-public class IndexMapper implements IndexProvider, Serializable {
-    static final String odeArrayName = "y";
+class IndexMapper(val hsm: HSM) : IndexProvider, Serializable {
     // HSM equation name -> ODE index
-    private final Map<String, Integer> indexMap = new HashMap<>();
+    private val innerIndexMap: MutableMap<String?, Int?> = HashMap()
+    private val codeMap: MutableMap<Int, String?> = HashMap()
 
-    private final Map<Integer ,String> codeMap = new HashMap<>();
+    val indexMap: Map<String?, Int?> get()  = innerIndexMap
 
-    private final HSM hsm;
-
-    public IndexMapper(HSM hsm) {
-        this.hsm = hsm;
-        prepeare();
+    private fun prepeare() {
+        hsm.variableTable.odes.stream()
+            .forEach { de: HMDerivativeEquation? ->
+                if (de is HMPartialDerivativeEquation) {
+                    throw RuntimeException("not supported") // todo изменить на списщк IsmaErrorList
+                }
+                addCode(de!!.code)
+            }
+        hsm.variableTable.algs.stream()
+            .forEach { a: HMAlgebraicEquation? -> addCode(a!!.code) }
+        hsm.linearSystem.vars.values
+            .forEach(Consumer { v: HMLinearVar -> addCode(v.code) })
     }
 
-    private void prepeare() {
-        hsm.getVariableTable().getOdes().stream()
-                .forEach(de -> {
-                    if (de instanceof HMPartialDerivativeEquation) {
-                        throw new RuntimeException("not supported"); // todo изменить на списщк IsmaErrorList
-                    }
-                    addCode(de.getCode());
-                });
-        hsm.getVariableTable().getAlgs().stream()
-                .forEach(a -> addCode(a.getCode()));
-        hsm.getLinearSystem().getVars().values()
-                .forEach(v-> addCode(v.getCode()));
-    }
-
-    private void addCode(String code) {
-        if (!indexMap.containsKey(code)) {
-            int idx =  indexMap.size();
-            indexMap.put(code, idx);
-            codeMap.put(idx, code);
+    private fun addCode(code: String?) {
+        if (!innerIndexMap.containsKey(code)) {
+            val idx = innerIndexMap.size
+            innerIndexMap[code] = idx
+            codeMap[idx] = code
         }
     }
 
-    @Override
-    public String getDifferentialArrayCode(String code) {
-        return odeArrayName + "[" + indexMap.get(code) + "]";
+    override fun getDifferentialArrayCode(code: String?): String {
+        return odeArrayName + "[" + innerIndexMap[code] + "]"
     }
 
-    @Override
-    public String getAlgebraicArrayCode(String code) {
-        return "a.Y(" + indexMap.get(code) + ")";
+    override fun getAlgebraicArrayCode(code: String?): String {
+        return "a.Y(" + innerIndexMap[code] + ")"
     }
 
-    @Override
-    public String getAlgebraicArrayCodeForDifferentialEquation(String aeCode) {
-        return getAlgebraicArrayCode(aeCode);
+    override fun getAlgebraicArrayCodeForDifferentialEquation(aeCode: String?): String {
+        return getAlgebraicArrayCode(aeCode)
     }
 
-    public HSM getHsm() {
-        return hsm;
+    fun index(code: String?): Int? {
+        return innerIndexMap[code]
     }
 
-    public Map<String, Integer> getIndexMap() {
-        return indexMap;
+    fun code(idx: Int): String? {
+        return codeMap[idx]
     }
 
-    public Integer index(String code) {
-        return indexMap.get(code);
+    companion object {
+        const val odeArrayName = "y"
     }
 
-    public String code(Integer idx) {
-        return codeMap.get(idx);
+    init {
+        prepeare()
     }
 }

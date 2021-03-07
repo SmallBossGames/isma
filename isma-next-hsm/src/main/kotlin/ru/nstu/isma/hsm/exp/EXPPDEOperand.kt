@@ -1,110 +1,57 @@
-package ru.nstu.isma.hsm.exp;
+package ru.nstu.isma.hsm.exp
 
-import ru.nstu.isma.hsm.var.HMVariable;
-import ru.nstu.isma.hsm.var.pde.HMSampledSpatialVariable;
-import ru.nstu.isma.hsm.var.pde.HMSpatialVariable;
-
-import java.io.Serializable;
+import ru.nstu.isma.hsm.`var`.HMVariable
+import ru.nstu.isma.hsm.`var`.pde.HMSampledSpatialVariable
+import ru.nstu.isma.hsm.`var`.pde.HMSpatialVariable
+import java.io.Serializable
 
 /**
  * by
  * Bessonov Alex.
  * Date: 04.12.13 Time: 1:51
  */
-public class EXPPDEOperand extends EXPOperand implements Serializable {
-    private HMSpatialVariable firstSpatialVariable;
-
-    private HMSpatialVariable secondSpatialVariable;
-
-    private Order order = Order.ONE;
-
-    public EXPPDEOperand(HMVariable variable) {
-        super(variable);
-    }
-
-    public HMSampledSpatialVariable getSampledFirstSpatialVar() {
-        if (firstSpatialVariable instanceof HMSampledSpatialVariable)
-            return (HMSampledSpatialVariable) firstSpatialVariable;
-        else throw new RuntimeException("Variable " + firstSpatialVariable.getCode() + " can't be sampled!");
-    }
-
-    public HMSampledSpatialVariable getSampledSecondSpatialVar() {
-        if (secondSpatialVariable instanceof HMSampledSpatialVariable)
-            return (HMSampledSpatialVariable) secondSpatialVariable;
-        else throw new RuntimeException("Variable " + secondSpatialVariable.getCode() + " can't be sampled!");
-    }
-
-    public HMSpatialVariable getFirstSpatialVariable() {
-        return firstSpatialVariable;
-    }
-
-    public void setFirstSpatialVariable(HMSpatialVariable firstSpatialVariable) {
-        this.firstSpatialVariable = firstSpatialVariable;
-    }
-
-    public HMSpatialVariable getSecondSpatialVariable() {
-        return secondSpatialVariable;
-    }
-
-    public void setSecondSpatialVariable(HMSpatialVariable secondSpatialVariable) {
-        this.secondSpatialVariable = secondSpatialVariable;
-    }
-
-    public boolean isMixedPDEOperand() {
-        return firstSpatialVariable != null && secondSpatialVariable != null;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public enum Order implements Serializable {
-
-        ONE(1), TWO(2), THREE(3), FOUR(4), FIVE(5);
-        int i;
-
-        Order(int i) {
-            this.i = i;
+class EXPPDEOperand(variable: HMVariable?) : EXPOperand(variable), Serializable {
+    var firstSpatialVariable: HMSpatialVariable? = null
+    var secondSpatialVariable: HMSpatialVariable? = null
+    var order = Order.ONE
+    val sampledFirstSpatialVar: HMSampledSpatialVariable
+        get() = if (firstSpatialVariable is HMSampledSpatialVariable) {
+            firstSpatialVariable as HMSampledSpatialVariable
+        } else {
+            throw RuntimeException("Variable " + firstSpatialVariable!!.code + " can't be sampled!")
         }
+    val sampledSecondSpatialVar: HMSampledSpatialVariable
+        get() = if (secondSpatialVariable is HMSampledSpatialVariable) {
+            secondSpatialVariable as HMSampledSpatialVariable
+        } else {
+            throw RuntimeException("Variable " + secondSpatialVariable!!.code + " can't be sampled!")
+        }
+    val isMixedPDEOperand: Boolean
+        get() = firstSpatialVariable != null && secondSpatialVariable != null
 
-        public static Order getByCode(Integer code) {
-            switch (code) {
-                case 1:
-                    return ONE;
-                case 2:
-                    return TWO;
-                case 3:
-                    return THREE;
-                case 4:
-                    return FOUR;
-                case 5:
-                    return FIVE;
-                default:
-                    return null;
+    enum class Order(var i: Int) : Serializable {
+        ONE(1), TWO(2), THREE(3), FOUR(4), FIVE(5);
 
+        companion object {
+            fun getByCode(code: Int?): Order? {
+                return when (code) {
+                    1 -> ONE
+                    2 -> TWO
+                    3 -> THREE
+                    4 -> FOUR
+                    5 -> FIVE
+                    else -> null
+                }
             }
         }
-
-        public int getI() {
-            return i;
-        }
-
-        public void setI(int i) {
-            this.i = i;
-        }
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(getVariable().getCode());
-        sb.append(" BY ");
-        sb.append(getSampledFirstSpatialVar().getCode());
-        sb.append(" ON ");
-        sb.append(order.name());
-        return sb.toString();
+    override fun toString(): String {
+        val sb = StringBuilder(variable!!.code)
+        sb.append(" BY ")
+        sb.append(sampledFirstSpatialVar.code)
+        sb.append(" ON ")
+        sb.append(order.name)
+        return sb.toString()
     }
 }

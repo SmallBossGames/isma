@@ -1,96 +1,73 @@
-package ru.nstu.isma.hsm.hybrid;
+package ru.nstu.isma.hsm.hybrid
 
-import ru.nstu.isma.hsm.HSM;
-import ru.nstu.isma.hsm.exp.HMExpression;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors
+import ru.nstu.isma.hsm.HSM
+import ru.nstu.isma.hsm.exp.HMExpression
+import java.io.Serializable
+import java.util.*
 
 /**
  * Created by Bessonov Alex
  * Date: 24.10.13
  * Time: 23:32
  */
-public class HMStateAutomata implements Serializable {
-    protected Map<String, HMState> states = new LinkedHashMap<>();
+class HMStateAutomata(protected var parent: HSM) : Serializable {
+    protected var innerStates: MutableMap<String?, HMState> = LinkedHashMap()
+    var transactions: HashSet<HMTransaction> = LinkedHashSet()
+        protected set
+    protected var pseudoStates: HashSet<HMPseudoState> = LinkedHashSet()
 
-    protected HashSet<HMTransaction> transactions = new LinkedHashSet<>();
+    var init: HMState? = null
 
-    protected HashSet<HMPseudoState> pseudoStates = new LinkedHashSet<>();
+    val states: Map<String?, HMState>
+        get() = innerStates
 
-    protected HMState init;
-
-    protected HSM parent;
-
-    public HMStateAutomata(HSM parent) {
-        this.parent = parent;
+    fun addTransaction(from: HMState?, to: HMState?, condition: HMExpression?) {
+        val tr = HMTransaction()
+        tr.source = from
+        tr.target = to
+        tr.condition = condition
+        transactions.add(tr)
     }
 
-    public Map<String, HMState> getStates() {
-        return states;
-    }
-
-    public HashSet<HMTransaction> getTransactions() {
-        return transactions;
-    }
-
-    public void addTransaction(HMState from, HMState to, HMExpression condition) {
-        HMTransaction tr = new HMTransaction();
-        tr.setSource(from);
-        tr.setTarget(to);
-        tr.setCondition(condition);
-        transactions.add(tr);
-    }
-
-    public boolean addState(HMState state) {
-        if (states.containsKey(state.getCode())) {
-            return false;
+    fun addState(state: HMState): Boolean {
+        if (innerStates.containsKey(state.code)) {
+            return false
         }
-        states.put(state.getCode(), state);
-        state.getVariables().setParent(parent.getVariableTable());
-        return true;
+        innerStates[state.code] = state
+        state.variables.parent = parent.variableTable
+        return true
     }
 
-    public HMState getState(String key) {
-        return states.get(key);
+    fun getState(key: String?): HMState? {
+        return innerStates[key]
     }
 
-    public List<HMTransaction> getAllFrom(HMState st) {
-        List<HMTransaction> tr = new LinkedList<HMTransaction>();
-        for (HMTransaction transaction : transactions) {
-            if (transaction.getSource().getCode().equals(st.getCode())) {
-                tr.add(transaction);
+    fun getAllFrom(st: HMState): List<HMTransaction> {
+        val tr: MutableList<HMTransaction> = LinkedList()
+        for (transaction in transactions) {
+            if (transaction.source?.code == st.code) {
+                tr.add(transaction)
             }
         }
-        return tr;
+        return tr
     }
 
-    public List<HMTransaction> getAllTo(HMState st) {
-        List<HMTransaction> tr = new LinkedList<HMTransaction>();
-        for (HMTransaction transaction : transactions) {
-            if (transaction.getTarget().getCode().equals(st.getCode())) {
-                tr.add(transaction);
+    fun getAllTo(st: HMState): List<HMTransaction> {
+        val tr: MutableList<HMTransaction> = LinkedList()
+        for (transaction in transactions) {
+            if (transaction.target?.code == st.code) {
+                tr.add(transaction)
             }
         }
-        return tr;
+        return tr
     }
 
-    public void addPseudoState(HMPseudoState ps) {
-        pseudoStates.add(ps);
-        ps.getVariables().setParent(parent.getVariableTable());
+    fun addPseudoState(ps: HMPseudoState) {
+        pseudoStates.add(ps)
+        ps.variables.parent = parent.variableTable
     }
 
-    public List<HMPseudoState> getAllPseudoStates() {
-        return pseudoStates.stream().collect(Collectors.toList());
-    }
-
-
-    public HMState getInit() {
-        return init;
-    }
-
-    public void setInit(HMState init) {
-        this.init = init;
-    }
+    val allPseudoStates: List<HMPseudoState?>
+        get() = pseudoStates.stream().collect(Collectors.toList())
 }

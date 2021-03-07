@@ -1,28 +1,15 @@
-package ru.nstu.isma.hsm.linear;
+package ru.nstu.isma.hsm.linear
 
-import ru.nstu.isma.hsm.var.HMVariable;
-
-import java.io.Serializable;
+import ru.nstu.isma.hsm.`var`.HMVariable
+import java.io.Serializable
 
 /**
  * Created by Bessonov Alex
  * on 13.03.2015.
  */
-public class HMLinearVar extends HMVariable implements Serializable {
-    private Integer columnIndex;
+class HMLinearVar : HMVariable, Serializable {
+    var columnIndex: Int? = null
 
-    public HMLinearVar() {
-    }
-
-    public HMLinearVar(String code) {
-        super(code);
-    }
-
-    public Integer getColumnIndex() {
-        return columnIndex;
-    }
-
-    public void setColumnIndex(Integer columnIndex) {
-        this.columnIndex = columnIndex;
-    }
+    constructor() {}
+    constructor(code: String?) : super(code) {}
 }

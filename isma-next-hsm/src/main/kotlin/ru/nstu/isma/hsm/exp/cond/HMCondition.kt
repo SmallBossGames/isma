@@ -1,14 +1,10 @@
-package ru.nstu.isma.hsm.exp.cond;
+package ru.nstu.isma.hsm.exp.cond
 
-import ru.nstu.isma15.hsm.exp.HMExpression;
-
-import java.io.Serializable;
-
+import ru.nstu.isma.hsm.exp.HMExpression
 /**
  * Created by Bessonov Alex
  * Date: 24.10.13
  * Time: 23:47
  */
-public class HMCondition extends HMExpression implements Serializable {
-    // TODO валидация
+class HMCondition : HMExpression(), java.io.Serializable { // TODO валидация
 }

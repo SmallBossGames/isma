@@ -1,34 +1,22 @@
-package ru.nstu.isma.hsm.exp;
+package ru.nstu.isma.hsm.exp
 
-import ru.nstu.isma.hsm.var.HMVariable;
-
-import java.io.Serializable;
+import ru.nstu.isma.hsm.`var`.HMVariable
+import java.io.Serializable
 
 /**
  * Created by Bessonov Alex
  * Date: 29.11.13
  * Time: 0:57
  */
-public class EXPOperand extends EXPToken implements Serializable {
-    protected HMVariable variable;
+open class EXPOperand : EXPToken, Serializable {
+    var variable: HMVariable? = null
 
-    public EXPOperand() {
+    constructor() {}
+    constructor(variable: HMVariable?) {
+        this.variable = variable
     }
 
-    public EXPOperand(HMVariable variable) {
-        this.variable = variable;
-    }
-
-    public HMVariable getVariable() {
-        return variable;
-    }
-
-    public void setVariable(HMVariable variable) {
-        this.variable = variable;
-    }
-
-    @Override
-    public String toString() {
-        return variable.toString();
+    override fun toString(): String {
+        return variable.toString()
     }
 }

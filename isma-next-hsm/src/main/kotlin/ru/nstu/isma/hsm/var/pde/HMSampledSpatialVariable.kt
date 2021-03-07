@@ -1,59 +1,41 @@
-package ru.nstu.isma.hsm.var.pde;
+package ru.nstu.isma.hsm.`var`.pde
 
-import ru.nstu.isma.hsm.var.HMConst;
-
-import java.io.Serializable;
+import ru.nstu.isma.hsm.`var`.HMConst
+import java.io.Serializable
 
 /**
  * Bessonov Alex.
  * Date: 04.12.13 Time: 0:17
  */
-public class HMSampledSpatialVariable extends HMSpatialVariable implements Serializable {
-
+class HMSampledSpatialVariable : HMSpatialVariable(), Serializable {
     // апроксимировать по шагу или количеству точек
-    protected ApproximateType type;
+    var type: ApproximateType? = null
 
     // в зависимости от типа - шаг или количество точек
-    protected HMConst apxVal;
-
-    public Double getStepSize() {
-        Double out = null;
-        if (type == ApproximateType.BY_NUMBER_OF_PIECES) {
-            out = (valTo.getValue() - valFrom.getValue()) / apxVal.getValue();
-        } else if (type == ApproximateType.BY_STEP) {
-           out = apxVal.getValue();
+    var apxVal: HMConst? = null
+    val stepSize: Double?
+        get() {
+            var out: Double? = null
+            if (type == ApproximateType.BY_NUMBER_OF_PIECES) {
+                out = (valTo!!.value!! - valFrom!!.value!!) / apxVal!!.value!!
+            } else if (type == ApproximateType.BY_STEP) {
+                out = apxVal!!.value
+            }
+            return out
         }
-        return out;
-    }
-
-    public Integer getPointsCount() {
-        Double out = null;
-        if (type == ApproximateType.BY_NUMBER_OF_PIECES) {
-            out = apxVal.getValue();
-        } else if (type == ApproximateType.BY_STEP) {
-            out = (valTo.getValue() - valFrom.getValue()) / apxVal.getValue();
+    val pointsCount: Int
+        get() {
+            var out: Double? = null
+            if (type == ApproximateType.BY_NUMBER_OF_PIECES) {
+                out = apxVal!!.value
+            } else if (type == ApproximateType.BY_STEP) {
+                out = (valTo!!.value!! - valFrom!!.value!!) / apxVal!!.value!!
+            }
+            out = Math.ceil(out!!)
+            return out.toInt()
         }
-        out = Math.ceil(out);
-        return out.intValue();
-    }
 
-    public ApproximateType getType() {
-        return type;
-    }
-
-    public void setType(ApproximateType type) {
-        this.type = type;
-    }
-
-    public HMConst getApxVal() {
-        return apxVal;
-    }
-
-    public void setApxVal(HMConst apxVal) {
-        this.apxVal = apxVal;
-    }
-
-    public enum ApproximateType implements Serializable {
+    enum class ApproximateType : Serializable {
         BY_STEP, BY_NUMBER_OF_PIECES
     }
 }

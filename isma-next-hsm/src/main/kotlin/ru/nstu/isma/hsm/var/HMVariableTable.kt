@@ -1,105 +1,65 @@
-package ru.nstu.isma.hsm.var;
+package ru.nstu.isma.hsm.`var`
 
-import ru.nstu.isma.hsm.exp.HMExpression;
-import ru.nstu.isma.hsm.var.pde.HMPartialDerivativeEquation;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import ru.nstu.isma.hsm.`var`.pde.HMPartialDerivativeEquation
+import ru.nstu.isma.hsm.exp.HMExpression
+import java.io.Serializable
+import java.util.*
 
 /**
  * Created by Bessonov Alex
  * Date: 24.10.13
  * Time: 23:33
  */
-public class HMVariableTable implements Serializable {
-    protected HMVariableTable parent;
+class HMVariableTable : Serializable {
+    var parent: HMVariableTable? = null
+    protected var variables: MutableMap<String?, HMVariable> = HashMap()
+    var setters: Map<String?, HMExpression?> = HashMap()
+    operator fun get(key: String?): HMVariable? {
+        return if (!variables.containsKey(key) && parent != null) {
+            parent!![key]
+        } else variables[key]
+    }
 
-    protected Map<String, HMVariable> variables = new HashMap<>();
+    fun contain(key: String?): Boolean {
+        return variables.containsKey(key)
+    }
 
-    protected Map<String, HMExpression> setters = new HashMap<>();
+    fun empty(): Boolean {
+        return variables.isEmpty()
+    }
 
-    public HMVariable get(String key) {
-        if (!variables.containsKey(key) && parent != null) {
-            return parent.get(key);
+    fun clear() {
+        variables.clear()
+    }
+
+    fun add(item: HMVariable): Boolean {
+        if (contain(item.code)) {
+            return false
         }
-        return variables.get(key);
+        variables[item.code] = item
+        return true
     }
 
-    public boolean contain(String key) {
-        return variables.containsKey(key);
-    }
-
-    public boolean empty() {
-        return variables.size() == 0;
-    }
-
-    public void clear() {
-        variables.clear();
-    }
-
-    public boolean add(HMVariable item) {
-        if (contain(item.getCode())) {
-            return false;
-        }
-        variables.put(item.getCode(), item);
-        return true;
-    }
-
-    public boolean remove(String key) {
+    fun remove(key: String?): Boolean {
         if (!contain(key)) {
-            return false;
+            return false
         }
-        variables.remove(key);
-        return true;
+        variables.remove(key)
+        return true
     }
 
-    public Set<String> keySet() {
-        return variables.keySet();
+    fun keySet(): Set<String?> {
+        return variables.keys
     }
 
-    public List<HMVariable> variables() {
-        return variables.values().stream().collect(Collectors.toList());
+    fun variables(): List<HMVariable> {
+        return variables.values.toList()
     }
 
-    public List<HMDerivativeEquation> getOdes() {
-        return variables.values().stream()
-                .filter(t -> t instanceof HMDerivativeEquation)
-                .map(t -> (HMDerivativeEquation) t)
-                .collect(Collectors.toList());
-    }
-
-    public List<HMAlgebraicEquation> getAlgs() {
-        return variables.values().stream()
-                .filter(t -> t instanceof HMAlgebraicEquation)
-                .map(t -> (HMAlgebraicEquation) t)
-                .collect(Collectors.toList());
-    }
-
-    public List<HMPartialDerivativeEquation> getPdes() {
-        return variables.values().stream()
-                .filter(t -> t instanceof HMPartialDerivativeEquation)
-                .map(t -> (HMPartialDerivativeEquation) t)
-                .collect(Collectors.toList());
-    }
-
-
-    public HMVariableTable getParent() {
-        return parent;
-    }
-
-    public void setParent(HMVariableTable parent) {
-        this.parent = parent;
-    }
-
-    public Map<String, HMExpression> getSetters() {
-        return setters;
-    }
-
-    public void setSetters(Map<String, HMExpression> setters) {
-        this.setters = setters;
-    }
+    val odes: List<HMDerivativeEquation>
+        get() = variables.values.filterIsInstance<HMDerivativeEquation>()
+    val algs: List<HMAlgebraicEquation>
+        get() = variables.values.filterIsInstance<HMAlgebraicEquation>()
+    val pdes: List<HMPartialDerivativeEquation>
+        get() = variables.values.filterIsInstance<HMPartialDerivativeEquation>()
 }

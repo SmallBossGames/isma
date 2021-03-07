@@ -1,106 +1,85 @@
-package ru.nstu.isma.hsm.service;
+package ru.nstu.isma.hsm.service
 
-import java.util.Stack;
-
-import ru.nstu.isma.hsm.exp.*;
+import ru.nstu.isma.hsm.exp.*
+import java.util.*
 
 /**
  * Created by Bessonov Alex
  * Date: 08.11.13
  * Time: 1:01
  */
-public class Infix2PolizConverter {
-    protected HMExpression input;
+class Infix2PolizConverter(protected var input: HMExpression) {
+    var poliz: HMExpression? = null
+        protected set
 
-    protected HMExpression poliz;
-
-    public Infix2PolizConverter(HMExpression input) {
-        this.input = input;
-    }
-
-    public HMExpression convert() {
-        Stack<EXPToken> temp = new Stack<EXPToken>();
-        poliz = new HMExpression();
-        poliz.setType(HMExpression.Type.POLIZ);
-        
-
-        for (EXPToken tk : input.getTokens()) {
-            if (tk instanceof EXPOperand) {
-                poliz.add(tk);
-                tryPopUnO(temp);
+    fun convert(): HMExpression {
+        val temp = Stack<EXPToken>()
+        poliz = HMExpression()
+        poliz!!.type = HMExpression.Type.POLIZ
+        for (tk in input.tokens) {
+            if (tk is EXPOperand) {
+                poliz!!.add(tk)
+                tryPopUnO(temp)
             } else if (isUnaryOperandToken(tk)) {
-                temp.push(tk);
+                temp.push(tk)
             } else if (isBinaryOperandToken(tk)) {
-                EXPOperator o = (EXPOperator) tk;
-                EXPOperator peekO = peekOperator(temp);
-
-                while (peekO != null && o.getPriority() <= peekO.getPriority()) {
-                    poliz.add(temp.pop());
-                    peekO = peekOperator(temp);
+                val o = tk as EXPOperator
+                var peekO = peekOperator(temp)
+                while (peekO != null && o.priority <= peekO.priority) {
+                    poliz!!.add(temp.pop())
+                    peekO = peekOperator(temp)
                 }
-                temp.push(o);
-
+                temp.push(o)
             } else if (isOpen(tk)) {
-                temp.push(tk);
+                temp.push(tk)
             } else if (isClose(tk)) {
-                EXPToken popToken = temp.pop();
+                var popToken = temp.pop()
                 while (popToken != null && !isOpen(popToken)) {
-                    poliz.add(popToken);
-                    if (temp.empty()) {
-                        popToken = null;
+                    poliz!!.add(popToken)
+                    popToken = if (temp.empty()) {
+                        null
                     } else {
-                        popToken = temp.pop();
+                        temp.pop()
                     }
                 }
-                tryPopUnO(temp);
+                tryPopUnO(temp)
             }
         }
         while (!temp.empty()) {
-            poliz.add(temp.pop());
+            poliz!!.add(temp.pop())
         }
-        return poliz;
+        return poliz!!
     }
 
-    public HMExpression getPoliz() {
-        return poliz;
+    protected fun isClose(tk: EXPToken?): Boolean {
+        return tk is EXPParenthesis && tk.type == EXPParenthesis.Type.CLOSE
     }
 
-    protected boolean isClose(EXPToken tk) {
-        return (tk instanceof EXPParenthesis && ((EXPParenthesis) tk).getType() == EXPParenthesis.Type.CLOSE);
+    protected fun isOpen(tk: EXPToken?): Boolean {
+        return tk is EXPParenthesis && tk.type == EXPParenthesis.Type.OPEN
     }
 
-    protected boolean isOpen(EXPToken tk) {
-        return (tk instanceof EXPParenthesis && ((EXPParenthesis) tk).getType() == EXPParenthesis.Type.OPEN);
+    protected fun peekOperator(temp: Stack<EXPToken>): EXPOperator? {
+        val peekToken = if (temp.empty()) null else temp.peek()
+        return if (peekToken is EXPOperator) peekToken else null
     }
 
-    protected EXPOperator peekOperator(Stack<EXPToken> temp) {
-        EXPToken peekToken = temp.empty() ? null : temp.peek();
-        return peekToken instanceof EXPOperator ? (EXPOperator) peekToken : null;
-    }
-
-    protected void tryPopUnO(Stack<EXPToken> temp) {
-        EXPToken peekToken = temp.empty() ? null : temp.peek();
+    protected fun tryPopUnO(temp: Stack<EXPToken>) {
+        val peekToken = if (temp.empty()) null else temp.peek()
         if (isUnaryOperandToken(peekToken)) {
-            poliz.add(temp.pop());
+            poliz!!.add(temp.pop())
         }
     }
 
-    private boolean isUnaryOperandToken(EXPToken t) {
-        if (t instanceof EXPOperator) {
-            return ((EXPOperator) t).getArity() == EXPOperator.ArityType.UNARY;
-        }
-        return false;
+    private fun isUnaryOperandToken(t: EXPToken?): Boolean {
+        return if (t is EXPOperator) {
+            t.arity == EXPOperator.ArityType.UNARY
+        } else false
     }
 
-    private boolean isBinaryOperandToken(EXPToken t) {
-        if (t instanceof EXPOperator) {
-            return ((EXPOperator) t).getArity() == EXPOperator.ArityType.BINARY;
-        }
-        return false;
+    private fun isBinaryOperandToken(t: EXPToken?): Boolean {
+        return if (t is EXPOperator) {
+            t.arity == EXPOperator.ArityType.BINARY
+        } else false
     }
-
-
-
-
-
 }

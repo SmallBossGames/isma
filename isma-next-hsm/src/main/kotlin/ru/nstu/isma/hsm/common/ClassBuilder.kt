@@ -1,74 +1,56 @@
-package ru.nstu.isma.hsm.common;
+package ru.nstu.isma.hsm.common
 
-import ru.nstu.isma.hsm.HSM;
-import ru.nstu.isma.generate.MemoryFileManager;
-import ru.nstu.isma.generate.MemoryJavaFileObject;
-
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.ToolProvider;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import ru.nstu.isma.generate.MemoryFileManager
+import ru.nstu.isma.generate.MemoryJavaFileObject
+import ru.nstu.isma.hsm.HSM
+import java.util.*
+import javax.tools.JavaFileManager
+import javax.tools.JavaFileObject
+import javax.tools.ToolProvider
 
 /**
  * Created by Bessonov Alex
  * on 14.03.2015.
  */
-public abstract class ClassBuilder<T> {
-    protected IndexMapper modelContext;
-    protected ClassLoader classLoader;
+abstract class ClassBuilder<T> {
+    var modelContext: IndexMapper? = null
+        protected set
+    var classLoader: ClassLoader? = null
+        protected set
 
-    protected ClassBuilder() {
+    protected constructor() {}
+    constructor(modelContext: IndexMapper?) {
+        this.modelContext = modelContext
     }
 
-    public ClassBuilder(IndexMapper modelContext) {
-        this.modelContext = modelContext;
+    constructor(hsm: HSM) {
+        modelContext = IndexMapper(hsm)
     }
 
-    public ClassBuilder(HSM hsm) {
-        modelContext = new IndexMapper(hsm);
-    }
-
-    public abstract String getJavaString(String name);
-
-    protected T build(String name, String pack, boolean printJava) {
-        T instance = null;
+    abstract fun getJavaString(name: String): String?
+    protected fun build(name: String, pack: String, printJava: Boolean): T? {
+        val instance: T?
         try {
-            String content = getJavaString(name);
+            val content = getJavaString(name)
             if (printJava) {
-                System.out.println("======= JAVA MODEL ===============");
-                System.out.println(content);
-                System.out.println("======= ========== ===============");
+                println("======= JAVA MODEL ===============")
+                println(content)
+                println("======= ========== ===============")
             }
-
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            JavaFileManager manager = new MemoryFileManager(compiler.getStandardFileManager(null, null, null));
-
-            List<String> options = new ArrayList<>();
-            options.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")));
-
-            List<JavaFileObject> files = new ArrayList<>();
-            files.add(new MemoryJavaFileObject(name, content));
-
-            compiler.getTask(null, manager, null, options, null, files).call();
-
-            classLoader = manager.getClassLoader(null);
-            instance = (T) classLoader.loadClass(pack + name).newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            val compiler = ToolProvider.getSystemJavaCompiler()
+            val manager: JavaFileManager = MemoryFileManager(compiler.getStandardFileManager(null, null, null))
+            val options: MutableList<String> = ArrayList()
+            options.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")))
+            val files: MutableList<JavaFileObject> = ArrayList()
+            files.add(MemoryJavaFileObject(name, content))
+            compiler.getTask(null, manager, null, options, null, files).call()
+            classLoader = manager.getClassLoader(null)
+            instance = classLoader!!.loadClass(pack + name).newInstance() as T
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw RuntimeException(e)
             // todo errorlist
         }
-        return instance;
-    }
-
-    public IndexMapper getModelContext() {
-        return modelContext;
-    }
-
-    public ClassLoader getClassLoader() {
-        return classLoader;
+        return instance
     }
 }

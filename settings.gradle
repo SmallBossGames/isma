@@ -48,4 +48,5 @@ include('isma-intg-parallel-ignite')
 //include('isma-distrib')
 //include('isma-intg-demo')
 //include('isma-core')
+include 'isma-next-tools'
 

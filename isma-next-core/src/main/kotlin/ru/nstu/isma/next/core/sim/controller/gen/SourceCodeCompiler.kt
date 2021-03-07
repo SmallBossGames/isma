@@ -17,7 +17,7 @@ class SourceCodeCompiler<T> {
         val compiler = ToolProvider.getSystemJavaCompiler()
         val manager: JavaFileManager = MemoryFileManager(compiler.getStandardFileManager(null, null, null))
         val options: MutableList<String> = ArrayList()
-        options.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")))
+        options.addAll(listOf("-classpath", System.getProperty("java.class.path")))
         val files: MutableList<JavaFileObject> = ArrayList()
         files.add(MemoryJavaFileObject(className, sourceCode))
         compiler.getTask(null, manager, null, options, null, files).call()

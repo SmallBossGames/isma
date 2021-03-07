@@ -38,7 +38,7 @@ include('isma-intg-server:isma-intg-server-api')
 include('isma-intg-server:isma-intg-server-client')
 include('isma-intg-server:isma-intg-server-tests')
 include('isma-lisma')
-include('isma-tools')
+
 include('isma-intg-parallel-ignite')
 
 
@@ -49,4 +49,5 @@ include('isma-intg-parallel-ignite')
 //include('isma-distrib')
 //include('isma-intg-demo')
 //include('isma-core')
+//include('isma-tools')
 

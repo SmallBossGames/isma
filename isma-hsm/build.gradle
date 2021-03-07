@@ -3,7 +3,7 @@
  */
 
 dependencies {
-    implementation project(':isma-tools')
+    implementation project(':isma-next-tools')
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
 

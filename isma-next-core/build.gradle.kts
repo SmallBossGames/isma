@@ -16,7 +16,7 @@ dependencies {
 
     implementation(project(":isma-hsm"))
     implementation (project(":isma-lisma"))
-    implementation (project(":isma-tools"))
+    implementation (project(":isma-next-tools"))
     implementation (project(":isma-intg-api"))
     implementation (project(":isma-intg-core"))
     implementation (project(":isma-intg-server:isma-intg-server-client"))

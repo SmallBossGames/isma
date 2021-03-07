@@ -7,6 +7,7 @@ rootProject.name = 'isma'
 include('isma-app-tornadofx')
 include('state-chart')
 include('isma-next-core')
+include('isma-next-tools')
 
 include 'grin:gui'
 include 'grin:analytic-fu'
@@ -48,5 +49,4 @@ include('isma-intg-parallel-ignite')
 //include('isma-distrib')
 //include('isma-intg-demo')
 //include('isma-core')
-include 'isma-next-tools'
 

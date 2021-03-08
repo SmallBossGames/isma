@@ -14,7 +14,7 @@ class SimulationProcessView : View() {
     private val simulationResult by inject<SimulationResultController>()
 
     override val root = vbox(10) {
-        padding = Insets(10.0)
+        paddingAll = 10.0
         hbox(5) {
             label("Execution state: ")
             label("waiting for start")

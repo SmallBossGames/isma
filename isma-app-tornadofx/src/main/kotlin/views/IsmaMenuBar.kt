@@ -4,8 +4,6 @@ import controllers.FileController
 import controllers.ProjectController
 import controllers.SimulationController
 import controllers.TextEditorController
-import events.NewProjectEvent
-import models.IsmaProjectModel
 import tornadofx.*
 
 class IsmaMenuBar : View() {

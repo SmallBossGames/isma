@@ -6,7 +6,7 @@ import controllers.ProjectController
 import controllers.SyntaxHighlightingController
 import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent
-import events.NewProjectEvent
+import events.NewBlueprintProjectEvent
 import events.PasteTextInCurrentEditorEvent
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.scene.paint.Color
@@ -205,11 +205,18 @@ class IsmaEditorTabPane: View() {
                     button {
                         text = "New transition"
                     }
+                    separator()
+                    button {
+                        text = "Remove state"
+                    }
+                    button {
+                        text = "Remove transition"
+                    }
                 }
             }
 
         }
-        subscribe<NewProjectEvent> { event->
+        subscribe<NewBlueprintProjectEvent> { event->
             val thisTabProject = event.ismaProject
             tab(thisTabProject.name) {
                 val codeArea = CodeArea()

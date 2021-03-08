@@ -1,9 +1,8 @@
 package controllers
 
-import events.NewProjectEvent
+import events.NewBlueprintProjectEvent
 import models.IsmaProjectModel
 import tornadofx.Controller
-import tornadofx.property
 
 class ProjectController : Controller() {
     private val projects = mutableSetOf<IsmaProjectModel>()
@@ -20,7 +19,7 @@ class ProjectController : Controller() {
 
     fun add(project: IsmaProjectModel){
         projects.add(project)
-        fire(NewProjectEvent(project))
+        fire(NewBlueprintProjectEvent(project))
         println(projects.count())
     }
 

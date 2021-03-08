@@ -17,11 +17,11 @@ class IsmaProjectModel {
         this.projectText = file.readText()
     }
 
-    val nameProperty = SimpleStringProperty("")
-    var name: String by nameProperty
+    fun nameProperty() = getProperty(IsmaProjectModel::name)
+    var name: String by property<String>()
 
-    val projectTextProperty =  SimpleStringProperty("")
-    var projectText: String by projectTextProperty
+    fun projectTextProperty() = getProperty(IsmaProjectModel::projectText)
+    var projectText: String by property("")
 
     var file: File? = null
 }

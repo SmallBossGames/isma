@@ -19,6 +19,8 @@ import tornadofx.*
 import javafx.scene.input.MouseEvent
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.TextAlignment
+import models.IsmaProjectModel
+import views.editors.IsmaTextEditor
 
 
 class IsmaEditorTabPane: View() {
@@ -218,47 +220,20 @@ class IsmaEditorTabPane: View() {
         }
         subscribe<NewBlueprintProjectEvent> { event->
             val thisTabProject = event.ismaProject
+
             tab(thisTabProject.name) {
-                val codeArea = CodeArea()
-
-                codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
-                codeArea.replaceText(thisTabProject.projectText)
-
-                subscribe<CutTextInCurrentEditorEvent> { if (isSelected) codeArea.cut() }
-                subscribe<CopyTextInCurrentEditorEvent> { if (isSelected) codeArea.copy() }
-                subscribe<PasteTextInCurrentEditorEvent> { if (isSelected) codeArea.paste() }
-
-                thisTabProject.projectTextProperty.bind(codeArea.textProperty())
-
-                codeArea.textProperty().onChange {
-                    val highlighting = highlightingController.createHighlightingStyleSpans(it ?: "")
-                    codeArea.setStyleSpans(0, highlighting)
+                val codeArea = IsmaTextEditor().apply {
+                    isSelectedProperty().bind(this@tab.selectedProperty())
+                    replaceText(thisTabProject.projectText)
+                    thisTabProject.projectTextProperty().bind(textProperty())
                 }
 
-                codeArea.stylesheet {
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("keyword")))) {
-                        fill = Color.ORANGE
-                        fontWeight = FontWeight.BOLD
-                    })
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("default")))) {
-                        fill = Color.BLACK
-                        fontWeight = FontWeight.NORMAL
-                    })
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("decimal")))) {
-                        fill = Color.BLUE
-                        fontWeight = FontWeight.NORMAL
-                    })
-                    addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("comment")))) {
-                        fill = Color.GRAY
-                        fontWeight = FontWeight.NORMAL
-                        fontStyle = FontPosture.ITALIC
-                    })
-                }
+                add(codeArea)
 
                 selectionModel.select(this)
                 activeProjectController.activeProject = thisTabProject
 
-                textProperty().bind(thisTabProject.nameProperty)
+                textProperty().bind(thisTabProject.nameProperty())
 
                 setOnCloseRequest {
                     projectController.close(event.ismaProject)
@@ -270,7 +245,7 @@ class IsmaEditorTabPane: View() {
                     }
                 }
 
-                add(codeArea)
+
             }
         }
     }

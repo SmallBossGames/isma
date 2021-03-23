@@ -1,4 +1,4 @@
-package views.editors
+package views.editors.text
 
 import controllers.SyntaxHighlightingController
 import events.CopyTextInCurrentEditorEvent
@@ -15,7 +15,7 @@ import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
 
-class IsmaTextEditor(): View() {
+class IsmaTextEditor: View() {
     private val highlightingController: SyntaxHighlightingController by inject()
 
     fun isSelectedProperty() = SimpleBooleanProperty(true)

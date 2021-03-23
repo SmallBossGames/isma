@@ -34,7 +34,7 @@ class FileController : Controller() {
 
         val file = selectedFiles.first()
 
-        projectController.add(IsmaProjectModel(file))
+        projectController.addText(IsmaProjectModel(file))
     }
 
     fun saveAll(){

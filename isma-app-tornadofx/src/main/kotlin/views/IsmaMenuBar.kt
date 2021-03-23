@@ -14,8 +14,11 @@ class IsmaMenuBar : View() {
 
     override val root = menubar {
         menu("File") {
-            item("New","Shortcut+N").action {
+            item("New text","Shortcut+N").action {
                 projectController.createNew()
+            }
+            item("New blueprint").action {
+                projectController.createNewBlueprint()
             }
             item("Open","Shortcut+O").action {
                 fileController.open()

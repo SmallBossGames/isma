@@ -190,6 +190,7 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
             }
         } ?: waveletPoints
         println("Passed time after derivative  ${System.currentTimeMillis() - timeBeforeDerivative}")
+
         for (i in transformedPoints.indices) {
             var temp: Point? = transformedPoints[i]
             for (transform in transforms) {

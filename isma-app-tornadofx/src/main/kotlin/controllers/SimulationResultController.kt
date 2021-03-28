@@ -27,9 +27,13 @@ class SimulationResultController : Controller() {
 
     private val grinIntegrationController by inject<IntegrationController>()
 
-    val simulationResultProperty = SimpleObjectProperty<HybridSystemIntgResult>(null)
+    private val simulationResultProperty = SimpleObjectProperty<HybridSystemIntgResult>(null)
+    fun simulationResultProperty() = simulationResultProperty
     var simulationResult by simulationResultProperty
 
+    private val isResultAvailableProperty = simulationResultProperty().isNotNull
+    fun isResultAvailableProperty() = isResultAvailableProperty
+    val isResultAvailable by isResultAvailableProperty
 
     fun showChart() {
         simulationResult?:return;

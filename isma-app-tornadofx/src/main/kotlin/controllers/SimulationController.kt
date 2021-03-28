@@ -3,6 +3,8 @@ package controllers
 import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
 import kotlinx.coroutines.*
 import enumerables.SaveTarget
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
 import ru.nstu.isma.intg.api.IntgResultPoint
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
@@ -10,6 +12,8 @@ import ru.nstu.isma.intg.lib.IntgMethodLibrary
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import tornadofx.Controller
+import tornadofx.getValue
+import tornadofx.setValue
 import java.util.function.Consumer
 import kotlin.math.max
 import kotlin.math.min
@@ -17,8 +21,15 @@ import kotlin.math.min
 class SimulationController: Controller() {
     private val lismaPdeController: LismaPdeController by inject()
     private val simulationParametersController: SimulationParametersController by inject()
-    private val simulationProgress by inject<SimulationProgressController>()
     private val simulationResult by inject<SimulationResultController>()
+
+    private val progressProperty = SimpleDoubleProperty();
+    fun progressProperty() = progressProperty
+    var progress by progressProperty
+
+    private val isSimulationInProgressProperty = SimpleBooleanProperty();
+    fun isSimulationInProgressProperty() = isSimulationInProgressProperty
+    var isSimulationInProgress by isSimulationInProgressProperty
 
     private var currentSimulation: Job? = null
 
@@ -121,16 +132,18 @@ class SimulationController: Controller() {
             simulationController: SimulationCoreController,
             initials: CauchyInitials){
         simulationController.addStepChangeListener {
-            simulationProgress.progress = normalizeProgress(initials.start, initials.end, it)
+            progress = normalizeProgress(initials.start, initials.end, it)
         }
     }
 
     private fun startSimualtionJob(controller: SimulationCoreController) = GlobalScope.launch {
         try {
+            isSimulationInProgress = true
             val result = controller.simulate()
             simulationResult.simulationResult = result
         } finally {
-            simulationProgress.progress = 0.0
+            isSimulationInProgress = false
+            progress = 0.0
             currentSimulation = null
         }
     }

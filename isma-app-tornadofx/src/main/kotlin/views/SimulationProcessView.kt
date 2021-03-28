@@ -1,19 +1,76 @@
 package views
 
-import controllers.SimulationProgressController
+import controllers.SimulationController
 import controllers.SimulationResultController
-import javafx.application.Platform
-import javafx.geometry.Insets
-import javafx.geometry.Orientation
-import javafx.scene.Parent
+import javafx.scene.control.Tooltip
+import javafx.scene.image.ImageView
 import tornadofx.*
-import kotlin.concurrent.thread
 
 class SimulationProcessView : View() {
-    private val simulationProgressController by inject<SimulationProgressController>()
     private val simulationResult by inject<SimulationResultController>()
+    private val simulationController: SimulationController by inject()
 
-    override val root = vbox(10) {
+    override val root = toolbar {
+        button {
+            graphic = ImageView("icons/toolbar/play.png")
+            tooltip = Tooltip("Play")
+            action { simulationController.simulate() }
+            managedWhen(!simulationController.isSimulationInProgressProperty())
+            hiddenWhen(simulationController.isSimulationInProgressProperty())
+        }
+        button {
+            graphic = ImageView("icons/toolbar/abort.png")
+            tooltip = Tooltip("Play")
+            action { simulationController.simulate() }
+            managedWhen(simulationController.isSimulationInProgressProperty())
+            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+        }
+        separator {
+            managedWhen(simulationController.isSimulationInProgressProperty())
+            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+        }
+        label("Progress: ") {
+            managedWhen(simulationController.isSimulationInProgressProperty())
+            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+        }
+        progressbar {
+            progressProperty().bind(simulationController.progressProperty())
+            managedWhen(simulationController.isSimulationInProgressProperty())
+            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+        }
+        separator {
+            managedWhen(simulationResult.isResultAvailableProperty())
+            hiddenWhen(!simulationResult.isResultAvailableProperty())
+        }
+        label("Results: "){
+            managedWhen(simulationResult.isResultAvailableProperty())
+            hiddenWhen(!simulationResult.isResultAvailableProperty())
+        }
+        button {
+            text = "Show"
+            action {
+                simulationResult.showChart()
+            }
+            managedWhen(simulationResult.isResultAvailableProperty())
+            hiddenWhen(!simulationResult.isResultAvailableProperty())
+        }
+        button {
+            text = "Export"
+            action {
+                simulationResult.exportToFile()
+            }
+            managedWhen(simulationResult.isResultAvailableProperty())
+            hiddenWhen(!simulationResult.isResultAvailableProperty())
+        }
+        button {
+            text = "Clean"
+            managedWhen(simulationResult.isResultAvailableProperty())
+            hiddenWhen(!simulationResult.isResultAvailableProperty())
+        }
+
+    }
+
+    /*override val root = vbox(10) {
         paddingAll = 10.0
         hbox(5) {
             label("Execution state: ")
@@ -45,6 +102,5 @@ class SimulationProcessView : View() {
                 text = "Clean"
             }
         }
-
-    }
+    }*/
 }

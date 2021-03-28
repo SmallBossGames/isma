@@ -34,11 +34,13 @@ class MainView : View() {
         }
 
         bottom {
-            drawer {
-                item("Error list") {
-                    add(ismaErrorListTable)
+            borderpane {
+                top = drawer {
+                    item("Error list") {
+                        add(ismaErrorListTable)
+                    }
                 }
-                item("Simulation") {
+                bottom = vbox {
                     add(simulationProcess)
                 }
             }

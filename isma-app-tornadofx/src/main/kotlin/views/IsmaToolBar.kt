@@ -56,11 +56,6 @@ class IsmaToolBar : View() {
             tooltip = Tooltip("Verify")
             action { lismaPdeController.translateLisma() }
         }
-        button{
-            graphic = ImageView("icons/toolbar/play.png")
-            tooltip = Tooltip("Play")
-            action { simulationController.simulate() }
-        }
         separator()
         button{
             graphic = ImageView("icons/toolbar/settings.png")

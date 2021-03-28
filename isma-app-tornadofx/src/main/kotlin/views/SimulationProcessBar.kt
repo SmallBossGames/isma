@@ -6,7 +6,7 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
 import tornadofx.*
 
-class SimulationProcessView : View() {
+class SimulationProcessBar : View() {
     private val simulationResult by inject<SimulationResultController>()
     private val simulationController: SimulationController by inject()
 
@@ -64,43 +64,12 @@ class SimulationProcessView : View() {
         }
         button {
             text = "Clean"
+            action {
+                simulationResult.clean()
+            }
             managedWhen(simulationResult.isResultAvailableProperty())
             hiddenWhen(!simulationResult.isResultAvailableProperty())
         }
 
     }
-
-    /*override val root = vbox(10) {
-        paddingAll = 10.0
-        hbox(5) {
-            label("Execution state: ")
-            label("waiting for start")
-        }
-        hbox(5) {
-            label("Progress: ")
-            progressbar {
-                progressProperty().bind(simulationProgressController.progressProperty)
-            }
-        }
-        hbox(5) {
-            button {
-                text = "Show chart"
-                action {
-                    simulationResult.showChart()
-                }
-            }
-            button {
-                text = "Export results"
-                action {
-                    simulationResult.exportToFile()
-                }
-            }
-            separator{
-                orientation = Orientation.VERTICAL
-            }
-            button {
-                text = "Clean"
-            }
-        }
-    }*/
 }

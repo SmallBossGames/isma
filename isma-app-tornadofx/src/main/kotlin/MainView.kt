@@ -1,7 +1,3 @@
-import controllers.SyntaxErrorController
-import javafx.geometry.Side
-import javafx.scene.control.ToggleGroup
-import models.SyntaxErrorModel
 import tornadofx.*
 import views.*
 import views.simulation.settings.SettingsPanelView
@@ -11,7 +7,7 @@ class MainView : View() {
     private val ismaToolBar: IsmaToolBar by inject()
     private val ismaErrorListTable: IsmaErrorListTable by inject()
     private val ismaEditorTabPane: IsmaEditorTabPane by inject()
-    private val simulationProcess: SimulationProcessView by inject()
+    private val simulationProcess: SimulationProcessBar by inject()
     private val settingsPanel: SettingsPanelView by inject()
 
     init {

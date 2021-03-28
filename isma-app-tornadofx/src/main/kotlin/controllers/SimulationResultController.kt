@@ -1,5 +1,6 @@
 package controllers
 
+import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser
@@ -29,10 +30,10 @@ class SimulationResultController : Controller() {
 
     private val simulationResultProperty = SimpleObjectProperty<HybridSystemIntgResult>(null)
     fun simulationResultProperty() = simulationResultProperty
-    var simulationResult by simulationResultProperty
+    var simulationResult: HybridSystemIntgResult? by simulationResultProperty
 
     private val isResultAvailableProperty = simulationResultProperty().isNotNull
-    fun isResultAvailableProperty() = isResultAvailableProperty
+    fun isResultAvailableProperty(): BooleanBinding = isResultAvailableProperty
     val isResultAvailable by isResultAvailableProperty
 
     fun showChart() {
@@ -62,8 +63,8 @@ class SimulationResultController : Controller() {
             font = "Arial"
         )
 
-        val headers = createColumnNamesArray(simulationResult)
-        val columns = createResultColumns(simulationResult, headers.size)
+        val headers = createColumnNamesArray(simulationResult!!)
+        val columns = createResultColumns(simulationResult!!, headers.size)
 
         val functions = arrayListOf<ConcatenationFunction>()
 
@@ -99,14 +100,18 @@ class SimulationResultController : Controller() {
         simulationResult ?: return
         try {
             FileWriter(file).buffered().use { writer ->
-                val header = buildHeader(simulationResult)
+                val header = buildHeader(simulationResult!!)
                 writer.write(header)
-                val points = buildPoints(simulationResult)
+                val points = buildPoints(simulationResult!!)
                 writer.write(points)
             }
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
+    }
+
+    fun clean() {
+        simulationResult = null
     }
 
     private fun buildHeader(result: HybridSystemIntgResult): String {
@@ -179,13 +184,13 @@ class SimulationResultController : Controller() {
             outputArray[i] = equationIndexProvider.getDifferentialEquationCode(i) ?: ""
         }
 
-        var offset = deCount;
+        var offset = deCount
 
         for (i in 0 until aeCount) {
             outputArray[i + offset] = equationIndexProvider.getAlgebraicEquationCode(i) ?: ""
         }
 
-        offset = aeCount + deCount;
+        offset = aeCount + deCount
 
         for (i in 0 until deCount) {
             outputArray[i + offset] = "f${i}"
@@ -207,13 +212,13 @@ class SimulationResultController : Controller() {
                     tempArray[j][i] = Point(x, it[i].yForDe[j])
                 }
 
-                var offset = it[i].yForDe.size;
+                var offset = it[i].yForDe.size
 
                 for (j in it[i].rhs[DaeSystem.RHS_AE_PART_IDX].indices) {
                     tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_AE_PART_IDX][j])
                 }
 
-                offset = it[i].yForDe.size + it[i].rhs[DaeSystem.RHS_AE_PART_IDX].size;
+                offset = it[i].yForDe.size + it[i].rhs[DaeSystem.RHS_AE_PART_IDX].size
 
                 for (j in it[i].rhs[DaeSystem.RHS_DE_PART_IDX].indices) {
                     tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_DE_PART_IDX][j])

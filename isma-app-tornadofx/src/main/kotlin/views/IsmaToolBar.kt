@@ -11,7 +11,6 @@ class IsmaToolBar : View() {
     private val projectController: ProjectController by inject()
     private val fileController: FileController by inject()
     private val textEditorController: TextEditorController by inject()
-    private val simulationController: SimulationController by inject()
 
     override val root = toolbar {
         button{

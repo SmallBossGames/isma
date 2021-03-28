@@ -35,23 +35,44 @@ class MatrixTransformerController : Controller() {
         val max = axisSettings.max
         val sumUnits = getUnitsLength(min, max)
 
-        val (minPixel, maxPixel) = getMinMaxPixel(direction)
+        val (minPixel, maxPixel) = getMinMaxPixelForFunc(direction)
         val sumPixel = maxPixel - minPixel
         val unitPrice = sumPixel / sumUnits
 
         return when (direction) {
             Direction.LEFT, Direction.RIGHT -> {
                 if (max <= 0) {
-                    minPixel + (-max.absoluteValue - number) * unitPrice
+                    if (number<0) {
+                        minPixel + (min.absoluteValue - number) * unitPrice
+                    } else {
+                        minPixel + (min.absoluteValue + number) * unitPrice
+                    }
+
                 } else {
-                    minPixel + (max.absoluteValue - number) * unitPrice
+                    if (number<0) {
+                        minPixel + (min.absoluteValue - number) * unitPrice
+                    } else {
+                        minPixel + (min.absoluteValue + number) * unitPrice
+                    }
                 }
             }
             Direction.TOP, Direction.BOTTOM -> {
+                println("min $min and minPixel=$minPixel")
+                println("Number $number")
                 if (min < 0) {
-                    minPixel + (min.absoluteValue + number) * unitPrice
+                    if (number > 0) {
+                        minPixel + (min.absoluteValue - number) * unitPrice
+                    } else {
+                        minPixel + (min.absoluteValue + number) * unitPrice
+                    }
+
                 } else {
-                    minPixel + (-min.absoluteValue + number) * unitPrice
+                    if (number > 0) {
+                        minPixel + (-min.absoluteValue - number) * unitPrice
+                    } else {
+                        minPixel + (-min.absoluteValue + number) * unitPrice
+                    }
+
                 }
             }
         }
@@ -72,6 +93,26 @@ class MatrixTransformerController : Controller() {
         }
     }
 
+    private fun getMinMaxPixelForFunc(direction: Direction): Pair<Double, Double> {
+        return when (direction) {
+            Direction.LEFT, Direction.RIGHT -> {
+                Pair(
+                    getLeftAxisSize() * SettingsProvider.getAxisWidth(),
+                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
+                )
+            }
+            Direction.TOP, Direction.BOTTOM -> {
+                Pair(
+                    getTopAxisSize() * SettingsProvider.getAxisWidth(),
+                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                )
+            }
+        }
+    }
+
+    /**
+     * Узнаём ширину окна за вычетом осей
+     */
     fun getMinMaxPixel(direction: Direction): Pair<Double, Double> {
         return when (direction) {
             Direction.LEFT, Direction.RIGHT -> {
@@ -103,7 +144,7 @@ class MatrixTransformerController : Controller() {
     private fun getBottomAxisSize(): Int {
         return model.cartesianSpaces.filter {
             it.xAxis.direction == Direction.BOTTOM
-                || it.yAxis.direction == Direction.BOTTOM
+                    || it.yAxis.direction == Direction.BOTTOM
         }
             .size
     }

@@ -3,11 +3,15 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
+import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
@@ -15,7 +19,10 @@ import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.function.model.LineType
 import tornadofx.*
+import java.util.*
 
 class ConcatenationCanvas : View() {
     private val model: ConcatenationCanvasModel by inject()
@@ -31,6 +38,7 @@ class ConcatenationCanvas : View() {
 
     init {
         val data = initData
+
         if (data != null) {
             model.cartesianSpaces = data.cartesianSpaces.toObservable()
             model.arrows = data.arrows.toObservable()

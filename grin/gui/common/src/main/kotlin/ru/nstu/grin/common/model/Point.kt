@@ -52,7 +52,8 @@ data class Point(
     }
 
 
-    private companion object {
-        const val DELTA = 5
+    companion object {
+        private const val DELTA = 5
+        val Zero = Point(0.0, 0.0)
     }
 }

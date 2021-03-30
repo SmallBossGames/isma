@@ -2,12 +2,13 @@ package views.editors.blueprint.controls
 
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
-import javafx.scene.Parent
+import javafx.scene.control.Label
+import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
-import javafx.scene.text.TextAlignment
 import tornadofx.*
 
 class StateBox : Fragment() {
@@ -17,6 +18,14 @@ class StateBox : Fragment() {
     private val mousePressedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseReleasedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseClickedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
+
+    private val isEditModeEnabledProperty = SimpleBooleanProperty(false)
+    private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
+    private var isEditModeEnabled by isEditModeEnabledProperty
+
+    private val boxNameProperty = SimpleStringProperty("")
+    public fun boxNameProperty() = boxNameProperty
+    public var boxName by boxNameProperty
 
     fun translateXProperty(): DoubleProperty = root.layoutXProperty()
     fun translateYProperty(): DoubleProperty = root.layoutYProperty()
@@ -33,7 +42,39 @@ class StateBox : Fragment() {
             arcWidth = 20.0
             arcHeight = 20.0
         }
-        label("Some label")
+
+        val nameTextArea = TextArea().apply {
+            textProperty().bindBidirectional(boxNameProperty())
+            visibleWhen(isEditModeEnabledProperty())
+            managedWhen(isEditModeEnabledProperty())
+            focusedProperty().onChange {
+                if(!it){
+                    isEditModeEnabled = false
+                }
+            }
+        }
+
+        val boxLabel = Label().label {
+            textProperty().bind(boxNameProperty())
+            visibleWhen(!isEditModeEnabledProperty())
+            managedWhen(!isEditModeEnabledProperty())
+        }
+
+        borderpane {
+            center = hbox {
+                setPrefSize(squareWidth - 20, squareHeight - 20)
+                translateX += 10
+                translateY += 10
+                alignment = Pos.CENTER
+                add(boxLabel)
+                add(nameTextArea)
+            }
+        }
+
+        addEventHandler(MouseEvent.MOUSE_CLICKED) {
+            isEditModeEnabled = true
+            nameTextArea.requestFocus()
+        }
 
         addEventHandler(MouseEvent.MOUSE_PRESSED) {
             executeMousePressedListener(it)

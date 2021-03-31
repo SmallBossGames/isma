@@ -27,6 +27,8 @@ class StateBox : Fragment() {
     public fun boxNameProperty() = boxNameProperty
     public var boxName by boxNameProperty
 
+    private var isDragged = false
+
     fun translateXProperty(): DoubleProperty = root.layoutXProperty()
     fun translateYProperty(): DoubleProperty = root.layoutYProperty()
 
@@ -34,6 +36,8 @@ class StateBox : Fragment() {
     fun centerYProperty(): DoubleBinding = root.layoutYProperty() + squareHeight / 2
 
     override val root = group {
+        prefWidth(squareWidth)
+        prefHeight(squareHeight)
         rectangle {
             viewOrder = 3.0
             fill = Color.CORAL
@@ -72,15 +76,21 @@ class StateBox : Fragment() {
         }
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            isEditModeEnabled = true
-            nameTextArea.requestFocus()
+            if(!isDragged){
+                isEditModeEnabled = true
+                nameTextArea.requestFocus()
+            }
         }
 
         addEventHandler(MouseEvent.MOUSE_PRESSED) {
+            isDragged = false
             executeMousePressedListener(it)
         }
         addEventHandler(MouseEvent.MOUSE_RELEASED) {
             executeMouseReleasedListeners(it)
+        }
+        addEventHandler(MouseEvent.MOUSE_DRAGGED) {
+            isDragged = true
         }
     }
 

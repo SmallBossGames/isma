@@ -106,7 +106,7 @@ class StateBox : Fragment() {
         mousePressedListeners.forEach { it(this, event) }
     }
 
-    fun addMouseReleasedListeners(handler: (StateBox, MouseEvent) -> Unit){
+    fun addMouseReleasedListener(handler: (StateBox, MouseEvent) -> Unit){
         mouseReleasedListeners.add(handler);
     }
 

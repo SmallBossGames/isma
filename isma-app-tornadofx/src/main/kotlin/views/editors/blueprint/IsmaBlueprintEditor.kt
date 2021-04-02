@@ -1,5 +1,7 @@
 package views.editors.blueprint
 
+import javafx.beans.Observable
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.Parent
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
@@ -14,6 +16,10 @@ class IsmaBlueprintEditor: View() {
 
     private var xOffset = 0.0;
     private var yOffset = 0.0;
+
+    private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
+    private fun isRemoveStateModeProperty() = isRemoveStateModeProperty
+    private var isRemoveStateMode by isRemoveStateModeProperty
 
     private val canvas = pane {
         val r1 = find<StateBox>().apply {
@@ -129,13 +135,9 @@ class IsmaBlueprintEditor: View() {
                 activeSquare!!.y = it.y + yOffset
             }
 
-            if(activeStateBox != null) {
-                activeStateBox!!.translateXProperty().value = it.x + xOffset
-                activeStateBox!!.translateYProperty().value = it.y + yOffset
+            if(it.isPrimaryButtonDown && activeStateBox != null && !isRemoveStateMode) {
+                moveStateBox(activeStateBox!!, it.x + xOffset, it.y + yOffset)
             }
-
-            //r2.x = it.x - r2.width / 2
-            //r2.y = it.y - r2.height / 2
         }
     }
 
@@ -164,7 +166,23 @@ class IsmaBlueprintEditor: View() {
             }
             separator()
             button {
-                text = "Remove state"
+                action {
+                    isRemoveStateMode = !isRemoveStateMode
+                }
+
+                text = if(isRemoveStateMode){
+                    "Stop remove state"
+                } else {
+                    "Remove state"
+                }
+
+                isRemoveStateModeProperty().onChange {
+                    text = if(it){
+                        "Stop remove state"
+                    } else {
+                        "Remove state"
+                    }
+                }
             }
             button {
                 text = "Remove transition"
@@ -172,9 +190,19 @@ class IsmaBlueprintEditor: View() {
         }
     }
 
+    private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
+        stateBox.translateXProperty().value = positionX
+        stateBox.translateYProperty().value = positionY
+    }
+
     private fun createNewState(){
         val stateBox = find<StateBox>().apply {
             addMousePressedListener { it, event ->
+                if(isRemoveStateMode){
+                    it.removeFromParent()
+                    return@addMousePressedListener;
+                }
+
                 xOffset = -event.x
                 yOffset = -event.y
                 activeStateBox = it
@@ -182,6 +210,10 @@ class IsmaBlueprintEditor: View() {
             addMouseReleasedListener { _, _ ->
                 activeStateBox = null
             }
+            addMouseClickedListeners { it, _ ->
+
+            }
+            isEditableProperty().bind(!isRemoveStateModeProperty())
         }
         canvas.add(stateBox)
     }

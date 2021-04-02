@@ -23,6 +23,10 @@ class StateBox : Fragment() {
     private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
     private var isEditModeEnabled by isEditModeEnabledProperty
 
+    private val isEditableProperty = SimpleBooleanProperty(true)
+    public fun isEditableProperty() = isEditableProperty
+    public var isEditable by isEditableProperty
+
     private val boxNameProperty = SimpleStringProperty("")
     public fun boxNameProperty() = boxNameProperty
     public var boxName by boxNameProperty
@@ -76,10 +80,11 @@ class StateBox : Fragment() {
         }
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            if(!isDragged){
+            if(!isDragged && isEditable){
                 isEditModeEnabled = true
                 nameTextArea.requestFocus()
             }
+            executeMouseClickedListeners(it)
         }
 
         addEventHandler(MouseEvent.MOUSE_PRESSED) {
@@ -103,7 +108,11 @@ class StateBox : Fragment() {
     }
 
     private fun executeMousePressedListener(event: MouseEvent){
-        mousePressedListeners.forEach { it(this, event) }
+        if(event.isPrimaryButtonDown){
+            for(i in mousePressedListeners.indices){
+                mousePressedListeners[i](this, event)
+            }
+        }
     }
 
     fun addMouseReleasedListener(handler: (StateBox, MouseEvent) -> Unit){
@@ -114,8 +123,12 @@ class StateBox : Fragment() {
         mouseReleasedListeners.remove(handler);
     }
 
-    private fun executeMouseReleasedListeners(event: MouseEvent){
-        mouseReleasedListeners.forEach { it(this, event) }
+    private fun executeMouseReleasedListeners(event: MouseEvent) {
+        if (event.isPrimaryButtonDown) {
+            for (i in mouseReleasedListeners.indices) {
+                mouseReleasedListeners[i](this, event)
+            }
+        }
     }
 
     fun addMouseClickedListeners(handler: (StateBox, MouseEvent) -> Unit){
@@ -127,6 +140,8 @@ class StateBox : Fragment() {
     }
 
     private fun executeMouseClickedListeners(event: MouseEvent){
-        mouseClickedListeners.forEach { it(this, event) }
+        for(i in mouseClickedListeners.indices){
+            mouseClickedListeners[i](this, event)
+        }
     }
 }

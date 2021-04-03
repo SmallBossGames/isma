@@ -9,6 +9,7 @@ import javafx.scene.shape.Rectangle
 import javafx.scene.text.TextAlignment
 import tornadofx.*
 import views.editors.blueprint.controls.StateBox
+import views.editors.blueprint.controls.StateTransactionArrow
 
 class IsmaBlueprintEditor: View() {
     private var activeSquare: Rectangle? = null
@@ -93,13 +94,32 @@ class IsmaBlueprintEditor: View() {
             endYProperty().bind(r2.centerYProperty())
         }
 
-        val lineBetweenInitAndState = line {
+/*        val lineBetweenInitAndState = line {
+            viewOrder = 4.0
+            startXProperty().bind(inintR.xProperty() + inintR.widthProperty() / 2)
+            startYProperty().bind(inintR.yProperty() + inintR.heightProperty() / 2)
+            endXProperty().bind(r1.centerXProperty())
+            endYProperty().bind(r1.centerYProperty())
+        }*/
+
+        val lineBetweenInitAndState2 = find<StateTransactionArrow> {
             viewOrder = 4.0
             startXProperty().bind(inintR.xProperty() + inintR.widthProperty() / 2)
             startYProperty().bind(inintR.yProperty() + inintR.heightProperty() / 2)
             endXProperty().bind(r1.centerXProperty())
             endYProperty().bind(r1.centerYProperty())
         }
+        add(lineBetweenInitAndState2)
+
+        val lineBetweenInitAndState3 = find<StateTransactionArrow> {
+            viewOrder = 4.0
+            endXProperty().bind(inintR.xProperty() + inintR.widthProperty() / 2)
+            endYProperty().bind(inintR.yProperty() + inintR.heightProperty() / 2)
+            startXProperty().bind(r1.centerXProperty())
+            startYProperty().bind(r1.centerYProperty())
+        }
+
+        add(lineBetweenInitAndState3)
 
         val r3Text = text {
             textAlignment = TextAlignment.CENTER

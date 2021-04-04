@@ -124,10 +124,8 @@ class StateBox : Fragment() {
     }
 
     private fun executeMouseReleasedListeners(event: MouseEvent) {
-        if (event.isPrimaryButtonDown) {
-            for (i in mouseReleasedListeners.indices) {
-                mouseReleasedListeners[i](this, event)
-            }
+        for (i in mouseReleasedListeners.indices) {
+            mouseReleasedListeners[i](this, event)
         }
     }
 

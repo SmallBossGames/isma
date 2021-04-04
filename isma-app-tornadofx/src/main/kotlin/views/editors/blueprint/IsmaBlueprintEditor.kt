@@ -1,7 +1,7 @@
 package views.editors.blueprint
 
-import javafx.beans.Observable
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.scene.Parent
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
@@ -12,39 +12,26 @@ import views.editors.blueprint.controls.StateBox
 import views.editors.blueprint.controls.StateTransactionArrow
 
 class IsmaBlueprintEditor: View() {
+    private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
+    private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
+    private val addTransactionStateCounterProperty = SimpleIntegerProperty(0)
+
     private var activeSquare: Rectangle? = null
     private var activeStateBox: StateBox? = null
+    private var statesToLink = arrayOf<StateBox?>(null, null)
 
     private var xOffset = 0.0;
     private var yOffset = 0.0;
 
-    private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
     private fun isRemoveStateModeProperty() = isRemoveStateModeProperty
+    private fun isAddTransactionModeProperty() = isAddTransactionModeProperty
+    private fun addTransactionStateCounterProperty() = addTransactionStateCounterProperty
+
     private var isRemoveStateMode by isRemoveStateModeProperty
+    private var isAddTransactionMode by isAddTransactionModeProperty
+    private var addTransactionStateCounter by addTransactionStateCounterProperty
 
     private val canvas = pane {
-        val r1 = find<StateBox>().apply {
-            addMousePressedListener { it, event ->
-                xOffset = -event.x
-                yOffset = -event.y
-                activeStateBox = it
-            }
-            addMouseReleasedListener { _, _ ->
-                activeStateBox = null
-            }
-        }
-        add(r1)
-        val r2 = find<StateBox>().apply {
-            addMousePressedListener { it, event ->
-                xOffset = -event.x
-                yOffset = -event.y
-                activeStateBox = it
-            }
-            addMouseReleasedListener { _, _ ->
-                activeStateBox = null
-            }
-        }
-        add(r2)
 
         val r3 = rectangle {
             viewOrder = 3.0
@@ -86,40 +73,6 @@ class IsmaBlueprintEditor: View() {
             }
         }
 
-        val lineBetweenStates = line {
-            viewOrder = 4.0
-            startXProperty().bind(r1.centerXProperty())
-            startYProperty().bind(r1.centerYProperty())
-            endXProperty().bind(r2.centerXProperty())
-            endYProperty().bind(r2.centerYProperty())
-        }
-
-/*        val lineBetweenInitAndState = line {
-            viewOrder = 4.0
-            startXProperty().bind(inintR.xProperty() + inintR.widthProperty() / 2)
-            startYProperty().bind(inintR.yProperty() + inintR.heightProperty() / 2)
-            endXProperty().bind(r1.centerXProperty())
-            endYProperty().bind(r1.centerYProperty())
-        }*/
-
-        val lineBetweenInitAndState2 = find<StateTransactionArrow> {
-            viewOrder = 4.0
-            startXProperty().bind(inintR.xProperty() + inintR.widthProperty() / 2)
-            startYProperty().bind(inintR.yProperty() + inintR.heightProperty() / 2)
-            endXProperty().bind(r1.centerXProperty())
-            endYProperty().bind(r1.centerYProperty())
-        }
-        add(lineBetweenInitAndState2)
-
-        val lineBetweenInitAndState3 = find<StateTransactionArrow> {
-            viewOrder = 4.0
-            endXProperty().bind(inintR.xProperty() + inintR.widthProperty() / 2)
-            endYProperty().bind(inintR.yProperty() + inintR.heightProperty() / 2)
-            startXProperty().bind(r1.centerXProperty())
-            startYProperty().bind(r1.centerYProperty())
-        }
-
-        add(lineBetweenInitAndState3)
 
         val r3Text = text {
             textAlignment = TextAlignment.CENTER
@@ -133,20 +86,6 @@ class IsmaBlueprintEditor: View() {
             xProperty().bind(inintR.xProperty() + 20.0)
             yProperty().bind(inintR.yProperty() + 30.0)
             text = "Init"
-        }
-
-        val transaction1 = text {
-            textAlignment = TextAlignment.JUSTIFY
-            xProperty().bind((lineBetweenStates.startXProperty() - lineBetweenStates.endXProperty()) / 2.0 + lineBetweenStates.endXProperty())
-            yProperty().bind((lineBetweenStates.startYProperty() - lineBetweenStates.endYProperty()) / 2.0 + lineBetweenStates.endYProperty() - 20.0)
-            text = "TIME > TIME1"
-        }
-
-        val transaction2 = text {
-            textAlignment = TextAlignment.JUSTIFY
-            xProperty().bind((lineBetweenStates.startXProperty() - lineBetweenStates.endXProperty()) / 2.0 + lineBetweenStates.endXProperty())
-            yProperty().bind((lineBetweenStates.startYProperty() - lineBetweenStates.endYProperty()) / 2.0 + lineBetweenStates.endYProperty() + 20.0)
-            text = "TIME < TIME3"
         }
 
         addEventHandler(MouseEvent.MOUSE_DRAGGED) {
@@ -180,9 +119,28 @@ class IsmaBlueprintEditor: View() {
             button {
                 text = "New state"
                 action { createNewState() }
+                disableClose()
             }
             button {
                 text = "New transition"
+
+                isAddTransactionModeProperty().onChange {
+                    text = if(it) {
+                        "Stop adding transaction"
+
+                    } else {
+                        "New transition"
+                    }
+                }
+
+                action {
+                    if(isAddTransactionMode) {
+                        isAddTransactionMode = false
+                    } else {
+                        isAddTransactionMode = true
+                        addTransactionStateCounter = 0
+                    }
+                }
             }
             separator()
             button {
@@ -216,7 +174,7 @@ class IsmaBlueprintEditor: View() {
     }
 
     private fun createNewState(){
-        val stateBox = find<StateBox>().apply {
+        val stateBox = find<StateBox> {
             addMousePressedListener { it, event ->
                 if(isRemoveStateMode){
                     it.removeFromParent()
@@ -231,9 +189,24 @@ class IsmaBlueprintEditor: View() {
                 activeStateBox = null
             }
             addMouseClickedListeners { it, _ ->
+                if(isAddTransactionMode) {
+                    statesToLink[addTransactionStateCounter++] = it
 
+                    if (addTransactionStateCounter > 1) {
+                        val arrow = find<StateTransactionArrow> {
+                            startXProperty().bind(statesToLink[0]!!.centerXProperty())
+                            startYProperty().bind(statesToLink[0]!!.centerYProperty())
+                            endXProperty().bind(statesToLink[1]!!.centerXProperty())
+                            endYProperty().bind(statesToLink[1]!!.centerYProperty())
+                        }
+                        isAddTransactionMode = false
+                        canvas.add(arrow)
+                    }
+
+                    return@addMouseClickedListeners;
+                }
             }
-            isEditableProperty().bind(!isRemoveStateModeProperty())
+            isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
         canvas.add(stateBox)
     }

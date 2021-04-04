@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.input.MouseEvent
-import org.w3c.dom.Text
 
 import tornadofx.*
 import kotlin.math.*
@@ -50,7 +49,6 @@ class StateTransactionArrow : Fragment() {
             textProperty().bindBidirectional(this@StateTransactionArrow.textProperty)
             visibleWhen(isTextEditModeProperty)
             managedWhen(isTextEditModeProperty)
-            println(height)
 
             focusedProperty().onChange {
                 if(!it) {
@@ -73,13 +71,13 @@ class StateTransactionArrow : Fragment() {
             add(arrowText)
         }
 
-        val arrowhead = polyline(-5.0, -5.0, 0.0, 0.0, -5.0, 5.0) {
+        val arrowhead = polyline(5.0, -5.0, 0.0, 0.0, 5.0, 5.0) {
             viewOrder = 6.0
         }
 
         line {
             viewOrder = 6.0
-            fun ss() {
+            fun updateGeometry() {
                 val x = this.endX - this.startX
                 val y = this.endY - this.startY
                 val angle = atan2(x, y) + PI/2
@@ -101,10 +99,10 @@ class StateTransactionArrow : Fragment() {
                 predicateText.translateY = textOffsetY
             }
 
-            this@StateTransactionArrow.startXProperty.onChange { ss() }
-            this@StateTransactionArrow.startYProperty.onChange { ss() }
-            this@StateTransactionArrow.endXProperty.onChange { ss() }
-            this@StateTransactionArrow.endYProperty.onChange { ss() }
+            this@StateTransactionArrow.startXProperty.onChange { updateGeometry() }
+            this@StateTransactionArrow.startYProperty.onChange { updateGeometry() }
+            this@StateTransactionArrow.endXProperty.onChange { updateGeometry() }
+            this@StateTransactionArrow.endYProperty.onChange { updateGeometry() }
         }
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {

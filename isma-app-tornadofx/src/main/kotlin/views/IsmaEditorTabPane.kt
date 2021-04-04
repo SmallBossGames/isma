@@ -24,22 +24,20 @@ import views.editors.text.IsmaTextEditor
 class IsmaEditorTabPane: View() {
     private val projectController: ProjectController by inject()
     private val activeProjectController: ActiveProjectController by inject()
-    private val ismaCodeArea: IsmaTextEditor by inject()
-    private val ismaBluprintEditor: IsmaBlueprintEditor by inject()
 
 
 
     override val root = tabpane {
         subscribe<NewBlueprintProjectEvent> {
             tab("The canvas project") {
-                add(ismaBluprintEditor)
+                add(find<IsmaBlueprintEditor>())
             }
         }
         subscribe<NewProjectEvent> { event->
             val thisTabProject = event.ismaProject
 
             tab(thisTabProject.name) {
-                add(ismaCodeArea.apply {
+                add(find<IsmaTextEditor> {
                     isSelectedProperty().bind(this@tab.selectedProperty())
                     replaceText(thisTabProject.projectText)
                     thisTabProject.projectTextProperty().bind(textProperty())}

@@ -11,7 +11,7 @@ import tornadofx.*
 import views.editors.blueprint.controls.StateBox
 import views.editors.blueprint.controls.StateTransactionArrow
 
-class IsmaBlueprintEditor: View() {
+class IsmaBlueprintEditor: Fragment() {
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
     private val isRemoveTransactionModeProperty = SimpleBooleanProperty(false)
     private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
@@ -120,35 +120,45 @@ class IsmaBlueprintEditor: View() {
         }
         bottom = toolbar {
             button {
+                action {
+                    resetEditorMode()
+                    createNewState()
+                }
+
                 text = "New state"
-                action { createNewState() }
+
                 disableClose()
             }
             button {
+                action {
+                    if(isAddTransactionMode) {
+                        resetEditorMode()
+                    } else {
+                        resetEditorMode()
+                        isAddTransactionMode = true
+                        addTransactionStateCounter = 0
+                    }
+                }
+
                 text = "New transition"
 
                 isAddTransactionModeProperty().onChange {
                     text = if(it) {
                         "Stop adding transaction"
-
                     } else {
                         "New transition"
-                    }
-                }
-
-                action {
-                    if(isAddTransactionMode) {
-                        isAddTransactionMode = false
-                    } else {
-                        isAddTransactionMode = true
-                        addTransactionStateCounter = 0
                     }
                 }
             }
             separator()
             button {
                 action {
-                    isRemoveStateMode = !isRemoveStateMode
+                    if (isRemoveStateMode) {
+                        resetEditorMode()
+                    } else {
+                        resetEditorMode()
+                        isRemoveStateMode = true
+                    }
                 }
 
                 text = "Remove state"
@@ -163,7 +173,12 @@ class IsmaBlueprintEditor: View() {
             }
             button {
                 action {
-                    isRemoveTransactionMode = !isRemoveTransactionMode
+                    if (isRemoveTransactionMode) {
+                        resetEditorMode()
+                    } else {
+                        resetEditorMode()
+                        isRemoveTransactionMode = true
+                    }
                 }
                 text = "Remove transition"
 
@@ -224,5 +239,11 @@ class IsmaBlueprintEditor: View() {
             isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
         canvas.add(stateBox)
+    }
+
+    private fun resetEditorMode() {
+        isRemoveStateMode = false
+        isRemoveTransactionMode = false
+        isAddTransactionMode = false
     }
 }

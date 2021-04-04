@@ -15,7 +15,7 @@ import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
 
-class IsmaTextEditor: View() {
+class IsmaTextEditor: Fragment() {
     private val highlightingController: SyntaxHighlightingController by inject()
 
     fun isSelectedProperty() = SimpleBooleanProperty(true)

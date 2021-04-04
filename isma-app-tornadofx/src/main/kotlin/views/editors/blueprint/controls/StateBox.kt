@@ -68,8 +68,8 @@ class StateBox : Fragment() {
             managedWhen(!isEditModeEnabledProperty())
         }
 
-        borderpane {
-            center = hbox {
+        group {
+            hbox {
                 setPrefSize(squareWidth - 20, squareHeight - 20)
                 translateX += 10
                 translateY += 10
@@ -77,10 +77,15 @@ class StateBox : Fragment() {
                 add(boxLabel)
                 add(nameTextArea)
             }
+            hbox {
+                button("Edit")
+                visibleWhen(!isEditModeEnabledProperty())
+                managedWhen(!isEditModeEnabledProperty())
+            }
         }
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            if(!isDragged && isEditable){
+            if (!isDragged && isEditable) {
                 isEditModeEnabled = true
                 nameTextArea.requestFocus()
             }

@@ -13,7 +13,6 @@ import tornadofx.*
 import kotlin.math.*
 
 class StateTransactionArrow : Fragment() {
-
     private val startXProperty = SimpleDoubleProperty(0.0)
     private val startYProperty = SimpleDoubleProperty(0.0)
     private val endXProperty = SimpleDoubleProperty(0.0)
@@ -21,6 +20,8 @@ class StateTransactionArrow : Fragment() {
 
     private val textProperty = SimpleStringProperty("")
     private val isTextEditModeProperty = SimpleBooleanProperty(false)
+
+    private val mousePressedListeners = arrayListOf<(StateTransactionArrow, MouseEvent) -> Unit>()
 
     fun startXProperty() = startXProperty
     fun startYProperty() = startYProperty
@@ -107,9 +108,30 @@ class StateTransactionArrow : Fragment() {
             this@StateTransactionArrow.endYProperty.onChange { updateGeometry() }
         }
 
+        addEventHandler(MouseEvent.MOUSE_PRESSED) {
+            executeMousePressedListener(it)
+        }
+
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
             isTextEditMode = true
             arrowTextEditor.requestFocus()
+        }
+
+    }
+
+    fun addMousePressedListener(handler: (StateTransactionArrow, MouseEvent) -> Unit){
+        mousePressedListeners.add(handler);
+    }
+
+    fun removeMousePressedListener(handler: (StateTransactionArrow, MouseEvent) -> Unit){
+        mousePressedListeners.remove(handler);
+    }
+
+    private fun executeMousePressedListener(event: MouseEvent){
+        if(event.isPrimaryButtonDown){
+            for(i in mousePressedListeners.indices){
+                mousePressedListeners[i](this, event)
+            }
         }
     }
 

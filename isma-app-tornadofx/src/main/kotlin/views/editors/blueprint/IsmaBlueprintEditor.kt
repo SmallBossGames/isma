@@ -13,6 +13,7 @@ import views.editors.blueprint.controls.StateTransactionArrow
 
 class IsmaBlueprintEditor: View() {
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
+    private val isRemoveTransactionModeProperty = SimpleBooleanProperty(false)
     private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
     private val addTransactionStateCounterProperty = SimpleIntegerProperty(0)
 
@@ -24,10 +25,12 @@ class IsmaBlueprintEditor: View() {
     private var yOffset = 0.0;
 
     private fun isRemoveStateModeProperty() = isRemoveStateModeProperty
+    private fun isRemoveTransactionModeProperty() = isRemoveTransactionModeProperty
     private fun isAddTransactionModeProperty() = isAddTransactionModeProperty
     private fun addTransactionStateCounterProperty() = addTransactionStateCounterProperty
 
     private var isRemoveStateMode by isRemoveStateModeProperty
+    private var isRemoveTransactionMode by isRemoveTransactionModeProperty
     private var isAddTransactionMode by isAddTransactionModeProperty
     private var addTransactionStateCounter by addTransactionStateCounterProperty
 
@@ -159,7 +162,18 @@ class IsmaBlueprintEditor: View() {
                 }
             }
             button {
+                action {
+                    isRemoveTransactionMode = !isRemoveTransactionMode
+                }
                 text = "Remove transition"
+
+                isRemoveTransactionModeProperty().onChange {
+                    text = if(it){
+                        "Stop remove transition"
+                    } else {
+                        "Remove transition"
+                    }
+                }
             }
         }
     }
@@ -194,6 +208,11 @@ class IsmaBlueprintEditor: View() {
                             startYProperty().bind(statesToLink[0]!!.centerYProperty())
                             endXProperty().bind(statesToLink[1]!!.centerXProperty())
                             endYProperty().bind(statesToLink[1]!!.centerYProperty())
+                            addMousePressedListener { it, _ ->
+                                if(isRemoveTransactionMode) {
+                                    it.removeFromParent()
+                                }
+                            }
                         }
                         isAddTransactionMode = false
                         canvas.add(arrow)

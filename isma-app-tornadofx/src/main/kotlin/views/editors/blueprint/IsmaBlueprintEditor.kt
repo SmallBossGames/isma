@@ -148,11 +148,7 @@ class IsmaBlueprintEditor: View() {
                     isRemoveStateMode = !isRemoveStateMode
                 }
 
-                text = if(isRemoveStateMode){
-                    "Stop remove state"
-                } else {
-                    "Remove state"
-                }
+                text = "Remove state"
 
                 isRemoveStateModeProperty().onChange {
                     text = if(it){

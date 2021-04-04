@@ -66,16 +66,18 @@ class StateTransactionArrow : Fragment() {
             managedWhen(!isTextEditModeProperty)
         }
         val predicateText = group {
-            viewOrder = 7.0
+            viewOrder = 5.0
             add(arrowTextEditor)
             add(arrowText)
         }
 
         val arrowhead = polyline(5.0, -5.0, 0.0, 0.0, 5.0, 5.0) {
+            strokeWidth = 3.0
             viewOrder = 6.0
         }
 
         line {
+            strokeWidth = 3.0
             viewOrder = 6.0
             fun updateGeometry() {
                 val x = this.endX - this.startX

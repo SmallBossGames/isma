@@ -2,6 +2,7 @@ package views.editors.blueprint
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
@@ -16,6 +17,7 @@ class IsmaBlueprintEditor: Fragment() {
     private val isRemoveTransactionModeProperty = SimpleBooleanProperty(false)
     private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
     private val addTransactionStateCounterProperty = SimpleIntegerProperty(0)
+    private val mainProjectTextProperty = SimpleStringProperty("")
 
     private var activeStateBox: StateBox? = null
     private var statesToLink = arrayOf<StateBox?>(null, null)
@@ -27,11 +29,13 @@ class IsmaBlueprintEditor: Fragment() {
     private fun isRemoveTransactionModeProperty() = isRemoveTransactionModeProperty
     private fun isAddTransactionModeProperty() = isAddTransactionModeProperty
     private fun addTransactionStateCounterProperty() = addTransactionStateCounterProperty
+    private fun mainProjectTextProperty() = mainProjectTextProperty
 
     private var isRemoveStateMode by isRemoveStateModeProperty
     private var isRemoveTransactionMode by isRemoveTransactionModeProperty
     private var isAddTransactionMode by isAddTransactionModeProperty
     private var addTransactionStateCounter by addTransactionStateCounterProperty
+    private val mainProjectText by mainProjectTextProperty
 
     private val canvas = pane {
         addMainAndInitBoxes()
@@ -138,7 +142,7 @@ class IsmaBlueprintEditor: Fragment() {
             val stateModel = LismaStateModel()
             stateModel.titleProperty().bind(boxNameProperty())
             addEditActionListener {
-                openTextEditorTab(stateModel)
+                openStateTextEditorTab(stateModel)
             }
             initMouseMovingEvents()
             initMouseRemoveStateEvents()
@@ -153,12 +157,22 @@ class IsmaBlueprintEditor: Fragment() {
         isAddTransactionMode = false
     }
 
-    private fun openTextEditorTab(state: LismaStateModel) {
+    private fun openStateTextEditorTab(state: LismaStateModel) {
         tabs.tab(state.title) {
-            add(find<IsmaTextEditor> {
+            add<IsmaTextEditor> {
                 replaceText(state.text)
                 state.textProperty().bind(textProperty())
-            })
+            }
+            textProperty().bind(state.titleProperty())
+        }
+    }
+
+    private fun openMainTextEditorTab() {
+        tabs.tab("Main") {
+            add<IsmaTextEditor> {
+                replaceText(mainProjectText)
+                mainProjectTextProperty().bind(textProperty())
+            }
         }
     }
 
@@ -170,6 +184,8 @@ class IsmaBlueprintEditor: Fragment() {
             boxName = "Main"
             translateXProperty() += 10
             translateYProperty() += 10
+
+            addEditActionListener { openMainTextEditorTab() }
 
             initMouseMovingEvents()
         }
@@ -241,7 +257,7 @@ class IsmaBlueprintEditor: Fragment() {
                 isAddTransactionMode = false
             }
 
-            return@addMouseClickedListeners;
+            return@addMouseClickedListeners
         }
     }
 }

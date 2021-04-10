@@ -25,8 +25,6 @@ class IsmaEditorTabPane: View() {
     private val projectController: ProjectController by inject()
     private val activeProjectController: ActiveProjectController by inject()
 
-
-
     override val root = tabpane {
         subscribe<NewBlueprintProjectEvent> {
             tab("The canvas project") {

@@ -10,6 +10,8 @@ import javafx.scene.text.TextAlignment
 import tornadofx.*
 import views.editors.blueprint.controls.StateBox
 import views.editors.blueprint.controls.StateTransactionArrow
+import views.editors.blueprint.models.LismaStateModel
+import views.editors.text.IsmaTextEditor
 
 class IsmaBlueprintEditor: Fragment() {
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
@@ -103,21 +105,14 @@ class IsmaBlueprintEditor: Fragment() {
         }
     }
 
-    override val root: Parent = borderpane {
-        center = tabpane {
-            tab ("Blueprint") {
-                add(canvas)
-            }
-            tab ("Main") {
-
-            }
-            tab ("State 1") {
-
-            }
-            tab ("State 2") {
-
-            }
+    private val tabs = tabpane {
+        tab ("Blueprint") {
+            add(canvas)
         }
+    }
+
+    override val root: Parent = borderpane {
+        center = tabs
         bottom = toolbar {
             button {
                 action {
@@ -199,7 +194,12 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun createNewState(){
+        val stateModel = LismaStateModel()
         val stateBox = find<StateBox> {
+            stateModel.titleProperty().bind(boxNameProperty())
+            addEditActionListener {
+                openTextEditorTab(stateModel)
+            }
             addMousePressedListener { it, event ->
                 if(isRemoveStateMode){
                     it.removeFromParent()
@@ -245,5 +245,14 @@ class IsmaBlueprintEditor: Fragment() {
         isRemoveStateMode = false
         isRemoveTransactionMode = false
         isAddTransactionMode = false
+    }
+
+    private fun openTextEditorTab(state: LismaStateModel) {
+        tabs.tab(state.title) {
+            add(find<IsmaTextEditor> {
+                replaceText(state.text)
+                state.textProperty().bind(textProperty())
+            })
+        }
     }
 }

@@ -18,6 +18,7 @@ class StateBox : Fragment() {
     private val mousePressedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseReleasedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseClickedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
+    private val editActionListeners = arrayListOf<() -> Unit>()
 
     private val isEditModeEnabledProperty = SimpleBooleanProperty(false)
     private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
@@ -78,7 +79,9 @@ class StateBox : Fragment() {
                 add(nameTextArea)
             }
             hbox {
-                button("Edit")
+                button("Edit") {
+                    action { executeEditActionListeners() }
+                }
                 visibleWhen(!isEditModeEnabledProperty())
                 managedWhen(!isEditModeEnabledProperty())
             }
@@ -145,6 +148,20 @@ class StateBox : Fragment() {
     private fun executeMouseClickedListeners(event: MouseEvent){
         for(i in mouseClickedListeners.indices){
             mouseClickedListeners[i](this, event)
+        }
+    }
+
+    fun addEditActionListener(op: () -> Unit){
+        editActionListeners.add(op);
+    }
+
+    fun removeEditActionListener(op: () -> Unit){
+        editActionListeners.remove(op);
+    }
+
+    private fun executeEditActionListeners(){
+        for(i in mouseClickedListeners.indices){
+            editActionListeners[i]()
         }
     }
 }

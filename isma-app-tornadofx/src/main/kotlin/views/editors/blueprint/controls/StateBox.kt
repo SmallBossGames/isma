@@ -1,15 +1,13 @@
 package views.editors.blueprint.controls
 
 import javafx.beans.binding.DoubleBinding
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
 import javafx.geometry.Pos
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 import tornadofx.*
 
 class StateBox : Fragment() {
@@ -20,24 +18,30 @@ class StateBox : Fragment() {
 
     private val isEditModeEnabledProperty = SimpleBooleanProperty(false)
     private val isEditableProperty = SimpleBooleanProperty(true)
+    private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
     private val boxNameProperty = SimpleStringProperty("")
     private val squareWidthProperty = SimpleDoubleProperty(150.0)
     private val squareHeightProperty = SimpleDoubleProperty(80.0)
+    private val colorProperty = SimpleObjectProperty<Paint>(Color.WHITE)
 
     private var isEditModeEnabled by isEditModeEnabledProperty
     private var isDragged = false
 
     public var isEditable by isEditableProperty
+    public var isEditButtonVisible by isEditButtonVisibleProperty
     public var boxName by boxNameProperty
     public var squareWidth by squareWidthProperty
     public var squareHeight by squareHeightProperty
+    public var color: Paint by colorProperty
 
     private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
 
     public fun isEditableProperty() = isEditableProperty
+    public fun isEditButtonVisible() = isEditButtonVisibleProperty
     public fun boxNameProperty() = boxNameProperty
     public fun squareWidthProperty() = squareWidthProperty
     public fun squareHeightProperty() = squareHeightProperty
+    public fun colorProperty() = colorProperty
 
     fun translateXProperty(): DoubleProperty = root.layoutXProperty()
     fun translateYProperty(): DoubleProperty = root.layoutYProperty()
@@ -49,8 +53,8 @@ class StateBox : Fragment() {
         rectangle {
             heightProperty().bind(squareHeightProperty())
             widthProperty().bind(squareWidthProperty())
+            fillProperty().bind(colorProperty())
             viewOrder = 3.0
-            fill = Color.CORAL
             arcWidth = 20.0
             arcHeight = 20.0
         }
@@ -82,12 +86,12 @@ class StateBox : Fragment() {
             add(nameTextArea)
         }
 
-        hbox {
-            button("Edit") {
-                action { executeEditActionListeners() }
-            }
-            visibleWhen(!isEditModeEnabledProperty())
-            managedWhen(!isEditModeEnabledProperty())
+        button("Edit") {
+            val isVisibleBinding = isEditModeEnabledProperty().not().and(isEditButtonVisible())
+
+            action { executeEditActionListeners() }
+            visibleWhen(isVisibleBinding)
+            managedWhen(isVisibleBinding)
         }
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
@@ -163,7 +167,7 @@ class StateBox : Fragment() {
     }
 
     private fun executeEditActionListeners(){
-        for(i in mouseClickedListeners.indices){
+        for(i in editActionListeners.indices){
             editActionListeners[i]()
         }
     }

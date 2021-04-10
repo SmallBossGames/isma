@@ -2,10 +2,9 @@ package views.editors.blueprint
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
-import javafx.scene.Parent
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
-import javafx.scene.shape.Rectangle
+import javafx.scene.paint.Color
 import tornadofx.*
 import views.editors.blueprint.controls.StateBox
 import views.editors.blueprint.controls.StateTransactionArrow
@@ -50,7 +49,7 @@ class IsmaBlueprintEditor: Fragment() {
         }
     }
 
-    override val root: Parent = borderpane {
+    override val root = borderpane {
         center = tabs
         bottom = toolbar {
             button {
@@ -134,6 +133,8 @@ class IsmaBlueprintEditor: Fragment() {
 
     private fun createNewState(){
         canvas.add<StateBox> {
+            color = Color.CORAL
+
             val stateModel = LismaStateModel()
             stateModel.titleProperty().bind(boxNameProperty())
             addEditActionListener {
@@ -163,6 +164,7 @@ class IsmaBlueprintEditor: Fragment() {
 
     private fun Pane.addMainAndInitBoxes() {
         add<StateBox> {
+            color = Color.LIGHTGREEN
             isEditable = false
             squareHeight = 60.0
             boxName = "Main"
@@ -173,6 +175,8 @@ class IsmaBlueprintEditor: Fragment() {
         }
 
         add<StateBox> {
+            color = Color.LIGHTBLUE
+            isEditButtonVisible = false
             isEditable = false
             squareHeight = 60.0
             boxName = "Init"

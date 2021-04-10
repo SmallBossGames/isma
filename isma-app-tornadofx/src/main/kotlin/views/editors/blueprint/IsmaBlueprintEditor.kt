@@ -4,9 +4,8 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.scene.Parent
 import javafx.scene.input.MouseEvent
-import javafx.scene.paint.Color
+import javafx.scene.layout.Pane
 import javafx.scene.shape.Rectangle
-import javafx.scene.text.TextAlignment
 import tornadofx.*
 import views.editors.blueprint.controls.StateBox
 import views.editors.blueprint.controls.StateTransactionArrow
@@ -19,7 +18,6 @@ class IsmaBlueprintEditor: Fragment() {
     private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
     private val addTransactionStateCounterProperty = SimpleIntegerProperty(0)
 
-    private var activeSquare: Rectangle? = null
     private var activeStateBox: StateBox? = null
     private var statesToLink = arrayOf<StateBox?>(null, null)
 
@@ -37,68 +35,9 @@ class IsmaBlueprintEditor: Fragment() {
     private var addTransactionStateCounter by addTransactionStateCounterProperty
 
     private val canvas = pane {
-
-        val r3 = rectangle {
-            viewOrder = 3.0
-            fill = Color.LIGHTGREEN
-            width = 150.0
-            height = 50.0
-            arcWidth = 20.0
-            arcHeight = 20.0
-
-            addEventHandler(MouseEvent.MOUSE_PRESSED) {
-                xOffset = this.x - it.x
-                yOffset = this.y - it.y
-                activeSquare = this
-                print("I'm here")
-            }
-            addEventHandler(MouseEvent.MOUSE_RELEASED) {
-                activeSquare = null
-                print("I'm here too")
-            }
-        }
-
-        val inintR = rectangle {
-            viewOrder = 3.0
-            fill = Color.LIGHTBLUE
-            width = 150.0
-            height = 50.0
-            arcWidth = 20.0
-            arcHeight = 20.0
-
-            addEventHandler(MouseEvent.MOUSE_PRESSED) {
-                xOffset = this.x - it.x
-                yOffset = this.y - it.y
-                activeSquare = this
-                print("I'm here")
-            }
-            addEventHandler(MouseEvent.MOUSE_RELEASED) {
-                activeSquare = null
-                print("I'm here too")
-            }
-        }
-
-
-        val r3Text = text {
-            textAlignment = TextAlignment.CENTER
-            xProperty().bind(r3.xProperty() + 20.0)
-            yProperty().bind(r3.yProperty() + 30.0)
-            text = "Main"
-        }
-
-        val inintRText = text {
-            textAlignment = TextAlignment.CENTER
-            xProperty().bind(inintR.xProperty() + 20.0)
-            yProperty().bind(inintR.yProperty() + 30.0)
-            text = "Init"
-        }
+        addMainAndInitBoxes()
 
         addEventHandler(MouseEvent.MOUSE_DRAGGED) {
-            if(activeSquare != null) {
-                activeSquare!!.x = it.x + xOffset
-                activeSquare!!.y = it.y + yOffset
-            }
-
             if(it.isPrimaryButtonDown && activeStateBox != null && !isRemoveStateMode) {
                 moveStateBox(activeStateBox!!, it.x + xOffset, it.y + yOffset)
             }
@@ -194,51 +133,17 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun createNewState(){
-        val stateModel = LismaStateModel()
-        val stateBox = find<StateBox> {
+        canvas.add<StateBox> {
+            val stateModel = LismaStateModel()
             stateModel.titleProperty().bind(boxNameProperty())
             addEditActionListener {
                 openTextEditorTab(stateModel)
             }
-            addMousePressedListener { it, event ->
-                if(isRemoveStateMode){
-                    it.removeFromParent()
-                    return@addMousePressedListener;
-                }
-
-                xOffset = -event.x
-                yOffset = -event.y
-                activeStateBox = it
-            }
-            addMouseReleasedListener { _, _ ->
-                activeStateBox = null
-            }
-            addMouseClickedListeners { it, _ ->
-                if(isAddTransactionMode) {
-                    statesToLink[addTransactionStateCounter++] = it
-
-                    if (addTransactionStateCounter > 1) {
-                        val arrow = find<StateTransactionArrow> {
-                            startXProperty().bind(statesToLink[0]!!.centerXProperty())
-                            startYProperty().bind(statesToLink[0]!!.centerYProperty())
-                            endXProperty().bind(statesToLink[1]!!.centerXProperty())
-                            endYProperty().bind(statesToLink[1]!!.centerYProperty())
-                            addMousePressedListener { it, _ ->
-                                if(isRemoveTransactionMode) {
-                                    it.removeFromParent()
-                                }
-                            }
-                        }
-                        isAddTransactionMode = false
-                        canvas.add(arrow)
-                    }
-
-                    return@addMouseClickedListeners;
-                }
-            }
+            initMouseMovingEvents()
+            initMouseRemoveStateEvents()
+            initMouseLinkTransactionEvents()
             isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
-        canvas.add(stateBox)
     }
 
     private fun resetEditorMode() {
@@ -253,6 +158,86 @@ class IsmaBlueprintEditor: Fragment() {
                 replaceText(state.text)
                 state.textProperty().bind(textProperty())
             })
+        }
+    }
+
+    private fun Pane.addMainAndInitBoxes() {
+        add<StateBox> {
+            isEditable = false
+            squareHeight = 60.0
+            boxName = "Main"
+            translateXProperty() += 10
+            translateYProperty() += 10
+
+            initMouseMovingEvents()
+        }
+
+        add<StateBox> {
+            isEditable = false
+            squareHeight = 60.0
+            boxName = "Init"
+            translateXProperty() += 10
+            translateYProperty() += 100
+
+            initMouseMovingEvents()
+            initMouseLinkTransactionEvents()
+        }
+    }
+
+    private fun StateBox.initMouseRemoveStateEvents() {
+        addMousePressedListener { it, event ->
+            if(!isRemoveStateMode){
+                return@addMousePressedListener
+            }
+            it.removeFromParent()
+        }
+    }
+
+    private fun StateTransactionArrow.initMouseRemoveTransactionEvents() {
+        addMousePressedListener { it, event ->
+            if(!isRemoveTransactionMode){
+                return@addMousePressedListener
+            }
+            it.removeFromParent()
+        }
+    }
+
+    private fun StateBox.initMouseMovingEvents() {
+        addMousePressedListener { it, event ->
+            if(isRemoveStateMode || isAddTransactionMode){
+                return@addMousePressedListener
+            }
+
+            xOffset = -event.x
+            yOffset = -event.y
+            activeStateBox = it
+        }
+        addMouseReleasedListener { _, _ ->
+            activeStateBox = null
+        }
+    }
+
+    private fun StateBox.initMouseLinkTransactionEvents() {
+        addMouseClickedListeners { it, _ ->
+            if (!isAddTransactionMode || isRemoveStateMode) {
+                return@addMouseClickedListeners
+            }
+
+            statesToLink[addTransactionStateCounter++] = it
+
+            if (addTransactionStateCounter > 1) {
+                canvas.add<StateTransactionArrow> {
+                    startXProperty().bind(statesToLink[0]!!.centerXProperty())
+                    startYProperty().bind(statesToLink[0]!!.centerYProperty())
+                    endXProperty().bind(statesToLink[1]!!.centerXProperty())
+                    endYProperty().bind(statesToLink[1]!!.centerYProperty())
+
+                    initMouseRemoveTransactionEvents()
+                }
+                isAddTransactionMode = false
+            }
+
+            return@addMouseClickedListeners;
         }
     }
 }

@@ -3,6 +3,7 @@ package views.editors.blueprint.controls
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.control.Label
@@ -12,27 +13,31 @@ import javafx.scene.paint.Color
 import tornadofx.*
 
 class StateBox : Fragment() {
-    private val squareWidth = 150.0
-    private val squareHeight = 80.0
-
     private val mousePressedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseReleasedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseClickedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val editActionListeners = arrayListOf<() -> Unit>()
 
     private val isEditModeEnabledProperty = SimpleBooleanProperty(false)
-    private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
-    private var isEditModeEnabled by isEditModeEnabledProperty
-
     private val isEditableProperty = SimpleBooleanProperty(true)
-    public fun isEditableProperty() = isEditableProperty
-    public var isEditable by isEditableProperty
-
     private val boxNameProperty = SimpleStringProperty("")
-    public fun boxNameProperty() = boxNameProperty
-    public var boxName by boxNameProperty
+    private val squareWidthProperty = SimpleDoubleProperty(150.0)
+    private val squareHeightProperty = SimpleDoubleProperty(80.0)
 
+    private var isEditModeEnabled by isEditModeEnabledProperty
     private var isDragged = false
+
+    public var isEditable by isEditableProperty
+    public var boxName by boxNameProperty
+    public var squareWidth by squareWidthProperty
+    public var squareHeight by squareHeightProperty
+
+    private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
+
+    public fun isEditableProperty() = isEditableProperty
+    public fun boxNameProperty() = boxNameProperty
+    public fun squareWidthProperty() = squareWidthProperty
+    public fun squareHeightProperty() = squareHeightProperty
 
     fun translateXProperty(): DoubleProperty = root.layoutXProperty()
     fun translateYProperty(): DoubleProperty = root.layoutYProperty()
@@ -41,13 +46,11 @@ class StateBox : Fragment() {
     fun centerYProperty(): DoubleBinding = root.layoutYProperty() + squareHeight / 2
 
     override val root = group {
-        prefWidth(squareWidth)
-        prefHeight(squareHeight)
         rectangle {
+            heightProperty().bind(squareHeightProperty())
+            widthProperty().bind(squareWidthProperty())
             viewOrder = 3.0
             fill = Color.CORAL
-            width = squareWidth
-            height = squareHeight
             arcWidth = 20.0
             arcHeight = 20.0
         }
@@ -69,22 +72,22 @@ class StateBox : Fragment() {
             managedWhen(!isEditModeEnabledProperty())
         }
 
-        group {
-            hbox {
-                setPrefSize(squareWidth - 20, squareHeight - 20)
-                translateX += 10
-                translateY += 10
-                alignment = Pos.CENTER
-                add(boxLabel)
-                add(nameTextArea)
+        hbox {
+            prefHeightProperty().bind(squareHeightProperty() - 20.0)
+            prefWidthProperty().bind(squareWidthProperty() - 20.0)
+            translateX += 10.0
+            translateY += 10.0
+            alignment = Pos.CENTER
+            add(boxLabel)
+            add(nameTextArea)
+        }
+
+        hbox {
+            button("Edit") {
+                action { executeEditActionListeners() }
             }
-            hbox {
-                button("Edit") {
-                    action { executeEditActionListeners() }
-                }
-                visibleWhen(!isEditModeEnabledProperty())
-                managedWhen(!isEditModeEnabledProperty())
-            }
+            visibleWhen(!isEditModeEnabledProperty())
+            managedWhen(!isEditModeEnabledProperty())
         }
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {

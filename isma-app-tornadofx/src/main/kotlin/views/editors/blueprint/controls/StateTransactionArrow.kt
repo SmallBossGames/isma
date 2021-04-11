@@ -57,6 +57,7 @@ class StateTransactionArrow : Fragment() {
                 }
             }
         }
+
         val arrowText = Label().apply {
             prefWidth = TextFieldLength
             translateY -= 11.0
@@ -66,13 +67,14 @@ class StateTransactionArrow : Fragment() {
             visibleWhen(!isTextEditModeProperty)
             managedWhen(!isTextEditModeProperty)
         }
+
         val predicateText = group {
             viewOrder = 5.0
             add(arrowTextEditor)
             add(arrowText)
         }
 
-        val arrowhead = polyline(5.0, -5.0, 0.0, 0.0, 5.0, 5.0) {
+        val arrowhead = polygon(7.0, -7.0, -7.0, 0.0, 7.0, 7.0) {
             strokeWidth = 3.0
             viewOrder = 6.0
         }
@@ -81,8 +83,8 @@ class StateTransactionArrow : Fragment() {
             strokeWidth = 3.0
             viewOrder = 6.0
             fun updateGeometry() {
-                val x = this.endX - this.startX
-                val y = this.endY - this.startY
+                val x = this@StateTransactionArrow.endX - this@StateTransactionArrow.startX
+                val y = this@StateTransactionArrow.endY - this@StateTransactionArrow.startY
                 val angle = atan2(x, y) + PI/2
                 val offsetX = 10.0 * sin(angle)
                 val offsetY = 10.0 * cos(angle)

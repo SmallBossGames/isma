@@ -27,6 +27,7 @@ class StateTransactionArrow : Fragment() {
     fun startYProperty() = startYProperty
     fun endXProperty() = endXProperty
     fun endYProperty() = endYProperty
+    fun isTextEditModeProperty() = isTextEditModeProperty
 
     fun textProperty() = textProperty
 
@@ -43,35 +44,38 @@ class StateTransactionArrow : Fragment() {
         layoutXProperty().bind((endXProperty - startXProperty) / 2 + startXProperty)
         layoutYProperty().bind((endYProperty - startYProperty) / 2 + startYProperty)
 
-        val arrowTextEditor = TextField().apply {
-            prefWidth = TextFieldLength
-            translateY -= 11.0
-            translateX = -TextFieldLength / 2.0
-            textProperty().bindBidirectional(this@StateTransactionArrow.textProperty)
-            visibleWhen(isTextEditModeProperty)
-            managedWhen(isTextEditModeProperty)
-
-            focusedProperty().onChange {
-                if(!it) {
-                    isTextEditMode = false
-                }
-            }
-        }
-
-        val arrowText = Label().apply {
-            prefWidth = TextFieldLength
-            translateY -= 11.0
-            translateX = -TextFieldLength / 2.0
-            alignment = Pos.CENTER
-            textProperty().bind(this@StateTransactionArrow.textProperty)
-            visibleWhen(!isTextEditModeProperty)
-            managedWhen(!isTextEditModeProperty)
-        }
-
         val predicateText = group {
             viewOrder = 5.0
-            add(arrowTextEditor)
-            add(arrowText)
+            textfield {
+                prefWidth = TextFieldLength
+                translateY = -10.0
+                translateX = -TextFieldLength / 2.0
+                textProperty().bindBidirectional(this@StateTransactionArrow.textProperty)
+
+                visibleWhen(isTextEditModeProperty)
+                managedWhen(isTextEditModeProperty)
+
+                isTextEditModeProperty().onChange {
+                    if(it) {
+                        requestFocus()
+                    }
+                }
+
+                focusedProperty().onChange {
+                    if(!it) {
+                        isTextEditMode = false
+                    }
+                }
+            }
+            label {
+                prefWidth = TextFieldLength
+                translateY = -10.0
+                translateX = -TextFieldLength / 2.0
+                alignment = Pos.CENTER
+                textProperty().bind(this@StateTransactionArrow.textProperty)
+                visibleWhen(!isTextEditModeProperty)
+                managedWhen(!isTextEditModeProperty)
+            }
         }
 
         val arrowhead = polygon(7.0, -7.0, -7.0, 0.0, 7.0, 7.0) {
@@ -88,8 +92,8 @@ class StateTransactionArrow : Fragment() {
                 val angle = atan2(x, y) + PI/2
                 val offsetX = 10.0 * sin(angle)
                 val offsetY = 10.0 * cos(angle)
-                val textOffsetX = 30.0 * sin(angle)
-                val textOffsetY = 30.0 * cos(angle)
+                val textOffsetX = 40.0 * sin(angle)
+                val textOffsetY = 40.0 * cos(angle)
 
                 startX = this@StateTransactionArrow.startX - this@group.layoutX + offsetX
                 startY = this@StateTransactionArrow.startY - this@group.layoutY + offsetY
@@ -116,7 +120,6 @@ class StateTransactionArrow : Fragment() {
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
             isTextEditMode = true
-            arrowTextEditor.requestFocus()
         }
 
     }

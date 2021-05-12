@@ -147,6 +147,9 @@ class IsmaBlueprintEditor: Fragment() {
             initMouseMovingEvents()
             initMouseRemoveStateEvents()
             initMouseLinkTransactionEvents()
+
+            translateXProperty() += 10
+            translateYProperty() += 200
             isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
     }

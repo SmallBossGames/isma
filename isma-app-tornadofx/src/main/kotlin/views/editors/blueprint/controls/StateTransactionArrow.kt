@@ -141,6 +141,6 @@ class StateTransactionArrow : Fragment() {
     }
 
     companion object {
-        private const val TextFieldLength = 200.0
+        private const val TextFieldLength = 150.0
     }
 }

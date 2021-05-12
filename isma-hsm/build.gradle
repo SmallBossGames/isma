@@ -6,9 +6,9 @@ dependencies {
     implementation project(':isma-next-tools')
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'org.jetbrains:annotations:20.1.0'
 
     testImplementation 'junit:junit:4.13.1'
-    compile 'org.jetbrains:annotations:20.1.0'
 }
 
 description = 'isma-hsm'

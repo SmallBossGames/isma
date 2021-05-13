@@ -9,6 +9,7 @@ import javafx.scene.paint.Color
 import tornadofx.*
 import views.editors.blueprint.controls.StateBox
 import views.editors.blueprint.controls.StateTransactionArrow
+import views.editors.blueprint.models.BluePrintTransactionModel
 import views.editors.blueprint.models.LismaStateModel
 import views.editors.text.IsmaTextEditor
 
@@ -37,8 +38,11 @@ class IsmaBlueprintEditor: Fragment() {
     private var addTransactionStateCounter by addTransactionStateCounterProperty
     private val mainProjectText by mainProjectTextProperty
 
+    private val transactions = ArrayList<BluePrintTransactionModel>()
+
     private val canvas = pane {
-        addMainAndInitBoxes()
+        addMainStateBox()
+        addInitStateBox()
 
         addEventHandler(MouseEvent.MOUSE_DRAGGED) {
             if(it.isPrimaryButtonDown && activeStateBox != null && !isRemoveStateMode) {
@@ -59,7 +63,7 @@ class IsmaBlueprintEditor: Fragment() {
             button {
                 action {
                     resetEditorMode()
-                    createNewState()
+                    addStateBox()
                 }
 
                 text = "New state"
@@ -130,13 +134,8 @@ class IsmaBlueprintEditor: Fragment() {
         }
     }
 
-    private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
-        stateBox.translateXProperty().value = positionX
-        stateBox.translateYProperty().value = positionY
-    }
-
-    private fun createNewState(){
-        canvas.add<StateBox> {
+    private fun addStateBox(): StateBox {
+        val stateBox = find<StateBox> {
             color = Color.CORAL
 
             val stateModel = LismaStateModel()
@@ -152,6 +151,88 @@ class IsmaBlueprintEditor: Fragment() {
             translateYProperty() += 200
             isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
+
+        canvas.add(stateBox)
+
+        return stateBox
+    }
+
+    private fun addTransactionArrow(startStateBox: StateBox, endStateBox: StateBox) {
+        if(transactions.any { it.startStateBox == startStateBox && it.endStateBox == endStateBox }) {
+            return
+        }
+
+        val transactionArrow = find<StateTransactionArrow> {
+            startXProperty().bind(startStateBox.centerXProperty())
+            startYProperty().bind(startStateBox.centerYProperty())
+            endXProperty().bind(endStateBox.centerXProperty())
+            endYProperty().bind(endStateBox.centerYProperty())
+
+            initMouseRemoveTransactionEvents()
+        }
+
+        canvas.add(transactionArrow)
+
+        transactions.add(BluePrintTransactionModel(startStateBox, endStateBox, transactionArrow))
+    }
+
+    private fun removeStateBox(stateBox: StateBox) {
+        transactions
+            .asSequence()
+            .filter { it.startStateBox == stateBox || it.endStateBox == stateBox }
+            .toList()
+            .forEach { removeTransaction(it) }
+
+        stateBox.removeFromParent()
+    }
+
+    private fun removeTransactionArrow(transactionArrow: StateTransactionArrow) {
+        transactions
+            .filter { it.transactionArrow == transactionArrow }
+            .toList()
+            .forEach { removeTransaction(it) }
+
+        transactionArrow.removeFromParent()
+    }
+
+    private fun removeTransaction(transaction: BluePrintTransactionModel) {
+        transactions.remove(transaction)
+        transaction.transactionArrow.removeFromParent()
+    }
+
+    private fun Pane.addMainStateBox() {
+        add<StateBox> {
+            color = Color.LIGHTGREEN
+            isEditable = false
+            squareHeight = 60.0
+            boxName = "Main"
+            translateXProperty() += 10
+            translateYProperty() += 10
+
+            addEditActionListener { openMainTextEditorTab() }
+
+            initMouseMovingEvents()
+        }
+    }
+
+    private fun Pane.addInitStateBox() {
+        add<StateBox> {
+            color = Color.LIGHTBLUE
+            isEditButtonVisible = false
+            isEditable = false
+            squareHeight = 60.0
+            boxName = "Init"
+            translateXProperty() += 10
+            translateYProperty() += 100
+
+            initMouseMovingEvents()
+            initMouseLinkTransactionEvents()
+        }
+    }
+
+    private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
+        stateBox.translateXProperty().value = positionX
+        stateBox.translateYProperty().value = positionY
     }
 
     private fun resetEditorMode() {
@@ -179,40 +260,12 @@ class IsmaBlueprintEditor: Fragment() {
         }
     }
 
-    private fun Pane.addMainAndInitBoxes() {
-        add<StateBox> {
-            color = Color.LIGHTGREEN
-            isEditable = false
-            squareHeight = 60.0
-            boxName = "Main"
-            translateXProperty() += 10
-            translateYProperty() += 10
-
-            addEditActionListener { openMainTextEditorTab() }
-
-            initMouseMovingEvents()
-        }
-
-        add<StateBox> {
-            color = Color.LIGHTBLUE
-            isEditButtonVisible = false
-            isEditable = false
-            squareHeight = 60.0
-            boxName = "Init"
-            translateXProperty() += 10
-            translateYProperty() += 100
-
-            initMouseMovingEvents()
-            initMouseLinkTransactionEvents()
-        }
-    }
-
     private fun StateBox.initMouseRemoveStateEvents() {
         addMousePressedListener { it, event ->
             if(!isRemoveStateMode){
                 return@addMousePressedListener
             }
-            it.removeFromParent()
+            removeStateBox(it)
         }
     }
 
@@ -221,7 +274,7 @@ class IsmaBlueprintEditor: Fragment() {
             if(!isRemoveTransactionMode){
                 return@addMousePressedListener
             }
-            it.removeFromParent()
+            removeTransactionArrow(it)
         }
     }
 
@@ -249,14 +302,7 @@ class IsmaBlueprintEditor: Fragment() {
             statesToLink[addTransactionStateCounter++] = it
 
             if (addTransactionStateCounter > 1) {
-                canvas.add<StateTransactionArrow> {
-                    startXProperty().bind(statesToLink[0]!!.centerXProperty())
-                    startYProperty().bind(statesToLink[0]!!.centerYProperty())
-                    endXProperty().bind(statesToLink[1]!!.centerXProperty())
-                    endYProperty().bind(statesToLink[1]!!.centerYProperty())
-
-                    initMouseRemoveTransactionEvents()
-                }
+                addTransactionArrow(statesToLink[0]!!, statesToLink[1]!!)
                 isAddTransactionMode = false
             }
 

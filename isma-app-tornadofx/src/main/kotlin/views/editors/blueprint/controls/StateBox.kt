@@ -19,7 +19,8 @@ class StateBox : Fragment() {
     private val isEditModeEnabledProperty = SimpleBooleanProperty(false)
     private val isEditableProperty = SimpleBooleanProperty(true)
     private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
-    private val boxNameProperty = SimpleStringProperty("")
+    private val nameProperty = SimpleStringProperty("")
+    private val textProperty = SimpleStringProperty("")
     private val squareWidthProperty = SimpleDoubleProperty(150.0)
     private val squareHeightProperty = SimpleDoubleProperty(80.0)
     private val colorProperty = SimpleObjectProperty<Paint>(Color.WHITE)
@@ -29,7 +30,8 @@ class StateBox : Fragment() {
 
     public var isEditable by isEditableProperty
     public var isEditButtonVisible by isEditButtonVisibleProperty
-    public var boxName by boxNameProperty
+    public var name: String by nameProperty
+    public var text: String by textProperty
     public var squareWidth by squareWidthProperty
     public var squareHeight by squareHeightProperty
     public var color: Paint by colorProperty
@@ -38,7 +40,8 @@ class StateBox : Fragment() {
 
     public fun isEditableProperty() = isEditableProperty
     public fun isEditButtonVisible() = isEditButtonVisibleProperty
-    public fun boxNameProperty() = boxNameProperty
+    public fun nameProperty() = nameProperty
+    public fun textProperty() = textProperty
     public fun squareWidthProperty() = squareWidthProperty
     public fun squareHeightProperty() = squareHeightProperty
     public fun colorProperty() = colorProperty
@@ -60,7 +63,7 @@ class StateBox : Fragment() {
         }
 
         val nameTextArea = TextArea().apply {
-            textProperty().bindBidirectional(boxNameProperty())
+            textProperty().bindBidirectional(nameProperty())
             visibleWhen(isEditModeEnabledProperty())
             managedWhen(isEditModeEnabledProperty())
             focusedProperty().onChange {
@@ -71,7 +74,7 @@ class StateBox : Fragment() {
         }
 
         val boxLabel = Label().label {
-            textProperty().bind(boxNameProperty())
+            textProperty().bind(nameProperty())
             visibleWhen(!isEditModeEnabledProperty())
             managedWhen(!isEditModeEnabledProperty())
         }

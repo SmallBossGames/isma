@@ -36,6 +36,7 @@ class IsmaBlueprintEditor: Fragment() {
     private var addTransactionStateCounter by addTransactionStateCounterProperty
 
     private val transactions = ArrayList<BlueprintEditorTransactionModel>()
+    private val stateBoxes = ArrayList<StateBox>()
     private val mainStateBox: StateBox = createMainStateBox()
     private val initStateBox: StateBox = createInitStateBox()
 
@@ -134,23 +135,34 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     public fun getBlueprintModel() : BlueprintModel {
-        val init = initStateBox.toBlueprintState()
         val main = mainStateBox.toBlueprintState()
-
-        val addedStates = HashMap<String, BlueprintStateModel>()
-        addedStates[init.name] = init
+        val init = initStateBox.toBlueprintState()
+        val states = stateBoxes.map { it.toBlueprintState() }.toTypedArray()
 
         val blueprintTransactions = transactions
             .map {
-                return@map BlueprintTransactionModel(
-                    startState = addedStates[it.startStateBox.name] ?: it.startStateBox.toBlueprintState(),
-                    endState = addedStates[it.endStateBox.name] ?: it.endStateBox.toBlueprintState(),
+                BlueprintTransactionModel(
+                    startStateName = it.startStateBox.name,
+                    endStateName = it.endStateBox.name,
                     predicate = it.transactionArrow.text
                 )
             }
             .toTypedArray()
 
-        return BlueprintModel(main, init, blueprintTransactions)
+        return BlueprintModel(main, init, states, blueprintTransactions)
+    }
+
+    public fun setBlueprintModel(model: BlueprintModel) {
+        stateBoxes.toTypedArray().forEach { it.removeFromEditor() }
+
+        mainStateBox.applyBlueprintState(model.main)
+        initStateBox.applyBlueprintState(model.init)
+
+        val stateBoxes = model.states.associateBy({ it.name }, {instantiateStateBoxFromBlueprintState(it)})
+
+        model.transactions.forEach {
+            addTransactionArrow(stateBoxes[it.startStateName]!!, stateBoxes[it.endStateName]!!, it.predicate)
+        }
     }
 
     private fun StateBox.toBlueprintState() : BlueprintStateModel {
@@ -162,32 +174,60 @@ class IsmaBlueprintEditor: Fragment() {
         )
     }
 
-    fun getOrCreateBlueprintState(states: HashMap<String, BlueprintStateModel>, stateBox: StateBox) : BlueprintStateModel {
-        return states[stateBox.name] ?: stateBox.toBlueprintState()
+    private fun StateBox.applyBlueprintState(blueprintState: BlueprintStateModel){
+        this.apply {
+            translateXProperty().value = blueprintState.canvasPositionX
+            translateYProperty().value = blueprintState.canvasPositionY
+            name = blueprintState.name
+            text = blueprintState.text
+        }
     }
 
-    private fun addStateBox(): StateBox {
+    private fun instantiateStateBoxFromBlueprintState(blueprintState: BlueprintStateModel) : StateBox {
+        return instantiateStateBox(
+            positionX = blueprintState.canvasPositionX,
+            positionY = blueprintState.canvasPositionY,
+            stateName = blueprintState.name,
+            stateText = blueprintState.text,
+        )
+    }
+
+    private fun instantiateStateBox(
+        positionX: Double = 0.0,
+        positionY: Double = 0.0,
+        stateName: String = "",
+        stateText: String = "",
+    ) : StateBox {
         val stateBox = find<StateBox> {
             color = Color.CORAL
 
             addEditActionListener {
                 openStateTextEditorTab(this)
             }
+
             initMouseMovingEvents()
             initMouseRemoveStateEvents()
             initMouseLinkTransactionEvents()
 
-            translateXProperty() += 10
-            translateYProperty() += 200
+            translateXProperty().value = positionX
+            translateYProperty().value = positionY
+            name = stateName
+            text = stateText
+
             isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
 
+        stateBoxes.add(stateBox)
         canvas.add(stateBox)
 
         return stateBox
     }
 
-    private fun addTransactionArrow(startStateBox: StateBox, endStateBox: StateBox) {
+    private fun addStateBox() {
+        instantiateStateBox(10.0, 200.0)
+    }
+
+    private fun addTransactionArrow(startStateBox: StateBox, endStateBox: StateBox, predicate: String = "") {
         if(transactions.any { it.startStateBox == startStateBox && it.endStateBox == endStateBox }) {
             return
         }
@@ -206,23 +246,23 @@ class IsmaBlueprintEditor: Fragment() {
         transactions.add(BlueprintEditorTransactionModel(startStateBox, endStateBox, transactionArrow))
     }
 
-    private fun removeStateBox(stateBox: StateBox) {
+    private fun StateBox.removeFromEditor() {
         transactions
             .asSequence()
-            .filter { it.startStateBox == stateBox || it.endStateBox == stateBox }
+            .filter { it.startStateBox == this || it.endStateBox == this }
             .toList()
             .forEach { removeTransaction(it) }
 
-        stateBox.removeFromParent()
+        this.removeFromParent()
     }
 
-    private fun removeTransactionArrow(transactionArrow: StateTransactionArrow) {
+    private fun StateTransactionArrow.removeFromEditor() {
         transactions
-            .filter { it.transactionArrow == transactionArrow }
+            .filter { it.transactionArrow == this }
             .toList()
             .forEach { removeTransaction(it) }
 
-        transactionArrow.removeFromParent()
+        this.removeFromParent()
     }
 
     private fun removeTransaction(transaction: BlueprintEditorTransactionModel) {
@@ -303,7 +343,7 @@ class IsmaBlueprintEditor: Fragment() {
             if(!isRemoveStateMode){
                 return@addMousePressedListener
             }
-            removeStateBox(it)
+            it.removeFromEditor()
         }
     }
 
@@ -312,7 +352,7 @@ class IsmaBlueprintEditor: Fragment() {
             if(!isRemoveTransactionMode){
                 return@addMousePressedListener
             }
-            removeTransactionArrow(it)
+            it.removeFromEditor()
         }
     }
 

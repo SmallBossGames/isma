@@ -1,7 +1,7 @@
 package views.editors.blueprint.models
 
 class BlueprintTransactionModel (
-    val startState: BlueprintStateModel,
-    val endState: BlueprintStateModel,
+    val startStateName: String,
+    val endStateName: String,
     val predicate: String,
 )

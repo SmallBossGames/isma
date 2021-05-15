@@ -8,7 +8,7 @@ plugins {
 }
 
 javafx {
-    version = "11.0.2"
+    version = "16"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -37,6 +37,5 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "11"
-    kotlinOptions.useIR = true
+    kotlinOptions.jvmTarget = "16"
 }

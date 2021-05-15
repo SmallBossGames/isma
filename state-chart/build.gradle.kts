@@ -6,7 +6,7 @@ plugins {
 }
 
 javafx {
-    version = "11.0.2"
+    version = "16"
     modules("javafx.controls", "javafx.graphics")
 }
 
@@ -16,5 +16,5 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "16"
 }

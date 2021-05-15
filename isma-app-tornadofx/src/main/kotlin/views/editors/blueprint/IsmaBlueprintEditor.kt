@@ -22,8 +22,8 @@ class IsmaBlueprintEditor: Fragment() {
     private var activeStateBox: StateBox? = null
     private var statesToLink = arrayOf<StateBox?>(null, null)
 
-    private var xOffset = 0.0;
-    private var yOffset = 0.0;
+    private var xOffset = 0.0
+    private var yOffset = 0.0
 
     private fun isRemoveStateModeProperty() = isRemoveStateModeProperty
     private fun isRemoveTransactionModeProperty() = isRemoveTransactionModeProperty

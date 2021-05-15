@@ -5,5 +5,6 @@ import tornadofx.launch
 class IsmaApp: App(MainView::class){
     init {
         IntgMethodLibraryLoader().load()
+        ismaKoinStart()
     }
 }

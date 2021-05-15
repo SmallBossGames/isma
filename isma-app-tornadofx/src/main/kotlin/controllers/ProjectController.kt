@@ -3,9 +3,10 @@ package controllers
 import events.NewBlueprintProjectEvent
 import events.NewProjectEvent
 import models.IsmaProjectModel
+import org.koin.core.component.KoinComponent
 import tornadofx.Controller
 
-class ProjectController : Controller() {
+class ProjectController : Controller(), KoinComponent {
     private val projects = mutableSetOf<IsmaProjectModel>()
 
     fun createNewBlueprint(name: String){

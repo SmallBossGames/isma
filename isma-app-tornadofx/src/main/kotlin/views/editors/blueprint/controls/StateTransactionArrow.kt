@@ -37,7 +37,7 @@ class StateTransactionArrow : Fragment() {
     val endY by endYProperty
 
     var isTextEditMode by isTextEditModeProperty
-    var text by textProperty
+    var text: String by textProperty
 
     override val root: Parent = group {
         viewOrder = 4.0

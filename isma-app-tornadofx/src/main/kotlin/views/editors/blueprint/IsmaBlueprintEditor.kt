@@ -238,6 +238,8 @@ class IsmaBlueprintEditor: Fragment() {
             endXProperty().bind(endStateBox.centerXProperty())
             endYProperty().bind(endStateBox.centerYProperty())
 
+            text = predicate
+
             initMouseRemoveTransactionEvents()
         }
 
@@ -339,7 +341,7 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun StateBox.initMouseRemoveStateEvents() {
-        addMousePressedListener { it, event ->
+        addMousePressedListener { it, _ ->
             if(!isRemoveStateMode){
                 return@addMousePressedListener
             }
@@ -348,7 +350,7 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun StateTransactionArrow.initMouseRemoveTransactionEvents() {
-        addMousePressedListener { it, event ->
+        addMousePressedListener { it, _ ->
             if(!isRemoveTransactionMode){
                 return@addMousePressedListener
             }

@@ -1,14 +1,16 @@
 package views
 
-import controllers.SimulationController
-import controllers.SimulationResultController
+import services.SimulationController
+import services.SimulationResultService
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject as koinImport
 import tornadofx.*
 
-class SimulationProcessBar : View() {
-    private val simulationResult by inject<SimulationResultController>()
-    private val simulationController: SimulationController by inject()
+class SimulationProcessBar : View(), KoinComponent {
+    private val simulationResult: SimulationResultService by koinImport()
+    private val simulationController: SimulationController by koinImport()
 
     override val root = toolbar {
         button {

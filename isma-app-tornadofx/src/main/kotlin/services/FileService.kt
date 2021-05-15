@@ -1,26 +1,25 @@
-package controllers
+package services
 
 import javafx.stage.FileChooser
 import models.IsmaProjectModel
-import tornadofx.Controller
+import org.koin.core.component.KoinComponent
 import tornadofx.FileChooserMode
 import tornadofx.chooseFile
+import org.koin.core.component.inject as koinInject
 
-class FileController : Controller() {
-    private val activeProjectController: ActiveProjectController by inject()
-    private val projectController: ProjectController by inject()
+class FileService(private val projectController: ProjectService) {
     private val fileFilers = arrayOf(
             FileChooser.ExtensionFilter("ISMA Next Project file", "*.im2"),
             FileChooser.ExtensionFilter("ISMA Project file", "*.im")
     )
 
     fun saveAs() {
-        val project = activeProjectController.activeProject ?: return
+        val project = projectController.activeProject ?: return
         saveProjectAs(project)
     }
 
     fun save() {
-        val project = activeProjectController.activeProject ?: return
+        val project = projectController.activeProject ?: return
         saveProject(project)
     }
 

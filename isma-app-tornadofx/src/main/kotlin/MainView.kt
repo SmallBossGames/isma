@@ -1,5 +1,6 @@
 import tornadofx.*
 import views.*
+import views.editors.tabpane.IsmaEditorTabPane
 import views.simulation.settings.SettingsPanelView
 
 class MainView : View() {

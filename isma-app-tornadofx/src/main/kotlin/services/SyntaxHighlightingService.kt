@@ -1,18 +1,16 @@
-package controllers
+package services
 
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
 import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
-import tornadofx.Controller
 
-class SyntaxHighlightingController : Controller() {
-    private val lismaPdeController: LismaPdeController by inject()
+class SyntaxHighlightingService(private val lismaPdeService: LismaPdeService) {
 
     fun createHighlightingStyleSpans(source: String): StyleSpans<Collection<String>>? {
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
         var lastKeyword = 0
 
-        lismaPdeController.getLismaTokens(source).forEach {
+        lismaPdeService.getLismaTokens(source).forEach {
             when (it.type) {
                 LismaLexer.CONST_KEYWORD, LismaLexer.STATE_KEYWORD, LismaLexer.FOR_KEYWORD, LismaLexer.IF_KEYWORD,
                 LismaLexer.FROM_KEYWORD -> {

@@ -1,12 +1,11 @@
-package controllers
+package services
 
 import enumerables.SaveTarget
 import models.*
 import ru.nstu.isma.intg.lib.IntgMethodLibrary
-import tornadofx.Controller
 import tornadofx.asObservable
 
-class SimulationParametersController: Controller() {
+class SimulationParametersService {
     val integrationMethods = (IntgMethodLibrary.getIntgMethodNames() ?: emptyList<String>())
             .asObservable()
 

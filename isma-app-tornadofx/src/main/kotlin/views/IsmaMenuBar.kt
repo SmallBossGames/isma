@@ -1,16 +1,18 @@
 package views
 
-import controllers.FileController
-import controllers.ProjectController
-import controllers.SimulationController
+import services.FileService
+import services.SimulationController
 import controllers.TextEditorController
+import org.koin.core.component.KoinComponent
+import services.ProjectService
 import tornadofx.*
+import org.koin.core.component.inject as koinInject
 
-class IsmaMenuBar : View() {
-    private val projectController: ProjectController by inject()
-    private val fileController: FileController by inject()
-    private val simulationController: SimulationController by inject()
-    private val textEditorController: TextEditorController by inject()
+class IsmaMenuBar : View(), KoinComponent {
+    private val projectController: ProjectService by koinInject()
+    private val fileService: FileService by koinInject()
+    private val simulationController: SimulationController by koinInject()
+    private val textEditorController: TextEditorController by koinInject()
 
     override val root = menubar {
         menu("File") {
@@ -21,16 +23,16 @@ class IsmaMenuBar : View() {
                 projectController.createNewBlueprint()
             }
             item("Open","Shortcut+O").action {
-                fileController.open()
+                fileService.open()
             }
             item("Save","Shortcut+S").action {
-                fileController.save()
+                fileService.save()
             }
             item("Save as...").action {
-                fileController.saveAs()
+                fileService.saveAs()
             }
             item("Save all").action {
-                fileController.saveAll()
+                fileService.saveAll()
             }
             separator()
             item("Model settings").action {

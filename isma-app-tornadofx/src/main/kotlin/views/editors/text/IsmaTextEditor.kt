@@ -1,25 +1,21 @@
 package views.editors.text
 
-import controllers.SyntaxHighlightingController
+import services.SyntaxHighlightingService
 import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent
 import events.PasteTextInCurrentEditorEvent
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ObservableValue
-import javafx.scene.Parent
 import javafx.scene.paint.Color
 import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
-import models.IsmaProjectModel
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject as koinInject
 import tornadofx.*
 
-class IsmaTextEditor: Fragment() {
-    private val highlightingController: SyntaxHighlightingController by inject()
-
-    fun isSelectedProperty() = SimpleBooleanProperty(true)
-    var isSelected by isSelectedProperty()
+class IsmaTextEditor: Fragment(), KoinComponent {
+    private val highlightingService: SyntaxHighlightingService by koinInject()
 
     fun textProperty(): ObservableValue<String> = root.textProperty()
     fun replaceText(text: String) = root.replaceText(text);
@@ -27,12 +23,12 @@ class IsmaTextEditor: Fragment() {
     override val root = CodeArea().apply {
         paragraphGraphicFactory = LineNumberFactory.get(this)
 
-        subscribe<CutTextInCurrentEditorEvent> { if (isSelected) cut() }
-        subscribe<CopyTextInCurrentEditorEvent> { if (isSelected) copy() }
-        subscribe<PasteTextInCurrentEditorEvent> { if (isSelected) paste() }
+        subscribe<CutTextInCurrentEditorEvent> { if (isFocused) cut() }
+        subscribe<CopyTextInCurrentEditorEvent> { if (isFocused) copy() }
+        subscribe<PasteTextInCurrentEditorEvent> { if (isFocused) paste() }
 
         textProperty().onChange {
-            val highlighting = highlightingController.createHighlightingStyleSpans(it ?: "")
+            val highlighting = highlightingService.createHighlightingStyleSpans(it ?: "")
             setStyleSpans(0, highlighting)
         }
 

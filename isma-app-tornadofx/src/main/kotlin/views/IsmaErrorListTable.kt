@@ -1,14 +1,16 @@
 package views
 
-import controllers.SyntaxErrorController
-import javafx.scene.Parent
+import services.SyntaxErrorService
 import models.SyntaxErrorModel
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject as koinInject
 import tornadofx.*
 
-class IsmaErrorListTable : View() {
-    private val syntaxErrorController: SyntaxErrorController by inject()
 
-    override val root = tableview(syntaxErrorController.errors) {
+class IsmaErrorListTable : View(), KoinComponent {
+    private val syntaxErrorService: SyntaxErrorService by koinInject()
+
+    override val root = tableview(syntaxErrorService.errors) {
         maxHeight = 200.0
         readonlyColumn("Row", SyntaxErrorModel::row).cellFormat {
             text = if (it > 0) it.toString() else ""

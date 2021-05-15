@@ -1,10 +1,12 @@
 package views.simulation.settings
 
-import controllers.SimulationParametersController
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject as koinInject
+import services.SimulationParametersService
 import tornadofx.*
 
-class EventDetectionView : View("Event detection") {
-    private val parametersController: SimulationParametersController by inject()
+class EventDetectionView : View("Event detection"), KoinComponent {
+    private val parametersService: SimulationParametersService by koinInject()
 
     override val root =
         scrollpane {
@@ -12,24 +14,24 @@ class EventDetectionView : View("Event detection") {
                 fieldset {
                     field("In use") {
                         checkbox {
-                            bind(parametersController.eventDetection.isEventDetectionInUseProperty)
+                            bind(parametersService.eventDetection.isEventDetectionInUseProperty)
                         }
                     }
                     field("Gamma") {
                         textfield {
-                            disableProperty().bind(!parametersController.eventDetection.isEventDetectionInUseProperty)
-                            bind(parametersController.eventDetection.gammaProperty)
+                            disableProperty().bind(!parametersService.eventDetection.isEventDetectionInUseProperty)
+                            bind(parametersService.eventDetection.gammaProperty)
                         }
                     }
                     field("Step limit") {
                         checkbox {
-                            bind(parametersController.eventDetection.isStepLimitInUseProperty)
+                            bind(parametersService.eventDetection.isStepLimitInUseProperty)
                         }
                     }
                     field("Low border") {
                         textfield {
-                            disableProperty().bind(!parametersController.eventDetection.isStepLimitInUseProperty)
-                            bind(parametersController.eventDetection.lowBorderProperty)
+                            disableProperty().bind(!parametersService.eventDetection.isStepLimitInUseProperty)
+                            bind(parametersService.eventDetection.lowBorderProperty)
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-package controllers
+package services
 
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
@@ -19,14 +19,10 @@ import java.io.FileWriter
 import java.io.IOException
 import java.util.UUID
 
-class SimulationResultController : Controller() {
-    private val commaAndSpace = ", "
-
+class SimulationResultService(private val grinIntegrationController: IntegrationController) {
     private val fileFilers = arrayOf(
             FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
-
-    private val grinIntegrationController by inject<IntegrationController>()
 
     private val simulationResultProperty = SimpleObjectProperty<HybridSystemIntgResult>(null)
     fun simulationResultProperty() = simulationResultProperty
@@ -118,24 +114,24 @@ class SimulationResultController : Controller() {
         val header = StringBuilder()
 
         // x
-        header.append("x").append(commaAndSpace)
+        header.append("x").append(COMMA_AND_SPACE)
         val equationIndexProvider = result.equationIndexProvider!!
 
         // Дифференциальные переменные
         val deCount = equationIndexProvider.getDifferentialEquationCount()
         for (i in 0 until deCount) {
-            header.append(equationIndexProvider.getDifferentialEquationCode(i)).append(commaAndSpace)
+            header.append(equationIndexProvider.getDifferentialEquationCode(i)).append(COMMA_AND_SPACE)
         }
 
         // Алгебраические переменные
         val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
         for (i in 0 until aeCount) {
-            header.append(equationIndexProvider.getAlgebraicEquationCode(i)).append(commaAndSpace)
+            header.append(equationIndexProvider.getAlgebraicEquationCode(i)).append(COMMA_AND_SPACE)
         }
 
         // Правая часть
         for (i in 0 until deCount) {
-            header.append("f").append(i.toString()).append(commaAndSpace)
+            header.append("f").append(i.toString()).append(COMMA_AND_SPACE)
         }
 
         // Удаляем последний пробел и запятую и заменяем на перенос строки
@@ -149,21 +145,21 @@ class SimulationResultController : Controller() {
             result.resultPointProvider!!.read {
                 for (p in it) {
                     // x
-                    points.append(p.x).append(commaAndSpace)
+                    points.append(p.x).append(COMMA_AND_SPACE)
 
                     // Дифференциальные переменные
                     for (yForDe in p.yForDe) {
-                        points.append(yForDe).append(commaAndSpace)
+                        points.append(yForDe).append(COMMA_AND_SPACE)
                     }
 
                     // Алгебраические переменные
                     for (yForAe in p.rhs[DaeSystem.RHS_AE_PART_IDX]) {
-                        points.append(yForAe).append(commaAndSpace)
+                        points.append(yForAe).append(Companion.COMMA_AND_SPACE)
                     }
 
                     // Правая часть
                     for (f in p.rhs[DaeSystem.RHS_DE_PART_IDX]) {
-                        points.append(f).append(commaAndSpace)
+                        points.append(f).append(COMMA_AND_SPACE)
                     }
 
                     // Удаляем последний пробел и запятую и заменяем на перенос строки
@@ -240,5 +236,9 @@ class SimulationResultController : Controller() {
             lineSize = 1.0,
             lineType = LineType.POLYNOM
         )
+    }
+
+    companion object {
+        private const val COMMA_AND_SPACE = ", "
     }
 }

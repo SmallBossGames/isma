@@ -1,10 +1,13 @@
 package views.simulation.settings
 
-import controllers.SimulationParametersController
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject as koinInject
+import services.SimulationParametersService
 import tornadofx.*
 
-class CauchyInitialsView: View("Initials") {
-    private val parametersController: SimulationParametersController by inject()
+
+class CauchyInitialsView: View("Initials"), KoinComponent {
+    private val parametersService: SimulationParametersService by koinInject()
 
     override val root =
         scrollpane {
@@ -12,17 +15,17 @@ class CauchyInitialsView: View("Initials") {
                 fieldset {
                     field("Start") {
                         textfield {
-                            bind(parametersController.cauchyInitialsModel.startTimeProperty)
+                            bind(parametersService.cauchyInitialsModel.startTimeProperty)
                         }
                     }
                     field("End") {
                         textfield {
-                            bind(parametersController.cauchyInitialsModel.endTimeProperty)
+                            bind(parametersService.cauchyInitialsModel.endTimeProperty)
                         }
                     }
                     field("Step") {
                         textfield {
-                            bind(parametersController.cauchyInitialsModel.stepProperty)
+                            bind(parametersService.cauchyInitialsModel.stepProperty)
                         }
                     }
                 }

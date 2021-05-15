@@ -3,13 +3,18 @@ package views
 import controllers.*
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
-import javafx.stage.Modality
+import org.koin.core.component.KoinComponent
+import services.FileService
+import services.LismaPdeService
+import services.ProjectService
 import tornadofx.*
+import org.koin.core.component.inject as koinInject
 
-class IsmaToolBar : View() {
-    private val lismaPdeController: LismaPdeController by inject()
-    private val projectController: ProjectController by inject()
-    private val fileController: FileController by inject()
+class IsmaToolBar : View(), KoinComponent {
+    private val projectController: ProjectService by koinInject()
+    private val fileService: FileService by koinInject()
+    private val lismaPdeService: LismaPdeService by koinInject()
+
     private val textEditorController: TextEditorController by inject()
 
     override val root = toolbar {
@@ -26,17 +31,17 @@ class IsmaToolBar : View() {
         button{
             graphic = ImageView("icons/open.png")
             tooltip = Tooltip("Open model")
-            action { fileController.open() }
+            action { fileService.open() }
         }
         button{
             graphic = ImageView("icons/toolbar/save.png")
             tooltip = Tooltip("Save current model")
-            action { fileController.save() }
+            action { fileService.save() }
         }
         button{
             graphic = ImageView("icons/toolbar/saveall.png")
             tooltip = Tooltip("Save all models")
-            action { fileController.saveAll() }
+            action { fileService.saveAll() }
         }
         separator()
         button{
@@ -58,7 +63,7 @@ class IsmaToolBar : View() {
         button{
             graphic = ImageView("icons/toolbar/checked.png")
             tooltip = Tooltip("Verify")
-            action { lismaPdeController.translateLisma() }
+            action { lismaPdeService.translateLisma() }
         }
         separator()
         button{

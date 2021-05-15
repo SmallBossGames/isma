@@ -1,10 +1,12 @@
 package views.simulation.settings
 
-import controllers.SimulationParametersController
+import org.koin.core.component.KoinComponent
+import services.SimulationParametersService
 import tornadofx.*
+import org.koin.core.component.inject as koinInject
 
-class MethodSettingsView: View("Method") {
-    private val parametersController: SimulationParametersController by inject()
+class MethodSettingsView: View("Method"), KoinComponent {
+    private val parametersService: SimulationParametersService by koinInject()
 
     override val root =
         scrollpane {
@@ -12,41 +14,41 @@ class MethodSettingsView: View("Method") {
                 fieldset {
                     field("Method") {
                         combobox<String> {
-                            items = parametersController.integrationMethods
-                            bind(parametersController.integrationMethod.selectedMethodProperty)
+                            items = parametersService.integrationMethods
+                            bind(parametersService.integrationMethod.selectedMethodProperty)
                         }
                     }
                     field("Accurate") {
                         checkbox {
-                            bind(parametersController.integrationMethod.isAccuracyInUseProperty)
+                            bind(parametersService.integrationMethod.isAccuracyInUseProperty)
                         }
                     }
                     field("Accuracy") {
                         textfield {
-                            disableProperty().bind(!parametersController.integrationMethod.isAccuracyInUseProperty)
-                            bind(parametersController.integrationMethod.accuracyProperty)
+                            disableProperty().bind(!parametersService.integrationMethod.isAccuracyInUseProperty)
+                            bind(parametersService.integrationMethod.accuracyProperty)
                         }
                     }
                     field("Stable") {
                         checkbox {
-                            bind(parametersController.integrationMethod.isStableInUseProperty)
+                            bind(parametersService.integrationMethod.isStableInUseProperty)
                         }
                     }
                     field("Parallel") {
                         checkbox {
-                            bind(parametersController.integrationMethod.isParallelInUseProperty)
+                            bind(parametersService.integrationMethod.isParallelInUseProperty)
                         }
                     }
                     field("Server") {
                         textfield {
-                            disableProperty().bind(!parametersController.integrationMethod.isParallelInUseProperty)
-                            bind(parametersController.integrationMethod.serverProperty)
+                            disableProperty().bind(!parametersService.integrationMethod.isParallelInUseProperty)
+                            bind(parametersService.integrationMethod.serverProperty)
                         }
                     }
                     field("Port") {
                         textfield {
-                            disableProperty().bind(!parametersController.integrationMethod.isParallelInUseProperty)
-                            bind(parametersController.integrationMethod.portProperty)
+                            disableProperty().bind(!parametersService.integrationMethod.isParallelInUseProperty)
+                            bind(parametersService.integrationMethod.portProperty)
                         }
                     }
                 }

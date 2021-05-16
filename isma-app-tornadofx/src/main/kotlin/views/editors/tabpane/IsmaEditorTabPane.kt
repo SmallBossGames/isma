@@ -2,7 +2,9 @@ package views.editors.tabpane
 
 import events.NewBlueprintProjectEvent
 import events.NewProjectEvent
+import javafx.scene.control.Tab
 import models.projects.BlueprintProjectDataProvider
+import models.projects.IProjectModel
 import org.koin.core.component.KoinComponent
 import services.ProjectService
 import tornadofx.View
@@ -28,45 +30,36 @@ class IsmaEditorTabPane: View(), KoinComponent {
                     }
                 }
 
-                selectionModel.select(this)
-                projectController.activeProject = project
-
-                textProperty().bind(project.nameProperty())
-
-                setOnCloseRequest {
-                    projectController.close(project)
-                }
-
-                setOnSelectionChanged {
-                    if(this.isSelected){
-                        projectController.activeProject = project
-                    }
-                }
+                initProjectTab(project)
             }
         }
         subscribe<NewProjectEvent> { event->
-            val thisTabProject = event.lismaProject
+            val project = event.lismaProject
 
-            tab(thisTabProject.name) {
+            tab(project.name) {
                 add<IsmaTextEditor> {
-                    replaceText(thisTabProject.lismaText)
-                    thisTabProject.lismaTextProperty().bind(textProperty())
+                    replaceText(project.lismaText)
+                    project.lismaTextProperty().bind(textProperty())
                 }
 
-                selectionModel.select(this)
-                projectController.activeProject = thisTabProject
+                initProjectTab(project)
+            }
+        }
+    }
 
-                textProperty().bind(thisTabProject.nameProperty())
+    private fun Tab.initProjectTab(project: IProjectModel) {
+        tabPane.selectionModel.select(this)
+        projectController.activeProject = project
 
-                setOnCloseRequest {
-                    projectController.close(event.lismaProject)
-                }
+        textProperty().bind(project.nameProperty())
 
-                setOnSelectionChanged {
-                    if(this.isSelected){
-                        projectController.activeProject = thisTabProject
-                    }
-                }
+        setOnCloseRequest {
+            projectController.close(project)
+        }
+
+        setOnSelectionChanged {
+            if(this.isSelected){
+                projectController.activeProject = project
             }
         }
     }

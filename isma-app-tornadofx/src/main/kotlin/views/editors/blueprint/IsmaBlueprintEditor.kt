@@ -134,7 +134,7 @@ class IsmaBlueprintEditor: Fragment() {
         }
     }
 
-    public fun getBlueprintModel() : BlueprintModel {
+    fun getBlueprintModel() : BlueprintModel {
         val main = mainStateBox.toBlueprintState()
         val init = initStateBox.toBlueprintState()
         val states = stateBoxes.map { it.toBlueprintState() }.toTypedArray()
@@ -152,13 +152,20 @@ class IsmaBlueprintEditor: Fragment() {
         return BlueprintModel(main, init, states, blueprintTransactions)
     }
 
-    public fun setBlueprintModel(model: BlueprintModel) {
+    fun setBlueprintModel(model: BlueprintModel) {
         stateBoxes.toTypedArray().forEach { it.removeFromEditor() }
 
         mainStateBox.applyBlueprintState(model.main)
         initStateBox.applyBlueprintState(model.init)
 
-        val stateBoxes = model.states.associateBy({ it.name }, {instantiateStateBoxFromBlueprintState(it)})
+        val stateBoxes = model.states.associateByTo(
+            mutableMapOf(
+                initStateBox.name to initStateBox,
+                mainStateBox.name to mainStateBox
+            ),
+            { it.name },
+            {instantiateStateBoxFromBlueprintState(it)}
+        )
 
         model.transactions.forEach {
             addTransactionArrow(stateBoxes[it.startStateName]!!, stateBoxes[it.endStateName]!!, it.predicate)

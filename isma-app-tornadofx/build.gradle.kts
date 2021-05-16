@@ -2,9 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
-    application
+    kotlin("plugin.serialization")
+
     id("org.openjfx.javafxplugin")
     id("com.github.johnrengelman.shadow")
+
+    application
 }
 
 javafx {
@@ -22,6 +25,7 @@ application {
 val koinVersion= "3.0.1"
 val kotlinReflectVersion = "1.5.0"
 val kotlinxCoroutinesVersion = "1.5.0"
+val kotlinxSerializationJsonVersion = "1.2.1"
 
 dependencies {
     implementation ("no.tornado:tornadofx:1.7.20")
@@ -30,6 +34,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core-ext:$koinVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
 
     implementation(project(":isma-hsm"))
     implementation(project(":isma-lisma"))

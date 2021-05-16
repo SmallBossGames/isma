@@ -2,6 +2,7 @@ package views.editors.tabpane
 
 import events.NewBlueprintProjectEvent
 import events.NewProjectEvent
+import models.projects.BlueprintProjectDataProvider
 import org.koin.core.component.KoinComponent
 import services.ProjectService
 import tornadofx.View
@@ -16,18 +17,40 @@ class IsmaEditorTabPane: View(), KoinComponent {
     private val projectController: ProjectService by koinInject()
 
     override val root = tabpane {
-        subscribe<NewBlueprintProjectEvent> {
-            tab("The canvas project") {
-                add(find<IsmaBlueprintEditor>())
+        subscribe<NewBlueprintProjectEvent> { event ->
+            val project = event.blueprintProject
+            tab(project.name) {
+                add<IsmaBlueprintEditor> {
+                    val provider = BlueprintProjectDataProvider(this@add)
+                    project.apply {
+                        dataProvider = provider
+                        pushBlueprint()
+                    }
+                }
+
+                selectionModel.select(this)
+                projectController.activeProject = project
+
+                textProperty().bind(project.nameProperty())
+
+                setOnCloseRequest {
+                    projectController.close(project)
+                }
+
+                setOnSelectionChanged {
+                    if(this.isSelected){
+                        projectController.activeProject = project
+                    }
+                }
             }
         }
         subscribe<NewProjectEvent> { event->
-            val thisTabProject = event.ismaProject
+            val thisTabProject = event.lismaProject
 
             tab(thisTabProject.name) {
                 add<IsmaTextEditor> {
-                    replaceText(thisTabProject.projectText)
-                    thisTabProject.projectTextProperty().bind(textProperty())
+                    replaceText(thisTabProject.lismaText)
+                    thisTabProject.lismaTextProperty().bind(textProperty())
                 }
 
                 selectionModel.select(this)
@@ -36,7 +59,7 @@ class IsmaEditorTabPane: View(), KoinComponent {
                 textProperty().bind(thisTabProject.nameProperty())
 
                 setOnCloseRequest {
-                    projectController.close(event.ismaProject)
+                    projectController.close(event.lismaProject)
                 }
 
                 setOnSelectionChanged {

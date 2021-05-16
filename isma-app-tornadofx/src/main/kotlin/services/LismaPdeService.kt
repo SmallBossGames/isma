@@ -16,7 +16,7 @@ class LismaPdeService(private val projectService: ProjectService, private val sy
         val project = projectService.activeProject ?: return null
 
         val errors = IsmaErrorList()
-        val translator: InputTranslator = LismaTranslator(project.projectText, errors)
+        val translator: InputTranslator = LismaTranslator(project.lismaText, errors)
         val model = translator.translate()
 
         val processedModel = if (model.isPDE) model else FDMNewConverter(model).convert()
@@ -32,7 +32,7 @@ class LismaPdeService(private val projectService: ProjectService, private val sy
 
     fun getLismaTokens(): List<Token>{
         val project = projectService.activeProject ?: return emptyList<Token>()
-        val inputStream = CharStreams.fromString(project.projectText)
+        val inputStream = CharStreams.fromString(project.lismaText)
         val lexer = LismaLexer(inputStream)
         return lexer.allTokens
     }

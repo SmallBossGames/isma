@@ -1,22 +1,34 @@
 package services
 
+import constants.OLD_ISMA_PROJECT_FILE
+import constants.STATE_CHART_ISMA_PROJECT_FILE
+import constants.TEXT_ISMA_PROJECT_FILE
 import javafx.stage.FileChooser
-import models.IsmaProjectModel
-import org.koin.core.component.KoinComponent
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import models.projects.BlueprintProjectModel
+import models.projects.IProjectModel
+import models.projects.LismaProjectModel
 import tornadofx.FileChooserMode
 import tornadofx.chooseFile
-import org.koin.core.component.inject as koinInject
 
 class FileService(private val projectController: ProjectService) {
-    private val fileFilers = arrayOf(
-            FileChooser.ExtensionFilter("ISMA Next Project file", "*.im2"),
-            FileChooser.ExtensionFilter("ISMA Project file", "*.im")
+    private val textProjectFileFilters = arrayOf(
+        FileChooser.ExtensionFilter("ISMA Project file", OLD_ISMA_PROJECT_FILE),
+        FileChooser.ExtensionFilter("ISMA Next Project file", TEXT_ISMA_PROJECT_FILE),
+    )
+
+    private val stateChartProjectFileFilters = arrayOf(
+        FileChooser.ExtensionFilter("ISMA State Chart Project file", STATE_CHART_ISMA_PROJECT_FILE),
     )
 
     fun saveAs() {
         val project = projectController.activeProject ?: return
         saveProjectAs(project)
     }
+
+    private val fileFilers = arrayOf(*textProjectFileFilters, *stateChartProjectFileFilters)
 
     fun save() {
         val project = projectController.activeProject ?: return
@@ -33,7 +45,27 @@ class FileService(private val projectController: ProjectService) {
 
         val file = selectedFiles.first()
 
-        projectController.addText(IsmaProjectModel(file))
+        when {
+            OLD_ISMA_PROJECT_FILE.contains(file.extension) -> {
+                TODO("Fix backward compatibility")
+            }
+            TEXT_ISMA_PROJECT_FILE.contains(file.extension) -> {
+                LismaProjectModel().apply {
+                    this.name = file.name
+                    this.lismaText = file.readText()
+                    this.file = file
+                    projectController.addText(this)
+                }
+            }
+            STATE_CHART_ISMA_PROJECT_FILE.contains(file.extension) -> {
+                val blueprint = BlueprintProjectModel().apply {
+                    this.name = file.name
+                    this.file = file
+                    this.blueprint = Json.decodeFromString(file.readText())
+                }
+                projectController.addBlueprint(blueprint)
+            }
+        }
     }
 
     fun saveAll(){
@@ -42,16 +74,47 @@ class FileService(private val projectController: ProjectService) {
         }
     }
 
-    private fun saveProject(project: IsmaProjectModel){
+    private fun saveProject(project: IProjectModel){
         if(project.file == null){
             return saveProjectAs(project)
         }
 
-        project.file!!.writeText(project.projectText)
+        val fileOutput: String
+
+        when (project) {
+            is LismaProjectModel -> {
+                fileOutput = project.lismaText
+            }
+            is BlueprintProjectModel -> {
+                fileOutput = Json.encodeToString(project.blueprint)
+            }
+            else -> {
+                throw NotImplementedError()
+            }
+        }
+
+        project.file!!.writeText(fileOutput)
     }
 
-    private fun saveProjectAs(project: IsmaProjectModel){
-        val selectedFiles = chooseFile (filters = fileFilers, mode = FileChooserMode.Save)
+    private fun saveProjectAs(project: IProjectModel){
+        val filters: Array<FileChooser.ExtensionFilter>
+        val fileOutput: String
+
+        when (project) {
+            is LismaProjectModel -> {
+                filters = textProjectFileFilters
+                fileOutput = project.lismaText
+            }
+            is BlueprintProjectModel -> {
+                filters = stateChartProjectFileFilters
+                fileOutput = Json.encodeToString(project.blueprint)
+            }
+            else -> {
+                throw NotImplementedError()
+            }
+        }
+
+        val selectedFiles = chooseFile (filters = filters, mode = FileChooserMode.Save)
 
         if(selectedFiles.isEmpty())
         {
@@ -60,10 +123,11 @@ class FileService(private val projectController: ProjectService) {
 
         val file = selectedFiles.first()
 
-        println(file.path)
+        project.apply {
+            this.name = file.name
+            this.file = file
+        }
 
-        project.name = file.name
-        project.file = file
-        file.writeText(project.projectText)
+        file.writeText(fileOutput)
     }
 }

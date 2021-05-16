@@ -4,7 +4,6 @@ import org.koin.dsl.module
 import ru.nstu.grin.integration.IntegrationController
 
 val servicesModule = module {
-    single<IBluePrintToLismaConverter> { BluePrintToLismaConverter() }
     single<ProjectService> { ProjectService() }
     single<FileService> { FileService(get()) }
     single<SyntaxErrorService> { SyntaxErrorService() }

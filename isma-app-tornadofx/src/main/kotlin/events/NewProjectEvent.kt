@@ -1,6 +1,6 @@
 package events
 
-import models.IsmaProjectModel
+import models.projects.LismaProjectModel
 import tornadofx.FXEvent
 
-class NewProjectEvent(val ismaProject: IsmaProjectModel) : FXEvent()
+class NewProjectEvent(val lismaProject: LismaProjectModel) : FXEvent()

@@ -18,7 +18,7 @@ fun BlueprintModel.convertToLisma() : String {
 
         if(blockModel == null) {
             val newBlockModel = StateBlockModel(key, statesMap[it.endStateName]!!.text)
-            newBlockModel.inputStates.add(it.endStateName)
+            newBlockModel.inputStates.add(it.startStateName)
             stateBlockModels[key] = newBlockModel
         } else {
             blockModel.inputStates.add(it.startStateName)
@@ -39,10 +39,10 @@ private class StateBlockModel(val transactionKey: String, val text: String) {
         val sb = StringBuilder()
             .appendLine("state $transactionKey {")
             .appendLine(text)
-            .append("} ")
+            .append("} from ")
 
         inputStates.forEach {
-            sb.append("$it, ")
+            sb.append("$it,")
         }
 
         sb[sb.lastIndex] = ';'

@@ -6,5 +6,5 @@ import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 
 val externalServicesModule = module {
     single { IntegrationController() }
-    single { IntegrationMethodLibraryLoader().load() }
+    single { IntegrationMethodLibraryLoader("methods/").load() }
 }

@@ -10,9 +10,8 @@ import java.net.URLClassLoader
 import java.util.*
 import java.util.jar.JarFile
 
-class IntegrationMethodLibraryLoader {
+class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val DEFAULT_DIRECTORY = "methods/"
 
     fun load() : IntegrationMethodsLibrary {
         val libraryInstance = IntegrationMethodsLibrary()
@@ -42,16 +41,15 @@ class IntegrationMethodLibraryLoader {
     }
 
     private fun loadUserMethods(): Collection<Class<out IntgMethod?>> {
-        val methodsDirPath = DEFAULT_DIRECTORY
-        val methodsDir = File(methodsDirPath)
+        val methodsDir = File(userMethodsDirectory)
         if (!methodsDir.exists()) {
             return emptyList()
         }
-        val jarFilter = FilenameFilter { dir: File?, name: String -> name.endsWith(".jar") }
+        val jarFilter = FilenameFilter { _, name -> name.endsWith(".jar") }
         val jarPaths = methodsDir.list(jarFilter) ?: return emptyList()
         val intgMethodClasses: LinkedList<Class<out IntgMethod?>> = LinkedList<Class<out IntgMethod?>>()
         for (jarPath in jarPaths) {
-            val loadedClasses = loadJar(methodsDirPath + jarPath)
+            val loadedClasses = loadJar(userMethodsDirectory + jarPath)
             intgMethodClasses.addAll(findIntgMethodClasses(loadedClasses)!!)
         }
         return intgMethodClasses

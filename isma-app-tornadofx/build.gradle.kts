@@ -40,7 +40,7 @@ dependencies {
     implementation(project(":isma-lisma"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))
-    implementation(project(":isma-next-integration-lib"))
+    implementation(project(":isma-next-integration-library"))
     implementation(project(":grin:integration"))
 
     testImplementation(kotlin("test-junit"))

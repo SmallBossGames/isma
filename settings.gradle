@@ -4,7 +4,7 @@ include('isma-app-tornadofx')
 include('state-chart')
 include('isma-next-core')
 include('isma-next-tools')
-include('isma-next-integration-lib')
+include('isma-next-integration-library')
 
 include 'grin:gui'
 include 'grin:analytic-fu'

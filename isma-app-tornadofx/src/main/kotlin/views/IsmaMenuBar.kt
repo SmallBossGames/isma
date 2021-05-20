@@ -1,7 +1,7 @@
 package views
 
 import services.FileService
-import services.SimulationController
+import services.SimulationService
 import controllers.TextEditorController
 import org.koin.core.component.KoinComponent
 import services.ProjectService
@@ -11,7 +11,7 @@ import org.koin.core.component.inject as koinInject
 class IsmaMenuBar : View(), KoinComponent {
     private val projectController: ProjectService by koinInject()
     private val fileService: FileService by koinInject()
-    private val simulationController: SimulationController by koinInject()
+    private val simulationService: SimulationService by koinInject()
     private val textEditorController: TextEditorController by koinInject()
 
     override val root = menubar {
@@ -66,7 +66,7 @@ class IsmaMenuBar : View(), KoinComponent {
                 println("Cut!")
             }
             item("Run","Shortcut+F5").action {
-                simulationController.simulate()
+                simulationService.simulate()
             }
         }
         menu("Settings") {

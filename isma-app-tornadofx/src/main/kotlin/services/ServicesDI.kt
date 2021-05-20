@@ -9,11 +9,7 @@ val servicesModule = module {
     single<SyntaxErrorService> { SyntaxErrorService() }
     single<LismaPdeService> { LismaPdeService(get(), get()) }
     single<SyntaxHighlightingService> { SyntaxHighlightingService(get()) }
-    single<SimulationParametersService> { SimulationParametersService() }
+    single<SimulationParametersService> { SimulationParametersService(get()) }
     single<SimulationResultService> { SimulationResultService(get()) }
-    single<SimulationController> { SimulationController(get(), get(), get()) }
-}
-
-val externalServicesModule = module {
-    single { IntegrationController() }
+    single<SimulationService> { SimulationService(get(), get(), get(), get()) }
 }

@@ -1,6 +1,6 @@
 package views
 
-import services.SimulationController
+import services.SimulationService
 import services.SimulationResultService
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
@@ -10,35 +10,35 @@ import tornadofx.*
 
 class SimulationProcessBar : View(), KoinComponent {
     private val simulationResult: SimulationResultService by koinImport()
-    private val simulationController: SimulationController by koinImport()
+    private val simulationService: SimulationService by koinImport()
 
     override val root = toolbar {
         button {
             graphic = ImageView("icons/toolbar/play.png")
             tooltip = Tooltip("Play")
-            action { simulationController.simulate() }
-            managedWhen(!simulationController.isSimulationInProgressProperty())
-            hiddenWhen(simulationController.isSimulationInProgressProperty())
+            action { simulationService.simulate() }
+            managedWhen(!simulationService.isSimulationInProgressProperty())
+            hiddenWhen(simulationService.isSimulationInProgressProperty())
         }
         button {
             graphic = ImageView("icons/toolbar/abort.png")
             tooltip = Tooltip("Play")
-            action { simulationController.simulate() }
-            managedWhen(simulationController.isSimulationInProgressProperty())
-            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+            action { simulationService.simulate() }
+            managedWhen(simulationService.isSimulationInProgressProperty())
+            hiddenWhen(!simulationService.isSimulationInProgressProperty())
         }
         separator {
-            managedWhen(simulationController.isSimulationInProgressProperty())
-            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+            managedWhen(simulationService.isSimulationInProgressProperty())
+            hiddenWhen(!simulationService.isSimulationInProgressProperty())
         }
         label("Progress: ") {
-            managedWhen(simulationController.isSimulationInProgressProperty())
-            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+            managedWhen(simulationService.isSimulationInProgressProperty())
+            hiddenWhen(!simulationService.isSimulationInProgressProperty())
         }
         progressbar {
-            progressProperty().bind(simulationController.progressProperty())
-            managedWhen(simulationController.isSimulationInProgressProperty())
-            hiddenWhen(!simulationController.isSimulationInProgressProperty())
+            progressProperty().bind(simulationService.progressProperty())
+            managedWhen(simulationService.isSimulationInProgressProperty())
+            hiddenWhen(!simulationService.isSimulationInProgressProperty())
         }
         separator {
             managedWhen(simulationResult.isResultAvailableProperty())

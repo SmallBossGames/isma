@@ -5,26 +5,22 @@ import kotlinx.coroutines.*
 import enumerables.SaveTarget
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject as koinInject
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
-import ru.nstu.isma.intg.lib.IntgMethodLibrary
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
-import services.LismaPdeService
-import services.SimulationParametersService
-import services.SimulationResultService
-import tornadofx.Controller
+import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 import tornadofx.getValue
 import tornadofx.setValue
 import kotlin.math.max
 import kotlin.math.min
 
-class SimulationController(
+class SimulationService(
     private val lismaPdeService: LismaPdeService,
     private val simulationParametersService: SimulationParametersService,
-    private val simulationResult: SimulationResultService) {
+    private val simulationResult: SimulationResultService,
+    private val library: IntegrationMethodsLibrary
+) {
 
     private val progressProperty = SimpleDoubleProperty();
     fun progressProperty() = progressProperty
@@ -63,17 +59,16 @@ class SimulationController(
     }
 
     private fun createCauchyInitials(): CauchyInitials {
-        val initials = CauchyInitials()
-        initials.start = simulationParametersService.cauchyInitialsModel.startTime
-        initials.end = simulationParametersService.cauchyInitialsModel.endTime
-        initials.stepSize = simulationParametersService.cauchyInitialsModel.step
-
-        return initials
+        return CauchyInitials().apply {
+            start = simulationParametersService.cauchyInitialsModel.startTime
+            end = simulationParametersService.cauchyInitialsModel.endTime
+            stepSize = simulationParametersService.cauchyInitialsModel.step
+        }
     }
 
     private fun createIntegrationMethod(): IntgMethod {
         val selectedMethod = simulationParametersService.integrationMethod.selectedMethod
-        return IntgMethodLibrary.getIntgMethod(selectedMethod)
+        return library.getIntgMethod(selectedMethod)!!
     }
 
     private fun createEventDetectionParameters(): EventDetectionParameters? {

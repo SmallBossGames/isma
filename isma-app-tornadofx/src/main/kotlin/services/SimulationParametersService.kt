@@ -2,11 +2,11 @@ package services
 
 import enumerables.SaveTarget
 import models.*
-import ru.nstu.isma.intg.lib.IntgMethodLibrary
+import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 import tornadofx.asObservable
 
-class SimulationParametersService {
-    val integrationMethods = (IntgMethodLibrary.getIntgMethodNames() ?: emptyList<String>())
+class SimulationParametersService(library: IntegrationMethodsLibrary) {
+    val integrationMethods = (library.getIntgMethodNames() ?: emptyList())
             .asObservable()
 
     val simplifyMethods = listOf("Radial-Distance", "Douglas-Peucker")

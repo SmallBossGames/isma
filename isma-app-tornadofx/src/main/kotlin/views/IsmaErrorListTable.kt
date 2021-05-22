@@ -1,14 +1,15 @@
 package views
 
-import services.SyntaxErrorService
 import models.SyntaxErrorModel
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject as koinInject
-import tornadofx.*
+import services.SyntaxErrorService
+import tornadofx.SmartResize
+import tornadofx.View
+import tornadofx.readonlyColumn
+import tornadofx.tableview
 
 
-class IsmaErrorListTable : View(), KoinComponent {
-    private val syntaxErrorService: SyntaxErrorService by koinInject()
+class IsmaErrorListTable : View() {
+    private val syntaxErrorService: SyntaxErrorService by di()
 
     override val root = tableview(syntaxErrorService.errors) {
         maxHeight = 200.0

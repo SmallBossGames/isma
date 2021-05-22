@@ -1,10 +1,13 @@
 import tornadofx.*
-import views.*
+import views.IsmaErrorListTable
+import views.IsmaMenuBar
+import views.IsmaToolBar
+import views.SimulationProcessBar
 import views.editors.tabpane.IsmaEditorTabPane
 import views.simulation.settings.SettingsPanelView
 
 class MainView : View() {
-    private val ismaMenuBar: IsmaMenuBar by inject()
+    private val ismaMenuBar: IsmaMenuBar by di()
     private val ismaToolBar: IsmaToolBar by inject()
     private val ismaErrorListTable: IsmaErrorListTable by inject()
     private val ismaEditorTabPane: IsmaEditorTabPane by inject()

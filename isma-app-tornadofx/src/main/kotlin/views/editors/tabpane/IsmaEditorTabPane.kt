@@ -5,18 +5,16 @@ import events.NewProjectEvent
 import javafx.scene.control.Tab
 import models.projects.BlueprintProjectDataProvider
 import models.projects.IProjectModel
-import org.koin.core.component.KoinComponent
 import services.ProjectService
 import tornadofx.View
 import tornadofx.tab
 import tornadofx.tabpane
 import views.editors.blueprint.IsmaBlueprintEditor
 import views.editors.text.IsmaTextEditor
-import org.koin.core.component.inject as koinInject
 
 
-class IsmaEditorTabPane: View(), KoinComponent {
-    private val projectController: ProjectService by koinInject()
+class IsmaEditorTabPane: View() {
+    private val projectController: ProjectService by di()
 
     override val root = tabpane {
         subscribe<NewBlueprintProjectEvent> { event ->

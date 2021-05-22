@@ -1,12 +1,10 @@
 package views.simulation.settings
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject as koinInject
 import services.SimulationParametersService
 import tornadofx.*
 
-class EventDetectionView : View("Event detection"), KoinComponent {
-    private val parametersService: SimulationParametersService by koinInject()
+class EventDetectionView : View("Event detection") {
+    private val parametersService: SimulationParametersService by di()
 
     override val root =
         scrollpane {

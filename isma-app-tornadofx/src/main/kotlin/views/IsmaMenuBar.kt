@@ -2,17 +2,16 @@ package views
 
 import services.FileService
 import services.SimulationService
-import controllers.TextEditorController
-import org.koin.core.component.KoinComponent
+import services.TextEditorService
 import services.ProjectService
 import tornadofx.*
-import org.koin.core.component.inject as koinInject
 
-class IsmaMenuBar : View(), KoinComponent {
-    private val projectController: ProjectService by koinInject()
-    private val fileService: FileService by koinInject()
-    private val simulationService: SimulationService by koinInject()
-    private val textEditorController: TextEditorController by koinInject()
+class IsmaMenuBar(
+    private val projectController: ProjectService,
+    private val fileService: FileService,
+    private val simulationService: SimulationService,
+    private val textEditorService: TextEditorService
+) : View() {
 
     override val root = menubar {
         menu("File") {
@@ -52,13 +51,13 @@ class IsmaMenuBar : View(), KoinComponent {
         }
         menu("Edit") {
             item("Cut","Shortcut+X").action {
-                textEditorController.cut()
+                textEditorService.cut()
             }
             item("Copy","Shortcut+C").action {
-                textEditorController.copy()
+                textEditorService.copy()
             }
             item("Paste","Shortcut+V").action {
-                textEditorController.paste()
+                textEditorService.paste()
             }
         }
         menu("Simulation") {

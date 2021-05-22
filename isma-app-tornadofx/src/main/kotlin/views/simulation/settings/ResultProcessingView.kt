@@ -1,13 +1,11 @@
 package views.simulation.settings
 
-import services.SimulationParametersService
-import org.koin.core.component.inject as koinInject
 import enumerables.SaveTarget
-import org.koin.core.component.KoinComponent
+import services.SimulationParametersService
 import tornadofx.*
 
-class ResultProcessingView : View("Result processing"), KoinComponent {
-    private val parametersService: SimulationParametersService by koinInject()
+class ResultProcessingView : View("Result processing") {
+    private val parametersService: SimulationParametersService by di()
 
     override val root =
         scrollpane {

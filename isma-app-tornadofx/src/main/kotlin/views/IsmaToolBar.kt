@@ -1,21 +1,18 @@
 package views
 
-import controllers.*
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
-import org.koin.core.component.KoinComponent
 import services.FileService
 import services.LismaPdeService
 import services.ProjectService
+import services.TextEditorService
 import tornadofx.*
-import org.koin.core.component.inject as koinInject
 
-class IsmaToolBar : View(), KoinComponent {
-    private val projectController: ProjectService by koinInject()
-    private val fileService: FileService by koinInject()
-    private val lismaPdeService: LismaPdeService by koinInject()
-
-    private val textEditorController: TextEditorController by inject()
+class IsmaToolBar : View() {
+    private val projectController: ProjectService by di()
+    private val fileService: FileService by di()
+    private val lismaPdeService: LismaPdeService by di()
+    private val textEditorService: TextEditorService by di()
 
     override val root = toolbar {
         button{
@@ -47,17 +44,17 @@ class IsmaToolBar : View(), KoinComponent {
         button{
             graphic = ImageView("icons/toolbar/cut.png")
             tooltip = Tooltip("Cut")
-            action { textEditorController.cut() }
+            action { textEditorService.cut() }
         }
         button{
             graphic = ImageView("icons/toolbar/copy.png")
             tooltip = Tooltip("Copy")
-            action { textEditorController.copy() }
+            action { textEditorService.copy() }
         }
         button{
             graphic = ImageView("icons/toolbar/paste.png")
             tooltip = Tooltip("Paste")
-            action { textEditorController.paste() }
+            action { textEditorService.paste() }
         }
         separator()
         button{

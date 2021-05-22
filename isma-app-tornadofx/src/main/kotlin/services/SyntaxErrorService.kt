@@ -1,8 +1,6 @@
 package services
 
 import models.SyntaxErrorModel
-import org.koin.core.component.KoinComponent
-import tornadofx.Controller
 import tornadofx.asObservable
 
 class SyntaxErrorService {

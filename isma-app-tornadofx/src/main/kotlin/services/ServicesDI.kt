@@ -1,7 +1,7 @@
 package services
 
 import org.koin.dsl.module
-import ru.nstu.grin.integration.IntegrationController
+import views.IsmaMenuBar
 
 val servicesModule = module {
     single<ProjectService> { ProjectService() }
@@ -12,4 +12,5 @@ val servicesModule = module {
     single<SimulationParametersService> { SimulationParametersService(get()) }
     single<SimulationResultService> { SimulationResultService(get()) }
     single<SimulationService> { SimulationService(get(), get(), get(), get()) }
+    single<TextEditorService> { TextEditorService() }
 }

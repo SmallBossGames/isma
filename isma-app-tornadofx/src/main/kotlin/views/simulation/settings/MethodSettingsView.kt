@@ -1,12 +1,10 @@
 package views.simulation.settings
 
-import org.koin.core.component.KoinComponent
 import services.SimulationParametersService
 import tornadofx.*
-import org.koin.core.component.inject as koinInject
 
-class MethodSettingsView: View("Method"), KoinComponent {
-    private val parametersService: SimulationParametersService by koinInject()
+class MethodSettingsView: View("Method") {
+    private val parametersService: SimulationParametersService by di()
 
     override val root =
         scrollpane {

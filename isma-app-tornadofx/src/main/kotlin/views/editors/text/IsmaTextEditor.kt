@@ -1,6 +1,5 @@
 package views.editors.text
 
-import services.SyntaxHighlightingService
 import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent
 import events.PasteTextInCurrentEditorEvent
@@ -10,15 +9,14 @@ import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject as koinInject
+import services.SyntaxHighlightingService
 import tornadofx.*
 
-class IsmaTextEditor: Fragment(), KoinComponent {
-    private val highlightingService: SyntaxHighlightingService by koinInject()
+class IsmaTextEditor: Fragment() {
+    private val highlightingService: SyntaxHighlightingService by di()
 
     fun textProperty(): ObservableValue<String> = root.textProperty()
-    fun replaceText(text: String) = root.replaceText(text);
+    fun replaceText(text: String) = root.replaceText(text)
 
     override val root = CodeArea().apply {
         paragraphGraphicFactory = LineNumberFactory.get(this)

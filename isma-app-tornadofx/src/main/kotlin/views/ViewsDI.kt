@@ -11,7 +11,7 @@ import views.toolbars.SimulationProcessBar
 
 val viewsModule = module {
     single { IsmaMenuBar(get(), get(), get(), get()) }
-    single { IsmaToolBar(get(), get(), get(), get()) }
+    single { IsmaToolBar(get(), get(), get(), get(), get()) }
     single { SimulationProcessBar(get(), get()) }
     single { IsmaErrorListTable(get()) }
     single { SettingsPanelView() }

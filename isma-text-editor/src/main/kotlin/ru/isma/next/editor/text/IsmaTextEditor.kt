@@ -1,15 +1,11 @@
-package views.editors.text
+package ru.isma.next.editor.text
 
-import events.CopyTextInCurrentEditorEvent
-import events.CutTextInCurrentEditorEvent
-import events.PasteTextInCurrentEditorEvent
 import javafx.beans.value.ObservableValue
 import javafx.scene.paint.Color
 import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
-import services.lisma.LismaHighlightingService
 import tornadofx.*
 
 class IsmaTextEditor: Fragment() {

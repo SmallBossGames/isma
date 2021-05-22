@@ -14,10 +14,10 @@ val servicesModule = module {
     single<ProjectService> { ProjectService() }
     single<ProjectFileService> { ProjectFileService(get()) }
     single<ModelErrorService> { ModelErrorService() }
-    single<LismaPdeService> { LismaPdeService(get()) }
+    single<LismaPdeService> { LismaPdeService() }
     single<LismaHighlightingService> { LismaHighlightingService(get()) }
     single<SimulationParametersService> { SimulationParametersService(get()) }
     single<SimulationResultService> { SimulationResultService(get()) }
-    single<SimulationService> { SimulationService(get(), get(), get(), get(), get()) }
+    single<SimulationService> { SimulationService(get(), get(), get(), get(), get(), get()) }
     single<TextEditorService> { TextEditorService() }
 }

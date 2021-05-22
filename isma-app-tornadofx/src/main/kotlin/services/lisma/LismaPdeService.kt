@@ -1,6 +1,9 @@
 package services.lisma
 
 import error.IsmaErrorList
+import models.FailedTranslation
+import models.LismaTranslationResult
+import models.SuccessTranslation
 import models.SyntaxErrorModel
 import models.projects.IProjectModel
 import org.antlr.v4.runtime.CharStreams
@@ -13,8 +16,8 @@ import ru.nstu.isma.next.core.sim.fdm.FDMNewConverter
 import services.ModelErrorService
 import services.project.ProjectService
 
-class LismaPdeService(private val modelService: ModelErrorService) {
-    fun translateLisma(source: String): HSM? {
+class LismaPdeService() {
+    fun translateLisma(source: String): LismaTranslationResult {
         val errors = IsmaErrorList()
         val translator: InputTranslator = LismaTranslator(source, errors)
         val model = translator.translate()
@@ -25,9 +28,11 @@ class LismaPdeService(private val modelService: ModelErrorService) {
             SyntaxErrorModel(it.row ?: 0, it.col ?: 0, it.msg)
         }
 
-        modelService.setErrorList(errorModels)
+        if (processedModel != null && errorModels.isEmpty()) {
+            return SuccessTranslation(processedModel)
+        }
 
-        return processedModel
+        return FailedTranslation(errorModels)
     }
 
     fun getLismaTokens(source: String): List<Token> {

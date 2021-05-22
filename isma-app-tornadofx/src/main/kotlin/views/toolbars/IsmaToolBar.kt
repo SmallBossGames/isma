@@ -2,6 +2,8 @@ package views.toolbars
 
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
+import models.FailedTranslation
+import services.ModelErrorService
 import services.project.ProjectFileService
 import services.lisma.LismaPdeService
 import services.project.ProjectService
@@ -12,7 +14,8 @@ class IsmaToolBar(
     private val projectController: ProjectService,
     private val projectFileService: ProjectFileService,
     private val lismaPdeService: LismaPdeService,
-    private val textEditorService: TextEditorService
+    private val textEditorService: TextEditorService,
+    private val modelService: ModelErrorService,
 ) : View() {
     override val root = toolbar {
         button{
@@ -60,7 +63,16 @@ class IsmaToolBar(
         button{
             graphic = ImageView("icons/toolbar/checked.png")
             tooltip = Tooltip("Verify")
-            action { lismaPdeService.translateLisma(projectController.activeProject?.lismaText?:return@action ) }
+            action {
+                val text = projectController.activeProject?.lismaText?:return@action
+                val translationResult = lismaPdeService.translateLisma(text)
+
+                modelService.setErrorList(emptyList())
+
+                if(translationResult is FailedTranslation) {
+                    modelService.setErrorList(translationResult.errors)
+                }
+            }
         }
         separator()
         button{

@@ -5,11 +5,14 @@ import kotlinx.coroutines.*
 import enumerables.SaveTarget
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
+import models.FailedTranslation
+import models.SuccessTranslation
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
+import services.ModelErrorService
 import services.lisma.LismaPdeService
 import services.project.ProjectService
 import tornadofx.getValue
@@ -22,7 +25,8 @@ class SimulationService(
     private val lismaPdeService: LismaPdeService,
     private val simulationParametersService: SimulationParametersService,
     private val simulationResult: SimulationResultService,
-    private val library: IntegrationMethodsLibrary
+    private val library: IntegrationMethodsLibrary,
+    private val modelService: ModelErrorService,
 ) {
 
     private val progressProperty = SimpleDoubleProperty();
@@ -36,29 +40,42 @@ class SimulationService(
     private var currentSimulation: Job? = null
 
     fun simulate(){
-        val hsm = lismaPdeService.translateLisma(projectService.activeProject?.lismaText ?: return) ?: return
-        val initials = createCauchyInitials()
-        val integrationMethod = createIntegrationMethod()
+        val translationResult = lismaPdeService.translateLisma(projectService.activeProject?.lismaText ?: return)
 
-        initAccuracyController(integrationMethod)
-        initStabilityController(integrationMethod)
+        modelService.setErrorList(emptyList())
 
-        hsm.initTimeEquation(initials.start)
+        when (translationResult) {
+            is FailedTranslation -> {
+                modelService.setErrorList(translationResult.errors)
+                return
+            }
+            is SuccessTranslation -> {
+                val initials = createCauchyInitials()
+                val integrationMethod = createIntegrationMethod()
 
-        val simulationController = SimulationCoreController(
-                hsm,
-                initials,
-                integrationMethod,
-                createParallelParameters(),
-                createFileResultParameters(),
-                createEventDetectionParameters()
-        )
+                initAccuracyController(integrationMethod)
+                initStabilityController(integrationMethod)
 
-        initProgressTracking(simulationController, initials)
+                translationResult.hsm.initTimeEquation(initials.start)
 
-        currentSimulation?.cancel()
+                val simulationController = SimulationCoreController(
+                    translationResult.hsm,
+                    initials,
+                    integrationMethod,
+                    createParallelParameters(),
+                    createFileResultParameters(),
+                    createEventDetectionParameters()
+                )
 
-        currentSimulation = startSimualtionJob(simulationController)
+                initProgressTracking(simulationController, initials)
+
+                currentSimulation?.cancel()
+
+                currentSimulation = startSimualtionJob(simulationController)
+            }
+        }
+
+
     }
 
     private fun createCauchyInitials(): CauchyInitials {

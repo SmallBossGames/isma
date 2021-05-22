@@ -14,7 +14,6 @@ val viewsModule = module {
     single { IsmaToolBar(get(), get(), get(), get()) }
     single { SimulationProcessBar(get(), get()) }
     single { IsmaErrorListTable(get()) }
-    single { IsmaEditorTabPane(get()) }
     single { SettingsPanelView() }
     factory { IsmaTextEditor() }
 }

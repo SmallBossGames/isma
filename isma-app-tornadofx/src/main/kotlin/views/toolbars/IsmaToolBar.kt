@@ -12,7 +12,7 @@ class IsmaToolBar(
     private val projectController: ProjectService,
     private val projectFileService: ProjectFileService,
     private val lismaPdeService: LismaPdeService,
-    private val textEditorService: TextEditorService,
+    private val textEditorService: TextEditorService
 ) : View() {
     override val root = toolbar {
         button{
@@ -60,7 +60,7 @@ class IsmaToolBar(
         button{
             graphic = ImageView("icons/toolbar/checked.png")
             tooltip = Tooltip("Verify")
-            action { lismaPdeService.translateLisma() }
+            action { lismaPdeService.translateLisma(projectController.activeProject?.lismaText?:return@action ) }
         }
         separator()
         button{

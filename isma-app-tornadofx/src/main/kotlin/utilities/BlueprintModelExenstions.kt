@@ -2,10 +2,6 @@ package utilities
 
 import views.editors.blueprint.models.BlueprintModel
 
-fun BlueprintModel.toJson() {
-
-}
-
 fun BlueprintModel.convertToLisma() : String {
     val resultStringBuilder = StringBuilder().appendLine(this.main.text)
 

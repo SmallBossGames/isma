@@ -13,9 +13,9 @@ import views.editors.blueprint.IsmaBlueprintEditor
 import views.editors.text.IsmaTextEditor
 
 
-class IsmaEditorTabPane(
-    private val projectController: ProjectService
-): View() {
+class IsmaEditorTabPane: View() {
+    private val projectController: ProjectService by di()
+
     override val root = tabpane {
         subscribe<NewBlueprintProjectEvent> { event ->
             val project = event.blueprintProject

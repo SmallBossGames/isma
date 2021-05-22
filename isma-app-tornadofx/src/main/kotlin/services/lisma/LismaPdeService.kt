@@ -2,6 +2,7 @@ package services.lisma
 
 import error.IsmaErrorList
 import models.SyntaxErrorModel
+import models.projects.IProjectModel
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Token
 import ru.nstu.isma.`in`.InputTranslator
@@ -12,13 +13,10 @@ import ru.nstu.isma.next.core.sim.fdm.FDMNewConverter
 import services.ModelErrorService
 import services.project.ProjectService
 
-class LismaPdeService(private val projectService: ProjectService, private val modelService: ModelErrorService) {
-
-    fun translateLisma(): HSM? {
-        val project = projectService.activeProject ?: return null
-
+class LismaPdeService(private val modelService: ModelErrorService) {
+    fun translateLisma(source: String): HSM? {
         val errors = IsmaErrorList()
-        val translator: InputTranslator = LismaTranslator(project.lismaText, errors)
+        val translator: InputTranslator = LismaTranslator(source, errors)
         val model = translator.translate()
 
         val processedModel = if (model.isPDE) model else FDMNewConverter(model).convert()
@@ -30,13 +28,6 @@ class LismaPdeService(private val projectService: ProjectService, private val mo
         modelService.setErrorList(errorModels)
 
         return processedModel
-    }
-
-    fun getLismaTokens(): List<Token>{
-        val project = projectService.activeProject ?: return emptyList<Token>()
-        val inputStream = CharStreams.fromString(project.lismaText)
-        val lexer = LismaLexer(inputStream)
-        return lexer.allTokens
     }
 
     fun getLismaTokens(source: String): List<Token> {

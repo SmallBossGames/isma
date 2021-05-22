@@ -11,12 +11,14 @@ import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 import services.lisma.LismaPdeService
+import services.project.ProjectService
 import tornadofx.getValue
 import tornadofx.setValue
 import kotlin.math.max
 import kotlin.math.min
 
 class SimulationService(
+    private val projectService: ProjectService,
     private val lismaPdeService: LismaPdeService,
     private val simulationParametersService: SimulationParametersService,
     private val simulationResult: SimulationResultService,
@@ -34,7 +36,7 @@ class SimulationService(
     private var currentSimulation: Job? = null
 
     fun simulate(){
-        val hsm = lismaPdeService.translateLisma() ?: return
+        val hsm = lismaPdeService.translateLisma(projectService.activeProject?.lismaText ?: return) ?: return
         val initials = createCauchyInitials()
         val integrationMethod = createIntegrationMethod()
 

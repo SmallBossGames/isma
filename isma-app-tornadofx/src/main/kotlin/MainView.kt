@@ -11,7 +11,7 @@ class MainView : View() {
     private val ismaToolBar: IsmaToolBar by di()
     private val simulationProcess: SimulationProcessBar by di()
     private val ismaErrorListTable: IsmaErrorListTable by di()
-    private val ismaEditorTabPane: IsmaEditorTabPane by di()
+    private val ismaEditorTabPane: IsmaEditorTabPane by inject()
     private val settingsPanel: SettingsPanelView by di()
 
     init {

@@ -1,10 +1,16 @@
 rootProject.name = 'isma'
 //JAVA 11+ projects
 include('isma-app-tornadofx')
+
 include('state-chart')
 include('isma-next-core')
 include('isma-next-tools')
 include('isma-next-integration-library')
+
+//TODO: extract editors to separate projects
+//include('isma-blueprint-editor')
+//include('isma-text-editor')
+
 
 include 'grin:gui'
 include 'grin:analytic-fu'
@@ -48,4 +54,6 @@ include('isma-intg-parallel-ignite')
 //include('isma-core')
 //include('isma-tools')
 include 'isma-next-hsm'
+include 'isma-blueprint-editor'
+include 'isma-text-editor'
 

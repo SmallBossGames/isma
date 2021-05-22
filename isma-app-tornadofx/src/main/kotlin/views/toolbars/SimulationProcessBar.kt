@@ -1,15 +1,15 @@
-package views
+package views.toolbars
 
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
-import services.SimulationResultService
-import services.SimulationService
+import services.simualtion.SimulationResultService
+import services.simualtion.SimulationService
 import tornadofx.*
 
-class SimulationProcessBar : View() {
-    private val simulationResult: SimulationResultService by di()
-    private val simulationService: SimulationService by di()
-
+class SimulationProcessBar(
+    private val simulationResult: SimulationResultService,
+    private val simulationService: SimulationService,
+) : View() {
     override val root = toolbar {
         button {
             graphic = ImageView("icons/toolbar/play.png")

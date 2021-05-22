@@ -1,4 +1,4 @@
-package services
+package services.project
 
 import constants.OLD_ISMA_PROJECT_FILE
 import constants.STATE_CHART_ISMA_PROJECT_FILE
@@ -13,7 +13,7 @@ import models.projects.LismaProjectModel
 import tornadofx.FileChooserMode
 import tornadofx.chooseFile
 
-class FileService(private val projectController: ProjectService) {
+class ProjectFileService(private val projectController: ProjectService) {
     private val textProjectFileFilters = arrayOf(
         FileChooser.ExtensionFilter("ISMA Project file", OLD_ISMA_PROJECT_FILE),
         FileChooser.ExtensionFilter("ISMA Next Project file", TEXT_ISMA_PROJECT_FILE),

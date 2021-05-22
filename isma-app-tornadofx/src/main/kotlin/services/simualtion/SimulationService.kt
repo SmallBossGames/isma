@@ -1,4 +1,4 @@
-package services
+package services.simualtion
 
 import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
 import kotlinx.coroutines.*
@@ -10,6 +10,7 @@ import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
+import services.lisma.LismaPdeService
 import tornadofx.getValue
 import tornadofx.setValue
 import kotlin.math.max

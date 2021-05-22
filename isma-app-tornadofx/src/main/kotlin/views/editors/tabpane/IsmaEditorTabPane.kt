@@ -5,17 +5,17 @@ import events.NewProjectEvent
 import javafx.scene.control.Tab
 import models.projects.BlueprintProjectDataProvider
 import models.projects.IProjectModel
-import services.ProjectService
+import services.project.ProjectService
 import tornadofx.View
 import tornadofx.tab
-import tornadofx.tabpane
+import tornadofx.*
 import views.editors.blueprint.IsmaBlueprintEditor
 import views.editors.text.IsmaTextEditor
 
 
-class IsmaEditorTabPane: View() {
-    private val projectController: ProjectService by di()
-
+class IsmaEditorTabPane(
+    private val projectController: ProjectService
+): View() {
     override val root = tabpane {
         subscribe<NewBlueprintProjectEvent> { event ->
             val project = event.blueprintProject

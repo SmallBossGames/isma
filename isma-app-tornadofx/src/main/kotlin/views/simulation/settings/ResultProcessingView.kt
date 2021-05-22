@@ -1,7 +1,7 @@
 package views.simulation.settings
 
 import enumerables.SaveTarget
-import services.SimulationParametersService
+import services.simualtion.SimulationParametersService
 import tornadofx.*
 
 class ResultProcessingView : View("Result processing") {

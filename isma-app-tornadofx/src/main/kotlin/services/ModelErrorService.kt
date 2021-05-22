@@ -3,7 +3,7 @@ package services
 import models.SyntaxErrorModel
 import tornadofx.asObservable
 
-class SyntaxErrorService {
+class ModelErrorService {
     val errors = arrayListOf<SyntaxErrorModel>().asObservable()
 
     fun setErrorList(errors: Iterable<SyntaxErrorModel>){

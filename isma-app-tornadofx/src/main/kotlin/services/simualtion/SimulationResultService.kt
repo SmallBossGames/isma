@@ -1,4 +1,4 @@
-package services
+package services.simualtion
 
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
@@ -154,7 +154,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
 
                     // Алгебраические переменные
                     for (yForAe in p.rhs[DaeSystem.RHS_AE_PART_IDX]) {
-                        points.append(yForAe).append(Companion.COMMA_AND_SPACE)
+                        points.append(yForAe).append(COMMA_AND_SPACE)
                     }
 
                     // Правая часть

@@ -9,11 +9,11 @@ import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
-import services.SyntaxHighlightingService
+import services.lisma.LismaHighlightingService
 import tornadofx.*
 
 class IsmaTextEditor: Fragment() {
-    private val highlightingService: SyntaxHighlightingService by di()
+    private val highlightingService: LismaHighlightingService by di()
 
     fun textProperty(): ObservableValue<String> = root.textProperty()
     fun replaceText(text: String) = root.replaceText(text)

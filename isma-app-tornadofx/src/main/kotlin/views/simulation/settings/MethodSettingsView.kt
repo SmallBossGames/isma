@@ -1,6 +1,6 @@
 package views.simulation.settings
 
-import services.SimulationParametersService
+import services.simualtion.SimulationParametersService
 import tornadofx.*
 
 class MethodSettingsView: View("Method") {

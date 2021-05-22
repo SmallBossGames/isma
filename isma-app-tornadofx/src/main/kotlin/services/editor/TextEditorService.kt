@@ -1,4 +1,4 @@
-package services
+package services.editor
 
 import events.CopyTextInCurrentEditorEvent
 import events.CutTextInCurrentEditorEvent

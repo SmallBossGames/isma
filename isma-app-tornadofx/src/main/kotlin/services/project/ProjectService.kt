@@ -1,4 +1,4 @@
-package services
+package services.project
 
 import events.NewBlueprintProjectEvent
 import events.NewProjectEvent

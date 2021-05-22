@@ -1,10 +1,10 @@
-package services
+package services.lisma
 
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
 import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
 
-class SyntaxHighlightingService(private val lismaPdeService: LismaPdeService) {
+class LismaHighlightingService(private val lismaPdeService: LismaPdeService) {
 
     fun createHighlightingStyleSpans(source: String): StyleSpans<Collection<String>>? {
         val spansBuilder = StyleSpansBuilder<Collection<String>>()

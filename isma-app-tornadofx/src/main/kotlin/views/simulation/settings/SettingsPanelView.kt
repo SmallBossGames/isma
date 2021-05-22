@@ -2,7 +2,7 @@ package views.simulation.settings
 
 import tornadofx.*
 
-class SettingsPanelView : View("My View") {
+class SettingsPanelView : View() {
     private val cauchyInitialsView: CauchyInitialsView by inject()
     private val methodSettingsView: MethodSettingsView by inject()
     private val eventDetectionView: EventDetectionView by inject()

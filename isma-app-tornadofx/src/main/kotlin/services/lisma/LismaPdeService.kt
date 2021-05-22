@@ -1,4 +1,4 @@
-package services
+package services.lisma
 
 import error.IsmaErrorList
 import models.SyntaxErrorModel
@@ -9,8 +9,10 @@ import ru.nstu.isma.`in`.lisma.LismaTranslator
 import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.next.core.sim.fdm.FDMNewConverter
+import services.ModelErrorService
+import services.project.ProjectService
 
-class LismaPdeService(private val projectService: ProjectService, private val syntaxService: SyntaxErrorService) {
+class LismaPdeService(private val projectService: ProjectService, private val modelService: ModelErrorService) {
 
     fun translateLisma(): HSM? {
         val project = projectService.activeProject ?: return null
@@ -25,7 +27,7 @@ class LismaPdeService(private val projectService: ProjectService, private val sy
             SyntaxErrorModel(it.row ?: 0, it.col ?: 0, it.msg)
         }
 
-        syntaxService.setErrorList(errorModels)
+        modelService.setErrorList(errorModels)
 
         return processedModel
     }

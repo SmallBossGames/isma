@@ -1,3 +1,0 @@
-package models
-
-class SemanticErrorModel

@@ -1,6 +1,6 @@
-package utilities
+package ru.isma.next.editor.blueprint.utilities
 
-import views.editors.blueprint.models.BlueprintModel
+import ru.isma.next.editor.blueprint.models.BlueprintModel
 
 fun BlueprintModel.convertToLisma() : String {
     val resultStringBuilder = StringBuilder().appendLine(this.main.text)

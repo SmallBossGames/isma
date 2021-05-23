@@ -1,7 +1,7 @@
 package models.projects
 
-import views.editors.blueprint.IsmaBlueprintEditor
-import views.editors.blueprint.models.BlueprintModel
+import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
+import ru.isma.next.editor.blueprint.models.BlueprintModel
 
 class BlueprintProjectDataProvider(private val blueprintEditor: IsmaBlueprintEditor) {
     var blueprint: BlueprintModel

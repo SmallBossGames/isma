@@ -6,6 +6,10 @@ import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
+import ru.isma.next.editor.text.events.CopyTextInCurrentEditorEvent
+import ru.isma.next.editor.text.events.CutTextInCurrentEditorEvent
+import ru.isma.next.editor.text.events.PasteTextInCurrentEditorEvent
+import ru.isma.next.editor.text.services.LismaHighlightingService
 import tornadofx.*
 
 class IsmaTextEditor: Fragment() {

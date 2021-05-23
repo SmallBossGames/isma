@@ -1,9 +1,8 @@
 package services
 
 import org.koin.dsl.module
+import ru.isma.next.common.services.lisma.services.LismaPdeService
 import services.editor.TextEditorService
-import services.lisma.LismaPdeService
-import services.lisma.LismaHighlightingService
 import services.project.ProjectFileService
 import services.project.ProjectService
 import services.simualtion.SimulationParametersService
@@ -15,7 +14,6 @@ val servicesModule = module {
     single<ProjectFileService> { ProjectFileService(get()) }
     single<ModelErrorService> { ModelErrorService() }
     single<LismaPdeService> { LismaPdeService() }
-    single<LismaHighlightingService> { LismaHighlightingService(get()) }
     single<SimulationParametersService> { SimulationParametersService(get()) }
     single<SimulationResultService> { SimulationResultService(get()) }
     single<SimulationService> { SimulationService(get(), get(), get(), get(), get(), get()) }

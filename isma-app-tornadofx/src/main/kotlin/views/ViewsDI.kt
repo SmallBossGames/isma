@@ -1,8 +1,7 @@
 package views
 
 import org.koin.dsl.module
-import views.editors.tabpane.IsmaEditorTabPane
-import views.editors.text.IsmaTextEditor
+import ru.isma.next.editor.text.IsmaTextEditor
 import views.simulation.settings.SettingsPanelView
 import views.toolbars.IsmaErrorListTable
 import views.toolbars.IsmaMenuBar

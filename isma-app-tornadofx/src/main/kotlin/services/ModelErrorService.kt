@@ -1,6 +1,6 @@
 package services
 
-import models.SyntaxErrorModel
+import ru.isma.next.common.services.lisma.models.SyntaxErrorModel
 import tornadofx.asObservable
 
 class ModelErrorService {

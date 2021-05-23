@@ -1,6 +1,6 @@
 package views.toolbars
 
-import models.SyntaxErrorModel
+import ru.isma.next.common.services.lisma.models.SyntaxErrorModel
 import services.ModelErrorService
 import tornadofx.SmartResize
 import tornadofx.View

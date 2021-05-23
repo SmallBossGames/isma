@@ -14,8 +14,7 @@ import ru.isma.next.editor.blueprint.models.BlueprintEditorTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
-import views.editors.blueprint.models.*
-import views.editors.text.IsmaTextEditor
+import ru.isma.next.editor.text.IsmaTextEditor
 
 class IsmaBlueprintEditor: Fragment() {
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)

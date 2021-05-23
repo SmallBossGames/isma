@@ -29,7 +29,6 @@ val kotlinxSerializationJsonVersion = "1.2.1"
 
 dependencies {
     implementation ("no.tornado:tornadofx:1.7.20")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
     implementation ("org.antlr:antlr4-runtime:4.9")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
@@ -42,6 +41,9 @@ dependencies {
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-next-integration-library"))
     implementation(project(":grin:integration"))
+    implementation(project(":isma-next-common-services"))
+    implementation(project(":isma-blueprint-editor"))
+    implementation(project(":isma-text-editor"))
 
     testImplementation(kotlin("test-junit"))
 }

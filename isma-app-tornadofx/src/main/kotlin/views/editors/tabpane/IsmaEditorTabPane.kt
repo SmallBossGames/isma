@@ -5,12 +5,12 @@ import events.NewProjectEvent
 import javafx.scene.control.Tab
 import models.projects.BlueprintProjectDataProvider
 import models.projects.IProjectModel
+import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
+import ru.isma.next.editor.text.IsmaTextEditor
 import services.project.ProjectService
 import tornadofx.View
 import tornadofx.tab
 import tornadofx.*
-import views.editors.blueprint.IsmaBlueprintEditor
-import views.editors.text.IsmaTextEditor
 
 
 class IsmaEditorTabPane: View() {

@@ -1,7 +1,8 @@
-package services.lisma
+package ru.isma.next.editor.text.services
 
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
+import ru.isma.next.common.services.lisma.services.LismaPdeService
 import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
 
 class LismaHighlightingService(private val lismaPdeService: LismaPdeService) {

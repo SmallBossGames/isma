@@ -2,10 +2,10 @@ package views.toolbars
 
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
-import models.FailedTranslation
+import ru.isma.next.common.services.lisma.FailedTranslation
+import ru.isma.next.common.services.lisma.services.LismaPdeService
 import services.ModelErrorService
 import services.project.ProjectFileService
-import services.lisma.LismaPdeService
 import services.project.ProjectService
 import services.editor.TextEditorService
 import tornadofx.*

@@ -22,6 +22,8 @@ val kotlinxSerializationJsonVersion = "1.2.1"
 dependencies {
     implementation(kotlin("stdlib"))
 
+    implementation(project(":isma-text-editor"))
+
     implementation ("no.tornado:tornadofx:1.7.20")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
 }

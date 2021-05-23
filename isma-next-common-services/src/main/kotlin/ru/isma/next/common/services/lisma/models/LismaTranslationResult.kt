@@ -1,5 +1,6 @@
-package models
+package ru.isma.next.common.services.lisma
 
+import ru.isma.next.common.services.lisma.models.SyntaxErrorModel
 import ru.nstu.isma.core.hsm.HSM
 
 sealed interface LismaTranslationResult

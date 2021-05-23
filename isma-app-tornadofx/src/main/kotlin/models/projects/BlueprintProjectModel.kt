@@ -1,11 +1,10 @@
 package models.projects
 
-import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import utilities.convertToLisma
-import views.editors.blueprint.models.BlueprintModel
+import ru.isma.next.editor.blueprint.models.BlueprintModel
 import java.io.File
 import tornadofx.*
+import ru.isma.next.editor.blueprint.utilities.convertToLisma
 
 class BlueprintProjectModel() : IProjectModel {
     private var blueprintValue: BlueprintModel = BlueprintModel.empty

@@ -19,13 +19,14 @@ class IsmaTextEditor: Fragment() {
     fun replaceText(text: String) = root.replaceText(text)
 
     override val root = CodeArea().apply {
-        paragraphGraphicFactory = LineNumberFactory.get(this)
-
         subscribe<CutTextInCurrentEditorEvent> { if (isFocused) cut() }
         subscribe<CopyTextInCurrentEditorEvent> { if (isFocused) copy() }
         subscribe<PasteTextInCurrentEditorEvent> { if (isFocused) paste() }
 
         textProperty().onChange {
+            if(paragraphGraphicFactory == null) {
+                paragraphGraphicFactory = LineNumberFactory.get(this)
+            }
             val highlighting = highlightingService.createHighlightingStyleSpans(it ?: "")
             setStyleSpans(0, highlighting)
         }

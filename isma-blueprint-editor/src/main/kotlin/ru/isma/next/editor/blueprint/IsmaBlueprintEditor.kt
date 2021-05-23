@@ -265,6 +265,7 @@ class IsmaBlueprintEditor: Fragment() {
             .toList()
             .forEach { removeTransaction(it) }
 
+        stateBoxes.remove(this)
         this.removeFromParent()
     }
 

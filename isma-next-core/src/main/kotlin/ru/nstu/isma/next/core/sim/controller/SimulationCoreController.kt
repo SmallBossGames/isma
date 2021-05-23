@@ -28,7 +28,8 @@ import java.util.function.Consumer
  * on 04.01.2015.
  */
 class SimulationCoreController(
-        private val hsm: HSM, initials: CauchyInitials,
+        private val hsm: HSM,
+        initials: CauchyInitials,
         private val method: IntgMethod,
         private val parallelParameters: ParallelParameters?,
         private val resultFileName: String?,
@@ -125,26 +126,43 @@ class SimulationCoreController(
         }
     }
 
-    private fun runSimulationInMemory(cauchyProblemSolver: HybridSystemSimulator,
-                                      stepSolver: DaeSystemStepSolver,
-                                      eventDetector: EventDetectionIntgController,
-                                      eventDetectionStepBoundLow: Double): HybridSystemIntgResult {
+    private fun runSimulationInMemory(
+        cauchyProblemSolver: HybridSystemSimulator,
+        stepSolver: DaeSystemStepSolver,
+        eventDetector: EventDetectionIntgController,
+        eventDetectionStepBoundLow: Double
+    ): HybridSystemIntgResult {
+
         val resultMemoryStore = IntgResultMemoryStore()
         val metricData: IntgMetricData = cauchyProblemSolver.run(
-                hybridSystem, stepSolver, simulationInitials, eventDetector, eventDetectionStepBoundLow, resultMemoryStore)
+            hybridSystem,
+            stepSolver,
+            simulationInitials,
+            eventDetector,
+            eventDetectionStepBoundLow,
+            resultMemoryStore
+        )
         logCalculationStatistic(metricData, stepSolver)
         return HybridSystemIntgResult(indexProvider, metricData, resultMemoryStore)
     }
 
     @Throws(IOException::class)
-    private fun runSimulationWithResultFile(cauchyProblemSolver: HybridSystemSimulator,
-                                            stepSolver: DaeSystemStepSolver,
-                                            eventDetector: EventDetectionIntgController,
-                                            eventDetectionStepBoundLow: Double): HybridSystemIntgResult {
-        val metricData: IntgMetricData?
+    private fun runSimulationWithResultFile(
+        cauchyProblemSolver: HybridSystemSimulator,
+        stepSolver: DaeSystemStepSolver,
+        eventDetector: EventDetectionIntgController,
+        eventDetectionStepBoundLow: Double
+    ): HybridSystemIntgResult {
+
         val resultWriter = IntgResultPointFileWriter(resultFileName)
-        metricData = cauchyProblemSolver.run(hybridSystem, stepSolver, simulationInitials,
-                eventDetector, eventDetectionStepBoundLow, resultWriter)
+        val metricData = cauchyProblemSolver.run(
+            hybridSystem,
+            stepSolver,
+            simulationInitials,
+            eventDetector,
+            eventDetectionStepBoundLow,
+            resultWriter
+        )
         resultWriter.await()
         resultWriter.close()
 
@@ -157,12 +175,18 @@ class SimulationCoreController(
         return result
     }
 
-    private fun logCalculationStatistic(metricData: IntgMetricData?, stepSolver: DaeSystemStepSolver) {
+    private fun logCalculationStatistic(
+        metricData: IntgMetricData?,
+        stepSolver: DaeSystemStepSolver
+    ) {
         if (logger.isInfoEnabled) {
-            val stepCalculationCount: Long = if (stepSolver is DefaultDaeSystemStepSolver) stepSolver.stepCalculationCount else -1
+            val stepCalculationCount = if (stepSolver is DefaultDaeSystemStepSolver) stepSolver.stepCalculationCount else -1
             val rhsCalculationCount: Long = if (stepSolver is DefaultDaeSystemStepSolver) stepSolver.rhsCalculationCount else -1
-            logger.info("Simulation time: {} ms; Step calculation count: {}; RHS calculation count: {}",
-                    metricData?.simulationTime, stepCalculationCount, rhsCalculationCount)
+            logger.info(
+                "Simulation time: {} ms; Step calculation count: {}; RHS calculation count: {}",
+                metricData?.simulationTime,
+                stepCalculationCount,
+                rhsCalculationCount)
         }
     }
 

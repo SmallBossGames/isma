@@ -87,11 +87,14 @@ class EquationIndexProvider(hsm: HSM) : IndexProvider {
     }
 
     init {
-        hsm.variableTable.odes.stream()
-                .forEach { ode: HMDerivativeEquation ->
-                    deIndices.putIfAbsent(ode.code, deIndices.size)
-                }
-        hsm.variableTable.algs.stream()
-                .forEach { ae: HMAlgebraicEquation -> aeIndices.putIfAbsent(ae.code, aeIndices.size) }
+        hsm.variableTable.odes
+            .forEach {
+                deIndices.putIfAbsent(it.code, deIndices.size)
+            }
+
+        hsm.variableTable.algs
+            .forEach {
+                aeIndices.putIfAbsent(it.code, aeIndices.size)
+            }
     }
 }

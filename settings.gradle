@@ -1,6 +1,6 @@
 rootProject.name = 'isma'
 //JAVA 11+ projects
-include('isma-app-tornadofx')
+include('isma-next-app')
 
 include('state-chart')
 include('isma-next-core')

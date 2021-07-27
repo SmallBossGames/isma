@@ -2,6 +2,8 @@ package ru.isma.next.app.views.toolbars
 
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import ru.isma.next.app.services.simualtion.SimulationResultService
 import ru.isma.next.app.services.simualtion.SimulationService
 import tornadofx.*
@@ -14,7 +16,7 @@ class SimulationProcessBar : View() {
         button {
             graphic = ImageView("icons/toolbar/play.png")
             tooltip = Tooltip("Play")
-            action { simulationService.simulate() }
+            action { GlobalScope.launch { simulationService.simulate() }  }
             managedWhen(!simulationService.isSimulationInProgressProperty())
             hiddenWhen(simulationService.isSimulationInProgressProperty())
         }

@@ -27,7 +27,8 @@ class HybridSystemSimulator {
             simulationInitials: SimulationInitials,
             eventDetector: EventDetectionIntgController,
             eventDetectionStepBoundLow: Double,
-            resultPointConsumer: Consumer<IntgResultPoint?>): IntgMetricData {
+            resultPointConsumer: Consumer<IntgResultPoint?>
+    ): IntgMetricData {
         val metricData = IntgMetricData()
         metricData.setStartTime(System.currentTimeMillis())
         var x = simulationInitials.start
@@ -54,9 +55,9 @@ class HybridSystemSimulator {
                 val eventFunctionGroups = guards.map { it.eventFunctionGroup }
                 val predictedStep = eventDetector.predictNextStep(toPoint, eventFunctionGroups)
                 // TODO: если так, то шагов около 8500
-                //double nextStep = Math.min(Math.max(predictedStep, eventDetectionStepBoundLow), toPoint.getNextStep());
+                val nextStep = min(max(predictedStep, eventDetectionStepBoundLow), toPoint.nextStep);
                 // TODO: а если так, то 170
-                val nextStep = min(max(predictedStep, eventDetectionStepBoundLow), simulationInitials.step)
+                //val nextStep = min(max(predictedStep, eventDetectionStepBoundLow), simulationInitials.step)
                 toPoint.nextStep = nextStep
             }
             x += toPoint.step

@@ -30,10 +30,4 @@ class LismaPdeService {
 
         return FailedTranslation(errorModels)
     }
-
-    fun getLismaTokens(source: String): List<Token> {
-        val inputStream = CharStreams.fromString(source)
-        val lexer = LismaLexer(inputStream)
-        return lexer.allTokens
-    }
 }

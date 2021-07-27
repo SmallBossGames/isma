@@ -7,14 +7,15 @@ import ru.isma.next.common.services.lisma.services.LismaPdeService
 import services.ModelErrorService
 import services.project.ProjectFileService
 import services.project.ProjectService
-import services.editor.TextEditorService
+import ru.isma.next.editor.text.services.TextEditorService
+import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import tornadofx.*
 
 class IsmaToolBar(
     private val projectController: ProjectService,
     private val projectFileService: ProjectFileService,
     private val lismaPdeService: LismaPdeService,
-    private val textEditorService: TextEditorService,
+    private val textEditorService: ITextEditorService,
     private val modelService: ModelErrorService,
 ) : View() {
     override val root = toolbar {

@@ -1,17 +1,21 @@
 package ru.isma.next.editor.text.services
 
+import org.antlr.v4.runtime.CharStreams
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
 import ru.isma.next.common.services.lisma.services.LismaPdeService
+import ru.isma.next.editor.text.services.contracts.IHighlightingService
 import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
 
-class LismaHighlightingService(private val lismaPdeService: LismaPdeService) {
-
-    fun createHighlightingStyleSpans(source: String): StyleSpans<Collection<String>>? {
+class LismaHighlightingService() : IHighlightingService {
+    override fun createHighlightingStyleSpans(source: String): StyleSpans<Collection<String>>? {
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
         var lastKeyword = 0
 
-        lismaPdeService.getLismaTokens(source).forEach {
+        val inputStream = CharStreams.fromString(source)
+        val tokens = LismaLexer(inputStream).allTokens
+
+        tokens.forEach {
             when (it.type) {
                 LismaLexer.CONST_KEYWORD, LismaLexer.STATE_KEYWORD, LismaLexer.FOR_KEYWORD, LismaLexer.IF_KEYWORD,
                 LismaLexer.FROM_KEYWORD -> {

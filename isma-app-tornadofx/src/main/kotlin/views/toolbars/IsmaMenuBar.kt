@@ -1,7 +1,8 @@
 package views.toolbars
 
 import services.project.ProjectFileService
-import services.editor.TextEditorService
+import ru.isma.next.editor.text.services.TextEditorService
+import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import services.project.ProjectService
 import services.simualtion.SimulationService
 import tornadofx.*
@@ -10,7 +11,7 @@ class IsmaMenuBar(
     private val projectController: ProjectService,
     private val projectFileService: ProjectFileService,
     private val simulationService: SimulationService,
-    private val textEditorService: TextEditorService
+    private val textEditorService: ITextEditorService
 ) : View() {
     override val root = menubar {
         menu("File") {

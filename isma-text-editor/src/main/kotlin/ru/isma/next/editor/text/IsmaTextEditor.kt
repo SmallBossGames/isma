@@ -6,22 +6,23 @@ import javafx.scene.text.FontPosture
 import javafx.scene.text.FontWeight
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
-import ru.isma.next.editor.text.events.CopyTextInCurrentEditorEvent
-import ru.isma.next.editor.text.events.CutTextInCurrentEditorEvent
-import ru.isma.next.editor.text.events.PasteTextInCurrentEditorEvent
+import ru.isma.next.editor.text.events.CopyTextInCurrentEditorRequest
+import ru.isma.next.editor.text.events.CutTextInCurrentEditorRequest
+import ru.isma.next.editor.text.events.PasteTextInCurrentEditorRequest
 import ru.isma.next.editor.text.services.LismaHighlightingService
+import ru.isma.next.editor.text.services.contracts.IHighlightingService
 import tornadofx.*
 
-class IsmaTextEditor: Fragment() {
-    private val highlightingService: LismaHighlightingService by di()
+class IsmaTextEditor(): Fragment() {
+    private val highlightingService: IHighlightingService = LismaHighlightingService()
 
     fun textProperty(): ObservableValue<String> = root.textProperty()
     fun replaceText(text: String) = root.replaceText(text)
 
     override val root = CodeArea().apply {
-        subscribe<CutTextInCurrentEditorEvent> { if (isFocused) cut() }
-        subscribe<CopyTextInCurrentEditorEvent> { if (isFocused) copy() }
-        subscribe<PasteTextInCurrentEditorEvent> { if (isFocused) paste() }
+        subscribe<CutTextInCurrentEditorRequest> { if (isFocused) cut() }
+        subscribe<CopyTextInCurrentEditorRequest> { if (isFocused) copy() }
+        subscribe<PasteTextInCurrentEditorRequest> { if (isFocused) paste() }
 
         textProperty().onChange {
             if(paragraphGraphicFactory == null) {
@@ -30,6 +31,8 @@ class IsmaTextEditor: Fragment() {
             val highlighting = highlightingService.createHighlightingStyleSpans(it ?: "")
             setStyleSpans(0, highlighting)
         }
+
+        isFocusTraversable
 
         stylesheet {
             addSelection(CssSelection(CssSelector(CssRuleSet(CssRule.c("keyword")))) {

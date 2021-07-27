@@ -7,6 +7,7 @@ import models.projects.BlueprintProjectDataProvider
 import models.projects.IProjectModel
 import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
 import ru.isma.next.editor.text.IsmaTextEditor
+import ru.isma.next.editor.text.services.contracts.IHighlightingService
 import services.project.ProjectService
 import tornadofx.View
 import tornadofx.tab

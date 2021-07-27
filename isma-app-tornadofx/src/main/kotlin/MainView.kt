@@ -7,12 +7,12 @@ import views.editors.tabpane.IsmaEditorTabPane
 import views.simulation.settings.SettingsPanelView
 
 class MainView : View() {
-    private val ismaMenuBar: IsmaMenuBar by di()
-    private val ismaToolBar: IsmaToolBar by di()
-    private val simulationProcess: SimulationProcessBar by di()
-    private val ismaErrorListTable: IsmaErrorListTable by di()
+    private val ismaMenuBar: IsmaMenuBar by inject()
+    private val ismaToolBar: IsmaToolBar by inject()
+    private val simulationProcess: SimulationProcessBar by inject()
+    private val ismaErrorListTable: IsmaErrorListTable by inject()
     private val ismaEditorTabPane: IsmaEditorTabPane by inject()
-    private val settingsPanel: SettingsPanelView by di()
+    private val settingsPanel: SettingsPanelView by inject()
 
     init {
         title = "ISMA Next"

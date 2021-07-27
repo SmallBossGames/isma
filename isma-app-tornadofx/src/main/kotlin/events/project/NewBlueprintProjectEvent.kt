@@ -1,4 +1,4 @@
-package events
+package events.project
 
 import models.projects.BlueprintProjectModel
 import models.projects.LismaProjectModel

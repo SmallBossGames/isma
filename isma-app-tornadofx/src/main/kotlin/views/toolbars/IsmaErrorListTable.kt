@@ -8,9 +8,9 @@ import tornadofx.readonlyColumn
 import tornadofx.tableview
 
 
-class IsmaErrorListTable(
-    modelErrorService: ModelErrorService
-) : View() {
+class IsmaErrorListTable : View() {
+    private val modelErrorService: ModelErrorService by di()
+
     override val root = tableview(modelErrorService.errors) {
         maxHeight = 200.0
         readonlyColumn("Row", SyntaxErrorModel::row).cellFormat {

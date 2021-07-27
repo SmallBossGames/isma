@@ -11,13 +11,13 @@ import ru.isma.next.editor.text.services.TextEditorService
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import tornadofx.*
 
-class IsmaToolBar(
-    private val projectController: ProjectService,
-    private val projectFileService: ProjectFileService,
-    private val lismaPdeService: LismaPdeService,
-    private val textEditorService: ITextEditorService,
-    private val modelService: ModelErrorService,
-) : View() {
+class IsmaToolBar: View() {
+    private val projectController: ProjectService by di()
+    private val projectFileService: ProjectFileService by di()
+    private val lismaPdeService: LismaPdeService by di()
+    private val textEditorService: ITextEditorService by di()
+    private val modelService: ModelErrorService by di()
+
     override val root = toolbar {
         button{
             graphic = ImageView("icons/new.png")

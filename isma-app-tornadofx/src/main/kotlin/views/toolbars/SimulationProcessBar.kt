@@ -6,10 +6,10 @@ import services.simualtion.SimulationResultService
 import services.simualtion.SimulationService
 import tornadofx.*
 
-class SimulationProcessBar(
-    private val simulationResult: SimulationResultService,
-    private val simulationService: SimulationService,
-) : View() {
+class SimulationProcessBar : View() {
+    private val simulationResult: SimulationResultService by di()
+    private val simulationService: SimulationService by di()
+
     override val root = toolbar {
         button {
             graphic = ImageView("icons/toolbar/play.png")

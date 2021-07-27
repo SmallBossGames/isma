@@ -1,7 +1,7 @@
 package services.project
 
-import events.NewBlueprintProjectEvent
-import events.NewProjectEvent
+import events.project.NewBlueprintProjectEvent
+import events.project.NewProjectEvent
 import models.projects.BlueprintProjectModel
 import models.projects.IProjectModel
 import models.projects.LismaProjectModel
@@ -12,28 +12,18 @@ class ProjectService {
 
     public var activeProject: IProjectModel? = null
 
-    fun createNewBlueprint(name: String) {
+    fun createNewBlueprint(name: String = "New blueprint") {
         val bpm = BlueprintProjectModel()
         bpm.name = name
         addBlueprint(bpm)
 
     }
 
-    fun createNew(name: String){
+    fun createNew(name: String = "New project"){
         LismaProjectModel().apply {
             this.name = name
             addText(this)
         }
-    }
-
-    fun createNew(){
-        val defaultProjectName = "New project"
-        createNew(defaultProjectName)
-    }
-
-    fun createNewBlueprint(){
-        val defaultProjectName = "New blueprint"
-        createNewBlueprint(defaultProjectName)
     }
 
     fun addText(project: LismaProjectModel){

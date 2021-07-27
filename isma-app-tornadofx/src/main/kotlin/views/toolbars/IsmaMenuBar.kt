@@ -7,12 +7,12 @@ import services.project.ProjectService
 import services.simualtion.SimulationService
 import tornadofx.*
 
-class IsmaMenuBar(
-    private val projectController: ProjectService,
-    private val projectFileService: ProjectFileService,
-    private val simulationService: SimulationService,
-    private val textEditorService: ITextEditorService
-) : View() {
+class IsmaMenuBar: View() {
+    private val projectController: ProjectService by di()
+    private val projectFileService: ProjectFileService by di()
+    private val simulationService: SimulationService by di()
+    private val textEditorService: ITextEditorService by di()
+
     override val root = menubar {
         menu("File") {
             item("New text","Shortcut+N").action {

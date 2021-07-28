@@ -7,6 +7,7 @@ import ru.isma.next.common.services.lisma.services.LismaPdeService
 import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
+import ru.isma.next.app.services.simualtion.SimulationParametersService
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import tornadofx.*
 
@@ -16,6 +17,7 @@ class IsmaToolBar: View() {
     private val lismaPdeService: LismaPdeService by di()
     private val textEditorService: ITextEditorService by di()
     private val modelService: ModelErrorService by di()
+    private val simulationParametersService: SimulationParametersService by di()
 
     override val root = toolbar {
         button{
@@ -75,9 +77,11 @@ class IsmaToolBar: View() {
             }
         }
         separator()
-        button{
-            graphic = ImageView("icons/toolbar/settings.png")
-            tooltip = Tooltip("ISMA settings")
+        button("Load settings").action {
+            simulationParametersService.load()
+        }
+        button("Store settings").action {
+            simulationParametersService.store()
         }
     }
 }

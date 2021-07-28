@@ -80,9 +80,9 @@ class SimulationService(
 
     private fun createCauchyInitials(): CauchyInitials {
         return CauchyInitials().apply {
-            start = simulationParametersService.cauchyInitialsModel.startTime
-            end = simulationParametersService.cauchyInitialsModel.endTime
-            stepSize = simulationParametersService.cauchyInitialsModel.step
+            start = simulationParametersService.cauchyInitials.startTime
+            end = simulationParametersService.cauchyInitials.endTime
+            stepSize = simulationParametersService.cauchyInitials.step
         }
     }
 

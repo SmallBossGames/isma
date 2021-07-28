@@ -13,17 +13,17 @@ class CauchyInitialsView: View("Initials") {
                 fieldset {
                     field("Start") {
                         textfield {
-                            bind(parametersService.cauchyInitialsModel.startTimeProperty)
+                            bind(parametersService.cauchyInitials.startTimeProperty)
                         }
                     }
                     field("End") {
                         textfield {
-                            bind(parametersService.cauchyInitialsModel.endTimeProperty)
+                            bind(parametersService.cauchyInitials.endTimeProperty)
                         }
                     }
                     field("Step") {
                         textfield {
-                            bind(parametersService.cauchyInitialsModel.stepProperty)
+                            bind(parametersService.cauchyInitials.stepProperty)
                         }
                     }
                 }

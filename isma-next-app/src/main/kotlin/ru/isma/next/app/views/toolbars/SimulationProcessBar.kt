@@ -72,6 +72,5 @@ class SimulationProcessBar : View() {
             managedWhen(simulationResult.isResultAvailableProperty())
             hiddenWhen(!simulationResult.isResultAvailableProperty())
         }
-
     }
 }

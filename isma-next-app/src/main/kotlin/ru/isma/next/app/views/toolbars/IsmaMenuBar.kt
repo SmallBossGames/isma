@@ -3,6 +3,7 @@ package ru.isma.next.app.views.toolbars
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import ru.isma.next.app.services.project.ProjectService
+import ru.isma.next.app.services.simualtion.SimulationParametersService
 import ru.isma.next.app.services.simualtion.SimulationService
 import tornadofx.*
 
@@ -11,6 +12,7 @@ class IsmaMenuBar: View() {
     private val projectFileService: ProjectFileService by di()
     private val simulationService: SimulationService by di()
     private val textEditorService: ITextEditorService by di()
+    private val simulationParametersService: SimulationParametersService by di()
 
     override val root = menubar {
         menu("File") {
@@ -65,6 +67,13 @@ class IsmaMenuBar: View() {
             }
             item("Run","Shortcut+F5").action {
                 simulationService.simulate()
+            }
+            separator()
+            item("Store Settings").action {
+                simulationParametersService.store()
+            }
+            item("Load Settings").action {
+                simulationParametersService.load()
             }
         }
         menu("Settings") {

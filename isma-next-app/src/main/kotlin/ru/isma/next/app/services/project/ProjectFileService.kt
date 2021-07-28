@@ -79,14 +79,12 @@ class ProjectFileService(private val projectController: ProjectService) {
             return saveProjectAs(project)
         }
 
-        val fileOutput: String
-
-        when (project) {
+        val fileOutput: String = when (project) {
             is LismaProjectModel -> {
-                fileOutput = project.lismaText
+                project.lismaText
             }
             is BlueprintProjectModel -> {
-                fileOutput = Json.encodeToString(project.blueprint)
+                Json.encodeToString(project.blueprint)
             }
             else -> {
                 throw NotImplementedError()

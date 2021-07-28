@@ -1,14 +1,15 @@
-package ru.isma.next.app.models
+package ru.isma.next.app.viewmodels
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
+import ru.isma.next.app.models.simulation.IntegrationMethodParametersModel
 import tornadofx.getValue
 import tornadofx.onChange
 import tornadofx.setValue
 
-class IntegrationMethodParametersModel {
+class IntegrationMethodParametersViewModel {
     val selectedMethodProperty = SimpleStringProperty()
     var selectedMethod: String by selectedMethodProperty
 
@@ -33,9 +34,16 @@ class IntegrationMethodParametersModel {
     val portProperty = SimpleIntegerProperty()
     var port by portProperty
 
-    init {
-        selectedMethodProperty.onChange {
-
-        }
+    fun commit(model: IntegrationMethodParametersModel){
+        selectedMethod = model.selectedMethod
+        accuracy = model.accuracy
+        isAccuracyInUse = model.isAccuracyInUse
+        isStableAllowedInUse = model.isStableAllowedInUse
+        isStableInUse = model.isStableInUse
+        isParallelInUse = model.isParallelInUse
+        server = model.server
+        port = model.port
     }
+
+    fun snapshot() = IntegrationMethodParametersModel(selectedMethod, accuracy, isAccuracyInUse, isStableAllowedInUse, isStableInUse, isParallelInUse, server, port)
 }

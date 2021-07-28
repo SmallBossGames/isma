@@ -24,5 +24,5 @@ dependencies {
 
     implementation ("no.tornado:tornadofx:1.7.20")
     implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
-    implementation ("org.antlr:antlr4-runtime:4.9")
+    implementation ("org.antlr:antlr4-runtime:4.9.2")
 }

@@ -17,7 +17,7 @@ repositories {
     mavenCentral()
 }
 
-val kotlinxSerializationJsonVersion = "1.2.1"
+val kotlinxSerializationJsonVersion = "1.2.2"
 
 dependencies {
     implementation(kotlin("stdlib"))

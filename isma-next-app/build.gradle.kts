@@ -23,13 +23,13 @@ application {
 }
 
 val koinVersion = "3.1.2"
-val kotlinReflectVersion = "1.5.0"
-val kotlinxCoroutinesVersion = "1.5.0"
-val kotlinxSerializationJsonVersion = "1.2.1"
+val kotlinReflectVersion = "1.5.21"
+val kotlinxCoroutinesVersion = "1.5.1-native-mt"
+val kotlinxSerializationJsonVersion = "1.2.2"
 
 dependencies {
     implementation ("no.tornado:tornadofx:1.7.20")
-    implementation ("org.antlr:antlr4-runtime:4.9")
+    implementation ("org.antlr:antlr4-runtime:4.9.2")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")

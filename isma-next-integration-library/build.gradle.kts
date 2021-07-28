@@ -18,5 +18,5 @@ dependencies {
     implementation (project(":isma-intg-lib:isma-intg-lib-rkfehlberg"))
 
     implementation("org.reflections:reflections:0.9.12")
-    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("org.slf4j:slf4j-api:1.7.31")
 }

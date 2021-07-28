@@ -11,7 +11,7 @@ javafx {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.30")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.21")
     implementation("no.tornado:tornadofx:1.7.20")
 }
 

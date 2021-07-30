@@ -1,8 +1,8 @@
 package ru.isma.next.app.services.project
 
-import constants.OLD_ISMA_PROJECT_FILE
-import constants.STATE_CHART_ISMA_PROJECT_FILE
-import constants.TEXT_ISMA_PROJECT_FILE
+import ru.isma.next.app.constants.OLD_ISMA_PROJECT_FILE
+import ru.isma.next.app.constants.STATE_CHART_ISMA_PROJECT_FILE
+import ru.isma.next.app.constants.TEXT_ISMA_PROJECT_FILE
 import javafx.stage.FileChooser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

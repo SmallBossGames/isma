@@ -1,4 +1,4 @@
-package constants
+package ru.isma.next.app.constants
 
 const val OLD_ISMA_PROJECT_FILE = "*.im"
 const val TEXT_ISMA_PROJECT_FILE = "*.im2"

@@ -1,6 +1,6 @@
 package ru.isma.next.app.services.simualtion
 
-import constants.SIMULATION_PARAMETERS_FILE
+import ru.isma.next.app.constants.SIMULATION_PARAMETERS_FILE
 import javafx.stage.FileChooser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString

@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":isma-next-common-services"))
     implementation(project(":isma-blueprint-editor"))
     implementation(project(":isma-text-editor"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.1-native-mt")
 
     testImplementation(kotlin("test-junit"))
 }

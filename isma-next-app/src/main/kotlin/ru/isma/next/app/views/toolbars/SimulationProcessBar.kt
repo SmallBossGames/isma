@@ -16,14 +16,14 @@ class SimulationProcessBar : View() {
         button {
             graphic = ImageView("icons/toolbar/play.png")
             tooltip = Tooltip("Play")
-            action { GlobalScope.launch { simulationService.simulate() }  }
+            action { simulationService.simulateAsync() }
             managedWhen(!simulationService.isSimulationInProgressProperty())
             hiddenWhen(simulationService.isSimulationInProgressProperty())
         }
         button {
             graphic = ImageView("icons/toolbar/abort.png")
-            tooltip = Tooltip("Play")
-            action { simulationService.simulate() }
+            tooltip = Tooltip("Abort")
+            action { simulationService.stopCurrentSimulation() }
             managedWhen(simulationService.isSimulationInProgressProperty())
             hiddenWhen(!simulationService.isSimulationInProgressProperty())
         }

@@ -1,22 +1,24 @@
 package ru.isma.next.app.services.simualtion
 
-import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
-import kotlinx.coroutines.*
-import ru.isma.next.app.enumerables.SaveTarget
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
+import kotlinx.coroutines.*
+import kotlinx.coroutines.javafx.JavaFx
+import ru.isma.next.app.enumerables.SaveTarget
+import ru.isma.next.app.services.ModelErrorService
+import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.common.services.lisma.FailedTranslation
-import ru.isma.next.common.services.lisma.services.LismaPdeService
 import ru.isma.next.common.services.lisma.SuccessTranslation
+import ru.isma.next.common.services.lisma.services.LismaPdeService
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
+import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
-import ru.isma.next.app.services.ModelErrorService
-import ru.isma.next.app.services.project.ProjectService
 import tornadofx.getValue
 import tornadofx.setValue
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.max
 import kotlin.math.min
 
@@ -29,53 +31,68 @@ class SimulationService(
     private val modelService: ModelErrorService,
 ) {
 
-    private val progressProperty = SimpleDoubleProperty();
+    private val progressProperty = SimpleDoubleProperty()
     fun progressProperty() = progressProperty
     var progress by progressProperty
 
-    private val isSimulationInProgressProperty = SimpleBooleanProperty();
+    private val isSimulationInProgressProperty = SimpleBooleanProperty()
     fun isSimulationInProgressProperty() = isSimulationInProgressProperty
     var isSimulationInProgress by isSimulationInProgressProperty
 
-    private var currentSimulation: Job? = null
+    private var currentSimulationJob: Job? = null
 
-    fun simulate(){
-        val translationResult = lismaPdeService.translateLisma(projectService.activeProject?.lismaText ?: return)
+    fun simulateAsync() {
+        stopCurrentSimulation()
 
-        modelService.setErrorList(emptyList())
+        val simulationJob = Job()
+        val simulationContext = EmptyCoroutineContext + simulationJob
+        val simulationScope = CoroutineScope(simulationContext)
 
-        when (translationResult) {
-            is FailedTranslation -> {
-                modelService.setErrorList(translationResult.errors)
-                return
-            }
-            is SuccessTranslation -> {
-                val initials = createCauchyInitials()
-                val integrationMethod = createIntegrationMethod()
+        currentSimulationJob = simulationJob
 
-                initAccuracyController(integrationMethod)
-                initStabilityController(integrationMethod)
+        simulationScope.launch {
+            val translationResult = lismaPdeService
+                .translateLisma(projectService.activeProject?.lismaText ?: return@launch)
 
-                translationResult.hsm.initTimeEquation(initials.start)
+            modelService.setErrorList(emptyList())
 
-                val simulationController = SimulationCoreController(
-                    translationResult.hsm,
-                    initials,
-                    integrationMethod,
-                    createParallelParameters(),
-                    createFileResultParameters(),
-                    createEventDetectionParameters()
-                )
+            when (translationResult) {
+                is FailedTranslation -> {
+                    modelService.setErrorList(translationResult.errors)
+                }
+                is SuccessTranslation -> {
+                    val initials = createCauchyInitials()
+                    val integrationMethod = createIntegrationMethod()
 
-                initProgressTracking(simulationController, initials)
+                    initAccuracyController(integrationMethod)
+                    initStabilityController(integrationMethod)
 
-                currentSimulation?.cancel()
+                    translationResult.hsm.initTimeEquation(initials.start)
 
-                currentSimulation = startSimualtionJob(simulationController)
+                    val simulationController = SimulationCoreController(
+                        translationResult.hsm,
+                        initials,
+                        integrationMethod,
+                        createParallelParameters(),
+                        createFileResultParameters(),
+                        createEventDetectionParameters()
+                    )
+
+                    initAsyncProgressTracking(simulationController, initials)
+
+                    startSimulation(simulationController)
+                }
+                else -> throw IllegalArgumentException()
             }
         }
+    }
 
+    fun stopCurrentSimulation() {
+        currentSimulationJob?.cancel()
 
+        currentSimulationJob = null
+        isSimulationInProgress = false
+        progress = 0.0
     }
 
     private fun createCauchyInitials(): CauchyInitials {
@@ -146,23 +163,30 @@ class SimulationService(
         }
     }
 
-    private fun initProgressTracking(
-            simulationController: SimulationCoreController,
-            initials: CauchyInitials){
+    private fun initAsyncProgressTracking(
+        simulationController: SimulationCoreController,
+        initials: CauchyInitials
+    ){
         simulationController.addStepChangeListener {
-            progress = normalizeProgress(initials.start, initials.end, it)
+            runBlocking(Dispatchers.JavaFx) {
+                progress = normalizeProgress(initials.start, initials.end, it)
+            }
         }
     }
 
-    private fun startSimualtionJob(controller: SimulationCoreController) = GlobalScope.launch {
+    private suspend fun startSimulation(controller: SimulationCoreController) = coroutineScope {
         try {
-            isSimulationInProgress = true
-            val result = controller.simulate()
-            simulationResult.simulationResult = result
+            withContext(Dispatchers.JavaFx) {
+                isSimulationInProgress = true
+            }
+            val result = async {
+                controller.simulate()
+            }
+            withContext(Dispatchers.JavaFx) {
+                simulationResult.simulationResult = result.await()
+            }
         } finally {
-            isSimulationInProgress = false
-            progress = 0.0
-            currentSimulation = null
+            stopCurrentSimulation()
         }
     }
 }

@@ -12,23 +12,17 @@ import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
 import tornadofx.FileChooserMode
 import tornadofx.chooseFile
+import java.io.File
 
 class ProjectFileService(private val projectController: ProjectService) {
-    private val textProjectFileFilters = arrayOf(
-        FileChooser.ExtensionFilter("ISMA Project file", OLD_ISMA_PROJECT_FILE),
-        FileChooser.ExtensionFilter("ISMA Next Project file", TEXT_ISMA_PROJECT_FILE),
-    )
-
-    private val stateChartProjectFileFilters = arrayOf(
-        FileChooser.ExtensionFilter("ISMA State Chart Project file", STATE_CHART_ISMA_PROJECT_FILE),
-    )
+    fun listAllFilesPaths(): List<String> {
+        return projectController.getAllProjects().mapNotNull { it.file?.path }
+    }
 
     fun saveAs() {
         val project = projectController.activeProject ?: return
         saveProjectAs(project)
     }
-
-    private val fileFilers = arrayOf(*textProjectFileFilters, *stateChartProjectFileFilters)
 
     fun save() {
         val project = projectController.activeProject ?: return
@@ -45,6 +39,22 @@ class ProjectFileService(private val projectController: ProjectService) {
 
         val file = selectedFiles.first()
 
+        if(file.exists()){
+            open(file)
+        }
+    }
+
+    fun open(vararg paths: String) {
+        paths.forEach {
+            val file = File(it)
+
+            if(file.exists()) {
+                open(file)
+            }
+        }
+    }
+
+    fun open(file: File) {
         when {
             OLD_ISMA_PROJECT_FILE.contains(file.extension) -> {
                 TODO("Fix backward compatibility")
@@ -127,5 +137,18 @@ class ProjectFileService(private val projectController: ProjectService) {
         }
 
         file.writeText(fileOutput)
+    }
+
+    companion object {
+        private val textProjectFileFilters = arrayOf(
+            FileChooser.ExtensionFilter("ISMA Project file", OLD_ISMA_PROJECT_FILE),
+            FileChooser.ExtensionFilter("ISMA Next Project file", TEXT_ISMA_PROJECT_FILE),
+        )
+
+        private val stateChartProjectFileFilters = arrayOf(
+            FileChooser.ExtensionFilter("ISMA State Chart Project file", STATE_CHART_ISMA_PROJECT_FILE),
+        )
+
+        private val fileFilers = arrayOf(*textProjectFileFilters, *stateChartProjectFileFilters)
     }
 }

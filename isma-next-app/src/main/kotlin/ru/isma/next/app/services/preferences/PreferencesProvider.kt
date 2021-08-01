@@ -3,6 +3,7 @@ package ru.isma.next.app.services.preferences
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.isma.next.app.models.preferences.DefaultFilesPreferencesModel
 import ru.isma.next.app.models.preferences.PreferencesModel
 import ru.isma.next.app.models.preferences.WindowPreferencesModel
 import java.io.File
@@ -27,6 +28,12 @@ class PreferencesProvider(val settingsFilePath: String) {
 
     fun commit(windowPreferences: WindowPreferencesModel){
         preferences = preferences.copy(windowPreferences = windowPreferences)
+
+        store()
+    }
+
+    fun commit(defaultFilesPreferences: DefaultFilesPreferencesModel){
+        preferences = preferences.copy(defaultFilesPreferencesModel = defaultFilesPreferences)
 
         store()
     }

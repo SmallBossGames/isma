@@ -1,7 +1,9 @@
 package ru.isma.next.app.views
 
+import ru.isma.next.app.models.preferences.DefaultFilesPreferencesModel
 import ru.isma.next.app.models.preferences.WindowPreferencesModel
 import ru.isma.next.app.services.preferences.PreferencesProvider
+import ru.isma.next.app.services.project.ProjectFileService
 import tornadofx.*
 import ru.isma.next.app.views.toolbars.IsmaErrorListTable
 import ru.isma.next.app.views.toolbars.IsmaMenuBar
@@ -12,6 +14,7 @@ import ru.isma.next.app.views.settings.SettingsPanelView
 
 class MainView : View() {
     private val preferencesProvider: PreferencesProvider by di()
+    private val projectFileService: ProjectFileService by di()
 
     private val ismaMenuBar: IsmaMenuBar by inject()
     private val ismaToolBar: IsmaToolBar by inject()
@@ -58,6 +61,7 @@ class MainView : View() {
         super.onDock()
 
         val windowProps = preferencesProvider.preferences.windowPreferences
+        val defaultFilesPreferences = preferencesProvider.preferences.defaultFilesPreferencesModel
 
         currentStage?.apply {
             isMaximized = windowProps.isMaximized
@@ -68,6 +72,8 @@ class MainView : View() {
 
             minHeight = 500.0
             minWidth = 800.0
+
+            projectFileService.open(*defaultFilesPreferences.lastOpenedProjectPath)
         }
     }
 
@@ -83,7 +89,12 @@ class MainView : View() {
                 y = it.y,
             )
 
+            val defaultFilesPreferences = DefaultFilesPreferencesModel(
+                lastOpenedProjectPath = projectFileService.listAllFilesPaths().toTypedArray()
+            )
+
             preferencesProvider.commit(preferencesModel)
+            preferencesProvider.commit(defaultFilesPreferences)
         }
     }
 }

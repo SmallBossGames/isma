@@ -1,6 +1,7 @@
 package ru.isma.next.app.views.settings
 
 import ru.isma.next.app.enumerables.SaveTarget
+import ru.isma.next.app.extentions.numberTextField
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import tornadofx.*
 
@@ -31,9 +32,8 @@ class ResultProcessingView : View("Result processing") {
                         }
                     }
                     field("Tolerance") {
-                        textfield {
+                        numberTextField(parametersService.resultProcessing.toleranceProperty) {
                             disableProperty().bind(!parametersService.resultProcessing.isSimplifyInUseProperty)
-                            bind(parametersService.resultProcessing.toleranceProperty)
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package ru.isma.next.app.views.settings
 
+import ru.isma.next.app.extentions.numberTextField
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import tornadofx.*
 
@@ -12,19 +13,13 @@ class CauchyInitialsView: View("Initials") {
             form {
                 fieldset {
                     field("Start") {
-                        textfield {
-                            bind(parametersService.cauchyInitials.startTimeProperty)
-                        }
+                        numberTextField(parametersService.cauchyInitials.startTimeProperty())
                     }
                     field("End") {
-                        textfield {
-                            bind(parametersService.cauchyInitials.endTimeProperty)
-                        }
+                        numberTextField(parametersService.cauchyInitials.endTimeProperty())
                     }
                     field("Step") {
-                        textfield {
-                            bind(parametersService.cauchyInitials.stepProperty)
-                        }
+                        numberTextField(parametersService.cauchyInitials.stepProperty())
                     }
                 }
             }

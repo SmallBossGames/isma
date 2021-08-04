@@ -1,5 +1,7 @@
 package ru.isma.next.app.views.settings
 
+import ru.isma.next.app.extentions.bindDouble
+import ru.isma.next.app.extentions.numberTextField
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import tornadofx.*
 
@@ -16,9 +18,8 @@ class EventDetectionView : View("Event detection") {
                         }
                     }
                     field("Gamma") {
-                        textfield {
+                        numberTextField(parametersService.eventDetection.gammaProperty) {
                             disableProperty().bind(!parametersService.eventDetection.isEventDetectionInUseProperty)
-                            bind(parametersService.eventDetection.gammaProperty)
                         }
                     }
                     field("Step limit") {
@@ -27,9 +28,8 @@ class EventDetectionView : View("Event detection") {
                         }
                     }
                     field("Low border") {
-                        textfield {
+                        numberTextField(parametersService.eventDetection.lowBorderProperty) {
                             disableProperty().bind(!parametersService.eventDetection.isStepLimitInUseProperty)
-                            bind(parametersService.eventDetection.lowBorderProperty)
                         }
                     }
                 }

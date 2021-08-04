@@ -1,5 +1,8 @@
 package ru.isma.next.app.views.settings
 
+import ru.isma.next.app.extentions.bindDouble
+import ru.isma.next.app.extentions.integerTextField
+import ru.isma.next.app.extentions.numberTextField
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import tornadofx.*
 
@@ -22,9 +25,8 @@ class MethodSettingsView: View("Method") {
                         }
                     }
                     field("Accuracy") {
-                        textfield {
+                        numberTextField(parametersService.integrationMethod.accuracyProperty){
                             disableProperty().bind(!parametersService.integrationMethod.isAccuracyInUseProperty)
-                            bind(parametersService.integrationMethod.accuracyProperty)
                         }
                     }
                     field("Stable") {
@@ -44,9 +46,8 @@ class MethodSettingsView: View("Method") {
                         }
                     }
                     field("Port") {
-                        textfield {
+                        integerTextField(parametersService.integrationMethod.portProperty) {
                             disableProperty().bind(!parametersService.integrationMethod.isParallelInUseProperty)
-                            bind(parametersService.integrationMethod.portProperty)
                         }
                     }
                 }

@@ -22,6 +22,7 @@ dependencies {
     implementation (project(":isma-intg-server:isma-intg-server-client"))
     implementation (project(":isma-intg-lib:isma-intg-lib-common"))
     implementation (project(":isma-intg-lib:isma-intg-lib-euler"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
     testImplementation (project(":isma-intg-lib:isma-intg-lib-common"))
 
     implementation ("org.apache.commons:commons-lang3:3.12.0")

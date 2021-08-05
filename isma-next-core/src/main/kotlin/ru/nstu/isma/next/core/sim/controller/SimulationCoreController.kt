@@ -1,5 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller
 
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.IntgMetricData
@@ -39,7 +41,7 @@ class SimulationCoreController(
     private lateinit var indexProvider: EquationIndexProvider
     private lateinit var hybridSystem: HybridSystem
     private var simulationInitials: SimulationInitials
-    private val stepChangeListeners: MutableList<Consumer<Double>> = LinkedList()
+    private val stepChangeListeners = ArrayList<(value: Double) -> Unit>()
     private var modelClassLoader: ClassLoader? = null
 
     init {
@@ -47,10 +49,10 @@ class SimulationCoreController(
                 initials.y0, initials.stepSize, initials.start, initials.end)
     }
 
-    fun simulate(): HybridSystemIntgResult {
+    suspend fun simulateAsync(): HybridSystemIntegrationResult = coroutineScope {
         checkHSM()
         prepareSimulation()
-        return runSimulation()
+        return@coroutineScope runSimulationAsync()
     }
 
     /**
@@ -90,9 +92,9 @@ class SimulationCoreController(
     /**
      * Моделирование
      */
-    private fun runSimulation(): HybridSystemIntgResult {
+    private suspend fun runSimulationAsync(): HybridSystemIntegrationResult = coroutineScope {
         var computeEngineClient: ComputeEngineClient? = null
-        return try {
+        return@coroutineScope try {
             val stepSolver: DaeSystemStepSolver = if (parallelParameters != null) {
                 computeEngineClient = ComputeEngineClient(modelClassLoader)
                 computeEngineClient.connect(parallelParameters.server, parallelParameters.port)
@@ -104,7 +106,7 @@ class SimulationCoreController(
             }
 
             val cauchyProblemSolver = HybridSystemSimulator()
-            stepChangeListeners.forEach(Consumer { c: Consumer<Double> -> cauchyProblemSolver.addStepChangeListener(c) })
+            stepChangeListeners.forEach(Consumer { c -> cauchyProblemSolver.addStepChangeListener(c) })
 
             val eventDetector = if (eventDetectionParameters != null)
                 EventDetectionIntgController(eventDetectionParameters.gamma, true)
@@ -119,6 +121,9 @@ class SimulationCoreController(
                 runSimulationInMemory(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow)
             }
         } catch (e: Exception) {
+            if (e is CancellationException) {
+                throw e
+            }
             e.printStackTrace()
             throw RuntimeException(e)
         } finally {
@@ -126,53 +131,59 @@ class SimulationCoreController(
         }
     }
 
-    private fun runSimulationInMemory(
+    private suspend fun runSimulationInMemory(
         cauchyProblemSolver: HybridSystemSimulator,
         stepSolver: DaeSystemStepSolver,
         eventDetector: EventDetectionIntgController,
         eventDetectionStepBoundLow: Double
-    ): HybridSystemIntgResult {
+    ): HybridSystemIntegrationResult = coroutineScope {
 
         val resultMemoryStore = IntgResultMemoryStore()
-        val metricData: IntgMetricData = cauchyProblemSolver.run(
+
+        val metricData: IntgMetricData = cauchyProblemSolver.runAsync(
             hybridSystem,
             stepSolver,
             simulationInitials,
             eventDetector,
             eventDetectionStepBoundLow,
-            resultMemoryStore
-        )
+        ) {
+            resultMemoryStore.accept(it)
+        }
+
         logCalculationStatistic(metricData, stepSolver)
-        return HybridSystemIntgResult(indexProvider, metricData, resultMemoryStore)
+        return@coroutineScope HybridSystemIntegrationResult(indexProvider, metricData, resultMemoryStore)
     }
 
     @Throws(IOException::class)
-    private fun runSimulationWithResultFile(
+    private suspend fun runSimulationWithResultFile(
         cauchyProblemSolver: HybridSystemSimulator,
         stepSolver: DaeSystemStepSolver,
         eventDetector: EventDetectionIntgController,
         eventDetectionStepBoundLow: Double
-    ): HybridSystemIntgResult {
+    ): HybridSystemIntegrationResult = coroutineScope {
 
         val resultWriter = IntgResultPointFileWriter(resultFileName)
-        val metricData = cauchyProblemSolver.run(
+        val resultReader = IntgResultPointFileReader()
+
+        val metricData = cauchyProblemSolver.runAsync(
             hybridSystem,
             stepSolver,
             simulationInitials,
             eventDetector,
             eventDetectionStepBoundLow,
-            resultWriter
-        )
+        ) {
+            resultWriter.accept(it)
+        }
         resultWriter.await()
         resultWriter.close()
 
         logCalculationStatistic(metricData, stepSolver)
-        val resultReader = IntgResultPointFileReader()
-        val result = HybridSystemIntgResult()
-        result.metricData = metricData
-        result.resultPointProvider = resultReader
-        result.equationIndexProvider = indexProvider
-        return result
+
+        return@coroutineScope HybridSystemIntegrationResult(
+            metricData = metricData,
+            resultPointProvider = resultReader,
+            equationIndexProvider = indexProvider,
+        )
     }
 
     private fun logCalculationStatistic(
@@ -190,7 +201,7 @@ class SimulationCoreController(
         }
     }
 
-    fun addStepChangeListener(c: Consumer<Double>) {
+    fun addStepChangeListener(c: (Double) -> Unit) {
         stepChangeListeners.add(c)
     }
 

@@ -12,7 +12,7 @@ import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.integration.IntegrationController
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
-import ru.nstu.isma.next.core.sim.controller.HybridSystemIntgResult
+import ru.nstu.isma.next.core.sim.controller.HybridSystemIntegrationResult
 import tornadofx.*
 import java.io.File
 import java.io.FileWriter
@@ -24,16 +24,16 @@ class SimulationResultService(private val grinIntegrationController: Integration
             FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
 
-    private val simulationResultProperty = SimpleObjectProperty<HybridSystemIntgResult>(null)
+    private val simulationResultProperty = SimpleObjectProperty<HybridSystemIntegrationResult>(null)
     fun simulationResultProperty() = simulationResultProperty
-    var simulationResult: HybridSystemIntgResult? by simulationResultProperty
+    var simulationResult: HybridSystemIntegrationResult? by simulationResultProperty
 
     private val isResultAvailableProperty = simulationResultProperty().isNotNull
     fun isResultAvailableProperty(): BooleanBinding = isResultAvailableProperty
     val isResultAvailable by isResultAvailableProperty
 
     fun showChart() {
-        simulationResult?:return;
+        simulationResult?:return
 
         val xAxis = ConcatenationAxis(
             id = UUID.randomUUID(),
@@ -110,7 +110,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
         simulationResult = null
     }
 
-    private fun buildHeader(result: HybridSystemIntgResult): String {
+    private fun buildHeader(result: HybridSystemIntegrationResult): String {
         val header = StringBuilder()
 
         // x
@@ -139,7 +139,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
         return header.toString()
     }
 
-    private fun buildPoints(result: HybridSystemIntgResult): String {
+    private fun buildPoints(result: HybridSystemIntegrationResult): String {
         val points = StringBuilder()
         if (result.resultPointProvider != null) {
             result.resultPointProvider!!.read {
@@ -170,7 +170,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
         return points.toString()
     }
 
-    private fun createColumnNamesArray(result: HybridSystemIntgResult) : Array<String> {
+    private fun createColumnNamesArray(result: HybridSystemIntegrationResult) : Array<String> {
         val equationIndexProvider = result.equationIndexProvider!!
         val deCount = equationIndexProvider.getDifferentialEquationCount()
         val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
@@ -195,7 +195,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
         return outputArray
     }
 
-    private fun createResultColumns(result: HybridSystemIntgResult, columnsCount: Int) : Array<Array<Point>> {
+    private fun createResultColumns(result: HybridSystemIntegrationResult, columnsCount: Int) : Array<Array<Point>> {
         val pointsProvider = result.resultPointProvider!!
         var outputArray = emptyArray<Array<Point>>()
         pointsProvider.read {

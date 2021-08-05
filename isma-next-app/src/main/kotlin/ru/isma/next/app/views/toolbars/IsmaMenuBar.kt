@@ -66,7 +66,7 @@ class IsmaMenuBar: View() {
                 println("Cut!")
             }
             item("Run","Shortcut+F5").action {
-                simulationService.simulateAsync()
+                simulationService.simulate()
             }
             separator()
             item("Store Settings").action {

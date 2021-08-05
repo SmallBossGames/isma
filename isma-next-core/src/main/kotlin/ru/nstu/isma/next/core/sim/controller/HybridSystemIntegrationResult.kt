@@ -8,7 +8,8 @@ import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
  * @author Maria Nasyrova
  * @since 06.10.2015
  */
-class HybridSystemIntgResult(
-        var equationIndexProvider: EquationIndexProvider? = null,
-        var metricData: IntgMetricData? = null,
-        var resultPointProvider: IntgResultPointProvider? = null)
+class HybridSystemIntegrationResult(
+        var equationIndexProvider: EquationIndexProvider,
+        var metricData: IntgMetricData,
+        var resultPointProvider: IntgResultPointProvider
+)

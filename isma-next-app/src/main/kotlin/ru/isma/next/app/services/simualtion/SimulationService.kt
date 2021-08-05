@@ -30,7 +30,6 @@ class SimulationService(
     private val library: IntegrationMethodsLibrary,
     private val modelService: ModelErrorService,
 ) {
-
     private val progressProperty = SimpleDoubleProperty()
     fun progressProperty() = progressProperty
     var progress by progressProperty
@@ -41,55 +40,58 @@ class SimulationService(
 
     private var currentSimulationJob: Job? = null
 
-    fun simulateAsync() {
-        stopCurrentSimulation()
-
-        val simulationJob = Job()
-        val simulationContext = EmptyCoroutineContext + simulationJob
-        val simulationScope = CoroutineScope(simulationContext)
-
-        currentSimulationJob = simulationJob
-
-        simulationScope.launch {
-            val translationResult = lismaPdeService
-                .translateLisma(projectService.activeProject?.lismaText ?: return@launch)
-
-            modelService.setErrorList(emptyList())
-
-            when (translationResult) {
-                is FailedTranslation -> {
-                    modelService.setErrorList(translationResult.errors)
-                }
-                is SuccessTranslation -> {
-                    val initials = createCauchyInitials()
-                    val integrationMethod = createIntegrationMethod()
-
-                    initAccuracyController(integrationMethod)
-                    initStabilityController(integrationMethod)
-
-                    translationResult.hsm.initTimeEquation(initials.start)
-
-                    val simulationController = SimulationCoreController(
-                        translationResult.hsm,
-                        initials,
-                        integrationMethod,
-                        createParallelParameters(),
-                        createFileResultParameters(),
-                        createEventDetectionParameters()
-                    )
-
-                    initAsyncProgressTracking(simulationController, initials)
-
-                    startSimulation(simulationController)
-                }
-                else -> throw IllegalArgumentException()
+    fun simulate() {
+        currentSimulationJob = SimulationScope.launch {
+            try {
+                simulateAsyncInternal()
             }
+            finally {
+                resetState()
+            }
+        }
+    }
+
+    private suspend fun simulateAsyncInternal() = coroutineScope {
+        val translationResult = lismaPdeService
+            .translateLisma(projectService.activeProject?.lismaText ?: return@coroutineScope)
+
+        modelService.setErrorList(emptyList())
+
+        when (translationResult) {
+            is FailedTranslation -> {
+                modelService.setErrorList(translationResult.errors)
+            }
+            is SuccessTranslation -> {
+                val initials = createCauchyInitials()
+                val integrationMethod = createIntegrationMethod()
+
+                initAccuracyController(integrationMethod)
+                initStabilityController(integrationMethod)
+
+                translationResult.hsm.initTimeEquation(initials.start)
+
+                val simulationController = SimulationCoreController(
+                    translationResult.hsm,
+                    initials,
+                    integrationMethod,
+                    createParallelParameters(),
+                    createFileResultParameters(),
+                    createEventDetectionParameters()
+                )
+
+                initAsyncProgressTracking(simulationController, initials)
+
+                startSimulation(simulationController)
+            }
+            else -> throw IllegalArgumentException()
         }
     }
 
     fun stopCurrentSimulation() {
         currentSimulationJob?.cancel()
+    }
 
+    private fun resetState(){
         currentSimulationJob = null
         isSimulationInProgress = false
         progress = 0.0
@@ -109,15 +111,13 @@ class SimulationService(
     }
 
     private fun createEventDetectionParameters(): EventDetectionParameters? {
-        return if (simulationParametersService.eventDetection.isEventDetectionInUse){
-            val stepLowerBound = if (simulationParametersService.eventDetection.isStepLimitInUse)
-                simulationParametersService.eventDetection.lowBorder
-            else
-                0.0
+        val eventDetectionParams = simulationParametersService.eventDetection
 
-            EventDetectionParameters(simulationParametersService.eventDetection.gamma, stepLowerBound)
-        }
-        else {
+        return if (eventDetectionParams.isEventDetectionInUse) {
+            val stepLowerBound = if (eventDetectionParams.isStepLimitInUse) eventDetectionParams.lowBorder else 0.0
+
+            EventDetectionParameters(eventDetectionParams.gamma, stepLowerBound)
+        } else {
             null
         }
     }
@@ -140,10 +140,6 @@ class SimulationService(
             null
     }
 
-
-    private fun normalizeProgress(start: Double, end: Double, current: Double): Double{
-        return max(0.0, min(1.0, (current - start) / (end-start)))
-    }
 
     private fun initAccuracyController(integrationMethod: IntgMethod){
         val accuracyController = integrationMethod.accuracyController
@@ -175,18 +171,24 @@ class SimulationService(
     }
 
     private suspend fun startSimulation(controller: SimulationCoreController) = coroutineScope {
-        try {
-            withContext(Dispatchers.JavaFx) {
-                isSimulationInProgress = true
-            }
-            val result = async {
-                controller.simulate()
-            }
-            withContext(Dispatchers.JavaFx) {
-                simulationResult.simulationResult = result.await()
-            }
-        } finally {
-            stopCurrentSimulation()
+        withContext(Dispatchers.JavaFx) {
+            isSimulationInProgress = true
+        }
+
+        val result = controller.simulateAsync()
+
+        withContext(Dispatchers.JavaFx) {
+            simulationResult.simulationResult = result
+        }
+    }
+
+    companion object {
+        private val SimulationSupervisor = SupervisorJob()
+
+        val SimulationScope = CoroutineScope(EmptyCoroutineContext + SimulationSupervisor)
+
+        private fun normalizeProgress(start: Double, end: Double, current: Double): Double{
+            return max(0.0, min(1.0, (current - start) / (end-start)))
         }
     }
 }

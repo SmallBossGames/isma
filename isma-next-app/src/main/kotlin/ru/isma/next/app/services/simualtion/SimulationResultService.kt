@@ -4,8 +4,9 @@ import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
@@ -14,12 +15,15 @@ import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.integration.IntegrationController
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
+import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.next.core.sim.controller.HybridSystemIntegrationResult
-import tornadofx.*
+import tornadofx.FileChooserMode
+import tornadofx.chooseFile
+import tornadofx.getValue
+import tornadofx.setValue
 import java.io.File
-import java.io.FileWriter
-import java.io.IOException
-import java.util.UUID
+import java.io.Writer
+import java.util.*
 
 class SimulationResultService(private val grinIntegrationController: IntegrationController) {
     private val fileFilers = arrayOf(
@@ -91,20 +95,20 @@ class SimulationResultService(private val grinIntegrationController: Integration
 
         val file = selectedFiles.first()
 
-        exportToFile(file)
+        ResultServiceScope.launch {
+            exportToFileAsync(file)
+        }
     }
 
-    fun exportToFile(file: File){
-        simulationResult ?: return
-        try {
-            FileWriter(file).buffered().use { writer ->
+    suspend fun exportToFileAsync(file: File) = coroutineScope {
+        val result = simulationResult ?: return@coroutineScope
+
+        launch(Dispatchers.IO) {
+            file.bufferedWriter().use { writer ->
                 val header = buildHeader(simulationResult!!)
                 writer.write(header)
-                val points = buildPoints(simulationResult!!)
-                writer.write(points)
+                writePoints(result, writer)
             }
-        } catch (e: IOException) {
-            throw RuntimeException(e)
         }
     }
 
@@ -112,63 +116,36 @@ class SimulationResultService(private val grinIntegrationController: Integration
         simulationResult = null
     }
 
-    private fun buildHeader(result: HybridSystemIntegrationResult): String {
-        val header = StringBuilder()
+    private suspend fun writePoints(result: HybridSystemIntegrationResult, writer: Writer) = coroutineScope {
+        result.resultPointProvider.results.collect { value ->
+            writer.appendLine(value.toCsvLine())
+        }
+    }
 
-        // x
-        header.append("x").append(COMMA_AND_SPACE)
-        val equationIndexProvider = result.equationIndexProvider
+    private fun IntgResultPoint.toCsvLine() : String {
+        val builder = StringBuilder()
+
+        builder.append(x).append(COMMA_AND_SPACE)
 
         // Дифференциальные переменные
-        val deCount = equationIndexProvider.getDifferentialEquationCount()
-        for (i in 0 until deCount) {
-            header.append(equationIndexProvider.getDifferentialEquationCode(i)).append(COMMA_AND_SPACE)
+        for (yForDe in yForDe) {
+            builder.append(yForDe).append(COMMA_AND_SPACE)
         }
 
         // Алгебраические переменные
-        val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
-        for (i in 0 until aeCount) {
-            header.append(equationIndexProvider.getAlgebraicEquationCode(i)).append(COMMA_AND_SPACE)
+        for (yForAe in rhs[DaeSystem.RHS_AE_PART_IDX]) {
+            builder.append(yForAe).append(COMMA_AND_SPACE)
         }
 
         // Правая часть
-        for (i in 0 until deCount) {
-            header.append("f").append(i.toString()).append(COMMA_AND_SPACE)
+        for (f in rhs[DaeSystem.RHS_DE_PART_IDX]) {
+            builder.append(f).append(COMMA_AND_SPACE)
         }
 
         // Удаляем последний пробел и запятую и заменяем на перенос строки
-        header.delete(header.length - 2, header.length).appendLine()
-        return header.toString()
-    }
+        builder.delete(builder.length - 2, builder.length)
 
-    private fun buildPoints(result: HybridSystemIntegrationResult): String = runBlocking {
-        val points = StringBuilder()
-
-        result.resultPointProvider.results.toList().forEach {
-
-            // x
-            points.append(it.x).append(COMMA_AND_SPACE)
-
-            // Дифференциальные переменные
-            for (yForDe in it.yForDe) {
-                points.append(yForDe).append(COMMA_AND_SPACE)
-            }
-
-            // Алгебраические переменные
-            for (yForAe in it.rhs[DaeSystem.RHS_AE_PART_IDX]) {
-                points.append(yForAe).append(COMMA_AND_SPACE)
-            }
-
-            // Правая часть
-            for (f in it.rhs[DaeSystem.RHS_DE_PART_IDX]) {
-                points.append(f).append(COMMA_AND_SPACE)
-            }
-
-            // Удаляем последний пробел и запятую и заменяем на перенос строки
-            points.delete(points.length - 2, points.length).appendLine()
-
-        }
-        return@runBlocking points.toString()
+        return builder.toString()
     }
 
     private fun createColumnNamesArray(result: HybridSystemIntegrationResult) : Array<String> {
@@ -238,5 +215,36 @@ class SimulationResultService(private val grinIntegrationController: Integration
 
     companion object {
         private const val COMMA_AND_SPACE = ", "
+
+        private val ResultServiceScope = CoroutineScope(Dispatchers.Default)
+
+        private fun buildHeader(result: HybridSystemIntegrationResult): String {
+            val header = StringBuilder()
+
+            // x
+            header.append("x").append(COMMA_AND_SPACE)
+            val equationIndexProvider = result.equationIndexProvider
+
+            // Дифференциальные переменные
+            val deCount = equationIndexProvider.getDifferentialEquationCount()
+            for (i in 0 until deCount) {
+                header.append(equationIndexProvider.getDifferentialEquationCode(i)).append(COMMA_AND_SPACE)
+            }
+
+            // Алгебраические переменные
+            val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
+            for (i in 0 until aeCount) {
+                header.append(equationIndexProvider.getAlgebraicEquationCode(i)).append(COMMA_AND_SPACE)
+            }
+
+            // Правая часть
+            for (i in 0 until deCount) {
+                header.append("f").append(i.toString()).append(COMMA_AND_SPACE)
+            }
+
+            // Удаляем последний пробел и запятую и заменяем на перенос строки
+            header.delete(header.length - 2, header.length).appendLine()
+            return header.toString()
+        }
     }
 }

@@ -117,7 +117,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
 
         // x
         header.append("x").append(COMMA_AND_SPACE)
-        val equationIndexProvider = result.equationIndexProvider!!
+        val equationIndexProvider = result.equationIndexProvider
 
         // Дифференциальные переменные
         val deCount = equationIndexProvider.getDifferentialEquationCount()
@@ -172,7 +172,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
     }
 
     private fun createColumnNamesArray(result: HybridSystemIntegrationResult) : Array<String> {
-        val equationIndexProvider = result.equationIndexProvider!!
+        val equationIndexProvider = result.equationIndexProvider
         val deCount = equationIndexProvider.getDifferentialEquationCount()
         val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
         val outputArray = Array(deCount*2 + aeCount) { "" }

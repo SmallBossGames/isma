@@ -2,18 +2,18 @@ package ru.nstu.isma.next.core.sim.controller
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consume
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.take
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.*
 import ru.nstu.isma.intg.api.calcmodel.HybridSystem
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
+import ru.nstu.isma.intg.api.models.IntgResultPoint
+import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
+import ru.nstu.isma.intg.api.providers.MemoryPointProvider
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
+import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
 import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.intg.server.client.ComputeEngineClient
@@ -142,7 +142,7 @@ class SimulationCoreController(
         eventDetectionStepBoundLow: Double
     ): HybridSystemIntegrationResult = coroutineScope {
 
-        val resultMemoryStore = IntgResultMemoryStore()
+        val resultMemoryStore = MemoryPointProvider()
 
         val metricData: IntgMetricData = cauchyProblemSolver.runAsync(
             hybridSystem,
@@ -189,10 +189,10 @@ class SimulationCoreController(
                 var isFirst = true
                 pointsChannel.consumeEach {
                     if(isFirst){
-                        writer.append(IntgResultPointFileWriter.buildCsvHeader(it))
+                        writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(it))
                         isFirst = false
                     }
-                    writer.append(IntgResultPointFileWriter.buildCsvString(it))
+                    writer.append(IntegrationResultPointFileHelpers.buildCsvString(it))
                 }
             }
         }

@@ -1,7 +1,7 @@
 package ru.nstu.isma.intg.api.solvers;
 
 import ru.nstu.isma.intg.api.IntgMetricData;
-import ru.nstu.isma.intg.api.IntgResultPoint;
+import ru.nstu.isma.intg.api.models.IntgResultPoint;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyProblem;
 
 import java.util.function.Consumer;

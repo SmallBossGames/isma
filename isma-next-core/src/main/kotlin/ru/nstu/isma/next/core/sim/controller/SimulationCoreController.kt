@@ -1,13 +1,15 @@
 package ru.nstu.isma.next.core.sim.controller
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consume
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.take
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.intg.api.IntgMetricData
-import ru.nstu.isma.intg.api.IntgResultMemoryStore
-import ru.nstu.isma.intg.api.IntgResultPointFileReader
-import ru.nstu.isma.intg.api.IntgResultPointFileWriter
+import ru.nstu.isma.intg.api.*
 import ru.nstu.isma.intg.api.calcmodel.HybridSystem
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
@@ -21,8 +23,8 @@ import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 import ru.nstu.isma.next.core.sim.controller.gen.SourceCodeCompiler
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
+import java.io.File
 import java.io.IOException
-import java.util.*
 import java.util.function.Consumer
 
 /**
@@ -30,12 +32,12 @@ import java.util.function.Consumer
  * on 04.01.2015.
  */
 class SimulationCoreController(
-        private val hsm: HSM,
-        initials: CauchyInitials,
-        private val method: IntgMethod,
-        private val parallelParameters: ParallelParameters?,
-        private val resultFileName: String?,
-        private val eventDetectionParameters: EventDetectionParameters?) {
+    private val hsm: HSM,
+    initials: CauchyInitials,
+    private val method: IntgMethod,
+    private val parallelParameters: ParallelParameters?,
+    private val resultStorageType: SimulationResultStorageType,
+    private val eventDetectionParameters: EventDetectionParameters?) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
     private lateinit var indexProvider: EquationIndexProvider
@@ -51,7 +53,7 @@ class SimulationCoreController(
 
     suspend fun simulateAsync(): HybridSystemIntegrationResult = coroutineScope {
         checkHSM()
-        prepareSimulation()
+        prepareSimulationAsync()
         return@coroutineScope runSimulationAsync()
     }
 
@@ -64,7 +66,7 @@ class SimulationCoreController(
     /**
      * 2 Подготовить HSM к рассчетам
      */
-    private fun prepareSimulation() {
+    private suspend fun prepareSimulationAsync() = coroutineScope {
         indexProvider = EquationIndexProvider(hsm)
         val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
         val hsSourceCode = hsClassBuilder.buildSourceCode()
@@ -115,11 +117,13 @@ class SimulationCoreController(
 
             val stepBoundLow = eventDetectionParameters?.stepBoundLow ?: 0.0
 
-            if (resultFileName != null) {
-                runSimulationWithResultFile(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow)
-            } else{
-                runSimulationInMemory(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow)
+            when(resultStorageType){
+                is MemoryStorage ->
+                    runSimulationInMemory(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow)
+                is FileStorage ->
+                    runSimulationWithResultFile(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow, resultStorageType.filePath)
             }
+
         } catch (e: Exception) {
             if (e is CancellationException) {
                 throw e
@@ -151,6 +155,7 @@ class SimulationCoreController(
         }
 
         logCalculationStatistic(metricData, stepSolver)
+
         return@coroutineScope HybridSystemIntegrationResult(indexProvider, metricData, resultMemoryStore)
     }
 
@@ -159,23 +164,41 @@ class SimulationCoreController(
         cauchyProblemSolver: HybridSystemSimulator,
         stepSolver: DaeSystemStepSolver,
         eventDetector: EventDetectionIntgController,
-        eventDetectionStepBoundLow: Double
+        eventDetectionStepBoundLow: Double,
+        resultFileName: String,
     ): HybridSystemIntegrationResult = coroutineScope {
 
-        val resultWriter = IntgResultPointFileWriter(resultFileName)
-        val resultReader = IntgResultPointFileReader()
+        val pointsChannel = Channel<IntgResultPoint>()
 
-        val metricData = cauchyProblemSolver.runAsync(
-            hybridSystem,
-            stepSolver,
-            simulationInitials,
-            eventDetector,
-            eventDetectionStepBoundLow,
-        ) {
-            resultWriter.accept(it)
+        val metricDataJob = async {
+            val result = cauchyProblemSolver.runAsync(
+                hybridSystem,
+                stepSolver,
+                simulationInitials,
+                eventDetector,
+                eventDetectionStepBoundLow,
+            ) {
+                pointsChannel.send(it)
+            }
+            pointsChannel.close()
+            return@async result
         }
-        resultWriter.await()
-        resultWriter.close()
+
+        launch(Dispatchers.IO) {
+            File(resultFileName).bufferedWriter().use { writer ->
+                var isFirst = true
+                pointsChannel.consumeEach {
+                    if(isFirst){
+                        writer.append(IntgResultPointFileWriter.buildCsvHeader(it))
+                        isFirst = false
+                    }
+                    writer.append(IntgResultPointFileWriter.buildCsvString(it))
+                }
+            }
+        }
+
+        val metricData = metricDataJob.await()
+        val resultReader = AsyncFilePointProvider(resultFileName)
 
         logCalculationStatistic(metricData, stepSolver)
 

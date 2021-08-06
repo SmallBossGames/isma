@@ -30,7 +30,7 @@ class HybridSystemSimulator {
         simulationInitials: SimulationInitials,
         eventDetector: EventDetectionIntgController,
         eventDetectionStepBoundLow: Double,
-        resultPointConsumer: (point: IntgResultPoint) -> Unit
+        resultPointConsumer: suspend (point: IntgResultPoint) -> Unit
     ): IntgMetricData = coroutineScope {
         val metricData = IntgMetricData()
         metricData.setStartTime(System.currentTimeMillis())

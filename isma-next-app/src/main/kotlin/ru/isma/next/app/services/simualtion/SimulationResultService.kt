@@ -4,6 +4,8 @@ import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
@@ -139,35 +141,34 @@ class SimulationResultService(private val grinIntegrationController: Integration
         return header.toString()
     }
 
-    private fun buildPoints(result: HybridSystemIntegrationResult): String {
+    private fun buildPoints(result: HybridSystemIntegrationResult): String = runBlocking {
         val points = StringBuilder()
-        if (result.resultPointProvider != null) {
-            result.resultPointProvider!!.read {
-                for (p in it) {
-                    // x
-                    points.append(p.x).append(COMMA_AND_SPACE)
 
-                    // Дифференциальные переменные
-                    for (yForDe in p.yForDe) {
-                        points.append(yForDe).append(COMMA_AND_SPACE)
-                    }
+        result.resultPointProvider.results.toList().forEach {
 
-                    // Алгебраические переменные
-                    for (yForAe in p.rhs[DaeSystem.RHS_AE_PART_IDX]) {
-                        points.append(yForAe).append(COMMA_AND_SPACE)
-                    }
+            // x
+            points.append(it.x).append(COMMA_AND_SPACE)
 
-                    // Правая часть
-                    for (f in p.rhs[DaeSystem.RHS_DE_PART_IDX]) {
-                        points.append(f).append(COMMA_AND_SPACE)
-                    }
-
-                    // Удаляем последний пробел и запятую и заменяем на перенос строки
-                    points.delete(points.length - 2, points.length).appendLine()
-                }
+            // Дифференциальные переменные
+            for (yForDe in it.yForDe) {
+                points.append(yForDe).append(COMMA_AND_SPACE)
             }
+
+            // Алгебраические переменные
+            for (yForAe in it.rhs[DaeSystem.RHS_AE_PART_IDX]) {
+                points.append(yForAe).append(COMMA_AND_SPACE)
+            }
+
+            // Правая часть
+            for (f in it.rhs[DaeSystem.RHS_DE_PART_IDX]) {
+                points.append(f).append(COMMA_AND_SPACE)
+            }
+
+            // Удаляем последний пробел и запятую и заменяем на перенос строки
+            points.delete(points.length - 2, points.length).appendLine()
+
         }
-        return points.toString()
+        return@runBlocking points.toString()
     }
 
     private fun createColumnNamesArray(result: HybridSystemIntegrationResult) : Array<String> {
@@ -195,34 +196,31 @@ class SimulationResultService(private val grinIntegrationController: Integration
         return outputArray
     }
 
-    private fun createResultColumns(result: HybridSystemIntegrationResult, columnsCount: Int) : Array<Array<Point>> {
-        val pointsProvider = result.resultPointProvider!!
-        var outputArray = emptyArray<Array<Point>>()
-        pointsProvider.read {
-            val rowsCount = it.size
-            val tempArray = Array(columnsCount) { Array(rowsCount) { Point.Zero } }
-            for (i in it.indices) {
-                val x = it[i].x
+    private fun createResultColumns(result: HybridSystemIntegrationResult, columnsCount: Int) : Array<Array<Point>> = runBlocking {
+        val it = result.resultPointProvider.results.toList()
+        val rowsCount = it.size
+        val tempArray = Array(columnsCount) { Array(rowsCount) { Point.Zero } }
+        for (i in it.indices) {
+            val x = it[i].x
 
-                for (j in it[i].yForDe.indices) {
-                    tempArray[j][i] = Point(x, it[i].yForDe[j])
-                }
-
-                var offset = it[i].yForDe.size
-
-                for (j in it[i].rhs[DaeSystem.RHS_AE_PART_IDX].indices) {
-                    tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_AE_PART_IDX][j])
-                }
-
-                offset = it[i].yForDe.size + it[i].rhs[DaeSystem.RHS_AE_PART_IDX].size
-
-                for (j in it[i].rhs[DaeSystem.RHS_DE_PART_IDX].indices) {
-                    tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_DE_PART_IDX][j])
-                }
+            for (j in it[i].yForDe.indices) {
+                tempArray[j][i] = Point(x, it[i].yForDe[j])
             }
-            outputArray = tempArray
+
+            var offset = it[i].yForDe.size
+
+            for (j in it[i].rhs[DaeSystem.RHS_AE_PART_IDX].indices) {
+                tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_AE_PART_IDX][j])
+            }
+
+            offset = it[i].yForDe.size + it[i].rhs[DaeSystem.RHS_AE_PART_IDX].size
+
+            for (j in it[i].rhs[DaeSystem.RHS_DE_PART_IDX].indices) {
+                tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_DE_PART_IDX][j])
+            }
         }
-        return outputArray
+
+        return@runBlocking tempArray
     }
 
     private fun createSimpleConcatenationFunction(name: String, points: List<Point>) : ConcatenationFunction {

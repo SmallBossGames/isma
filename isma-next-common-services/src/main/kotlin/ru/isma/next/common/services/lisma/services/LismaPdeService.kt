@@ -6,7 +6,6 @@ import ru.isma.next.common.services.lisma.LismaTranslationResult
 import ru.isma.next.common.services.lisma.SuccessTranslation
 import ru.isma.next.common.services.lisma.models.SyntaxErrorModel
 import ru.nstu.isma.lisma.InputTranslator
-import ru.nstu.isma.lisma.LismaTranslator
 import ru.nstu.isma.next.core.sim.fdm.FDMNewConverter
 
 class LismaPdeService(

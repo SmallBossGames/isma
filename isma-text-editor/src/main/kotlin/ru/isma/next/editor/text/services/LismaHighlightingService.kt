@@ -3,9 +3,8 @@ package ru.isma.next.editor.text.services
 import org.antlr.v4.runtime.CharStreams
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
-import ru.isma.next.common.services.lisma.services.LismaPdeService
 import ru.isma.next.editor.text.services.contracts.IHighlightingService
-import ru.nstu.isma.`in`.lisma.analysis.gen.LismaLexer
+import ru.nstu.isma.lisma.analysis.gen.LismaLexer
 
 class LismaHighlightingService() : IHighlightingService {
     override fun createHighlightingStyleSpans(source: String): StyleSpans<Collection<String>>? {

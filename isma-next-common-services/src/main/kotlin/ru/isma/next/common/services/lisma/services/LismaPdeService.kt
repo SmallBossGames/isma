@@ -5,15 +5,16 @@ import ru.isma.next.common.services.lisma.FailedTranslation
 import ru.isma.next.common.services.lisma.LismaTranslationResult
 import ru.isma.next.common.services.lisma.SuccessTranslation
 import ru.isma.next.common.services.lisma.models.SyntaxErrorModel
-import ru.nstu.isma.`in`.InputTranslator
-import ru.nstu.isma.`in`.lisma.LismaTranslator
+import ru.nstu.isma.lisma.InputTranslator
+import ru.nstu.isma.lisma.LismaTranslator
 import ru.nstu.isma.next.core.sim.fdm.FDMNewConverter
 
-class LismaPdeService {
+class LismaPdeService(
+    private val translator: InputTranslator
+) {
     fun translateLisma(source: String): LismaTranslationResult {
         val errors = IsmaErrorList()
-        val translator: InputTranslator = LismaTranslator(source, errors)
-        val model = translator.translate()
+        val model = translator.translate(source, errors)
 
         val processedModel = if (model.isPDE) model else FDMNewConverter(model).convert()
 

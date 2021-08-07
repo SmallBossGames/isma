@@ -4,6 +4,8 @@ import org.koin.dsl.module
 import ru.isma.next.editor.text.services.TextEditorService
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import ru.nstu.grin.integration.IntegrationController
+import ru.nstu.isma.lisma.InputTranslator
+import ru.nstu.isma.lisma.LismaTranslator
 import ru.nstu.isma.next.core.sim.controller.HsmCompiler
 import ru.nstu.isma.next.core.sim.controller.HybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
@@ -19,4 +21,5 @@ val externalServicesModule = module {
     single<ISimulationCoreController> { SimulationCoreController(get(), get()) }
     single<IHybridSystemSimulator> { HybridSystemSimulator() }
     single<IHsmCompiler> { HsmCompiler() }
+    single<InputTranslator> { LismaTranslator() }
 }

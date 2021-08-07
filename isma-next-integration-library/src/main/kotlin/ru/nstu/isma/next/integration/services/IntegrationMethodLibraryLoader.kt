@@ -36,7 +36,7 @@ class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
     }
 
     private fun loadSystemMethods(): Collection<Class<out IntgMethod?>> {
-        val reflections: org.reflections.Reflections = org.reflections.Reflections("ru.nstu.isma.intg.lib")
+        val reflections = org.reflections.Reflections("ru.nstu.isma.intg.lib")
         return reflections.getSubTypesOf(IntgMethod::class.java)
     }
 
@@ -56,18 +56,18 @@ class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
     }
 
     private fun registerIntgMethod(libraryInstance: IntegrationMethodsLibrary, intgMethodClass: Class<out IntgMethod?>, system: Boolean): Boolean {
-        var intgMethod: IntgMethod? = null
         try {
-            intgMethod = intgMethodClass.newInstance()
+            val integrationMethod = intgMethodClass.getDeclaredConstructor().newInstance()
+            if (integrationMethod != null && !libraryInstance.containsIntgMethod(integrationMethod.name)) {
+                libraryInstance.registerIntgMethod(integrationMethod, system)
+                return true
+            }
         } catch (e: InstantiationException) {
             logger.error("Failed to create intg method from class \"" + intgMethodClass.name + "\"", e)
         } catch (e: IllegalAccessException) {
             logger.error("Failed to create intg method from class \"" + intgMethodClass.name + "\"", e)
         }
-        if (intgMethod != null && !libraryInstance.containsIntgMethod(intgMethod.getName())) {
-            libraryInstance.registerIntgMethod(intgMethod, system)
-            return true
-        }
+
         return false
     }
 

@@ -14,8 +14,9 @@ import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.next.core.sim.controller.FileStorage
 import ru.nstu.isma.next.core.sim.controller.MemoryStorage
-import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.SimulationResultStorageType
+import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
+import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
@@ -32,6 +33,7 @@ class SimulationService(
     private val simulationResult: SimulationResultService,
     private val library: IntegrationMethodsLibrary,
     private val modelService: ModelErrorService,
+    private val simulationController: ISimulationCoreController,
 ) {
     private val progressProperty = SimpleDoubleProperty()
     fun progressProperty() = progressProperty
@@ -73,18 +75,31 @@ class SimulationService(
 
                 translationResult.hsm.initTimeEquation(initials.start)
 
-                val simulationController = SimulationCoreController(
-                    translationResult.hsm,
-                    initials,
-                    integrationMethod,
-                    createParallelParameters(),
-                    createFileResultParameters(),
-                    createEventDetectionParameters()
+                withContext(Dispatchers.JavaFx) {
+                    isSimulationInProgress = true
+                }
+
+                val context = IntegratorApiParameters(
+                    hsm = translationResult.hsm,
+                    initials = createCauchyInitials(),
+                    method = integrationMethod,
+                    parallelParameters = createParallelParameters(),
+                    resultStorageType = createFileResultParameters(),
+                    eventDetectionParameters = createEventDetectionParameters(),
+                    stepChangeHandlers = arrayListOf(
+                        {
+                            withContext(Dispatchers.JavaFx) {
+                                progress = normalizeProgress(initials.start, initials.end, it)
+                            }
+                        }
+                    )
                 )
 
-                initAsyncProgressTracking(simulationController, initials)
+                val result = simulationController.simulateAsync(context)
 
-                startSimulation(simulationController)
+                withContext(Dispatchers.JavaFx) {
+                    simulationResult.simulationResult = result
+                }
             }
             else -> throw IllegalArgumentException()
         }
@@ -160,29 +175,6 @@ class SimulationService(
         val stabilityController = integrationMethod.stabilityController
         if (stabilityController != null) {
             stabilityController.isEnabled = simulationParametersService.integrationMethod.isStableInUse
-        }
-    }
-
-    private fun initAsyncProgressTracking(
-        simulationController: SimulationCoreController,
-        initials: CauchyInitials
-    ){
-        simulationController.addStepChangeListener {
-            withContext(Dispatchers.JavaFx) {
-                progress = normalizeProgress(initials.start, initials.end, it)
-            }
-        }
-    }
-
-    private suspend fun startSimulation(controller: SimulationCoreController) = coroutineScope {
-        withContext(Dispatchers.JavaFx) {
-            isSimulationInProgress = true
-        }
-
-        val result = controller.simulateAsync()
-
-        withContext(Dispatchers.JavaFx) {
-            simulationResult.simulationResult = result
         }
     }
 

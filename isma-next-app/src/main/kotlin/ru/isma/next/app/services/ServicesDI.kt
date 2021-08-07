@@ -17,6 +17,6 @@ val servicesModule = module {
     single<LismaPdeService> { LismaPdeService() }
     single<SimulationParametersService> { SimulationParametersService(get()) }
     single<SimulationResultService> { SimulationResultService(get()) }
-    single<SimulationService> { SimulationService(get(), get(), get(), get(), get(), get()) }
+    single<SimulationService> { SimulationService(get(), get(), get(), get(), get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
 }

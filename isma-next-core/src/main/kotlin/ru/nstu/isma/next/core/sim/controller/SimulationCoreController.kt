@@ -5,10 +5,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.intg.api.*
+import ru.nstu.isma.intg.api.IntgMetricData
 import ru.nstu.isma.intg.api.calcmodel.HybridSystem
-import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
-import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
 import ru.nstu.isma.intg.api.providers.MemoryPointProvider
@@ -18,113 +16,91 @@ import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.intg.server.client.ComputeEngineClient
 import ru.nstu.isma.intg.server.client.RemoteDaeSystemStepSolver
+import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.gen.AnalyzedHybridSystemClassBuilder
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 import ru.nstu.isma.next.core.sim.controller.gen.SourceCodeCompiler
-import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
-import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
+import ru.nstu.isma.next.core.sim.controller.models.FileStorageSimulationParameters
+import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
+import ru.nstu.isma.next.core.sim.controller.models.InMemorySimulationParameters
+import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import java.io.File
 import java.io.IOException
-import java.util.function.Consumer
 
 /**
  * Created by Bessonov Alex
  * on 04.01.2015.
  */
-class SimulationCoreController(
-    private val hsm: HSM,
-    initials: CauchyInitials,
-    private val method: IntgMethod,
-    private val parallelParameters: ParallelParameters?,
-    private val resultStorageType: SimulationResultStorageType,
-    private val eventDetectionParameters: EventDetectionParameters?) {
-
+class SimulationCoreController : ISimulationCoreController {
     private val logger = LoggerFactory.getLogger(this.javaClass)
-    private lateinit var indexProvider: EquationIndexProvider
-    private lateinit var hybridSystem: HybridSystem
-    private var simulationInitials: SimulationInitials
-    private val stepChangeListeners = ArrayList<suspend (value: Double) -> Unit>()
-    private var modelClassLoader: ClassLoader? = null
-
-    init {
-        simulationInitials = SimulationInitials(
-                initials.y0, initials.stepSize, initials.start, initials.end)
-    }
-
-    suspend fun simulateAsync(): HybridSystemIntegrationResult = coroutineScope {
-        checkHSM()
-        prepareSimulationAsync()
-        return@coroutineScope runSimulationAsync()
-    }
-
-    /**
-     * 1 Проверить на корректность
-     */
-    private fun checkHSM() { // todo
-    }
-
-    /**
-     * 2 Подготовить HSM к рассчетам
-     */
-    private suspend fun prepareSimulationAsync() = coroutineScope {
-        indexProvider = EquationIndexProvider(hsm)
-        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
-        val hsSourceCode = hsClassBuilder.buildSourceCode()
-        hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
-            DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode
-        )
-        modelClassLoader = hybridSystem.javaClass.classLoader
-
-        // подготовка СЛАУ
-        //HMLinearSystem linearSystem = hsm.getLinearSystem();
-        //if (linearSystem != null && !linearSystem.isEmpty())
-        //linearSystem.prepareForCalculation(modelContext);
-        //hybridSystem.setLinearSystem(hsm.getLinearSystem());
-
-        // заполняем начальные значения для ДУ
-        val odeInitials = DoubleArray(hsm.variableTable.odes.size)
-        for (ode in hsm.variableTable.odes) {
-            val idx = indexProvider.getDifferentialEquationIndex(ode.code)!!
-            odeInitials[idx] = ode.initialValue
-        }
-        simulationInitials = SimulationInitials(odeInitials, simulationInitials.step,
-                simulationInitials.start, simulationInitials.end)
-    }
 
     /**
      * Моделирование
      */
-    private suspend fun runSimulationAsync(): HybridSystemIntegrationResult = coroutineScope {
+    override suspend fun simulateAsync(parameters: IntegratorApiParameters): HybridSystemIntegrationResult = coroutineScope {
+        val compilationResult = compileHsm(parameters.hsm)
+
+        val initials = SimulationInitials(
+            differentialEquationInitials = createOdeInitials(compilationResult.indexProvider, parameters.hsm),
+            start = parameters.initials.start,
+            end = parameters.initials.end,
+            step = parameters.initials.stepSize
+        )
+
         var computeEngineClient: ComputeEngineClient? = null
         return@coroutineScope try {
-            val stepSolver: DaeSystemStepSolver = if (parallelParameters != null) {
-                computeEngineClient = ComputeEngineClient(modelClassLoader)
-                computeEngineClient.connect(parallelParameters.server, parallelParameters.port)
-                computeEngineClient.loadIntgMethod(method)
-                computeEngineClient.loadDaeSystem(hybridSystem.daeSystem)
-                RemoteDaeSystemStepSolver(method, computeEngineClient)
+            val stepSolver: DaeSystemStepSolver = if (parameters.parallelParameters != null) {
+                computeEngineClient = ComputeEngineClient(compilationResult.classLoader).apply {
+                    connect(parameters.parallelParameters.server, parameters.parallelParameters.port)
+                    loadIntgMethod(parameters.method)
+                    loadDaeSystem(compilationResult.hybridSystem.daeSystem)
+                }
+                RemoteDaeSystemStepSolver(parameters.method, computeEngineClient)
             } else {
-                DefaultDaeSystemStepSolver(method, hybridSystem.daeSystem)
+                DefaultDaeSystemStepSolver(parameters.method, compilationResult.hybridSystem.daeSystem)
             }
 
             val cauchyProblemSolver = HybridSystemSimulator()
 
-            stepChangeListeners.forEach {
-                    c -> cauchyProblemSolver.addStepChangeListener(c)
+            parameters.stepChangeHandlers.forEach {
+                cauchyProblemSolver.addStepChangeListener(it)
             }
 
-            val eventDetector = if (eventDetectionParameters != null)
-                EventDetectionIntgController(eventDetectionParameters.gamma, true)
+            val eventDetector = if (parameters.eventDetectionParameters != null)
+                EventDetectionIntgController(parameters.eventDetectionParameters.gamma, true)
             else
                 EventDetectionIntgController(0.0, false)
 
-            val stepBoundLow = eventDetectionParameters?.stepBoundLow ?: 0.0
+            val stepBoundLow = parameters.eventDetectionParameters?.stepBoundLow ?: 0.0
 
-            when(resultStorageType){
-                is MemoryStorage ->
-                    runSimulationInMemory(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow)
-                is FileStorage ->
-                    runSimulationWithResultFile(cauchyProblemSolver, stepSolver, eventDetector, stepBoundLow, resultStorageType.filePath)
+            when(parameters.resultStorageType) {
+                is MemoryStorage -> {
+                    val context = InMemorySimulationParameters(
+                        compilationResult.hybridSystem,
+                        initials,
+                        compilationResult.indexProvider,
+                        cauchyProblemSolver,
+                        stepSolver,
+                        eventDetector,
+                        stepBoundLow
+                    )
+
+                    runSimulationInMemory(context)
+                }
+                is FileStorage -> {
+                    val context = FileStorageSimulationParameters(
+                        compilationResult.hybridSystem,
+                        initials,
+                        compilationResult.indexProvider,
+                        cauchyProblemSolver,
+                        stepSolver,
+                        eventDetector,
+                        stepBoundLow,
+                        parameters.resultStorageType.filePath
+                    )
+
+                    runSimulationWithResultFile(context)
+                }
             }
 
         } catch (e: Exception) {
@@ -138,79 +114,92 @@ class SimulationCoreController(
         }
     }
 
-    private suspend fun runSimulationInMemory(
-        cauchyProblemSolver: HybridSystemSimulator,
-        stepSolver: DaeSystemStepSolver,
-        eventDetector: EventDetectionIntgController,
-        eventDetectionStepBoundLow: Double
-    ): HybridSystemIntegrationResult = coroutineScope {
+    private suspend fun compileHsm(hsm: HSM): HsmCompilationResult = coroutineScope {
+        val indexProvider = EquationIndexProvider(hsm)
+        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
+        val hsSourceCode = hsClassBuilder.buildSourceCode()
+        val hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
+            DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode
+        )
+        val modelClassLoader = hybridSystem.javaClass.classLoader!!
 
-        val resultMemoryStore = MemoryPointProvider()
+        return@coroutineScope HsmCompilationResult(indexProvider, hybridSystem, modelClassLoader)
+    }
 
-        val metricData: IntgMetricData = cauchyProblemSolver.runAsync(
-            hybridSystem,
-            stepSolver,
-            simulationInitials,
-            eventDetector,
-            eventDetectionStepBoundLow,
-        ) {
-            resultMemoryStore.accept(it)
+    private suspend fun createOdeInitials(indexProvider: EquationIndexProvider, hsm: HSM): DoubleArray = coroutineScope {
+        val odeInitials = DoubleArray(hsm.variableTable.odes.size)
+
+        for (ode in hsm.variableTable.odes) {
+            val idx = indexProvider.getDifferentialEquationIndex(ode.code)!!
+            odeInitials[idx] = ode.initialValue
         }
 
-        logCalculationStatistic(metricData, stepSolver)
-
-        return@coroutineScope HybridSystemIntegrationResult(indexProvider, metricData, resultMemoryStore)
+        return@coroutineScope odeInitials
     }
+
+    private suspend fun runSimulationInMemory(context: InMemorySimulationParameters): HybridSystemIntegrationResult =
+        coroutineScope {
+            val resultMemoryStore = MemoryPointProvider()
+
+            val metricData: IntgMetricData = context.cauchyProblemSolver.runAsync(
+                context.hybridSystem,
+                context.stepSolver,
+                context.simulationInitials,
+                context.eventDetector,
+                context.eventDetectionStepBoundLow,
+            ) {
+                resultMemoryStore.accept(it)
+            }
+
+            logCalculationStatistic(metricData, context.stepSolver)
+
+            return@coroutineScope HybridSystemIntegrationResult(context.indexProvider, metricData, resultMemoryStore)
+        }
 
     @Throws(IOException::class)
-    private suspend fun runSimulationWithResultFile(
-        cauchyProblemSolver: HybridSystemSimulator,
-        stepSolver: DaeSystemStepSolver,
-        eventDetector: EventDetectionIntgController,
-        eventDetectionStepBoundLow: Double,
-        resultFileName: String,
-    ): HybridSystemIntegrationResult = coroutineScope {
+    private suspend fun runSimulationWithResultFile(context: FileStorageSimulationParameters): HybridSystemIntegrationResult =
+        coroutineScope {
 
-        val pointsChannel = Channel<IntgResultPoint>()
+            val pointsChannel = Channel<IntgResultPoint>()
 
-        val metricDataJob = async {
-            val result = cauchyProblemSolver.runAsync(
-                hybridSystem,
-                stepSolver,
-                simulationInitials,
-                eventDetector,
-                eventDetectionStepBoundLow,
-            ) {
-                pointsChannel.send(it)
+            val metricDataJob = async {
+                val result = context.cauchyProblemSolver.runAsync(
+                    context.hybridSystem,
+                    context.stepSolver,
+                    context.simulationInitials,
+                    context.eventDetector,
+                    context.eventDetectionStepBoundLow,
+                ) {
+                    pointsChannel.send(it)
+                }
+                pointsChannel.close()
+                return@async result
             }
-            pointsChannel.close()
-            return@async result
-        }
 
-        launch(Dispatchers.IO) {
-            File(resultFileName).bufferedWriter().use { writer ->
-                var isFirst = true
-                pointsChannel.consumeEach {
-                    if(isFirst){
-                        writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(it))
-                        isFirst = false
+            launch(Dispatchers.IO) {
+                File(context.resultFileName).bufferedWriter().use { writer ->
+                    var isFirst = true
+                    pointsChannel.consumeEach {
+                        if (isFirst) {
+                            writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(it))
+                            isFirst = false
+                        }
+                        writer.append(IntegrationResultPointFileHelpers.buildCsvString(it))
                     }
-                    writer.append(IntegrationResultPointFileHelpers.buildCsvString(it))
                 }
             }
+
+            val metricData = metricDataJob.await()
+            val resultReader = AsyncFilePointProvider(context.resultFileName)
+
+            logCalculationStatistic(metricData, context.stepSolver)
+
+            return@coroutineScope HybridSystemIntegrationResult(
+                metricData = metricData,
+                resultPointProvider = resultReader,
+                equationIndexProvider = context.indexProvider,
+            )
         }
-
-        val metricData = metricDataJob.await()
-        val resultReader = AsyncFilePointProvider(resultFileName)
-
-        logCalculationStatistic(metricData, stepSolver)
-
-        return@coroutineScope HybridSystemIntegrationResult(
-            metricData = metricData,
-            resultPointProvider = resultReader,
-            equationIndexProvider = indexProvider,
-        )
-    }
 
     private fun logCalculationStatistic(
         metricData: IntgMetricData?,
@@ -227,12 +216,9 @@ class SimulationCoreController(
         }
     }
 
-    fun addStepChangeListener(c: suspend (Double) -> Unit) {
-        stepChangeListeners.add(c)
-    }
-
     companion object {
         private const val DEFAULT_PACKAGE_NAME = "ru.nstu.isma.core.simulation.controller"
         private const val DEFAULT_CLASS_NAME = "AnalyzedHybridSystem"
     }
 }
+

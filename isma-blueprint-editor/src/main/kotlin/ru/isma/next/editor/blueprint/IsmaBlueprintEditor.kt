@@ -56,7 +56,10 @@ class IsmaBlueprintEditor: Fragment() {
 
     private val tabs = tabpane {
         tab ("Blueprint") {
-            add(canvas)
+            isClosable = false
+            scrollpane {
+                add(canvas)
+            }
         }
     }
 

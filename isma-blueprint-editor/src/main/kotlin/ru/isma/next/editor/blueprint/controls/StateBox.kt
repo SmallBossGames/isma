@@ -28,23 +28,23 @@ class StateBox : Fragment() {
     private var isEditModeEnabled by isEditModeEnabledProperty
     private var isDragged = false
 
-    public var isEditable by isEditableProperty
-    public var isEditButtonVisible by isEditButtonVisibleProperty
-    public var name: String by nameProperty
-    public var text: String by textProperty
-    public var squareWidth by squareWidthProperty
-    public var squareHeight by squareHeightProperty
-    public var color: Paint by colorProperty
+    var isEditable by isEditableProperty
+    var isEditButtonVisible by isEditButtonVisibleProperty
+    var name: String by nameProperty
+    var text: String by textProperty
+    var squareWidth by squareWidthProperty
+    var squareHeight by squareHeightProperty
+    var color: Paint by colorProperty
 
     private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
 
-    public fun isEditableProperty() = isEditableProperty
-    public fun isEditButtonVisible() = isEditButtonVisibleProperty
-    public fun nameProperty() = nameProperty
-    public fun textProperty() = textProperty
-    public fun squareWidthProperty() = squareWidthProperty
-    public fun squareHeightProperty() = squareHeightProperty
-    public fun colorProperty() = colorProperty
+    fun isEditableProperty() = isEditableProperty
+    fun isEditButtonVisible() = isEditButtonVisibleProperty
+    fun nameProperty() = nameProperty
+    fun textProperty() = textProperty
+    fun squareWidthProperty() = squareWidthProperty
+    fun squareHeightProperty() = squareHeightProperty
+    fun colorProperty() = colorProperty
 
     fun translateXProperty(): DoubleProperty = root.layoutXProperty()
     fun translateYProperty(): DoubleProperty = root.layoutYProperty()
@@ -118,11 +118,11 @@ class StateBox : Fragment() {
     }
 
     fun addMousePressedListener(handler: (StateBox, MouseEvent) -> Unit){
-        mousePressedListeners.add(handler);
+        mousePressedListeners.add(handler)
     }
 
     fun removeMousePressedListener(handler: (StateBox, MouseEvent) -> Unit){
-        mousePressedListeners.remove(handler);
+        mousePressedListeners.remove(handler)
     }
 
     private fun executeMousePressedListener(event: MouseEvent){
@@ -134,11 +134,11 @@ class StateBox : Fragment() {
     }
 
     fun addMouseReleasedListener(handler: (StateBox, MouseEvent) -> Unit){
-        mouseReleasedListeners.add(handler);
+        mouseReleasedListeners.add(handler)
     }
 
     fun removeMouseReleasedListeners(handler: (StateBox, MouseEvent) -> Unit){
-        mouseReleasedListeners.remove(handler);
+        mouseReleasedListeners.remove(handler)
     }
 
     private fun executeMouseReleasedListeners(event: MouseEvent) {
@@ -148,11 +148,11 @@ class StateBox : Fragment() {
     }
 
     fun addMouseClickedListeners(handler: (StateBox, MouseEvent) -> Unit){
-        mouseClickedListeners.add(handler);
+        mouseClickedListeners.add(handler)
     }
 
     fun removeMouseClickedListeners(handler: (StateBox, MouseEvent) -> Unit){
-        mouseClickedListeners.remove(handler);
+        mouseClickedListeners.remove(handler)
     }
 
     private fun executeMouseClickedListeners(event: MouseEvent){
@@ -162,11 +162,11 @@ class StateBox : Fragment() {
     }
 
     fun addEditActionListener(op: () -> Unit){
-        editActionListeners.add(op);
+        editActionListeners.add(op)
     }
 
     fun removeEditActionListener(op: () -> Unit){
-        editActionListeners.remove(op);
+        editActionListeners.remove(op)
     }
 
     private fun executeEditActionListeners(){

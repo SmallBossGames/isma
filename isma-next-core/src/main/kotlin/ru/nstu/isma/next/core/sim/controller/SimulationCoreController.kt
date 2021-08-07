@@ -16,14 +16,12 @@ import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.intg.server.client.ComputeEngineClient
 import ru.nstu.isma.intg.server.client.RemoteDaeSystemStepSolver
+import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.gen.AnalyzedHybridSystemClassBuilder
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 import ru.nstu.isma.next.core.sim.controller.gen.SourceCodeCompiler
-import ru.nstu.isma.next.core.sim.controller.models.FileStorageSimulationParameters
-import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
-import ru.nstu.isma.next.core.sim.controller.models.InMemorySimulationParameters
-import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
+import ru.nstu.isma.next.core.sim.controller.models.*
 import java.io.File
 import java.io.IOException
 
@@ -31,7 +29,9 @@ import java.io.IOException
  * Created by Bessonov Alex
  * on 04.01.2015.
  */
-class SimulationCoreController : ISimulationCoreController {
+class SimulationCoreController(
+    private val hybridSystemSimulator: IHybridSystemSimulator
+) : ISimulationCoreController {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
     /**
@@ -60,12 +60,6 @@ class SimulationCoreController : ISimulationCoreController {
                 DefaultDaeSystemStepSolver(parameters.method, compilationResult.hybridSystem.daeSystem)
             }
 
-            val cauchyProblemSolver = HybridSystemSimulator()
-
-            parameters.stepChangeHandlers.forEach {
-                cauchyProblemSolver.addStepChangeListener(it)
-            }
-
             val eventDetector = if (parameters.eventDetectionParameters != null)
                 EventDetectionIntgController(parameters.eventDetectionParameters.gamma, true)
             else
@@ -79,10 +73,10 @@ class SimulationCoreController : ISimulationCoreController {
                         compilationResult.hybridSystem,
                         initials,
                         compilationResult.indexProvider,
-                        cauchyProblemSolver,
                         stepSolver,
                         eventDetector,
-                        stepBoundLow
+                        stepBoundLow,
+                        parameters.stepChangeHandlers
                     )
 
                     runSimulationInMemory(context)
@@ -92,11 +86,11 @@ class SimulationCoreController : ISimulationCoreController {
                         compilationResult.hybridSystem,
                         initials,
                         compilationResult.indexProvider,
-                        cauchyProblemSolver,
                         stepSolver,
                         eventDetector,
                         stepBoundLow,
-                        parameters.resultStorageType.filePath
+                        parameters.resultStorageType.filePath,
+                        parameters.stepChangeHandlers
                     )
 
                     runSimulationWithResultFile(context)
@@ -141,15 +135,21 @@ class SimulationCoreController : ISimulationCoreController {
         coroutineScope {
             val resultMemoryStore = MemoryPointProvider()
 
-            val metricData: IntgMetricData = context.cauchyProblemSolver.runAsync(
+            val simulatorParameters = HybridSystemSimulatorParameters(
                 context.hybridSystem,
                 context.stepSolver,
                 context.simulationInitials,
                 context.eventDetector,
                 context.eventDetectionStepBoundLow,
-            ) {
-                resultMemoryStore.accept(it)
-            }
+                stepChangeHandlers = context.stepChangeHandlers,
+                resultPointHandlers = arrayListOf(
+                    {
+                        resultMemoryStore.accept(it)
+                    }
+                )
+            )
+
+            val metricData: IntgMetricData = hybridSystemSimulator.runAsync(simulatorParameters)
 
             logCalculationStatistic(metricData, context.stepSolver)
 
@@ -159,19 +159,24 @@ class SimulationCoreController : ISimulationCoreController {
     @Throws(IOException::class)
     private suspend fun runSimulationWithResultFile(context: FileStorageSimulationParameters): HybridSystemIntegrationResult =
         coroutineScope {
-
             val pointsChannel = Channel<IntgResultPoint>()
 
             val metricDataJob = async {
-                val result = context.cauchyProblemSolver.runAsync(
+                val simulatorParameters = HybridSystemSimulatorParameters(
                     context.hybridSystem,
                     context.stepSolver,
                     context.simulationInitials,
                     context.eventDetector,
                     context.eventDetectionStepBoundLow,
-                ) {
-                    pointsChannel.send(it)
-                }
+                    stepChangeHandlers = context.stepChangeHandlers,
+                    resultPointHandlers = arrayListOf(
+                        {
+                            pointsChannel.send(it)
+                        }
+                    )
+                )
+
+                val result = hybridSystemSimulator.runAsync(simulatorParameters)
                 pointsChannel.close()
                 return@async result
             }

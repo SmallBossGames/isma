@@ -11,9 +11,9 @@ data class FileStorageSimulationParameters(
     val hybridSystem: HybridSystem,
     val simulationInitials: SimulationInitials,
     val indexProvider: EquationIndexProvider,
-    val cauchyProblemSolver: HybridSystemSimulator,
     val stepSolver: DaeSystemStepSolver,
     val eventDetector: EventDetectionIntgController,
     val eventDetectionStepBoundLow: Double,
     val resultFileName: String,
+    val stepChangeHandlers: List<suspend (value: Double) -> Unit>,
 )

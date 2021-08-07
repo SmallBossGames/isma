@@ -168,7 +168,7 @@ class SimulationService(
         initials: CauchyInitials
     ){
         simulationController.addStepChangeListener {
-            runBlocking(Dispatchers.JavaFx) {
+            withContext(Dispatchers.JavaFx) {
                 progress = normalizeProgress(initials.start, initials.end, it)
             }
         }

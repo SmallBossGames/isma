@@ -43,7 +43,7 @@ class SimulationCoreController(
     private lateinit var indexProvider: EquationIndexProvider
     private lateinit var hybridSystem: HybridSystem
     private var simulationInitials: SimulationInitials
-    private val stepChangeListeners = ArrayList<(value: Double) -> Unit>()
+    private val stepChangeListeners = ArrayList<suspend (value: Double) -> Unit>()
     private var modelClassLoader: ClassLoader? = null
 
     init {
@@ -108,7 +108,10 @@ class SimulationCoreController(
             }
 
             val cauchyProblemSolver = HybridSystemSimulator()
-            stepChangeListeners.forEach(Consumer { c -> cauchyProblemSolver.addStepChangeListener(c) })
+
+            stepChangeListeners.forEach {
+                    c -> cauchyProblemSolver.addStepChangeListener(c)
+            }
 
             val eventDetector = if (eventDetectionParameters != null)
                 EventDetectionIntgController(eventDetectionParameters.gamma, true)
@@ -224,7 +227,7 @@ class SimulationCoreController(
         }
     }
 
-    fun addStepChangeListener(c: (Double) -> Unit) {
+    fun addStepChangeListener(c: suspend (Double) -> Unit) {
         stepChangeListeners.add(c)
     }
 

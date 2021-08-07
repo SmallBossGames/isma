@@ -18,9 +18,9 @@ import kotlin.math.min
  * @since 06.10.2015
  */
 class HybridSystemSimulator {
-    private val stepChangeListeners = ArrayList<(value: Double) -> Unit>()
+    private val stepChangeListeners = ArrayList<suspend (value: Double) -> Unit>()
 
-    fun addStepChangeListener(c: (value: Double) -> Unit) {
+    fun addStepChangeListener(c: suspend (value: Double) -> Unit) {
         stepChangeListeners.add(c)
     }
 

@@ -15,6 +15,7 @@ import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
 import ru.isma.next.editor.text.IsmaTextEditor
+import kotlin.math.max
 
 class IsmaBlueprintEditor: Fragment() {
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
@@ -325,8 +326,8 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
-        stateBox.translateXProperty().value = positionX
-        stateBox.translateYProperty().value = positionY
+        stateBox.translateXProperty().value = max(positionX, 10.0)
+        stateBox.translateYProperty().value = max(positionY, 10.0)
     }
 
     private fun resetEditorMode() {

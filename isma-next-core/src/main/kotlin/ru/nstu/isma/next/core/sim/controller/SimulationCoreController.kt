@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.consumeEach
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.IntgMetricData
-import ru.nstu.isma.intg.api.calcmodel.HybridSystem
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
 import ru.nstu.isma.intg.api.providers.MemoryPointProvider
@@ -16,11 +15,10 @@ import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.intg.server.client.ComputeEngineClient
 import ru.nstu.isma.intg.server.client.RemoteDaeSystemStepSolver
+import ru.nstu.isma.next.core.sim.controller.contracts.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
-import ru.nstu.isma.next.core.sim.controller.gen.AnalyzedHybridSystemClassBuilder
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
-import ru.nstu.isma.next.core.sim.controller.gen.SourceCodeCompiler
 import ru.nstu.isma.next.core.sim.controller.models.*
 import java.io.File
 import java.io.IOException
@@ -30,7 +28,8 @@ import java.io.IOException
  * on 04.01.2015.
  */
 class SimulationCoreController(
-    private val hybridSystemSimulator: IHybridSystemSimulator
+    private val hybridSystemSimulator: IHybridSystemSimulator,
+    private val hsmCompiler: IHsmCompiler,
 ) : ISimulationCoreController {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -38,7 +37,7 @@ class SimulationCoreController(
      * Моделирование
      */
     override suspend fun simulateAsync(parameters: IntegratorApiParameters): HybridSystemIntegrationResult = coroutineScope {
-        val compilationResult = compileHsm(parameters.hsm)
+        val compilationResult = hsmCompiler.compile(parameters.hsm)
 
         val initials = SimulationInitials(
             differentialEquationInitials = createOdeInitials(compilationResult.indexProvider, parameters.hsm),
@@ -106,18 +105,6 @@ class SimulationCoreController(
         } finally {
             computeEngineClient?.disconnect()
         }
-    }
-
-    private suspend fun compileHsm(hsm: HSM): HsmCompilationResult = coroutineScope {
-        val indexProvider = EquationIndexProvider(hsm)
-        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
-        val hsSourceCode = hsClassBuilder.buildSourceCode()
-        val hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
-            DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode
-        )
-        val modelClassLoader = hybridSystem.javaClass.classLoader!!
-
-        return@coroutineScope HsmCompilationResult(indexProvider, hybridSystem, modelClassLoader)
     }
 
     private suspend fun createOdeInitials(indexProvider: EquationIndexProvider, hsm: HSM): DoubleArray = coroutineScope {
@@ -219,11 +206,6 @@ class SimulationCoreController(
                 stepCalculationCount,
                 rhsCalculationCount)
         }
-    }
-
-    companion object {
-        private const val DEFAULT_PACKAGE_NAME = "ru.nstu.isma.core.simulation.controller"
-        private const val DEFAULT_CLASS_NAME = "AnalyzedHybridSystem"
     }
 }
 

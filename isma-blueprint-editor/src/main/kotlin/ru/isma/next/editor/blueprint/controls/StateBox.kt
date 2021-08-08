@@ -36,8 +36,7 @@ class StateBox : Fragment() {
     var squareHeight by squareHeightProperty
     var color: Paint by colorProperty
 
-    private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
-
+    fun isEditModeEnabledProperty() = isEditModeEnabledProperty
     fun isEditableProperty() = isEditableProperty
     fun isEditButtonVisible() = isEditButtonVisibleProperty
     fun nameProperty() = nameProperty
@@ -63,11 +62,13 @@ class StateBox : Fragment() {
         }
 
         val nameTextArea = TextArea().apply {
-            textProperty().bindBidirectional(nameProperty())
             visibleWhen(isEditModeEnabledProperty())
             managedWhen(isEditModeEnabledProperty())
             focusedProperty().onChange {
-                if(!it){
+                if(it){
+                    text = name
+                } else {
+                    name = text
                     isEditModeEnabled = false
                 }
             }

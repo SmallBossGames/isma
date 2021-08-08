@@ -5,7 +5,6 @@ import javafx.beans.property.SimpleIntegerProperty
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
-import tornadofx.*
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
 import ru.isma.next.editor.blueprint.controls.StateBox
@@ -15,9 +14,12 @@ import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
 import ru.isma.next.editor.text.IsmaTextEditor
+import tornadofx.*
 import kotlin.math.max
 
 class IsmaBlueprintEditor: Fragment() {
+    private val nameChangingMonitor = NameChangingMonitor("New state")
+
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
     private val isRemoveTransactionModeProperty = SimpleBooleanProperty(false)
     private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
@@ -222,11 +224,14 @@ class IsmaBlueprintEditor: Fragment() {
             initMouseMovingEvents()
             initMouseRemoveStateEvents()
             initMouseLinkTransactionEvents()
+            initNameChangingEvent()
 
             translateXProperty().value = positionX
             translateYProperty().value = positionY
-            name = stateName
+            name = stateName.ifEmpty { nameChangingMonitor.createNextDefaultName() }
             text = stateText
+
+            nameChangingMonitor.tryRegister(name)
 
             isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
@@ -296,6 +301,8 @@ class IsmaBlueprintEditor: Fragment() {
             translateXProperty() += 10
             translateYProperty() += 10
 
+            nameChangingMonitor.tryRegister(name)
+
             addEditActionListener { openMainTextEditorTab() }
 
             initMouseMovingEvents()
@@ -312,6 +319,8 @@ class IsmaBlueprintEditor: Fragment() {
             translateXProperty() += 10
             translateYProperty() += 100
 
+            nameChangingMonitor.tryRegister(name)
+
             initMouseMovingEvents()
             initMouseLinkTransactionEvents()
         }
@@ -326,8 +335,8 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
-        stateBox.translateXProperty().value = max(positionX, 10.0)
-        stateBox.translateYProperty().value = max(positionY, 10.0)
+        stateBox.translateXProperty().value = max(positionX, 0.0)
+        stateBox.translateYProperty().value = max(positionY, 0.0)
     }
 
     private fun resetEditorMode() {
@@ -404,4 +413,20 @@ class IsmaBlueprintEditor: Fragment() {
             return@addMouseClickedListeners
         }
     }
+
+    private fun StateBox.initNameChangingEvent() {
+        var previousName = ""
+        isEditModeEnabledProperty().onChange {
+            if(it) {
+                previousName = name
+            } else {
+                if(nameChangingMonitor.tryRegister(name)){
+                    nameChangingMonitor.tryUnregister(previousName)
+                } else {
+                    name = previousName
+                }
+            }
+        }
+    }
 }
+

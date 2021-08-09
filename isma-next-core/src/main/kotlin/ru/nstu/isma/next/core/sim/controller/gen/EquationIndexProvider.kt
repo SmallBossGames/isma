@@ -6,9 +6,6 @@ import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import common.IndexProvider
 import org.apache.commons.text.StringSubstitutor
-import ru.nstu.isma.core.hsm.`var`.HMAlgebraicEquation
-import ru.nstu.isma.core.hsm.`var`.HMDerivativeEquation
-import java.util.function.Consumer
 
 /**
  * Генератор индексов для уравнений в расчетной модели.

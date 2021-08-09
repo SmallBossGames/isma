@@ -1,6 +1,6 @@
 package ru.nstu.isma.lisma
 
-import error.IsmaErrorList
+import ru.nstu.isma.core.hsm.models.IsmaErrorList
 import ru.nstu.isma.core.hsm.HSM
 
 /**

@@ -9,6 +9,7 @@ import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.common.services.lisma.FailedTranslation
 import ru.isma.next.common.services.lisma.SuccessTranslation
+import ru.isma.next.common.services.lisma.models.ErrorViewModel
 import ru.isma.next.common.services.lisma.services.LismaPdeService
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
@@ -60,11 +61,14 @@ class SimulationService(
         val translationResult = lismaPdeService
             .translateLisma(projectService.activeProject?.lismaText ?: return@coroutineScope)
 
-        modelService.setErrorList(emptyList())
+        modelService.putErrorList(emptyList())
 
         when (translationResult) {
             is FailedTranslation -> {
-                modelService.setErrorList(translationResult.errors)
+                val errorViewModels = translationResult.errors.map {
+                    ErrorViewModel.fromIsmaErrorModel(it)
+                }
+                modelService.putErrorList(errorViewModels)
             }
             is SuccessTranslation -> {
                 val initials = createCauchyInitials()

@@ -1,7 +1,6 @@
 package ru.nstu.isma.lisma
 
-import error.IsmaError
-import error.IsmaErrorList
+import ru.nstu.isma.core.hsm.models.IsmaErrorList
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import ru.nstu.isma.core.hsm.HSM

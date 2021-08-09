@@ -24,7 +24,8 @@ import org.apache.commons.text.StringSubstitutor
  * @since 05.10.2015
  */
 class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexProvider: EquationIndexProvider, private val packageName: String, private val className: String) {
-    private val hmExpressionBuilder: HMExpressionBuilder = HMExpressionBuilder(indexProvider)
+    private val hmExpressionBuilder: HMExpressionBuilder =
+        HMExpressionBuilder(indexProvider)
 
     fun buildSourceCode(): String {
         val values = ImmutableMap.of(

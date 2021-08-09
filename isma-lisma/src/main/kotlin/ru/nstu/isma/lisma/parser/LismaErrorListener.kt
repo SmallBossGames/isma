@@ -1,13 +1,13 @@
 package ru.nstu.isma.lisma.parser
 
-import error.IsmaError
-import error.IsmaErrorList
+import ru.nstu.isma.core.hsm.models.IsmaError
 import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.Parser
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.dfa.DFA
 import org.antlr.v4.runtime.atn.ATNConfigSet
+import ru.nstu.isma.core.hsm.models.IsmaSyntaxError
 import java.util.*
 
 /**
@@ -24,8 +24,7 @@ class LismaErrorListener(private val errors: MutableList<IsmaError>) : ANTLRErro
         s: String,
         e: RecognitionException
     ) {
-        val err = IsmaError(i, i2, s)
-        err.type = IsmaError.Type.SYNTAX
+        val err = IsmaSyntaxError(i, i2, s)
         errors.add(err)
     }
 

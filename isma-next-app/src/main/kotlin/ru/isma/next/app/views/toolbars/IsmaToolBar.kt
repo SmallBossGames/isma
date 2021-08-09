@@ -8,6 +8,7 @@ import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.SimulationParametersService
+import ru.isma.next.common.services.lisma.models.ErrorViewModel
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import tornadofx.*
 
@@ -69,10 +70,10 @@ class IsmaToolBar: View() {
                 val text = projectController.activeProject?.lismaText?:return@action
                 val translationResult = lismaPdeService.translateLisma(text)
 
-                modelService.setErrorList(emptyList())
+                modelService.putErrorList(emptyList())
 
                 if(translationResult is FailedTranslation) {
-                    modelService.setErrorList(translationResult.errors)
+                    modelService.putErrorList(translationResult.errors.map { ErrorViewModel.fromIsmaErrorModel(it) })
                 }
             }
         }

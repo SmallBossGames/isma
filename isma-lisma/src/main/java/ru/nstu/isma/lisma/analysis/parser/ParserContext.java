@@ -1,9 +1,9 @@
 package ru.nstu.isma.lisma.analysis.parser;
 
-import error.IsmaError;
-import error.IsmaErrorList;
 import ru.nstu.isma.core.hsm.exp.EXPParenthesis;
 import ru.nstu.isma.core.hsm.exp.HMExpression;
+import ru.nstu.isma.core.hsm.models.IsmaErrorList;
+import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,8 +34,7 @@ public class ParserContext {
 
     public Integer getIdxValue(String idxName) {
         if (!indexMap.containsKey(idxName)) {
-            IsmaError err = new IsmaError("The index " + idxName + " does not have the for part.");
-            err.setType(IsmaError.Type.SEM);
+            var err = new IsmaSemanticError("The index " + idxName + " does not have the for part.");
             errors.push(err);
         }
         return indexMap.get(idxName);

@@ -1,9 +1,9 @@
 package ru.nstu.isma.lisma.analysis.parser.visitor;
 
-import error.IsmaError;
 import org.antlr.v4.runtime.misc.NotNull;
 import ru.nstu.isma.core.hsm.exp.EXPPDEOperand;
 import ru.nstu.isma.core.hsm.exp.HMExpression;
+import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
 import ru.nstu.isma.core.hsm.var.HMVariable;
 import ru.nstu.isma.core.hsm.var.HMVariableTable;
 import ru.nstu.isma.core.hsm.var.pde.HMBoundaryCondition;
@@ -46,9 +46,8 @@ public class BoundInfoVisitor extends LismaBaseVisitor<HMBoundaryCondition> {
             bound.setDerOrder(o.getOrder().getI());
         }
 
-        if (v == null || !(v instanceof HMPartialDerivativeEquation)) {
-            IsmaError error = new IsmaError("error in the definition of boundary conditions. Unknown PDE " + v.getCode());
-            error.setType(IsmaError.Type.SEM);
+        if (!(v instanceof HMPartialDerivativeEquation)) {
+            var error = new IsmaSemanticError("error in the definition of boundary conditions. Unknown PDE " + (v != null ? v.getCode() : "null"));
             pc.errors().push(error);
             return null;
         }
@@ -64,8 +63,7 @@ public class BoundInfoVisitor extends LismaBaseVisitor<HMBoundaryCondition> {
         // 3 ищем переменную
         String avCode = ctx.Identifier().getText();
         if (table.get(avCode) == null || !(table.get(avCode) instanceof HMSpatialVariable)) {
-            IsmaError error = new IsmaError("error in the definition of boundary conditions. Unknown variable " + avCode);
-            error.setType(IsmaError.Type.SEM);
+            var error = new IsmaSemanticError("error in the definition of boundary conditions. Unknown variable " + avCode);
             pc.errors().push(error);
             return null;
         }

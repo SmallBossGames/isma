@@ -1,10 +1,10 @@
 package ru.nstu.isma.lisma.analysis.parser.visitor;
 
-import error.IsmaError;
-import error.IsmaErrorList;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import ru.nstu.isma.core.hsm.exp.*;
+import ru.nstu.isma.core.hsm.models.IsmaErrorList;
+import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
 import ru.nstu.isma.core.hsm.service.Infix2PolizConverter;
 import ru.nstu.isma.core.hsm.var.HMEquation;
 import ru.nstu.isma.core.hsm.var.HMVariable;
@@ -13,8 +13,8 @@ import ru.nstu.isma.core.hsm.var.pde.HMPartialDerivativeEquation;
 import ru.nstu.isma.core.hsm.var.pde.HMSpatialVariable;
 import ru.nstu.isma.lisma.analysis.gen.LismaBaseVisitor;
 import ru.nstu.isma.lisma.analysis.gen.LismaParser;
-import ru.nstu.isma.lisma.parser.InternalConstUtil;
 import ru.nstu.isma.lisma.analysis.parser.ParserContext;
+import ru.nstu.isma.lisma.parser.InternalConstUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,8 +61,7 @@ public class ExpressionVisitor extends LismaBaseVisitor<Object> {
         try {
             super.visit(tree);
         } catch (Exception e) {
-            IsmaError err = new IsmaError("error during analysis of the right-hand side. " + e.getMessage());
-            err.setType(IsmaError.Type.SEM);
+            var err = new IsmaSemanticError("error during analysis of the right-hand side. " + e.getMessage());
             pc.errors().push(err);
         }
         if (toPoliz) {

@@ -1,6 +1,5 @@
 package ru.nstu.isma.lisma.analysis.parser.visitor;
 
-import error.IsmaError;
 import org.antlr.v4.runtime.misc.NotNull;
 import ru.nstu.isma.core.hsm.HSM;
 import ru.nstu.isma.core.hsm.exp.EXPOperand;
@@ -10,6 +9,7 @@ import ru.nstu.isma.core.hsm.hybrid.HMState;
 import ru.nstu.isma.core.hsm.hybrid.HMStateAutomata;
 import ru.nstu.isma.core.hsm.linear.HMLinearEquation;
 import ru.nstu.isma.core.hsm.linear.HMLinearVar;
+import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
 import ru.nstu.isma.core.hsm.var.*;
 import ru.nstu.isma.core.hsm.var.pde.HMPartialDerivativeEquation;
 import ru.nstu.isma.lisma.analysis.gen.LismaParser;
@@ -74,8 +74,7 @@ public class PopulateExpressionVisitor extends BaseVisitor {
         VariableVisitor vv = new VariableVisitor(pc);
         String code = vv.visit(variable).getCode();
         if (!(table.get(code) instanceof HMDerivativeEquation)) {
-            IsmaError e = new IsmaError("error during initilizing initial conditions. There is no corresponding ODE for the variable " + code);
-            e.setType(IsmaError.Type.SEM);
+            var e = new IsmaSemanticError("error during initilizing initial conditions. There is no corresponding ODE for the variable " + code);
             pc.errors().push(e);
             return;
         }

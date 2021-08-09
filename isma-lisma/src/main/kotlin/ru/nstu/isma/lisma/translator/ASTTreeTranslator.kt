@@ -1,6 +1,6 @@
 package ru.nstu.isma.lisma.translator
 
-import error.IsmaErrorList
+import ru.nstu.isma.core.hsm.models.IsmaErrorList
 import org.antlr.v4.runtime.tree.ParseTree
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.core.hsm.`var`.HMDerivativeEquation

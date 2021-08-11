@@ -2,13 +2,11 @@ package ru.isma.next.app.views.toolbars
 
 import javafx.scene.control.Tooltip
 import javafx.scene.image.ImageView
-import ru.isma.next.common.services.lisma.FailedTranslation
-import ru.isma.next.common.services.lisma.services.LismaPdeService
+import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import ru.isma.next.common.services.lisma.models.ErrorViewModel
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import tornadofx.*
 
@@ -67,14 +65,8 @@ class IsmaToolBar: View() {
             graphic = ImageView("icons/toolbar/checked.png")
             tooltip = Tooltip("Verify")
             action {
-                val text = projectController.activeProject?.lismaText?:return@action
-                val translationResult = lismaPdeService.translateLisma(text)
-
-                modelService.putErrorList(emptyList())
-
-                if(translationResult is FailedTranslation) {
-                    modelService.putErrorList(translationResult.errors.map { ErrorViewModel.fromIsmaErrorModel(it) })
-                }
+                val lismaSnapshot = projectController.activeProject?.snapshot() ?: return@action
+                lismaPdeService.translateLisma(lismaSnapshot)
             }
         }
         separator()

@@ -1,6 +1,6 @@
 package ru.isma.next.app.views.toolbars
 
-import ru.isma.next.common.services.lisma.models.ErrorViewModel
+import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.services.ModelErrorService
 import tornadofx.SmartResize
 import tornadofx.View
@@ -14,11 +14,12 @@ class IsmaErrorListTable : View() {
     override val root = tableview(modelErrorService.errors) {
         maxHeight = 200.0
         readonlyColumn("Row", ErrorViewModel::row).cellFormat {
-            text = if (it > 0) it.toString() else ""
+            text = if (it >= 0) it.toString() else ""
         }
         readonlyColumn("Position", ErrorViewModel::position).cellFormat {
-            text = if (it > 0) it.toString() else ""
+            text = if (it >= 0) it.toString() else ""
         }
+        readonlyColumn("Fragment", ErrorViewModel::fragmentName)
         readonlyColumn("Message", ErrorViewModel::message)
         columnResizePolicy = SmartResize.POLICY
     }

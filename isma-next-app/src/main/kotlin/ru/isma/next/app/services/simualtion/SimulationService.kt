@@ -5,12 +5,10 @@ import javafx.beans.property.SimpleDoubleProperty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.enumerables.SaveTarget
-import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.common.services.lisma.FailedTranslation
-import ru.isma.next.common.services.lisma.SuccessTranslation
-import ru.isma.next.common.services.lisma.models.ErrorViewModel
-import ru.isma.next.common.services.lisma.services.LismaPdeService
+import ru.isma.next.common.services.lisma.models.FailedTranslation
+import ru.isma.next.common.services.lisma.models.SuccessTranslation
+import ru.isma.next.app.services.project.LismaPdeService
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.next.core.sim.controller.FileStorage
@@ -33,7 +31,6 @@ class SimulationService(
     private val simulationParametersService: SimulationParametersService,
     private val simulationResult: SimulationResultService,
     private val library: IntegrationMethodsLibrary,
-    private val modelService: ModelErrorService,
     private val simulationController: ISimulationCoreController,
 ) {
     private val progressProperty = SimpleDoubleProperty()
@@ -58,18 +55,10 @@ class SimulationService(
     }
 
     private suspend fun simulateAsyncInternal() = coroutineScope {
-        val translationResult = lismaPdeService
-            .translateLisma(projectService.activeProject?.lismaText ?: return@coroutineScope)
+        val sourceCode = projectService.activeProject?.snapshot() ?: return@coroutineScope
 
-        modelService.putErrorList(emptyList())
-
-        when (translationResult) {
-            is FailedTranslation -> {
-                val errorViewModels = translationResult.errors.map {
-                    ErrorViewModel.fromIsmaErrorModel(it)
-                }
-                modelService.putErrorList(errorViewModels)
-            }
+        when (val translationResult = lismaPdeService.translateLisma(sourceCode)) {
+            is FailedTranslation -> { }
             is SuccessTranslation -> {
                 val initials = createCauchyInitials()
                 val integrationMethod = createIntegrationMethod()
@@ -78,10 +67,6 @@ class SimulationService(
                 initStabilityController(integrationMethod)
 
                 translationResult.hsm.initTimeEquation(initials.start)
-
-                withContext(Dispatchers.JavaFx) {
-                    isSimulationInProgress = true
-                }
 
                 val context = IntegratorApiParameters(
                     hsm = translationResult.hsm,
@@ -99,13 +84,16 @@ class SimulationService(
                     )
                 )
 
+                withContext(Dispatchers.JavaFx) {
+                    isSimulationInProgress = true
+                }
+
                 val result = simulationController.simulateAsync(context)
 
                 withContext(Dispatchers.JavaFx) {
                     simulationResult.simulationResult = result
                 }
             }
-            else -> throw IllegalArgumentException()
         }
     }
 

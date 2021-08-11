@@ -16,13 +16,14 @@ import java.util.*
  * Time: 22:01
  */
 class LismaErrorListener(private val errors: MutableList<IsmaError>) : ANTLRErrorListener {
+
     override fun syntaxError(
         recognizer: Recognizer<*, *>?,
         o: Any,
         i: Int,
         i2: Int,
         s: String,
-        e: RecognitionException
+        e: RecognitionException?
     ) {
         val err = IsmaSyntaxError(i, i2, s)
         errors.add(err)

@@ -1,6 +1,6 @@
 package ru.isma.next.app.services
 
-import ru.isma.next.common.services.lisma.models.ErrorViewModel
+import ru.isma.next.app.models.ErrorViewModel
 import tornadofx.asObservable
 
 class ModelErrorService {

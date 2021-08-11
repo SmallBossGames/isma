@@ -11,11 +11,13 @@ class LismaProjectModel: IProjectModel {
 
     override var name: String by nameProperty
 
-    override var lismaText: String by lismaTextProperty
+    var lismaText: String by lismaTextProperty
 
     override var file: File? = null
 
     override fun nameProperty(): SimpleStringProperty = nameProperty
+
+    override fun snapshot() = LismaTextModel(lismaText)
 
     fun lismaTextProperty(): SimpleStringProperty = lismaTextProperty
 }

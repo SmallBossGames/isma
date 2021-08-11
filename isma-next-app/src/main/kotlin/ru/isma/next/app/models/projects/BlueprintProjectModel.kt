@@ -1,12 +1,12 @@
 package ru.isma.next.app.models.projects
 
 import javafx.beans.property.SimpleStringProperty
+import ru.isma.next.app.utilities.convertToLisma
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import java.io.File
 import tornadofx.*
-import ru.isma.next.editor.blueprint.utilities.convertToLisma
 
-class BlueprintProjectModel() : IProjectModel {
+class BlueprintProjectModel : IProjectModel {
     private var blueprintValue: BlueprintModel = BlueprintModel.empty
 
     private val nameProperty = SimpleStringProperty("")
@@ -16,6 +16,8 @@ class BlueprintProjectModel() : IProjectModel {
     override var file: File? = null
 
     override fun nameProperty() = nameProperty
+
+    override fun snapshot() = blueprint.convertToLisma()
 
     var dataProvider: BlueprintProjectDataProvider? = null
 
@@ -28,9 +30,6 @@ class BlueprintProjectModel() : IProjectModel {
             blueprintValue = value
             pushBlueprint()
         }
-
-    override val lismaText: String
-        get() = blueprint.convertToLisma()
 
     fun pushBlueprint() {
         val provider = dataProvider ?: return

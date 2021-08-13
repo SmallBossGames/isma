@@ -171,9 +171,9 @@ class SimulationService(
     }
 
     companion object {
-        private val SimulationSupervisor = SupervisorJob()
+        private val SimulationSupervisorJob = SupervisorJob()
 
-        val SimulationScope = CoroutineScope(EmptyCoroutineContext + SimulationSupervisor)
+        val SimulationScope = CoroutineScope(EmptyCoroutineContext + SimulationSupervisorJob)
 
         private fun normalizeProgress(start: Double, end: Double, current: Double): Double{
             return max(0.0, min(1.0, (current - start) / (end-start)))

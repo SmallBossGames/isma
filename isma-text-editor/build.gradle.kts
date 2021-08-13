@@ -12,10 +12,6 @@ javafx {
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
 

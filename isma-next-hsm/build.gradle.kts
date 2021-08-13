@@ -5,10 +5,6 @@ plugins {
 group = "ru.nstu.isma"
 version = "1.0.0"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(project(":isma-next-tools"))
     implementation("org.apache.commons:commons-lang3:3.12.0")

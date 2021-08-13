@@ -13,10 +13,6 @@ javafx {
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
-repositories {
-    mavenCentral()
-}
-
 val kotlinxSerializationJsonVersion = "1.2.2"
 
 dependencies {

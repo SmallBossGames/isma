@@ -7,10 +7,6 @@ plugins {
 group = "ru.nstu.isma.next"
 version = "1.0.0"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
 

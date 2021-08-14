@@ -8,7 +8,7 @@
  * this file please contact info (at) jgraph (dot) com.
  *//*
 
-package com.mxgraph.examples.swing.editor;
+package com.mxgraph.ru.isma.next.math.engine.examples.swing.editor;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -89,7 +89,7 @@ public class EditorRuler extends JComponent implements MouseMotionListener,
 
 	*/
 /**
-	 * Holds the shared number formatter.
+	 * Holds the ru.isma.next.math.engine.shared number formatter.
 	 * 
 	 * @see NumberFormat#getInstance()
 	 *//*

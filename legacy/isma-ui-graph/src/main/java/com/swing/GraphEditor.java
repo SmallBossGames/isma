@@ -48,7 +48,7 @@ public class GraphEditor extends BasicGraphEditor implements OutputAware
 	private static final long serialVersionUID = -4601740824088314699L;
 
 	/**
-	 * Holds the shared number formatter.
+	 * Holds the ru.isma.next.math.engine.shared number formatter.
 	 * 
 	 * @see NumberFormat#getInstance()
 	 */
@@ -60,7 +60,7 @@ public class GraphEditor extends BasicGraphEditor implements OutputAware
 	 */
 	public static URL url = null;
 
-	//GraphEditor.class.getResource("/com/mxgraph/examples/swing/images/connector.gif");
+	//GraphEditor.class.getResource("/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/connector.gif");
     private EditorPalette ewPalette = null;
 
 	private EditorPalette macrosPalette = null;

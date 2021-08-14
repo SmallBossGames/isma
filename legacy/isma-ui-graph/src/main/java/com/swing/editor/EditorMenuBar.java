@@ -53,12 +53,12 @@ public class EditorMenuBar extends JMenuBar
 //
         /*menu.add(editor.bind(mxResources.get("addMacros"),
 				new PageSetupAction(),
-				"/com/mxgraph/examples/swing/images/pagesetup.gif"));*/
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/pagesetup.gif"));*/
 //		menu.add(editor.bind(mxResources.get("pageSetup"),
 //				new PageSetupAction(),
-//				"/com/mxgraph/examples/swing/images/pagesetup.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/pagesetup.gif"));
 //		menu.add(editor.bind(mxResources.get("print"), new PrintAction(),
-//				"/com/mxgraph/examples/swing/images/print.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/print.gif"));
 
 		menu.addSeparator();
 
@@ -318,13 +318,13 @@ public class EditorMenuBar extends JMenuBar
 //						.bind(
 //								mxResources.get("basicStyle"),
 //								new StylesheetAction(
-//										"/com/mxgraph/examples/swing/resources/basic-style.xml")));
+//										"/com/mxgraph/ru.isma.next.math.engine.examples/swing/resources/basic-style.xml")));
 //		submenu
 //				.add(editor
 //						.bind(
 //								mxResources.get("defaultStyle"),
 //								new StylesheetAction(
-//										"/com/mxgraph/examples/swing/resources/default-style.xml")));
+//										"/com/mxgraph/ru.isma.next.math.engine.examples/swing/resources/default-style.xml")));
 //
 //		// Creates the options menu
 //		menu = add(new JMenu(mxResources.get("options")));
@@ -655,7 +655,7 @@ public class EditorMenuBar extends JMenuBar
 
 //		submenu.add(editor.bind(mxResources.get("fillcolor"), new ColorAction(
 //				"Fillcolor", mxConstants.STYLE_FILLCOLOR),
-//				"/com/mxgraph/examples/swing/images/fillcolor.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/fillcolor.gif"));
 //		submenu.add(editor.bind(mxResources.get("gradient"), new ColorAction(
 //				"Gradient", mxConstants.STYLE_GRADIENTCOLOR)));
 //
@@ -676,7 +676,7 @@ public class EditorMenuBar extends JMenuBar
 //
 //		submenu.add(editor.bind(mxResources.get("fontcolor"), new ColorAction(
 //				"Fontcolor", mxConstants.STYLE_FONTCOLOR),
-//				"/com/mxgraph/examples/swing/images/fontcolor.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/fontcolor.gif"));
 //
 //		submenu.addSeparator();
 //
@@ -740,7 +740,7 @@ public class EditorMenuBar extends JMenuBar
 //
 //		submenu.add(editor.bind(mxResources.get("linecolor"), new ColorAction(
 //				"Linecolor", mxConstants.STYLE_STROKECOLOR),
-//				"/com/mxgraph/examples/swing/images/linecolor.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/linecolor.gif"));
 //
 //		submenu.addSeparator();
 //
@@ -759,22 +759,22 @@ public class EditorMenuBar extends JMenuBar
 //
 //		submenu.add(editor.bind(mxResources.get("straight"),
 //				new SetStyleAction("straight"),
-//				"/com/mxgraph/examples/swing/images/straight.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/straight.gif"));
 //
 //		submenu.add(editor.bind(mxResources.get("horizontal"),
 //				new SetStyleAction(""),
-//				"/com/mxgraph/examples/swing/images/connect.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/connect.gif"));
 //		submenu.add(editor.bind(mxResources.get("vertical"),
 //				new SetStyleAction("vertical"),
-//				"/com/mxgraph/examples/swing/images/vertical.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/vertical.gif"));
 //
 //		submenu.addSeparator();
 //
 //		submenu.add(editor.bind(mxResources.get("entityRelation"),
 //				new SetStyleAction("edgeStyle=mxEdgeStyle.EntityRelation"),
-//				"/com/mxgraph/examples/swing/images/entity.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/entity.gif"));
 //		submenu.add(editor.bind(mxResources.get("arrow"), new SetStyleAction(
-//				"arrow"), "/com/mxgraph/examples/swing/images/arrow.gif"));
+//				"arrow"), "/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/arrow.gif"));
 //
 //		submenu.addSeparator();
 //
@@ -787,22 +787,22 @@ public class EditorMenuBar extends JMenuBar
 //
 //		submenu.add(editor.bind(mxResources.get("open"), new KeyValueAction(
 //				mxConstants.STYLE_STARTARROW, mxConstants.ARROW_OPEN),
-//				"/com/mxgraph/examples/swing/images/open_start.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/open_start.gif"));
 //		submenu.add(editor.bind(mxResources.get("classic"), new KeyValueAction(
 //				mxConstants.STYLE_STARTARROW, mxConstants.ARROW_CLASSIC),
-//				"/com/mxgraph/examples/swing/images/classic_start.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/classic_start.gif"));
 //		submenu.add(editor.bind(mxResources.get("block"), new KeyValueAction(
 //				mxConstants.STYLE_STARTARROW, mxConstants.ARROW_BLOCK),
-//				"/com/mxgraph/examples/swing/images/block_start.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/block_start.gif"));
 //
 //		submenu.addSeparator();
 //
 //		submenu.add(editor.bind(mxResources.get("diamond"), new KeyValueAction(
 //				mxConstants.STYLE_STARTARROW, mxConstants.ARROW_DIAMOND),
-//				"/com/mxgraph/examples/swing/images/diamond_start.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/diamond_start.gif"));
 //		submenu.add(editor.bind(mxResources.get("oval"), new KeyValueAction(
 //				mxConstants.STYLE_STARTARROW, mxConstants.ARROW_OVAL),
-//				"/com/mxgraph/examples/swing/images/oval_start.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/oval_start.gif"));
 //
 //		submenu.addSeparator();
 //
@@ -815,22 +815,22 @@ public class EditorMenuBar extends JMenuBar
 //
 //		submenu.add(editor.bind(mxResources.get("open"), new KeyValueAction(
 //				mxConstants.STYLE_ENDARROW, mxConstants.ARROW_OPEN),
-//				"/com/mxgraph/examples/swing/images/open_end.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/open_end.gif"));
 //		submenu.add(editor.bind(mxResources.get("classic"), new KeyValueAction(
 //				mxConstants.STYLE_ENDARROW, mxConstants.ARROW_CLASSIC),
-//				"/com/mxgraph/examples/swing/images/classic_end.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/classic_end.gif"));
 //		submenu.add(editor.bind(mxResources.get("block"), new KeyValueAction(
 //				mxConstants.STYLE_ENDARROW, mxConstants.ARROW_BLOCK),
-//				"/com/mxgraph/examples/swing/images/block_end.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/block_end.gif"));
 //
 //		submenu.addSeparator();
 //
 //		submenu.add(editor.bind(mxResources.get("diamond"), new KeyValueAction(
 //				mxConstants.STYLE_ENDARROW, mxConstants.ARROW_DIAMOND),
-//				"/com/mxgraph/examples/swing/images/diamond_end.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/diamond_end.gif"));
 //		submenu.add(editor.bind(mxResources.get("oval"), new KeyValueAction(
 //				mxConstants.STYLE_ENDARROW, mxConstants.ARROW_OVAL),
-//				"/com/mxgraph/examples/swing/images/oval_end.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/oval_end.gif"));
 //
 //		submenu.addSeparator();
 //
@@ -845,25 +845,25 @@ public class EditorMenuBar extends JMenuBar
 //
 //		submenu.add(editor.bind(mxResources.get("left"), new KeyValueAction(
 //				mxConstants.STYLE_ALIGN, mxConstants.ALIGN_LEFT),
-//				"/com/mxgraph/examples/swing/images/left.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/left.gif"));
 //		submenu.add(editor.bind(mxResources.get("center"), new KeyValueAction(
 //				mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER),
-//				"/com/mxgraph/examples/swing/images/center.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/center.gif"));
 //		submenu.add(editor.bind(mxResources.get("right"), new KeyValueAction(
 //				mxConstants.STYLE_ALIGN, mxConstants.ALIGN_RIGHT),
-//				"/com/mxgraph/examples/swing/images/right.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/right.gif"));
 //
 //		submenu.addSeparator();
 //
 //		submenu.add(editor.bind(mxResources.get("top"), new KeyValueAction(
 //				mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP),
-//				"/com/mxgraph/examples/swing/images/top.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/top.gif"));
 //		submenu.add(editor.bind(mxResources.get("middle"), new KeyValueAction(
 //				mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE),
-//				"/com/mxgraph/examples/swing/images/middle.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/middle.gif"));
 //		submenu.add(editor.bind(mxResources.get("bottom"), new KeyValueAction(
 //				mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_BOTTOM),
-//				"/com/mxgraph/examples/swing/images/bottom.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/bottom.gif"));
 //
 //		submenu = (JMenu) menu.add(new JMenu(mxResources.get("spacing")));
 //

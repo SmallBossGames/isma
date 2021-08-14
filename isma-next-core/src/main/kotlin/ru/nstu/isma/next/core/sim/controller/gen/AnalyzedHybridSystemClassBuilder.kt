@@ -66,14 +66,14 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
     private fun renderInitState(): String {
         val template = "\t\t" +
                 "hsb.addState(\"\${stateCode}\")" +
-                "\${differentialEquations}" +
+                "\${ru.isma.next.math.engine.differentialEquations}" +
                 "\${algebraicEquations}" +
                 "\${guards}" +
                 "\${setters};"
 
         val sub = StringSubstitutor(ImmutableMap.of(
                 "stateCode", HSM.INIT_STATE,
-                "differentialEquations", renderDifferentialEquations(hsm.variableTable.odes),
+                "ru.isma.next.math.engine.differentialEquations", renderDifferentialEquations(hsm.variableTable.odes),
                 "algebraicEquations", renderAlgebraicEquations(hsm.variableTable.algs),
                 "guards", renderGuards(getTransactions(HSM.INIT_STATE)),
                 "setters", renderSetters(hsm.variableTable.setters)
@@ -92,11 +92,11 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
     private fun renderState(state: HMState): String {
         val template = """
 
-		hsb.addState("${"$"}{stateCode}")${"$"}{differentialEquations}${"$"}{algebraicEquations}${"$"}{guards}${"$"}{setters};"""
+		hsb.addState("${"$"}{stateCode}")${"$"}{ru.isma.next.math.engine.differentialEquations}${"$"}{algebraicEquations}${"$"}{guards}${"$"}{setters};"""
 
         val sub = StringSubstitutor(ImmutableMap.builder<String, String>()
                 .put("stateCode", state.code)
-                .put("differentialEquations", renderDifferentialEquations(state.variables.odes))
+                .put("ru.isma.next.math.engine.differentialEquations", renderDifferentialEquations(state.variables.odes))
                 .put("algebraicEquations", renderAlgebraicEquations(state.variables.algs))
                 .put("guards", renderGuards(getTransactions(state.code)))
                 .put("setters", renderSetters(state.variables.setters))
@@ -132,11 +132,11 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
     private fun renderPseudoState(state: HMPseudoState): String {
         val template = """
 
-		hsb.addPseudoState("${"$"}{stateCode}")${"$"}{differentialEquations}${"$"}{algebraicEquations}${"$"}{setters};"""
+		hsb.addPseudoState("${"$"}{stateCode}")${"$"}{ru.isma.next.math.engine.differentialEquations}${"$"}{algebraicEquations}${"$"}{setters};"""
 
         val sub = StringSubstitutor(ImmutableMap.of(
                 "stateCode", state.code,
-                "differentialEquations", renderDifferentialEquations(state.variables.odes),
+                "ru.isma.next.math.engine.differentialEquations", renderDifferentialEquations(state.variables.odes),
                 "algebraicEquations", renderAlgebraicEquations(state.variables.algs),
                 "setters", renderSetters(state.variables.setters)
         ))

@@ -41,7 +41,7 @@ public class EditorToolBar extends JToolBar
 //		addSeparator();
 //
 //		add(editor.bind("Print", new PrintAction(),
-//				"/com/mxgraph/examples/swing/images/print.gif"));
+//				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/print.gif"));
 
 		addSeparator();
 
@@ -125,33 +125,33 @@ public class EditorToolBar extends JToolBar
 		addSeparator();
 
 		add(editor.bind("Bold", new FontStyleAction(true),
-				"/com/mxgraph/examples/swing/images/bold.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/bold.gif"));
 		add(editor.bind("Italic", new FontStyleAction(false),
-				"/com/mxgraph/examples/swing/images/italic.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/italic.gif"));
 
 		addSeparator();
 
 		add(editor.bind("Left", new KeyValueAction(mxConstants.STYLE_ALIGN,
 				mxConstants.ALIGN_LEFT),
-				"/com/mxgraph/examples/swing/images/left.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/left.gif"));
 		add(editor.bind("Center", new KeyValueAction(mxConstants.STYLE_ALIGN,
 				mxConstants.ALIGN_CENTER),
-				"/com/mxgraph/examples/swing/images/center.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/center.gif"));
 		add(editor.bind("Right", new KeyValueAction(mxConstants.STYLE_ALIGN,
 				mxConstants.ALIGN_RIGHT),
-				"/com/mxgraph/examples/swing/images/right.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/right.gif"));
 
 		addSeparator();
 
 		add(editor.bind("Font", new ColorAction("Font",
 				mxConstants.STYLE_FONTCOLOR),
-				"/com/mxgraph/examples/swing/images/fontcolor.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/fontcolor.gif"));
 		add(editor.bind("Stroke", new ColorAction("Stroke",
 				mxConstants.STYLE_STROKECOLOR),
-				"/com/mxgraph/examples/swing/images/linecolor.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/linecolor.gif"));
 		add(editor.bind("Fill", new ColorAction("Fill",
 				mxConstants.STYLE_FILLCOLOR),
-				"/com/mxgraph/examples/swing/images/fillcolor.gif"));
+				"/com/mxgraph/ru.isma.next.math.engine.examples/swing/images/fillcolor.gif"));
 
 		addSeparator();
 

@@ -38,7 +38,7 @@ public class BasicGraphEditor extends JPanel
         try
         {
             //TODO fix resource path?
-            //mxResources.add("com/mxgraph/examples/swing/resources/editor");
+            //mxResources.add("com/mxgraph/ru.isma.next.math.engine.examples/swing/resources/editor");
         }
         catch (Exception e)
         {

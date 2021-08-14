@@ -1,6 +1,6 @@
 package ru.isma.next.math.engine.explicitDifferentialEquations
 
-import ru.isma.next.math.engine.shared.NonStationaryODE
+import ru.isma.next.math.common.NonStationaryODE
 import kotlin.math.abs
 
 class RKM4Integrator(val accuracy: Double) : ExplicitIntegrator() {

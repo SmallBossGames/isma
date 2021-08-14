@@ -1,6 +1,6 @@
 package ru.isma.next.math.engine.explicitDifferentialEquations
 
-import ru.isma.next.math.engine.shared.NonStationaryODE
+import ru.isma.next.math.common.NonStationaryODE
 import ru.isma.next.math.engine.shared.zeroSafetyNorm
 import kotlin.math.abs
 import kotlin.math.max

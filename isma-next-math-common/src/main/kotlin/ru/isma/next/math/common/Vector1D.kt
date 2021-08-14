@@ -1,4 +1,4 @@
-package ru.isma.next.math.engine.shared
+package ru.isma.next.math.common
 
 class Vector1D(val size: Int) {
     private val innerArray = DoubleArray(size)

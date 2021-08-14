@@ -1,4 +1,6 @@
-package ru.isma.next.math.engine.shared
+package ru.isma.next.math.common
+
+import ru.isma.next.math.engine.shared.zeroSafetyNorm
 
 //Non-concurrent
 class NewtonRaphsonSolver(size: Int, val accuracy: Double, val rVector: DoubleArray) {

@@ -53,4 +53,5 @@ include('isma-intg-parallel-ignite')
 //include('isma-tools')
 include 'isma-next-hsm'
 include 'isma-next-math-engine'
+include 'isma-next-math-common'
 

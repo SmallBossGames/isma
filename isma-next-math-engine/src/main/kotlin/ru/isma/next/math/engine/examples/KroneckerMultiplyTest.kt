@@ -1,6 +1,6 @@
 package ru.isma.next.math.engine.examples
 
-import ru.isma.next.math.engine.shared.Matrix2D
+import ru.isma.next.math.common.Matrix2D
 
 fun kroneckerMultiplyTest1(){
     val matrix = Matrix2D(4)

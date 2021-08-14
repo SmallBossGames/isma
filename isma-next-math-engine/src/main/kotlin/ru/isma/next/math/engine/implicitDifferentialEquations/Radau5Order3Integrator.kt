@@ -1,5 +1,8 @@
 package ru.isma.next.math.engine.implicitDifferentialEquations
 
+import ru.isma.next.math.common.JacobiMatrixSolver
+import ru.isma.next.math.common.Matrix2D
+import ru.isma.next.math.common.NonStationaryODE
 import ru.isma.next.math.engine.shared.*
 import smallBossMathLib.implicitDifferentialEquations.exceptions.ExceedingLimitEvaluationsException
 import smallBossMathLib.implicitDifferentialEquations.exceptions.ExceedingLimitStepsException

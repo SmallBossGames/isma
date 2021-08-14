@@ -1,4 +1,4 @@
-package ru.isma.next.math.engine.shared
+package ru.isma.next.math.common
 
 import kotlin.math.abs
 import kotlin.math.max

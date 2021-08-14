@@ -1,5 +1,6 @@
 package ru.isma.next.math.engine.shared
 
+import ru.isma.next.math.common.Matrix2D
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt

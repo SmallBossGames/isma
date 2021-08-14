@@ -2,8 +2,8 @@ package ru.isma.next.math.engine.implicitDifferentialEquations
 
 import smallBossMathLib.implicitDifferentialEquations.exceptions.ExceedingLimitEvaluationsException
 import smallBossMathLib.implicitDifferentialEquations.exceptions.ExceedingLimitStepsException
-import ru.isma.next.math.engine.shared.NewtonRaphsonSolver
-import ru.isma.next.math.engine.shared.StationaryODE
+import ru.isma.next.math.common.NewtonRaphsonSolver
+import ru.isma.next.math.common.StationaryODE
 import ru.isma.next.math.engine.shared.zeroSafetyNorm
 import kotlin.math.sqrt
 

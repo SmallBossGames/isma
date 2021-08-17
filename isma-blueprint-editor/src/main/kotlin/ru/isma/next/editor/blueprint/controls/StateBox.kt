@@ -8,6 +8,7 @@ import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
+import javafx.scene.text.Font
 import tornadofx.*
 
 class StateBox : Fragment() {
@@ -75,6 +76,7 @@ class StateBox : Fragment() {
         }
 
         val boxLabel = Label().label {
+            font = Font("Arial", 22.0)
             textProperty().bind(nameProperty())
             visibleWhen(!isEditModeEnabledProperty())
             managedWhen(!isEditModeEnabledProperty())

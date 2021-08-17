@@ -1,14 +1,13 @@
 package ru.isma.next.app.services.project
 
-import ru.isma.next.app.events.project.NewBlueprintProjectEvent
-import ru.isma.next.app.events.project.NewProjectEvent
+import javafx.collections.FXCollections
+import javafx.collections.ObservableSet
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
-import tornadofx.FX
 
 class ProjectService {
-    private val projects = mutableSetOf<IProjectModel>()
+    val projects: ObservableSet<IProjectModel> = FXCollections.observableSet()
 
     var activeProject: IProjectModel? = null
 
@@ -28,12 +27,10 @@ class ProjectService {
 
     fun addText(project: LismaProjectModel){
         projects.add(project)
-        FX.eventbus.fire(NewProjectEvent(project))
     }
 
     fun addBlueprint(project: BlueprintProjectModel){
         projects.add(project)
-        FX.eventbus.fire(NewBlueprintProjectEvent(project))
     }
 
     fun close(project: IProjectModel){

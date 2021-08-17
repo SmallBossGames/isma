@@ -21,7 +21,7 @@ class IsmaEditorTabPane: View() {
         projectController.projects.addListener { it: SetChangeListener.Change<out IProjectModel?> ->
             when (val addedElement = it.elementAdded) {
                 is BlueprintProjectModel -> {
-                    this@tabpane.tab(addedElement.name) {
+                    tab(addedElement.name) {
                         add<IsmaBlueprintEditor> {
                             val provider = BlueprintProjectDataProvider(this@add)
                             addedElement.apply {

@@ -13,15 +13,15 @@ object IntegrationResultPointFileHelpers {
         for (y in resultPoint.yForDe) {
             builder.append(COMMA).append(y)
         }
-        val yForAeArray = resultPoint.rhs[DaeSystem.RHS_AE_PART_IDX]
-        for (yForAe in yForAeArray) {
-            builder.append(COMMA).append(yForAe)
-        }
         val fArray = resultPoint.rhs[DaeSystem.RHS_DE_PART_IDX]
         for (f in fArray) {
             builder.append(COMMA).append(f)
         }
-        builder.append(System.lineSeparator())
+        val yForAeArray = resultPoint.rhs[DaeSystem.RHS_AE_PART_IDX]
+        for (yForAe in yForAeArray) {
+            builder.append(COMMA).append(yForAe)
+        }
+        builder.appendLine()
         return builder.toString()
     }
 
@@ -31,7 +31,7 @@ object IntegrationResultPointFileHelpers {
         builder.append(COMMA).append(firstResultPoint.yForDe.size) // y count;
         builder.append(COMMA).append(firstResultPoint.rhs[DaeSystem.RHS_DE_PART_IDX].size) // rhsForDeCount;
         builder.append(COMMA).append(firstResultPoint.rhs[DaeSystem.RHS_AE_PART_IDX].size) // rhsForAeCount;
-        builder.append(System.lineSeparator())
+        builder.appendLine()
         return builder.toString()
     }
 

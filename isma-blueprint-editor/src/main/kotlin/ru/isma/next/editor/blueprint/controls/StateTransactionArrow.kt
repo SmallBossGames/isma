@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.Parent
 import javafx.scene.input.MouseEvent
+import javafx.scene.text.Font
 
 import tornadofx.*
 import kotlin.math.*
@@ -66,6 +67,7 @@ class StateTransactionArrow : Fragment() {
                 }
             }
             label {
+                font = Font("Arial", 16.0)
                 prefWidth = TextFieldLength
                 translateY = -10.0
                 translateX = -TextFieldLength / 2.0
@@ -90,7 +92,7 @@ class StateTransactionArrow : Fragment() {
                 val angle = atan2(x, y) + PI/2
                 val offsetX = 10.0 * sin(angle)
                 val offsetY = 10.0 * cos(angle)
-                val textOffsetX = 40.0 * sin(angle)
+                val textOffsetX = 70.0 * sin(angle)
                 val textOffsetY = 40.0 * cos(angle)
 
                 startX = this@StateTransactionArrow.startX - this@group.layoutX + offsetX
@@ -123,11 +125,11 @@ class StateTransactionArrow : Fragment() {
     }
 
     fun addMousePressedListener(handler: (StateTransactionArrow, MouseEvent) -> Unit){
-        mousePressedListeners.add(handler);
+        mousePressedListeners.add(handler)
     }
 
     fun removeMousePressedListener(handler: (StateTransactionArrow, MouseEvent) -> Unit){
-        mousePressedListeners.remove(handler);
+        mousePressedListeners.remove(handler)
     }
 
     private fun executeMousePressedListener(event: MouseEvent){

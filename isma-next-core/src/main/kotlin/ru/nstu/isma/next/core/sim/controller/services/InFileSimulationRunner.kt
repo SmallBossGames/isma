@@ -16,7 +16,7 @@ import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
-import ru.nstu.isma.next.core.sim.controller.models.InMemorySimulationParameters
+import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 import java.io.File
 
 class InFileSimulationRunner(
@@ -25,7 +25,7 @@ class InFileSimulationRunner(
 ) : ISimulationRunner {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override suspend fun run(context: InMemorySimulationParameters): HybridSystemIntegrationResult = coroutineScope {
+    override suspend fun run(context: SimulationParameters): HybridSystemIntegrationResult = coroutineScope {
         val pointsChannel = Channel<IntgResultPoint>()
 
         val metricDataJob = async {

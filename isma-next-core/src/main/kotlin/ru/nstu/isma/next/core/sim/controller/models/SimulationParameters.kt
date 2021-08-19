@@ -7,7 +7,7 @@ import ru.nstu.isma.next.core.sim.controller.HybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.SimulationInitials
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 
-data class InMemorySimulationParameters(
+data class SimulationParameters(
     val hybridSystem: HybridSystem,
     val simulationInitials: SimulationInitials,
     val indexProvider: EquationIndexProvider,

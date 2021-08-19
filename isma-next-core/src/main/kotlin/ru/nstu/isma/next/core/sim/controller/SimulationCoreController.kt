@@ -11,7 +11,7 @@ import ru.nstu.isma.intg.server.client.RemoteDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.contracts.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
-import ru.nstu.isma.next.core.sim.controller.models.InMemorySimulationParameters
+import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
 import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerProvider
@@ -60,7 +60,7 @@ class SimulationCoreController(
 
             val stepBoundLow = parameters.eventDetectionParameters?.stepBoundLow ?: 0.0
 
-            val context = InMemorySimulationParameters(
+            val context = SimulationParameters(
                 compilationResult.hybridSystem,
                 initials,
                 compilationResult.indexProvider,

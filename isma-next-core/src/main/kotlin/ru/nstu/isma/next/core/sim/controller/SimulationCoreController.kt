@@ -1,7 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller
 
-import kotlinx.coroutines.*
-import org.slf4j.LoggerFactory
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
@@ -11,7 +11,9 @@ import ru.nstu.isma.intg.server.client.RemoteDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.contracts.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
-import ru.nstu.isma.next.core.sim.controller.models.*
+import ru.nstu.isma.next.core.sim.controller.models.InMemorySimulationParameters
+import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
+import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
 import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerProvider
 
 /**
@@ -20,6 +22,7 @@ import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerProvider
  */
 class SimulationCoreController(
     private val simulationRunnerProvider: ISimulationRunnerProvider,
+    private val integrationMethodProvider: IIntegrationMethodProvider,
     private val hsmCompiler: IHsmCompiler,
 ) : ISimulationCoreController {
     /**
@@ -37,15 +40,17 @@ class SimulationCoreController(
 
         var computeEngineClient: ComputeEngineClient? = null
         return@coroutineScope try {
+            val method = integrationMethodProvider.method
+
             val stepSolver: DaeSystemStepSolver = if (parameters.parallelParameters != null) {
                 computeEngineClient = ComputeEngineClient(compilationResult.classLoader).apply {
                     connect(parameters.parallelParameters.server, parameters.parallelParameters.port)
-                    loadIntgMethod(parameters.method)
+                    loadIntgMethod(method)
                     loadDaeSystem(compilationResult.hybridSystem.daeSystem)
                 }
-                RemoteDaeSystemStepSolver(parameters.method, computeEngineClient)
+                RemoteDaeSystemStepSolver(method, computeEngineClient)
             } else {
-                DefaultDaeSystemStepSolver(parameters.method, compilationResult.hybridSystem.daeSystem)
+                DefaultDaeSystemStepSolver(method, compilationResult.hybridSystem.daeSystem)
             }
 
             val eventDetector = if (parameters.eventDetectionParameters != null)

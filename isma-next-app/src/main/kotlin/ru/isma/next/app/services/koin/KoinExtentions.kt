@@ -8,10 +8,7 @@ import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.app.services.simualtion.SimulationParametersService
-import ru.isma.next.app.services.simualtion.SimulationResultService
-import ru.isma.next.app.services.simualtion.SimulationRunnerProvider
-import ru.isma.next.app.services.simualtion.SimulationService
+import ru.isma.next.app.services.simualtion.*
 import ru.isma.next.editor.text.services.TextEditorService
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
 import ru.nstu.grin.integration.IntegrationController
@@ -23,6 +20,7 @@ import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.contracts.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
+import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
 import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerProvider
 import ru.nstu.isma.next.core.sim.controller.services.InFileSimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.InMemorySimulationRunner
@@ -41,10 +39,11 @@ fun KoinApplication.addExternalServices() {
         single { IntegrationController() }
         single { IntegrationMethodLibraryLoader("methods/").load() }
         single<ITextEditorService> { TextEditorService() }
-        single<ISimulationCoreController> { SimulationCoreController(get(), get()) }
+        single<ISimulationCoreController> { SimulationCoreController(get(), get(), get()) }
         single<IHybridSystemSimulator> { HybridSystemSimulator() }
         single<IHsmCompiler> { HsmCompiler() }
         single<InputTranslator> { LismaTranslator() }
+        single<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
     }
     modules(module)
 }
@@ -57,7 +56,7 @@ fun KoinApplication.addAppServices() {
         single<LismaPdeService> { LismaPdeService(get(), get()) }
         single<SimulationParametersService> { SimulationParametersService(get()) }
         single<SimulationResultService> { SimulationResultService(get()) }
-        single<SimulationService> { SimulationService(get(), get(), get(), get(), get(), get()) }
+        single<SimulationService> { SimulationService(get(), get(), get(), get(), get()) }
         single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
         single<ISimulationRunnerProvider> { SimulationRunnerProvider(get(), get(), get()) }
     }

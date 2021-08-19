@@ -27,7 +27,6 @@ class SimulationService(
     private val lismaPdeService: LismaPdeService,
     private val simulationParametersService: SimulationParametersService,
     private val simulationResult: SimulationResultService,
-    private val library: IntegrationMethodsLibrary,
     private val simulationController: ISimulationCoreController,
 ) {
     private val progressProperty = SimpleDoubleProperty()
@@ -58,17 +57,12 @@ class SimulationService(
             is FailedTranslation -> { }
             is SuccessTranslation -> {
                 val initials = createCauchyInitials()
-                val integrationMethod = createIntegrationMethod()
-
-                initAccuracyController(integrationMethod)
-                initStabilityController(integrationMethod)
 
                 translationResult.hsm.initTimeEquation(initials.start)
 
                 val context = IntegratorApiParameters(
                     hsm = translationResult.hsm,
                     initials = createCauchyInitials(),
-                    method = integrationMethod,
                     parallelParameters = createParallelParameters(),
                     eventDetectionParameters = createEventDetectionParameters(),
                     stepChangeHandlers = arrayListOf(
@@ -111,11 +105,6 @@ class SimulationService(
         }
     }
 
-    private fun createIntegrationMethod(): IntgMethod {
-        val selectedMethod = simulationParametersService.integrationMethod.selectedMethod
-        return library.getIntgMethod(selectedMethod)!!
-    }
-
     private fun createEventDetectionParameters(): EventDetectionParameters? {
         val eventDetectionParams = simulationParametersService.eventDetection
 
@@ -136,25 +125,6 @@ class SimulationService(
         }
         else {
             null
-        }
-    }
-
-
-    private fun initAccuracyController(integrationMethod: IntgMethod){
-        val accuracyController = integrationMethod.accuracyController
-        if (accuracyController != null) {
-            val accuracyInUse = simulationParametersService.integrationMethod.isAccuracyInUse
-            accuracyController.isEnabled = accuracyInUse
-            if (accuracyInUse){
-                accuracyController.accuracy = simulationParametersService.integrationMethod.accuracy
-            }
-        }
-    }
-
-    private fun initStabilityController(integrationMethod: IntgMethod){
-        val stabilityController = integrationMethod.stabilityController
-        if (stabilityController != null) {
-            stabilityController.isEnabled = simulationParametersService.integrationMethod.isStableInUse
         }
     }
 

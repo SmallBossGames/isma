@@ -11,9 +11,6 @@ import ru.isma.next.common.services.lisma.models.SuccessTranslation
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.methods.IntgMethod
-import ru.nstu.isma.next.core.sim.controller.FileStorage
-import ru.nstu.isma.next.core.sim.controller.MemoryStorage
-import ru.nstu.isma.next.core.sim.controller.SimulationResultStorageType
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
@@ -73,7 +70,6 @@ class SimulationService(
                     initials = createCauchyInitials(),
                     method = integrationMethod,
                     parallelParameters = createParallelParameters(),
-                    resultStorageType = createFileResultParameters(),
                     eventDetectionParameters = createEventDetectionParameters(),
                     stepChangeHandlers = arrayListOf(
                         {
@@ -140,14 +136,6 @@ class SimulationService(
         }
         else {
             null
-        }
-    }
-
-    private fun createFileResultParameters(): SimulationResultStorageType {
-        return when(simulationParametersService.resultSaving.savingTarget)
-        {
-            SaveTarget.MEMORY -> MemoryStorage
-            SaveTarget.FILE -> FileStorage("temp.csv")
         }
     }
 

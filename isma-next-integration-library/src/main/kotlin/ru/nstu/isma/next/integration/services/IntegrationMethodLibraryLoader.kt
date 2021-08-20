@@ -1,5 +1,6 @@
 package ru.nstu.isma.next.integration.services
 
+import com.google.common.reflect.ClassPath
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import java.io.File
@@ -9,6 +10,7 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.util.*
 import java.util.jar.JarFile
+
 
 class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -23,7 +25,7 @@ class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
                 true
             )
         }
-        val userMethods: Collection<Class<out IntgMethod?>> = loadUserMethods()
+        val userMethods = loadUserMethods()
         userMethods.forEach { cls ->
             registerIntgMethod(
                 libraryInstance,
@@ -35,22 +37,34 @@ class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
         return libraryInstance
     }
 
-    private fun loadSystemMethods(): Collection<Class<out IntgMethod?>> {
+    private fun loadSystemMethods(): Collection<Class<out IntgMethod>> {
+        // 7 times slower, but supported by Google
+        //return findAllClassesUsingGoogleGuice("ru.nstu.isma.intg.lib")
+
         val reflections = org.reflections.Reflections("ru.nstu.isma.intg.lib")
         return reflections.getSubTypesOf(IntgMethod::class.java)
     }
 
-    private fun loadUserMethods(): Collection<Class<out IntgMethod?>> {
+    @Throws(IOException::class)
+    fun findAllClassesUsingGoogleGuice(packageName: String): List<Class<out IntgMethod>> {
+        return ClassPath.from(this.javaClass.classLoader)
+            .getTopLevelClassesRecursive(packageName)
+            .map { it.load() }
+            .filter { it.isInstance(IntgMethod::class.java)  }
+            .map { it.asSubclass(IntgMethod::class.java)}
+    }
+
+    private fun loadUserMethods(): Collection<Class<out IntgMethod>> {
         val methodsDir = File(userMethodsDirectory)
         if (!methodsDir.exists()) {
             return emptyList()
         }
         val jarFilter = FilenameFilter { _, name -> name.endsWith(".jar") }
         val jarPaths = methodsDir.list(jarFilter) ?: return emptyList()
-        val intgMethodClasses: LinkedList<Class<out IntgMethod?>> = LinkedList<Class<out IntgMethod?>>()
+        val intgMethodClasses = LinkedList<Class<out IntgMethod?>>()
         for (jarPath in jarPaths) {
             val loadedClasses = loadJar(userMethodsDirectory + jarPath)
-            intgMethodClasses.addAll(findIntgMethodClasses(loadedClasses)!!)
+            intgMethodClasses.addAll(findIntgMethodClasses(loadedClasses))
         }
         return intgMethodClasses
     }
@@ -71,11 +85,11 @@ class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
         return false
     }
 
-    private fun findIntgMethodClasses(classes: List<Class<*>>): List<Class<out IntgMethod?>>? {
-        val intgMethodClasses: LinkedList<Class<out IntgMethod?>> = LinkedList<Class<out IntgMethod?>>()
+    private fun findIntgMethodClasses(classes: List<Class<*>>): List<Class<out IntgMethod>> {
+        val intgMethodClasses = LinkedList<Class<out IntgMethod?>>()
         classes.forEach { cls ->
             if (IntgMethod::class.java.isAssignableFrom(cls)) {
-                intgMethodClasses.add(cls as Class<out IntgMethod?>)
+                intgMethodClasses.add(cls.asSubclass(IntgMethod::class.java))
             }
         }
         return intgMethodClasses
@@ -94,8 +108,10 @@ class IntegrationMethodLibraryLoader(private val userMethodsDirectory: String) {
                     continue
                 }
                 // -6 because of .class
-                var className = jarEntry.name.substring(0, jarEntry.name.length - 6)
-                className = className.replace('/', '.')
+                val className = jarEntry.name
+                    .substring(0, jarEntry.name.length - 6)
+                    .replace('/', '.')
+
                 try {
                     val loadedClass = classLoader.loadClass(className)
                     loadedClasses.add(loadedClass)

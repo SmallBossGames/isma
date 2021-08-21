@@ -7,6 +7,8 @@ module isma.isma.hsm.main {
     exports ru.nstu.isma.core.hsm;
     exports ru.nstu.isma.core.hsm.hybrid;
     exports ru.nstu.isma.core.hsm.linear;
+    exports ru.nstu.isma.core.hsm.events;
+    exports common;
 
     requires java.compiler;
     requires isma.isma.next.tools.main;

@@ -38,7 +38,7 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
         return StringSubstitutor(values).replace(GENERATED_CLASS_TEMPLATE)
     }
 
-    private fun renderImports(classes: Collection<Class<*>>): String {
+    private fun renderImports(classes: List<Class<*>>): String {
         val template = "\nimport %s;"
         return classes.stream()
                 .map { obj: Class<*> -> obj.canonicalName }
@@ -144,13 +144,13 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
         return sub.replace(template)
     }
 
-    private fun getTransactions(fromStateCode: String): Collection<HMTransaction> {
+    private fun getTransactions(fromStateCode: String): Set<HMTransaction> {
         return hsm.automata.transactions.stream()
                 .filter { t: HMTransaction -> t.source.code == fromStateCode }
                 .collect(Collectors.toSet())
     }
 
-    private fun renderDifferentialEquations(odes: Collection<HMDerivativeEquation>): String {
+    private fun renderDifferentialEquations(odes: List<HMDerivativeEquation>): String {
         val template = """
 			.add${"$"}{deClassName}(${"$"}{de})"""
 
@@ -186,7 +186,7 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
         return sub.replace(template)
     }
 
-    private fun renderAlgebraicEquations(algEquations: Collection<HMAlgebraicEquation>): String {
+    private fun renderAlgebraicEquations(algEquations: List<HMAlgebraicEquation>): String {
         val template = """
 			.add${"$"}{aeClassName}(new ${"$"}{aeClassName}("${"$"}{name}", ${"$"}{index}, (y, a) -> (${"$"}{expression}), "${"$"}{desc}"))"""
         return algEquations.stream().map {
@@ -202,7 +202,7 @@ class AnalyzedHybridSystemClassBuilder(private val hsm: HSM, private val indexPr
         }.collect(Collectors.joining())
     }
 
-    private fun renderGuards(transactions: Collection<HMTransaction>): String {
+    private fun renderGuards(transactions: Set<HMTransaction>): String {
         return transactions.stream()
                 .map { renderGuard(it.source.code, it.target.code, it.condition) }
                 .collect(Collectors.joining())

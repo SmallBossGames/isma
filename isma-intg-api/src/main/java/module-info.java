@@ -8,4 +8,6 @@ module isma.isma.intg.api.main {
     exports ru.nstu.isma.intg.api;
     exports ru.nstu.isma.intg.api.models;
     exports ru.nstu.isma.intg.api.calcmodel.cauchy;
+    exports ru.nstu.isma.intg.api.providers;
+    exports ru.nstu.isma.intg.api.utilities;
 }

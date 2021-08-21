@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm")
-
     id("org.openjfx.javafxplugin")
+    //id("ch.tutteli.gradle.plugins.kotlin.module.info")
 }
 
 group = "ru.nstu.isma"

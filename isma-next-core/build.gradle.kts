@@ -1,7 +1,6 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm")
+    //id("ch.tutteli.gradle.plugins.kotlin.module.info")
 }
 
 group = "ru.nstu.isma.next"

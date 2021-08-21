@@ -1,17 +1,5 @@
 package ru.nstu.isma.print
 
-import javax.tools.StandardJavaFileManager
-import javax.tools.ForwardingJavaFileManager
-import javax.tools.JavaFileManager
-import java.security.SecureClassLoader
-import kotlin.Throws
-import java.lang.ClassNotFoundException
-import java.io.ByteArrayInputStream
-import java.io.IOException
-import javax.tools.JavaFileObject
-import javax.tools.FileObject
-import javax.tools.SimpleJavaFileObject
-
 /**
  * Created by Bessonov Alex
  * on 14.03.2015.

@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    id("ch.tutteli.gradle.plugins.kotlin.module.info")
 }
 
 group = "ru.nstu.isma"

@@ -46,8 +46,7 @@ public abstract class ClassBuilder<T> {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             JavaFileManager manager = new MemoryFileManager(compiler.getStandardFileManager(null, null, null));
 
-            List<String> options = new ArrayList<>();
-            options.addAll(Arrays.asList("-classpath", System.getProperty("java.class.path")));
+            var options = new ArrayList<>(Arrays.asList("-classpath", System.getProperty("java.class.path")));
 
             List<JavaFileObject> files = new ArrayList<>();
             files.add(new MemoryJavaFileObject(name, content));

@@ -4,6 +4,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "1.5.0" apply false
     id("ch.tutteli.gradle.plugins.kotlin.module.info") version "4.0.2" apply false
+    id("de.jjohannes.extra-java-module-info") version "0.9" apply false
 }
 
 allprojects {

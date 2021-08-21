@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("de.jjohannes.extra-java-module-info") version "0.9"
+    id("de.jjohannes.extra-java-module-info")
 }
 
 val moduleName by extra("isma.isma.intg.api.main")

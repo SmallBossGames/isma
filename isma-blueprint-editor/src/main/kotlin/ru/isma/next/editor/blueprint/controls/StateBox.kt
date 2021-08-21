@@ -75,7 +75,7 @@ class StateBox : Fragment() {
             }
         }
 
-        val boxLabel = Label().label {
+        val boxLabel = Label().apply {
             font = Font("Arial", 22.0)
             textProperty().bind(nameProperty())
             visibleWhen(!isEditModeEnabledProperty())

@@ -37,5 +37,9 @@ class ProjectService {
         projects.remove(project)
     }
 
+    fun closeAll() {
+        projects.clear()
+    }
+
     fun getAllProjects() = projects.toTypedArray()
 }

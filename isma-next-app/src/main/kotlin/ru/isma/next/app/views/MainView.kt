@@ -1,25 +1,26 @@
 package ru.isma.next.app.views
 
+import org.koin.core.component.KoinComponent
 import ru.isma.next.app.models.preferences.DefaultFilesPreferencesModel
 import ru.isma.next.app.models.preferences.WindowPreferencesModel
 import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.ProjectFileService
-import tornadofx.*
+import ru.isma.next.app.views.settings.SettingsPanelView
+import ru.isma.next.app.views.tabpane.IsmaEditorTabPane
 import ru.isma.next.app.views.toolbars.IsmaErrorListTable
 import ru.isma.next.app.views.toolbars.IsmaMenuBar
 import ru.isma.next.app.views.toolbars.IsmaToolBar
 import ru.isma.next.app.views.toolbars.SimulationProcessBar
-import ru.isma.next.app.views.tabpane.IsmaEditorTabPane
-import ru.isma.next.app.views.settings.SettingsPanelView
+import tornadofx.*
 
-class MainView : View() {
+class MainView : View(), KoinComponent {
     private val preferencesProvider: PreferencesProvider by di()
     private val projectFileService: ProjectFileService by di()
 
-    private val ismaMenuBar: IsmaMenuBar by inject()
-    private val ismaToolBar: IsmaToolBar by inject()
-    private val simulationProcess: SimulationProcessBar by inject()
-    private val ismaErrorListTable: IsmaErrorListTable by inject()
+    private val ismaMenuBar: IsmaMenuBar by di()
+    private val ismaToolBar: IsmaToolBar by di()
+    private val simulationProcess: SimulationProcessBar by di()
+    private val ismaErrorListTable: IsmaErrorListTable by di()
     private val ismaEditorTabPane: IsmaEditorTabPane by inject()
     private val settingsPanel: SettingsPanelView by inject()
 

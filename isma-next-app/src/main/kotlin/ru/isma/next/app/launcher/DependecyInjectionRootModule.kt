@@ -6,6 +6,7 @@ import ru.isma.next.app.services.koin.addExternalServices
 import ru.isma.next.app.services.koin.addSimulationRunners
 import ru.isma.next.app.views.koin.addBlueprintEditor
 import ru.isma.next.app.views.koin.addLismaTextEditor
+import ru.isma.next.app.views.koin.addToolbars
 
 fun ismaKoinStart() = startKoin {
     addAppServices()
@@ -13,4 +14,5 @@ fun ismaKoinStart() = startKoin {
     addSimulationRunners()
     addLismaTextEditor()
     addBlueprintEditor()
+    addToolbars()
 }

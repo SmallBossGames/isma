@@ -3,6 +3,7 @@ package ru.isma.next.editor.blueprint.controls
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.*
 import javafx.geometry.Pos
+import javafx.scene.Group
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
@@ -11,7 +12,7 @@ import javafx.scene.paint.Paint
 import javafx.scene.text.Font
 import tornadofx.*
 
-class StateBox : Fragment() {
+class StateBox : Group() {
     private val mousePressedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseReleasedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseClickedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
@@ -46,78 +47,78 @@ class StateBox : Fragment() {
     fun squareHeightProperty() = squareHeightProperty
     fun colorProperty() = colorProperty
 
-    fun translateXProperty(): DoubleProperty = root.layoutXProperty()
-    fun translateYProperty(): DoubleProperty = root.layoutYProperty()
+    fun centerXProperty(): DoubleBinding = layoutXProperty() + squareWidth / 2
+    fun centerYProperty(): DoubleBinding = layoutYProperty() + squareHeight / 2
 
-    fun centerXProperty(): DoubleBinding = root.layoutXProperty() + squareWidth / 2
-    fun centerYProperty(): DoubleBinding = root.layoutYProperty() + squareHeight / 2
+    init {
+        this.apply {
+            rectangle {
+                heightProperty().bind(squareHeightProperty())
+                widthProperty().bind(squareWidthProperty())
+                fillProperty().bind(colorProperty())
+                viewOrder = 3.0
+                arcWidth = 20.0
+                arcHeight = 20.0
+            }
 
-    override val root = group {
-        rectangle {
-            heightProperty().bind(squareHeightProperty())
-            widthProperty().bind(squareWidthProperty())
-            fillProperty().bind(colorProperty())
-            viewOrder = 3.0
-            arcWidth = 20.0
-            arcHeight = 20.0
-        }
-
-        val nameTextArea = TextArea().apply {
-            visibleWhen(isEditModeEnabledProperty())
-            managedWhen(isEditModeEnabledProperty())
-            focusedProperty().onChange {
-                if(it){
-                    text = name
-                } else {
-                    name = text
-                    isEditModeEnabled = false
+            val nameTextArea = TextArea().apply {
+                visibleWhen(isEditModeEnabledProperty())
+                managedWhen(isEditModeEnabledProperty())
+                focusedProperty().onChange {
+                    if(it){
+                        text = name
+                    } else {
+                        name = text
+                        isEditModeEnabled = false
+                    }
                 }
             }
-        }
 
-        val boxLabel = Label().apply {
-            font = Font("Arial", 22.0)
-            textProperty().bind(nameProperty())
-            visibleWhen(!isEditModeEnabledProperty())
-            managedWhen(!isEditModeEnabledProperty())
-        }
-
-        hbox {
-            prefHeightProperty().bind(squareHeightProperty() - 20.0)
-            prefWidthProperty().bind(squareWidthProperty() - 20.0)
-            translateX += 10.0
-            translateY += 10.0
-            alignment = Pos.CENTER
-            add(boxLabel)
-            add(nameTextArea)
-        }
-
-        button("Edit") {
-            val isVisibleBinding = isEditModeEnabledProperty().not().and(isEditButtonVisible())
-
-            action { executeEditActionListeners() }
-            visibleWhen(isVisibleBinding)
-            managedWhen(isVisibleBinding)
-        }
-
-        addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            if (!isDragged && isEditable) {
-                isEditModeEnabled = true
-                nameTextArea.requestFocus()
+            val boxLabel = Label().apply {
+                font = Font("Arial", 22.0)
+                textProperty().bind(nameProperty())
+                visibleWhen(!isEditModeEnabledProperty())
+                managedWhen(!isEditModeEnabledProperty())
             }
-            executeMouseClickedListeners(it)
+
+            hbox {
+                prefHeightProperty().bind(squareHeightProperty() - 20.0)
+                prefWidthProperty().bind(squareWidthProperty() - 20.0)
+                translateX += 10.0
+                translateY += 10.0
+                alignment = Pos.CENTER
+                add(boxLabel)
+                add(nameTextArea)
+            }
+
+            button("Edit") {
+                val isVisibleBinding = isEditModeEnabledProperty().not().and(isEditButtonVisible())
+
+                action { executeEditActionListeners() }
+                visibleWhen(isVisibleBinding)
+                managedWhen(isVisibleBinding)
+            }
+
+            addEventHandler(MouseEvent.MOUSE_CLICKED) {
+                if (!isDragged && isEditable) {
+                    isEditModeEnabled = true
+                    nameTextArea.requestFocus()
+                }
+                executeMouseClickedListeners(it)
+            }
+
+            addEventHandler(MouseEvent.MOUSE_PRESSED) {
+                isDragged = false
+                executeMousePressedListener(it)
+            }
+            addEventHandler(MouseEvent.MOUSE_RELEASED) {
+                executeMouseReleasedListeners(it)
+            }
+            addEventHandler(MouseEvent.MOUSE_DRAGGED) {
+                isDragged = true
+            }
         }
 
-        addEventHandler(MouseEvent.MOUSE_PRESSED) {
-            isDragged = false
-            executeMousePressedListener(it)
-        }
-        addEventHandler(MouseEvent.MOUSE_RELEASED) {
-            executeMouseReleasedListeners(it)
-        }
-        addEventHandler(MouseEvent.MOUSE_DRAGGED) {
-            isDragged = true
-        }
     }
 
     fun addMousePressedListener(handler: (StateBox, MouseEvent) -> Unit){

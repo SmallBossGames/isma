@@ -185,8 +185,8 @@ class IsmaBlueprintEditor: Fragment() {
 
     private fun StateBox.toBlueprintState() : BlueprintStateModel {
         return BlueprintStateModel(
-            this.translateXProperty().value,
-            this.translateYProperty().value,
+            this.layoutXProperty().value,
+            this.layoutYProperty().value,
             this.name,
             this.text
         )
@@ -194,8 +194,8 @@ class IsmaBlueprintEditor: Fragment() {
 
     private fun StateBox.applyBlueprintState(blueprintState: BlueprintStateModel){
         this.apply {
-            translateXProperty().value = blueprintState.canvasPositionX
-            translateYProperty().value = blueprintState.canvasPositionY
+            layoutXProperty().value = blueprintState.canvasPositionX
+            layoutYProperty().value = blueprintState.canvasPositionY
             name = blueprintState.name
             text = blueprintState.text
         }
@@ -216,7 +216,7 @@ class IsmaBlueprintEditor: Fragment() {
         stateName: String = "",
         stateText: String = "",
     ) : StateBox {
-        val stateBox = find<StateBox> {
+        val stateBox = StateBox().apply {
             color = Color.CORAL
 
             addEditActionListener {
@@ -228,8 +228,8 @@ class IsmaBlueprintEditor: Fragment() {
             initMouseLinkTransactionEvents()
             initNameChangingEvent()
 
-            translateXProperty().value = positionX
-            translateYProperty().value = positionY
+            layoutXProperty().value = positionX
+            layoutYProperty().value = positionY
             name = stateName.ifEmpty { nameChangingMonitor.createNextDefaultName() }
             text = stateText
 
@@ -253,7 +253,7 @@ class IsmaBlueprintEditor: Fragment() {
             return
         }
 
-        val transactionArrow = find<StateTransactionArrow> {
+        val transactionArrow = StateTransactionArrow().apply {
             startXProperty().bind(startStateBox.centerXProperty())
             startYProperty().bind(startStateBox.centerYProperty())
             endXProperty().bind(endStateBox.centerXProperty())
@@ -295,13 +295,13 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun createMainStateBox() : StateBox {
-        return find {
+        return StateBox().apply {
             color = Color.LIGHTGREEN
             isEditable = false
             squareHeight = 60.0
             name = MAIN_STATE
-            translateXProperty() += 10
-            translateYProperty() += 10
+            layoutXProperty() += 10
+            layoutYProperty() += 10
 
             nameChangingMonitor.tryRegister(name)
 
@@ -312,14 +312,14 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun createInitStateBox() : StateBox {
-        return find {
+        return StateBox().apply {
             color = Color.LIGHTBLUE
             isEditButtonVisible = false
             isEditable = false
             squareHeight = 60.0
             name = INIT_STATE
-            translateXProperty() += 10
-            translateYProperty() += 100
+            layoutXProperty() += 10
+            layoutYProperty() += 100
 
             nameChangingMonitor.tryRegister(name)
 
@@ -337,8 +337,8 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
-        stateBox.translateXProperty().value = max(positionX, 0.0)
-        stateBox.translateYProperty().value = max(positionY, 0.0)
+        stateBox.layoutXProperty().value = max(positionX, 0.0)
+        stateBox.layoutYProperty().value = max(positionY, 0.0)
     }
 
     private fun resetEditorMode() {

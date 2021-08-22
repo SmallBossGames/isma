@@ -29,13 +29,13 @@ class IsmaEditorTabPane: View(), KoinComponent {
             when (val addedElement = it.elementAdded) {
                 is BlueprintProjectModel -> {
                     tab(addedElement.name) {
-                        add<IsmaBlueprintEditor> {
-                            val provider = BlueprintProjectDataProvider(this@add)
+                        add(IsmaBlueprintEditor().apply {
+                            val provider = BlueprintProjectDataProvider(this@apply)
                             addedElement.apply {
                                 dataProvider = provider
                                 pushBlueprint()
                             }
-                        }
+                        })
                         initProjectTab(addedElement)
                     }
                 }

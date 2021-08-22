@@ -2,7 +2,10 @@ package ru.isma.next.editor.blueprint
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.event.EventHandler
+import javafx.scene.control.*
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
@@ -16,10 +19,10 @@ import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
 import ru.isma.next.editor.text.IsmaTextEditor
 import ru.isma.next.editor.text.services.LismaHighlightingService
 import ru.isma.next.editor.text.services.TextEditorService
-import tornadofx.*
 import kotlin.math.max
+import ru.isma.next.editor.blueprint.utilities.*
 
-class IsmaBlueprintEditor: Fragment() {
+class IsmaBlueprintEditor: BorderPane() {
     private val nameChangingMonitor = NameChangingMonitor("New state")
 
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
@@ -48,7 +51,7 @@ class IsmaBlueprintEditor: Fragment() {
     private val mainStateBox: StateBox = createMainStateBox()
     private val initStateBox: StateBox = createInitStateBox()
 
-    private val canvas = pane {
+    private val canvas = Pane().apply {
         addMainStateBox()
         addInitStateBox()
 
@@ -59,30 +62,23 @@ class IsmaBlueprintEditor: Fragment() {
         }
     }
 
-    private val tabs = tabpane {
-        tab ("Blueprint") {
+    private val tabs = TabPane(
+        Tab("Blueprint", ScrollPane(canvas)).apply {
             isClosable = false
-            scrollpane {
-                add(canvas)
-            }
         }
-    }
+    )
 
-    override val root = borderpane {
+    init {
         center = tabs
-        bottom = toolbar {
-            button {
-                action {
+        bottom = ToolBar(
+            Button("New state").apply {
+                onAction = EventHandler {
                     resetEditorMode()
                     addStateBox()
                 }
-
-                text = "New state"
-
-                disableClose()
-            }
-            button {
-                action {
+            },
+            Button("New transition").apply {
+                onAction = EventHandler {
                     if(isAddTransactionMode) {
                         resetEditorMode()
                     } else {
@@ -92,19 +88,17 @@ class IsmaBlueprintEditor: Fragment() {
                     }
                 }
 
-                text = "New transition"
-
-                isAddTransactionModeProperty().onChange {
-                    text = if(it) {
+                isAddTransactionModeProperty().addListener { _, _, value ->
+                    text = if(value) {
                         "Stop adding transaction"
                     } else {
                         "New transition"
                     }
                 }
-            }
-            separator()
-            button {
-                action {
+            },
+            Separator(),
+            Button("Remove state").apply {
+                onAction = EventHandler {
                     if (isRemoveStateMode) {
                         resetEditorMode()
                     } else {
@@ -115,16 +109,17 @@ class IsmaBlueprintEditor: Fragment() {
 
                 text = "Remove state"
 
-                isRemoveStateModeProperty().onChange {
-                    text = if(it){
+                isRemoveStateModeProperty().addListener { _, _, value ->
+                    text = if(value){
                         "Stop remove state"
                     } else {
                         "Remove state"
                     }
                 }
-            }
-            button {
-                action {
+            },
+
+            Button("Remove transition").apply {
+                onAction = EventHandler {
                     if (isRemoveTransactionMode) {
                         resetEditorMode()
                     } else {
@@ -132,17 +127,16 @@ class IsmaBlueprintEditor: Fragment() {
                         isRemoveTransactionMode = true
                     }
                 }
-                text = "Remove transition"
 
-                isRemoveTransactionModeProperty().onChange {
-                    text = if(it){
+                isRemoveTransactionModeProperty().addListener { _, _, value ->
+                    text = if(value){
                         "Stop remove transition"
                     } else {
                         "Remove transition"
                     }
                 }
             }
-        }
+        )
     }
 
     fun getBlueprintModel() : BlueprintModel {
@@ -239,7 +233,7 @@ class IsmaBlueprintEditor: Fragment() {
         }
 
         stateBoxes.add(stateBox)
-        canvas.add(stateBox)
+        canvas.children.add(stateBox)
 
         return stateBox
     }
@@ -264,9 +258,11 @@ class IsmaBlueprintEditor: Fragment() {
             initMouseRemoveTransactionEvents()
         }
 
-        canvas.add(transactionArrow)
+        canvas.children.add(transactionArrow)
 
         transactions.add(BlueprintEditorTransactionModel(startStateBox, endStateBox, transactionArrow))
+
+
     }
 
     private fun StateBox.removeFromEditor() {
@@ -277,7 +273,7 @@ class IsmaBlueprintEditor: Fragment() {
             .forEach { removeTransaction(it) }
 
         stateBoxes.remove(this)
-        this.removeFromParent()
+        children.remove(this)
     }
 
     private fun StateTransactionArrow.removeFromEditor() {
@@ -286,12 +282,13 @@ class IsmaBlueprintEditor: Fragment() {
             .toList()
             .forEach { removeTransaction(it) }
 
-        this.removeFromParent()
+        children.remove(this)
     }
 
     private fun removeTransaction(transaction: BlueprintEditorTransactionModel) {
         transactions.remove(transaction)
-        transaction.transactionArrow.removeFromParent()
+
+        children.remove(transaction.transactionArrow)
     }
 
     private fun createMainStateBox() : StateBox {
@@ -300,8 +297,8 @@ class IsmaBlueprintEditor: Fragment() {
             isEditable = false
             squareHeight = 60.0
             name = MAIN_STATE
-            layoutXProperty() += 10
-            layoutYProperty() += 10
+            layoutXProperty().value += 10
+            layoutXProperty().value += 10
 
             nameChangingMonitor.tryRegister(name)
 
@@ -318,8 +315,8 @@ class IsmaBlueprintEditor: Fragment() {
             isEditable = false
             squareHeight = 60.0
             name = INIT_STATE
-            layoutXProperty() += 10
-            layoutYProperty() += 100
+            layoutXProperty().value += 10
+            layoutYProperty().value += 100
 
             nameChangingMonitor.tryRegister(name)
 
@@ -329,11 +326,11 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun Pane.addMainStateBox() {
-        add(mainStateBox)
+        children.add(mainStateBox)
     }
 
     private fun Pane.addInitStateBox() {
-        add(initStateBox)
+        children.add(initStateBox)
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
@@ -348,26 +345,22 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun openStateTextEditorTab(state: StateBox) {
-        tabs.tab(state.name) {
-            val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
-                replaceText(state.text)
-                state.textProperty().bind(textProperty())
-            }
-
-            add(editor)
-
-            textProperty().bind(state.nameProperty())
+        val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
+            replaceText(state.text)
+            state.textProperty().bind(textProperty())
         }
+
+        tabs.tabs.add(Tab(state.name, editor).apply {
+            textProperty().bind(state.nameProperty())
+        })
     }
 
     private fun openMainTextEditorTab() {
-        tabs.tab("Main") {
-            val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
-                replaceText(mainStateBox.text)
-                mainStateBox.textProperty().bind(textProperty())
-            }
-            add(editor)
+        val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
+            replaceText(mainStateBox.text)
+            mainStateBox.textProperty().bind(textProperty())
         }
+        tabs.tabs.add(Tab("Main", editor))
     }
 
     private fun StateBox.initMouseRemoveStateEvents() {
@@ -422,8 +415,8 @@ class IsmaBlueprintEditor: Fragment() {
 
     private fun StateBox.initNameChangingEvent() {
         var previousName = ""
-        isEditModeEnabledProperty().onChange {
-            if(it) {
+        isEditModeEnabledProperty().addListener { _, _, value ->
+            if(value) {
                 previousName = name
             } else {
                 if(nameChangingMonitor.tryRegister(name)){

@@ -14,6 +14,8 @@ import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
 import ru.isma.next.editor.text.IsmaTextEditor
+import ru.isma.next.editor.text.services.LismaHighlightingService
+import ru.isma.next.editor.text.services.TextEditorService
 import tornadofx.*
 import kotlin.math.max
 
@@ -347,20 +349,24 @@ class IsmaBlueprintEditor: Fragment() {
 
     private fun openStateTextEditorTab(state: StateBox) {
         tabs.tab(state.name) {
-            add<IsmaTextEditor> {
+            val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
                 replaceText(state.text)
                 state.textProperty().bind(textProperty())
             }
+
+            add(editor)
+
             textProperty().bind(state.nameProperty())
         }
     }
 
     private fun openMainTextEditorTab() {
         tabs.tab("Main") {
-            add<IsmaTextEditor> {
+            val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
                 replaceText(mainStateBox.text)
                 mainStateBox.textProperty().bind(textProperty())
             }
+            add(editor)
         }
     }
 

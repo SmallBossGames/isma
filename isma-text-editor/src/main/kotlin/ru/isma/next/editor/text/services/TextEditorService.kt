@@ -1,13 +1,13 @@
 package ru.isma.next.editor.text.services
 
-import ru.isma.next.editor.text.events.CopyTextInCurrentEditorRequest
-import ru.isma.next.editor.text.events.CutTextInCurrentEditorRequest
-import ru.isma.next.editor.text.events.PasteTextInCurrentEditorRequest
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
-import tornadofx.FX
 
 class TextEditorService : ITextEditorService {
-    override fun cut() = FX.eventbus.fire(CutTextInCurrentEditorRequest)
-    override fun copy() = FX.eventbus.fire(CopyTextInCurrentEditorRequest)
-    override fun paste() = FX.eventbus.fire(PasteTextInCurrentEditorRequest)
+    override val cutEventHandler = HashSet<() -> Unit>()
+    override val copyEventHandler = HashSet<() -> Unit>()
+    override val pasteEventHandler = HashSet<() -> Unit>()
+
+    override fun cut() = cutEventHandler.forEach { it() }
+    override fun copy() = copyEventHandler.forEach { it() }
+    override fun paste() = pasteEventHandler.forEach { it() }
 }

@@ -19,20 +19,20 @@ class LismaHighlightingService() : IHighlightingService {
                 LismaLexer.CONST_KEYWORD, LismaLexer.STATE_KEYWORD, LismaLexer.FOR_KEYWORD, LismaLexer.IF_KEYWORD,
                 LismaLexer.FROM_KEYWORD -> {
                     spansBuilder
-                        .add(listOf("default"),  it.startIndex - lastKeyword)
-                        .add(listOf("keyword"), it.stopIndex - it.startIndex + 1)
+                        .add(listOf("syntax-default"),  it.startIndex - lastKeyword)
+                        .add(listOf("syntax-keyword"), it.stopIndex - it.startIndex + 1)
                     lastKeyword = it.stopIndex + 1
                 }
                 LismaLexer.COMMENT, LismaLexer.SL_COMMENT -> {
                     spansBuilder
-                        .add(listOf("default"),  it.startIndex - lastKeyword)
-                        .add(listOf("comment"), it.stopIndex - it.startIndex + 1)
+                        .add(listOf("syntax-default"),  it.startIndex - lastKeyword)
+                        .add(listOf("syntax-comment"), it.stopIndex - it.startIndex + 1)
                     lastKeyword = it.stopIndex + 1
                 }
                 LismaLexer.FloatingPointLiteral, LismaLexer.DecimalLiteral -> {
                     spansBuilder
-                        .add(listOf("default"),  it.startIndex - lastKeyword)
-                        .add(listOf("decimal"), it.stopIndex - it.startIndex + 1)
+                        .add(listOf("syntax-default"),  it.startIndex - lastKeyword)
+                        .add(listOf("syntax-decimal"), it.stopIndex - it.startIndex + 1)
                     lastKeyword = it.stopIndex + 1
                 }
                 else -> {

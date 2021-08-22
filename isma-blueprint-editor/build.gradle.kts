@@ -22,4 +22,5 @@ dependencies {
 
     implementation ("no.tornado:tornadofx:1.7.20")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
 }

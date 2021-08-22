@@ -6,6 +6,7 @@ module ru.nstu.isma.ismanextpurejfx {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires org.kordamp.ikonli.javafx;
+    requires koin.core.jvm;
 
     opens ru.nstu.isma.ismanextpurejfx to javafx.fxml;
     exports ru.nstu.isma.ismanextpurejfx;

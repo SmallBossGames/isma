@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":isma-blueprint-editor"))
     implementation(project(":isma-text-editor"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.1-native-mt")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
 
     testImplementation(kotlin("test-junit"))
 }

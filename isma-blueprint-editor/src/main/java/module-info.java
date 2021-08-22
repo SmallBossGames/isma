@@ -4,4 +4,5 @@ module isma.isma.blueprint.editor.main {
     requires javafx.graphics;
     requires javafx.controls;
     requires isma.isma.text.editor.main;
+    requires org.fxmisc.richtext;
 }

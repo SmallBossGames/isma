@@ -55,6 +55,8 @@ class MainView : View() {
         right {
             add(settingsPanel)
         }
+
+        stylesheets.add("style.css")
     }
 
     override fun onDock() {

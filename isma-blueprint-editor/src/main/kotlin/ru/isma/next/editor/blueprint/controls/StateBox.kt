@@ -2,15 +2,20 @@ package ru.isma.next.editor.blueprint.controls
 
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.*
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Group
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
+import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
-import tornadofx.*
+import ru.isma.next.editor.blueprint.utilities.*
 
 class StateBox : Group() {
     private val mousePressedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
@@ -47,25 +52,25 @@ class StateBox : Group() {
     fun squareHeightProperty() = squareHeightProperty
     fun colorProperty() = colorProperty
 
-    fun centerXProperty(): DoubleBinding = layoutXProperty() + squareWidth / 2
-    fun centerYProperty(): DoubleBinding = layoutYProperty() + squareHeight / 2
+    fun centerXProperty(): DoubleBinding = layoutXProperty().add(squareWidth / 2)
+    fun centerYProperty(): DoubleBinding = layoutYProperty().add(squareHeight / 2)
 
     init {
         this.apply {
-            rectangle {
+            children.add(Rectangle().apply {
                 heightProperty().bind(squareHeightProperty())
                 widthProperty().bind(squareWidthProperty())
                 fillProperty().bind(colorProperty())
                 viewOrder = 3.0
                 arcWidth = 20.0
                 arcHeight = 20.0
-            }
+            })
 
             val nameTextArea = TextArea().apply {
-                visibleWhen(isEditModeEnabledProperty())
-                managedWhen(isEditModeEnabledProperty())
-                focusedProperty().onChange {
-                    if(it){
+                visibleProperty().bind(isEditModeEnabledProperty())
+                managedProperty().bind(isEditModeEnabledProperty())
+                focusedProperty().addListener{ _, _, value ->
+                    if(value){
                         text = name
                     } else {
                         name = text
@@ -77,27 +82,30 @@ class StateBox : Group() {
             val boxLabel = Label().apply {
                 font = Font("Arial", 22.0)
                 textProperty().bind(nameProperty())
-                visibleWhen(!isEditModeEnabledProperty())
-                managedWhen(!isEditModeEnabledProperty())
+                visibleProperty().bind(!isEditModeEnabledProperty())
+                managedProperty().bind(!isEditModeEnabledProperty())
             }
 
-            hbox {
-                prefHeightProperty().bind(squareHeightProperty() - 20.0)
-                prefWidthProperty().bind(squareWidthProperty() - 20.0)
+            children.add(HBox().apply {
+                prefHeightProperty().bind(squareHeightProperty().subtract(20.0))
+                prefWidthProperty().bind(squareWidthProperty().subtract(20.0))
                 translateX += 10.0
                 translateY += 10.0
                 alignment = Pos.CENTER
-                add(boxLabel)
-                add(nameTextArea)
-            }
+                children.add(boxLabel)
+                children.add(nameTextArea)
+            })
 
-            button("Edit") {
+            children.add(Button("Edit").apply {
                 val isVisibleBinding = isEditModeEnabledProperty().not().and(isEditButtonVisible())
 
-                action { executeEditActionListeners() }
-                visibleWhen(isVisibleBinding)
-                managedWhen(isVisibleBinding)
-            }
+                onAction = EventHandler {
+                    executeEditActionListeners()
+                }
+
+                visibleProperty().bind(isVisibleBinding)
+                managedProperty().bind(isVisibleBinding)
+            })
 
             addEventHandler(MouseEvent.MOUSE_CLICKED) {
                 if (!isDragged && isEditable) {

@@ -1,16 +1,24 @@
 package ru.isma.next.editor.blueprint.controls
 
+
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.beans.value.ObservableValue
 import javafx.geometry.Pos
 import javafx.scene.Group
-import javafx.scene.Parent
+import javafx.scene.control.Label
+import javafx.scene.control.TextField
 import javafx.scene.input.MouseEvent
+import javafx.scene.shape.Line
+import javafx.scene.shape.Polygon
 import javafx.scene.text.Font
-
-import tornadofx.*
-import kotlin.math.*
+import ru.isma.next.editor.blueprint.utilities.getValue
+import ru.isma.next.editor.blueprint.utilities.setValue
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 class StateTransactionArrow : Group() {
     private val startXProperty = SimpleDoubleProperty(0.0)
@@ -40,89 +48,93 @@ class StateTransactionArrow : Group() {
     var text: String by textProperty
 
     init {
-        this.apply {
-            viewOrder = 4.0
-            layoutXProperty().bind((endXProperty - startXProperty) / 2 + startXProperty)
-            layoutYProperty().bind((endYProperty - startYProperty) / 2 + startYProperty)
+        viewOrder = 4.0
+        layoutXProperty().bind((endXProperty.subtract(startXProperty)).divide( 2).add(startXProperty))
+        layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(startYProperty))
 
-            val predicateText = group {
-                viewOrder = 5.0
-                textfield {
-                    prefWidth = TextFieldLength
-                    translateY = -10.0
-                    translateX = -TextFieldLength / 2.0
-                    textProperty().bindBidirectional(this@StateTransactionArrow.textProperty)
+        val predicateText = Group().apply {
+            viewOrder = 5.0
+            children.add(TextField().apply {
+                prefWidth = TextFieldLength
+                translateY = -10.0
+                translateX = -TextFieldLength / 2.0
+                textProperty().bindBidirectional(this@StateTransactionArrow.textProperty)
 
-                    visibleWhen(isTextEditModeProperty)
-                    managedWhen(isTextEditModeProperty)
+                visibleProperty().bind(isTextEditModeProperty)
+                managedProperty().bind(isTextEditModeProperty)
 
-                    isTextEditModeProperty().onChange {
-                        if (it) {
-                            requestFocus()
-                        }
-                    }
-
-                    focusedProperty().onChange {
-                        if (!it) {
-                            isTextEditMode = false
-                        }
+                isTextEditModeProperty().addListener { _, _, value ->
+                    if (value) {
+                        requestFocus()
                     }
                 }
-                label {
+
+                focusedProperty().addListener { _, _, value ->
+                    if (!value) {
+                        isTextEditMode = false
+                    }
+                }
+            })
+            children.add(
+                Label().apply {
                     font = Font("Arial", 16.0)
                     prefWidth = TextFieldLength
                     translateY = -10.0
                     translateX = -TextFieldLength / 2.0
                     alignment = Pos.CENTER
                     textProperty().bind(this@StateTransactionArrow.textProperty)
-                    visibleWhen(!isTextEditModeProperty)
-                    managedWhen(!isTextEditModeProperty)
+                    visibleProperty().bind(!isTextEditModeProperty)
+                    managedProperty().bind(!isTextEditModeProperty)
                 }
+            )
+        }
+
+        val arrowhead = Polygon(7.0, -7.0, -7.0, 0.0, 7.0, 7.0).apply {
+            strokeWidth = 3.0
+            viewOrder = 6.0
+        }
+
+        children.addAll(arrowhead, predicateText)
+
+        line {
+            strokeWidth = 3.0
+            viewOrder = 6.0
+
+            fun updateGeometry() {
+                val x = this@StateTransactionArrow.endX - this@StateTransactionArrow.startX
+                val y = this@StateTransactionArrow.endY - this@StateTransactionArrow.startY
+                val angle = atan2(x, y) + PI / 2
+                val offsetX = 10.0 * sin(angle)
+                val offsetY = 10.0 * cos(angle)
+                val textOffsetX = 70.0 * sin(angle)
+                val textOffsetY = 40.0 * cos(angle)
+
+                startX = this@StateTransactionArrow.startX - this@StateTransactionArrow.layoutX + offsetX
+                startY = this@StateTransactionArrow.startY - this@StateTransactionArrow.layoutY + offsetY
+                endX = this@StateTransactionArrow.endX - this@StateTransactionArrow.layoutX + offsetX
+                endY = this@StateTransactionArrow.endY - this@StateTransactionArrow.layoutY + offsetY
+
+                arrowhead.translateX = offsetX
+                arrowhead.translateY = offsetY
+                arrowhead.rotate = -angle / PI * 180.0
+
+                predicateText.translateX = textOffsetX
+                predicateText.translateY = textOffsetY
             }
 
-            val arrowhead = polygon(7.0, -7.0, -7.0, 0.0, 7.0, 7.0) {
-                strokeWidth = 3.0
-                viewOrder = 6.0
-            }
+            this@StateTransactionArrow.startXProperty.onChange { updateGeometry() }
+            this@StateTransactionArrow.startYProperty.onChange { updateGeometry() }
+            this@StateTransactionArrow.endXProperty.onChange { updateGeometry() }
+            this@StateTransactionArrow.endYProperty.onChange { updateGeometry() }
+        }
 
-            line {
-                strokeWidth = 3.0
-                viewOrder = 6.0
-                fun updateGeometry() {
-                    val x = this@StateTransactionArrow.endX - this@StateTransactionArrow.startX
-                    val y = this@StateTransactionArrow.endY - this@StateTransactionArrow.startY
-                    val angle = atan2(x, y) + PI / 2
-                    val offsetX = 10.0 * sin(angle)
-                    val offsetY = 10.0 * cos(angle)
-                    val textOffsetX = 70.0 * sin(angle)
-                    val textOffsetY = 40.0 * cos(angle)
 
-                    startX = this@StateTransactionArrow.startX - this@apply.layoutX + offsetX
-                    startY = this@StateTransactionArrow.startY - this@apply.layoutY + offsetY
-                    endX = this@StateTransactionArrow.endX - this@apply.layoutX + offsetX
-                    endY = this@StateTransactionArrow.endY - this@apply.layoutY + offsetY
+        addEventHandler(MouseEvent.MOUSE_PRESSED) {
+            executeMousePressedListener(it)
+        }
 
-                    arrowhead.translateX = offsetX
-                    arrowhead.translateY = offsetY
-                    arrowhead.rotate = -angle / PI * 180.0
-
-                    predicateText.translateX = textOffsetX
-                    predicateText.translateY = textOffsetY
-                }
-
-                this@StateTransactionArrow.startXProperty.onChange { updateGeometry() }
-                this@StateTransactionArrow.startYProperty.onChange { updateGeometry() }
-                this@StateTransactionArrow.endXProperty.onChange { updateGeometry() }
-                this@StateTransactionArrow.endYProperty.onChange { updateGeometry() }
-            }
-
-            addEventHandler(MouseEvent.MOUSE_PRESSED) {
-                executeMousePressedListener(it)
-            }
-
-            addEventHandler(MouseEvent.MOUSE_CLICKED) {
-                isTextEditMode = true
-            }
+        addEventHandler(MouseEvent.MOUSE_CLICKED) {
+            isTextEditMode = true
         }
     }
 
@@ -142,7 +154,19 @@ class StateTransactionArrow : Group() {
         }
     }
 
+    fun <T> ObservableValue<T>.onChange(op: () -> Unit){
+        this.addListener{ _, _, value ->
+            op()
+        }
+    }
+
     companion object {
         private const val TextFieldLength = 150.0
+
+        inline fun Group.line(op: Line.() -> Unit){
+            this.children.add(
+                Line().apply(op)
+            )
+        }
     }
 }

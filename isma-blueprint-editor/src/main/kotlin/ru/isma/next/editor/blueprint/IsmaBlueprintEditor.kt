@@ -16,13 +16,12 @@ import ru.isma.next.editor.blueprint.models.BlueprintEditorTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
-import ru.isma.next.editor.text.IsmaTextEditor
-import ru.isma.next.editor.text.services.LismaHighlightingService
-import ru.isma.next.editor.text.services.TextEditorService
+import ru.isma.next.editor.blueprint.services.ITextEditorFactory
+import ru.isma.next.editor.blueprint.utilities.getValue
+import ru.isma.next.editor.blueprint.utilities.setValue
 import kotlin.math.max
-import ru.isma.next.editor.blueprint.utilities.*
 
-class IsmaBlueprintEditor: BorderPane() {
+class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): BorderPane() {
     private val nameChangingMonitor = NameChangingMonitor("New state")
 
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
@@ -345,7 +344,7 @@ class IsmaBlueprintEditor: BorderPane() {
     }
 
     private fun openStateTextEditorTab(state: StateBox) {
-        val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
+        val editor = editorFactory.editor.apply {
             replaceText(state.text)
             state.textProperty().bind(textProperty())
         }
@@ -356,7 +355,7 @@ class IsmaBlueprintEditor: BorderPane() {
     }
 
     private fun openMainTextEditorTab() {
-        val editor = IsmaTextEditor(TextEditorService(), LismaHighlightingService()).apply {
+        val editor = editorFactory.editor.apply {
             replaceText(mainStateBox.text)
             mainStateBox.textProperty().bind(textProperty())
         }

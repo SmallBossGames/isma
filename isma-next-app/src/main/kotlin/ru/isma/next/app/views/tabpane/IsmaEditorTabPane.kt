@@ -20,7 +20,11 @@ import tornadofx.tabpane
 class IsmaEditorTabPane: View(), KoinComponent {
     private val projectController: ProjectService by di()
 
-    private fun getTextEditor() : IsmaTextEditor = get()
+    private val textEditor : IsmaTextEditor
+        get() = get()
+
+    private val blueprintEditor : IsmaBlueprintEditor
+        get() = get()
 
     override val root = tabpane {
         stylesheet {  }
@@ -29,7 +33,7 @@ class IsmaEditorTabPane: View(), KoinComponent {
             when (val addedElement = it.elementAdded) {
                 is BlueprintProjectModel -> {
                     tab(addedElement.name) {
-                        add(IsmaBlueprintEditor().apply {
+                        add(blueprintEditor.apply {
                             val provider = BlueprintProjectDataProvider(this@apply)
                             addedElement.apply {
                                 dataProvider = provider
@@ -41,12 +45,10 @@ class IsmaEditorTabPane: View(), KoinComponent {
                 }
                 is LismaProjectModel -> {
                     tab(addedElement.name) {
-                        val editor = getTextEditor().apply {
+                        add(textEditor.apply {
                             replaceText(addedElement.lismaText)
                             addedElement.lismaTextProperty().bind(textProperty())
-                        }
-
-                        add(editor)
+                        })
 
                         initProjectTab(addedElement)
                     }

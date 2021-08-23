@@ -5,9 +5,9 @@ import ru.isma.next.app.services.simualtion.SimulationParametersService
 import tornadofx.*
 
 
-class CauchyInitialsView: View("Initials") {
-    private val parametersService: SimulationParametersService by di()
-
+class CauchyInitialsView(
+    private val parametersService: SimulationParametersService
+): View("Initials") {
     override val root =
         scrollpane {
             form {

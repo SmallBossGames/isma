@@ -1,8 +1,7 @@
-package launcher
+package ru.isma.next.app.launcher
 
-import ru.isma.next.app.launcher.IsmaApp
-import tornadofx.*
+import javafx.application.Application
 
-fun main(args: Array<String>) {
-    launch<IsmaApp>(args = args)
+fun main() {
+    Application.launch(IsmaApplication::class.java)
 }

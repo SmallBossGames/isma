@@ -5,9 +5,9 @@ import ru.isma.next.app.extentions.numberTextField
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import tornadofx.*
 
-class ResultProcessingView : View("Result processing") {
-    private val parametersService: SimulationParametersService by di()
-
+class ResultProcessingView(
+    private val parametersService: SimulationParametersService
+) : View("Result processing") {
     override val root =
         scrollpane {
             form {

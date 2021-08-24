@@ -17,12 +17,10 @@ import ru.isma.next.app.views.toolbars.SimulationProcessBar
 import tornadofx.*
 
 class MainView(
-    private val preferencesProvider: PreferencesProvider,
-    private val projectFileService: ProjectFileService,
-    ismaMenuBar: IsmaMenuBar,
-    ismaToolBar: IsmaToolBar,
     private val simulationProcess: SimulationProcessBar,
     private val ismaErrorListTable: IsmaErrorListTable,
+    ismaMenuBar: IsmaMenuBar,
+    ismaToolBar: IsmaToolBar,
     ismaEditorTabPane: IsmaEditorTabPane,
     settingsPanel: SettingsPanelView,
 ) : BorderPane() {
@@ -47,47 +45,8 @@ class MainView(
 
         right = settingsPanel.root
 
+        //left = Drawer()
+
         stylesheets.add("style.css")
     }
-
-   /* override fun onDock() {
-        super.onDock()
-
-        val windowProps = preferencesProvider.preferences.windowPreferences
-        val defaultFilesPreferences = preferencesProvider.preferences.defaultFilesPreferencesModel
-
-        currentStage?.apply {
-            isMaximized = windowProps.isMaximized
-            height = windowProps.height
-            width = windowProps.width
-            x = windowProps.x
-            y = windowProps.y
-
-            minHeight = 500.0
-            minWidth = 800.0
-
-            projectFileService.open(*defaultFilesPreferences.lastOpenedProjectPath)
-        }
-    }
-
-    override fun onUndock() {
-        super.onUndock()
-
-        currentStage?.also {
-            val preferencesModel = WindowPreferencesModel(
-                isMaximized = it.isMaximized,
-                height = it.height,
-                width = it.width,
-                x = it.x,
-                y = it.y,
-            )
-
-            val defaultFilesPreferences = DefaultFilesPreferencesModel(
-                lastOpenedProjectPath = projectFileService.listAllFilesPaths().toTypedArray()
-            )
-
-            preferencesProvider.commit(preferencesModel)
-            preferencesProvider.commit(defaultFilesPreferences)
-        }
-    }*/
 }

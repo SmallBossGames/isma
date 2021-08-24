@@ -1,6 +1,5 @@
 package ru.isma.next.app.views.koin
 
-import javafx.scene.control.TabPane
 import org.koin.core.KoinApplication
 import org.koin.dsl.module
 import ru.isma.next.app.services.editors.TextEditorFactory
@@ -66,7 +65,7 @@ fun KoinApplication.addSettingsPanel(){
 fun KoinApplication.addMainView() {
     modules(
         module {
-            single { MainView(get(),get(),get(),get(),get(),get(),get(),get()) }
+            single { MainView(get(), get(), get(), get(), get(), get()) }
         }
     )
 }

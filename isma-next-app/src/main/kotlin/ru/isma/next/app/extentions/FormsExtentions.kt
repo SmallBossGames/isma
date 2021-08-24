@@ -9,7 +9,7 @@ import tornadofx.bind
 import tornadofx.onChange
 import tornadofx.textfield
 
-private class DoubleConverter(): StringConverter<Number>() {
+class DoubleConverter(): StringConverter<Number>() {
     override fun toString(value: Number?): String {
         return value?.toString() ?: "0"
     }
@@ -19,7 +19,7 @@ private class DoubleConverter(): StringConverter<Number>() {
     }
 }
 
-private class IntegerConverter(): StringConverter<Number>() {
+class IntegerConverter(): StringConverter<Number>() {
     override fun toString(value: Number?): String {
         return value?.toString() ?: "0"
     }
@@ -48,6 +48,15 @@ fun Field.numberTextField(property: DoubleProperty): TextField {
             if (!it) {
                 text = doubleConverterInstance.normalizeString(text)
             }
+        }
+    }
+}
+
+fun numberTextFieldPureFx(property: DoubleProperty): TextField {
+    return TextField().apply {
+        textProperty().bindBidirectional(property, doubleConverterInstance)
+        focusedProperty().addListener { _, _, _ ->
+            text = doubleConverterInstance.normalizeString(text)
         }
     }
 }

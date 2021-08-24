@@ -1,56 +1,33 @@
 package ru.isma.next.app.views.settings
 
-import ru.isma.next.app.extentions.bindDouble
-import ru.isma.next.app.extentions.integerTextField
-import ru.isma.next.app.extentions.numberTextField
+import javafx.scene.control.ScrollPane
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import tornadofx.*
+import ru.isma.next.app.views.controls.PropertiesGrid
+import tornadofx.View
 
 class MethodSettingsView(
     private val parametersService: SimulationParametersService
 ): View("Method") {
     override val root =
-        scrollpane {
-            form {
-                fieldset {
-                    field("Method") {
-                        combobox<String> {
-                            items = parametersService.integrationMethods
-                            bind(parametersService.integrationMethod.selectedMethodProperty)
-                        }
-                    }
-                    field("Accurate") {
-                        checkbox {
-                            bind(parametersService.integrationMethod.isAccuracyInUseProperty)
-                        }
-                    }
-                    field("Accuracy") {
-                        numberTextField(parametersService.integrationMethod.accuracyProperty){
-                            disableProperty().bind(!parametersService.integrationMethod.isAccuracyInUseProperty)
-                        }
-                    }
-                    field("Stable") {
-                        checkbox {
-                            bind(parametersService.integrationMethod.isStableInUseProperty)
-                        }
-                    }
-                    field("Parallel") {
-                        checkbox {
-                            bind(parametersService.integrationMethod.isParallelInUseProperty)
-                        }
-                    }
-                    field("Server") {
-                        textfield {
-                            disableProperty().bind(!parametersService.integrationMethod.isParallelInUseProperty)
-                            bind(parametersService.integrationMethod.serverProperty)
-                        }
-                    }
-                    field("Port") {
-                        integerTextField(parametersService.integrationMethod.portProperty) {
-                            disableProperty().bind(!parametersService.integrationMethod.isParallelInUseProperty)
-                        }
-                    }
+        ScrollPane(
+            PropertiesGrid().apply {
+                addComboBox(
+                    "Method",
+                    parametersService.integrationMethods,
+                    parametersService.integrationMethod.selectedMethodProperty
+                )
+                addNode("Accurate", parametersService.integrationMethod.isAccuracyInUseProperty)
+                addNode("Accuracy", parametersService.integrationMethod.accuracyProperty).apply {
+                    disableProperty().bind(parametersService.integrationMethod.isAccuracyInUseProperty.not())
+                }
+                addNode("Stable", parametersService.integrationMethod.isStableInUseProperty)
+                addNode("Parallel", parametersService.integrationMethod.isParallelInUseProperty)
+                addNode("Server", parametersService.integrationMethod.serverProperty).apply {
+                    disableProperty().bind(parametersService.integrationMethod.isParallelInUseProperty.not())
+                }
+                addNode("Port", parametersService.integrationMethod.portProperty).apply {
+                    disableProperty().bind(parametersService.integrationMethod.isParallelInUseProperty.not())
                 }
             }
-        }
+        )
 }

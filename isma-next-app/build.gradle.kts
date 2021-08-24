@@ -31,6 +31,9 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.1-native-mt")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
+    implementation("com.dlsc.formsfx:formsfx-core:11.4.2")
 
     implementation(project(":isma-hsm"))
     implementation(project(":isma-lisma"))
@@ -41,8 +44,6 @@ dependencies {
     implementation(project(":isma-next-common-services"))
     implementation(project(":isma-blueprint-editor"))
     implementation(project(":isma-text-editor"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.1-native-mt")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
 
     testImplementation(kotlin("test-junit"))
 }

@@ -1,15 +1,30 @@
 package ru.isma.next.app.views.settings
 
+import javafx.collections.FXCollections
+import javafx.scene.control.RadioButton
+import javafx.scene.control.ScrollPane
+import javafx.scene.control.ToggleGroup
+import javafx.scene.layout.GridPane
 import ru.isma.next.app.enumerables.SaveTarget
 import ru.isma.next.app.extentions.numberTextField
 import ru.isma.next.app.services.simualtion.SimulationParametersService
+import ru.isma.next.app.views.controls.PropertiesGrid
 import tornadofx.*
 
 class ResultProcessingView(
     private val parametersService: SimulationParametersService
 ) : View("Result processing") {
     override val root =
-        scrollpane {
+        ScrollPane(
+            PropertiesGrid().apply {
+                addComboBox(
+                    "Save result",
+                    FXCollections.observableArrayList(SaveTarget.values().toList()),
+                    parametersService.resultSaving.savingTargetProperty
+                )
+            }
+        )
+        /*scrollpane {
             form {
                 fieldset {
                     field("Save result") {
@@ -38,5 +53,5 @@ class ResultProcessingView(
                     }
                 }
             }
-        }
+        }*/
 }

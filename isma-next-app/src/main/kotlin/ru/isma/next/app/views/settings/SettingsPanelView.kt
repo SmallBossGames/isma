@@ -11,7 +11,7 @@ class SettingsPanelView(
 ) : View() {
     override val root = drawer {
         multiselect = true
-        val itemsWidth = 300.0
+        val itemsWidth = 240.0
 
         item(cauchyInitialsView.title) {
             prefWidth = itemsWidth

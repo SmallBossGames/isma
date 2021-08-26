@@ -37,7 +37,7 @@ fun KoinApplication.addSimulationRunners() {
 fun KoinApplication.addExternalServices() {
     val module = module {
         single { IntegrationController() }
-        single { IntegrationMethodLibraryLoader("methods/").load() }
+        single { IntegrationMethodLibraryLoader().load() }
         single<ITextEditorService> { TextEditorService() }
         single<ISimulationCoreController> { SimulationCoreController(get(), get(), get()) }
         single<IHybridSystemSimulator> { HybridSystemSimulator() }

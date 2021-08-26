@@ -2,7 +2,6 @@ plugins {
     application
     kotlin("jvm")
     id("org.openjfx.javafxplugin")
-    id("org.beryx.jlink") version "2.24.1"
 }
 
 group = "ru.nstu.isma"
@@ -35,13 +34,19 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
+
+
+    implementation(project(":isma-hsm"))
+    implementation(project(":isma-lisma"))
+//    implementation(project(":isma-next-core"))
+//    implementation(project(":isma-intg-api"))
+//    implementation(project(":isma-next-integration-library"))
+//    implementation(project(":grin:integration"))
+//    implementation(project(":isma-next-common-services"))
+    implementation(project(":isma-blueprint-editor"))
+    implementation(project(":isma-text-editor"))
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-}
-
-jlink {
-    launcher {
-        name = "Launch"
-    }
 }

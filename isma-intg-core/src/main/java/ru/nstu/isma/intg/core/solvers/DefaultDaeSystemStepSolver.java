@@ -1,5 +1,7 @@
 package ru.nstu.isma.intg.core.solvers;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.nstu.isma.intg.api.calcmodel.*;
 import ru.nstu.isma.intg.api.methods.*;
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver;
@@ -26,6 +28,7 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
         commitDaeSystem(daeSystem);
     }
 
+    @NotNull
     @Override
     public IntgMethod getIntgMethod() {
         return intgMethod;
@@ -54,12 +57,13 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
     }
 
     @Override
-    public void apply(DaeSystemChangeSet changeSet) {
+    public void apply(@Nullable DaeSystemChangeSet changeSet) {
         if (changeSet != null && !changeSet.isEmpty()) {
             commitDaeSystem(changeSet.apply(daeSystem));
         }
     }
 
+    @NotNull
     @Override
     public IntgPoint step(IntgPoint fromPoint) {
         double initialStep = fromPoint.getStep();
@@ -110,11 +114,6 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
         return rhsCalculationCount;
     }
 
-    public void resetCalculationStatistic() {
-        stepCalculationCount = 0;
-        rhsCalculationCount = 0;
-    }
-
     protected double[] nextY(IntgPoint fromPoint, double[][] stages) {
         double[] nextY = new double[fromPoint.getY().length];
 
@@ -135,7 +134,7 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
     }
 
     @Override
-    public double[][] stages(IntgPoint fromPoint) {
+    public double[][] stages(@NotNull IntgPoint fromPoint) {
         if (getIntgMethod().getStageCalculators().length == 0)
             return new double[0][];
 

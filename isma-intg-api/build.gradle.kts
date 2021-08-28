@@ -7,7 +7,7 @@ val moduleName by extra("isma.isma.intg.api.main")
 
 dependencies{
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
-    implementation("org.jetbrains:annotations:13.0")
+    implementation("org.jetbrains:annotations:22.0.0")
 }
 
 tasks {

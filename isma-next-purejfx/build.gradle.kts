@@ -7,7 +7,7 @@ plugins {
 group = "ru.nstu.isma"
 version = "1.0-SNAPSHOT"
 
-val junitVersion = "5.7.1"
+val junitVersion = "5.7.2"
 val koinVersion = "3.1.2"
 val kotlinReflectVersion = "1.5.21"
 val kotlinxCoroutinesVersion = "1.5.1-native-mt"

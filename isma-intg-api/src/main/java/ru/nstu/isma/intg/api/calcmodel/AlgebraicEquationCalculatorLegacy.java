@@ -1,16 +1,19 @@
 package ru.nstu.isma.intg.api.calcmodel;
 
+import kotlin.Deprecated;
+
 /**
  * @author Maria Nasyrova
  * @since 04.10.2015
  */
-public class AlgebraicEquationCalculator implements AlgebraicEquationResultProvider {
+@Deprecated(message = "Use AlgebraicEquationCalculator")
+public class AlgebraicEquationCalculatorLegacy implements IAlgebraicEquationResultProvider {
 
     private final double[] y;
     private final Double[] calcResults;
     private final AlgebraicEquation[] algebraicEquations;
 
-    public AlgebraicEquationCalculator(double[] y, AlgebraicEquation[] algebraicEquations) {
+    public AlgebraicEquationCalculatorLegacy(double[] y, AlgebraicEquation[] algebraicEquations) {
         this.y = y;
         this.calcResults = new Double[algebraicEquations.length];
         this.algebraicEquations = algebraicEquations;

@@ -1,9 +1,6 @@
 package ru.nstu.isma.intg.core.solvers;
 
-import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquationCalculator;
-import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
-import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet;
-import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation;
+import ru.nstu.isma.intg.api.calcmodel.*;
 import ru.nstu.isma.intg.api.methods.*;
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver;
 
@@ -21,9 +18,12 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
     private long stepCalculationCount;
     private long rhsCalculationCount;
 
+    private DifferentialEquationsCalculator deCalculator;
+    private AlgebraicEquationCalculator aeCalculator;
+
     public DefaultDaeSystemStepSolver(IntgMethod intgMethod, DaeSystem daeSystem) {
         this.intgMethod = intgMethod;
-        this.daeSystem = daeSystem;
+        commitDaeSystem(daeSystem);
     }
 
     @Override
@@ -46,23 +46,17 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
     }
 
     protected double[] calculateRhsForAlgebraicEquations(double[] yForDe) {
-        AlgebraicEquationCalculator calc = new AlgebraicEquationCalculator(yForDe, daeSystem.getAlgebraicEquations());
-        return calc.getValues();
+        return aeCalculator.apply(yForDe);
     }
 
     protected double[] calculateRhsForDifferentialEquations(double[] yForDe, double[][] rhs) {
-        DifferentialEquation[] differentialEquations = daeSystem.getDifferentialEquations();
-        double[] rhsForDe = new double[differentialEquations.length];
-        for (int i = 0; i < differentialEquations.length; i++) {
-            rhsForDe[i] = differentialEquations[i].apply(yForDe, rhs);
-        }
-        return rhsForDe;
+        return deCalculator.apply(yForDe, rhs);
     }
 
     @Override
     public void apply(DaeSystemChangeSet changeSet) {
         if (changeSet != null && !changeSet.isEmpty()) {
-            daeSystem = changeSet.apply(daeSystem);
+            commitDaeSystem(changeSet.apply(daeSystem));
         }
     }
 
@@ -202,6 +196,12 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
         }
 
         return k;
+    }
+
+    private void commitDaeSystem(DaeSystem daeSystem){
+        this.daeSystem = daeSystem;
+        this.aeCalculator = new AlgebraicEquationCalculator(daeSystem.getAlgebraicEquations());
+        this.deCalculator = new DifferentialEquationsCalculator(daeSystem.getDifferentialEquations());
     }
 
     private boolean isControllerEnabled(IntgController intgController) {

@@ -1,7 +1,8 @@
 package ru.nstu.isma.intg.api.solvers
 
-import ru.nstu.isma.intg.api.methods.IntgMethod
+import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet
+import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.api.methods.IntgPoint
 
 /**
@@ -16,4 +17,21 @@ interface DaeSystemStepSolver {
     fun calculateRhs(yForDe: DoubleArray): Array<DoubleArray>
     fun step(fromPoint: IntgPoint): IntgPoint
     fun stages(fromPoint: IntgPoint): Array<DoubleArray>
+    fun dispose()
+}
+
+fun DaeSystemStepSolver.use(op: DaeSystemStepSolver.() -> Unit) {
+    try {
+        op()
+    } finally {
+        dispose()
+    }
+}
+
+suspend inline fun <T> DaeSystemStepSolver.useAsync(crossinline op: suspend DaeSystemStepSolver.() -> T) = coroutineScope {
+    try {
+        return@coroutineScope op()
+    } finally {
+        dispose()
+    }
 }

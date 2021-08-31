@@ -12,10 +12,10 @@ class IntgResultPoint(
     val rhs: Array<DoubleArray>, // TODO: можно сохранять только алгебраические
 ) {
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val that = o as IntgResultPoint
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val that = other as IntgResultPoint
         if (that.x.compareTo(x) != 0) return false
         return if (!yForDe.contentEquals(that.yForDe)) false else rhs[DaeSystem.RHS_AE_PART_IDX].contentEquals(that.rhs[DaeSystem.RHS_AE_PART_IDX])
     }

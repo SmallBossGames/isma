@@ -56,4 +56,9 @@ public class RemoteDaeSystemStepSolver implements DaeSystemStepSolver {
     public double[][] stages(IntgPoint fromPoint) {
         throw new UnsupportedOperationException("Should never be called on a client side.");
     }
+
+    @Override
+    public void dispose() {
+        computeEngineClient.disconnect();
+    }
 }

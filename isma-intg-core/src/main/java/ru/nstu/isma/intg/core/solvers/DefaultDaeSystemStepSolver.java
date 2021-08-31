@@ -207,4 +207,6 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
         return intgController != null && intgController.isEnabled();
     }
 
+    @Override
+    public void dispose() {}
 }

@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.5.0" apply false
+    kotlin("jvm") version "1.5.30" apply false
     id("org.openjfx.javafxplugin") version "0.0.10" apply false
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "1.5.0" apply false

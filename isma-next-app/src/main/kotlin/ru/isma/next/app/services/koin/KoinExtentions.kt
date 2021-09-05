@@ -24,6 +24,9 @@ import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
 import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerProvider
 import ru.nstu.isma.next.core.sim.controller.services.InFileSimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.InMemorySimulationRunner
+import ru.nstu.isma.next.core.sim.controller.services.solvers.DefaultDaeSystemStepSolverFactory
+import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
+import ru.nstu.isma.next.core.sim.controller.services.solvers.RemoteDaeSystemStepSolverFactory
 import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 
 fun KoinApplication.addSimulationRunners() {
@@ -39,8 +42,8 @@ fun KoinApplication.addExternalServices() {
         single { IntegrationController() }
         single { IntegrationMethodLibraryLoader().load() }
         single<ITextEditorService> { TextEditorService() }
-        single<ISimulationCoreController> { SimulationCoreController(get(), get(), get()) }
-        single<IHybridSystemSimulator> { HybridSystemSimulator() }
+        single<ISimulationCoreController> { SimulationCoreController(get(), get()) }
+        single<IHybridSystemSimulator> { HybridSystemSimulator(get()) }
         single<IHsmCompiler> { HsmCompiler() }
         single<InputTranslator> { LismaTranslator() }
         single<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
@@ -59,6 +62,15 @@ fun KoinApplication.addAppServices() {
         single<SimulationService> { SimulationService(get(), get(), get(), get(), get()) }
         single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
         single<ISimulationRunnerProvider> { SimulationRunnerProvider(get(), get(), get()) }
+    }
+    modules(module)
+}
+
+fun KoinApplication.addDaeSolversServices() {
+    val module = module {
+        single<IDaeSystemSolverFactory> { DaeSystemStepSolverFactory(get(), get(), get(), get()) }
+        single { DefaultDaeSystemStepSolverFactory() }
+        single { RemoteDaeSystemStepSolverFactory() }
     }
     modules(module)
 }

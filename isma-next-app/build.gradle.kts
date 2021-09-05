@@ -44,6 +44,9 @@ dependencies {
     implementation(project(":isma-blueprint-editor"))
     implementation(project(":isma-text-editor"))
 
+    api(project(":isma-intg-core"))
+    api(project(":isma-intg-server:isma-intg-server-client"))
+
     testImplementation(kotlin("test-junit"))
 }
 

@@ -7,12 +7,9 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import ru.nstu.isma.intg.api.IntgMetricData
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
-import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
-import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
@@ -30,8 +27,7 @@ class InFileSimulationRunner(
 
         val metricDataJob = async {
             val simulatorParameters = HybridSystemSimulatorParameters(
-                context.hybridSystem,
-                context.stepSolver,
+                context.compilationResult,
                 context.simulationInitials,
                 context.eventDetector,
                 context.eventDetectionStepBoundLow,
@@ -64,16 +60,16 @@ class InFileSimulationRunner(
         val metricData = metricDataJob.await()
         val resultReader = AsyncFilePointProvider(resultFileName)
 
-        logCalculationStatistic(metricData, context.stepSolver)
+       /* logCalculationStatistic(metricData, context.stepSolver)*/
 
         return@coroutineScope HybridSystemIntegrationResult(
             metricData = metricData,
             resultPointProvider = resultReader,
-            equationIndexProvider = context.indexProvider,
+            equationIndexProvider = context.compilationResult.indexProvider,
         )
     }
 
-    private fun logCalculationStatistic(
+/*    private fun logCalculationStatistic(
         metricData: IntgMetricData?,
         stepSolver: DaeSystemStepSolver
     ) {
@@ -86,5 +82,5 @@ class InFileSimulationRunner(
                 stepCalculationCount,
                 rhsCalculationCount)
         }
-    }
+    }*/
 }

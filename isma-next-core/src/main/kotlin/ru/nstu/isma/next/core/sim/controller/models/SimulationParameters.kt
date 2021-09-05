@@ -8,10 +8,8 @@ import ru.nstu.isma.next.core.sim.controller.SimulationInitials
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 
 data class SimulationParameters(
-    val hybridSystem: HybridSystem,
+    val compilationResult: HsmCompilationResult,
     val simulationInitials: SimulationInitials,
-    val indexProvider: EquationIndexProvider,
-    val stepSolver: DaeSystemStepSolver,
     val eventDetector: EventDetectionIntgController,
     val eventDetectionStepBoundLow: Double,
     val stepChangeHandlers: List<suspend (value: Double) -> Unit>,

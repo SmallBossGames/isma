@@ -7,8 +7,11 @@ import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation
 import ru.nstu.isma.intg.api.calcmodel.HybridSystemChangeSet
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.api.models.IntgResultPoint
+import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
+import ru.nstu.isma.intg.api.solvers.useAsync
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
+import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
 import kotlin.math.max
 import kotlin.math.min
 
@@ -16,8 +19,17 @@ import kotlin.math.min
  * @author Maria Nasyrova
  * @since 06.10.2015
  */
-class HybridSystemSimulator : IHybridSystemSimulator {
-    override suspend fun runAsync(parameters: HybridSystemSimulatorParameters): IntgMetricData = coroutineScope {
+class HybridSystemSimulator(
+    private val daeSystemStepSolverFactory: IDaeSystemSolverFactory
+) : IHybridSystemSimulator {
+
+    override suspend fun runAsync(parameters: HybridSystemSimulatorParameters) = coroutineScope {
+        daeSystemStepSolverFactory.create(parameters.hsmCompilationResult).useAsync {
+            return@useAsync runAsyncInternal(parameters, this)
+        }
+    }
+
+    private suspend fun runAsyncInternal(parameters: HybridSystemSimulatorParameters, stepSolver: DaeSystemStepSolver): IntgMetricData = coroutineScope {
         val metricData = IntgMetricData()
         metricData.setStartTime(System.currentTimeMillis())
         var x = parameters.simulationInitials.start
@@ -25,14 +37,14 @@ class HybridSystemSimulator : IHybridSystemSimulator {
         var step = parameters.simulationInitials.step
         var yForDe = parameters.simulationInitials.differentialEquationInitials
         var changeSet: HybridSystemChangeSet
-        var rhs = parameters.stepSolver.calculateRhs(yForDe)
+        var rhs = stepSolver.calculateRhs(yForDe)
         var isLastStep = false
         while (x < end && isActive) {
-            changeSet = parameters.hybridSystem.checkTransitions(yForDe, rhs)
+            changeSet = parameters.hsmCompilationResult.hybridSystem.checkTransitions(yForDe, rhs)
             if (!changeSet.isEmpty) {
                 changeInitials(yForDe, changeSet)
-                parameters.stepSolver.apply(changeSet)
-                rhs = parameters.stepSolver.calculateRhs(yForDe)
+                stepSolver.apply(changeSet)
+                rhs = stepSolver.calculateRhs(yForDe)
             }
 
             parameters.resultPointHandlers.forEach {
@@ -40,11 +52,11 @@ class HybridSystemSimulator : IHybridSystemSimulator {
             }
 
             val fromPoint = IntgPoint(step, yForDe, rhs)
-            val toPoint = parameters.stepSolver.step(fromPoint)
+            val toPoint = stepSolver.step(fromPoint)
 
             // TODO: сделать правильно, чтобы первый шаг тоже оценивался.
             if (parameters.eventDetector.isEnabled) {
-                val guards = parameters.hybridSystem.currentState.guards
+                val guards = parameters.hsmCompilationResult.hybridSystem.currentState.guards
                 val eventFunctionGroups = guards.map { it.eventFunctionGroup }
                 val predictedStep = parameters.eventDetector.predictNextStep(toPoint, eventFunctionGroups)
                 // TODO: если так, то шагов около 8500

@@ -4,8 +4,6 @@ import kotlinx.coroutines.coroutineScope
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.intg.api.IntgMetricData
 import ru.nstu.isma.intg.api.providers.MemoryPointProvider
-import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
-import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
@@ -20,8 +18,7 @@ class InMemorySimulationRunner(
         val resultMemoryStore = MemoryPointProvider()
 
         val simulatorParameters = HybridSystemSimulatorParameters(
-            context.hybridSystem,
-            context.stepSolver,
+            context.compilationResult,
             context.simulationInitials,
             context.eventDetector,
             context.eventDetectionStepBoundLow,
@@ -35,12 +32,16 @@ class InMemorySimulationRunner(
 
         val metricData: IntgMetricData = hybridSystemSimulator.runAsync(simulatorParameters)
 
-        logCalculationStatistic(metricData, context.stepSolver)
+       /* logCalculationStatistic(metricData, context.stepSolver)*/
 
-        return@coroutineScope HybridSystemIntegrationResult(context.indexProvider, metricData, resultMemoryStore)
+        return@coroutineScope HybridSystemIntegrationResult(
+            context.compilationResult.indexProvider,
+            metricData,
+            resultMemoryStore
+        )
     }
 
-    private fun logCalculationStatistic(
+    /*private fun logCalculationStatistic(
         metricData: IntgMetricData?,
         stepSolver: DaeSystemStepSolver
     ) {
@@ -53,5 +54,5 @@ class InMemorySimulationRunner(
                 stepCalculationCount,
                 rhsCalculationCount)
         }
-    }
+    }*/
 }

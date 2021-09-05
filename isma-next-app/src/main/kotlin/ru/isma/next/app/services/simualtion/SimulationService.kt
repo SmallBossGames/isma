@@ -4,18 +4,14 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import ru.isma.next.app.enumerables.SaveTarget
+import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.common.services.lisma.models.FailedTranslation
 import ru.isma.next.common.services.lisma.models.SuccessTranslation
-import ru.isma.next.app.services.project.LismaPdeService
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
-import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
-import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
-import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 import tornadofx.getValue
 import tornadofx.setValue
 import kotlin.coroutines.EmptyCoroutineContext
@@ -63,7 +59,6 @@ class SimulationService(
                 val context = IntegratorApiParameters(
                     hsm = translationResult.hsm,
                     initials = createCauchyInitials(),
-                    parallelParameters = createParallelParameters(),
                     eventDetectionParameters = createEventDetectionParameters(),
                     stepChangeHandlers = arrayListOf(
                         {
@@ -113,17 +108,6 @@ class SimulationService(
 
             EventDetectionParameters(eventDetectionParams.gamma, stepLowerBound)
         } else {
-            null
-        }
-    }
-
-    private fun createParallelParameters(): ParallelParameters? {
-        return if (simulationParametersService.integrationMethod.isParallelInUse){
-            ParallelParameters(
-                    simulationParametersService.integrationMethod.server,
-                    simulationParametersService.integrationMethod.port)
-        }
-        else {
             null
         }
     }

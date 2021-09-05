@@ -7,8 +7,7 @@ import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
 import ru.nstu.isma.next.core.sim.controller.SimulationInitials
 
 data class HybridSystemSimulatorParameters(
-    val hybridSystem: HybridSystem,
-    val stepSolver: DaeSystemStepSolver,
+    val hsmCompilationResult: HsmCompilationResult,
     val simulationInitials: SimulationInitials,
     val eventDetector: EventDetectionIntgController,
     val eventDetectionStepBoundLow: Double,

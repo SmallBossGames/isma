@@ -43,10 +43,12 @@ fun KoinApplication.addExternalServices() {
         single { IntegrationMethodLibraryLoader().load() }
         single<ITextEditorService> { TextEditorService() }
         single<ISimulationCoreController> { SimulationCoreController(get(), get()) }
-        single<IHybridSystemSimulator> { HybridSystemSimulator(get()) }
+
         single<IHsmCompiler> { HsmCompiler() }
         single<InputTranslator> { LismaTranslator() }
         single<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
+
+        factory<IHybridSystemSimulator> { HybridSystemSimulator(get()) }
     }
     modules(module)
 }

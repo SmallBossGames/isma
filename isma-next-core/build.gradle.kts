@@ -7,6 +7,7 @@ group = "ru.nstu.isma.next"
 version = "1.0.0"
 
 val moduleName by extra("isma.isma.intg.api.main")
+val koinVersion = "3.1.2"
 
 dependencies {
     implementation(project(":isma-hsm"))
@@ -25,6 +26,8 @@ dependencies {
     implementation ("org.slf4j:slf4j-api:1.7.32")
     implementation ("com.google.guava:guava:30.1.1-jre")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
+
+    implementation ("io.insert-koin:koin-core:$koinVersion")
 
     testImplementation ("junit:junit:4.13.2")
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")

@@ -161,7 +161,7 @@ class StateTransactionArrow : Group() {
     }
 
     companion object {
-        private const val TextFieldLength = 150.0
+        private const val TextFieldLength = 100.0
 
         inline fun Group.line(op: Line.() -> Unit){
             this.children.add(

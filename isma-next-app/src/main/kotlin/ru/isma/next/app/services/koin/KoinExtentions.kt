@@ -21,7 +21,7 @@ import ru.nstu.isma.next.core.sim.controller.contracts.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
-import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerProvider
+import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerFactory
 import ru.nstu.isma.next.core.sim.controller.services.InFileSimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.InMemorySimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.solvers.DefaultDaeSystemStepSolverFactory
@@ -63,7 +63,7 @@ fun KoinApplication.addAppServices() {
         single<SimulationResultService> { SimulationResultService(get()) }
         single<SimulationService> { SimulationService(get(), get(), get(), get(), get()) }
         single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
-        single<ISimulationRunnerProvider> { SimulationRunnerProvider(get(), get(), get()) }
+        single<ISimulationRunnerFactory> { SimulationRunnerFactory(get(), get(), get()) }
     }
     modules(module)
 }

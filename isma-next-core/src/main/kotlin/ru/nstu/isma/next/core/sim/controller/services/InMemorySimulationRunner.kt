@@ -32,27 +32,10 @@ class InMemorySimulationRunner(
 
         val metricData: IntgMetricData = hybridSystemSimulator.runAsync(simulatorParameters)
 
-       /* logCalculationStatistic(metricData, context.stepSolver)*/
-
         return@coroutineScope HybridSystemIntegrationResult(
             context.compilationResult.indexProvider,
             metricData,
             resultMemoryStore
         )
     }
-
-    /*private fun logCalculationStatistic(
-        metricData: IntgMetricData?,
-        stepSolver: DaeSystemStepSolver
-    ) {
-        if (logger.isInfoEnabled) {
-            val stepCalculationCount = if (stepSolver is DefaultDaeSystemStepSolver) stepSolver.stepCalculationCount else -1
-            val rhsCalculationCount: Long = if (stepSolver is DefaultDaeSystemStepSolver) stepSolver.rhsCalculationCount else -1
-            logger.info(
-                "Simulation time: {} ms; Step calculation count: {}; RHS calculation count: {}",
-                metricData?.simulationTime,
-                stepCalculationCount,
-                rhsCalculationCount)
-        }
-    }*/
 }

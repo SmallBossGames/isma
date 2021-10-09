@@ -19,12 +19,12 @@ class DaeSystemStepSolverFactory(
             remoteDaeSystemStepSolverFactory.create(
                 methodParams.server,
                 methodParams.port,
-                integrationMethodProvider.method,
+                integrationMethodProvider.createMethod(),
                 hsmCompilationResult
             )
         } else {
             defaultDaeSystemStepSolverFactory.create(
-                integrationMethodProvider.method,
+                integrationMethodProvider.createMethod(),
                 hsmCompilationResult.hybridSystem.daeSystem
             )
         }

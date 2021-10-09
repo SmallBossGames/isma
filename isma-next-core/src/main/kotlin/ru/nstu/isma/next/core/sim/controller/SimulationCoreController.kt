@@ -8,14 +8,14 @@ import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
-import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerProvider
+import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerFactory
 
 /**
  * Created by Bessonov Alex
  * on 04.01.2015.
  */
 class SimulationCoreController(
-    private val simulationRunnerProvider: ISimulationRunnerProvider,
+    private val simulationRunnerProvider: ISimulationRunnerFactory,
     private val hsmCompiler: IHsmCompiler,
 ) : ISimulationCoreController {
     /**
@@ -46,7 +46,7 @@ class SimulationCoreController(
             parameters.stepChangeHandlers
         )
 
-        return@coroutineScope simulationRunnerProvider.runner.run(context)
+        return@coroutineScope simulationRunnerProvider.create().run(context)
     }
 
     private suspend fun createOdeInitials(indexProvider: EquationIndexProvider, hsm: HSM): DoubleArray = coroutineScope {

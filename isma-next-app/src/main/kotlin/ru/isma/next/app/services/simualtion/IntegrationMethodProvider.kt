@@ -8,13 +8,12 @@ class IntegrationMethodProvider(
     private val library: IntegrationMethodsLibrary,
     private val simulationParametersService: SimulationParametersService,
 ) : IIntegrationMethodProvider {
-    override val method: IntgMethod
-        get() {
-            val method = createIntegrationMethod()
-            initAccuracyController(method)
-            initStabilityController(method)
-            return method
-        }
+    override fun createMethod(): IntgMethod {
+        val method = createIntegrationMethod()
+        initAccuracyController(method)
+        initStabilityController(method)
+        return method
+    }
 
     private fun createIntegrationMethod(): IntgMethod {
         val selectedMethod = simulationParametersService.integrationMethod.selectedMethod

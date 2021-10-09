@@ -20,8 +20,6 @@ class InMemorySimulationRunner(
         val simulatorParameters = HybridSystemSimulatorParameters(
             context.compilationResult,
             context.simulationInitials,
-            context.eventDetector,
-            context.eventDetectionStepBoundLow,
             stepChangeHandlers = context.stepChangeHandlers,
             resultPointHandlers = arrayListOf(
                 {

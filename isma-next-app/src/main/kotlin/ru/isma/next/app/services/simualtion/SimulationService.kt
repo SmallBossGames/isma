@@ -11,7 +11,6 @@ import ru.isma.next.common.services.lisma.models.SuccessTranslation
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
-import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
 import tornadofx.getValue
 import tornadofx.setValue
 import kotlin.coroutines.EmptyCoroutineContext
@@ -59,7 +58,6 @@ class SimulationService(
                 val context = IntegratorApiParameters(
                     hsm = translationResult.hsm,
                     initials = createCauchyInitials(),
-                    eventDetectionParameters = createEventDetectionParameters(),
                     stepChangeHandlers = arrayListOf(
                         {
                             withContext(Dispatchers.JavaFx) {
@@ -97,18 +95,6 @@ class SimulationService(
             start = simulationParametersService.cauchyInitials.startTime
             end = simulationParametersService.cauchyInitials.endTime
             stepSize = simulationParametersService.cauchyInitials.step
-        }
-    }
-
-    private fun createEventDetectionParameters(): EventDetectionParameters? {
-        val eventDetectionParams = simulationParametersService.eventDetection
-
-        return if (eventDetectionParams.isEventDetectionInUse) {
-            val stepLowerBound = if (eventDetectionParams.isStepLimitInUse) eventDetectionParams.lowBorder else 0.0
-
-            EventDetectionParameters(eventDetectionParams.gamma, stepLowerBound)
-        } else {
-            null
         }
     }
 

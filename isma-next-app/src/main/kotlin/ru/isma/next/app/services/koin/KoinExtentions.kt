@@ -24,6 +24,7 @@ import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
 import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerFactory
 import ru.nstu.isma.next.core.sim.controller.services.InFileSimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.InMemorySimulationRunner
+import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory
 import ru.nstu.isma.next.core.sim.controller.services.solvers.DefaultDaeSystemStepSolverFactory
 import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
 import ru.nstu.isma.next.core.sim.controller.services.solvers.RemoteDaeSystemStepSolverFactory
@@ -48,7 +49,7 @@ fun KoinApplication.addExternalServices() {
         single<InputTranslator> { LismaTranslator() }
         single<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
 
-        factory<IHybridSystemSimulator> { HybridSystemSimulator(get()) }
+        factory<IHybridSystemSimulator> { HybridSystemSimulator(get(), get()) }
     }
     modules(module)
 }
@@ -73,6 +74,13 @@ fun KoinApplication.addDaeSolversServices() {
         single<IDaeSystemSolverFactory> { DaeSystemStepSolverFactory(get(), get(), get(), get()) }
         single { DefaultDaeSystemStepSolverFactory() }
         single { RemoteDaeSystemStepSolverFactory() }
+    }
+    modules(module)
+}
+
+fun KoinApplication.addEventDetectionServices() {
+    val module = module {
+        single<IEventDetectorFactory> { EventDetectorFactory(get()) }
     }
     modules(module)
 }

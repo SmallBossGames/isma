@@ -7,11 +7,11 @@ plugins {
 group = "ru.nstu.isma"
 version = "1.0-SNAPSHOT"
 
-val junitVersion = "5.7.2"
+val junitVersion = "5.8.1"
 val koinVersion = "3.1.2"
-val kotlinReflectVersion = "1.5.21"
-val kotlinxCoroutinesVersion = "1.5.1-native-mt"
-val kotlinxSerializationJsonVersion = "1.2.2"
+val kotlinReflectVersion = "1.5.31"
+val kotlinxCoroutinesVersion = "1.5.2-native-mt"
+val kotlinxSerializationJsonVersion = "1.3.0"
 
 application {
     mainModule.set("ru.nstu.isma.ismanextpurejfx")
@@ -19,7 +19,7 @@ application {
 }
 
 javafx {
-    version = "16"
+    version = "17"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 

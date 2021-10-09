@@ -11,7 +11,7 @@ plugins {
 }
 
 javafx {
-    version = "16"
+    version = "17"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -20,9 +20,9 @@ application {
 }
 
 val koinVersion = "3.1.2"
-val kotlinReflectVersion = "1.5.21"
-val kotlinxCoroutinesVersion = "1.5.1-native-mt"
-val kotlinxSerializationJsonVersion = "1.2.2"
+val kotlinReflectVersion = "1.5.31"
+val kotlinxCoroutinesVersion = "1.5.2-native-mt"
+val kotlinxSerializationJsonVersion = "1.3.0"
 
 dependencies {
     implementation ("no.tornado:tornadofx:1.7.20")
@@ -31,7 +31,7 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.1-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.2-native-mt")
     implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
 
     implementation(project(":isma-hsm"))

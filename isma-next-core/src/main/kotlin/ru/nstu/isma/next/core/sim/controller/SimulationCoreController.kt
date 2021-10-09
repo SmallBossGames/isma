@@ -31,18 +31,9 @@ class SimulationCoreController(
             step = parameters.initials.stepSize
         )
 
-        val eventDetector = if (parameters.eventDetectionParameters != null)
-            EventDetectionIntgController(parameters.eventDetectionParameters.gamma, true)
-        else
-            EventDetectionIntgController(0.0, false)
-
-        val stepBoundLow = parameters.eventDetectionParameters?.stepBoundLow ?: 0.0
-
         val context = SimulationParameters(
             compilationResult,
             initials,
-            eventDetector,
-            stepBoundLow,
             parameters.stepChangeHandlers
         )
 

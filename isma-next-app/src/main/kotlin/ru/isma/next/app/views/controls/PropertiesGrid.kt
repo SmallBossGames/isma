@@ -25,19 +25,17 @@ class PropertiesGrid: GridPane() {
 
     fun addNode(title: String, property: StringProperty) : TextField {
         val field = TextField().apply {
-            textProperty().bind(property)
+            textProperty().bindBidirectional(property)
         }
         return addNode(title, field)
     }
 
     fun addNode(title: String, property: BooleanProperty) : CheckBox {
         val checkbox = CheckBox().apply {
-            selectedProperty().bind(property)
+            selectedProperty().bindBidirectional(property)
         }
         return addNode(title, checkbox)
     }
-
-
 
     fun <T> addComboBox(title: String, variants: ObservableList<T>, property: Property<T>): ComboBox<T> {
         val node = ComboBox<T>(variants).apply {
@@ -46,7 +44,7 @@ class PropertiesGrid: GridPane() {
         return addNode(title, node)
     }
 
-    fun <T: Node> addNode(title: String, field: T) : T {
+    private fun <T: Node> addNode(title: String, field: T) : T {
         val row = this.rowCount
         val label = Label(title).apply {
             padding = Insets(5.0, 10.0,5.0,5.0)

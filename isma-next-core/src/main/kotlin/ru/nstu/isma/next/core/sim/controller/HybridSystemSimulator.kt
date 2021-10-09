@@ -11,25 +11,30 @@ import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.intg.api.solvers.useAsync
 import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
+import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetector
+import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory
 import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * @author Maria Nasyrova
  * @since 06.10.2015
  */
 class HybridSystemSimulator(
-    private val daeSystemStepSolverFactory: IDaeSystemSolverFactory
+    private val daeSystemStepSolverFactory: IDaeSystemSolverFactory,
+    private val eventDetectorFactory: IEventDetectorFactory
 ) : IHybridSystemSimulator {
 
     override suspend fun runAsync(parameters: HybridSystemSimulatorParameters) = coroutineScope {
         daeSystemStepSolverFactory.create(parameters.hsmCompilationResult).useAsync {
-            return@useAsync runAsyncInternal(parameters, this)
+            return@useAsync runAsyncInternal(parameters, this, eventDetectorFactory.create())
         }
     }
 
-    private suspend fun runAsyncInternal(parameters: HybridSystemSimulatorParameters, stepSolver: DaeSystemStepSolver): IntgMetricData = coroutineScope {
+    private suspend fun runAsyncInternal(
+        parameters: HybridSystemSimulatorParameters,
+        stepSolver: DaeSystemStepSolver,
+        eventDetector: IEventDetector?,
+    ): IntgMetricData = coroutineScope {
         val metricData = IntgMetricData()
         metricData.setStartTime(System.currentTimeMillis())
         var x = parameters.simulationInitials.start
@@ -54,17 +59,11 @@ class HybridSystemSimulator(
             val fromPoint = IntgPoint(step, yForDe, rhs)
             val toPoint = stepSolver.step(fromPoint)
 
-            // TODO: сделать правильно, чтобы первый шаг тоже оценивался.
-            if (parameters.eventDetector.isEnabled) {
+            if(eventDetector != null){
                 val guards = parameters.hsmCompilationResult.hybridSystem.currentState.guards
-                val eventFunctionGroups = guards.map { it.eventFunctionGroup }
-                val predictedStep = parameters.eventDetector.predictNextStep(toPoint, eventFunctionGroups)
-                // TODO: если так, то шагов около 8500
-                val nextStep = min(max(predictedStep, parameters.eventDetectionStepBoundLow), toPoint.nextStep)
-                // TODO: а если так, то 170
-                //val nextStep = min(max(predictedStep, eventDetectionStepBoundLow), simulationInitials.step)
-                toPoint.nextStep = nextStep
+                toPoint.nextStep = eventDetector.predictNextStep(toPoint, guards)
             }
+
             x += toPoint.step
             step = toPoint.nextStep
             yForDe = toPoint.y

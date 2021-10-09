@@ -9,11 +9,11 @@ group = "ru.nstu.isma"
 version = "1.0.0"
 
 javafx {
-    version = "16"
+    version = "17"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
-val kotlinxSerializationJsonVersion = "1.2.2"
+val kotlinxSerializationJsonVersion = "1.3.0"
 
 dependencies {
     implementation(kotlin("stdlib"))

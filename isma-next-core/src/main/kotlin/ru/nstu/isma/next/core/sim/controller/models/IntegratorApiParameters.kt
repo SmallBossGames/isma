@@ -8,6 +8,5 @@ import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
 data class IntegratorApiParameters(
     val hsm: HSM,
     val initials: CauchyInitials,
-    val eventDetectionParameters: EventDetectionParameters?,
     val stepChangeHandlers: List<suspend (Double) -> Unit>
 )

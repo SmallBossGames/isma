@@ -9,8 +9,6 @@ import ru.nstu.isma.next.core.sim.controller.SimulationInitials
 data class HybridSystemSimulatorParameters(
     val hsmCompilationResult: HsmCompilationResult,
     val simulationInitials: SimulationInitials,
-    val eventDetector: EventDetectionIntgController,
-    val eventDetectionStepBoundLow: Double,
     val resultPointHandlers: List<suspend (point: IntgResultPoint) -> Unit>,
     val stepChangeHandlers: List<suspend (value: Double) -> Unit>,
 )

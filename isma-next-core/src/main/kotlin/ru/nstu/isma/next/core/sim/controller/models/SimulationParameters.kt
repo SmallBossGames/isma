@@ -10,7 +10,5 @@ import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 data class SimulationParameters(
     val compilationResult: HsmCompilationResult,
     val simulationInitials: SimulationInitials,
-    val eventDetector: EventDetectionIntgController,
-    val eventDetectionStepBoundLow: Double,
     val stepChangeHandlers: List<suspend (value: Double) -> Unit>,
 )

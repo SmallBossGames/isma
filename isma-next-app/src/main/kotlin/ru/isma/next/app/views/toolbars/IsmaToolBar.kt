@@ -5,7 +5,8 @@ import javafx.scene.control.Button
 import javafx.scene.control.Separator
 import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
-import javafx.scene.image.ImageView
+import ru.isma.next.app.extentions.matIconAL
+import ru.isma.next.app.extentions.matIconMZ
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
@@ -22,49 +23,49 @@ class IsmaToolBar(
     init {
         items.addAll(
             Button().apply {
-                graphic = ImageView("icons/new.png")
+                graphic = matIconAL("add_circle_outline")
                 tooltip = Tooltip("New model")
                 onAction = EventHandler { projectController.createNew() }
             },
             Button().apply {
-                graphic = ImageView("icons/blueprint.png")
+                graphic = matIconAL("add_box")
                 tooltip = Tooltip("New blueprint")
                 onAction = EventHandler { projectController.createNewBlueprint() }
             },
             Button().apply {
-                graphic = ImageView("icons/open.png")
+                graphic = matIconAL("folder_open")
                 tooltip = Tooltip("Open model")
                 onAction = EventHandler { projectFileService.open() }
             },
             Button().apply {
-                graphic = ImageView("icons/toolbar/save.png")
+                graphic = matIconMZ("save")
                 tooltip = Tooltip("Save current model")
                 onAction = EventHandler { projectFileService.save() }
             },
             Button().apply {
-                graphic = ImageView("icons/toolbar/saveall.png")
+                graphic = matIconMZ("save_alt")
                 tooltip = Tooltip("Save all models")
                 onAction = EventHandler { projectFileService.saveAll() }
             },
             Separator(),
             Button().apply {
-                graphic = ImageView("icons/toolbar/cut.png")
+                graphic = matIconAL("content_cut")
                 tooltip = Tooltip("Cut")
                 onAction = EventHandler { textEditorService.cut() }
             },
             Button().apply {
-                graphic = ImageView("icons/toolbar/copy.png")
+                graphic = matIconAL("content_copy")
                 tooltip = Tooltip("Copy")
                 onAction = EventHandler { textEditorService.copy() }
             },
             Button().apply {
-                graphic = ImageView("icons/toolbar/paste.png")
+                graphic = matIconAL("content_paste")
                 tooltip = Tooltip("Paste")
                 onAction = EventHandler { textEditorService.paste() }
             },
             Separator(),
             Button().apply {
-                graphic = ImageView("icons/toolbar/checked.png")
+                graphic = matIconAL("check_circle")
                 tooltip = Tooltip("Verify")
                 onAction = EventHandler {
                     val lismaSnapshot = projectController.activeProject?.snapshot() ?: return@EventHandler
@@ -72,16 +73,20 @@ class IsmaToolBar(
                 }
             },
             Separator(),
-            Button("Load Settings").apply {
+            Button().apply {
+                graphic = matIconAL("bookmark")
+                tooltip = Tooltip("Store Settings")
+                onAction = EventHandler {
+                    simulationParametersService.store()
+                }
+            },
+            Button().apply {
+                graphic = matIconAL("bookmark_border")
+                tooltip = Tooltip("Load Settings")
                 onAction = EventHandler {
                     simulationParametersService.load()
                 }
             },
-            Button("Store Settings").apply {
-                onAction = EventHandler {
-                    simulationParametersService.store()
-                }
-            }
         )
     }
 }

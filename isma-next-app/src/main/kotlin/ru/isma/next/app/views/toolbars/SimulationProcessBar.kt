@@ -3,6 +3,8 @@ package ru.isma.next.app.views.toolbars
 import javafx.event.EventHandler
 import javafx.scene.control.*
 import javafx.scene.image.ImageView
+import ru.isma.next.app.extentions.matIconAL
+import ru.isma.next.app.extentions.matIconMZ
 import ru.isma.next.app.services.simualtion.SimulationResultService
 import ru.isma.next.app.services.simualtion.SimulationService
 
@@ -13,14 +15,14 @@ class SimulationProcessBar(
     init {
         items.addAll(
             Button().apply {
-                graphic = ImageView("icons/toolbar/play.png")
+                graphic = matIconMZ("play_arrow")
                 tooltip = Tooltip("Play")
                 onAction = EventHandler { simulationService.simulate() }
                 managedProperty().bind(!simulationService.isSimulationInProgressProperty())
                 visibleProperty().bind(!simulationService.isSimulationInProgressProperty())
             },
             Button().apply {
-                graphic = ImageView("icons/toolbar/abort.png")
+                graphic = matIconAL("close")
                 tooltip = Tooltip("Abort")
                 onAction = EventHandler { simulationService.stopCurrentSimulation() }
                 managedProperty().bind(simulationService.isSimulationInProgressProperty())

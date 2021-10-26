@@ -344,7 +344,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private fun openStateTextEditorTab(state: StateBox) {
-        val editor = editorFactory.editor.apply {
+        val editor = editorFactory.createTextEditor().apply {
             replaceText(state.text)
             state.textProperty().bind(textProperty())
         }
@@ -355,7 +355,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private fun openMainTextEditorTab() {
-        val editor = editorFactory.editor.apply {
+        val editor = editorFactory.createTextEditor().apply {
             replaceText(mainStateBox.text)
             mainStateBox.textProperty().bind(textProperty())
         }

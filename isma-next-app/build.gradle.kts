@@ -5,7 +5,6 @@ plugins {
     kotlin("plugin.serialization")
 
     id("org.openjfx.javafxplugin")
-    id("com.github.johnrengelman.shadow")
 
     application
 }
@@ -34,7 +33,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:1.5.2-native-mt")
     implementation("org.kordamp.ikonli:ikonli-javafx:12.2.0")
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.2.0")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.7")
 
     implementation(project(":isma-hsm"))
     implementation(project(":isma-lisma"))

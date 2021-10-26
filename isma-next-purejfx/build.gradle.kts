@@ -34,7 +34,7 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.7")
 
 
     implementation(project(":isma-hsm"))

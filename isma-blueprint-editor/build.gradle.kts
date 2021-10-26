@@ -21,5 +21,5 @@ dependencies {
     implementation(project(":isma-text-editor"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.6")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.7")
 }

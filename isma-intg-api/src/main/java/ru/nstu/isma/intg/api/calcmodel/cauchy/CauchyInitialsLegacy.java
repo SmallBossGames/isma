@@ -6,7 +6,7 @@ import java.util.Arrays;
 /**
  * Начальные условия задачи Коши
  */
-public class CauchyInitials implements Serializable {
+public class CauchyInitialsLegacy implements Serializable {
 
     private double start = 0.0;
     private double end = 0.0;

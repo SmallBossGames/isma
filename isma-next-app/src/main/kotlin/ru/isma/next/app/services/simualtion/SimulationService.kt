@@ -9,6 +9,7 @@ import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.common.services.lisma.models.FailedTranslation
 import ru.isma.next.common.services.lisma.models.SuccessTranslation
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
+import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitialsLegacy
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import tornadofx.getValue
@@ -84,18 +85,18 @@ class SimulationService(
         currentSimulationJob?.cancel()
     }
 
-    private fun resetState(){
+    private fun resetState() {
         currentSimulationJob = null
         isSimulationInProgress = false
         progress = 0.0
     }
 
     private fun createCauchyInitials(): CauchyInitials {
-        return CauchyInitials().apply {
-            start = simulationParametersService.cauchyInitials.startTime
-            end = simulationParametersService.cauchyInitials.endTime
-            stepSize = simulationParametersService.cauchyInitials.step
-        }
+        return CauchyInitials(
+            start = simulationParametersService.cauchyInitials.startTime,
+            end = simulationParametersService.cauchyInitials.endTime,
+            stepSize = simulationParametersService.cauchyInitials.step,
+        )
     }
 
     companion object {
@@ -103,8 +104,8 @@ class SimulationService(
 
         val SimulationScope = CoroutineScope(EmptyCoroutineContext + SimulationSupervisorJob)
 
-        private fun normalizeProgress(start: Double, end: Double, current: Double): Double{
-            return max(0.0, min(1.0, (current - start) / (end-start)))
+        private fun normalizeProgress(start: Double, end: Double, current: Double): Double {
+            return ((current - start) / (end-start)).coerceIn(0.0, 1.0)
         }
     }
 }

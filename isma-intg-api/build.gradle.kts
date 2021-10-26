@@ -21,6 +21,6 @@ tasks {
 }
 
 extraJavaModuleInfo {
-    automaticModule("kotlinx-coroutines-core-jvm-1.5.1-native-mt.jar", "kotlinx.coroutines.core.jvm")
+    automaticModule("kotlinx-coroutines-core-jvm-1.5.2-native-mt.jar", "kotlinx.coroutines.core.jvm")
     failOnMissingModuleInfo.set(false)
 }

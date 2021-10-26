@@ -2,7 +2,7 @@ package ru.nstu.isma.intg.demo.problems;
 
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation;
-import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials;
+import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitialsLegacy;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyProblem;
 
 public class FourDimensionalCauchyProblem extends CauchyProblem {
@@ -12,8 +12,8 @@ public class FourDimensionalCauchyProblem extends CauchyProblem {
         super.setDaeSystem(createDaeSystem());
     }
 
-    private static CauchyInitials createInitials() {
-        CauchyInitials cauchyInitials = new CauchyInitials();
+    private static CauchyInitialsLegacy createInitials() {
+        CauchyInitialsLegacy cauchyInitials = new CauchyInitialsLegacy();
 
         cauchyInitials.setInterval(0, 4.5);
         cauchyInitials.setStepSize(0.3);

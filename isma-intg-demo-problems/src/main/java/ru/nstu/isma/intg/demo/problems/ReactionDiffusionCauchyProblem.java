@@ -1,6 +1,6 @@
 package ru.nstu.isma.intg.demo.problems;
 
-import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials;
+import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitialsLegacy;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyProblem;
 import ru.nstu.isma.intg.demo.problems.lotkaVolterra.*;
 import ru.nstu.isma.intg.demo.problems.lotkaVolterra.utils.Pair;
@@ -13,7 +13,7 @@ public class ReactionDiffusionCauchyProblem extends CauchyProblem {
 
         setDaeSystem(lvProblem.getDaeSystem());
 
-        CauchyInitials cauchyInitials = new CauchyInitials();
+        CauchyInitialsLegacy cauchyInitials = new CauchyInitialsLegacy();
         cauchyInitials.setInterval(0, 1.0);
         cauchyInitials.setStepSize(0.001);
         cauchyInitials.setY0(lvProblem.getY0());

@@ -40,17 +40,6 @@ class DefaultDaeSystemStepSolver(
         return rhs
     }
 
-    private fun calculateRhsForAlgebraicEquations(yForDe: DoubleArray?): DoubleArray {
-        return aeCalculator!!.apply(yForDe!!)
-    }
-
-    private fun calculateRhsForDifferentialEquations(
-        yForDe: DoubleArray?,
-        rhs: Array<DoubleArray>?
-    ): DoubleArray {
-        return deCalculator!!.apply(yForDe!!, rhs!!)
-    }
-
     override fun apply(changeSet: DaeSystemChangeSet?) {
         if (changeSet != null && !changeSet.isEmpty) {
             commitDaeSystem(changeSet.apply(daeSystem))
@@ -59,6 +48,7 @@ class DefaultDaeSystemStepSolver(
 
     override fun step(fromPoint: IntgPoint): IntgPoint {
         val initialStep = fromPoint.step
+
         var stages = stages(fromPoint)
         var accuracyNextStep: Double? = null
         if (isControllerEnabled(intgMethod.accuracyController)) {
@@ -67,7 +57,9 @@ class DefaultDaeSystemStepSolver(
             accuracyNextStep = accuracyResults.tunedStep
             fromPoint.step = accuracyResults.tunedStep
         }
+
         stepCalculationCount++
+
         val nextY = nextY(fromPoint, stages)
         val nextRhs = calculateRhs(nextY)
         val toPoint = IntgPoint(fromPoint.step, nextY, nextRhs, stages, fromPoint.step)
@@ -83,31 +75,15 @@ class DefaultDaeSystemStepSolver(
         if (minPredictedNextStep == null || stabilityNextStep != null && stabilityNextStep < minPredictedNextStep) {
             minPredictedNextStep = stabilityNextStep
         }
+
         var nextStep = initialStep
         if (minPredictedNextStep != null && minPredictedNextStep > initialStep) {
             nextStep = minPredictedNextStep
         }
+
         toPoint.nextStep = nextStep
+
         return toPoint
-    }
-
-    private fun nextY(fromPoint: IntgPoint, stages: Array<DoubleArray>): DoubleArray {
-        val nextY = DoubleArray(fromPoint.y.size)
-        var odeStages = DoubleArray(0)
-        for (odeIdx in 0 until daeSystem.differentialEquationCount) {
-
-            if (stages.isNotEmpty()) {
-                odeStages = stages[odeIdx]
-            }
-
-            nextY[odeIdx] = intgMethod.nextY(
-                fromPoint.step,
-                odeStages,
-                fromPoint.y[odeIdx],
-                fromPoint.rhs[DaeSystem.RHS_DE_PART_IDX][odeIdx]
-            )
-        }
-        return nextY
     }
 
     override fun stages(fromPoint: IntgPoint): Array<DoubleArray> {
@@ -135,6 +111,36 @@ class DefaultDaeSystemStepSolver(
             }
         }
         return stages
+    }
+
+    private fun calculateRhsForAlgebraicEquations(yForDe: DoubleArray): DoubleArray {
+        return aeCalculator!!.apply(yForDe)
+    }
+
+    private fun calculateRhsForDifferentialEquations(
+        yForDe: DoubleArray,
+        rhs: Array<DoubleArray>
+    ): DoubleArray {
+        return deCalculator!!.apply(yForDe, rhs)
+    }
+
+    private fun nextY(fromPoint: IntgPoint, stages: Array<DoubleArray>): DoubleArray {
+        val nextY = DoubleArray(fromPoint.y.size)
+        var odeStages = DoubleArray(0)
+        for (odeIdx in 0 until daeSystem.differentialEquationCount) {
+
+            if (stages.isNotEmpty()) {
+                odeStages = stages[odeIdx]
+            }
+
+            nextY[odeIdx] = intgMethod.nextY(
+                fromPoint.step,
+                odeStages,
+                fromPoint.y[odeIdx],
+                fromPoint.rhs[DaeSystem.RHS_DE_PART_IDX][odeIdx]
+            )
+        }
+        return nextY
     }
 
     private fun yk(stageCalc: StageCalculator, fromPoint: IntgPoint, stages: Array<DoubleArray>): DoubleArray {

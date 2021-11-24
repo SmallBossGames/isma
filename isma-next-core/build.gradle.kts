@@ -7,7 +7,7 @@ group = "ru.nstu.isma.next"
 version = "1.0.0"
 
 val moduleName by extra("isma.isma.intg.api.main")
-val koinVersion = "3.1.2"
+val koinVersion = "3.1.3"
 
 dependencies {
     implementation(project(":isma-hsm"))

@@ -8,7 +8,7 @@ version = "1.0.0"
 val moduleName by extra("isma.isma.next.tools.main")
 
 dependencies {
-    implementation(kotlin("stdlib"))
+
 }
 
 

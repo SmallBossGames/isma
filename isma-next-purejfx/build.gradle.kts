@@ -8,10 +8,10 @@ group = "ru.nstu.isma"
 version = "1.0-SNAPSHOT"
 
 val junitVersion = "5.8.1"
-val koinVersion = "3.1.2"
-val kotlinReflectVersion = "1.5.31"
+val koinVersion = "3.1.3"
+val kotlinReflectVersion = "1.6.0"
 val kotlinxCoroutinesVersion = "1.5.2-native-mt"
-val kotlinxSerializationJsonVersion = "1.3.0"
+val kotlinxSerializationJsonVersion = "1.3.1"
 
 application {
     mainModule.set("ru.nstu.isma.ismanextpurejfx")
@@ -29,7 +29,7 @@ dependencies {
     implementation("org.kordamp.ikonli:ikonli-javafx:12.2.0")
     implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.2.0")
 
-    implementation ("org.antlr:antlr4-runtime:4.9.2")
+    implementation ("org.antlr:antlr4-runtime:4.9.3")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")

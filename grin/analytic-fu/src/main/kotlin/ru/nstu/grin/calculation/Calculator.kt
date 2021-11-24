@@ -28,6 +28,7 @@ class Calculator(private val list: List<Litter>) {
                 MultiplyOperator -> {
                     stack.push(stack.pop() * stack.pop())
                 }
+                else -> {}
             }
         }
         return stack.pop()

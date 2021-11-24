@@ -7,6 +7,7 @@ import javafx.stage.FileChooser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.isma.next.app.constants.ALL_ISMA_PROJECT_FILES
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
@@ -149,6 +150,10 @@ class ProjectFileService(private val projectController: ProjectService) {
             FileChooser.ExtensionFilter("ISMA State Chart Project file", STATE_CHART_ISMA_PROJECT_FILE),
         )
 
-        private val fileFilers = arrayOf(*textProjectFileFilters, *stateChartProjectFileFilters)
+        private val allProjectFileFilters = arrayOf(
+            FileChooser.ExtensionFilter("All ISMA project files", STATE_CHART_ISMA_PROJECT_FILE),
+        )
+
+        private val fileFilers = arrayOf(*allProjectFileFilters, *textProjectFileFilters, *stateChartProjectFileFilters)
     }
 }

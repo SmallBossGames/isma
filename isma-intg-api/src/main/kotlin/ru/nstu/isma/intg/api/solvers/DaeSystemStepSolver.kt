@@ -13,7 +13,7 @@ import ru.nstu.isma.intg.api.methods.IntgPoint
  */
 interface DaeSystemStepSolver {
     val intgMethod: IntgMethod
-    fun apply(changeSet: DaeSystemChangeSet)
+    fun apply(changeSet: DaeSystemChangeSet?)
     fun calculateRhs(yForDe: DoubleArray): Array<DoubleArray>
     fun step(fromPoint: IntgPoint): IntgPoint
     fun stages(fromPoint: IntgPoint): Array<DoubleArray>

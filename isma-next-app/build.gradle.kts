@@ -18,14 +18,14 @@ application {
     mainClass.set("ru.isma.next.app.launcher.LauncherKt")
 }
 
-val koinVersion = "3.1.2"
-val kotlinReflectVersion = "1.5.31"
+val koinVersion = "3.1.3"
+val kotlinReflectVersion = "1.6.0"
 val kotlinxCoroutinesVersion = "1.5.2-native-mt"
-val kotlinxSerializationJsonVersion = "1.3.0"
+val kotlinxSerializationJsonVersion = "1.3.1"
 
 dependencies {
     implementation ("no.tornado:tornadofx:1.7.20")
-    implementation ("org.antlr:antlr4-runtime:4.9.2")
+    implementation ("org.antlr:antlr4-runtime:4.9.3")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")
@@ -47,8 +47,6 @@ dependencies {
 
     api(project(":isma-intg-core"))
     api(project(":isma-intg-server:isma-intg-server-client"))
-
-    testImplementation(kotlin("test-junit"))
 }
 
 tasks.withType<KotlinCompile>() {

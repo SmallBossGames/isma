@@ -25,7 +25,7 @@ dependencies {
     implementation ("org.apache.commons:commons-text:1.9")
     implementation ("org.slf4j:slf4j-api:1.7.32")
     implementation ("com.google.guava:guava:31.0.1-jre")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC")
 
     implementation ("io.insert-koin:koin-core:$koinVersion")
 
@@ -45,6 +45,6 @@ tasks {
 }
 
 extraJavaModuleInfo {
-    automaticModule("kotlinx-coroutines-core-jvm-1.5.2-native-mt.jar", "kotlinx.coroutines.core.jvm")
+    automaticModule("kotlinx-coroutines-core-jvm-1.6.0-RC.jar", "kotlinx.coroutines.core.jvm")
     failOnMissingModuleInfo.set(false)
 }

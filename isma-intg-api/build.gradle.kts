@@ -6,7 +6,7 @@ plugins {
 val moduleName by extra("isma.isma.intg.api.main")
 
 dependencies{
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-RC")
     implementation("org.jetbrains:annotations:22.0.0")
 }
 
@@ -21,6 +21,6 @@ tasks {
 }
 
 extraJavaModuleInfo {
-    automaticModule("kotlinx-coroutines-core-jvm-1.5.2-native-mt.jar", "kotlinx.coroutines.core.jvm")
+    automaticModule("kotlinx-coroutines-core-jvm-1.6.0-RC.jar", "kotlinx.coroutines.core.jvm")
     failOnMissingModuleInfo.set(false)
 }

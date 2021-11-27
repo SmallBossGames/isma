@@ -17,7 +17,7 @@ class IntegrationMethodProvider(
 
     private fun createIntegrationMethod(): IntgMethod {
         val selectedMethod = simulationParametersService.integrationMethod.selectedMethod
-        return library.getIntgMethod(selectedMethod)!!
+        return library.getIntegrationMethod(selectedMethod)!!
     }
 
     private fun initAccuracyController(integrationMethod: IntgMethod){

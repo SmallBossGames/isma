@@ -14,7 +14,7 @@ import tornadofx.asObservable
 import tornadofx.chooseFile
 
 class SimulationParametersService(library: IntegrationMethodsLibrary) {
-    val integrationMethods = (library.getIntgMethodNames() ?: emptyList())
+    val integrationMethods = library.getIntegrationMethodNames()
             .asObservable()
 
     val simplifyMethods = listOf("Radial-Distance", "Douglas-Peucker")

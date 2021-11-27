@@ -5,22 +5,11 @@ import java.util.*
 
 
 class IntegrationMethodLibraryLoader {
-    fun load() : IntegrationMethodsLibrary {
-        val libraryInstance = IntegrationMethodsLibrary()
-        val systemMethods = ServiceLoader.load(IntgMethod::class.java)
-        systemMethods.forEach { cls ->
-            registerIntgMethod(libraryInstance, cls)
+    companion object {
+        @JvmStatic
+        fun load(): IntegrationMethodsLibrary {
+            val methods = ServiceLoader.load(IntgMethod::class.java)
+            return IntegrationMethodsLibrary(methods)
         }
-
-        return libraryInstance
     }
-
-    private fun registerIntgMethod(libraryInstance: IntegrationMethodsLibrary, integrationMethod: IntgMethod): Boolean {
-        if (!libraryInstance.containsIntgMethod(integrationMethod.name)) {
-            libraryInstance.registerIntgMethod(integrationMethod)
-            return true
-        }
-        return false
-    }
-
 }

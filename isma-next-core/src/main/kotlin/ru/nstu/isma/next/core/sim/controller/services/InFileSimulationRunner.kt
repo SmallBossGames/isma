@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.slf4j.LoggerFactory
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
 import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
@@ -18,12 +17,15 @@ import java.io.File
 
 class InFileSimulationRunner(
     private val hybridSystemSimulator: IHybridSystemSimulator,
-    private val resultFileName: String,
 ) : ISimulationRunner {
     override suspend fun run(context: SimulationParameters): HybridSystemIntegrationResult = coroutineScope {
+        val tempFileCreating = async(Dispatchers.IO) {
+            File.createTempFile("ismaSolverTempFile_", ".txt")
+        }
+
         val pointsChannel = Channel<IntgResultPoint>()
 
-        val metricDataJob = async {
+        val simulating = async {
             val simulatorParameters = HybridSystemSimulatorParameters(
                 context.compilationResult,
                 context.simulationInitials,
@@ -40,8 +42,10 @@ class InFileSimulationRunner(
             return@async result
         }
 
+        val tempFile = tempFileCreating.await()
+
         launch(Dispatchers.IO) {
-            File(resultFileName).bufferedWriter().use { writer ->
+            tempFile.bufferedWriter().use { writer ->
                 var isFirst = true
                 pointsChannel.consumeEach {
                     if (isFirst) {
@@ -53,8 +57,8 @@ class InFileSimulationRunner(
             }
         }
 
-        val metricData = metricDataJob.await()
-        val resultReader = AsyncFilePointProvider(resultFileName)
+        val metricData = simulating.await()
+        val resultReader = AsyncFilePointProvider(tempFile)
 
         return@coroutineScope HybridSystemIntegrationResult(
             metricData = metricData,

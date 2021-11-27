@@ -7,9 +7,9 @@ import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers.buildIn
 import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers.buildMetdataFromHeader
 import java.io.File
 
-class AsyncFilePointProvider(filePath: String) : IntegrationResultPointProvider {
+class AsyncFilePointProvider(file: File) : IntegrationResultPointProvider {
     override val results = flow {
-        File(filePath).bufferedReader().use { reader ->
+        file.bufferedReader().use { reader ->
             val header = reader.readLine()
             val metadata = buildMetdataFromHeader(header)
 

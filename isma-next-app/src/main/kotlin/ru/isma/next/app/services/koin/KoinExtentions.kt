@@ -32,7 +32,7 @@ import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 
 fun KoinApplication.addSimulationRunners() {
     val module = module {
-        single { InFileSimulationRunner(get(), "temp.csv") }
+        single { InFileSimulationRunner(get()) }
         single { InMemorySimulationRunner(get()) }
     }
     modules(module)
@@ -41,7 +41,7 @@ fun KoinApplication.addSimulationRunners() {
 fun KoinApplication.addExternalServices() {
     val module = module {
         single { IntegrationController() }
-        single { IntegrationMethodLibraryLoader().load() }
+        single { IntegrationMethodLibraryLoader.load() }
         single<ITextEditorService> { TextEditorService() }
         single<ISimulationCoreController> { SimulationCoreController(get(), get()) }
 

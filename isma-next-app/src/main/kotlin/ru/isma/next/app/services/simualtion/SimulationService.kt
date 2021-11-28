@@ -26,79 +26,68 @@ class SimulationService(
 ) {
     val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()
 
-    private val progressProperty = SimpleDoubleProperty()
-    fun progressProperty() = progressProperty
-    var progress by progressProperty
+    private val currentSimulationJobs = mutableMapOf<InProgressSimulationModel, Job>()
 
-    private val isSimulationInProgressProperty = SimpleBooleanProperty()
-    fun isSimulationInProgressProperty() = isSimulationInProgressProperty
-    var isSimulationInProgress by isSimulationInProgressProperty
-
-    private var currentSimulationJob: Job? = null
+    private var taskNumber = 1
 
     fun simulate() {
-        currentSimulationJob = SimulationScope.launch {
+        val trackingTask = InProgressSimulationModel(taskNumber)
+
+        taskNumber++
+
+        val currentSimulationJob = SimulationScope.launch {
             try {
-                simulateAsyncInternal()
+                val sourceCode = projectService.activeProject?.snapshot()
+                    ?: return@launch
+
+                val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation
+                    ?: return@launch
+
+                val initials = createCauchyInitials()
+
+                val hsm = translationResult.hsm.apply {
+                    initTimeEquation(initials.start)
+                }
+
+                val context = IntegratorApiParameters(
+                    hsm = hsm,
+                    initials = initials,
+                    stepChangeHandlers = arrayListOf(
+                        {
+                            val progress = normalizeProgress(initials.start, initials.end, it)
+                            trackingTask.commitProgress(progress)
+                        }
+                    )
+                )
+
+                withContext(Dispatchers.JavaFx) {
+                    trackingTasks.add(trackingTask)
+                }
+
+                val result = simulationController.simulateAsync(context)
+
+                val resultModel = CompletedSimulationModel(
+                    trackingTask.id,
+                    result.equationIndexProvider,
+                    result.metricData,
+                    result.resultPointProvider
+                )
+
+                simulationResult.commitSimulationResult(resultModel)
             }
             finally {
-                resetState()
+                SimulationScope.launch(Dispatchers.JavaFx) {
+                    trackingTasks.remove(trackingTask)
+                    currentSimulationJobs.remove(trackingTask)
+                }
             }
         }
+
+        currentSimulationJobs[trackingTask] = currentSimulationJob
     }
 
-    private suspend fun simulateAsyncInternal() = coroutineScope {
-        val trackingTask = InProgressSimulationModel(1)
-
-        val sourceCode = projectService.activeProject?.snapshot() ?: return@coroutineScope
-
-        val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation ?: return@coroutineScope
-
-        val initials = createCauchyInitials()
-
-        translationResult.hsm.initTimeEquation(initials.start)
-
-        val context = IntegratorApiParameters(
-            hsm = translationResult.hsm,
-            initials = createCauchyInitials(),
-            stepChangeHandlers = arrayListOf(
-                {
-                    withContext(Dispatchers.JavaFx) {
-                        progress = normalizeProgress(initials.start, initials.end, it)
-                    }
-                }
-            )
-        )
-
-        withContext(Dispatchers.JavaFx) {
-            isSimulationInProgress = true
-            trackingTasks.add(trackingTask)
-        }
-
-        val result = simulationController.simulateAsync(context)
-
-        withContext(Dispatchers.JavaFx) {
-            trackingTasks.remove(trackingTask)
-        }
-
-        val resultModel = CompletedSimulationModel(
-            1,
-            result.equationIndexProvider,
-            result.metricData,
-            result.resultPointProvider
-        )
-
-        simulationResult.commitSimulationResult(resultModel)
-    }
-
-    fun stopCurrentSimulation() {
-        currentSimulationJob?.cancel()
-    }
-
-    private fun resetState() {
-        currentSimulationJob = null
-        isSimulationInProgress = false
-        progress = 0.0
+    fun stopSimulation(trackingTask: InProgressSimulationModel) {
+        currentSimulationJobs.getOrDefault(trackingTask, null)?.cancel()
     }
 
     private fun createCauchyInitials(): CauchyInitials {
@@ -112,7 +101,7 @@ class SimulationService(
     companion object {
         private val SimulationSupervisorJob = SupervisorJob()
 
-        val SimulationScope = CoroutineScope(EmptyCoroutineContext + SimulationSupervisorJob)
+        val SimulationScope = CoroutineScope(Dispatchers.Default + SimulationSupervisorJob)
 
         private fun normalizeProgress(start: Double, end: Double, current: Double): Double {
             return ((current - start) / (end-start)).coerceIn(0.0, 1.0)

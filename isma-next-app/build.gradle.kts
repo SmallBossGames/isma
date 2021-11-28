@@ -49,7 +49,3 @@ dependencies {
     api(project(":isma-intg-core"))
     api(project(":isma-intg-server:isma-intg-server-client"))
 }
-
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "16"
-}

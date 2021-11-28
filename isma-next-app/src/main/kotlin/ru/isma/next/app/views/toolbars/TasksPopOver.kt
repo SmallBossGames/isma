@@ -8,15 +8,21 @@ import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.controlsfx.control.PopOver
 import ru.isma.next.app.extentions.matIconAL
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.services.simualtion.SimulationResultService
+import ru.isma.next.app.services.simualtion.SimulationService
 
 class TasksPopOver(
-    private val simulationResultService: SimulationResultService
+    private val simulationResultService: SimulationResultService,
+    private val simulationService: SimulationService,
 ): PopOver() {
     private val inProgressTasksContainer = VBox()
         .apply {
@@ -62,7 +68,7 @@ class TasksPopOver(
             while (it.next()){
                 if(it.wasAdded()) {
                     it.addedSubList.forEach { instance ->
-                        val item = createInProgressTasksListItem(1)
+                        val item = createInProgressTasksListItem(instance)
 
                         inProgressItemMap[instance] = item
 
@@ -131,24 +137,23 @@ class TasksPopOver(
         collection.removeListener(listener)
     }
 
-    private fun createCompletedTasksListItem(item: CompletedSimulationModel): HBox {
+    private fun createCompletedTasksListItem(trackingTask: CompletedSimulationModel): HBox {
         return HBox(
-            Label("Task #${item.id}"),
-            Label("Completed"),
+            Label("Task #${trackingTask.id}"),
             Button("Show").apply {
                 onAction = EventHandler {
-                    simulationResultService.showChart(item)
+                    simulationResultService.showChart(trackingTask)
                 }
             },
             Button("Export").apply {
                 onAction = EventHandler {
-                    simulationResultService.exportToFile(item)
+                    simulationResultService.exportToFile(trackingTask)
                 }
             },
             Button("Remove").apply {
                 onAction = EventHandler {
-                    runBlocking {
-                        simulationResultService.removeSimulationResult(item)
+                    PopOverScope.launch {
+                        simulationResultService.removeSimulationResult(trackingTask)
                     }
                 }
             }
@@ -158,22 +163,26 @@ class TasksPopOver(
         }
     }
 
-    companion object {
-        private fun createInProgressTasksListItem(id: Int): HBox {
-            return HBox(
-                Label("Task #$id"),
-                ProgressBar(),
-                Button().apply {
-                    graphic = matIconAL("close")
-                    tooltip = Tooltip("Abort")
-//                        onAction = EventHandler { simulationService.stopCurrentSimulation() }
-//                        managedProperty().bind(simulationService.isSimulationInProgressProperty())
-//                        visibleProperty().bind(simulationService.isSimulationInProgressProperty())
+    private fun createInProgressTasksListItem(trackingTask: InProgressSimulationModel): HBox {
+        return HBox(
+            Label("Task #${trackingTask.id}"),
+            ProgressBar().apply {
+                progressProperty().bind(trackingTask.progressProperty)
+            },
+            Button().apply {
+                graphic = matIconAL("close")
+                tooltip = Tooltip("Abort")
+                onAction = EventHandler {
+                    simulationService.stopSimulation(trackingTask)
                 }
-            ).apply {
-                alignment = Pos.CENTER_LEFT
-                spacing = 5.0
             }
+        ).apply {
+            alignment = Pos.CENTER_LEFT
+            spacing = 5.0
         }
+    }
+
+    companion object {
+        val PopOverScope = CoroutineScope(Dispatchers.JavaFx)
     }
 }

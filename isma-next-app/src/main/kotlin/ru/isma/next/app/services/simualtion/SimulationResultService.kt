@@ -1,7 +1,5 @@
 package ru.isma.next.app.services.simualtion
 
-import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser
@@ -10,7 +8,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
-import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
@@ -20,29 +17,18 @@ import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.integration.IntegrationController
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.models.IntgResultPoint
-import ru.nstu.isma.next.core.sim.controller.HybridSystemIntegrationResult
 import tornadofx.FileChooserMode
 import tornadofx.chooseFile
-import tornadofx.getValue
-import tornadofx.setValue
 import java.io.File
 import java.io.Writer
 import java.util.*
 
 class SimulationResultService(private val grinIntegrationController: IntegrationController) {
-    val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()
+    val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()!!
 
     private val fileFilers = arrayOf(
-            FileChooser.ExtensionFilter("Comma separate file", "*.csv")
+        FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
-
-    private val simulationResultProperty = SimpleObjectProperty<HybridSystemIntegrationResult>(null)
-    fun simulationResultProperty() = simulationResultProperty
-    var simulationResult: HybridSystemIntegrationResult? by simulationResultProperty
-
-    private val isResultAvailableProperty = simulationResultProperty().isNotNull
-    fun isResultAvailableProperty(): BooleanBinding = isResultAvailableProperty
-    val isResultAvailable by isResultAvailableProperty
 
     suspend fun commitSimulationResult(result: CompletedSimulationModel) =
         withContext(Dispatchers.JavaFx) {
@@ -54,8 +40,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
             trackingTasksResults.remove(result)
         }
 
-    fun showChart() {
-        simulationResult?:return
+    fun showChart(simulationResult: CompletedSimulationModel) {
 
         val xAxis = ConcatenationAxis(
             id = UUID.randomUUID(),
@@ -81,8 +66,8 @@ class SimulationResultService(private val grinIntegrationController: Integration
             font = "Arial"
         )
 
-        val headers = createColumnNamesArray(simulationResult!!)
-        val columns = createResultColumns(simulationResult!!, headers.size)
+        val headers = createColumnNamesArray(simulationResult)
+        val columns = createResultColumns(simulationResult, headers.size)
 
         val functions = arrayListOf<ConcatenationFunction>()
 
@@ -101,38 +86,27 @@ class SimulationResultService(private val grinIntegrationController: Integration
         grinIntegrationController.integrate(spaces)
     }
 
-    fun exportToFile(){
+    fun exportToFile(simulationResult: CompletedSimulationModel){
         val selectedFiles = chooseFile (filters = fileFilers, mode = FileChooserMode.Save)
 
-        if(selectedFiles.isEmpty())
-        {
-            return
-        }
-
-        val file = selectedFiles.first()
+        val file = selectedFiles.firstOrNull() ?: return
 
         ResultServiceScope.launch {
-            exportToFileAsync(file)
+            exportToFileAsync(simulationResult, file)
         }
     }
 
-    suspend fun exportToFileAsync(file: File) = coroutineScope {
-        val result = simulationResult ?: return@coroutineScope
-
+    suspend fun exportToFileAsync(simulationResult: CompletedSimulationModel, file: File) = coroutineScope {
         launch(Dispatchers.IO) {
             file.bufferedWriter().use { writer ->
-                val header = buildHeader(simulationResult!!)
+                val header = buildHeader(simulationResult)
                 writer.write(header)
-                writePoints(result, writer)
+                writePoints(simulationResult, writer)
             }
         }
     }
 
-    fun clean() {
-        simulationResult = null
-    }
-
-    private suspend fun writePoints(result: HybridSystemIntegrationResult, writer: Writer) = coroutineScope {
+    private suspend fun writePoints(result: CompletedSimulationModel, writer: Writer) = coroutineScope {
         result.resultPointProvider.results.collect { value ->
             writer.appendLine(value.toCsvLine())
         }
@@ -164,7 +138,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
         return builder.toString()
     }
 
-    private fun createColumnNamesArray(result: HybridSystemIntegrationResult) : Array<String> {
+    private fun createColumnNamesArray(result: CompletedSimulationModel) : Array<String> {
         val equationIndexProvider = result.equationIndexProvider
         val deCount = equationIndexProvider.getDifferentialEquationCount()
         val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
@@ -189,7 +163,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
         return outputArray
     }
 
-    private fun createResultColumns(result: HybridSystemIntegrationResult, columnsCount: Int) : Array<Array<Point>> = runBlocking {
+    private fun createResultColumns(result: CompletedSimulationModel, columnsCount: Int) : Array<Array<Point>> = runBlocking {
         val it = result.resultPointProvider.results.toList()
         val rowsCount = it.size
         val tempArray = Array(columnsCount) { Array(rowsCount) { Point.Zero } }
@@ -234,7 +208,7 @@ class SimulationResultService(private val grinIntegrationController: Integration
 
         private val ResultServiceScope = CoroutineScope(Dispatchers.Default)
 
-        private fun buildHeader(result: HybridSystemIntegrationResult): String {
+        private fun buildHeader(result: CompletedSimulationModel): String {
             val header = StringBuilder()
 
             // x

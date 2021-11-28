@@ -79,7 +79,6 @@ class SimulationService(
 
         withContext(Dispatchers.JavaFx) {
             trackingTasks.remove(trackingTask)
-            simulationResult.simulationResult = result
         }
 
         val resultModel = CompletedSimulationModel(

@@ -2,17 +2,22 @@ package ru.isma.next.app.views.toolbars
 
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
+import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import kotlinx.coroutines.runBlocking
 import org.controlsfx.control.PopOver
 import ru.isma.next.app.extentions.matIconAL
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
+import ru.isma.next.app.services.simualtion.SimulationResultService
 
-class TasksPopOver: PopOver() {
+class TasksPopOver(
+    private val simulationResultService: SimulationResultService
+): PopOver() {
     private val inProgressTasksContainer = VBox()
         .apply {
             spacing = 5.0
@@ -88,7 +93,7 @@ class TasksPopOver: PopOver() {
             while (it.next()){
                 if(it.wasAdded()) {
                     it.addedSubList.forEach { instance ->
-                        val item = createCompletedTasksListItem(1)
+                        val item = createCompletedTasksListItem(instance)
 
                         completedItemMap[instance] = item
 
@@ -126,6 +131,33 @@ class TasksPopOver: PopOver() {
         collection.removeListener(listener)
     }
 
+    private fun createCompletedTasksListItem(item: CompletedSimulationModel): HBox {
+        return HBox(
+            Label("Task #${item.id}"),
+            Label("Completed"),
+            Button("Show").apply {
+                onAction = EventHandler {
+                    simulationResultService.showChart(item)
+                }
+            },
+            Button("Export").apply {
+                onAction = EventHandler {
+                    simulationResultService.exportToFile(item)
+                }
+            },
+            Button("Remove").apply {
+                onAction = EventHandler {
+                    runBlocking {
+                        simulationResultService.removeSimulationResult(item)
+                    }
+                }
+            }
+        ).apply {
+            alignment = Pos.CENTER_LEFT
+            spacing = 5.0
+        }
+    }
+
     companion object {
         private fun createInProgressTasksListItem(id: Int): HBox {
             return HBox(
@@ -138,19 +170,6 @@ class TasksPopOver: PopOver() {
 //                        managedProperty().bind(simulationService.isSimulationInProgressProperty())
 //                        visibleProperty().bind(simulationService.isSimulationInProgressProperty())
                 }
-            ).apply {
-                alignment = Pos.CENTER_LEFT
-                spacing = 5.0
-            }
-        }
-
-        private fun createCompletedTasksListItem(id: Int): HBox {
-            return HBox(
-                Label("Task #$id"),
-                Label("Completed"),
-                Button("Show"),
-                Button("Export"),
-                Button("Remove")
             ).apply {
                 alignment = Pos.CENTER_LEFT
                 spacing = 5.0

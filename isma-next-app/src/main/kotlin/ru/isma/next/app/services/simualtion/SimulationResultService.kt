@@ -2,11 +2,15 @@ package ru.isma.next.app.services.simualtion
 
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.FXCollections
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.javafx.JavaFx
+import ru.isma.next.app.models.simulation.CompletedSimulationModel
+import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
@@ -26,6 +30,8 @@ import java.io.Writer
 import java.util.*
 
 class SimulationResultService(private val grinIntegrationController: IntegrationController) {
+    val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()
+
     private val fileFilers = arrayOf(
             FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
@@ -37,6 +43,16 @@ class SimulationResultService(private val grinIntegrationController: Integration
     private val isResultAvailableProperty = simulationResultProperty().isNotNull
     fun isResultAvailableProperty(): BooleanBinding = isResultAvailableProperty
     val isResultAvailable by isResultAvailableProperty
+
+    suspend fun commitSimulationResult(result: CompletedSimulationModel) =
+        withContext(Dispatchers.JavaFx) {
+            trackingTasksResults.add(result)
+        }
+
+    suspend fun removeSimulationResult(result: CompletedSimulationModel) =
+        withContext(Dispatchers.JavaFx) {
+            trackingTasksResults.remove(result)
+        }
 
     fun showChart() {
         simulationResult?:return

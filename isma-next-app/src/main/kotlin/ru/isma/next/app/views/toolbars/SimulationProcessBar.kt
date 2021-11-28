@@ -2,16 +2,23 @@ package ru.isma.next.app.views.toolbars
 
 import javafx.event.EventHandler
 import javafx.scene.control.*
-import javafx.scene.image.ImageView
+import org.controlsfx.control.PopOver
 import ru.isma.next.app.extentions.matIconAL
 import ru.isma.next.app.extentions.matIconMZ
 import ru.isma.next.app.services.simualtion.SimulationResultService
 import ru.isma.next.app.services.simualtion.SimulationService
 
 class SimulationProcessBar(
-    private val simulationResult: SimulationResultService,
+    private val simulationResultService: SimulationResultService,
     private val simulationService: SimulationService,
 ) : ToolBar() {
+
+    private val popover = TasksPopOver().apply {
+        arrowLocation = PopOver.ArrowLocation.BOTTOM_LEFT
+        bindInProgressTasksList(simulationService.trackingTasks)
+        bindCompletedSimulationModel(simulationResultService.trackingTasksResults)
+    }
+
     init {
         items.addAll(
             Button().apply {
@@ -20,6 +27,13 @@ class SimulationProcessBar(
                 onAction = EventHandler { simulationService.simulate() }
                 managedProperty().bind(!simulationService.isSimulationInProgressProperty())
                 visibleProperty().bind(!simulationService.isSimulationInProgressProperty())
+            },
+            Separator(),
+            Button().apply {
+                text = "Tasks"
+                onAction = EventHandler {
+                    popover.show(this)
+                }
             },
             Button().apply {
                 graphic = matIconAL("close")
@@ -42,27 +56,27 @@ class SimulationProcessBar(
                 visibleProperty().bind(simulationService.isSimulationInProgressProperty())
             },
             Separator().apply {
-                managedProperty().bind(simulationResult.isResultAvailableProperty())
-                visibleProperty().bind(simulationResult.isResultAvailableProperty())
+                managedProperty().bind(simulationResultService.isResultAvailableProperty())
+                visibleProperty().bind(simulationResultService.isResultAvailableProperty())
             },
             Label("Results: ").apply {
-                managedProperty().bind(simulationResult.isResultAvailableProperty())
-                visibleProperty().bind(simulationResult.isResultAvailableProperty())
+                managedProperty().bind(simulationResultService.isResultAvailableProperty())
+                visibleProperty().bind(simulationResultService.isResultAvailableProperty())
             },
             Button("Show").apply {
-                onAction = EventHandler { simulationResult.showChart() }
-                managedProperty().bind(simulationResult.isResultAvailableProperty())
-                visibleProperty().bind(simulationResult.isResultAvailableProperty())
+                onAction = EventHandler { simulationResultService.showChart() }
+                managedProperty().bind(simulationResultService.isResultAvailableProperty())
+                visibleProperty().bind(simulationResultService.isResultAvailableProperty())
             },
             Button("Export").apply {
-                onAction = EventHandler { simulationResult.exportToFile() }
-                managedProperty().bind(simulationResult.isResultAvailableProperty())
-                visibleProperty().bind(simulationResult.isResultAvailableProperty())
+                onAction = EventHandler { simulationResultService.exportToFile() }
+                managedProperty().bind(simulationResultService.isResultAvailableProperty())
+                visibleProperty().bind(simulationResultService.isResultAvailableProperty())
             },
             Button("Clean").apply {
-                onAction = EventHandler { simulationResult.clean() }
-                managedProperty().bind(simulationResult.isResultAvailableProperty())
-                visibleProperty().bind(simulationResult.isResultAvailableProperty())
+                onAction = EventHandler { simulationResultService.clean() }
+                managedProperty().bind(simulationResultService.isResultAvailableProperty())
+                visibleProperty().bind(simulationResultService.isResultAvailableProperty())
             }
         )
     }

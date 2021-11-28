@@ -34,6 +34,7 @@ dependencies {
     implementation("org.kordamp.ikonli:ikonli-javafx:12.2.0")
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.2.0")
     implementation ("org.fxmisc.richtext:richtextfx:0.10.7")
+    implementation("org.controlsfx:controlsfx:11.1.0")
 
     implementation(project(":isma-hsm"))
     implementation(project(":isma-lisma"))

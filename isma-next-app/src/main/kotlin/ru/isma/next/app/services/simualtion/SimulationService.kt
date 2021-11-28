@@ -2,21 +2,20 @@ package ru.isma.next.app.services.simualtion
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.collections.FXCollections
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import ru.isma.next.app.models.simulation.CompletedSimulationModel
+import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.common.services.lisma.models.FailedTranslation
 import ru.isma.next.common.services.lisma.models.SuccessTranslation
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
-import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitialsLegacy
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import tornadofx.getValue
 import tornadofx.setValue
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.math.max
-import kotlin.math.min
 
 class SimulationService(
     private val projectService: ProjectService,
@@ -25,6 +24,8 @@ class SimulationService(
     private val simulationResult: SimulationResultService,
     private val simulationController: ISimulationCoreController,
 ) {
+    val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()
+
     private val progressProperty = SimpleDoubleProperty()
     fun progressProperty() = progressProperty
     var progress by progressProperty
@@ -47,38 +48,48 @@ class SimulationService(
     }
 
     private suspend fun simulateAsyncInternal() = coroutineScope {
+        val trackingTask = InProgressSimulationModel(1)
+
         val sourceCode = projectService.activeProject?.snapshot() ?: return@coroutineScope
 
-        when (val translationResult = lismaPdeService.translateLisma(sourceCode)) {
-            is FailedTranslation -> { }
-            is SuccessTranslation -> {
-                val initials = createCauchyInitials()
+        val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation ?: return@coroutineScope
 
-                translationResult.hsm.initTimeEquation(initials.start)
+        val initials = createCauchyInitials()
 
-                val context = IntegratorApiParameters(
-                    hsm = translationResult.hsm,
-                    initials = createCauchyInitials(),
-                    stepChangeHandlers = arrayListOf(
-                        {
-                            withContext(Dispatchers.JavaFx) {
-                                progress = normalizeProgress(initials.start, initials.end, it)
-                            }
-                        }
-                    )
-                )
+        translationResult.hsm.initTimeEquation(initials.start)
 
-                withContext(Dispatchers.JavaFx) {
-                    isSimulationInProgress = true
+        val context = IntegratorApiParameters(
+            hsm = translationResult.hsm,
+            initials = createCauchyInitials(),
+            stepChangeHandlers = arrayListOf(
+                {
+                    withContext(Dispatchers.JavaFx) {
+                        progress = normalizeProgress(initials.start, initials.end, it)
+                    }
                 }
+            )
+        )
 
-                val result = simulationController.simulateAsync(context)
-
-                withContext(Dispatchers.JavaFx) {
-                    simulationResult.simulationResult = result
-                }
-            }
+        withContext(Dispatchers.JavaFx) {
+            isSimulationInProgress = true
+            trackingTasks.add(trackingTask)
         }
+
+        val result = simulationController.simulateAsync(context)
+
+        withContext(Dispatchers.JavaFx) {
+            trackingTasks.remove(trackingTask)
+            simulationResult.simulationResult = result
+        }
+
+        val resultModel = CompletedSimulationModel(
+            1,
+            result.equationIndexProvider,
+            result.metricData,
+            result.resultPointProvider
+        )
+
+        simulationResult.commitSimulationResult(resultModel)
     }
 
     fun stopCurrentSimulation() {

@@ -1,7 +1,5 @@
 package ru.isma.next.app.services.simualtion
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
 import javafx.collections.FXCollections
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
@@ -13,9 +11,6 @@ import ru.isma.next.common.services.lisma.models.SuccessTranslation
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
-import tornadofx.getValue
-import tornadofx.setValue
-import kotlin.coroutines.EmptyCoroutineContext
 
 class SimulationService(
     private val projectService: ProjectService,
@@ -31,7 +26,10 @@ class SimulationService(
     private var taskNumber = 1
 
     fun simulate() {
-        val trackingTask = InProgressSimulationModel(taskNumber)
+        val trackingTask = InProgressSimulationModel(
+            taskNumber,
+            simulationParametersService.snapshot()
+        )
 
         taskNumber++
 
@@ -70,10 +68,11 @@ class SimulationService(
                     trackingTask.id,
                     result.equationIndexProvider,
                     result.metricData,
-                    result.resultPointProvider
+                    result.resultPointProvider,
+                    trackingTask.parameters
                 )
 
-                simulationResult.commitSimulationResult(resultModel)
+                simulationResult.commitResult(resultModel)
             }
             finally {
                 SimulationScope.launch(Dispatchers.JavaFx) {

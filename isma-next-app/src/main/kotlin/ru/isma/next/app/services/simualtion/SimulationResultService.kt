@@ -30,12 +30,12 @@ class SimulationResultService(private val grinIntegrationController: Integration
         FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
 
-    suspend fun commitSimulationResult(result: CompletedSimulationModel) =
+    suspend fun commitResult(result: CompletedSimulationModel) =
         withContext(Dispatchers.JavaFx) {
             trackingTasksResults.add(result)
         }
 
-    suspend fun removeSimulationResult(result: CompletedSimulationModel) =
+    suspend fun removeResult(result: CompletedSimulationModel) =
         withContext(Dispatchers.JavaFx) {
             trackingTasksResults.remove(result)
         }

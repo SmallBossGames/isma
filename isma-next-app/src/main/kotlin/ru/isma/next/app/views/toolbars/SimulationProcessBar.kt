@@ -11,14 +11,12 @@ import ru.isma.next.app.services.simualtion.SimulationResultService
 import ru.isma.next.app.services.simualtion.SimulationService
 
 class SimulationProcessBar(
-    private val simulationResultService: SimulationResultService,
+    simulationResultService: SimulationResultService,
     private val simulationService: SimulationService,
 ) : ToolBar() {
 
-    private val popover = TasksPopOver(simulationResultService, simulationService).apply {
+    private val tasksPopOver = TasksPopOver(simulationResultService, simulationService).apply {
         arrowLocation = PopOver.ArrowLocation.BOTTOM_LEFT
-        bindInProgressTasksList(simulationService.trackingTasks)
-        bindCompletedSimulationModel(simulationResultService.trackingTasksResults)
     }
 
     init {
@@ -32,7 +30,7 @@ class SimulationProcessBar(
             Button().apply {
                 text = "Tasks"
                 onAction = EventHandler {
-                    popover.show(this)
+                    tasksPopOver.show(this)
                 }
             }
         )

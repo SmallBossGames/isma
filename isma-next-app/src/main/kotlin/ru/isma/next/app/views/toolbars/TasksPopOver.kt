@@ -1,5 +1,6 @@
 package ru.isma.next.app.views.toolbars
 
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
@@ -12,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.controlsfx.control.PopOver
 import ru.isma.next.app.extentions.matIconAL
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
@@ -35,6 +35,19 @@ class TasksPopOver(
             spacing = 5.0
             padding = Insets(2.0)
         }
+
+    private val detailsTextProperty = SimpleStringProperty("")
+
+    private val detailsPopover = PopOver().apply {
+        arrowLocation = ArrowLocation.LEFT_BOTTOM
+        contentNode = VBox(
+            Label("").apply {
+                textProperty().bind(detailsTextProperty)
+            }
+        ).apply {
+            padding = Insets(5.0)
+        }
+    }
 
     private var inProgressListChangeListener: ListChangeListener<InProgressSimulationModel>? = null
 
@@ -59,6 +72,9 @@ class TasksPopOver(
             spacing = 5.0
             padding = Insets(10.0)
         }
+
+        bindInProgressTasksList(simulationService.trackingTasks)
+        bindCompletedSimulationModel(simulationResultService.trackingTasksResults)
     }
 
     fun bindInProgressTasksList(collection: ObservableList<InProgressSimulationModel>) {
@@ -153,8 +169,16 @@ class TasksPopOver(
             Button("Remove").apply {
                 onAction = EventHandler {
                     PopOverScope.launch {
-                        simulationResultService.removeSimulationResult(trackingTask)
+                        simulationResultService.removeResult(trackingTask)
                     }
+                }
+            },
+            Button().apply {
+                tooltip = Tooltip("Details")
+                graphic = matIconAL("chevron_right")
+                onAction = EventHandler {
+                    detailsTextProperty.value = trackingTask.toMultilineDetails()
+                    detailsPopover.show(this)
                 }
             }
         ).apply {
@@ -184,5 +208,37 @@ class TasksPopOver(
 
     companion object {
         val PopOverScope = CoroutineScope(Dispatchers.JavaFx)
+
+        private fun CompletedSimulationModel.toMultilineDetails(): String {
+            val builder = StringBuilder()
+
+            builder
+                .appendLine("Cauchy Initials")
+                .appendLine("Start: ${parameters.cauchyInitials.startTime}")
+                .appendLine("End: ${parameters.cauchyInitials.endTime}")
+                .appendLine("Initial step: ${parameters.cauchyInitials.initialStep}")
+                .appendLine()
+
+            builder
+                .appendLine("Integration Method")
+                .appendLine("Method: ${parameters.integrationMethodParameters.selectedMethod}")
+                .appendLine("Is accurate: ${parameters.integrationMethodParameters.isAccuracyInUse}")
+
+            if(parameters.integrationMethodParameters.isAccuracyInUse){
+                builder.appendLine("Accuracy: ${parameters.integrationMethodParameters.accuracy}")
+            }
+
+            builder
+                .appendLine("Is stable: ${parameters.integrationMethodParameters.isStableInUse}")
+                .appendLine()
+
+            builder
+                .appendLine("Statistic")
+                .appendLine("Simulation time: ${metricData.simulationTime}ms")
+                .appendLine()
+
+            return builder.toString()
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 package ru.isma.next.app.services.simualtion
 
+import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
@@ -8,13 +9,14 @@ import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFa
 import ru.nstu.isma.next.core.sim.controller.services.solvers.RemoteDaeSystemStepSolverFactory
 
 class DaeSystemStepSolverFactory(
-    private val parametersService: SimulationParametersService,
+    parameterProvider: ISimulationSettingsProvider,
     private val defaultDaeSystemStepSolverFactory: DefaultDaeSystemStepSolverFactory,
     private val remoteDaeSystemStepSolverFactory: RemoteDaeSystemStepSolverFactory,
     private val integrationMethodProvider: IIntegrationMethodProvider,
 ): IDaeSystemSolverFactory {
+    private val methodParams = parameterProvider.simulationParameters.integrationMethodParameters
+
     override fun create(hsmCompilationResult: HsmCompilationResult): DaeSystemStepSolver {
-        val methodParams = parametersService.integrationMethod
         return if(methodParams.isParallelInUse){
             remoteDaeSystemStepSolverFactory.create(
                 methodParams.server,

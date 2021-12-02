@@ -1,40 +1,44 @@
 package ru.isma.next.app.services.simualtion
 
+import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 
 class IntegrationMethodProvider(
     private val library: IntegrationMethodsLibrary,
-    private val simulationParametersService: SimulationParametersService,
+    simulationSettingsProvider: ISimulationSettingsProvider,
 ) : IIntegrationMethodProvider {
-    override fun createMethod(): IntgMethod {
-        val method = createIntegrationMethod()
-        initAccuracyController(method)
-        initStabilityController(method)
-        return method
+
+    private val parameters = simulationSettingsProvider.simulationParameters.integrationMethodParameters
+
+    private val method = createIntegrationMethod().apply {
+        initAccuracyController()
+        initStabilityController()
     }
 
+    override fun createMethod() = method
+
     private fun createIntegrationMethod(): IntgMethod {
-        val selectedMethod = simulationParametersService.integrationMethod.selectedMethod
+        val selectedMethod = parameters.selectedMethod
         return library.getIntegrationMethod(selectedMethod)!!
     }
 
-    private fun initAccuracyController(integrationMethod: IntgMethod){
-        val accuracyController = integrationMethod.accuracyController
+    private fun IntgMethod.initAccuracyController(){
+        val accuracyController = accuracyController
         if (accuracyController != null) {
-            val accuracyInUse = simulationParametersService.integrationMethod.isAccuracyInUse
+            val accuracyInUse = parameters.isAccuracyInUse
             accuracyController.isEnabled = accuracyInUse
             if (accuracyInUse){
-                accuracyController.accuracy = simulationParametersService.integrationMethod.accuracy
+                accuracyController.accuracy = parameters.accuracy
             }
         }
     }
 
-    private fun initStabilityController(integrationMethod: IntgMethod){
-        val stabilityController = integrationMethod.stabilityController
+    private fun IntgMethod.initStabilityController(){
+        val stabilityController = stabilityController
         if (stabilityController != null) {
-            stabilityController.isEnabled = simulationParametersService.integrationMethod.isStableInUse
+            stabilityController.isEnabled = parameters.isStableInUse
         }
     }
 }

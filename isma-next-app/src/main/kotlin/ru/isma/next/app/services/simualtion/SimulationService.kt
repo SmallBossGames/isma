@@ -3,22 +3,20 @@ package ru.isma.next.app.services.simualtion
 import javafx.collections.FXCollections
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import org.koin.core.component.KoinComponent
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
+import ru.isma.next.app.services.koin.SimulationScope
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.common.services.lisma.models.SuccessTranslation
+import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
+import ru.isma.next.services.simulation.abstractions.models.CauchyInitialsModel
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 
-class SimulationService(
-    private val projectService: ProjectService,
-    private val lismaPdeService: LismaPdeService,
-    private val simulationParametersService: SimulationParametersService,
-    private val simulationResult: SimulationResultService,
-    private val simulationController: ISimulationCoreController,
-) {
+class SimulationService : KoinComponent {
     val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()
 
     private val currentSimulationJobs = mutableMapOf<InProgressSimulationModel, Job>()
@@ -26,9 +24,17 @@ class SimulationService(
     private var taskNumber = 1
 
     fun simulate() {
+        val simulationScope = getKoin().createScope<SimulationScope>()
+
+        val projectService: ProjectService = simulationScope.get()
+        val lismaPdeService: LismaPdeService = simulationScope.get()
+        val simulationResult: SimulationResultService = simulationScope.get()
+        val simulationController: ISimulationCoreController = simulationScope.get()
+        val parametersService: ISimulationSettingsProvider = simulationScope.get()
+
         val trackingTask = InProgressSimulationModel(
             taskNumber,
-            simulationParametersService.snapshot()
+            parametersService.simulationParameters
         )
 
         taskNumber++
@@ -41,7 +47,7 @@ class SimulationService(
                 val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation
                     ?: return@launch
 
-                val initials = createCauchyInitials()
+                val initials = parametersService.simulationParameters.cauchyInitials.toCauchyInitials()
 
                 val hsm = translationResult.hsm.apply {
                     initTimeEquation(initials.start)
@@ -75,6 +81,8 @@ class SimulationService(
                 simulationResult.commitResult(resultModel)
             }
             finally {
+                simulationScope.close()
+
                 SimulationScope.launch(Dispatchers.JavaFx) {
                     trackingTasks.remove(trackingTask)
                     currentSimulationJobs.remove(trackingTask)
@@ -89,14 +97,6 @@ class SimulationService(
         currentSimulationJobs.getOrDefault(trackingTask, null)?.cancel()
     }
 
-    private fun createCauchyInitials(): CauchyInitials {
-        return CauchyInitials(
-            start = simulationParametersService.cauchyInitials.startTime,
-            end = simulationParametersService.cauchyInitials.endTime,
-            stepSize = simulationParametersService.cauchyInitials.step,
-        )
-    }
-
     companion object {
         private val SimulationSupervisorJob = SupervisorJob()
 
@@ -105,5 +105,7 @@ class SimulationService(
         private fun normalizeProgress(start: Double, end: Double, current: Double): Double {
             return ((current - start) / (end-start)).coerceIn(0.0, 1.0)
         }
+
+        private fun CauchyInitialsModel.toCauchyInitials() = CauchyInitials(startTime, endTime, initialStep)
     }
 }

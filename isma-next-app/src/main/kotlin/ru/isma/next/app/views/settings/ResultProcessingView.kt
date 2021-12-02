@@ -1,15 +1,11 @@
 package ru.isma.next.app.views.settings
 
 import javafx.collections.FXCollections
-import javafx.scene.control.RadioButton
 import javafx.scene.control.ScrollPane
-import javafx.scene.control.ToggleGroup
-import javafx.scene.layout.GridPane
-import ru.isma.next.app.enumerables.SaveTarget
-import ru.isma.next.app.extentions.numberTextField
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import ru.isma.next.app.views.controls.PropertiesGrid
-import tornadofx.*
+import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
+import tornadofx.View
 
 class ResultProcessingView(
     private val parametersService: SimulationParametersService

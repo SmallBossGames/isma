@@ -11,6 +11,7 @@ import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.*
 import ru.isma.next.editor.text.services.TextEditorService
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
+import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
 import ru.nstu.grin.integration.IntegrationController
 import ru.nstu.isma.lisma.InputTranslator
 import ru.nstu.isma.lisma.LismaTranslator
@@ -32,8 +33,7 @@ import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 
 fun KoinApplication.addSimulationRunners() {
     val module = module {
-        single { InFileSimulationRunner(get()) }
-        single { InMemorySimulationRunner(get()) }
+
     }
     modules(module)
 }
@@ -43,35 +43,50 @@ fun KoinApplication.addExternalServices() {
         single { IntegrationController() }
         single { IntegrationMethodLibraryLoader.load() }
         single<ITextEditorService> { TextEditorService() }
-        single<ISimulationCoreController> { SimulationCoreController(get(), get()) }
+
 
         single<IHsmCompiler> { HsmCompiler() }
         single<InputTranslator> { LismaTranslator() }
-        single<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
 
-        factory<IHybridSystemSimulator> { HybridSystemSimulator(get(), get()) }
+
+
     }
     modules(module)
 }
 
+class SimulationScope
+
 fun KoinApplication.addAppServices() {
     val module = module {
+        scope<SimulationScope>{
+            scoped<ISimulationSettingsProvider> { SnapshotSimulationSettingsProvider(get()) }
+            scoped<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
+            scoped<IDaeSystemSolverFactory> { DaeSystemStepSolverFactory(get(), get(), get(), get()) }
+            scoped<IHybridSystemSimulator> { HybridSystemSimulator(get(), get()) }
+            scoped<ISimulationRunnerFactory> { SimulationRunnerFactory(get(), get(), get()) }
+            scoped<ISimulationCoreController> { SimulationCoreController(get(), get()) }
+            scoped<IEventDetectorFactory> { EventDetectorFactory(get()) }
+            scoped { InFileSimulationRunner(get()) }
+            scoped { InMemorySimulationRunner(get()) }
+        }
+
         single<ProjectService> { ProjectService() }
         single<ProjectFileService> { ProjectFileService(get()) }
         single<ModelErrorService> { ModelErrorService() }
         single<LismaPdeService> { LismaPdeService(get(), get()) }
         single<SimulationParametersService> { SimulationParametersService(get()) }
         single<SimulationResultService> { SimulationResultService(get()) }
-        single<SimulationService> { SimulationService(get(), get(), get(), get(), get()) }
+        single<SimulationService> { SimulationService() }
         single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
-        single<ISimulationRunnerFactory> { SimulationRunnerFactory(get(), get(), get()) }
+
+
     }
     modules(module)
 }
 
 fun KoinApplication.addDaeSolversServices() {
     val module = module {
-        single<IDaeSystemSolverFactory> { DaeSystemStepSolverFactory(get(), get(), get(), get()) }
+
         single { DefaultDaeSystemStepSolverFactory() }
         single { RemoteDaeSystemStepSolverFactory() }
     }
@@ -80,7 +95,7 @@ fun KoinApplication.addDaeSolversServices() {
 
 fun KoinApplication.addEventDetectionServices() {
     val module = module {
-        single<IEventDetectorFactory> { EventDetectorFactory(get()) }
+
     }
     modules(module)
 }

@@ -1,4 +1,4 @@
-package ru.isma.next.app.models.simulation
+package ru.isma.next.services.simulation.abstractions.models
 
 import kotlinx.serialization.Serializable
 

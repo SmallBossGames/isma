@@ -54,4 +54,5 @@ include('isma-intg-parallel-ignite')
 include 'isma-next-math-engine'
 include 'isma-next-math-common'
 include('isma-next-purejfx')
+include 'isma-next-services-simulation-abstractions'
 

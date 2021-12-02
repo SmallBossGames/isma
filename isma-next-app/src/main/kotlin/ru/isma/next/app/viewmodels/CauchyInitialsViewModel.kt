@@ -2,9 +2,7 @@ package ru.isma.next.app.viewmodels
 
 import tornadofx.*
 import javafx.beans.property.SimpleDoubleProperty
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
-import ru.isma.next.app.models.simulation.CauchyInitialsModel
+import ru.isma.next.services.simulation.abstractions.models.CauchyInitialsModel
 
 class CauchyInitialsViewModel {
     private val startTimeProperty = SimpleDoubleProperty()

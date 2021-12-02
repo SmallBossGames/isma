@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
@@ -45,6 +43,7 @@ dependencies {
     implementation(project(":isma-next-common-services"))
     implementation(project(":isma-blueprint-editor"))
     implementation(project(":isma-text-editor"))
+    implementation(project(":isma-next-services-simulation-abstractions"))
 
     api(project(":isma-intg-core"))
     api(project(":isma-intg-server:isma-intg-server-client"))

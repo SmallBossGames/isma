@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleDoubleProperty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.withContext
+import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 
 class InProgressSimulationModel(
     val id: Int,

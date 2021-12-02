@@ -5,9 +5,9 @@ import javafx.stage.FileChooser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import ru.isma.next.app.enumerables.SaveTarget
-import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.viewmodels.*
+import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
+import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 import tornadofx.FileChooserMode
 import tornadofx.asObservable

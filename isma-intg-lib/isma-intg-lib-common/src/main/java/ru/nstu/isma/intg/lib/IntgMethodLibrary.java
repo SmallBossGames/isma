@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Deprecated
 public final class IntgMethodLibrary {
     private static final Map<String, IntgMethod> SYSTEM_METHODS = new HashMap<>();
     private static final Map<String, IntgMethod> USER_METHODS = new HashMap<>();

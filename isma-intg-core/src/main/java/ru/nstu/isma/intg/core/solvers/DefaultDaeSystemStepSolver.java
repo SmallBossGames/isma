@@ -12,6 +12,7 @@ import java.util.Arrays;
  * @author Mariya Nasyrova
  * @since 01.09.14
  */
+@Deprecated
 public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
 
     private final IntgMethod intgMethod;

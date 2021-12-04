@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller
+package ru.nstu.isma.next.core.sim.controller.models
 
 /**
  * @author Maria Nasyrova

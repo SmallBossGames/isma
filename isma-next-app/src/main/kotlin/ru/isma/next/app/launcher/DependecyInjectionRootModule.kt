@@ -5,15 +5,15 @@ import ru.isma.next.app.services.koin.*
 import ru.isma.next.app.views.koin.*
 
 fun ismaKoinStart() = startKoin {
+    modules(simulationScopeModule)
+    modules(externalServicesModule)
+    modules(appServicesModule)
+    modules(daeSystemStepSolversModule)
+
     addMainView()
-    addAppServices()
-    addExternalServices()
-    addSimulationRunners()
     addLismaTextEditor()
     addBlueprintEditor()
     addToolbars()
     addEditorTabPane()
     addSettingsPanel()
-    addDaeSolversServices()
-    addEventDetectionServices()
 }

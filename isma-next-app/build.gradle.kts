@@ -35,6 +35,7 @@ dependencies {
     implementation("org.controlsfx:controlsfx:11.1.0")
 
     implementation(project(":isma-hsm"))
+    implementation(project(":isma-next-core-fdm"))
     implementation(project(":isma-lisma"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))

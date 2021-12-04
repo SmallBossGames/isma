@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller
+package ru.nstu.isma.next.core.sim.controller.services.simulators
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
@@ -9,7 +9,6 @@ import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.intg.api.solvers.useAsync
-import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetector
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory

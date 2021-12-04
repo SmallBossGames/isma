@@ -16,6 +16,7 @@ import java.util.function.Consumer;
  * @author Maria Nasyrova
  * @since 09.12.2014
  */
+@Deprecated
 public class DefaultCauchyProblemSolver implements CauchyProblemSolver {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultCauchyProblemSolver.class);

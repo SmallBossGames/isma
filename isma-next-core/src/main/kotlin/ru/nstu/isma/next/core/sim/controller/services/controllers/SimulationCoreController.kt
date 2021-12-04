@@ -1,21 +1,21 @@
-package ru.nstu.isma.next.core.sim.controller
+package ru.nstu.isma.next.core.sim.controller.services.controllers
 
 import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
-import ru.nstu.isma.next.core.sim.controller.contracts.IHsmCompiler
-import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
+import ru.nstu.isma.next.core.sim.controller.services.hsm.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
+import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
+import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
-import ru.nstu.isma.next.core.sim.controller.services.ISimulationRunnerFactory
+import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunnerProvider
 
 /**
  * Created by Bessonov Alex
  * on 04.01.2015.
  */
 class SimulationCoreController(
-    private val simulationRunnerProvider: ISimulationRunnerFactory,
+    private val simulationRunnerProvider: ISimulationRunnerProvider,
     private val hsmCompiler: IHsmCompiler,
 ) : ISimulationCoreController {
     /**

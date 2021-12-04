@@ -13,11 +13,15 @@ import ru.isma.next.common.services.lisma.models.SuccessTranslation
 import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
 import ru.isma.next.services.simulation.abstractions.models.CauchyInitialsModel
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
-import ru.nstu.isma.next.core.sim.controller.contracts.ISimulationCoreController
+import ru.nstu.isma.next.core.sim.controller.services.controllers.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 
-class SimulationService : KoinComponent {
-    val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()
+class SimulationService(
+    private val projectService: ProjectService,
+    private val lismaPdeService: LismaPdeService,
+    private val simulationResult: SimulationResultService,
+) : KoinComponent {
+    val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()!!
 
     private val currentSimulationJobs = mutableMapOf<InProgressSimulationModel, Job>()
 
@@ -25,15 +29,13 @@ class SimulationService : KoinComponent {
 
     fun simulate() {
         val simulationScope = getKoin().createScope<SimulationScope>()
-
-        val projectService: ProjectService = simulationScope.get()
-        val lismaPdeService: LismaPdeService = simulationScope.get()
-        val simulationResult: SimulationResultService = simulationScope.get()
         val simulationController: ISimulationCoreController = simulationScope.get()
         val parametersService: ISimulationSettingsProvider = simulationScope.get()
+        val project = projectService.activeProject ?: return
 
         val trackingTask = InProgressSimulationModel(
             taskNumber,
+            project.name,
             parametersService.simulationParameters
         )
 
@@ -41,8 +43,7 @@ class SimulationService : KoinComponent {
 
         val currentSimulationJob = SimulationScope.launch {
             try {
-                val sourceCode = projectService.activeProject?.snapshot()
-                    ?: return@launch
+                val sourceCode = project.snapshot()
 
                 val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation
                     ?: return@launch
@@ -72,6 +73,7 @@ class SimulationService : KoinComponent {
 
                 val resultModel = CompletedSimulationModel(
                     trackingTask.id,
+                    trackingTask.model,
                     result.equationIndexProvider,
                     result.metricData,
                     result.resultPointProvider,

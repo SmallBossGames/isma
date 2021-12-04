@@ -8,6 +8,7 @@ import ru.isma.next.services.simulation.abstractions.models.SimulationParameters
 
 class InProgressSimulationModel(
     val id: Int,
+    val model: String,
     val parameters: SimulationParametersModel
 ) {
     val progressProperty = SimpleDoubleProperty()

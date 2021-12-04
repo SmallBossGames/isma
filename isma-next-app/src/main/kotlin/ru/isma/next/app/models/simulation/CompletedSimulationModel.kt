@@ -7,6 +7,7 @@ import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 
 class CompletedSimulationModel(
     val id: Int,
+    val modelName: String,
     val equationIndexProvider: EquationIndexProvider,
     val metricData: IntgMetricData,
     val resultPointProvider: IntegrationResultPointProvider,

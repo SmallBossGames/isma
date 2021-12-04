@@ -10,7 +10,7 @@ import ru.isma.next.app.models.projects.LismaTextModel
 import ru.nstu.isma.core.hsm.models.IsmaSemanticError
 import ru.nstu.isma.core.hsm.models.IsmaSyntaxError
 import ru.nstu.isma.lisma.InputTranslator
-import ru.nstu.isma.next.core.sim.fdm.FDMNewConverter
+import ru.nstu.isma.next.core.fdm.FDMNewConverter
 
 class LismaPdeService(
     private val translator: InputTranslator,

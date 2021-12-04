@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.services
+package ru.nstu.isma.intg.api.providers
 
 import ru.nstu.isma.intg.api.methods.IntgMethod
 

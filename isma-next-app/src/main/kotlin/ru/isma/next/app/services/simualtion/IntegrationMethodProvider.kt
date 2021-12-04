@@ -2,27 +2,24 @@ package ru.isma.next.app.services.simualtion
 
 import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
 import ru.nstu.isma.intg.api.methods.IntgMethod
-import ru.nstu.isma.next.core.sim.controller.services.IIntegrationMethodProvider
+import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 
 class IntegrationMethodProvider(
-    private val library: IntegrationMethodsLibrary,
+    library: IntegrationMethodsLibrary,
     simulationSettingsProvider: ISimulationSettingsProvider,
 ) : IIntegrationMethodProvider {
 
     private val parameters = simulationSettingsProvider.simulationParameters.integrationMethodParameters
 
-    private val method = createIntegrationMethod().apply {
-        initAccuracyController()
-        initStabilityController()
-    }
+    private val method = library
+        .getIntegrationMethod(parameters.selectedMethod)!!
+        .apply {
+            initAccuracyController()
+            initStabilityController()
+        }
 
     override fun createMethod() = method
-
-    private fun createIntegrationMethod(): IntgMethod {
-        val selectedMethod = parameters.selectedMethod
-        return library.getIntegrationMethod(selectedMethod)!!
-    }
 
     private fun IntgMethod.initAccuracyController(){
         val accuracyController = accuracyController

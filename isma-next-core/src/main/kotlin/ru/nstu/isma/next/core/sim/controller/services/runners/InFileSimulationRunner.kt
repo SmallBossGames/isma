@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.services
+package ru.nstu.isma.next.core.sim.controller.services.runners
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
 import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
-import ru.nstu.isma.next.core.sim.controller.HybridSystemIntegrationResult
-import ru.nstu.isma.next.core.sim.controller.contracts.IHybridSystemSimulator
+import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
+import ru.nstu.isma.next.core.sim.controller.services.simulators.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 import java.io.File
@@ -38,7 +38,9 @@ class InFileSimulationRunner(
             )
 
             val result = hybridSystemSimulator.runAsync(simulatorParameters)
+
             pointsChannel.close()
+
             return@async result
         }
 

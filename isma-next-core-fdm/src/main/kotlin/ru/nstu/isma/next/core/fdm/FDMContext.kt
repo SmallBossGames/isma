@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.fdm
+package ru.nstu.isma.next.core.fdm
 
 import ru.nstu.isma.core.hsm.`var`.HMConst
 import ru.nstu.isma.core.hsm.`var`.HMEquation
@@ -28,7 +28,7 @@ class FDMContext {
             throw RuntimeException("FDMContext doesn't contain " + equation.code)
         }
         val newName: StringBuilder = StringBuilder(equation.code)
-        newName.append(FDMStatic.APX_PREFIX)
+        newName.append(APX_PREFIX)
         for (v in variables) {
             newName.append("_")
             if (indexes.containsKey(v.code) && isEqContains(equation, v)) {

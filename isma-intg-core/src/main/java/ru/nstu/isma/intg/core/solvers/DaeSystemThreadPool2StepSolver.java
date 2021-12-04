@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
  * @author Mariya Nasyrova
  * @since 25.02.16
  */
+@Deprecated
 public class DaeSystemThreadPool2StepSolver extends DefaultDaeSystemStepSolver {
 
     private final ExecutorService executorService;

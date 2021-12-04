@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.contracts
+package ru.nstu.isma.next.core.sim.controller.services.simulators
 
 import ru.nstu.isma.intg.api.IntgMetricData
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters

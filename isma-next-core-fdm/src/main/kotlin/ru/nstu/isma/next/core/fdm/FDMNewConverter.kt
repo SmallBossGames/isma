@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.fdm
+package ru.nstu.isma.next.core.fdm
 
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.core.hsm.`var`.*
@@ -307,7 +307,7 @@ class FDMNewConverter(private val model: HSM?) {
             throw RuntimeException("FDM converter doesn't contain " + equation.code)
         }
         val newName = StringBuilder(equation.code)
-        newName.append(FDMStatic.APX_PREFIX)
+        newName.append(APX_PREFIX)
         for (v in approximatedVariables) {
             newName.append("_")
             newName.append(indexIterator!!.getIndex(v.code)!!.index)
@@ -320,7 +320,7 @@ class FDMNewConverter(private val model: HSM?) {
             throw RuntimeException("FDM converter doesn't contain " + equation.code)
         }
         val newName = StringBuilder(equation.code)
-        newName.append(FDMStatic.APX_PREFIX)
+        newName.append(APX_PREFIX)
         for (v in approximatedVariables) {
             newName.append("_")
             if (v.code == av.code) {

@@ -1,5 +1,6 @@
-package ru.nstu.isma.next.core.sim.fdm
+package ru.nstu.isma.next.core.fdm
 
+import ru.nstu.isma.next.core.fdm.FDMIndexedApxVar
 import java.util.*
 
 /**

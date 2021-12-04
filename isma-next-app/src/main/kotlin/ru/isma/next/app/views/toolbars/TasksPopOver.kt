@@ -213,6 +213,11 @@ class TasksPopOver(
             val builder = StringBuilder()
 
             builder
+                .appendLine("Model")
+                .appendLine("Name: $modelName")
+                .appendLine()
+
+            builder
                 .appendLine("Cauchy Initials")
                 .appendLine("Start: ${parameters.cauchyInitials.startTime}")
                 .appendLine("End: ${parameters.cauchyInitials.endTime}")

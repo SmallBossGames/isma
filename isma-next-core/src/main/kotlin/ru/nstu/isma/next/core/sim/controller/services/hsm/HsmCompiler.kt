@@ -1,9 +1,8 @@
-package ru.nstu.isma.next.core.sim.controller
+package ru.nstu.isma.next.core.sim.controller.services.hsm
 
 import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.calcmodel.HybridSystem
-import ru.nstu.isma.next.core.sim.controller.contracts.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.gen.AnalyzedHybridSystemClassBuilder
 import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 import ru.nstu.isma.next.core.sim.controller.gen.SourceCodeCompiler

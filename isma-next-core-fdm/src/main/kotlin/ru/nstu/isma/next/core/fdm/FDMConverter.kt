@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.fdm
+package ru.nstu.isma.next.core.fdm
 
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.core.hsm.`var`.*
@@ -16,6 +16,7 @@ import java.util.function.Consumer
  * Time: 1:53
  * преобразует модель с ДУЧП в модель с ОДУ
  */
+@Deprecated("Use FDMNewConverter instead")
 class FDMConverter(model: HSM) {
     private val model: HSM = model
     private val variableTable: HMVariableTable = model.variableTable
@@ -253,7 +254,7 @@ class FDMConverter(model: HSM) {
             throw RuntimeException("FDM converter doesn't contain " + equation.code)
         }
         val newName: StringBuilder = StringBuilder(equation.code)
-        newName.append(FDMStatic.APX_PREFIX)
+        newName.append(APX_PREFIX)
         for (v in apxVars) {
             newName.append("_")
             newName.append(indexIterator!!.getIndex(v.code)!!.index)
@@ -273,7 +274,7 @@ class FDMConverter(model: HSM) {
             throw RuntimeException("FDM converter doesn't contain " + equation.code)
         }
         val newName: StringBuilder = StringBuilder(equation.code)
-        newName.append(FDMStatic.APX_PREFIX)
+        newName.append(APX_PREFIX)
         for (v in apxVars) {
             newName.append("_")
             if (v.code == av.code) {

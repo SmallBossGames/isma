@@ -13,6 +13,7 @@ import java.util.List;
  * @author Mariya Nasyrova
  * @since 25.02.16
  */
+@Deprecated
 public class DaeSystemThreadStepSolver extends DefaultDaeSystemStepSolver {
 
     private final int threadCount;

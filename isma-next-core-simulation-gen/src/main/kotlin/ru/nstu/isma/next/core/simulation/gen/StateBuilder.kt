@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.gen
+package ru.nstu.isma.next.core.simulation.gen
 
 import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquation
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation
@@ -12,10 +12,12 @@ import java.util.stream.Collectors
  * @since  14.07.2016
  */
 class StateBuilder(
-        /** Название  */
-        private val name: String?,
-        /** HybridSystemBuilder, создавший состояние  */
-        private val parent: HybridSystemBuilder) {
+    /** Название  */
+    private val name: String?,
+
+    /** HybridSystemBuilder, создавший состояние  */
+    private val parent: HybridSystemBuilder,
+) {
     /** ОДУ  */
     private val differentialEquations: MutableList<DifferentialEquation?>
 
@@ -66,8 +68,8 @@ class StateBuilder(
     /** Компонует локальное состояние ГС по сформированному описанию.  */
     fun toHybridSystemState(): HybridSystem.State {
         val guards = guardBuilders.stream()
-                .map { obj: GuardBuilder -> obj.toGuard() }
-                .collect(Collectors.toList())
+            .map { obj: GuardBuilder -> obj.toGuard() }
+            .collect(Collectors.toList())
         return HybridSystem.State(name, differentialEquations, algebraicEquations, guards, setters)
     }
 

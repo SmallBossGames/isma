@@ -36,6 +36,7 @@ dependencies {
 
     implementation(project(":isma-hsm"))
     implementation(project(":isma-next-core-fdm"))
+    implementation(project(":isma-next-core-simulation-gen"))
     implementation(project(":isma-lisma"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))

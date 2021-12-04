@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.gen
+package ru.nstu.isma.next.core.simulation.gen
 
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem

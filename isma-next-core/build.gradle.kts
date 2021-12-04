@@ -6,10 +6,11 @@ plugins {
 group = "ru.nstu.isma.next"
 version = "1.0.0"
 
-val moduleName by extra("isma.isma.intg.api.main")
+val moduleName by extra("isma.isma.next.core.main")
 val koinVersion = "3.1.3"
 
 dependencies {
+    implementation(project(":isma-next-core-simulation-gen"))
     implementation(project(":isma-hsm"))
     implementation(project(":isma-lisma"))
     implementation(project(":isma-next-tools"))

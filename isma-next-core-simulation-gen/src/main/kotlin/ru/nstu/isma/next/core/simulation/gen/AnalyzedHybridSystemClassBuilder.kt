@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.gen
+package ru.nstu.isma.next.core.simulation.gen
 
 import com.google.common.collect.ImmutableMap
 import common.HMExpressionBuilder

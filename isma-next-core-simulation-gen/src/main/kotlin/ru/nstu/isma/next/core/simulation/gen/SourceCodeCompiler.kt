@@ -1,11 +1,8 @@
-package ru.nstu.isma.next.core.sim.controller.gen
+package ru.nstu.isma.next.core.simulation.gen
 
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.generate.MemoryFileManager
 import ru.nstu.isma.generate.MemoryJavaFileObject
-import java.util.*
-import javax.tools.JavaFileManager
-import javax.tools.JavaFileObject
 import javax.tools.ToolProvider
 
 /**

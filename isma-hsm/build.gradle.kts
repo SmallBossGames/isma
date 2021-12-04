@@ -1,7 +1,8 @@
 plugins {
     kotlin("jvm")
-    id("ch.tutteli.gradle.plugins.kotlin.module.info")
 }
+
+val moduleName by extra("isma.isma.hsm.main")
 
 dependencies {
     implementation(project(":isma-next-tools"))
@@ -11,4 +12,14 @@ dependencies {
     implementation("org.jetbrains:annotations:22.0.0")
 
     testImplementation("junit:junit:4.13.2")
+}
+
+tasks {
+    compileJava {
+        inputs.property("moduleName", moduleName)
+        options.compilerArgs = listOf(
+            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
+        )
+    }
+    //check { dependsOn(integTestTask) }
 }

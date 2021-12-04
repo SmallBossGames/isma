@@ -1,7 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller.models
 
 import ru.nstu.isma.intg.api.calcmodel.HybridSystem
-import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
+import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
 
 data class HsmCompilationResult(
     val indexProvider: EquationIndexProvider,

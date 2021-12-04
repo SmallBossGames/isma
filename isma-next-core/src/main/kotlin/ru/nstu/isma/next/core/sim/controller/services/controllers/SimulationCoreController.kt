@@ -3,12 +3,12 @@ package ru.nstu.isma.next.core.sim.controller.services.controllers
 import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.next.core.sim.controller.services.hsm.IHsmCompiler
-import ru.nstu.isma.next.core.sim.controller.gen.EquationIndexProvider
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunnerProvider
+import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
 
 /**
  * Created by Bessonov Alex

@@ -1,16 +1,14 @@
-package ru.nstu.isma.next.core.sim.controller.gen
+package ru.nstu.isma.next.core.simulation.gen
 
 import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
 import ru.nstu.isma.intg.api.calcmodel.*
-import java.util.ArrayList
 
 /**
  * @author Maria Nasyrova
  * @since 14.07.2016
  */
-class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, private val parent: GuardBuilder) {
-    private val eventFunctions = ArrayList<EventFunction>()
-
+class GuardBuilder(private val guard: Guard, private val parent: StateBuilder) {
+    private var eventFunctionGroupBuilder: EventFunctionGroupBuilder? = null
     fun addState(name: String?): StateBuilder? {
         return parent.addState(name)
     }
@@ -35,12 +33,10 @@ class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, pri
         return parent.addSetter(setter)
     }
 
-    // Сознательно запрещен
-    // public EventFunctionGroupBuilder addEventFunctionGroup(EventFunctionGroup.StepChoiceRule stepChoiceRule) {
-    // }
-    fun addEventFunction(eventFunction: EventFunction): EventFunctionGroupBuilder {
-        StateBuilder.add(eventFunction, eventFunctions)
-        return this
+    fun addEventFunctionGroup(stepChoiceRule: StepChoiceRule?): EventFunctionGroupBuilder {
+        check(eventFunctionGroupBuilder == null) { "you can call addEventFunctionGroup for guard only once" }
+        eventFunctionGroupBuilder = EventFunctionGroupBuilder(stepChoiceRule, this)
+        return eventFunctionGroupBuilder!!
     }
 
     fun toHybridSystemState(): HybridSystem.State? {
@@ -51,12 +47,9 @@ class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, pri
         return parent.toHybridSystem()
     }
 
-    fun toGuard(): Guard? {
-        return parent.toGuard()
+    fun toGuard(): Guard {
+        val eventFunctionGroup = eventFunctionGroupBuilder!!.toEventFunctionGroup()
+        guard.eventFunctionGroup = eventFunctionGroup
+        return guard
     }
-
-    fun toEventFunctionGroup(): EventFunctionGroup {
-        return EventFunctionGroup(stepChoiceRule, eventFunctions)
-    }
-
 }

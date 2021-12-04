@@ -56,4 +56,5 @@ include 'isma-next-math-common'
 include('isma-next-purejfx')
 include 'isma-next-services-simulation-abstractions'
 include 'isma-next-core-fdm'
+include 'isma-next-core-simulation-gen'
 

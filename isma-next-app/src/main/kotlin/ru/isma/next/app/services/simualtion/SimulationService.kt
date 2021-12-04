@@ -85,9 +85,10 @@ class SimulationService(
             finally {
                 simulationScope.close()
 
+                currentSimulationJobs.remove(trackingTask)
+
                 SimulationScope.launch(Dispatchers.JavaFx) {
                     trackingTasks.remove(trackingTask)
-                    currentSimulationJobs.remove(trackingTask)
                 }
             }
         }

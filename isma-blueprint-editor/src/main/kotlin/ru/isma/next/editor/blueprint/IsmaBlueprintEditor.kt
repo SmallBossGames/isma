@@ -266,28 +266,25 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
     private fun StateBox.removeFromEditor() {
         transactions
-            .asSequence()
+            .toTypedArray()
             .filter { it.startStateBox == this || it.endStateBox == this }
-            .toList()
             .forEach { removeTransaction(it) }
 
         stateBoxes.remove(this)
-        children.remove(this)
+        canvas.children.remove(this)
     }
 
     private fun StateTransactionArrow.removeFromEditor() {
         transactions
+            .toTypedArray()
             .filter { it.transactionArrow == this }
-            .toList()
             .forEach { removeTransaction(it) }
-
-        children.remove(this)
     }
 
     private fun removeTransaction(transaction: BlueprintEditorTransactionModel) {
         transactions.remove(transaction)
 
-        children.remove(transaction.transactionArrow)
+        canvas.children.remove(transaction.transactionArrow)
     }
 
     private fun createMainStateBox() : StateBox {

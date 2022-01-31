@@ -366,7 +366,10 @@ statement
 // ------------------------------------------------------------------
 // 1.10 macros
 // ------------------------------------------------------------------
-   macros : 'macro' macro_item (COMMA macro_item)* SEMI;
+
+   MACRO_KEYWORD : 'macro';
+
+   macros : MACRO_KEYWORD macro_item (COMMA macro_item)* SEMI;
    macro_item : primary_id ASSIGN expression;
 
 // ------------------------------------------------------------------

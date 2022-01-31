@@ -106,7 +106,7 @@ class StateTransactionArrow : Group() {
                 val angle = atan2(x, y) + PI / 2
                 val offsetX = 10.0 * sin(angle)
                 val offsetY = 10.0 * cos(angle)
-                val textOffsetX = 70.0 * sin(angle)
+                val textOffsetX = 80.0 * sin(angle)
                 val textOffsetY = 40.0 * cos(angle)
 
                 startX = this@StateTransactionArrow.startX - this@StateTransactionArrow.layoutX + offsetX
@@ -161,7 +161,7 @@ class StateTransactionArrow : Group() {
     }
 
     companion object {
-        private const val TextFieldLength = 100.0
+        private const val TextFieldLength = 150.0
 
         inline fun Group.line(op: Line.() -> Unit){
             this.children.add(

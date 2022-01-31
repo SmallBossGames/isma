@@ -54,12 +54,13 @@ public class CalcConstVisitor extends BaseVisitor {
     }
 
     private void calcInitCond(String code) {
-        if (!(table.get(code) instanceof HMDerivativeEquation)) {
+        if (!(table.get(code) instanceof HMDerivativeEquation equation)) {
             var e = new IsmaSemanticError("error while computing boundary condtions. There is no corresponding ODE for the variable " + code);
             pc.errors().push(e);
+
+            return;
         }
 
-        HMDerivativeEquation equation = (HMDerivativeEquation) table.get(code);
         // TODO временный костыль - не подсчитываем значения у PDE поскольку на данном этапе это не возможно
         if (!(equation instanceof HMPartialDerivativeEquation)) {
             HMConst initConst = equation.getInitial();

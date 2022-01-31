@@ -13,7 +13,7 @@ javafx {
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
-val kotlinxSerializationJsonVersion = "1.3.1"
+val kotlinxSerializationJsonVersion = "1.3.2"
 
 dependencies {
     implementation(project(":isma-text-editor"))

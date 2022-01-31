@@ -6,7 +6,7 @@ plugins {
 group = "ru.nstu.isma"
 version = "1.0.0"
 
-val kotlinxSerializationJsonVersion = "1.3.1"
+val kotlinxSerializationJsonVersion = "1.3.2"
 
 repositories {
     mavenCentral()

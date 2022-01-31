@@ -10,7 +10,6 @@ import tornadofx.*
 
 class ConcatenationView : View() {
     private val model: ConcatenationViewModel by inject()
-    val initData: InitCanvasData? by param()
 
     override val root: Parent = vbox {
         menubar {
@@ -36,11 +35,14 @@ class ConcatenationView : View() {
             }
         }
         add<CanvasWorkPanel>()
+    }
+
+    fun addConcatenationCanvas(initCanvasData: InitCanvasData){
         val concatenationCanvas = find<ConcatenationCanvas>(
             mapOf(
-                ConcatenationCanvas::initData to initData
+                ConcatenationCanvas::initData to initCanvasData
             )
         ) { }
-        add(concatenationCanvas)
+        root.add(concatenationCanvas)
     }
 }

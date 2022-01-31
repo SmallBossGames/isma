@@ -3,12 +3,10 @@ package ru.nstu.grin.integration
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
-import tornadofx.Controller
+import tornadofx.FX
 import tornadofx.Scope
-import tornadofx.find
 
-class IntegrationController : Controller() {
-
+class GrinIntegrationFacade {
     fun integrate(spaces: List<CartesianSpace>) {
         val initData = InitCanvasData(
             cartesianSpaces = spaces,
@@ -16,11 +14,10 @@ class IntegrationController : Controller() {
             descriptions = listOf()
         )
         val scope = Scope()
-        find<ConcatenationView>(
+        FX.find<ConcatenationView>(
             scope = scope,
-            params = mapOf(
-                ConcatenationView:: initData to initData
-            )
-        ).openWindow()
+        ).apply {
+            addConcatenationCanvas(initData)
+        }.openWindow()
     }
 }

@@ -4,7 +4,6 @@ import javafx.collections.FXCollections
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
@@ -14,7 +13,7 @@ import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
-import ru.nstu.grin.integration.IntegrationController
+import ru.nstu.grin.integration.GrinIntegrationFacade
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import tornadofx.FileChooserMode
@@ -23,7 +22,7 @@ import java.io.File
 import java.io.Writer
 import java.util.*
 
-class SimulationResultService(private val grinIntegrationController: IntegrationController) {
+class SimulationResultService(private val grinIntegrationController: GrinIntegrationFacade) {
     val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()!!
 
     private val fileFilers = arrayOf(

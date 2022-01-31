@@ -80,10 +80,9 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                 val scope = Scope()
                 find<ConcatenationView>(
                     scope = scope,
-                    params = mapOf(
-                        ConcatenationView::initData to initData
-                    )
-                ).openWindow()
+                ).apply {
+                    addConcatenationCanvas(initData)
+                }.openWindow()
             }
 
             model.selectionSettings.dropToDefault()

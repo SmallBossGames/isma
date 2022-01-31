@@ -10,6 +10,7 @@ import ru.isma.next.app.models.preferences.DefaultFilesPreferencesModel
 import ru.isma.next.app.models.preferences.WindowPreferencesModel
 import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.ProjectFileService
+import tornadofx.FX
 
 class IsmaApplication : Application(), KoinComponent {
     lateinit var stage: Stage
@@ -29,6 +30,9 @@ class IsmaApplication : Application(), KoinComponent {
 
         stage.initWindow(scene, "ISMA Next")
         stage.show()
+
+        // Initialize GRIN Legacy
+        FX.registerApplication(this, stage)
     }
 
     override fun stop() {

@@ -10,7 +10,6 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
-    private val numberFormatter = NumberFormatter()
     private val matrixTransformerController: MatrixTransformerController by inject()
 
     override fun drawMarks(
@@ -30,9 +29,9 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
 
         if (axis.settings.max > 0 && axis.settings.min < 0) {
             val zeroText = if (axis.isLogarithmic()) {
-                numberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
+                NumberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
             } else {
-                numberFormatter.format(0.0)
+                NumberFormatter.format(0.0)
             }
             context.strokeText(
                 zeroText,
@@ -63,9 +62,9 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
                 }
             }
             val text = if (axis.isLogarithmic()) {
-                numberFormatter.formatLogarithmic(stepY, axis.settings.logarithmBase)
+                NumberFormatter.formatLogarithmic(stepY, axis.settings.logarithmBase)
             } else {
-                numberFormatter.format(stepY)
+                NumberFormatter.format(stepY)
             }
 
             context.strokeText(
@@ -98,9 +97,9 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
                 }
             }
             val text = if (axis.isLogarithmic()) {
-                numberFormatter.formatLogarithmic(currentY, axis.settings.logarithmBase)
+                NumberFormatter.formatLogarithmic(currentY, axis.settings.logarithmBase)
             } else {
-                numberFormatter.format(currentY)
+                NumberFormatter.format(currentY)
             }
 
             context.strokeText(

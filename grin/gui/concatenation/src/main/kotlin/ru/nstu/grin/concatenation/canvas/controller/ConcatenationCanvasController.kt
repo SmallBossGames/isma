@@ -103,7 +103,7 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun clearCanvas() {
-        canvasModel.canvas.graphicsContext2D.clearRect(
+        canvasModel.functionsLayer.graphicsContext2D.clearRect(
             0.0, 0.0,
             SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
         )

@@ -57,8 +57,6 @@ class MatrixTransformerController : Controller() {
                 }
             }
             Direction.TOP, Direction.BOTTOM -> {
-                println("min $min and minPixel=$minPixel")
-                println("Number $number")
                 if (min < 0) {
                     if (number > 0) {
                         minPixel + (min.absoluteValue - number) * unitPrice

@@ -4,5 +4,6 @@ import javafx.scene.canvas.Canvas
 import tornadofx.ViewModel
 
 class CanvasModel: ViewModel() {
-    lateinit var canvas: Canvas
+    lateinit var functionsLayer: Canvas
+    lateinit var uiLayer: Canvas
 }

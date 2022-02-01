@@ -19,10 +19,12 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode
+
         if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
             println("Release primary button")
             model.traceSettings = null
         }
+
         if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
             model.moveSettings = null
         }
@@ -53,7 +55,6 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                     cartesianSpace.xAxis.settings,
                     cartesianSpace.xAxis.direction
                 )
-                println("MinX=$minX and maxX=$maxX")
                 cartesianSpace.xAxis.settings.min = minX
                 cartesianSpace.xAxis.settings.max = maxX
 
@@ -67,9 +68,8 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                     cartesianSpace.yAxis.settings,
                     cartesianSpace.yAxis.direction
                 )
-                cartesianSpace.yAxis.settings.min = maxY
-                cartesianSpace.yAxis.settings.max = minY
-                println("ySettings=${cartesianSpace.yAxis.settings}")
+                cartesianSpace.yAxis.settings.min = minY
+                cartesianSpace.yAxis.settings.max = maxY
             }
             if (editMode == EditMode.WINDOWED) {
                 val initData = InitCanvasData(

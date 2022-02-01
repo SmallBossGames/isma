@@ -10,16 +10,21 @@ class SelectionDrawElement(
     private val selectionSettings: SelectionSettings
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext) {
-        val (isSelected, firstPoint, secondPoint) = selectionSettings
-        if (isSelected.not()) return
+        val (isFirstPointSelected, isSecondPointSelected, firstPoint, secondPoint) = selectionSettings
+
+        if (!isFirstPointSelected || !isSecondPointSelected) {
+            return
+        }
+
         context.stroke = Color.BLACK
+
         context.strokeRect(
-            if (firstPoint.x<secondPoint.x) firstPoint.x else secondPoint.x,
-            if (firstPoint.y<secondPoint.y) firstPoint.y else secondPoint.y,
+            if (firstPoint.x < secondPoint.x) firstPoint.x else secondPoint.x,
+            if (firstPoint.y < secondPoint.y) firstPoint.y else secondPoint.y,
             abs(secondPoint.x - firstPoint.x),
             abs(secondPoint.y - firstPoint.y)
         )
 
-        println("Stroked rect $selectionSettings")
+        // println("Stroked rect $selectionSettings")
     }
 }

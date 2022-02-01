@@ -15,9 +15,12 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private val concatenationViewModel: ConcatenationViewModel by inject()
 
     override fun handle(event: MouseEvent) {
+        var isUiLayerDirty = false
+
         model.unselectAll()
         val editMode = concatenationViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
+
         if ((editMode == EditMode.SELECTION || editMode == EditMode.MOVE) && event.button == MouseButton.PRIMARY) {
             val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
             description?.isSelected = true
@@ -25,32 +28,55 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
             val function = model.cartesianSpaces.map { it.functions }.flatten()
                 .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } }
             function?.isSelected = true
+
+            isUiLayerDirty = true
         }
 
-        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.button == MouseButton.PRIMARY) {
-                println("Pressed primary button")
-                model.selectionSettings.isSelected = true
+                model.selectionSettings.isFirstPointSelected = true
                 model.selectionSettings.firstPoint = Point(event.x, event.y)
             }
-        }
-        if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
-            handleEditMode(event)
-        }
-        if (event.button == MouseButton.SECONDARY) {
-            println("Set to false")
-            model.pointToolTipSettings.isShow = false
-            model.pointToolTipSettings.pointsSettings.clear()
-        }
-        if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
-            handleViewMode(event)
-        }
-        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
-            handleMoveMode(event)
+
+            isUiLayerDirty = true
         }
 
-        showContextMenu(event)
-        chainDrawer.draw()
+        if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
+            handleEditMode(event)
+
+            isUiLayerDirty = true
+        }
+
+        if (event.button == MouseButton.SECONDARY) {
+            model.pointToolTipSettings.isShow = false
+            model.pointToolTipSettings.pointsSettings.clear()
+
+            isUiLayerDirty = true
+        }
+
+        if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
+            handleViewMode(event)
+
+            isUiLayerDirty = true
+        }
+
+        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+            handleMoveMode(event)
+
+            isUiLayerDirty = true
+        }
+
+        if (event.button == MouseButton.SECONDARY) {
+            showContextMenu(event)
+
+            isUiLayerDirty = true
+        } else {
+            model.contextMenuSettings.type = ContextMenuType.NONE
+        }
+
+        if(isUiLayerDirty){
+            chainDrawer.draw()
+        }
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
@@ -134,13 +160,10 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun showContextMenu(event: MouseEvent) {
-        if (event.button != MouseButton.SECONDARY) {
-            model.contextMenuSettings.type = ContextMenuType.NONE
-            return
-        }
         val axises = model.cartesianSpaces.map {
             listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
         }.flatten()
+
         val cartesianSpace = axises.firstOrNull {
             it.second.isLocated(event.x, event.y)
         }?.first
@@ -150,8 +173,8 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         } else {
             model.contextMenuSettings.type = ContextMenuType.AXIS
         }
+
         model.contextMenuSettings.xGraphic = event.x
         model.contextMenuSettings.yGraphic = event.y
-        chainDrawer.draw()
     }
 }

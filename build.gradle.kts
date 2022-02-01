@@ -21,10 +21,10 @@ subprojects {
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
 
-        targetCompatibility = "16"
+        targetCompatibility = "17"
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>{
-        targetCompatibility = "16"
+        targetCompatibility = "17"
     }
 }

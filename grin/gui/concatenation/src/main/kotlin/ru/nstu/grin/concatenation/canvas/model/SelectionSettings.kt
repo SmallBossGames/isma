@@ -3,18 +3,23 @@ package ru.nstu.grin.concatenation.canvas.model
 import ru.nstu.grin.common.model.Point
 
 data class SelectionSettings(
-    var isSelected: Boolean = false,
-    var firstPoint: Point = Point(-1.0, -1.0),
-    var secondPoint: Point = Point(-1.0, -1.0)
+    var isFirstPointSelected: Boolean = false,
+    var isSecondPointSelected: Boolean = false,
+    var firstPoint: Point = Point.Zero,
+    var secondPoint: Point = Point.Zero
 ) {
     fun dropToDefault() {
-        isSelected = false
-        firstPoint = Point(-1.0, -1.0)
-        secondPoint = Point(-1.0, -1.0)
+        isFirstPointSelected = false
+        isSecondPointSelected = false
+        firstPoint = Point.Zero
+        secondPoint = Point.Zero
     }
 
     fun getArea(): Double {
-        if (secondPoint.x == -1.0 || secondPoint.y == -1.0) return 0.0
+        if (!isFirstPointSelected || !isSecondPointSelected) {
+            return 0.0
+        }
+
         return (getMaxY() - getMinY()) * (getMaxX() - getMinX())
     }
 

@@ -18,36 +18,51 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     private val matrixTransformer: MatrixTransformerController by inject()
 
     override fun handle(event: MouseEvent) {
+        var uiLayerDirty = false
+
         val editMode = concatenationViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
-        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {
+
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.isPrimaryButtonDown) {
-                println("Primary button down dragged")
-                if (model.selectionSettings.firstPoint.x == -1.0) {
-                    println("I'm here mazahaka")
-                    model.selectionSettings.isSelected = true
+                if (!model.selectionSettings.isFirstPointSelected) {
                     model.selectionSettings.firstPoint = Point(event.x, event.y)
+                    model.selectionSettings.isFirstPointSelected = true
                 } else {
                     model.selectionSettings.secondPoint = Point(event.x, event.y)
+                    model.selectionSettings.isSecondPointSelected = true
                 }
             }
+
             if (!event.isPrimaryButtonDown) {
-                model.selectionSettings.isSelected = false
+                model.selectionSettings.isFirstPointSelected = false
+                model.selectionSettings.isSecondPointSelected = false
             }
-            chainDrawer.draw()
+
+            uiLayerDirty = true
         }
+
         if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
             handleEditMode(event)
+
+            uiLayerDirty = true
         }
 
         if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
             handleDragged(event)
-        }
-        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
-            handleMoveMode(event)
+
+            uiLayerDirty = true
         }
 
-        chainDrawer.draw()
+        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+            handleMoveMode(event)
+
+            uiLayerDirty = true
+        }
+
+        if (uiLayerDirty){
+            chainDrawer.drawUiLayer()
+        }
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
@@ -104,7 +119,6 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun handleEditMode(event: MouseEvent) {
-        println("Dragged primary button")
         val traceSettings = model.traceSettings ?: return
         val x = matrixTransformer.transformPixelToUnits(
             event.x,
@@ -118,7 +132,6 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         )
         traceSettings.pressedPoint.x = x
         traceSettings.pressedPoint.y = y
-        chainDrawer.draw()
     }
 
     private fun handleMoveMode(event: MouseEvent) {

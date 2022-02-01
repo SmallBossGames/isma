@@ -27,43 +27,54 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val contextMenu = ContextMenu()
 
     override fun draw() {
-        val canvas = canvasModel.canvas
-        val context = canvas.graphicsContext2D
-        ClearDrawElement().draw(context)
-        ArrowDrawElement(model.arrows, 1.0).draw(context)
-        DescriptionDrawElement(model.descriptions).draw(context)
+        drawFunctionsLayer()
+        drawUiLayer()
+    }
 
-        for (cartesianSpace in model.cartesianSpaces) {
-            if (cartesianSpace.isShowGrid) {
-                GridDrawElement(
-                    cartesianSpace.xAxis,
-                    cartesianSpace.yAxis,
-                    Color.valueOf("BBBBBB"),
-                    matrixTransformerController
-                ).draw(context)
-                GridDrawElement(
-                    cartesianSpace.xAxis,
-                    cartesianSpace.yAxis,
-                    Color.valueOf("EDEDED"),
-                    matrixTransformerController
-                ).draw(context)
+    fun drawFunctionsLayer(){
+        with(canvasModel.functionsLayer.graphicsContext2D) {
+            ClearDrawElement.draw(this)
+
+            for (cartesianSpace in model.cartesianSpaces) {
+                if (cartesianSpace.isShowGrid) {
+                    GridDrawElement(
+                        cartesianSpace.xAxis,
+                        cartesianSpace.yAxis,
+                        Color.valueOf("BBBBBB"),
+                        matrixTransformerController
+                    ).draw(this)
+                    GridDrawElement(
+                        cartesianSpace.xAxis,
+                        cartesianSpace.yAxis,
+                        Color.valueOf("EDEDED"),
+                        matrixTransformerController
+                    ).draw(this)
+                }
             }
+
+            functionDrawElement.draw(this)
         }
+    }
 
-        functionDrawElement.draw(context)
+    fun drawUiLayer() {
+        with(canvasModel.uiLayer.graphicsContext2D){
+            ClearDrawElement.draw(this)
 
-        axisDrawElement.draw(context)
+            ArrowDrawElement(model.arrows, 1.0).draw(this)
+            DescriptionDrawElement(model.descriptions).draw(this)
 
-        pointTooltipsDrawElement.draw(context)
+            axisDrawElement.draw(this)
+            pointTooltipsDrawElement.draw(this)
 
-        ContextMenuDrawElement(
-            contextMenu,
-            model,
-            controller,
-            this,
-            scope
-        ).draw(context)
+            ContextMenuDrawElement(
+                contextMenu,
+                model,
+                controller,
+                this@ConcatenationChainDrawer,
+                scope
+            ).draw(this)
 
-        SelectionDrawElement(model.selectionSettings).draw(context)
+            SelectionDrawElement(model.selectionSettings).draw(this)
+        }
     }
 }

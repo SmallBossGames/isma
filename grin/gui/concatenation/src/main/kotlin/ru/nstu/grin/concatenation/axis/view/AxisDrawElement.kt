@@ -19,11 +19,12 @@ class AxisDrawElement : ChainDrawElement, Controller() {
             val xAxis = cartesianSpace.xAxis
             val yAxis = cartesianSpace.yAxis
 
-            if (xAxis.isHide.not()) {
+            if (!xAxis.isHide) {
                 drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
                 drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
             }
-            if (yAxis.isHide.not()) {
+
+            if (!yAxis.isHide) {
                 drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
                 drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
             }
@@ -38,12 +39,17 @@ class AxisDrawElement : ChainDrawElement, Controller() {
         color: Color
     ) {
         context.stroke = color
+
         val startPoint = order * SettingsProvider.getAxisWidth()
         val marksCoordinate = startPoint + MARKS_MARGIN
 
         when (direction) {
             Direction.LEFT -> {
-                verticalAxisDraw.drawMarks(context, axis, marksCoordinate)
+                verticalAxisDraw.drawMarks(
+                    context,
+                    axis,
+                    marksCoordinate
+                )
             }
             Direction.RIGHT -> {
                 verticalAxisDraw.drawMarks(
@@ -54,7 +60,9 @@ class AxisDrawElement : ChainDrawElement, Controller() {
             }
             Direction.TOP -> {
                 horizontalAxisDraw.drawMarks(
-                    context, axis, marksCoordinate
+                    context,
+                    axis,
+                    marksCoordinate
                 )
             }
             Direction.BOTTOM -> {

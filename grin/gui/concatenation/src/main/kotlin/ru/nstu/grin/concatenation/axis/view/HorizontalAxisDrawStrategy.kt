@@ -9,7 +9,6 @@ import tornadofx.Controller
 import kotlin.math.absoluteValue
 
 class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
-    private val numberFormatter = NumberFormatter()
     private val matrixTransformerController: MatrixTransformerController by inject()
 
     override fun drawMarks(
@@ -28,9 +27,9 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
 
         if (axis.settings.max > 0 && axis.settings.min < 0) {
             val zeroText = if (axis.isLogarithmic()) {
-                numberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
+                NumberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
             } else {
-                numberFormatter.format(0.0)
+                NumberFormatter.format(0.0)
             }
             context.strokeText(
                 zeroText,
@@ -60,9 +59,9 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
                 }
             }
             val text = if (axis.isLogarithmic()) {
-                numberFormatter.formatLogarithmic(stepX, axis.settings.logarithmBase)
+                NumberFormatter.formatLogarithmic(stepX, axis.settings.logarithmBase)
             } else {
-                numberFormatter.format(stepX)
+                NumberFormatter.format(stepX)
             }
             context.strokeText(
                 text,
@@ -91,12 +90,13 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
                     continue
                 }
             }
-            println("stepX, currentX=$currentX")
+
             val text = if (axis.isLogarithmic()) {
-                numberFormatter.formatLogarithmic(currentX, axis.settings.logarithmBase)
+                NumberFormatter.formatLogarithmic(currentX, axis.settings.logarithmBase)
             } else {
-                numberFormatter.format(currentX)
+                NumberFormatter.format(currentX)
             }
+
             context.strokeText(
                 text,
                 stepX,

@@ -30,11 +30,11 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
         }
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && event.button == MouseButton.PRIMARY) {
-            println("Release primary button")
-
             val selectionSettings = model.selectionSettings
-            val area = selectionSettings.getArea()
+
+            val area = selectionSettings.area
             if (area < 10.0) {
+                model.selectionSettings.reset()
                 return
             }
 
@@ -46,25 +46,26 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
 
             for (cartesianSpace in cartesianSpaces) {
                 val minX = matrixTransformer.transformPixelToUnits(
-                    selectionSettings.getMinX(),
+                    selectionSettings.minX,
                     cartesianSpace.xAxis.settings,
                     cartesianSpace.xAxis.direction
                 )
                 val maxX = matrixTransformer.transformPixelToUnits(
-                    selectionSettings.getMaxX(),
+                    selectionSettings.maxX,
                     cartesianSpace.xAxis.settings,
                     cartesianSpace.xAxis.direction
                 )
                 cartesianSpace.xAxis.settings.min = minX
                 cartesianSpace.xAxis.settings.max = maxX
 
+                // These values are inverted because we count pixels from the top of the canvas
                 val minY = matrixTransformer.transformPixelToUnits(
-                    selectionSettings.getMinY(),
+                    selectionSettings.maxY,
                     cartesianSpace.yAxis.settings,
                     cartesianSpace.yAxis.direction
                 )
                 val maxY = matrixTransformer.transformPixelToUnits(
-                    selectionSettings.getMaxY(),
+                    selectionSettings.minY,
                     cartesianSpace.yAxis.settings,
                     cartesianSpace.yAxis.direction
                 )
@@ -85,7 +86,7 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                 }.openWindow()
             }
 
-            model.selectionSettings.dropToDefault()
+            model.selectionSettings.reset()
         }
         chainDrawer.draw()
     }

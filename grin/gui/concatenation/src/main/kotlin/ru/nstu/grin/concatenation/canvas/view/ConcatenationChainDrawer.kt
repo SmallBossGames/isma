@@ -53,6 +53,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
             }
 
             functionDrawElement.draw(this)
+            axisDrawElement.draw(this)
         }
     }
 
@@ -63,7 +64,6 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
             ArrowDrawElement(model.arrows, 1.0).draw(this)
             DescriptionDrawElement(model.descriptions).draw(this)
 
-            axisDrawElement.draw(this)
             pointTooltipsDrawElement.draw(this)
 
             ContextMenuDrawElement(

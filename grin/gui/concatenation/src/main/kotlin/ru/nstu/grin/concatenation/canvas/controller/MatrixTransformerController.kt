@@ -5,8 +5,7 @@ import ru.nstu.grin.concatenation.axis.model.AxisSettings
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.Controller
-import java.lang.IllegalArgumentException
-import kotlin.math.absoluteValue
+import kotlin.math.abs
 
 class MatrixTransformerController : Controller() {
     private val model: ConcatenationCanvasModel by inject()
@@ -14,7 +13,7 @@ class MatrixTransformerController : Controller() {
     fun transformPixelToUnits(number: Double, axisSettings: AxisSettings, direction: Direction): Double {
         val min = axisSettings.min
         val max = axisSettings.max
-        val sumUnits = getUnitsLength(min, max)
+        val sumUnits = abs(max - min)
 
         val (minPixel, maxPixel) = getMinMaxPixel(direction)
         val sumPixel = maxPixel - minPixel
@@ -33,77 +32,18 @@ class MatrixTransformerController : Controller() {
     fun transformUnitsToPixel(number: Double, axisSettings: AxisSettings, direction: Direction): Double {
         val min = axisSettings.min
         val max = axisSettings.max
-        val sumUnits = getUnitsLength(min, max)
+        val sumUnits = abs(max - min)
 
-        val (minPixel, maxPixel) = getMinMaxPixelForFunc(direction)
+        val (minPixel, maxPixel) = getMinMaxPixel(direction)
         val sumPixel = maxPixel - minPixel
         val unitPrice = sumPixel / sumUnits
 
         return when (direction) {
             Direction.LEFT, Direction.RIGHT -> {
-                if (max <= 0) {
-                    if (number<0) {
-                        minPixel + (min.absoluteValue - number) * unitPrice
-                    } else {
-                        minPixel + (min.absoluteValue + number) * unitPrice
-                    }
-
-                } else {
-                    if (number<0) {
-                        minPixel + (min.absoluteValue - number) * unitPrice
-                    } else {
-                        minPixel + (min.absoluteValue + number) * unitPrice
-                    }
-                }
+                maxPixel - (number - min) * unitPrice
             }
             Direction.TOP, Direction.BOTTOM -> {
-                if (min < 0) {
-                    if (number > 0) {
-                        minPixel + (min.absoluteValue - number) * unitPrice
-                    } else {
-                        minPixel + (min.absoluteValue + number) * unitPrice
-                    }
-
-                } else {
-                    if (number > 0) {
-                        minPixel + (-min.absoluteValue - number) * unitPrice
-                    } else {
-                        minPixel + (-min.absoluteValue + number) * unitPrice
-                    }
-
-                }
-            }
-        }
-    }
-
-    private fun getUnitsLength(min: Double, max: Double): Double {
-        return when {
-            min >= 0 && max >= 0 -> {
-                max - min
-            }
-            min <= 0 && max >= 0 -> {
-                min.absoluteValue + max.absoluteValue
-            }
-            min <= 0 && max <= 0 -> {
-                min.absoluteValue - max.absoluteValue
-            }
-            else -> throw IllegalArgumentException("Such min and max can't be $min and $max")
-        }
-    }
-
-    private fun getMinMaxPixelForFunc(direction: Direction): Pair<Double, Double> {
-        return when (direction) {
-            Direction.LEFT, Direction.RIGHT -> {
-                Pair(
-                    getLeftAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
-                )
-            }
-            Direction.TOP, Direction.BOTTOM -> {
-                Pair(
-                    getTopAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-                )
+                minPixel + (number - min) * unitPrice
             }
         }
     }
@@ -124,31 +64,31 @@ class MatrixTransformerController : Controller() {
                     getLeftAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth()
                 )
-
             }
         }
     }
 
     private fun getLeftAxisSize(): Int {
-        return model.cartesianSpaces.filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
+        return model.cartesianSpaces
+            .filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
             .size
     }
 
     private fun getRightAxisSize(): Int {
-        return model.cartesianSpaces.filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
+        return model.cartesianSpaces
+            .filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
             .size
     }
 
     private fun getBottomAxisSize(): Int {
-        return model.cartesianSpaces.filter {
-            it.xAxis.direction == Direction.BOTTOM
-                    || it.yAxis.direction == Direction.BOTTOM
-        }
+        return model.cartesianSpaces
+            .filter { it.xAxis.direction == Direction.BOTTOM || it.yAxis.direction == Direction.BOTTOM }
             .size
     }
 
     private fun getTopAxisSize(): Int {
-        return model.cartesianSpaces.filter { it.xAxis.direction == Direction.TOP || it.yAxis.direction == Direction.TOP }
+        return model.cartesianSpaces
+            .filter { it.xAxis.direction == Direction.TOP || it.yAxis.direction == Direction.TOP }
             .size
     }
 }

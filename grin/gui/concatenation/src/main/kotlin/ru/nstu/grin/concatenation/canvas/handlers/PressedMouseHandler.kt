@@ -75,7 +75,7 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         }
 
         if(isUiLayerDirty){
-            chainDrawer.draw()
+            chainDrawer.drawUiLayer()
         }
     }
 

@@ -199,7 +199,8 @@ class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
             if (temp != null) {
                 points[i].xGraphic = matrixTransformer.transformUnitsToPixel(
                     temp.x,
-                    xAxis.settings, xAxis.direction
+                    xAxis.settings,
+                    xAxis.direction
                 )
                 points[i].yGraphic = matrixTransformer.transformUnitsToPixel(
                     temp.y,

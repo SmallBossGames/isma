@@ -13,7 +13,7 @@ class CartesianListView : Fragment() {
     private val model: CartesianListViewModel by inject()
     private val controller: CartesianListViewController = find { }
 
-    override val root: Parent = listview(model.cartesianSpacesProperty) {
+    override val root: Parent = listview(model.cartesianSpaces) {
         cellFormat {
             graphic = form {
                 hbox {

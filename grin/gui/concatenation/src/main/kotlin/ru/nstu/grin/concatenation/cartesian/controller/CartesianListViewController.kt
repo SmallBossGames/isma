@@ -4,7 +4,6 @@ import ru.nstu.grin.concatenation.cartesian.events.DeleteCartesianSpaceQuery
 import ru.nstu.grin.concatenation.cartesian.events.GetAllCartesiansEvent
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
 import tornadofx.Controller
-import tornadofx.toObservable
 import java.util.*
 
 class CartesianListViewController : Controller() {
@@ -12,8 +11,7 @@ class CartesianListViewController : Controller() {
 
     init {
         subscribe<GetAllCartesiansEvent> {
-            println("Get all cartesians")
-            model.cartesianSpaces = it.cartesianSpaces.toObservable()
+            model.replaceCartesianSpaces(it.cartesianSpaces)
         }
     }
 

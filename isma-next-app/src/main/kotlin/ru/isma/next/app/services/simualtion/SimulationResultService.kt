@@ -82,7 +82,7 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
             yAxis)
 
         val spaces = listOf(cartesianSpace)
-        grinIntegrationController.integrate(spaces)
+        grinIntegrationController.open(spaces)
     }
 
     fun exportToFile(simulationResult: CompletedSimulationModel){

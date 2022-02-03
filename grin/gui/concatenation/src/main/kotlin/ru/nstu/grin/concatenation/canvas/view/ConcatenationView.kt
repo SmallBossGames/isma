@@ -4,12 +4,11 @@ import javafx.scene.Parent
 import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
 import ru.nstu.grin.concatenation.canvas.events.LoadEvent
 import ru.nstu.grin.concatenation.canvas.events.SaveEvent
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import tornadofx.*
 
-class ConcatenationView : View() {
-    private val model: ConcatenationViewModel by inject()
+class ConcatenationView(fxScope: Scope, initData: InitCanvasData?) : View() {
+    override val scope: Scope = fxScope
 
     override val root: Parent = vbox {
         menubar {
@@ -35,14 +34,12 @@ class ConcatenationView : View() {
             }
         }
         add<CanvasWorkPanel>()
-    }
 
-    fun addConcatenationCanvas(initCanvasData: InitCanvasData){
         val concatenationCanvas = find<ConcatenationCanvas>(
             mapOf(
-                ConcatenationCanvas::initData to initCanvasData
+                ConcatenationCanvas::initData to initData
             )
         ) { }
-        root.add(concatenationCanvas)
+        add(concatenationCanvas)
     }
 }

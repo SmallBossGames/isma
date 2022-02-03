@@ -2,20 +2,31 @@ package ru.nstu.grin.concatenation.canvas.view
 
 import javafx.scene.Parent
 import javafx.scene.control.TabPane
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.View
 import tornadofx.tab
 import tornadofx.tabpane
 
 class CanvasWorkPanel : View() {
+    private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
+    private val chainDrawer: ConcatenationChainDrawer by inject()
+
     override val root: Parent = tabpane {
         tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
-        tab("Режимы") {
+
+        tab("Chart") {
+            content = ChartPanel(
+                concatenationCanvasModel,
+                chainDrawer
+            )
+        }
+        tab("Modes") {
             add<ModesPanel>()
         }
-        tab("Математические операции") {
+        tab("Math") {
             add<MathPanel>()
         }
-        tab("Графические преобразования") {
+        tab("Transformations") {
             add<TransformPanel>()
         }
     }

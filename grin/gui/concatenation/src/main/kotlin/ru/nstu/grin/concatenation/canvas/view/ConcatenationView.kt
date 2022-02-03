@@ -14,11 +14,11 @@ class ConcatenationView(fxScope: Scope, initData: InitCanvasData?) : View() {
         menubar {
             menu("Файл") {
                 item("Сохранить как").action {
-                    val file = chooseFile(title="File", filters = arrayOf(), mode = FileChooserMode.Save).first()
+                    val file = chooseFile(title = "File", filters = arrayOf(), mode = FileChooserMode.Save).first()
                     fire(SaveEvent(file))
                 }
                 item("Загрузить").action {
-                    val file = chooseFile(title="File", filters = arrayOf(), mode = FileChooserMode.Single).first()
+                    val file = chooseFile(title = "File", filters = arrayOf(), mode = FileChooserMode.Single).first()
                     fire(LoadEvent(file))
                 }
             }
@@ -34,12 +34,12 @@ class ConcatenationView(fxScope: Scope, initData: InitCanvasData?) : View() {
             }
         }
         add<CanvasWorkPanel>()
-
-        val concatenationCanvas = find<ConcatenationCanvas>(
-            mapOf(
-                ConcatenationCanvas::initData to initData
+        add(
+            find<ConcatenationCanvas>(
+                mapOf(
+                    ConcatenationCanvas::initData to initData
+                )
             )
-        ) { }
-        add(concatenationCanvas)
+        )
     }
 }

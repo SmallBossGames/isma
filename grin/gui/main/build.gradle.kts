@@ -10,8 +10,6 @@ application {
 }
 
 dependencies {
-    implementation(project(":grin:gui:simple"))
     implementation(project(":grin:gui:concatenation"))
-    implementation(project(":grin:gui:kube"))
     api(project(":grin:gui:common"))
 }

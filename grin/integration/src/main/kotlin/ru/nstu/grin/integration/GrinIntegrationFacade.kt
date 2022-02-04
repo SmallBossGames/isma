@@ -21,7 +21,7 @@ class GrinIntegrationFacade: KoinComponent {
 
         val view = get<ConcatenationView>{ parametersOf(initData) }
 
-        with(Stage()){
+        Stage().apply {
             scene = Scene(view.root)
             title = "GRIN"
             initModality(Modality.WINDOW_MODAL)

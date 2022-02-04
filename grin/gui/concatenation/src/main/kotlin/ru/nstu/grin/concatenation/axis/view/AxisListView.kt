@@ -42,14 +42,9 @@ class AxisListView : Fragment() {
                             padding = Insets(5.0)
                         })
 
-                        add(Label("Min: ${it.settings.min}").apply { padding = Insets(5.0) })
-                        add(Label("Max: ${it.settings.max}").apply { padding = Insets(5.0) })
-
-                        /*fieldset("Спрятана") {
-                            field {
-                                label(if (it.isHide) "Да" else "Нет")
-                            }
-                        }*/
+                        add(Label("Direction: ${it.direction}").apply {
+                            padding = Insets(5.0)
+                        })
                     }
                 }
 

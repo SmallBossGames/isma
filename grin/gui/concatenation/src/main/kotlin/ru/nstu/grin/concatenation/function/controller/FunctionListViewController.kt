@@ -26,11 +26,23 @@ class FunctionListViewController : Controller() {
     }
 
     fun openCopyModal(id: UUID) {
-        find<CopyFunctionFragment>(
+        val view = find<CopyFunctionFragment>(
             mapOf(
                 CopyFunctionFragment::functionId to id
             )
-        ).openModal()
+        )
+
+        Stage().apply {
+            scene = Scene(view.root)
+            title = "Function parameters"
+            initModality(Modality.WINDOW_MODAL)
+
+            if (owner != null){
+                initOwner(owner)
+            }
+
+            show()
+        }
     }
 
     fun openChangeModal(id: UUID, owner: Window? = null) {

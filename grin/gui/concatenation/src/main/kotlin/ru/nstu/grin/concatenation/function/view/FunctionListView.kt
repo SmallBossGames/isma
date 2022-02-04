@@ -19,14 +19,14 @@ class FunctionListView : Fragment() {
             graphic = borderpane {
                 left {
                     hbox {
-                        spacing = 20.0
+                        spacing = 10.0
                         add(Rectangle(15.0, it.lineSize, it.functionColor))
                         add(Label(it.name))
                     }
                 }
                 right {
                     hbox {
-                        spacing = 20.0
+                        spacing = 5.0
 
                         button {
                             action {

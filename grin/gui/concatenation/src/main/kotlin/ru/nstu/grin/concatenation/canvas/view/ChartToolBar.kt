@@ -5,7 +5,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.ToolBar
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
-class ChartPanel(
+class ChartToolBar(
     concatenationCanvasModel: ConcatenationCanvasModel,
     chainDrawer: ConcatenationChainDrawer
 ): ToolBar() {

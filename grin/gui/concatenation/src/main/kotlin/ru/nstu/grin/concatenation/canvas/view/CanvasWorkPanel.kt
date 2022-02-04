@@ -15,7 +15,7 @@ class CanvasWorkPanel : View() {
         tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
 
         tab("Chart") {
-            content = ChartPanel(
+            content = ChartToolBar(
                 concatenationCanvasModel,
                 chainDrawer
             )

@@ -4,6 +4,7 @@ import javafx.scene.Parent
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.shape.Rectangle
 import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import tornadofx.*
@@ -20,8 +21,12 @@ class FunctionListView : Fragment() {
                     fieldset("Имя") {
                         label(it.name)
                     }
-                    fieldset("цвет") {
-                        label(it.functionColor.toString())
+                    fieldset("Цвет") {
+                        add(Rectangle(10.0, 10.0, it.functionColor))
+                        /*label(
+                            text = "",
+                            graphic = Rectangle(10.0, 10.0, it.functionColor)
+                        )*/
                     }
                     fieldset("Размер линии") {
                         label(it.lineSize.toString())

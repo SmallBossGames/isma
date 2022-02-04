@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.canvas.view
 
+import javafx.geometry.Insets
 import javafx.scene.Parent
 import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
 import ru.nstu.grin.concatenation.canvas.events.LoadEvent
@@ -34,12 +35,21 @@ class ConcatenationView(fxScope: Scope, initData: InitCanvasData?) : View() {
             }
         }
         add<CanvasWorkPanel>()
-        add(
-            find<ConcatenationCanvas>(
-                mapOf(
-                    ConcatenationCanvas::initData to initData
+        borderpane {
+            center {
+                add(
+                    find<ConcatenationCanvas>(
+                        mapOf(
+                            ConcatenationCanvas::initData to initData
+                        )
+                    )
                 )
-            )
-        )
+            }
+            right {
+                add<ElementsView>(){
+                    padding = Insets(0.0, 0.0, 0.0, 2.0)
+                }
+            }
+        }
     }
 }

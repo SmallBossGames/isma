@@ -1,9 +1,18 @@
 package ru.nstu.grin.concatenation.axis.view
 
+import javafx.geometry.Insets
 import javafx.scene.Parent
+import javafx.scene.Scene
+import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.layout.CornerRadii
+import javafx.scene.text.Font
+import javafx.stage.Modality
+import javafx.stage.Stage
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.events.GetAllAxisQuery
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
@@ -15,49 +24,60 @@ class AxisListView : Fragment() {
 
     override val root: Parent = listview(model.axisesProperty) {
         cellFormat {
-            graphic = form {
-                hbox {
-                    fieldset("Имя") {
-                        field {
-                            label(it.name)
-                        }
-                    }
-                    spacing = 20.0
-                    fieldset("Цвет") {
-                        field {
-                            label(it.backGroundColor.toString())
-                        }
-                    }
-                    fieldset("Шрифт") {
-                        field {
-                            label(it.font)
-                        }
-                    }
-                    fieldset("Размер шрифта") {
-                        field {
-                            label(it.textSize.toString())
-                        }
-                    }
-                    fieldset("Спрятана") {
-                        field {
-                            label(if (it.isHide) "Да" else "Нет")
-                        }
+            graphic = borderpane {
+                left {
+                    hbox {
+                        spacing = 10.0
+
+                        add(Label(it.name).apply {
+                            textFill = it.fontColor
+                            font = Font(it.font, it.textSize)
+                            background = Background(
+                                BackgroundFill(
+                                    it.backGroundColor,
+                                    CornerRadii(0.0),
+                                    Insets(0.0)
+                                )
+                            )
+                            padding = Insets(5.0)
+                        })
+
+                        add(Label("Min: ${it.settings.min}").apply { padding = Insets(5.0) })
+                        add(Label("Max: ${it.settings.max}").apply { padding = Insets(5.0) })
+
+                        /*fieldset("Спрятана") {
+                            field {
+                                label(if (it.isHide) "Да" else "Нет")
+                            }
+                        }*/
                     }
                 }
-                button {
-                    action {
-                        find<AxisChangeFragment>(
-                            mapOf(
-                                AxisChangeFragment::axisId to it.id
+
+                right {
+                    button {
+                        action {
+                            val view = find<AxisChangeFragment>(
+                                mapOf(
+                                    AxisChangeFragment::axisId to it.id
+                                )
                             )
-                        ).openModal()
+
+                            Stage().apply {
+                                scene = Scene(view.root)
+                                title = "Change axis"
+                                initModality(Modality.WINDOW_MODAL)
+                                initOwner(currentWindow!!)
+
+                                show()
+                            }
+                        }
+                        val image = Image("edit-tool.png")
+                        val imageView = ImageView(image)
+                        imageView.fitHeight = 20.0
+                        imageView.fitWidth = 20.0
+                        graphic = imageView
+                        tooltip = Tooltip("Отредактировать")
                     }
-                    val image = Image("edit-tool.png")
-                    val imageView = ImageView(image)
-                    imageView.fitHeight = 20.0
-                    imageView.fitWidth = 20.0
-                    graphic = imageView
-                    tooltip = Tooltip("Отредактировать")
                 }
             }
         }

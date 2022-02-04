@@ -43,7 +43,7 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
 
         val xAxis = ConcatenationAxis(
             id = UUID.randomUUID(),
-            name = "tt",
+            name = "X axis",
             order = 0,
             direction = Direction.BOTTOM,
             backGroundColor = Color.BLACK,
@@ -55,7 +55,7 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
 
         val yAxis = ConcatenationAxis(
             id = UUID.randomUUID(),
-            name = "tt",
+            name = "Y axis",
             order = 0,
             direction = Direction.LEFT,
             backGroundColor = Color.BLACK,

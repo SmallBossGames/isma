@@ -16,14 +16,14 @@ class ElementsView : Fragment() {
         tab("Функции") {
             add<FunctionListView>()
         }
-        tab("Описания") {
-            add<DescriptionListView>()
-        }
         tab("Оси") {
             add<AxisListView>()
         }
         tab("Пространства") {
             add<CartesianListView>()
+        }
+        tab("Описания") {
+            add<DescriptionListView>()
         }
     }
 }

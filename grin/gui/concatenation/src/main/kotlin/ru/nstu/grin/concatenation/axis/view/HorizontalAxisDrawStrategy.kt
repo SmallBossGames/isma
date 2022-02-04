@@ -7,6 +7,8 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import tornadofx.Controller
 import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.math.min
 
 class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
     private val matrixTransformerController: MatrixTransformerController by inject()
@@ -40,6 +42,27 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         }
     }
 
+    private fun drawDoubleMark(
+        context: GraphicsContext,
+        axis: ConcatenationAxis,
+        marksCoordinate: Double,
+        value: Double,
+        pixel: Double
+    ){
+        val text = if (axis.isLogarithmic()) {
+            NumberFormatter.formatLogarithmic(value, axis.settings.logarithmBase)
+        } else {
+            NumberFormatter.format(value)
+        }
+
+        context.strokeText(
+            text,
+            pixel,
+            marksCoordinate,
+            MAX_TEXT_WIDTH
+        )
+    }
+
     private fun drawDoubleMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
@@ -48,28 +71,31 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
     ) {
         val (minPixel, maxPixel) = matrixTransformerController.getMinMaxPixel(axis.direction)
 
-        var currentX = minPixel + 10.0
-        while (currentX < maxPixel) {
-            val stepX = matrixTransformerController.transformPixelToUnits(currentX, axis.settings, axis.direction)
+        val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
+        val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
 
-            if (axis.settings.max > 0 && axis.settings.min < 0) {
-                if ((currentX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {
-                    currentX += axis.distanceBetweenMarks
-                    continue
-                }
-            }
-            val text = if (axis.isLogarithmic()) {
-                NumberFormatter.formatLogarithmic(stepX, axis.settings.logarithmBase)
-            } else {
-                NumberFormatter.format(stepX)
-            }
-            context.strokeText(
-                text,
-                currentX,
-                marksCoordinate,
-                MAX_TEXT_WIDTH
-            )
-            currentX += axis.distanceBetweenMarks
+        if(zeroPixel < maxDrawingPixel && zeroPixel > minDrawingPixel){
+            drawDoubleMark(context, axis, marksCoordinate, 0.0, zeroPixel)
+        }
+
+        var currentPixel = max(zeroPixel + axis.distanceBetweenMarks, minDrawingPixel)
+
+        while (currentPixel < maxDrawingPixel) {
+            val currentValue = matrixTransformerController.transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+
+            drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
+
+            currentPixel += axis.distanceBetweenMarks
+        }
+
+        currentPixel = min(zeroPixel - axis.distanceBetweenMarks, maxDrawingPixel)
+
+        while (currentPixel > minDrawingPixel) {
+            val currentValue = matrixTransformerController.transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+
+            drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
+
+            currentPixel -= axis.distanceBetweenMarks
         }
     }
 
@@ -109,5 +135,6 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
 
     private companion object {
         const val MAX_TEXT_WIDTH = 30.0
+        const val TEXT_VERTICAL_BORDERS_OFFSET = 10.0
     }
 }

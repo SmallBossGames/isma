@@ -1,5 +1,9 @@
 package ru.nstu.grin.concatenation.function.controller
 
+import javafx.scene.Scene
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.Window
 import ru.nstu.grin.concatenation.function.events.DeleteFunctionQuery
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
@@ -29,12 +33,24 @@ class FunctionListViewController : Controller() {
         ).openModal()
     }
 
-    fun openChangeModal(id: UUID) {
-        find<ChangeFunctionFragment>(
+    fun openChangeModal(id: UUID, owner: Window? = null) {
+        val view = find<ChangeFunctionFragment>(
             mapOf(
                 ChangeFunctionFragment::functionId to id
             )
-        ).openModal()
+        )
+
+        Stage().apply {
+            scene = Scene(view.root)
+            title = "Function parameters"
+            initModality(Modality.WINDOW_MODAL)
+
+            if (owner != null){
+                initOwner(owner)
+            }
+
+            show()
+        }
     }
 
     fun getAllFunctions() {

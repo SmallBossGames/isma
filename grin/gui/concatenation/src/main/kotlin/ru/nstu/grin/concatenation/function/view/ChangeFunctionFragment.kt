@@ -26,7 +26,7 @@ class ChangeFunctionFragment : Fragment() {
             field("Размер линии") {
                 textfield(model.lineSizeProperty) {
                     validator {
-                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                        if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                             error("Число должно быть плавающим 20,0 и больше нуля")
                         } else {
                             null
@@ -46,7 +46,7 @@ class ChangeFunctionFragment : Fragment() {
             field("Вид линии") {
                 combobox(model.lineTypeProperty, LineType.values().toList()) {
                     cellFormat {
-                        text = when (it) {
+                        text = when (it!!) {
                             LineType.POLYNOM -> "Полином"
                             LineType.RECT_FILL_DOTES -> "Прямоугольник заполненные точки"
                             LineType.SEGMENTS -> "Сегменты"

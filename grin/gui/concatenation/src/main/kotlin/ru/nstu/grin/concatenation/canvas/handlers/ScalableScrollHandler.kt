@@ -38,7 +38,6 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
         if (event.deltaY > 0) {
             scaleSettings.upRemaining--
             scaleSettings.downRemaining++
-            println("Up")
 
             if (scaleSettings.upRemaining <= 0) {
                 axis.settings.min += DELTA
@@ -51,7 +50,6 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
                 return
             }
         } else {
-            println("Down")
             scaleSettings.downRemaining--
             scaleSettings.upRemaining++
 

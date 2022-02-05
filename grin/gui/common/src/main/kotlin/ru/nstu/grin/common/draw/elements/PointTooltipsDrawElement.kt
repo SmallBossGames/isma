@@ -17,7 +17,7 @@ class PointTooltipsDrawElement(
         val filteredPoints = pointTooltipSettings.pointsSettings.filter { pointSettings ->
             !pointTooltips.any { it.text == formatText(pointSettings) }
         }
-        println("Filtered ${filteredPoints.size}")
+
         for (pointSettings in filteredPoints) {
             val pointToolTip = Tooltip()
             pointToolTip.text = formatText(pointSettings)

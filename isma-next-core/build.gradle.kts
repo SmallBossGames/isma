@@ -24,7 +24,7 @@ dependencies {
 
     implementation ("org.apache.commons:commons-lang3:3.12.0")
     implementation ("org.apache.commons:commons-text:1.9")
-    implementation ("org.slf4j:slf4j-api:1.7.33")
+    implementation ("org.slf4j:slf4j-api:1.7.35")
     implementation ("com.google.guava:guava:31.0.1-jre")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 

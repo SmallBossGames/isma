@@ -13,16 +13,16 @@ import tornadofx.*
 class ElementsView : Fragment() {
     override val root: Parent = tabpane {
         tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
-        tab("Функции") {
+        tab("Functions") {
             add<FunctionListView>()
         }
-        tab("Оси") {
+        tab("Axes") {
             add<AxisListView>()
         }
-        tab("Пространства") {
+        tab("Spaces") {
             add<CartesianListView>()
         }
-        tab("Описания") {
+        tab("Descriptions") {
             add<DescriptionListView>()
         }
     }

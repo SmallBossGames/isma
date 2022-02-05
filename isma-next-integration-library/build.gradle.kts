@@ -15,5 +15,5 @@ dependencies {
     implementation (project(":isma-intg-lib:isma-intg-lib-rkmerson"))
     implementation (project(":isma-intg-lib:isma-intg-lib-rkfehlberg"))
 
-    implementation("org.slf4j:slf4j-api:1.7.33")
+    implementation("org.slf4j:slf4j-api:1.7.35")
 }

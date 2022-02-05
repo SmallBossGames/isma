@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version "1.6.0" apply false
-    id("org.openjfx.javafxplugin") version "0.0.10" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.0" apply false
-    id("de.jjohannes.extra-java-module-info") version "0.9" apply false
+    kotlin("jvm") version "1.6.10" apply false
+    id("org.openjfx.javafxplugin") version "0.0.11" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10" apply false
+    id("de.jjohannes.extra-java-module-info") version "0.11" apply false
 }
 
 allprojects {
@@ -26,5 +26,8 @@ subprojects {
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>{
         targetCompatibility = "17"
+        kotlinOptions {
+            jvmTarget = "17"
+        }
     }
 }

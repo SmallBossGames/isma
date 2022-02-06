@@ -81,7 +81,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     }
 
     fun drawUiLayer() {
-        with(canvasModel.uiLayer.graphicsContext2D){
+        canvasModel.uiLayer.graphicsContext2D.apply {
             ClearDrawElement.draw(this)
 
             ArrowDrawElement(model.arrows, 1.0).draw(this)

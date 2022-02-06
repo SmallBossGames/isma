@@ -4,20 +4,19 @@ import javafx.event.EventHandler
 import javafx.scene.input.ScrollEvent
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.canvas.model.ScaleSettings
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.Controller
 
 class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
     private val model: ConcatenationCanvasModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
-    private val currentCanvasSettings: MutableMap<ConcatenationAxis, ScaleSettings> = mutableMapOf()
 
     override fun handle(event: ScrollEvent) {
-        val axises = model.cartesianSpaces.map {
+        val axes = model.cartesianSpaces.map {
             listOf(it.xAxis, it.yAxis)
         }.flatten()
-        val axis = axises.firstOrNull {
+
+        val axis = axes.firstOrNull {
             it.isLocated(event.x, event.y)
         }
 
@@ -33,49 +32,20 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
     }
 
     private fun handleScaleByAxis(event: ScrollEvent, axis: ConcatenationAxis) {
-        val scaleSettings = getScaleSettings(axis)
+        val delta = event.deltaY
+        val oldMin = axis.settings.min
+        val oldMax = axis.settings.max
 
-        if (event.deltaY > 0) {
-            scaleSettings.upRemaining--
-            scaleSettings.downRemaining++
-
-            if (scaleSettings.upRemaining <= 0) {
-                axis.settings.min += DELTA
-                axis.settings.max -= DELTA
-                scaleSettings.upRemaining =
-                    TIMES_TO_SCROLL
-                scaleSettings.downRemaining =
-                    TIMES_TO_SCROLL
-                scaleSettings.delta = axis.settings.pixelCost / DELTA_DELIMITER
-                return
-            }
+        if(delta > 0) {
+            axis.settings.min = oldMin * (1.0 + delta * AXIS_SCALING_COEFFICIENT)
+            axis.settings.max = oldMax * (1.0 - delta * AXIS_SCALING_COEFFICIENT)
         } else {
-            scaleSettings.downRemaining--
-            scaleSettings.upRemaining++
-
-            if (scaleSettings.downRemaining <= 0) {
-                axis.settings.min -= DELTA
-                axis.settings.max += DELTA
-                scaleSettings.downRemaining =
-                    TIMES_TO_SCROLL
-                scaleSettings.upRemaining =
-                    TIMES_TO_SCROLL
-                scaleSettings.delta = axis.settings.pixelCost / DELTA_DELIMITER
-                return
-            }
+            axis.settings.min = oldMin / (1.0 - delta * AXIS_SCALING_COEFFICIENT)
+            axis.settings.max = oldMax / (1.0 + delta * AXIS_SCALING_COEFFICIENT)
         }
-        currentCanvasSettings[axis] = scaleSettings
-    }
-
-    private fun getScaleSettings(axis: ConcatenationAxis): ScaleSettings {
-        return currentCanvasSettings[axis] ?: ScaleSettings(
-            delta = axis.settings.pixelCost / DELTA_DELIMITER
-        )
     }
 
     private companion object {
-        const val DELTA = 2.0
-        const val TIMES_TO_SCROLL = 3L
-        const val DELTA_DELIMITER = 10L
+        const val AXIS_SCALING_COEFFICIENT = 0.003
     }
 }

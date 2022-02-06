@@ -57,8 +57,8 @@ class SpacesTransformationController: Controller() {
                 transformPoints(
                     function.id,
                     function.points,
-                    cartesianSpace.xAxis,
-                    cartesianSpace.yAxis,
+                    cartesianSpace.xAxis.copy(),
+                    cartesianSpace.yAxis.copy(),
                     function.getMirrorDetails(),
                     function.getDerivativeDetails(),
                     function.getWaveletDetails()

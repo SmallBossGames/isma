@@ -45,11 +45,12 @@ dependencies {
     implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-next-integration-library"))
-    implementation(project(":grin:integration"))
     implementation(project(":isma-next-common-services"))
     implementation(project(":isma-blueprint-editor"))
     implementation(project(":isma-text-editor"))
     implementation(project(":isma-next-services-simulation-abstractions"))
+
+    implementation(project(":grin:integration"))
 
     api(project(":isma-intg-core"))
     api(project(":isma-intg-server:isma-intg-server-client"))

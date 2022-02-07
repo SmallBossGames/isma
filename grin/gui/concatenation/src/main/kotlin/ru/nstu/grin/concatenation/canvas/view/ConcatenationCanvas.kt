@@ -43,8 +43,6 @@ class ConcatenationCanvas : View() {
             hgrow = Priority.ALWAYS
 
             canvasModel.functionsLayer = this
-
-            chainDrawer.drawFunctionsLayer()
         }
 
         canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
@@ -64,9 +62,9 @@ class ConcatenationCanvas : View() {
             onMousePressed = pressedMouseHandle
 
             onMouseReleased = releaseMouseHandler
-
-            chainDrawer.drawUiLayer()
         }
+
+        chainDrawer.draw()
     }
 
     fun redraw() {

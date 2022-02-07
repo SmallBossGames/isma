@@ -132,8 +132,8 @@ class FunctionCanvasService : Controller() {
 
     fun calculateIntegral(event: CalculateIntegralEvent) {
         val function = getFunction(event.functionId)
-        val min = function.points.map { it.x }.minOrNull()!!
-        val max = function.points.map { it.x }.maxOrNull()!!
+        val min = function.points.minOf { it.x }
+        val max = function.points.maxOf { it.x }
         if (min > event.leftBorder) {
             tornadofx.error("Левая граница не может быть меньше минимума функции")
             return

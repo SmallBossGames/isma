@@ -1,26 +1,20 @@
 package ru.isma.next.app.services.simualtion
 
 import javafx.collections.FXCollections
-import javafx.scene.paint.Color
 import javafx.stage.FileChooser
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
-import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.axis.model.Direction
-import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
-import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.model.LineType
+import ru.nstu.grin.integration.FunctionModel
 import ru.nstu.grin.integration.GrinIntegrationFacade
+import ru.nstu.grin.integration.PointModel
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import tornadofx.FileChooserMode
 import tornadofx.chooseFile
 import java.io.File
 import java.io.Writer
-import java.util.*
 
 class SimulationResultService(private val grinIntegrationController: GrinIntegrationFacade) {
     val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()!!
@@ -40,49 +34,10 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         }
 
     fun showChart(simulationResult: CompletedSimulationModel) {
-
-        val xAxis = ConcatenationAxis(
-            id = UUID.randomUUID(),
-            name = "X axis",
-            order = 0,
-            direction = Direction.BOTTOM,
-            backGroundColor = Color.BLACK,
-            fontColor = Color.CYAN,
-            distanceBetweenMarks = 40.0,
-            textSize = 12.0,
-            font = "Arial"
-        )
-
-        val yAxis = ConcatenationAxis(
-            id = UUID.randomUUID(),
-            name = "Y axis",
-            order = 0,
-            direction = Direction.LEFT,
-            backGroundColor = Color.BLACK,
-            fontColor = Color.CYAN,
-            distanceBetweenMarks = 40.0,
-            textSize = 12.0,
-            font = "Arial"
-        )
-
         val headers = createColumnNamesArray(simulationResult)
         val columns = createResultColumns(simulationResult, headers.size)
-
-        val functions = arrayListOf<ConcatenationFunction>()
-
-        for (i in headers.indices) {
-            functions.add(createSimpleConcatenationFunction(headers[i], columns[i].toList()))
-        }
-
-        val cartesianSpace = CartesianSpace(
-            UUID.randomUUID(),
-            "SomeSpace",
-            functions,
-            xAxis,
-            yAxis)
-
-        val spaces = listOf(cartesianSpace)
-        grinIntegrationController.open(spaces)
+        val functions = headers.mapIndexed { i, name -> FunctionModel(name, columns[i].asIterable()) }
+        grinIntegrationController.openSimpleChart(functions)
     }
 
     fun exportToFile(simulationResult: CompletedSimulationModel){
@@ -162,44 +117,31 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         return outputArray
     }
 
-    private fun createResultColumns(result: CompletedSimulationModel, columnsCount: Int) : Array<Array<Point>> = runBlocking {
+    private fun createResultColumns(result: CompletedSimulationModel, columnsCount: Int) : Array<Array<PointModel>> = runBlocking {
         val it = result.resultPointProvider.results.toList()
         val rowsCount = it.size
-        val tempArray = Array(columnsCount) { Array(rowsCount) { Point.Zero } }
+        val tempArray = Array(columnsCount) { Array(rowsCount) { PointModel.ZERO } }
         for (i in it.indices) {
             val x = it[i].x
 
             for (j in it[i].yForDe.indices) {
-                tempArray[j][i] = Point(x, it[i].yForDe[j])
+                tempArray[j][i] = PointModel(x, it[i].yForDe[j])
             }
 
             var offset = it[i].yForDe.size
 
             for (j in it[i].rhs[DaeSystem.RHS_AE_PART_IDX].indices) {
-                tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_AE_PART_IDX][j])
+                tempArray[j + offset][i] = PointModel(x, it[i].rhs[DaeSystem.RHS_AE_PART_IDX][j])
             }
 
             offset = it[i].yForDe.size + it[i].rhs[DaeSystem.RHS_AE_PART_IDX].size
 
             for (j in it[i].rhs[DaeSystem.RHS_DE_PART_IDX].indices) {
-                tempArray[j + offset][i] = Point(x, it[i].rhs[DaeSystem.RHS_DE_PART_IDX][j])
+                tempArray[j + offset][i] = PointModel(x, it[i].rhs[DaeSystem.RHS_DE_PART_IDX][j])
             }
         }
 
         return@runBlocking tempArray
-    }
-
-    private fun createSimpleConcatenationFunction(name: String, points: List<Point>) : ConcatenationFunction {
-        return ConcatenationFunction(
-            id = UUID.randomUUID(),
-            name = name,
-            points = points,
-            isHide = false,
-            isSelected = false,
-            functionColor = Color.color(Math.random(), Math.random(), Math.random()),
-            lineSize = 1.0,
-            lineType = LineType.POLYNOM
-        )
     }
 
     companion object {

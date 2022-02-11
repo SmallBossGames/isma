@@ -6,17 +6,21 @@ import ru.isma.next.app.views.koin.*
 import ru.nstu.grin.integration.grinModule
 
 fun ismaKoinStart() = startKoin {
-    modules(simulationScopeModule)
-    modules(externalServicesModule)
-    modules(appServicesModule)
-    modules(daeSystemStepSolversModule)
+    modules(
+        simulationScopeModule,
+        externalServicesModule,
+        appServicesModule,
+        daeSystemStepSolversModule
+    )
 
     modules(grinModule)
 
-    addMainView()
-    addLismaTextEditor()
-    addBlueprintEditor()
-    addToolbars()
-    addEditorTabPane()
-    addSettingsPanel()
+    modules(
+        toolbarsModule,
+        mainViewModule,
+        settingsPanelModule,
+        editorTabPaneModule,
+        lismaTextEditorModule,
+        blueprintEditorModule
+    )
 }

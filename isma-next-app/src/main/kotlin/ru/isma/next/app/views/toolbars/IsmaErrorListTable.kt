@@ -4,7 +4,6 @@ import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.util.Callback
 import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.services.ModelErrorService
 
@@ -18,13 +17,13 @@ class IsmaErrorListTable(
         columns.addAll(
             TableColumn<ErrorViewModel, Int>("Row").apply {
                 cellValueFactory = PropertyValueFactory(ErrorViewModel::row.name)
-                cellFactory = Callback { NumericCell() }
+                setCellFactory { NumericCell() }
                 prefWidthProperty().bind(this@IsmaErrorListTable.widthProperty().multiply(0.05))
                 isResizable = false
             },
             TableColumn<ErrorViewModel, Int>("Position").apply {
                 cellValueFactory = PropertyValueFactory(ErrorViewModel::position.name)
-                cellFactory = Callback { NumericCell() }
+                setCellFactory { NumericCell() }
                 prefWidthProperty().bind(this@IsmaErrorListTable.widthProperty().multiply(0.05))
                 isResizable = false
             },

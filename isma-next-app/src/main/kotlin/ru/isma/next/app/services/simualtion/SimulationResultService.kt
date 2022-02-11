@@ -1,6 +1,10 @@
 package ru.isma.next.app.services.simualtion
 
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
+import javafx.scene.control.*
+import javafx.scene.layout.HBox
 import javafx.stage.FileChooser
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
@@ -19,6 +23,8 @@ import java.io.Writer
 class SimulationResultService(private val grinIntegrationController: GrinIntegrationFacade) {
     val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()!!
 
+    class ColumnPickerItem(val isSelected: BooleanProperty, val columnName: String)
+
     private val fileFilers = arrayOf(
         FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
@@ -35,9 +41,53 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
 
     fun showChart(simulationResult: CompletedSimulationModel) {
         val headers = createColumnNamesArray(simulationResult)
-        val columns = createResultColumns(simulationResult, headers.size)
-        val functions = headers.mapIndexed { i, name -> FunctionModel(name, columns[i].asIterable()) }
-        grinIntegrationController.openSimpleChart(functions)
+        val columnPickerItems = headers.mapIndexed {
+                i, item -> ColumnPickerItem(SimpleBooleanProperty(), item)
+        }
+
+        Dialog<ButtonType>().apply {
+            title = "Select variables"
+            dialogPane.content = ScrollPane(
+                ListView(FXCollections.observableArrayList(columnPickerItems)).apply {
+                    setCellFactory {
+                        object : ListCell<ColumnPickerItem>() {
+                            override fun updateItem(item: ColumnPickerItem?, empty: Boolean) {
+                                if (empty || item == null || graphic != null) {
+                                    return
+                                }
+
+                                graphic = HBox(
+                                    CheckBox().apply {
+                                        selectedProperty().bindBidirectional(item.isSelected)
+                                    },
+                                    Label(item.columnName)
+                                ).apply {
+                                    spacing = 10.0
+                                }
+                            }
+                        }
+                    }
+                })
+
+            dialogPane.buttonTypes.addAll(
+                ButtonType("Ok", ButtonBar.ButtonData.OK_DONE),
+                ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE),
+            )
+            showAndWait().ifPresent {
+                if(it.buttonData == ButtonBar.ButtonData.OK_DONE){
+                    val selctedHeaders = headers.filterIndexed { i, _ ->
+                        columnPickerItems[i].isSelected.value
+                    }
+                    val selectedColumns = createResultColumns(simulationResult, headers.size).filterIndexed { i, _ ->
+                        columnPickerItems[i].isSelected.value
+                    }
+                    val functions = selctedHeaders.mapIndexed { i, name ->
+                        FunctionModel(name, selectedColumns[i].asIterable())
+                    }
+                    grinIntegrationController.openSimpleChart(functions)
+                }
+            }
+        }
     }
 
     fun exportToFile(simulationResult: CompletedSimulationModel){

@@ -8,19 +8,18 @@ import javafx.scene.control.Tooltip
 import org.controlsfx.control.PopOver
 import org.koin.core.component.KoinComponent
 import ru.isma.next.app.extentions.matIconMZ
-import ru.isma.next.app.services.simualtion.SimulationResultService
 import ru.isma.next.app.services.simualtion.SimulationService
 
 class SimulationProcessBar(
-    simulationResultService: SimulationResultService,
     private val simulationService: SimulationService,
+    private val tasksPopOver: TasksPopOver,
 ) : ToolBar(), KoinComponent {
 
-    private val tasksPopOver = TasksPopOver(simulationResultService, simulationService).apply {
-        arrowLocation = PopOver.ArrowLocation.BOTTOM_LEFT
-    }
-
     init {
+        tasksPopOver.apply {
+            arrowLocation = PopOver.ArrowLocation.BOTTOM_LEFT
+        }
+
         items.addAll(
             Button().apply {
                 graphic = matIconMZ("play_arrow")

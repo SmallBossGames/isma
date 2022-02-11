@@ -134,9 +134,9 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         val tempResult = List(orderedColumnNumbers.size) { mutableListOf<PointModel>() }
 
         var indicesInitialized = false
-        var regularIndices: IntArray = intArrayOf()
-        var aeIndices: IntArray = intArrayOf()
-        var deIndices: IntArray = intArrayOf()
+        var regularIndices = intArrayOf()
+        var aeIndices = intArrayOf()
+        var deIndices = intArrayOf()
 
         result.resultPointProvider.results.collect {
             if(!indicesInitialized) {

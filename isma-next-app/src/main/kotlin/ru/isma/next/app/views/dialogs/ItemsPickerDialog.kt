@@ -8,7 +8,7 @@ import javafx.scene.layout.HBox
 
 class NamedPickerItem<T>(val name: String, val value: T)
 
-fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): Iterable<NamedPickerItem<T>> {
+fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): List<NamedPickerItem<T>> {
     class SelectionItemViewModel(val isSelected: BooleanProperty, val value: NamedPickerItem<T>)
 
     val selectionItemViewModels = item.map { SelectionItemViewModel(SimpleBooleanProperty(), it) }

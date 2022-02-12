@@ -25,10 +25,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val canvasViewModel: CanvasViewModel by inject()
     private val model: ConcatenationCanvasModel by inject()
-    private val controller: ConcatenationCanvasController by inject()
+
     private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
-    private val spacesTransformationController: SpacesTransformationController by inject()
     private val pointTooltipsDrawElement: PointTooltipsDrawElement by inject()
+
+    private val controller: ConcatenationCanvasController by inject()
+    private val spacesTransformationController: SpacesTransformationController by inject()
     private val axisDrawElement: AxisDrawElement by inject()
     private val matrixTransformerController: MatrixTransformerController by inject()
 
@@ -55,7 +57,10 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
 
         withContext(Dispatchers.JavaFx) {
             canvasViewModel.functionsLayerContext.apply {
-                ClearDrawElement.draw(this)
+                val width = canvasViewModel.canvasWidth
+                val height = canvasViewModel.canvasHeight
+
+                ClearDrawElement.draw(this, width, height)
 
                 for (cartesianSpace in model.cartesianSpaces) {
                     if (cartesianSpace.isShowGrid) {
@@ -64,30 +69,33 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
                             cartesianSpace.yAxis,
                             Color.valueOf("BBBBBB"),
                             matrixTransformerController
-                        ).draw(this)
+                        ).draw(this, width, height)
                         GridDrawElement(
                             cartesianSpace.xAxis,
                             cartesianSpace.yAxis,
                             Color.valueOf("EDEDED"),
                             matrixTransformerController
-                        ).draw(this)
+                        ).draw(this, width, height)
                     }
                 }
 
-                functionDrawElement.draw(this)
-                axisDrawElement.draw(this)
+                functionDrawElement.draw(this, width, height)
+                axisDrawElement.draw(this, width, height)
             }
         }
     }
 
     fun drawUiLayer() {
         canvasViewModel.uiLayerContext.apply {
-            ClearDrawElement.draw(this)
+            val width = canvasViewModel.canvasWidth
+            val height = canvasViewModel.canvasHeight
 
-            ArrowDrawElement(model.arrows, 1.0).draw(this)
-            DescriptionDrawElement(model.descriptions).draw(this)
+            ClearDrawElement.draw(this, width, height)
 
-            pointTooltipsDrawElement.draw(this)
+            ArrowDrawElement(model.arrows, 1.0).draw(this, width, height)
+            DescriptionDrawElement(model.descriptions).draw(this, width, height)
+
+            pointTooltipsDrawElement.draw(this, width, height)
 
             ContextMenuDrawElement(
                 contextMenu,
@@ -95,9 +103,9 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
                 controller,
                 this@ConcatenationChainDrawer,
                 scope
-            ).draw(this)
+            ).draw(this, width, height)
 
-            SelectionDrawElement(model.selectionSettings).draw(this)
+            SelectionDrawElement(model.selectionSettings).draw(this, width, height)
         }
     }
 

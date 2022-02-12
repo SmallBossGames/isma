@@ -14,7 +14,7 @@ class AxisDrawElement : ChainDrawElement, Controller() {
     private val verticalAxisDraw: VerticalAxisDrawStrategy by inject()
     private val horizontalAxisDraw: HorizontalAxisDrawStrategy by inject()
 
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         for (cartesianSpace in model.cartesianSpaces) {
             val xAxis = cartesianSpace.xAxis
             val yAxis = cartesianSpace.yAxis

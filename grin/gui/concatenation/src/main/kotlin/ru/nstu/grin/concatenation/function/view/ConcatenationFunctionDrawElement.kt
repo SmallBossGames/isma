@@ -10,7 +10,7 @@ import tornadofx.Controller
 class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     private val model: ConcatenationCanvasModel by inject()
 
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val previousLineSize = context.lineWidth
         for (cartesianSpace in model.cartesianSpaces) {
             for (function in cartesianSpace.functions) {

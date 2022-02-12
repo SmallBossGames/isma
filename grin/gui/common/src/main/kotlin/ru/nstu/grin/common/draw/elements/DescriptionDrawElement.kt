@@ -9,7 +9,7 @@ import ru.nstu.grin.common.view.ChainDrawElement
 class DescriptionDrawElement(
     private val descriptions: List<Description>
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         for (description in descriptions) {
             println("Description = $description")
             context.stroke = description.color

@@ -20,7 +20,7 @@ class ContextMenuDrawElement(
     private val chainDrawer: ConcatenationChainDrawer,
     private val scope: Scope
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         contextMenu.items.clear()
 
         val settings = model.contextMenuSettings

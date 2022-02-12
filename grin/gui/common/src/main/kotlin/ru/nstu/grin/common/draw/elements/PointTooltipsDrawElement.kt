@@ -13,7 +13,7 @@ class PointTooltipsDrawElement(
     private val pointTooltips: MutableList<Tooltip>,
     private val stage: Stage
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val filteredPoints = pointTooltipSettings.pointsSettings.filter { pointSettings ->
             !pointTooltips.any { it.text == formatText(pointSettings) }
         }

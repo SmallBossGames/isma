@@ -68,11 +68,17 @@ class ConcatenationCanvas : View() {
         widthProperty().addListener { _ ->
             c1.width = width
             c2.width = width
+            canvasViewModel.canvasWidth = width
+
+            chainDrawer.draw()
         }
 
         heightProperty().addListener { _ ->
             c1.height = height
             c2.height = height
+            canvasViewModel.canvasHeight = height
+
+            chainDrawer.draw()
         }
 
         chainDrawer.draw()

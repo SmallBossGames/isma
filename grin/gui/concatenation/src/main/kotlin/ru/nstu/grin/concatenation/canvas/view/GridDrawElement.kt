@@ -14,7 +14,7 @@ class GridDrawElement(
     private val matrixTransformerController: MatrixTransformerController
 ) : ChainDrawElement {
 
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         context.stroke = color
 
         if (xAxis.settings.isOnlyIntegerPow) {

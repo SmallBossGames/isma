@@ -11,7 +11,7 @@ class GridDrawElement(
     private val yCorrelation: Double,
     private val isFull: Boolean = false
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         context.stroke = color
 
         val middleWidth = context.canvas.width / 2 + xCorrelation

@@ -16,7 +16,7 @@ class PointTooltipsDrawElement : ChainDrawElement, Controller() {
     private val model: ConcatenationCanvasModel by inject()
     private val transformer: MatrixTransformerController by inject()
 
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val stage = model.primaryStage
         val filteredPoints = model.pointToolTipSettings.pointsSettings.filter { pointSettings ->
             !pointTooltips.any { it.text == formatText(pointSettings) }

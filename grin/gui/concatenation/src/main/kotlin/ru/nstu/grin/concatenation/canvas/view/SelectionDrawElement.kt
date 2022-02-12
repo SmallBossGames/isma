@@ -10,7 +10,7 @@ import kotlin.math.min
 class SelectionDrawElement(
     private val selectionSettings: SelectionSettings
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val (isFirstPointSelected, isSecondPointSelected, firstPoint, secondPoint) = selectionSettings
 
         if (!isFirstPointSelected || !isSecondPointSelected) {

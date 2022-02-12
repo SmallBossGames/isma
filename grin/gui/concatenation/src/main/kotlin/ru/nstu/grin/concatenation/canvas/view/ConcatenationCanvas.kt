@@ -10,15 +10,16 @@ import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.model.CanvasModel
+import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import tornadofx.*
 
+
 class ConcatenationCanvas : View() {
     private val model: ConcatenationCanvasModel by inject()
-    private val canvasModel: CanvasModel by inject()
+    private val canvasViewModel: CanvasViewModel by inject()
     private var chainDrawer: ConcatenationChainDrawer = find { }
     private val scalableScrollHandler: ScalableScrollHandler by inject()
     private val draggedHandler: DraggedHandler by inject()
@@ -38,18 +39,18 @@ class ConcatenationCanvas : View() {
     }
 
     override val root: Parent = pane {
-        canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
+        val c1 = canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
 
-            canvasModel.functionsLayer = this
+            canvasViewModel.functionsLayerContext = graphicsContext2D
         }
 
-        canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
+        val c2 = canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
             vgrow = Priority.ALWAYS
             hgrow = Priority.ALWAYS
 
-            canvasModel.uiLayer = this
+            canvasViewModel.uiLayerContext = graphicsContext2D
 
             model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
             model.cartesianSpaces.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
@@ -62,6 +63,16 @@ class ConcatenationCanvas : View() {
             onMousePressed = pressedMouseHandle
 
             onMouseReleased = releaseMouseHandler
+        }
+
+        widthProperty().addListener { _ ->
+            c1.width = width
+            c2.width = width
+        }
+
+        heightProperty().addListener { _ ->
+            c1.height = height
+            c2.height = height
         }
 
         chainDrawer.draw()

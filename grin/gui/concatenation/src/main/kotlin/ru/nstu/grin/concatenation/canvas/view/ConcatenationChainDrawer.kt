@@ -14,7 +14,7 @@ import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import ru.nstu.grin.concatenation.canvas.model.CanvasModel
+import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
@@ -23,7 +23,7 @@ import tornadofx.Controller
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ConcatenationChainDrawer : ChainDrawer, Controller() {
-    private val canvasModel: CanvasModel by inject()
+    private val canvasViewModel: CanvasViewModel by inject()
     private val model: ConcatenationCanvasModel by inject()
     private val controller: ConcatenationCanvasController by inject()
     private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
@@ -54,7 +54,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
         spacesTransformationController.transformSpaces()
 
         withContext(Dispatchers.JavaFx) {
-            with(canvasModel.functionsLayer.graphicsContext2D) {
+            canvasViewModel.functionsLayerContext.apply {
                 ClearDrawElement.draw(this)
 
                 for (cartesianSpace in model.cartesianSpaces) {
@@ -81,7 +81,7 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     }
 
     fun drawUiLayer() {
-        canvasModel.uiLayer.graphicsContext2D.apply {
+        canvasViewModel.uiLayerContext.apply {
             ClearDrawElement.draw(this)
 
             ArrowDrawElement(model.arrows, 1.0).draw(this)

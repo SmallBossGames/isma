@@ -10,7 +10,7 @@ import ru.nstu.grin.common.view.modal.ArrowModalView
 import ru.nstu.grin.concatenation.axis.controller.AxisCanvasController
 import ru.nstu.grin.concatenation.canvas.GenerateUtils
 import ru.nstu.grin.concatenation.canvas.events.*
-import ru.nstu.grin.concatenation.canvas.model.CanvasModel
+import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
@@ -27,7 +27,7 @@ import tornadofx.*
  * Разбить по нескольким контроллерам, один для функций, другой для осей и т.д
  */
 class ConcatenationCanvasController : Controller() {
-    private val canvasModel: CanvasModel by inject()
+    private val canvasViewModel: CanvasViewModel by inject()
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
     private val functionsController: FunctionsCanvasController = find { }
@@ -103,7 +103,7 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun clearCanvas() {
-        canvasModel.functionsLayer.graphicsContext2D.clearRect(
+        canvasViewModel.functionsLayerContext.clearRect(
             0.0, 0.0,
             SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
         )

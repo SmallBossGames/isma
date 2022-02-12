@@ -73,10 +73,18 @@ class PointTooltipsDrawElement : ChainDrawElement, Controller() {
 
         val y = if (pointSettings.yAxisSettings.isLogarithmic) {
             pointSettings.yAxisSettings.logarithmBase.pow(
-                transformer.transformPixelToUnits(pointSettings.yGraphic, pointSettings.yAxisSettings, Direction.LEFT)
+                transformer.transformPixelToUnits(
+                    pointSettings.yGraphic,
+                    pointSettings.yAxisSettings,
+                    Direction.LEFT
+                )
             )
         } else {
-            transformer.transformPixelToUnits(pointSettings.yGraphic, pointSettings.yAxisSettings, Direction.LEFT)
+            transformer.transformPixelToUnits(
+                pointSettings.yGraphic,
+                pointSettings.yAxisSettings,
+                Direction.LEFT
+            )
         }
         return "x=${x.round(5)}, y=${y.round(5)}"
     }

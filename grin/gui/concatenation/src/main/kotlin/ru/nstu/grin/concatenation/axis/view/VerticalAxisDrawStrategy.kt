@@ -17,10 +17,13 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
     override fun drawMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
-        marksCoordinate: Double
+        marksCoordinate: Double,
+        canvasWidth: Double,
+        canvasHeight: Double
     ) {
         context.font = Font.font(axis.font, axis.textSize)
-        val zeroPixel = matrixTransformerController.transformUnitsToPixel(0.0, axis.settings, axis.direction)
+        val zeroPixel = matrixTransformerController
+            .transformUnitsToPixel(0.0, axis.settings, axis.direction)
 
         if (axis.settings.isOnlyIntegerPow) {
             println("IsOnlyIntger")
@@ -55,9 +58,10 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         context: GraphicsContext,
         axis: ConcatenationAxis,
         marksCoordinate: Double,
-        zeroPixel: Double
+        zeroPixel: Double,
     ) {
-        val (minPixel, maxPixel) = matrixTransformerController.getMinMaxPixel(axis.direction)
+        val (minPixel, maxPixel) = matrixTransformerController
+            .getMinMaxPixel(axis.direction)
 
         val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
         val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
@@ -69,7 +73,8 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         var currentPixel = max(zeroPixel + axis.distanceBetweenMarks, minDrawingPixel)
 
         while (currentPixel < maxDrawingPixel) {
-            val currentValue = matrixTransformerController.transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+            val currentValue = matrixTransformerController
+                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
 
             drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
 
@@ -79,7 +84,8 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         currentPixel = min(zeroPixel - axis.distanceBetweenMarks, maxDrawingPixel)
 
         while (currentPixel > minDrawingPixel) {
-            val currentValue = matrixTransformerController.transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+            val currentValue = matrixTransformerController
+                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
 
             drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
 
@@ -91,12 +97,13 @@ class VerticalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         context: GraphicsContext,
         axis: ConcatenationAxis,
         marksCoordinate: Double,
-        zeroPixel: Double
+        zeroPixel: Double,
     ) {
         var currentY = axis.settings.max.roundToInt().toDouble()
         val min = axis.settings.min
         while (currentY > min) {
-            val stepY = matrixTransformerController.transformUnitsToPixel(currentY, axis.settings, axis.direction)
+            val stepY = matrixTransformerController
+                .transformUnitsToPixel(currentY, axis.settings, axis.direction)
 
             if (axis.settings.max > 0 && axis.settings.min < 0) {
                 if ((stepY - zeroPixel).absoluteValue < (axis.distanceBetweenMarks / 2)) {

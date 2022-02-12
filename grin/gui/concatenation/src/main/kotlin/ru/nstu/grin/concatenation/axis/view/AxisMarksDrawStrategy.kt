@@ -7,6 +7,8 @@ interface AxisMarksDrawStrategy {
     fun drawMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
-        marksCoordinate: Double
+        marksCoordinate: Double,
+        canvasWidth: Double,
+        canvasHeight: Double,
     )
 }

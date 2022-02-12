@@ -123,12 +123,12 @@ class SpacesTransformationController: Controller() {
                 points[i].xGraphic = matrixTransformer.transformUnitsToPixel(
                     temp.x,
                     xAxis.settings,
-                    xAxis.direction
+                    xAxis.direction,
                 )
                 points[i].yGraphic = matrixTransformer.transformUnitsToPixel(
                     temp.y,
                     yAxis.settings,
-                    yAxis.direction
+                    yAxis.direction,
                 )
             } else {
                 points[i].xGraphic = null

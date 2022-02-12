@@ -16,10 +16,14 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
     override fun drawMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
-        marksCoordinate: Double
+        marksCoordinate: Double,
+        canvasWidth: Double,
+        canvasHeight: Double
     ) {
         context.font = Font.font(axis.font, axis.textSize)
-        val zeroPixel = matrixTransformerController.transformUnitsToPixel(0.0, axis.settings, axis.direction)
+
+        val zeroPixel = matrixTransformerController
+            .transformUnitsToPixel(0.0, axis.settings, axis.direction)
 
         if (axis.settings.isOnlyIntegerPow) {
             drawOnlyIntegerMark(context, axis, marksCoordinate, zeroPixel)
@@ -81,7 +85,8 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         var currentPixel = max(zeroPixel + axis.distanceBetweenMarks, minDrawingPixel)
 
         while (currentPixel < maxDrawingPixel) {
-            val currentValue = matrixTransformerController.transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+            val currentValue = matrixTransformerController
+                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
 
             drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
 
@@ -91,7 +96,8 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         currentPixel = min(zeroPixel - axis.distanceBetweenMarks, maxDrawingPixel)
 
         while (currentPixel > minDrawingPixel) {
-            val currentValue = matrixTransformerController.transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+            val currentValue = matrixTransformerController
+                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
 
             drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
 
@@ -108,7 +114,8 @@ class HorizontalAxisDrawStrategy : AxisMarksDrawStrategy, Controller() {
         var currentX = axis.settings.min.toInt().toDouble()
         val max = axis.settings.max
         while (currentX < max) {
-            val stepX = matrixTransformerController.transformUnitsToPixel(currentX, axis.settings, axis.direction)
+            val stepX = matrixTransformerController
+                .transformUnitsToPixel(currentX, axis.settings, axis.direction)
 
             if (axis.settings.max > 0 && axis.settings.min < 0) {
                 if ((stepX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {

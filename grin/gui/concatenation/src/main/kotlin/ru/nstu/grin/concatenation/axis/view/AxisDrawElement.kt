@@ -20,13 +20,43 @@ class AxisDrawElement : ChainDrawElement, Controller() {
             val yAxis = cartesianSpace.yAxis
 
             if (!xAxis.isHide) {
-                drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
-                drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
+                drawBackground(
+                    context,
+                    xAxis.order,
+                    xAxis.direction,
+                    xAxis.backGroundColor,
+                    canvasWidth,
+                    canvasHeight
+                )
+                drawAxisMarks(
+                    context,
+                    xAxis.order,
+                    xAxis,
+                    xAxis.direction,
+                    xAxis.fontColor,
+                    canvasWidth,
+                    canvasHeight
+                )
             }
 
             if (!yAxis.isHide) {
-                drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
-                drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
+                drawBackground(
+                    context,
+                    yAxis.order,
+                    yAxis.direction,
+                    yAxis.backGroundColor,
+                    canvasWidth,
+                    canvasHeight
+                )
+                drawAxisMarks(
+                    context,
+                    yAxis.order,
+                    yAxis,
+                    yAxis.direction,
+                    yAxis.fontColor,
+                    canvasWidth,
+                    canvasHeight
+                )
             }
         }
     }
@@ -36,7 +66,9 @@ class AxisDrawElement : ChainDrawElement, Controller() {
         order: Int,
         axis: ConcatenationAxis,
         direction: Direction,
-        color: Color
+        color: Color,
+        canvasWidth: Double,
+        canvasHeight: Double
     ) {
         context.stroke = color
 
@@ -48,34 +80,49 @@ class AxisDrawElement : ChainDrawElement, Controller() {
                 verticalAxisDraw.drawMarks(
                     context,
                     axis,
-                    marksCoordinate
+                    marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
                 )
             }
             Direction.RIGHT -> {
                 verticalAxisDraw.drawMarks(
                     context,
                     axis,
-                    SettingsProvider.getCanvasWidth() - marksCoordinate
+                    canvasWidth - marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
                 )
             }
             Direction.TOP -> {
                 horizontalAxisDraw.drawMarks(
                     context,
                     axis,
-                    marksCoordinate
+                    marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
                 )
             }
             Direction.BOTTOM -> {
                 horizontalAxisDraw.drawMarks(
                     context,
                     axis,
-                    SettingsProvider.getCanvasHeight() - marksCoordinate
+                    canvasHeight - marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
                 )
             }
         }
     }
 
-    private fun drawBackground(context: GraphicsContext, order: Int, direction: Direction, color: Color) {
+    private fun drawBackground(
+        context: GraphicsContext,
+        order: Int,
+        direction: Direction,
+        color: Color,
+        canvasWidth: Double, 
+        canvasHeight: Double
+    ) {
         context.fill = color
         val startPoint = order * SettingsProvider.getAxisWidth()
         when (direction) {
@@ -84,30 +131,30 @@ class AxisDrawElement : ChainDrawElement, Controller() {
                     startPoint,
                     getTopAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                    canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
                 )
             }
             Direction.RIGHT -> {
                 context.fillRect(
-                    SettingsProvider.getCanvasWidth() - startPoint,
+                    canvasWidth - startPoint,
                     getTopAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                    canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
                 )
             }
             Direction.TOP -> {
                 context.fillRect(
                     getLeftAxisSize() * SettingsProvider.getAxisWidth(),
                     startPoint,
-                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth(),
+                    canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth()
                 )
             }
             Direction.BOTTOM -> {
                 context.fillRect(
                     getLeftAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight() - startPoint - SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth(),
+                    canvasHeight - startPoint - SettingsProvider.getAxisWidth(),
+                    canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth()
                 )
             }

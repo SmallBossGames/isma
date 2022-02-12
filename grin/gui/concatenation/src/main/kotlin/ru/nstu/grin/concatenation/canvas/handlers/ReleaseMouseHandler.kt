@@ -4,10 +4,7 @@ import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
-import ru.nstu.grin.concatenation.canvas.model.EditMode
-import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
+import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import tornadofx.Controller

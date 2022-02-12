@@ -40,6 +40,11 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         val headerColumnPairs = headers.mapIndexed{i, header -> NamedPickerItem(header, i) }
 
         val pickedItems = pickItems(headerColumnPairs)
+
+        if(pickedItems.isEmpty()){
+            return
+        }
+
         val selectedColumnIndices = pickedItems.map { it.value }.toIntArray()
         val selectedColumns = createResultColumns(simulationResult, selectedColumnIndices)
 

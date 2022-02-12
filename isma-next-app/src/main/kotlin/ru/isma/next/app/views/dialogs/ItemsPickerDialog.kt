@@ -6,6 +6,8 @@ import javafx.collections.FXCollections
 import javafx.scene.control.*
 import javafx.scene.layout.HBox
 
+private const val LIST_ITEMS_SPACING = 10.0
+
 class NamedPickerItem<T>(val name: String, val value: T)
 
 fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): List<NamedPickerItem<T>> {
@@ -30,7 +32,7 @@ fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): List<NamedPickerItem<T>> 
                                 },
                                 Label(item.value.name)
                             ).apply {
-                                spacing = 10.0
+                                spacing = LIST_ITEMS_SPACING
                             }
                         }
                     }
@@ -44,7 +46,7 @@ fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): List<NamedPickerItem<T>> 
 
         val result = showAndWait()
 
-        return if(result.isPresent && result.get().buttonData == ButtonBar.ButtonData.OK_DONE) {
+        return if (result.isPresent && result.get().buttonData == ButtonBar.ButtonData.OK_DONE) {
             selectionItemViewModels.filter { it.isSelected.value }.map { it.value }
         } else {
             emptyList()

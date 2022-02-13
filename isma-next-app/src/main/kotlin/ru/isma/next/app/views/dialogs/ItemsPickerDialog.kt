@@ -3,7 +3,10 @@ package ru.isma.next.app.views.dialogs
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
+import javafx.geometry.Insets
 import javafx.scene.control.*
+import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 
 private const val LIST_ITEMS_SPACING = 10.0
@@ -17,8 +20,8 @@ fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): List<NamedPickerItem<T>> 
 
     Dialog<ButtonType>().apply {
         title = "Select variables"
-        dialogPane.content = ScrollPane(
-            ListView(FXCollections.observableArrayList(selectionItemViewModels)).apply {
+        dialogPane.content = BorderPane().apply {
+            center = ListView(FXCollections.observableArrayList(selectionItemViewModels)).apply {
                 setCellFactory {
                     object : ListCell<SelectionItemViewModel>() {
                         override fun updateItem(item: SelectionItemViewModel?, empty: Boolean) {
@@ -37,7 +40,25 @@ fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): List<NamedPickerItem<T>> 
                         }
                     }
                 }
-            })
+            }
+            bottom = AnchorPane(
+                HBox(
+                    Button("Select all").apply {
+                        setOnAction {
+                            selectionItemViewModels.forEach { it.isSelected.value = true }
+                        }
+                    },
+                    Button("Unselect all").apply {
+                        setOnAction {
+                            selectionItemViewModels.forEach { it.isSelected.value = false }
+                        }
+                    },
+                ).apply {
+                    AnchorPane.setRightAnchor(this, 0.0)
+                    spacing = LIST_ITEMS_SPACING
+                    padding = Insets(5.0, 0.0, 5.0, 0.0)
+                })
+        }
 
         dialogPane.buttonTypes.addAll(
             ButtonType("Ok", ButtonBar.ButtonData.OK_DONE),

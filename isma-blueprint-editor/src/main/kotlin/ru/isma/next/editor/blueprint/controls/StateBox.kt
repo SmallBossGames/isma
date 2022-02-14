@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
+import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Group
 import javafx.scene.control.Button
@@ -31,8 +32,8 @@ class StateBox : Group() {
     private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
     private val nameProperty = SimpleStringProperty("")
     private val textProperty = SimpleStringProperty("")
-    private val squareWidthProperty = SimpleDoubleProperty(150.0)
-    private val squareHeightProperty = SimpleDoubleProperty(80.0)
+    private val squareWidthProperty = SimpleDoubleProperty(110.0)
+    private val squareHeightProperty = SimpleDoubleProperty(65.0)
     private val colorProperty = SimpleObjectProperty<Paint>(Color.WHITE)
 
     private var isEditModeEnabled by isEditModeEnabledProperty
@@ -82,7 +83,7 @@ class StateBox : Group() {
         }
 
         val boxLabel = Label().apply {
-            font = Font("Arial", 22.0)
+            font = Font("Arial", 16.0)
             textProperty().bind(nameProperty())
             visibleProperty().bind(!isEditModeEnabledProperty())
             managedProperty().bind(!isEditModeEnabledProperty())
@@ -99,6 +100,8 @@ class StateBox : Group() {
         })
 
         children.add(Button("Edit").apply {
+            padding = Insets(2.0, 5.0,2.0,5.0)
+
             val isVisibleBinding = isEditModeEnabledProperty().not().and(isEditButtonVisible())
 
             onAction = EventHandler {

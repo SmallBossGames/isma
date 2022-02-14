@@ -15,6 +15,8 @@ class IsmaTextEditor(
     private val pasteEvent = {if (isFocused) paste()}
 
     init {
+        setStyle("-fx-font-family: consolas; -fx-font-size: 12pt;");
+
         textEditorService.apply {
             cutEventHandler.add(cutEvent)
             copyEventHandler.add(copyEvent)

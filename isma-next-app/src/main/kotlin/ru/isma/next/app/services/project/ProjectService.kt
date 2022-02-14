@@ -7,7 +7,7 @@ import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
 
 class ProjectService {
-    val projects: ObservableSet<IProjectModel> = FXCollections.observableSet()
+    val projects = FXCollections.observableSet<IProjectModel>()!!
 
     var activeProject: IProjectModel? = null
 

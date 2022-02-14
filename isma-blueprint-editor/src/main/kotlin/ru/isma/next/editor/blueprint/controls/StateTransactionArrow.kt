@@ -106,8 +106,8 @@ class StateTransactionArrow : Group() {
                 val angle = atan2(x, y) + PI / 2
                 val offsetX = 10.0 * sin(angle)
                 val offsetY = 10.0 * cos(angle)
-                val textOffsetX = 80.0 * sin(angle)
-                val textOffsetY = 40.0 * cos(angle)
+                val textOffsetX = 75.0 * sin(angle)
+                val textOffsetY = 50.0 * cos(angle)
 
                 startX = this@StateTransactionArrow.startX - this@StateTransactionArrow.layoutX + offsetX
                 startY = this@StateTransactionArrow.startY - this@StateTransactionArrow.layoutY + offsetY

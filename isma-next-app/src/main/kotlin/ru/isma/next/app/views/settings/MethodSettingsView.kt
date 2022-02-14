@@ -7,7 +7,7 @@ import tornadofx.View
 
 class MethodSettingsView(
     private val parametersService: SimulationParametersService
-): View("Method") {
+): View("Integration") {
     override val root =
         ScrollPane(
             PropertiesGrid().apply {

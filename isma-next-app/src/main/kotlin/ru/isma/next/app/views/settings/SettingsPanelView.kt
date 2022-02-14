@@ -21,13 +21,13 @@ class SettingsPanelView(
             prefWidth = itemsWidth
             add(methodSettingsView)
         }
-        item(resultProcessingView.title) {
-            prefWidth = itemsWidth
-            add(resultProcessingView)
-        }
         item(eventDetectionView.title) {
             prefWidth = itemsWidth
             add(eventDetectionView)
+        }
+        item(resultProcessingView.title) {
+            prefWidth = itemsWidth
+            add(resultProcessingView)
         }
     }
 }

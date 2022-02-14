@@ -3,6 +3,7 @@ package ru.isma.next.app.launcher
 import ru.isma.next.app.views.MainView
 import javafx.application.Application
 import javafx.scene.Scene
+import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -28,7 +29,8 @@ class IsmaApplication : Application(), KoinComponent {
 
         val scene = Scene(mainView)
 
-        stage.initWindow(scene, "ISMA Next")
+        stage.initWindow(scene, "ISMA 22")
+        stage.icons.add(Image("images/isma-2016-title.png"))
         stage.show()
 
         // Initialize GRIN Legacy
@@ -53,7 +55,7 @@ class IsmaApplication : Application(), KoinComponent {
         y = windowProps.y
 
         minHeight = 500.0
-        minWidth = 800.0
+        minWidth = 600.0
 
         projectFileService.open(*defaultFilesPreferences.lastOpenedProjectPath)
     }

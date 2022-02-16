@@ -1,8 +1,14 @@
 package ru.isma.next.app.views.tabpane
 
-import javafx.collections.SetChangeListener
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import ru.isma.next.app.models.projects.BlueprintProjectDataProvider
@@ -21,40 +27,48 @@ class IsmaEditorTabPane(
 
     private val blueprintEditor : IsmaBlueprintEditor get() = get()
 
+    private val coroutinesScope = CoroutineScope(Dispatchers.JavaFx)
+
     init {
-        projectController.projects.addListener { it: SetChangeListener.Change<out IProjectModel?> ->
-            when (val addedElement = it.elementAdded) {
-                is BlueprintProjectModel -> {
-                    tabs.add(
-                        Tab(addedElement.name, blueprintEditor.apply {
-                            val provider = BlueprintProjectDataProvider(this)
-                            addedElement.apply {
-                                dataProvider = provider
-                                pushBlueprint()
+        coroutinesScope.launch {
+            merge(projectController.existedProjects, projectController.newProjects)
+                .cancellable()
+                .collect {
+                    val tab = when (it) {
+                        is BlueprintProjectModel -> {
+                            Tab(it.name, blueprintEditor.apply {
+                                val provider = BlueprintProjectDataProvider(this)
+                                it.apply {
+                                    dataProvider = provider
+                                    pushBlueprint()
+                                }
+                            }).apply {
+                                initProjectTab(it)
                             }
-                        }).apply {
-                            initProjectTab(addedElement)
                         }
-                    )
-                }
-                is LismaProjectModel -> {
-                    tabs.add(
-                        Tab(addedElement.name, textEditor.apply {
-                            replaceText(addedElement.lismaText)
-                            addedElement.lismaTextProperty().bind(textProperty())
-                        }).apply {
-                            initProjectTab(addedElement)
+                        is LismaProjectModel -> {
+                            Tab(it.name, textEditor.apply {
+                                replaceText(it.lismaText)
+                                it.lismaTextProperty().bind(textProperty())
+                            }).apply {
+                                initProjectTab(it)
+                            }
                         }
-                    )
+                        else -> {
+                            throw IllegalArgumentException()
+                        }
+                    }
+
+                    addTabAndSelect(tab)
                 }
-                null -> {
-                }
-            }
         }
     }
 
+    fun dispose() {
+        coroutinesScope.cancel()
+    }
+
     private fun Tab.initProjectTab(project: IProjectModel) {
-        selectionModel.select(this)
         projectController.activeProject = project
 
         textProperty().bind(project.nameProperty())
@@ -68,5 +82,10 @@ class IsmaEditorTabPane(
                 projectController.activeProject = project
             }
         }
+    }
+
+    private fun TabPane.addTabAndSelect(tab: Tab) {
+        tabs.add(tab)
+        selectionModel.select(tab)
     }
 }

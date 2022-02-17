@@ -11,11 +11,11 @@ import ru.isma.next.app.services.koin.SimulationScope
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.common.services.lisma.models.SuccessTranslation
-import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
 import ru.isma.next.services.simulation.abstractions.models.CauchyInitialsModel
+import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
-import ru.nstu.isma.next.core.sim.controller.services.controllers.ISimulationCoreController
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
+import ru.nstu.isma.next.core.sim.controller.services.controllers.ISimulationCoreController
 
 class SimulationService(
     private val projectService: ProjectService,
@@ -35,13 +35,13 @@ class SimulationService(
     fun simulate() {
         val simulationScope = getKoin().createScope<SimulationScope>()
         val simulationController: ISimulationCoreController = simulationScope.get()
-        val parametersService: ISimulationSettingsProvider = simulationScope.get()
+        val simulationParameters: SimulationParametersModel = simulationScope.get()
         val project = projectService.activeProject ?: return
 
         val trackingTask = InProgressSimulationModel(
             taskNumber,
             project.name,
-            parametersService.simulationParameters
+            simulationParameters
         )
 
         taskNumber++
@@ -53,7 +53,7 @@ class SimulationService(
                 val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation
                     ?: return@launch
 
-                val initials = parametersService.simulationParameters.cauchyInitials.toCauchyInitials()
+                val initials = simulationParameters.cauchyInitials.toCauchyInitials()
 
                 val hsm = translationResult.hsm.apply {
                     initTimeEquation(initials.start)

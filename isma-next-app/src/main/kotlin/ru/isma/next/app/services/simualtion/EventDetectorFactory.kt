@@ -1,13 +1,13 @@
 package ru.isma.next.app.services.simualtion
 
-import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
+import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.DefaultEventDetector
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory
 
 class EventDetectorFactory(
-    parametersService: ISimulationSettingsProvider,
+    simulationParameters: SimulationParametersModel,
 ): IEventDetectorFactory {
-    private val parameters = parametersService.simulationParameters.eventDetectionParameters
+    private val parameters = simulationParameters.eventDetectionParameters
 
     private val detector = if(parameters.isEventDetectionInUse){
         val gamma = parameters.gamma

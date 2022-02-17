@@ -10,7 +10,7 @@ import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.*
 import ru.isma.next.editor.text.services.TextEditorService
 import ru.isma.next.editor.text.services.contracts.ITextEditorService
-import ru.isma.next.services.simulation.abstractions.interfaces.ISimulationSettingsProvider
+import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.lisma.InputTranslator
 import ru.nstu.isma.lisma.LismaTranslator
@@ -40,7 +40,7 @@ val externalServicesModule = module {
 
 val simulationScopeModule = module {
     scope<SimulationScope> {
-        scoped<ISimulationSettingsProvider> { SnapshotSimulationSettingsProvider(get()) }
+
         scoped<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
         scoped<IDaeSystemSolverFactory> { DaeSystemStepSolverFactory(get(), get(), get(), get()) }
         scoped<IHybridSystemSimulator> { HybridSystemSimulator(get(), get()) }
@@ -49,6 +49,8 @@ val simulationScopeModule = module {
         scoped<IEventDetectorFactory> { EventDetectorFactory(get()) }
         scoped { InFileSimulationRunner(get()) }
         scoped { InMemorySimulationRunner(get()) }
+
+        scoped<SimulationParametersModel> { get<SimulationParametersService>().snapshot() }
     }
 }
 

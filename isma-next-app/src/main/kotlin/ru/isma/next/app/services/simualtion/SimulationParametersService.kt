@@ -1,24 +1,21 @@
 package ru.isma.next.app.services.simualtion
 
-import ru.isma.next.app.constants.SIMULATION_PARAMETERS_FILE
+import javafx.collections.FXCollections
 import javafx.stage.FileChooser
+import javafx.stage.Window
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.isma.next.app.constants.SIMULATION_PARAMETERS_FILE
 import ru.isma.next.app.viewmodels.*
 import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
 import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
-import tornadofx.FileChooserMode
-import tornadofx.asObservable
-import tornadofx.chooseFile
 
 class SimulationParametersService(library: IntegrationMethodsLibrary) {
-    val integrationMethods = library.getIntegrationMethodNames()
-            .asObservable()
+    val integrationMethods = FXCollections.observableArrayList(library.getIntegrationMethodNames())
 
-    val simplifyMethods = listOf("Radial-Distance", "Douglas-Peucker")
-            .asObservable()
+    val simplifyMethods = FXCollections.observableArrayList("Radial-Distance", "Douglas-Peucker")
 
     val cauchyInitials = CauchyInitialsViewModel()
 
@@ -50,30 +47,24 @@ class SimulationParametersService(library: IntegrationMethodsLibrary) {
         eventDetection.lowBorder = 0.001
     }
 
-    fun store() {
-        val selectedFiles = chooseFile (filters = simulationParametersFileFilters, mode = FileChooserMode.Save)
-
-        if(selectedFiles.isEmpty())
-        {
-            return
-        }
-
-        val file = selectedFiles.first()
+    fun store(ownerWindow: Window? = null) {
+        val file = FileChooser().run {
+            title = "Save Simulation Parameters"
+            extensionFilters.addAll(simulationParametersFileFilters)
+            return@run showSaveDialog(ownerWindow)
+        } ?: return
 
         val fileOutput = Json.encodeToString(snapshot())
 
         file.writeText(fileOutput)
     }
 
-    fun load() {
-        val selectedFiles = chooseFile (filters = simulationParametersFileFilters, mode = FileChooserMode.Single)
-
-        if(selectedFiles.isEmpty())
-        {
-            return
-        }
-
-        val file = selectedFiles.first()
+    fun load(ownerWindow: Window? = null) {
+        val file = FileChooser().run {
+            title = "Load Simulation Parameters"
+            extensionFilters.addAll(simulationParametersFileFilters)
+            return@run showOpenDialog(ownerWindow)
+        } ?: return
 
         val inputText = file.readText()
 

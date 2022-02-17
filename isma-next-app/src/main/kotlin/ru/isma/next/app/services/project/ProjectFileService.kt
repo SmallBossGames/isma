@@ -1,18 +1,16 @@
 package ru.isma.next.app.services.project
 
-import ru.isma.next.app.constants.OLD_ISMA_PROJECT_FILE
-import ru.isma.next.app.constants.STATE_CHART_ISMA_PROJECT_FILE
-import ru.isma.next.app.constants.TEXT_ISMA_PROJECT_FILE
 import javafx.stage.FileChooser
+import javafx.stage.Window
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import ru.isma.next.app.constants.ALL_ISMA_PROJECT_FILES
+import ru.isma.next.app.constants.OLD_ISMA_PROJECT_FILE
+import ru.isma.next.app.constants.STATE_CHART_ISMA_PROJECT_FILE
+import ru.isma.next.app.constants.TEXT_ISMA_PROJECT_FILE
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
-import tornadofx.FileChooserMode
-import tornadofx.chooseFile
 import java.io.File
 
 class ProjectFileService(private val projectController: ProjectService) {
@@ -30,15 +28,12 @@ class ProjectFileService(private val projectController: ProjectService) {
         saveProject(project)
     }
 
-    fun open() {
-        val selectedFiles = chooseFile (filters = fileFilers, mode = FileChooserMode.Single)
-
-        if(selectedFiles.isEmpty())
-        {
-            return
-        }
-
-        val file = selectedFiles.first()
+    fun open(ownerWindow: Window? = null) {
+        val file = FileChooser().run {
+            title = "Open Project File"
+            extensionFilters.addAll(fileFilters)
+            return@run showOpenDialog(ownerWindow)
+        } ?: return
 
         if(file.exists()){
             open(file)
@@ -105,7 +100,7 @@ class ProjectFileService(private val projectController: ProjectService) {
         project.file!!.writeText(fileOutput)
     }
 
-    private fun saveProjectAs(project: IProjectModel){
+    private fun saveProjectAs(project: IProjectModel, ownerWindow: Window? = null){
         val filters: Array<FileChooser.ExtensionFilter>
         val fileOutput: String
 
@@ -123,14 +118,11 @@ class ProjectFileService(private val projectController: ProjectService) {
             }
         }
 
-        val selectedFiles = chooseFile (filters = filters, mode = FileChooserMode.Save)
-
-        if(selectedFiles.isEmpty())
-        {
-            return
-        }
-
-        val file = selectedFiles.first()
+        val file = FileChooser().run {
+            title = "Save Project File"
+            extensionFilters.addAll(filters)
+            return@run showSaveDialog(ownerWindow)
+        } ?: return
 
         project.apply {
             this.name = file.name
@@ -154,6 +146,6 @@ class ProjectFileService(private val projectController: ProjectService) {
             FileChooser.ExtensionFilter("All ISMA project files", STATE_CHART_ISMA_PROJECT_FILE),
         )
 
-        private val fileFilers = arrayOf(*allProjectFileFilters, *textProjectFileFilters, *stateChartProjectFileFilters)
+        private val fileFilters = arrayOf(*allProjectFileFilters, *textProjectFileFilters, *stateChartProjectFileFilters)
     }
 }

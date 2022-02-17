@@ -8,7 +8,7 @@ import ru.isma.next.app.models.preferences.PreferencesModel
 import ru.isma.next.app.models.preferences.WindowPreferencesModel
 import java.io.File
 
-class PreferencesProvider(val settingsFilePath: String) {
+class PreferencesProvider(private val settingsFilePath: String) {
     var preferences: PreferencesModel = load()
         private set
 

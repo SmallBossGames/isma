@@ -2,6 +2,7 @@ package ru.isma.next.app.services.simualtion
 
 import javafx.collections.FXCollections
 import javafx.stage.FileChooser
+import javafx.stage.Window
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.javafx.changeAsFlow
@@ -13,8 +14,6 @@ import ru.nstu.grin.integration.GrinIntegrationFacade
 import ru.nstu.grin.integration.PointModel
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.models.IntgResultPoint
-import tornadofx.FileChooserMode
-import tornadofx.chooseFile
 import java.io.File
 import java.io.Writer
 
@@ -60,10 +59,12 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         grinIntegrationController.openSimpleChart(functions)
     }
 
-    fun exportToFile(simulationResult: CompletedSimulationModel){
-        val selectedFiles = chooseFile (filters = fileFilers, mode = FileChooserMode.Save)
-
-        val file = selectedFiles.firstOrNull() ?: return
+    fun exportToFile(simulationResult: CompletedSimulationModel, ownerWindow: Window? = null){
+        val file = FileChooser().run {
+            title = "Export Results"
+            extensionFilters.addAll(fileFilers)
+            return@run showSaveDialog(ownerWindow)
+        } ?: return
 
         ResultServiceScope.launch {
             exportToFileAsync(simulationResult, file)

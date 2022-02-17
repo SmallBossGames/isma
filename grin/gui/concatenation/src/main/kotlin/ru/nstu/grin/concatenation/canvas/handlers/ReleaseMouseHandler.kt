@@ -7,6 +7,7 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
+import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import tornadofx.Controller
 import tornadofx.Scope
 
@@ -78,7 +79,8 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                     descriptions = model.descriptions.toList()
                 )
                 val scope = Scope()
-                ConcatenationView(scope, initData).openWindow()
+
+                ConcatenationView(scope, CanvasProjectLoader(scope), initData).openWindow()
             }
 
             model.selectionSettings.reset()

@@ -8,21 +8,21 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.file.model.SavedCanvas
 import tornadofx.Controller
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.nio.file.Path
+import tornadofx.Scope
+import java.io.File
 
-class CanvasProjectLoader : Controller() {
+class CanvasProjectLoader(override val scope: Scope) : Controller() {
     private val model: ConcatenationCanvasModel by inject()
     private val mapper = createObjectMapper()
 
-    fun save(path: Path) {
+    fun save(path: File) {
         val savedCanvas = SavedCanvas(
             cartesians = model.cartesianSpaces,
             descriptions = model.descriptions,
             arrows = model.arrows
         )
-        FileOutputStream(path.toFile()).use {
+
+        path.bufferedWriter(Charsets.UTF_8).use {
             val length = mapper.writeValueAsString(savedCanvas).length
             println("Length $length")
             val sequenceWriter = mapper.writer().writeValues(it)
@@ -30,10 +30,8 @@ class CanvasProjectLoader : Controller() {
         }
     }
 
-    fun load(path: Path) {
-        val json = FileInputStream(path.toAbsolutePath().toFile()).use {
-            it.readBytes().toString(Charsets.UTF_8)
-        }
+    fun load(path: File) {
+        val json = path.readText(Charsets.UTF_8)
 
         val savedCanvas = mapper.readValue<SavedCanvas>(json)
         model.cartesianSpaces.clear()

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections
 import javafx.stage.FileChooser
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import ru.isma.next.app.javafx.changeAsFlow
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.views.dialogs.NamedPickerItem
 import ru.isma.next.app.views.dialogs.pickItems
@@ -18,7 +19,11 @@ import java.io.File
 import java.io.Writer
 
 class SimulationResultService(private val grinIntegrationController: GrinIntegrationFacade) {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
     val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()!!
+
+    val changedTrackingTasksResults = trackingTasksResults.changeAsFlow(coroutineScope)
 
     private val fileFilers = arrayOf(
         FileChooser.ExtensionFilter("Comma separate file", "*.csv")

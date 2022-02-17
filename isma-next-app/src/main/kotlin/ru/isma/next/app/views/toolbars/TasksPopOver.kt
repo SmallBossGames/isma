@@ -1,8 +1,6 @@
 package ru.isma.next.app.views.toolbars
 
 import javafx.beans.property.SimpleStringProperty
-import javafx.collections.ListChangeListener
-import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -11,6 +9,8 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import org.controlsfx.control.PopOver
@@ -24,6 +24,8 @@ class TasksPopOver(
     private val simulationResultService: SimulationResultService,
     private val simulationService: SimulationService,
 ): PopOver() {
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+
     private val inProgressTasksContainer = VBox()
         .apply {
             spacing = 5.0
@@ -49,14 +51,6 @@ class TasksPopOver(
         }
     }
 
-    private var inProgressListChangeListener: ListChangeListener<InProgressSimulationModel>? = null
-
-    private var completedListChangeListener: ListChangeListener<CompletedSimulationModel>? = null
-
-    private var inProgressList: ObservableList<InProgressSimulationModel>? = null
-
-    private var completedList: ObservableList<CompletedSimulationModel>? = null
-
     private val inProgressItemMap = mutableMapOf<InProgressSimulationModel, HBox>()
 
     private val completedItemMap = mutableMapOf<CompletedSimulationModel, HBox>()
@@ -73,84 +67,68 @@ class TasksPopOver(
             padding = Insets(10.0)
         }
 
-        bindInProgressTasksList(simulationService.trackingTasks)
-        bindCompletedSimulationModel(simulationResultService.trackingTasksResults)
+        bindInProgressTasksList()
+        bindCompletedSimulationModel()
     }
 
-    fun bindInProgressTasksList(collection: ObservableList<InProgressSimulationModel>) {
-        unbindInProgressTasksList()
+    private fun bindInProgressTasksList() {
+        coroutineScope.launch {
+            simulationService.changedTrackingTasks
+                .cancellable()
+                .collect {
+                    while (it.next()) {
+                        if (it.wasAdded()) {
+                            it.addedSubList.forEach { instance ->
+                                val item = createInProgressTasksListItem(instance)
 
-        val listener = ListChangeListener<InProgressSimulationModel> {
-            while (it.next()){
-                if(it.wasAdded()) {
-                    it.addedSubList.forEach { instance ->
-                        val item = createInProgressTasksListItem(instance)
+                                inProgressItemMap[instance] = item
 
-                        inProgressItemMap[instance] = item
+                                inProgressTasksContainer.children.add(item)
+                            }
+                        } else if (it.wasRemoved()) {
+                            it.removed.forEach { instance ->
+                                val item = inProgressItemMap[instance]
 
-                        inProgressTasksContainer.children.add(item)
-                    }
-                } else if(it.wasRemoved()) {
-                    it.removed.forEach { instance ->
-                        val item = inProgressItemMap[instance]
+                                inProgressItemMap.remove(instance)
 
-                        inProgressItemMap.remove(instance)
-
-                        inProgressTasksContainer.children.remove(item)
-                    }
-                }
-            }
-        }
-
-        inProgressList = collection
-        inProgressListChangeListener = listener
-
-        collection.addListener(listener)
-    }
-
-    fun bindCompletedSimulationModel(collection: ObservableList<CompletedSimulationModel>) {
-        unbindCompletedTasksList()
-
-        val listener = ListChangeListener<CompletedSimulationModel> {
-            while (it.next()){
-                if(it.wasAdded()) {
-                    it.addedSubList.forEach { instance ->
-                        val item = createCompletedTasksListItem(instance)
-
-                        completedItemMap[instance] = item
-
-                        completedTasksContainer.children.add(item)
-                    }
-                } else if(it.wasRemoved()) {
-                    it.removed.forEach { instance ->
-                        val item = completedItemMap[instance]
-
-                        completedItemMap.remove(instance)
-
-                        completedTasksContainer.children.remove(item)
+                                inProgressTasksContainer.children.remove(item)
+                            }
+                        }
                     }
                 }
-            }
         }
-
-        completedList = collection
-        completedListChangeListener = listener
-
-        collection.addListener(listener)
     }
 
-    fun unbindInProgressTasksList() {
-        val listener = inProgressListChangeListener ?: return
-        val collection = inProgressList ?: return
+    private fun bindCompletedSimulationModel() {
+        coroutineScope.launch {
+            simulationResultService.changedTrackingTasksResults
+                .cancellable()
+                .collect {
+                    while (it.next()) {
+                        if (it.wasAdded()) {
+                            it.addedSubList.forEach { instance ->
+                                val item = createCompletedTasksListItem(instance)
 
-        collection.removeListener(listener)
+                                completedItemMap[instance] = item
+
+                                completedTasksContainer.children.add(item)
+                            }
+                        } else if (it.wasRemoved()) {
+                            it.removed.forEach { instance ->
+                                val item = completedItemMap[instance]
+
+                                completedItemMap.remove(instance)
+
+                                completedTasksContainer.children.remove(item)
+                            }
+                        }
+                    }
+                }
+        }
     }
 
-    fun unbindCompletedTasksList() {
-        val listener = completedListChangeListener ?: return
-        val collection = completedList ?: return
-
-        collection.removeListener(listener)
+    fun dispose() {
+        coroutineScope.cancel()
     }
 
     private fun createCompletedTasksListItem(trackingTask: CompletedSimulationModel): HBox {

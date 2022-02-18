@@ -1,49 +1,37 @@
 package ru.nstu.grin.concatenation.file
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.file.model.SavedCanvas
+import ru.nstu.grin.concatenation.canvas.model.project.ProjectSnapshot
+import ru.nstu.grin.concatenation.canvas.model.project.toModel
+import ru.nstu.grin.concatenation.canvas.model.project.toSnapshot
 import tornadofx.Controller
 import tornadofx.Scope
 import java.io.File
 
+//TODO: implement descriptions and arrows saving
 class CanvasProjectLoader(override val scope: Scope) : Controller() {
     private val model: ConcatenationCanvasModel by inject()
-    private val mapper = createObjectMapper()
 
     fun save(path: File) {
-        val savedCanvas = SavedCanvas(
-            cartesians = model.cartesianSpaces,
-            descriptions = model.descriptions,
-            arrows = model.arrows
+        val project = ProjectSnapshot(
+            spaces = model.cartesianSpaces.map { it.toSnapshot() }
         )
 
         path.bufferedWriter(Charsets.UTF_8).use {
-            val sequenceWriter = mapper.writer().writeValues(it)
-            sequenceWriter.write(savedCanvas)
+            it.write(Json.encodeToString(project))
         }
     }
 
     fun load(path: File) {
         val json = path.readText(Charsets.UTF_8)
+        val project = Json.decodeFromString<ProjectSnapshot>(json)
 
-        val savedCanvas = mapper.readValue<SavedCanvas>(json)
         model.cartesianSpaces.clear()
-        model.cartesianSpaces.setAll(savedCanvas.cartesians)
+        model.cartesianSpaces.setAll(project.spaces.map { it.toModel() })
         model.descriptions.clear()
-        model.descriptions.setAll(savedCanvas.descriptions)
         model.arrows.clear()
-        model.arrows.setAll(savedCanvas.arrows)
-    }
-
-    fun createObjectMapper(): ObjectMapper {
-        return ObjectMapper()
-            .registerKotlinModule()
-            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 }

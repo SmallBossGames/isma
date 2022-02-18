@@ -5,7 +5,6 @@ import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
@@ -26,12 +25,19 @@ class GrinIntegrationFacade: KoinComponent {
             descriptions = listOf()
         )
 
-        val view = get<ConcatenationView>{ parametersOf(initData) }
+        val scope = getKoin().createScope<MainGrinScope>()
+
+        val view = scope.get<ConcatenationView>{ parametersOf(initData) }
 
         Stage().apply {
             scene = Scene(view.root)
             title = "GRIN"
-            initModality(Modality.WINDOW_MODAL)
+            initModality(
+                Modality.WINDOW_MODAL
+            )
+            setOnCloseRequest {
+                scope.close()
+            }
             show()
         }
     }

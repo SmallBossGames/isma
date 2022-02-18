@@ -19,8 +19,9 @@ data class CartesianSpace(
         return CartesianSpace(
             id = UUID.randomUUID(),
             name = name,
-            functions = functions.map { it.copy(id = UUID.randomUUID(), points = it.points.map { it.copy() }) }
-                .toMutableList(),
+            functions = functions.map {
+                it.copy(id = UUID.randomUUID(), points = it.points.map { it.copy() })
+            }.toMutableList(),
             xAxis = xAxis.copy(id = UUID.randomUUID(), settings = xAxis.settings.copy()),
             yAxis = yAxis.copy(id = UUID.randomUUID(), settings = yAxis.settings.copy()),
             isShowGrid = isShowGrid

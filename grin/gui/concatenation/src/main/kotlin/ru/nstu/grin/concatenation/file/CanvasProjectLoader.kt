@@ -23,8 +23,6 @@ class CanvasProjectLoader(override val scope: Scope) : Controller() {
         )
 
         path.bufferedWriter(Charsets.UTF_8).use {
-            val length = mapper.writeValueAsString(savedCanvas).length
-            println("Length $length")
             val sequenceWriter = mapper.writer().writeValues(it)
             sequenceWriter.write(savedCanvas)
         }

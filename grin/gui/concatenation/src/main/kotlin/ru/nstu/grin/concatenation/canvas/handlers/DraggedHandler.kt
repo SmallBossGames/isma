@@ -86,7 +86,7 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         if (draggedSettings.lastY == -1.0) draggedSettings.lastY = event.y
 
 
-        if (axis.isXAxis()) {
+        if (axis.isXAxis) {
             when {
                 event.x < draggedSettings.lastX -> {
                     axis.settings.min -= DELTA

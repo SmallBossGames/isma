@@ -24,7 +24,7 @@ class MirrorFunctionController : Controller() {
     }
 
     fun mirrorFunction(isY: Boolean, function: ConcatenationFunction) {
-        val mirrorDetails = function.getMirrorDetails()
+        val mirrorDetails = function.mirrorDetails
         val mirrorEvent = UpdateFunctionEvent(
             id = function.id,
             name = function.name,

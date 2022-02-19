@@ -113,8 +113,7 @@ class FunctionCanvasService : Controller() {
     fun derivativeFunction(event: DerivativeFunctionEvent) {
         val function = getFunction(event.id)
 
-        val details = DerivativeDetails(degree = event.degree, type = event.type)
-        function.details.add(details)
+        function.derivativeDetails = DerivativeDetails(degree = event.degree, type = event.type)
 
         view.redraw()
     }
@@ -122,9 +121,7 @@ class FunctionCanvasService : Controller() {
     fun waveletFunction(event: WaveletFunctionEvent) {
         val function = getFunction(event.id)
 
-        val details =
-            WaveletDetails(waveletTransformFun = event.waveletTransformFun, waveletDirection = event.waveletDirection)
-        function.details.add(details)
+        function.waveletDetails = WaveletDetails(waveletTransformFun = event.waveletTransformFun, waveletDirection = event.waveletDirection)
 
         view.redraw()
         localizeFunction(LocalizeFunctionEvent(function.id))
@@ -195,7 +192,7 @@ class FunctionCanvasService : Controller() {
         function.isHide = event.isHide
         function.lineSize = event.lineSize
         function.lineType = event.lineType
-        function.replaceMirrorDetails(event.mirroDetails)
+        function.mirrorDetails = event.mirroDetails
         view.redraw()
         getAllFunctions()
     }

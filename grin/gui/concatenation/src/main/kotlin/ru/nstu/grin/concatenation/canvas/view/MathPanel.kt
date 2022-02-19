@@ -40,9 +40,9 @@ class MathPanel : Fragment() {
             action {
                 val function = model.getSelectedFunction()
                 if (function != null) {
-                    val derivativeDetails = function.getDerivativeDetails()
+                    val derivativeDetails = function.derivativeDetails
                     if (derivativeDetails != null) {
-                        function.removeDerivativeDetails()
+                        function.derivativeDetails = null
                         drawer.draw()
                         return@action
                     }
@@ -65,9 +65,9 @@ class MathPanel : Fragment() {
             action {
                 val function = model.getSelectedFunction()
                 if (function != null) {
-                    val waveletDetails = function.getWaveletDetails()
+                    val waveletDetails = function.waveletDetails
                     if (waveletDetails != null) {
-                        function.removeWaveletDetails()
+                        function.waveletDetails = null
                         drawer.draw()
                         return@action
                     }

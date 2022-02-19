@@ -40,7 +40,9 @@ data class ConcatenationFunctionSnapshot(
 
     val lineSize: Double,
     val lineType: LineType,
-    val details: List<ConcatenationFunctionDetailsSnapshot>
+    var mirrorDetails: MirrorDetailsSnapshot,
+    var derivativeDetails: DerivativeDetailsSnapshot?,
+    var waveletDetails: WaveletDetailsSnapshot?,
 )
 
 @Serializable
@@ -167,19 +169,17 @@ fun PointSnapshot.toModel() = Point(x, y)
 
 fun Point.toSnapshot() = PointSnapshot(x, y)
 
-fun ConcatenationFunctionDetailsSnapshot.toModel() =
-    when(this) {
-        is DerivativeDetailsSnapshot -> DerivativeDetails(degree, type)
-        is MirrorDetailsSnapshot -> MirrorDetails(isMirrorX, isMirrorY)
-        is WaveletDetailsSnapshot -> WaveletDetails(waveletTransformFun, waveletDirection)
-    }
+fun DerivativeDetailsSnapshot.toModel() = DerivativeDetails(degree, type)
 
-fun ConcatenationFunctionDetails.toSnapshot() =
-    when(this) {
-        is DerivativeDetails -> DerivativeDetailsSnapshot(degree, type)
-        is MirrorDetails -> MirrorDetailsSnapshot(isMirrorX, isMirrorY)
-        is WaveletDetails -> WaveletDetailsSnapshot(waveletTransformFun, waveletDirection)
-    }
+fun DerivativeDetails.toSnapshot() = DerivativeDetailsSnapshot(degree, type)
+
+fun MirrorDetailsSnapshot.toModel() = MirrorDetails(isMirrorX, isMirrorY)
+
+fun MirrorDetails.toSnapshot() = MirrorDetailsSnapshot(isMirrorX, isMirrorY)
+
+fun WaveletDetailsSnapshot.toModel() = WaveletDetails(waveletTransformFun, waveletDirection)
+
+fun WaveletDetails.toSnapshot() = WaveletDetailsSnapshot(waveletTransformFun, waveletDirection)
 
 fun ConcatenationFunctionSnapshot.toModel() =
     ConcatenationFunction(
@@ -191,7 +191,9 @@ fun ConcatenationFunctionSnapshot.toModel() =
         functionColor = functionColor.toModel(),
         lineSize = lineSize,
         lineType = lineType,
-        details = details.map { it.toModel() }.toMutableList()
+        mirrorDetails = mirrorDetails.toModel(),
+        derivativeDetails = derivativeDetails?.toModel(),
+        waveletDetails = waveletDetails?.toModel(),
     )
 
 fun ConcatenationFunction.toSnapshot() =
@@ -204,7 +206,9 @@ fun ConcatenationFunction.toSnapshot() =
         functionColor = functionColor.toSnapshot(),
         lineSize = lineSize,
         lineType = lineType,
-        details = details.map { it.toSnapshot() }
+        mirrorDetails = mirrorDetails.toSnapshot(),
+        derivativeDetails = derivativeDetails?.toSnapshot(),
+        waveletDetails = waveletDetails?.toSnapshot(),
     )
 
 fun CartesianSpaceSnapshot.toModel() =

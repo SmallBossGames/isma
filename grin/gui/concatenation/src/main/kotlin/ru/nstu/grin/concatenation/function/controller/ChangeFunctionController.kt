@@ -19,7 +19,7 @@ class ChangeFunctionController : Controller() {
                 model.lineSize = it.function.lineSize.toString()
                 model.lineType = it.function.lineType
                 model.isHide = !it.function.isHide
-                val mirrorDetails = it.function.details.filterIsInstance<MirrorDetails>().first()
+                val mirrorDetails = it.function.mirrorDetails
                 model.isMirrorX = mirrorDetails.isMirrorX
                 model.isMirrorY = mirrorDetails.isMirrorY
             }

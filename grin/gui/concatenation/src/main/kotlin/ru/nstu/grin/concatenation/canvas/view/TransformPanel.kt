@@ -41,9 +41,9 @@ class TransformPanel : Fragment() {
                     return@action
                 }
                 enableWhen {
-                    val function = model.getSelectedFunction()
-                    val description = model.getSelectedDescription()
-                    (function != null || description != null).toProperty()
+                    val selectedFunction = model.getSelectedFunction()
+                    val selectedDescription = model.getSelectedDescription()
+                    (selectedFunction != null || selectedDescription != null).toProperty()
                 }
             }
         }
@@ -63,7 +63,7 @@ class TransformPanel : Fragment() {
                         mapOf(MirrorFunctionFragment::isMirrorY to false)
                     ).openModal()
                 } else {
-                    val mirrorDetails = function.getMirrorDetails()
+                    val mirrorDetails = function.mirrorDetails
                     val mirrorEvent = UpdateFunctionEvent(
                         id = function.id,
                         name = function.name,
@@ -95,7 +95,7 @@ class TransformPanel : Fragment() {
                         mapOf(MirrorFunctionFragment::isMirrorY to true)
                     ).openModal()
                 } else {
-                    val mirrorDetails = function.getMirrorDetails()
+                    val mirrorDetails = function.mirrorDetails
                     val mirrorEvent = UpdateFunctionEvent(
                         id = function.id,
                         name = function.name,

@@ -18,38 +18,21 @@ data class ConcatenationFunction(
 
     var lineSize: Double,
     var lineType: LineType,
-    val details: MutableList<ConcatenationFunctionDetails> = mutableListOf(MirrorDetails())
+    var mirrorDetails: MirrorDetails = MirrorDetails(),
+    var derivativeDetails: DerivativeDetails? = null,
+    var waveletDetails: WaveletDetails? = null,
 ) : Cloneable {
     public override fun clone(): ConcatenationFunction {
         return ConcatenationFunction(
             id = id,
             name = name,
-            points = points.map { it.clone() as Point },
+            points = points.map { it.copy() },
             functionColor = functionColor,
             lineSize = lineSize,
             lineType = lineType,
-            details = details.map {
-                when (it) {
-                    is MirrorDetails -> it.copy()
-                    is DerivativeDetails -> it.copy()
-                    is WaveletDetails -> it.copy()
-                }
-            }.toMutableList()
+            mirrorDetails = mirrorDetails.copy(),
+            derivativeDetails = derivativeDetails?.copy(),
+            waveletDetails = waveletDetails?.copy(),
         )
     }
-
-    fun replaceMirrorDetails(details: MirrorDetails) {
-        this.details.removeIf { it is MirrorDetails }
-        this.details.add(details)
-    }
-
-    fun getMirrorDetails() = details.filterIsInstance<MirrorDetails>().first()
-
-    fun getDerivativeDetails() = details.filterIsInstance<DerivativeDetails>().firstOrNull()
-
-    fun getWaveletDetails() = details.filterIsInstance<WaveletDetails>().firstOrNull()
-
-    fun removeDerivativeDetails() = details.removeIf { it is DerivativeDetails }
-
-    fun removeWaveletDetails() = details.removeIf { it is WaveletDetails }
 }

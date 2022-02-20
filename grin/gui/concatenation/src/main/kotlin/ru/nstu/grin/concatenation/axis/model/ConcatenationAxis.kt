@@ -41,7 +41,7 @@ data class ConcatenationAxis(
         )
     }
 
-    fun isLocated(x: Double, y: Double): Boolean {
+    fun isLocated(x: Double, y: Double, canvasWidth: Double, canvasHeight: Double): Boolean {
         when (direction) {
             Direction.LEFT -> {
                 val maxX = (order + 1) * SettingsProvider.getAxisWidth()
@@ -49,8 +49,8 @@ data class ConcatenationAxis(
                 return x < maxX && x > minX
             }
             Direction.RIGHT -> {
-                val maxX = SettingsProvider.getCanvasWidth() - order * SettingsProvider.getAxisWidth()
-                val minX = SettingsProvider.getCanvasWidth() - (order + 1) * SettingsProvider.getAxisWidth()
+                val maxX = canvasWidth - order * SettingsProvider.getAxisWidth()
+                val minX = canvasWidth - (order + 1) * SettingsProvider.getAxisWidth()
 
                 return x > minX && x < maxX
             }
@@ -61,8 +61,8 @@ data class ConcatenationAxis(
                 return y > minY && y < maxY
             }
             Direction.BOTTOM -> {
-                val maxY = SettingsProvider.getCanvasHeight() - order * SettingsProvider.getAxisWidth()
-                val minY = SettingsProvider.getCanvasHeight() - (order + 1) * SettingsProvider.getAxisWidth()
+                val maxY = canvasHeight - order * SettingsProvider.getAxisWidth()
+                val minY = canvasHeight - (order + 1) * SettingsProvider.getAxisWidth()
 
                 return y > minY && y < maxY
             }

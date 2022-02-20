@@ -30,10 +30,21 @@ class ContextMenuDrawElement(
                 val axises = model.cartesianSpaces.map {
                     listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
                 }.flatten()
-                val axis =
-                    axises.firstOrNull { it.second.isLocated(settings.xGraphic, settings.yGraphic) }?.second ?: return
+                val axis = axises.firstOrNull {
+                    it.second.isLocated(
+                        settings.xGraphic,
+                        settings.yGraphic,
+                        canvasWidth,
+                        canvasHeight
+                    )
+                }?.second ?: return
                 val cartesianSpace = axises.firstOrNull {
-                    it.second.isLocated(settings.xGraphic, settings.yGraphic)
+                    it.second.isLocated(
+                        settings.xGraphic,
+                        settings.yGraphic,
+                        canvasWidth,
+                        canvasHeight
+                    )
                 }?.first ?: return
 
                 val logMenuItem = MenuItem("Включить логарифмический масштаб")
@@ -56,7 +67,7 @@ class ContextMenuDrawElement(
 
                 val changeAxis = MenuItem("Изменить ось")
                 changeAxis.action {
-                    if (cartesianSpace.xAxis.isLocated(settings.xGraphic, settings.yGraphic)) {
+                    if (cartesianSpace.xAxis.isLocated(settings.xGraphic, settings.yGraphic, canvasWidth, canvasHeight)) {
                         find<AxisChangeFragment>(
                             scope, mapOf(
                                 AxisChangeFragment::axisId.name to cartesianSpace.xAxis.id

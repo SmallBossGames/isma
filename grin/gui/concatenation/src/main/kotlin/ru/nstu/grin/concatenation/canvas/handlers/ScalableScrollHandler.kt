@@ -5,12 +5,14 @@ import javafx.scene.input.ScrollEvent
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import tornadofx.Controller
 
 class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
     private val model: ConcatenationCanvasModel by inject()
+    private val canvasViewModel: CanvasViewModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
     private val matrixTransformer: MatrixTransformerController by inject()
 
@@ -20,7 +22,7 @@ class ScalableScrollHandler : EventHandler<ScrollEvent>, Controller() {
         }.flatten()
 
         val axis = axes.firstOrNull {
-            it.isLocated(event.x, event.y)
+            it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
         }
 
         if (axis != null) {

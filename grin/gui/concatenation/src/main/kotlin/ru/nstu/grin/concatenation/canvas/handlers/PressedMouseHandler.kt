@@ -11,6 +11,7 @@ import tornadofx.Controller
 
 class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private val model: ConcatenationCanvasModel by inject()
+    private val canvasViewModel: CanvasViewModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
     private val concatenationViewModel: ConcatenationViewModel by inject()
 
@@ -80,7 +81,10 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten().any { it.isLocated(event.x, event.y) }
+        return model.cartesianSpaces
+            .map { listOf(it.xAxis, it.yAxis) }
+            .flatten()
+            .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
     }
 
     private fun handleViewMode(event: MouseEvent) {
@@ -165,7 +169,7 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         }.flatten()
 
         val cartesianSpace = axises.firstOrNull {
-            it.second.isLocated(event.x, event.y)
+            it.second.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
         }?.first
 
         if (cartesianSpace == null) {

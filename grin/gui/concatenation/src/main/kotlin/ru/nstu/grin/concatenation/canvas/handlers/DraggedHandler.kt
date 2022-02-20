@@ -12,6 +12,7 @@ import tornadofx.Controller
 
 class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     private val model: ConcatenationCanvasModel by inject()
+    private val canvasViewModel: CanvasViewModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
     private val concatenationViewModel: ConcatenationViewModel by inject()
@@ -66,7 +67,10 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten().any { it.isLocated(event.x, event.y) }
+        return model.cartesianSpaces
+            .map { listOf(it.xAxis, it.yAxis) }
+            .flatten()
+            .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
     }
 
     private fun handleDragged(event: MouseEvent) {
@@ -77,7 +81,7 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
             listOf(it.xAxis, it.yAxis)
         }.flatten()
         val axis = axises.firstOrNull {
-            it.isLocated(event.x, event.y)
+            it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
         } ?: return
 
         val draggedSettings = getDraggedSettings(axis)

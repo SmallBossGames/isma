@@ -54,17 +54,21 @@ class SpacesTransformationController: Controller() {
     suspend fun transformSpaces() = coroutineScope {
         for (cartesianSpace in model.cartesianSpaces) {
             for (function in cartesianSpace.functions) {
-                if (function.isHide) continue
+                if (function.isHide) {
+                    function.pixelsToDraw = null
+                    continue
+                }
 
-                transformPoints(
-                    function.id,
-                    function.points,
-                    cartesianSpace.xAxis.toSnapshot(),
-                    cartesianSpace.yAxis.toSnapshot(),
-                    function.mirrorDetails,
-                    function.derivativeDetails,
-                    function.waveletDetails,
-                )
+                function.pixelsToDraw =
+                    transformPoints(
+                        function.id,
+                        function.points,
+                        cartesianSpace.xAxis.toSnapshot(),
+                        cartesianSpace.yAxis.toSnapshot(),
+                        function.mirrorDetails,
+                        function.derivativeDetails,
+                        function.waveletDetails,
+                    )
             }
         }
     }
@@ -77,7 +81,7 @@ class SpacesTransformationController: Controller() {
         mirrorDetails: MirrorDetails,
         derivativeDetails: DerivativeDetails?,
         waveletDetails: WaveletDetails?
-    ) = coroutineScope {
+    ): Pair<DoubleArray, DoubleArray> = coroutineScope {
 
         /*val transforms = listOf(
             LogTransform(
@@ -123,18 +127,23 @@ class SpacesTransformationController: Controller() {
 
         val transformedPoints = points
 
-        for (point in transformedPoints) {
-            point.xGraphic = matrixTransformer.transformUnitsToPixel(
-                point.x,
+        val xResults = DoubleArray(transformedPoints.size)
+        val yResults = DoubleArray(transformedPoints.size)
+
+        for (i in transformedPoints.indices) {
+            xResults[i] = matrixTransformer.transformUnitsToPixel(
+                transformedPoints[i].x,
                 xAxis.settings.toModel(),
                 xAxis.direction,
             )
-            point.yGraphic = matrixTransformer.transformUnitsToPixel(
-                point.y,
+            yResults[i] = matrixTransformer.transformUnitsToPixel(
+                transformedPoints[i].y,
                 yAxis.settings.toModel(),
                 yAxis.direction,
             )
         }
+
+        Pair(xResults, yResults)
     }
 
     private fun makeDerivative(points: List<Point>, details: DerivativeDetails): List<Point> {

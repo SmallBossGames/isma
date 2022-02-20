@@ -6,6 +6,7 @@ import javafx.scene.input.MouseEvent
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.model.*
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import tornadofx.Controller
 
@@ -27,7 +28,11 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
             description?.isSelected = true
 
             val function = model.cartesianSpaces.map { it.functions }.flatten()
-                .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } }
+                .firstOrNull {
+                    val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                    return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+                }
             function?.isSelected = true
 
             isUiLayerDirty = true
@@ -90,27 +95,32 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleViewMode(event: MouseEvent) {
         val cartesianSpace = model.cartesianSpaces.firstOrNull {
             it.functions.any {
-                it.points.any { it.isNearBy(event.x, event.y) }
+                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
             }
         } ?: return
         val nearFunction = model.cartesianSpaces.mapNotNull {
             it.functions.firstOrNull {
-                it.points.any { it.isNearBy(event.x, event.y) }
+                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
             }
         }.firstOrNull() ?: return
 
-        val nearPoint = nearFunction.points.first {
-            it.isNearBy(event.x, event.y)
-        }
-        println("Found nearPoint $nearPoint")
+        val pixels = nearFunction.pixelsToDraw ?: throw java.lang.NullPointerException()
+
+        val nearPointIndex = ConcatenationFunction.indexOfPixelsNearBy(
+            pixels.first, pixels.second, event.x, event.y
+        )
 
         val pointToolTipSettings = model.pointToolTipSettings
         pointToolTipSettings.isShow = true
         val pointSettings = PointSettings(
             cartesianSpace.xAxis.settings,
             cartesianSpace.yAxis.settings,
-            nearPoint.xGraphic ?: 0.0,
-            nearPoint.yGraphic ?: 0.0
+            pixels.first[nearPointIndex],
+            pixels.second[nearPointIndex],
         )
         pointToolTipSettings.pointsSettings.add(pointSettings)
     }
@@ -118,11 +128,21 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleEditMode(event: MouseEvent) {
         println("Pressed primary button")
         val triple = model.cartesianSpaces.mapNotNull {
-            val point = it.functions.filter { it.isHide.not() }.firstOrNull {
-                it.points.firstOrNull { it.isNearBy(event.x, event.y) } != null
-            }?.points?.first {
-                it.isNearBy(event.x, event.y)
-            }
+            val point = it.functions
+                .filter { it.isHide.not() }
+                .firstOrNull {
+                    val pixels = it.pixelsToDraw ?: return@firstOrNull false
+                    ConcatenationFunction.isPixelsNearBy(
+                        pixels.first, pixels.second, event.x, event.y
+                    )
+                }?.run {
+                    val pixels = pixelsToDraw ?: return@run null
+                    val index = ConcatenationFunction.indexOfPixelsNearBy(
+                        pixels.first, pixels.second, event.x, event.y
+                    )
+                    points[index]
+                }
+
             if (point != null) {
                 Triple(it.xAxis, it.yAxis, point)
             } else {
@@ -140,9 +160,19 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleMoveMode(event: MouseEvent) {
         val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
         val function = model.cartesianSpaces.map { it.functions }.flatten()
-            .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } }
+            .firstOrNull {
+                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+            }
         val cartesian =
-            model.cartesianSpaces.firstOrNull { it.functions.any { it.points.any { it.isNearBy(event.x, event.y) } } }
+            model.cartesianSpaces.firstOrNull {
+                it.functions.any {
+                    val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                    return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+                }
+            }
 
         if (description != null) {
             model.moveSettings = MoveSettings(

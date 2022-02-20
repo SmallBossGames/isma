@@ -22,6 +22,8 @@ data class ConcatenationFunction(
     var derivativeDetails: DerivativeDetails? = null,
     var waveletDetails: WaveletDetails? = null,
 ) : Cloneable {
+    var pixelsToDraw: Pair<DoubleArray, DoubleArray>? = null
+
     public override fun clone(): ConcatenationFunction {
         return ConcatenationFunction(
             id = id,
@@ -34,5 +36,31 @@ data class ConcatenationFunction(
             derivativeDetails = derivativeDetails?.copy(),
             waveletDetails = waveletDetails?.copy(),
         )
+    }
+
+    companion object {
+        fun isPixelsNearBy(xPixels: DoubleArray, yPixels: DoubleArray, x: Double, y:Double) : Boolean {
+            for (i in xPixels.indices) {
+
+                if(Point.isNearBy(x, y, xPixels[i], yPixels[i]))
+                {
+                    return true
+                }
+            }
+
+            return false
+        }
+
+        fun indexOfPixelsNearBy(xPixels: DoubleArray, yPixels: DoubleArray, x: Double, y:Double) : Int {
+            for (i in xPixels.indices) {
+
+                if(Point.isNearBy(x, y, xPixels[i], yPixels[i]))
+                {
+                    return i
+                }
+            }
+
+            return -1
+        }
     }
 }

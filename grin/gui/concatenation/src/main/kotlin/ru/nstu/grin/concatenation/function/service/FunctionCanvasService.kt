@@ -148,23 +148,22 @@ class FunctionCanvasService : Controller() {
     fun localizeFunction(event: LocalizeFunctionEvent) {
         val cartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
         val function = model.cartesianSpaces.map { it.functions }.flatten().first { it.id == event.id }
-        val xPoints = function.points.map {
-            it.xGraphic?.let {
-                matrixTransformer.transformPixelToUnits(
-                    it,
-                    cartesianSpace.xAxis.settings,
-                    cartesianSpace.xAxis.direction
-                )
-            } ?: it.x
+        val pixels = function.pixelsToDraw ?: return
+
+        val xPoints = pixels.first.map {
+            matrixTransformer.transformPixelToUnits(
+                it,
+                cartesianSpace.xAxis.settings,
+                cartesianSpace.xAxis.direction
+            )
         }
-        val yPoints = function.points.map {
-            it.yGraphic?.let {
-                matrixTransformer.transformPixelToUnits(
-                    it,
-                    cartesianSpace.yAxis.settings,
-                    cartesianSpace.yAxis.direction
-                )
-            } ?: it.y
+
+        val yPoints = pixels.second.map {
+            matrixTransformer.transformPixelToUnits(
+                it,
+                cartesianSpace.xAxis.settings,
+                cartesianSpace.xAxis.direction
+            )
         }
 
         val minY = yPoints.minOrNull() ?: return

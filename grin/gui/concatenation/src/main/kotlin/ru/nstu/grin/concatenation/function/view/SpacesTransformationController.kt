@@ -36,8 +36,8 @@ class SpacesTransformationController: Controller() {
     private val matrixTransformer: MatrixTransformerController by inject()
     private val model: ConcatenationCanvasModel by inject()
 
-    private val derivativesCache: MutableMap<DerivativeCacheKey, List<Point>> = ConcurrentHashMap()
-    private val waveletCache: MutableMap<WaveletCacheKey, List<Point>> = ConcurrentHashMap()
+    private val derivativesCache = ConcurrentHashMap<DerivativeCacheKey, List<Point>>()
+    private val waveletCache = ConcurrentHashMap<WaveletCacheKey, List<Point>>()
 
     data class DerivativeCacheKey(
         val functionId: UUID,
@@ -79,7 +79,7 @@ class SpacesTransformationController: Controller() {
         waveletDetails: WaveletDetails?
     ) = coroutineScope {
 
-        val transforms = listOf(
+        /*val transforms = listOf(
             LogTransform(
                 xAxis.axisMarkType == AxisMarkType.LOGARITHMIC,
                 xAxis.settings.logarithmBase,
@@ -87,9 +87,9 @@ class SpacesTransformationController: Controller() {
                 yAxis.settings.logarithmBase
             ),
             MirrorTransform(mirrorDetails.isMirrorX, mirrorDetails.isMirrorY)
-        )
+        )*/
 
-        val waveletPoints = waveletDetails?.let {
+        /*val waveletPoints = waveletDetails?.let {
             val key = WaveletCacheKey(
                 functionId,
                 it.waveletTransformFun,
@@ -103,10 +103,14 @@ class SpacesTransformationController: Controller() {
             } else {
                 cached
             }
-        } ?: points
+        } ?: points*/
 
-        val transformedPoints = derivativeDetails?.let {
-            val key = DerivativeCacheKey(functionId, it.type, it.degree)
+        /*val transformedPoints = derivativeDetails?.let {
+            val key = DerivativeCacheKey(
+                functionId,
+                it.type,
+                it.degree
+            )
             val cached = derivativesCache[key]
             if (cached == null) {
                 val new = makeDerivative(waveletPoints, it)
@@ -115,28 +119,21 @@ class SpacesTransformationController: Controller() {
             } else {
                 cached
             }
-        } ?: waveletPoints
+        } ?: waveletPoints*/
 
-        for (i in transformedPoints.indices) {
-            var temp: Point? = transformedPoints[i]
-            for (transform in transforms) {
-                temp = temp?.let { transform.transform(it) }
-            }
-            if (temp != null) {
-                points[i].xGraphic = matrixTransformer.transformUnitsToPixel(
-                    temp.x,
-                    xAxis.settings.toModel(),
-                    xAxis.direction,
-                )
-                points[i].yGraphic = matrixTransformer.transformUnitsToPixel(
-                    temp.y,
-                    yAxis.settings.toModel(),
-                    yAxis.direction,
-                )
-            } else {
-                points[i].xGraphic = null
-                points[i].yGraphic = null
-            }
+        val transformedPoints = points
+
+        for (point in transformedPoints) {
+            point.xGraphic = matrixTransformer.transformUnitsToPixel(
+                point.x,
+                xAxis.settings.toModel(),
+                xAxis.direction,
+            )
+            point.yGraphic = matrixTransformer.transformUnitsToPixel(
+                point.y,
+                yAxis.settings.toModel(),
+                yAxis.direction,
+            )
         }
     }
 

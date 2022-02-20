@@ -1,11 +1,13 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import javafx.scene.layout.Priority
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.common.model.Arrow
-import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
@@ -13,11 +15,13 @@ import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
-import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
+import ru.nstu.grin.concatenation.javafx.changeAsFlow
 import tornadofx.*
 
 
 class ConcatenationCanvas : View() {
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+
     private val model: ConcatenationCanvasModel by inject()
     private val canvasViewModel: CanvasViewModel by inject()
     private var chainDrawer: ConcatenationChainDrawer = find { }
@@ -30,9 +34,9 @@ class ConcatenationCanvas : View() {
 
     init {
         initData?.also { data ->
-            model.cartesianSpaces = data.cartesianSpaces.toObservable()
-            model.arrows = data.arrows.toObservable()
-            model.descriptions = data.descriptions.toObservable()
+            model.cartesianSpaces.addAll(data.cartesianSpaces.toObservable())
+            model.arrows.addAll(data.arrows.toObservable())
+            model.descriptions.addAll(data.descriptions.toObservable())
 
             model.normalizeSpaces()
         }
@@ -51,10 +55,6 @@ class ConcatenationCanvas : View() {
             hgrow = Priority.ALWAYS
 
             canvasViewModel.uiLayerContext = graphicsContext2D
-
-            model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
-            model.cartesianSpaces.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
-            model.descriptionsProperty.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
 
             onScroll = scalableScrollHandler
 
@@ -81,7 +81,27 @@ class ConcatenationCanvas : View() {
             chainDrawer.draw()
         }
 
+        coroutineScope.launch {
+            launch {
+                model.arrows.changeAsFlow(coroutineScope).collect { chainDrawer.draw() }
+            }
+            launch {
+                model.cartesianSpaces.changeAsFlow(coroutineScope).collect { chainDrawer.draw() }
+            }
+            launch {
+                model.descriptions.changeAsFlow(coroutineScope).collect { chainDrawer.draw() }
+            }
+        }
+
+
         chainDrawer.draw()
+    }
+
+    /**
+     * Cleanup the object on remove
+     */
+    fun dispose() {
+        coroutineScope.cancel()
     }
 
     fun redraw() {

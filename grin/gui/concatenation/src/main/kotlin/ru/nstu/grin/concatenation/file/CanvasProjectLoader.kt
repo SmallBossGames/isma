@@ -29,7 +29,6 @@ class CanvasProjectLoader(override val scope: Scope) : Controller() {
         val json = path.readText(Charsets.UTF_8)
         val project = Json.decodeFromString<ProjectSnapshot>(json)
 
-        model.cartesianSpaces.clear()
         model.cartesianSpaces.setAll(project.spaces.map { it.toModel() })
         model.descriptions.clear()
         model.arrows.clear()

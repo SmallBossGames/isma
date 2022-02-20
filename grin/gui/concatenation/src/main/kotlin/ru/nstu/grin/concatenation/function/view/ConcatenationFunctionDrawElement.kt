@@ -2,7 +2,6 @@ package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.model.LineType
@@ -10,29 +9,6 @@ import tornadofx.Controller
 
 class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
     private val model: ConcatenationCanvasModel by inject()
-
-    private fun radialDistanceFilter(points: List<Point>): List<Point> {
-        var previousPoint: Point? = null
-
-        return points.filter {
-            val prevPoint = previousPoint
-            if(prevPoint == null){
-                previousPoint = it
-                true
-            } else{
-                val diffX = (prevPoint.xGraphic!! - it.xGraphic!!)
-                val diffY = (prevPoint.yGraphic!! - it.yGraphic!!)
-                val distance = diffX * diffX + diffX * diffY
-
-                if(distance < 0.25){
-                    false
-                } else {
-                    previousPoint = it
-                    true
-                }
-            }
-        }
-    }
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val previousLineSize = context.lineWidth

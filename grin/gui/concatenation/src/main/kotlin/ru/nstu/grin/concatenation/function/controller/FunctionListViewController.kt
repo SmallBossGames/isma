@@ -18,10 +18,7 @@ class FunctionListViewController : Controller() {
 
     init {
         subscribe<GetAllFunctionsEvent> {
-            if (model.functions != null) {
-                model.functions.clear()
-            }
-            model.functionsProperty.setAll(it.functions)
+            model.functions.setAll(it.functions)
         }
     }
 

@@ -83,13 +83,13 @@ class ConcatenationCanvas : View() {
 
         coroutineScope.launch {
             launch {
-                model.arrows.changeAsFlow(coroutineScope).collect { chainDrawer.draw() }
+                model.arrows.changeAsFlow().collect { chainDrawer.draw() }
             }
             launch {
-                model.cartesianSpaces.changeAsFlow(coroutineScope).collect { chainDrawer.draw() }
+                model.cartesianSpaces.changeAsFlow().collect { chainDrawer.draw() }
             }
             launch {
-                model.descriptions.changeAsFlow(coroutineScope).collect { chainDrawer.draw() }
+                model.descriptions.changeAsFlow().collect { chainDrawer.draw() }
             }
         }
 

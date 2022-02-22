@@ -14,7 +14,7 @@ class FunctionListView : Fragment() {
     private val model: FunctionListViewModel by inject()
     private val controller: FunctionListViewController = find { }
 
-    override val root: Parent = listview(model.functionsProperty) {
+    override val root: Parent = listview(model.functions) {
         cellFormat {
             graphic = borderpane {
                 left {

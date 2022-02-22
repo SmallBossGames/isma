@@ -2,11 +2,8 @@ package ru.nstu.grin.concatenation.canvas.view
 
 import javafx.scene.control.ContextMenu
 import javafx.scene.paint.Color
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
@@ -21,6 +18,7 @@ import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
 import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Controller
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val canvasViewModel: CanvasViewModel by inject()
@@ -37,24 +35,30 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
     private val contextMenu = ContextMenu()
 
     private val drawingInProgress = AtomicBoolean(false)
-    private val canvasIsDirty = AtomicBoolean(false)
+    private val transformationJob = AtomicReference<Job>(null)
 
     override fun draw() {
-        canvasIsDirty.set(true)
-
-        if (drawingInProgress.compareAndSet(false, true)){
-            while (canvasIsDirty.compareAndSet(true, false)) {
-                drawFunctionsLayer()
-                drawUiLayer()
+        val transformationJobLocal = transformationJob.getAndSet(
+            CoroutinesScope.launch {
+                spacesTransformationController.transformSpaces()
             }
+        )
 
-            drawingInProgress.set(false)
+        transformationJobLocal?.cancel()
+
+        if (drawingInProgress.compareAndSet(false, true)) {
+            CoroutinesScope.launch {
+                while (transformationJob.getAndSet(null)?.join() != null){
+                    drawFunctionsLayer()
+                    drawUiLayer()
+                }
+
+                drawingInProgress.set(false)
+            }
         }
     }
 
-    fun drawFunctionsLayer() = CoroutinesScope.launch {
-        spacesTransformationController.transformSpaces()
-
+    suspend fun drawFunctionsLayer() = coroutineScope {
         withContext(Dispatchers.JavaFx) {
             canvasViewModel.functionsLayerContext.apply {
                 val width = canvasViewModel.canvasWidth

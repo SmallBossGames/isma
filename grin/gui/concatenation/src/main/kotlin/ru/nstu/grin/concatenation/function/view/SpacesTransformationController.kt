@@ -11,6 +11,7 @@ import jwave.transforms.wavelets.haar.Haar1
 import jwave.transforms.wavelets.legendre.Legendre3
 import jwave.transforms.wavelets.other.DiscreteMayer
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
@@ -54,6 +55,8 @@ class SpacesTransformationController: Controller() {
     suspend fun transformSpaces() = coroutineScope {
         for (cartesianSpace in model.cartesianSpaces) {
             for (function in cartesianSpace.functions) {
+                ensureActive()
+
                 if (function.isHide) {
                     function.pixelsToDraw = null
                     continue
@@ -131,6 +134,8 @@ class SpacesTransformationController: Controller() {
         val yResults = DoubleArray(transformedPoints.size)
 
         for (i in transformedPoints.indices) {
+            ensureActive()
+
             xResults[i] = matrixTransformer.transformUnitsToPixel(
                 transformedPoints[i].x,
                 xAxis.settings.toModel(),

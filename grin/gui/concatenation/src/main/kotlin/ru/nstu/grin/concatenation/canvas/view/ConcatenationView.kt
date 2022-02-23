@@ -3,7 +3,7 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.geometry.Insets
 import javafx.scene.Parent
 import javafx.stage.FileChooser
-import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import tornadofx.*
@@ -13,6 +13,8 @@ class ConcatenationView(
     private val canvasProjectLoader: CanvasProjectLoader,
     initData: InitCanvasData?
 ) : View() {
+    private val concatenationCanvasController: ConcatenationCanvasController by inject()
+
     override val root: Parent = borderpane {
         top {
             vbox {
@@ -39,12 +41,7 @@ class ConcatenationView(
                     }
                     menu("Полотно") {
                         item("Очистить все").action {
-                            fire(ConcatenationClearCanvasEvent)
-                        }
-                    }
-                    menu("Элементы") {
-                        item("Открыть окно с элементами").action {
-                            find<ElementsView>().openModal()
+                            concatenationCanvasController.clearCanvas()
                         }
                     }
                 }

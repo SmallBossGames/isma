@@ -1,5 +1,8 @@
 package ru.nstu.grin.concatenation.file
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,6 +16,7 @@ import java.io.File
 
 //TODO: implement descriptions and arrows saving
 class CanvasProjectLoader(override val scope: Scope) : Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
 
     fun save(path: File) {
@@ -32,5 +36,9 @@ class CanvasProjectLoader(override val scope: Scope) : Controller() {
         model.cartesianSpaces.setAll(project.spaces.map { it.toModel() })
         model.descriptions.clear()
         model.arrows.clear()
+
+        coroutineScope.launch {
+            model.reportUpdateAll()
+        }
     }
 }

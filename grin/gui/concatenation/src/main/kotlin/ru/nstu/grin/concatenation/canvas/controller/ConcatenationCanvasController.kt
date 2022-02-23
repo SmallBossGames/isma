@@ -1,17 +1,16 @@
 package ru.nstu.grin.concatenation.canvas.controller
 
 import javafx.stage.StageStyle
-import ru.nstu.grin.common.common.SettingsProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.converters.model.ArrowConverter
 import ru.nstu.grin.common.events.ConcatenationArrowEvent
-import ru.nstu.grin.common.events.ConcatenationClearCanvasEvent
 import ru.nstu.grin.common.model.ConcatenationType
 import ru.nstu.grin.common.view.modal.ArrowModalView
 import ru.nstu.grin.concatenation.axis.controller.AxisCanvasController
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianCanvasController
 import ru.nstu.grin.concatenation.description.controller.DescriptionCanvasController
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
@@ -23,9 +22,8 @@ import tornadofx.Controller
  * Разбить по нескольким контроллерам, один для функций, другой для осей и т.д
  */
 class ConcatenationCanvasController : Controller() {
-    private val canvasViewModel: CanvasViewModel by inject()
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
-    private val view: ConcatenationCanvas by inject()
     private val functionsController: FunctionsCanvasController = find { }
     private val axisCanvasController: AxisCanvasController = find { }
     private val cartesianController: CartesianCanvasController = find { }
@@ -34,9 +32,6 @@ class ConcatenationCanvasController : Controller() {
     init {
         subscribe<ConcatenationArrowEvent> { event ->
             addArrow(event)
-        }
-        subscribe<ConcatenationClearCanvasEvent> {
-            clearCanvas()
         }
     }
 
@@ -77,12 +72,12 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun clearCanvas() {
-        canvasViewModel.functionsLayerContext.clearRect(
-            0.0, 0.0,
-            SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()
-        )
         model.arrows.clear()
         model.descriptions.clear()
         model.cartesianSpaces.clear()
+
+        coroutineScope.launch {
+            model.reportUpdateAll()
+        }
     }
 }

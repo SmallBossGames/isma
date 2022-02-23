@@ -35,36 +35,41 @@ class ConcatenationCanvasModel : ItemViewModel<ConcatenationCanvas>(), Cloneable
     private val functionsListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationFunction>>()
     val functionsListUpdatedEvent = functionsListUpdatedEventInternal.asSharedFlow()
 
-    fun getAllFunctions() =
-        cartesianSpaces.map { it.functions }.flatten()
-
-    suspend fun reportFunctionsListUpdate() =
-        functionsListUpdatedEventInternal.emit(getAllFunctions())
-
     private val axesListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationAxis>>()
     val axesListUpdatedEvent = axesListUpdatedEventInternal.asSharedFlow()
-
-    fun getAllAxes() =
-        cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
-
-    suspend fun reportAxesListUpdate() =
-        axesListUpdatedEventInternal.emit(getAllAxes())
 
     private val cartesianSpacesListUpdatedEventInternal = MutableSharedFlow<List<CartesianSpace>>()
     val cartesianSpacesListUpdatedEvent = cartesianSpacesListUpdatedEventInternal.asSharedFlow()
 
+    private val descriptionsListUpdatedEventInternal = MutableSharedFlow<List<Description>>()
+    val descriptionsListUpdatedEvent = descriptionsListUpdatedEventInternal.asSharedFlow()
+
+    fun getAllFunctions() = cartesianSpaces.map { it.functions }.flatten()
+
+    fun getAllAxes() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
+
     fun getAllCartesianSpaces() = cartesianSpaces
+
+    fun getAllDescriptions() = descriptions
+
+    suspend fun reportFunctionsListUpdate() =
+        functionsListUpdatedEventInternal.emit(getAllFunctions())
+
+    suspend fun reportAxesListUpdate() =
+        axesListUpdatedEventInternal.emit(getAllAxes())
 
     suspend fun reportCartesianSpacesListUpdate() =
         cartesianSpacesListUpdatedEventInternal.emit(getAllCartesianSpaces())
 
-    private val descriptionsListUpdatedEventInternal = MutableSharedFlow<List<Description>>()
-    val descriptionsListUpdatedEvent = descriptionsListUpdatedEventInternal.asSharedFlow()
-
-    fun getAllDescriptions() = descriptions
-
     suspend fun reportDescriptionsListUpdate() =
         descriptionsListUpdatedEventInternal.emit(getAllDescriptions())
+
+    suspend fun reportUpdateAll(){
+        reportFunctionsListUpdate()
+        reportAxesListUpdate()
+        reportCartesianSpacesListUpdate()
+        reportDescriptionsListUpdate()
+    }
 
     fun unselectAll() {
         for (cartesianSpace in cartesianSpaces) {

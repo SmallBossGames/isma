@@ -211,15 +211,12 @@ class FunctionCanvasService : Controller() {
         }
     }
 
-    fun deleteFunction(event: DeleteFunctionQuery) {
-        for (cartesianSpace in model.cartesianSpaces) {
-            val function = cartesianSpace.functions.firstOrNull { it.id == event.id }
-            if (function != null) {
-                cartesianSpace.functions.remove(function)
-            }
+    fun deleteFunction(function: ConcatenationFunction) {
+        model.cartesianSpaces.forEach {
+            it.functions.remove(function)
         }
-        view.redraw()
         getAllFunctions()
+        view.redraw()
     }
 
     private fun ConcatenationAxisDTO.getOrder(): Int {

@@ -9,14 +9,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.events.DeleteFunctionQuery
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import tornadofx.Controller
 import java.util.*
 
 class FunctionListViewController : Controller() {
+    private val functionCanvasService: FunctionCanvasService by inject()
     private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: FunctionListViewModel by inject()
@@ -71,8 +73,7 @@ class FunctionListViewController : Controller() {
         }
     }
 
-    fun deleteFunction(functionId: UUID) {
-        val event = DeleteFunctionQuery(functionId)
-        fire(event)
+    fun deleteFunction(function: ConcatenationFunction) {
+        functionCanvasService.deleteFunction(function)
     }
 }

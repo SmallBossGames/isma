@@ -59,7 +59,7 @@ class FunctionListView : Fragment() {
                                 }).apply {
                                     tooltip = Tooltip("Удалить")
                                     setOnAction {
-                                        controller.deleteFunction(item.id)
+                                        controller.deleteFunction(item)
                                     }
                                 },
                             ).apply {

@@ -3,7 +3,6 @@ package ru.nstu.grin.concatenation.cartesian.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.events.*
@@ -68,10 +67,7 @@ class CartesianCanvasService : Controller() {
         getAllCartesianSpaces()
         coroutineScope.launch {
             model.reportFunctionsListUpdate()
+            model.reportAxesListUpdate()
         }
-
-        val axises = model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
-        val axisEvent = GetAllAxisesEvent(axises)
-        fire(axisEvent)
     }
 }

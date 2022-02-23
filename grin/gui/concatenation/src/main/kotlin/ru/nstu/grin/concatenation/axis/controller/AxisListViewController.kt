@@ -1,17 +1,25 @@
 package ru.nstu.grin.concatenation.axis.controller
 
-import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import tornadofx.Controller
-import tornadofx.toObservable
 
 class AxisListViewController : Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+    private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
     private val model: AxisListViewModel by inject()
 
     init {
-        subscribe<GetAllAxisesEvent> {
-            println("Get axises axisListViewController")
-            model.axises = it.axises.toObservable()
+        coroutineScope.launch {
+            concatenationCanvasModel.axesListUpdatedEvent.collect {
+                model.axises.setAll(it)
+            }
         }
+
+        model.axises.setAll(concatenationCanvasModel.getAllAxes())
     }
 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
@@ -39,6 +40,15 @@ class ConcatenationCanvasModel : ItemViewModel<ConcatenationCanvas>(), Cloneable
 
     suspend fun reportFunctionsListUpdate() =
         functionsListUpdatedEventInternal.emit(getAllFunctions())
+
+    private val axesListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationAxis>>()
+    val axesListUpdatedEvent = axesListUpdatedEventInternal.asSharedFlow()
+
+    fun getAllAxes() =
+        cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
+
+    suspend fun reportAxesListUpdate() =
+        axesListUpdatedEventInternal.emit(getAllAxes())
 
     fun unselectAll() {
         for (cartesianSpace in cartesianSpaces) {

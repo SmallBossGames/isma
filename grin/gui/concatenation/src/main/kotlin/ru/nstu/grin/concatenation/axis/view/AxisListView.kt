@@ -22,7 +22,7 @@ class AxisListView : Fragment() {
     private val model: AxisListViewModel by inject()
     private val controller: AxisListViewController = find { }
 
-    override val root: Parent = listview(model.axisesProperty) {
+    override val root: Parent = listview(model.axises) {
         cellFormat {
             graphic = borderpane {
                 left {

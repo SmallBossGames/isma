@@ -50,6 +50,14 @@ class ConcatenationCanvasModel : ItemViewModel<ConcatenationCanvas>(), Cloneable
     suspend fun reportAxesListUpdate() =
         axesListUpdatedEventInternal.emit(getAllAxes())
 
+    private val cartesianSpacesListUpdatedEventInternal = MutableSharedFlow<List<CartesianSpace>>()
+    val cartesianSpacesListUpdatedEvent = cartesianSpacesListUpdatedEventInternal.asSharedFlow()
+
+    fun getAllCartesianSpaces() = cartesianSpaces
+
+    suspend fun reportCartesianSpacesListUpdate() =
+        cartesianSpacesListUpdatedEventInternal.emit(getAllCartesianSpaces())
+
     fun unselectAll() {
         for (cartesianSpace in cartesianSpaces) {
             for (function in cartesianSpace.functions) {

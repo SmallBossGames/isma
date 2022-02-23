@@ -42,9 +42,9 @@ class CartesianCanvasService : Controller() {
     }
 
     fun getAllCartesianSpaces() {
-        val event =
-            GetAllCartesiansEvent(model.cartesianSpaces)
-        fire(event)
+        coroutineScope.launch {
+            model.reportCartesianSpacesListUpdate()
+        }
     }
 
     fun updateCartesian(event: UpdateCartesianEvent) {

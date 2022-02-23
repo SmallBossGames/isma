@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.function.events.ShowIntersectionsEvent
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.IntersectionFunctionModel
@@ -32,9 +31,5 @@ class IntersectionFunctionController : Controller() {
             secondId = list[1].id
         )
         fire(event)
-    }
-
-    fun getAllFunctions() {
-        fire(GetAllFunctionsQuery())
     }
 }

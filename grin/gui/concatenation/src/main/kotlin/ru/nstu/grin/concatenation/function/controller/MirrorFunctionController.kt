@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.MirrorFunctionModel
@@ -24,10 +23,6 @@ class MirrorFunctionController : Controller() {
         }
 
         model.functions.setAll(concatenationCanvasModel.getAllFunctions())
-    }
-
-    fun getAllFunctions() {
-        fire(GetAllFunctionsQuery())
     }
 
     fun mirrorFunction(isY: Boolean, function: ConcatenationFunction) {

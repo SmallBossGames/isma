@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.function.events.LocalizeFunctionEvent
 import ru.nstu.grin.concatenation.function.model.LocalizeFunctionModel
 import tornadofx.Controller
@@ -31,9 +30,5 @@ class LocalizeFunctionController : Controller() {
             id = id
         )
         fire(event)
-    }
-
-    fun getAllFunctions() {
-        fire(GetAllFunctionsQuery())
     }
 }

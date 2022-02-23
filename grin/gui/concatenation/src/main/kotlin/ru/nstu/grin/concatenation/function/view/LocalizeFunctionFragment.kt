@@ -14,7 +14,7 @@ class LocalizeFunctionFragment : Fragment() {
     private lateinit var list: ListView<ConcatenationFunction>
 
     override val root: Parent = vbox {
-        listview(model.functionsProperty) {
+        listview(model.functions) {
             list = this
             cellFormat {
                 graphic = form {
@@ -29,17 +29,12 @@ class LocalizeFunctionFragment : Fragment() {
         button("Ок") {
             action {
                 val function = list.selectedItem ?: let {
-                    tornadofx.error("Необходимо выбрать функцию")
+                    error("Необходимо выбрать функцию")
                     return@action
                 }
                 controller.localize(function.id)
                 close()
             }
         }
-    }
-
-
-    init {
-        controller.getAllFunctions()
     }
 }

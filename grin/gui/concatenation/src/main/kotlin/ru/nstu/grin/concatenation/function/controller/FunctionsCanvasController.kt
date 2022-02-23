@@ -36,9 +36,6 @@ class FunctionsCanvasController : Controller() {
             val function = service.getFunction(event.id)
             fire(GetFunctionEvent(function))
         }
-        subscribe<GetAllFunctionsQuery> {
-            service.getAllFunctions()
-        }
         subscribe<DeleteFunctionQuery> {
             service.deleteFunction(it)
         }

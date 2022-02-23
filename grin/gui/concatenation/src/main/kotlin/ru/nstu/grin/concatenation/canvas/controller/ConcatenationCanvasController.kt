@@ -72,9 +72,7 @@ class ConcatenationCanvasController : Controller() {
     }
 
     fun clearCanvas() {
-        model.arrows.clear()
-        model.descriptions.clear()
-        model.cartesianSpaces.clear()
+        model.clearAll()
 
         coroutineScope.launch {
             model.reportUpdateAll()

@@ -17,7 +17,7 @@ class IntersectionFunctionFragment : Fragment() {
     private lateinit var list: ListView<ConcatenationFunction>
 
     override val root: Parent = vbox {
-        listview(model.functionsProperty) {
+        listview(model.functions) {
             list = this
             selectionModel.selectionMode = SelectionMode.MULTIPLE
 
@@ -30,7 +30,7 @@ class IntersectionFunctionFragment : Fragment() {
 
                 if (node is ListCell<*>) {
                     it.consume()
-                    val cell = node as ListCell<ConcatenationFunction>
+                    val cell = node
                     val lv = cell.listView
 
                     lv.requestFocus()
@@ -59,16 +59,12 @@ class IntersectionFunctionFragment : Fragment() {
             action {
                 val functions = list.selectionModel.selectedItems
                 if (functions.size != 2) {
-                    tornadofx.error("Можно выбрать пересечение только между двумя функциями")
+                    error("Можно выбрать пересечение только между двумя функциями")
                     return@action
                 }
                 controller.findIntersection(functions)
                 close()
             }
         }
-    }
-
-    init {
-        controller.getAllFunctions()
     }
 }

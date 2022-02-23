@@ -119,6 +119,13 @@ class ConcatenationCanvasModel : ItemViewModel<ConcatenationCanvas>(), Cloneable
         }
     }
 
+    fun clearAll()
+    {
+        cartesianSpaces.clear()
+        arrows.clear()
+        descriptions.clear()
+    }
+
     private companion object {
         const val DEFAULT_INDENT = 0.01
     }

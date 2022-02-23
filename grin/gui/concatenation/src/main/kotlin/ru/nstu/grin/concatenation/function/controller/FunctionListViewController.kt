@@ -10,7 +10,6 @@ import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.events.DeleteFunctionQuery
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
@@ -70,10 +69,6 @@ class FunctionListViewController : Controller() {
 
             show()
         }
-    }
-
-    fun getAllFunctions() {
-        fire(GetAllFunctionsQuery())
     }
 
     fun deleteFunction(functionId: UUID) {

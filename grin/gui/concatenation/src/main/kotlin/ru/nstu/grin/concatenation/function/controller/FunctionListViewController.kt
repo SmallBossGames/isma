@@ -4,8 +4,12 @@ import javafx.scene.Scene
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.Window
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.events.DeleteFunctionQuery
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
@@ -14,12 +18,18 @@ import tornadofx.Controller
 import java.util.*
 
 class FunctionListViewController : Controller() {
+    private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: FunctionListViewModel by inject()
 
     init {
-        subscribe<GetAllFunctionsEvent> {
-            model.functions.setAll(it.functions)
+        coroutineScope.launch {
+            concatenationCanvasModel.functionsListUpdatedEvent.collect{
+                model.functions.setAll(it)
+            }
         }
+
+        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
     }
 
     fun openCopyModal(id: UUID) {

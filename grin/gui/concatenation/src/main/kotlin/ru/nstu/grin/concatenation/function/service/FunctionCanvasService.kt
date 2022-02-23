@@ -1,5 +1,8 @@
 package ru.nstu.grin.concatenation.function.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.axis.model.Direction
@@ -21,6 +24,7 @@ import tornadofx.Controller
 import java.util.*
 
 class FunctionCanvasService : Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
     private val matrixTransformer: MatrixTransformerController by inject()
@@ -202,11 +206,9 @@ class FunctionCanvasService : Controller() {
 
 
     fun getAllFunctions() {
-        val functions = model.cartesianSpaces.map {
-            it.functions
-        }.flatten()
-        val event = GetAllFunctionsEvent(functions)
-        fire(event)
+        coroutineScope.launch {
+            model.reportFunctionsListUpdate()
+        }
     }
 
     fun deleteFunction(event: DeleteFunctionQuery) {

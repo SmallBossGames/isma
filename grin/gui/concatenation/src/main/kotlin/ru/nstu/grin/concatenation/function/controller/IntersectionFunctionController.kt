@@ -1,6 +1,10 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.function.events.ShowIntersectionsEvent
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
@@ -8,15 +12,18 @@ import ru.nstu.grin.concatenation.function.model.IntersectionFunctionModel
 import tornadofx.Controller
 
 class IntersectionFunctionController : Controller() {
+    private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: IntersectionFunctionModel by inject()
 
     init {
-        subscribe<GetAllFunctionsEvent> {
-            if (model.functions != null) {
-                model.functions.clear()
+        coroutineScope.launch {
+            concatenationCanvasModel.functionsListUpdatedEvent.collect{
+                model.functions.setAll(it)
             }
-            model.functionsProperty.setAll(it.functions)
         }
+
+        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
     }
 
     fun findIntersection(list: List<ConcatenationFunction>) {

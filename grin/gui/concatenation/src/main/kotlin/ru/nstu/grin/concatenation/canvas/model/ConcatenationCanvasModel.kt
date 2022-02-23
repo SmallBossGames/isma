@@ -1,6 +1,8 @@
 package ru.nstu.grin.concatenation.canvas.model
 
 import javafx.collections.FXCollections.observableArrayList
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
@@ -28,6 +30,15 @@ class ConcatenationCanvasModel : ItemViewModel<ConcatenationCanvas>(), Cloneable
     var traceSettings: TraceSettings? = null
 
     var moveSettings: MoveSettings? = null
+
+    private val functionsListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationFunction>>()
+    val functionsListUpdatedEvent = functionsListUpdatedEventInternal.asSharedFlow()
+
+    fun getAllFunctions() =
+        cartesianSpaces.map { it.functions }.flatten()
+
+    suspend fun reportFunctionsListUpdate() =
+        functionsListUpdatedEventInternal.emit(getAllFunctions())
 
     fun unselectAll() {
         for (cartesianSpace in cartesianSpaces) {

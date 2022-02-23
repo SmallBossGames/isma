@@ -1,14 +1,17 @@
 package ru.nstu.grin.concatenation.cartesian.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.events.*
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
 import tornadofx.Controller
 import java.util.*
 
 class CartesianCanvasService : Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
@@ -63,10 +66,9 @@ class CartesianCanvasService : Controller() {
 
     private fun refreshDependencies() {
         getAllCartesianSpaces()
-        val functions = model.cartesianSpaces.map { it.functions }.flatten()
-        val functionEvent =
-            GetAllFunctionsEvent(functions)
-        fire(functionEvent)
+        coroutineScope.launch {
+            model.reportFunctionsListUpdate()
+        }
 
         val axises = model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
         val axisEvent = GetAllAxisesEvent(axises)

@@ -1,6 +1,10 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
 import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
@@ -8,15 +12,18 @@ import ru.nstu.grin.concatenation.function.model.MirrorFunctionModel
 import tornadofx.Controller
 
 class MirrorFunctionController : Controller() {
+    private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: MirrorFunctionModel by inject()
 
     init {
-        subscribe<GetAllFunctionsEvent> {
-            if (model.functions != null) {
-                model.functions.clear()
+        coroutineScope.launch {
+            concatenationCanvasModel.functionsListUpdatedEvent.collect{
+                model.functions.setAll(it)
             }
-            model.functionsProperty.setAll(it.functions)
         }
+
+        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
     }
 
     fun getAllFunctions() {

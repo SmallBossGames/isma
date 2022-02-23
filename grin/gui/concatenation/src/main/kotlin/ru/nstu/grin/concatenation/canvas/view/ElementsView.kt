@@ -7,8 +7,8 @@ import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.function.view.FunctionListView
 import tornadofx.Fragment
+import tornadofx.tab
 import tornadofx.tabpane
-import tornadofx.*
 
 class ElementsView : Fragment() {
     override val root: Parent = tabpane {

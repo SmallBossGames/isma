@@ -1,35 +1,30 @@
 package ru.nstu.grin.concatenation.axis.controller
 
-import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
-import ru.nstu.grin.concatenation.axis.events.GetAxisEvent
 import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
+import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
 import tornadofx.Controller
-import java.util.*
 
 class AxisChangeFragmentController : Controller() {
-    private val axisId: UUID by param()
+    private val axis: ConcatenationAxis by param()
     private val model: AxisChangeFragmentModel by inject()
     private val logarithmicTypeModel: LogarithmicTypeModel by inject()
 
     init {
-        subscribe<GetAxisEvent> {
-            if (it.axis.id == axisId) {
-                model.axisColor = it.axis.backGroundColor
-                model.distanceBetweenMarks = it.axis.distanceBetweenMarks.toString()
-                model.textSize = it.axis.textSize.toString()
-                model.font = it.axis.font
-                model.fontColor = it.axis.fontColor
-                model.isHide = it.axis.isHide
-                model.min = it.axis.settings.min.toString()
-                model.max = it.axis.settings.max.toString()
-            }
-        }
+        model.axisColor = axis.backGroundColor
+        model.distanceBetweenMarks = axis.distanceBetweenMarks.toString()
+        model.textSize = axis.textSize.toString()
+        model.font = axis.font
+        model.fontColor = axis.fontColor
+        model.isHide = axis.isHide
+        model.min = axis.settings.min.toString()
+        model.max = axis.settings.max.toString()
     }
 
     fun updateAxis() {
         val event = UpdateAxisEvent(
-            id = axisId,
+            id = axis.id,
             distance = model.distanceBetweenMarks.toDouble(),
             textSize = model.textSize.toDouble(),
             font = model.font,

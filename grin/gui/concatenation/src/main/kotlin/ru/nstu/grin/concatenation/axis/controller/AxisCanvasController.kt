@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.axis.controller
 
-import ru.nstu.grin.concatenation.axis.events.AxisQuery
 import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
 import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 import tornadofx.Controller
@@ -11,9 +10,6 @@ class AxisCanvasController : Controller() {
     init {
         subscribe<UpdateAxisEvent> {
             service.updateAxis(it)
-        }
-        subscribe<AxisQuery> {
-            service.getAxis(it.id)
         }
     }
 }

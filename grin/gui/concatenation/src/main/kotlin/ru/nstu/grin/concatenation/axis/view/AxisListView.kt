@@ -61,7 +61,7 @@ class AxisListView : Fragment() {
                 setOnAction {
                     val view = find<AxisChangeFragment>(
                         mapOf(
-                            AxisChangeFragment::axisId to item.id
+                            "axis" to item
                         )
                     )
 

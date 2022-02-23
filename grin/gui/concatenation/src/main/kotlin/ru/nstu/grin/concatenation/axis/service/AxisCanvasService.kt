@@ -3,27 +3,16 @@ package ru.nstu.grin.concatenation.axis.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.nstu.grin.concatenation.axis.events.GetAxisEvent
 import ru.nstu.grin.concatenation.axis.events.UpdateAxisEvent
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import tornadofx.Controller
-import java.util.*
 
 class AxisCanvasService : Controller() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
-
-    fun getAxis(id: UUID) {
-        val axis = model.cartesianSpaces.map {
-            listOf(it.xAxis, it.yAxis)
-        }.flatten().first { it.id == id }
-
-        val event = GetAxisEvent(axis)
-        fire(event)
-    }
 
     fun getAllAxises() {
         coroutineScope.launch {

@@ -4,14 +4,11 @@ import javafx.scene.Parent
 import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
-import ru.nstu.grin.concatenation.axis.events.AxisQuery
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
 import tornadofx.*
-import java.util.*
 
 class AxisChangeFragment : Fragment() {
-    val axisId: UUID by param()
     private val model: AxisChangeFragmentModel by inject()
     private val controller: AxisChangeFragmentController by inject(params = params)
     private val logFragment = find<LogarithmicTypeFragment>(params = params)
@@ -128,9 +125,5 @@ class AxisChangeFragment : Fragment() {
                 close()
             }
         }
-    }
-
-    init {
-        fire(AxisQuery(axisId))
     }
 }

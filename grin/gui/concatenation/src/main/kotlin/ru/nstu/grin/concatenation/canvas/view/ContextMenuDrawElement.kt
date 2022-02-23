@@ -70,13 +70,13 @@ class ContextMenuDrawElement(
                     if (cartesianSpace.xAxis.isLocated(settings.xGraphic, settings.yGraphic, canvasWidth, canvasHeight)) {
                         find<AxisChangeFragment>(
                             scope, mapOf(
-                                AxisChangeFragment::axisId.name to cartesianSpace.xAxis.id
+                                "axis" to cartesianSpace.xAxis
                             )
                         ).openModal()
                     } else {
                         find<AxisChangeFragment>(
                             scope, mapOf(
-                                AxisChangeFragment::axisId.name to cartesianSpace.yAxis.id
+                                "axis" to cartesianSpace.yAxis
                             )
                         ).openModal()
                     }

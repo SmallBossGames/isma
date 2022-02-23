@@ -23,52 +23,51 @@ class FunctionListView : Fragment() {
                 override fun updateItem(item: ConcatenationFunction?, empty: Boolean) {
                     super.updateItem(item, empty)
 
-                    if (item == null) {
-                        graphic = null
-                    } else {
-                        graphic = BorderPane().apply {
-                            left = HBox(
-                                Rectangle(15.0, item.lineSize, item.functionColor),
-                                Label(item.name)
-                            ).apply {
-                                spacing = 10.0
-                            }
-
-                            right = HBox(
-                                Button(null, ImageView(Image("copy.png")).apply {
-                                    fitHeight = 20.0
-                                    fitWidth = 20.0
-                                }).apply {
-                                    tooltip = Tooltip("Скопировать")
-                                    setOnAction {
-                                        controller.openCopyModal(item.id)
-                                    }
-                                },
-                                Button(null, ImageView(Image("edit-tool.png")).apply {
-                                    fitHeight = 20.0
-                                    fitWidth = 20.0
-                                }).apply {
-                                    tooltip = Tooltip("Отредактировать")
-                                    setOnAction {
-                                        controller.openChangeModal(item.id, currentWindow)
-                                    }
-                                },
-                                Button(null, ImageView(Image("send-to-trash.png")).apply {
-                                    fitHeight = 20.0
-                                    fitWidth = 20.0
-                                }).apply {
-                                    tooltip = Tooltip("Удалить")
-                                    setOnAction {
-                                        controller.deleteFunction(item)
-                                    }
-                                },
-                            ).apply {
-                                spacing = 5.0
-                            }
-                        }
-                    }
+                    graphic = if (item == null) null else createItem(item)
                 }
             }
         }
     }
+
+    private fun createItem(item: ConcatenationFunction) =
+        BorderPane().apply {
+            left = HBox(
+                Rectangle(15.0, item.lineSize, item.functionColor),
+                Label(item.name)
+            ).apply {
+                spacing = 10.0
+            }
+
+            right = HBox(
+                Button(null, ImageView(Image("copy.png")).apply {
+                    fitHeight = 20.0
+                    fitWidth = 20.0
+                }).apply {
+                    tooltip = Tooltip("Скопировать")
+                    setOnAction {
+                        controller.openCopyModal(item.id)
+                    }
+                },
+                Button(null, ImageView(Image("edit-tool.png")).apply {
+                    fitHeight = 20.0
+                    fitWidth = 20.0
+                }).apply {
+                    tooltip = Tooltip("Отредактировать")
+                    setOnAction {
+                        controller.openChangeModal(item.id, currentWindow)
+                    }
+                },
+                Button(null, ImageView(Image("send-to-trash.png")).apply {
+                    fitHeight = 20.0
+                    fitWidth = 20.0
+                }).apply {
+                    tooltip = Tooltip("Удалить")
+                    setOnAction {
+                        controller.deleteFunction(item)
+                    }
+                },
+            ).apply {
+                spacing = 5.0
+            }
+        }
 }

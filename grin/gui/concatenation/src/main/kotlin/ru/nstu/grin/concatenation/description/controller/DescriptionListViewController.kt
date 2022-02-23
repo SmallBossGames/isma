@@ -1,22 +1,29 @@
 package ru.nstu.grin.concatenation.description.controller
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.description.events.DeleteDescriptionQuery
-import ru.nstu.grin.concatenation.description.events.GetAllDescriptionsEvent
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import tornadofx.Controller
 import java.util.*
 
 class DescriptionListViewController : Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+    private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
     private val model: DescriptionListViewModel by inject()
 
     init {
-        subscribe<GetAllDescriptionsEvent> {
-            if (model.descriptions != null) {
-                model.descriptions.clear()
+        coroutineScope.launch {
+            concatenationCanvasModel.descriptionsListUpdatedEvent.collect{
+                model.descriptions.setAll(it)
             }
-            model.descriptionsProperty.setAll(it.descriptions)
         }
+
+        model.descriptions.setAll(concatenationCanvasModel.getAllDescriptions())
     }
 
     fun openChangeModal(id: UUID) {

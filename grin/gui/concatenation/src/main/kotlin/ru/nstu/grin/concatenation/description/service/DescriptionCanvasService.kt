@@ -1,11 +1,15 @@
 package ru.nstu.grin.concatenation.description.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.description.events.*
 import tornadofx.Controller
 
 class DescriptionCanvasService : Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
@@ -30,7 +34,9 @@ class DescriptionCanvasService : Controller() {
     }
 
     fun getAll() {
-        fire(GetAllDescriptionsEvent(descriptions = model.descriptions))
+        coroutineScope.launch {
+            model.reportDescriptionsListUpdate()
+        }
     }
 
     fun delete(event: DeleteDescriptionQuery) {

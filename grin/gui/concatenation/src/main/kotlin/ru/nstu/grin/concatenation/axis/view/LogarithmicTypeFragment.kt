@@ -16,7 +16,7 @@ class LogarithmicTypeFragment : Fragment() {
         field("Основание логарифма") {
             textfield(model.logarithmBaseProperty) {
                 validator {
-                    if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                    if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                         error("Число должно быть плавающим 20,0 и больше нуля")
                     } else {
                         null
@@ -30,7 +30,7 @@ class LogarithmicTypeFragment : Fragment() {
         field("Целочисленные шаг") {
             textfield(model.integerStepProperty) {
                 validator {
-                    if (it?.toIntOrNull() == null || it.toIntOrNull() ?: -1 < 0) {
+                    if (it?.toIntOrNull() == null || (it.toIntOrNull() ?: -1) < 0) {
                         error("Число должно быть плавающим 20,0 и больше нуля")
                     } else {
                         null

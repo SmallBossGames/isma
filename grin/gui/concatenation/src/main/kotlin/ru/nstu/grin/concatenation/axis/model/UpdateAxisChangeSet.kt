@@ -1,11 +1,9 @@
-package ru.nstu.grin.concatenation.axis.events
+package ru.nstu.grin.concatenation.axis.model
 
 import javafx.scene.paint.Color
-import ru.nstu.grin.concatenation.axis.model.AxisMarkType
-import tornadofx.FXEvent
 import java.util.*
 
-data class UpdateAxisEvent(
+data class UpdateAxisChangeSet(
     val id: UUID,
     val distance: Double,
     val textSize: Double,
@@ -14,9 +12,7 @@ data class UpdateAxisEvent(
     val axisColor: Color,
     val isHide: Boolean,
     val axisMarkType: AxisMarkType,
-    val logarithmBase: Double,
-    val isOnlyIntegerPow: Boolean,
-    val integerStep: Int,
     val min: Double,
     val max: Double
-) : FXEvent()
+)
+

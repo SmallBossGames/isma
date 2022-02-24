@@ -8,7 +8,6 @@ import ru.nstu.grin.common.converters.model.ArrowConverter
 import ru.nstu.grin.common.events.ConcatenationArrowEvent
 import ru.nstu.grin.common.model.ConcatenationType
 import ru.nstu.grin.common.view.modal.ArrowModalView
-import ru.nstu.grin.concatenation.axis.controller.AxisCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianCanvasController
@@ -25,7 +24,6 @@ class ConcatenationCanvasController : Controller() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val functionsController: FunctionsCanvasController = find { }
-    private val axisCanvasController: AxisCanvasController = find { }
     private val cartesianController: CartesianCanvasController = find { }
     private val descriptionController: DescriptionCanvasController = find { }
 

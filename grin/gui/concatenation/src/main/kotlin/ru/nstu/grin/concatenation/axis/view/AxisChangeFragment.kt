@@ -9,13 +9,12 @@ import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
 import tornadofx.*
 
 class AxisChangeFragment : Fragment() {
-    private val model: AxisChangeFragmentModel by inject()
+    private val model: AxisChangeFragmentModel by inject(params = params)
+    private val logFragmentModel: LogarithmicTypeModel by inject(params = params)
     private val controller: AxisChangeFragmentController by inject(params = params)
     private val logFragment = find<LogarithmicTypeFragment>(params = params)
-    private val logFragmentModel: LogarithmicTypeModel by inject()
 
     override val root: Parent = form {
-        println(controller.params)
         fieldset("Текст") {
             field("Расстояние между метками") {
                 textfield(model.distanceBetweenMarksProperty) {

@@ -7,6 +7,8 @@ import tornadofx.ViewModel
 import tornadofx.*
 
 class LogarithmicTypeModel : ViewModel() {
+    private val axis: ConcatenationAxis by param()
+
     var logarithmBaseProperty = SimpleDoubleProperty(this, "logarithmBaseProperty", 10.0)
     var logarithmBase by logarithmBaseProperty
 
@@ -15,4 +17,16 @@ class LogarithmicTypeModel : ViewModel() {
 
     var integerStepProperty = SimpleIntegerProperty(this, "integerStepProperty", 1)
     var integerStep by integerStepProperty
+
+    init {
+        logarithmBase = axis.settings.logarithmBase
+        isOnlyIntegerPow = axis.settings.isOnlyIntegerPow
+        integerStep = axis.settings.integerStep
+    }
+
+    fun createChangeSet() = UpdateLogarithmicTypeChangeSet(
+        logarithmBase = logarithmBase,
+        isOnlyIntegerPow = isOnlyIntegerPow,
+        integerStep = integerStep,
+    )
 }

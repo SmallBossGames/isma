@@ -1,13 +1,11 @@
 package ru.nstu.grin.concatenation.axis.view
 
 import javafx.scene.Parent
-import ru.nstu.grin.concatenation.axis.controller.LogarithmicTypeFragmentController
 import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
 import tornadofx.*
 
 class LogarithmicTypeFragment : Fragment() {
-    private val model: LogarithmicTypeModel by inject()
-    private val controller: LogarithmicTypeFragmentController = find(params = params) { }
+    private val model: LogarithmicTypeModel by inject(params = params)
 
     override val root: Parent = fieldset {
         field("Основание логарифма") {

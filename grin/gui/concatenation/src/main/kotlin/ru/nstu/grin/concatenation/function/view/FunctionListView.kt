@@ -45,7 +45,7 @@ class FunctionListView : Fragment() {
                 }).apply {
                     tooltip = Tooltip("Скопировать")
                     setOnAction {
-                        controller.openCopyModal(item.id)
+                        controller.openCopyModal(item)
                     }
                 },
                 Button(null, ImageView(Image("edit-tool.png")).apply {

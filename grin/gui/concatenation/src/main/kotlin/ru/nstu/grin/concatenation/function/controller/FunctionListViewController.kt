@@ -33,10 +33,10 @@ class FunctionListViewController : Controller() {
         model.functions.setAll(concatenationCanvasModel.getAllFunctions())
     }
 
-    fun openCopyModal(id: UUID) {
+    fun openCopyModal(function: ConcatenationFunction) {
         val view = find<CopyFunctionFragment>(
             mapOf(
-                CopyFunctionFragment::functionId to id
+                "function" to function
             )
         )
 

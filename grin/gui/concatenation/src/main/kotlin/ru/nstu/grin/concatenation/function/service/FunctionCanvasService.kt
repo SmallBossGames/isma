@@ -52,10 +52,9 @@ class FunctionCanvasService : Controller() {
         localizeFunction(LocalizeFunctionEvent(firstFun.id))
     }
 
-    fun copyFunction(event: FunctionCopyQuery) {
-        val oldFunction = model.cartesianSpaces.map { it.functions }.flatten().first { it.id == event.id }
-        val newFunction = oldFunction.clone().copy(id = UUID.randomUUID(), name = event.name)
-        val cartesianSpace = model.cartesianSpaces.first { it.functions.firstOrNull { it.id == event.id } != null }
+    fun copyFunction(originFunction: ConcatenationFunction, newName: String = originFunction.name) {
+        val newFunction = originFunction.clone().copy(name = newName)
+        val cartesianSpace = model.cartesianSpaces.first { it.functions.contains(originFunction) }
         cartesianSpace.functions.add(newFunction)
         getAllFunctions()
     }

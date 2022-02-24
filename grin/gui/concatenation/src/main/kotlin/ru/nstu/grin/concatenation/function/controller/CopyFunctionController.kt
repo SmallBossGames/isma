@@ -1,19 +1,14 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.FunctionCopyQuery
 import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import tornadofx.Controller
-import java.util.*
 
 class CopyFunctionController : Controller() {
-    val functionId: UUID by param()
-    private val model: CopyFunctionModel by inject()
+    private val functionCanvasService: FunctionCanvasService by inject()
+    private val model: CopyFunctionModel by inject(params = params)
 
     fun copy() {
-        val event = FunctionCopyQuery(
-            id = functionId,
-            name = model.name
-        )
-        fire(event)
+        functionCanvasService.copyFunction(model.function, model.name)
     }
 }

@@ -10,8 +10,10 @@ import jwave.transforms.wavelets.coiflet.Coiflet5
 import jwave.transforms.wavelets.haar.Haar1
 import jwave.transforms.wavelets.legendre.Legendre3
 import jwave.transforms.wavelets.other.DiscreteMayer
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
@@ -53,25 +55,25 @@ class SpacesTransformationController: Controller() {
     )
 
     suspend fun transformSpaces() = coroutineScope {
-        for (cartesianSpace in model.cartesianSpaces) {
-            for (function in cartesianSpace.functions) {
+        model.cartesianSpaces.map { space ->
+            space.functions.forEach { function ->
                 ensureActive()
 
                 if (function.isHide) {
                     function.pixelsToDraw = null
-                    continue
+                } else{
+                    launch {
+                        function.pixelsToDraw = transformPoints(
+                            function.id,
+                            function.points,
+                            space.xAxis.toSnapshot(),
+                            space.yAxis.toSnapshot(),
+                            function.mirrorDetails,
+                            function.derivativeDetails,
+                            function.waveletDetails,
+                        )
+                    }
                 }
-
-                function.pixelsToDraw =
-                    transformPoints(
-                        function.id,
-                        function.points,
-                        cartesianSpace.xAxis.toSnapshot(),
-                        cartesianSpace.yAxis.toSnapshot(),
-                        function.mirrorDetails,
-                        function.derivativeDetails,
-                        function.waveletDetails,
-                    )
             }
         }
     }

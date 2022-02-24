@@ -8,9 +8,6 @@ class FunctionsCanvasController : Controller() {
     private val service: FunctionCanvasService by inject()
 
     init {
-        subscribe<ConcatenationFunctionEvent> { event ->
-            service.addFunction(event)
-        }
         subscribe<FunctionCopyQuery> {
             service.copyFunction(it)
         }

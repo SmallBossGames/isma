@@ -8,6 +8,7 @@ import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.converter.CartesianSpaceConverter
+import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
@@ -25,12 +26,12 @@ import java.util.*
 
 class FunctionCanvasService : Controller() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
     private val matrixTransformer: MatrixTransformerController by inject()
 
-    fun addFunction(event: ConcatenationFunctionEvent) {
-        val cartesianSpace = event.cartesianSpace
+    fun addFunction(cartesianSpace: CartesianSpaceDTO) {
         val found = model.cartesianSpaces.firstOrNull {
             it.xAxis.name == cartesianSpace.xAxis.name
                 && it.yAxis.name == cartesianSpace.yAxis.name
@@ -47,7 +48,7 @@ class FunctionCanvasService : Controller() {
             found.merge(functions)
             model.cartesianSpaces.add(found)
         }
-        val firstFun = event.cartesianSpace.functions.first()
+        val firstFun = cartesianSpace.functions.first()
         localizeFunction(LocalizeFunctionEvent(firstFun.id))
     }
 

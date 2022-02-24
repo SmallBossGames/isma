@@ -7,8 +7,8 @@ import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
 import ru.nstu.grin.concatenation.function.dto.ConcatenationFunctionDTO
-import ru.nstu.grin.concatenation.function.events.ConcatenationFunctionEvent
 import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
 import tornadofx.Controller
 import java.util.*
@@ -18,10 +18,11 @@ class AddFunctionController : Controller() {
     private val analyticFunctionModel: AnalyticFunctionModel by inject()
     private val manualFunctionModel: ManualFunctionModel by inject()
     private val fileFunctionModel: FileFunctionModel by inject()
+    private val functionsCanvasService: FunctionCanvasService by inject()
     private val pointsBuilder = PointsBuilder()
 
     fun addFunction() {
-        when (model.inputWay) {
+        when (model.inputWay!!) {
             InputWay.FILE -> addFileFunction()
             InputWay.ANALYTIC -> addAnalyticFunction()
             InputWay.MANUAL -> addManualFunction()
@@ -75,11 +76,7 @@ class AddFunctionController : Controller() {
                 font = model.yFont
             )
         )
-        fire(
-            ConcatenationFunctionEvent(
-                cartesianSpace = cartesianSpace
-            )
-        )
+        functionsCanvasService.addFunction(cartesianSpace)
     }
 
     private fun addFileFunction() {
@@ -103,8 +100,8 @@ class AddFunctionController : Controller() {
                     ConcatenationFunctionDTO(
                         id = UUID.randomUUID(),
                         name = "${model.functionName}.$index",
-                        points = list.mapIndexedNotNull { index, point ->
-                            if (index % model.step == 0) {
+                        points = list.mapIndexedNotNull { i, point ->
+                            if (i % model.step == 0) {
                                 point
                             } else {
                                 null
@@ -122,19 +119,15 @@ class AddFunctionController : Controller() {
                     xAxis = xAxis,
                     yAxis = yAxis
                 )
-                fire(
-                    ConcatenationFunctionEvent(
-                        cartesianSpace
-                    )
-                )
+                functionsCanvasService.addFunction(cartesianSpace)
             }
             AddFunctionsMode.ADD_TO_NEW_CARTESIAN_SPACES -> {
                 points.forEachIndexed { index, list ->
                     val function = ConcatenationFunctionDTO(
                         id = UUID.randomUUID(),
                         name = "${model.functionName}.$index",
-                        points = list.mapIndexedNotNull { index, point ->
-                            if (index % model.step == 0) {
+                        points = list.mapIndexedNotNull { i, point ->
+                            if (i % model.step == 0) {
                                 point
                             } else {
                                 null
@@ -155,11 +148,7 @@ class AddFunctionController : Controller() {
                         yAxis = yAxis
                     )
 
-                    fire(
-                        ConcatenationFunctionEvent(
-                            cartesianSpace
-                        )
-                    )
+                    functionsCanvasService.addFunction(cartesianSpace)
                 }
             }
         }
@@ -248,9 +237,7 @@ class AddFunctionController : Controller() {
             yAxis = yAxis
         )
 
-        fire(
-            ConcatenationFunctionEvent(cartesianSpace = cartesianSpace)
-        )
+        functionsCanvasService.addFunction(cartesianSpace)
     }
 
     private companion object {

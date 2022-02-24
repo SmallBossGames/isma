@@ -5,12 +5,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.events.ShowIntersectionsEvent
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.IntersectionFunctionModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import tornadofx.Controller
 
 class IntersectionFunctionController : Controller() {
+    private val functionCanvasService: FunctionCanvasService by inject()
     private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: IntersectionFunctionModel by inject()
@@ -26,10 +27,6 @@ class IntersectionFunctionController : Controller() {
     }
 
     fun findIntersection(list: List<ConcatenationFunction>) {
-        val event = ShowIntersectionsEvent(
-            id = list[0].id,
-            secondId = list[1].id
-        )
-        fire(event)
+        functionCanvasService.showInterSections(list[0], list[1])
     }
 }

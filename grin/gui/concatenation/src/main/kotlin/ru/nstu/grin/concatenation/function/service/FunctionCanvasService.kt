@@ -59,16 +59,16 @@ class FunctionCanvasService : Controller() {
         getAllFunctions()
     }
 
-    fun showInterSections(event: ShowIntersectionsEvent) {
+    fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
         val interactionSearcher = IntersectionSearcher()
         val firstFunc = Function(
-            getFunction(event.id).points.map { Pair(it.x.round(), it.y.round()) }
+            firstFunction.points.map { Pair(it.x.round(), it.y.round()) }
         )
-        val firstCartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
+        val firstCartesianSpace = model.cartesianSpaces.first { it.functions.contains(firstFunction) }
         val secondFunc = Function(
-            getFunction(event.secondId).points.map { Pair(it.x.round(), it.y.round()) }
+            secondFunction.points.map { Pair(it.x.round(), it.y.round()) }
         )
-        val secondCartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.secondId } }
+        val secondCartesianSpace = model.cartesianSpaces.first { it.functions.contains(secondFunction) }
 
         val intersections = interactionSearcher.findIntersections(firstFunc, secondFunc)
 

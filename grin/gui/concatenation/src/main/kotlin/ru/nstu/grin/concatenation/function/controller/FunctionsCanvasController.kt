@@ -8,9 +8,7 @@ class FunctionsCanvasController : Controller() {
     private val service: FunctionCanvasService by inject()
 
     init {
-        subscribe<ShowIntersectionsEvent> {
-            service.showInterSections(it)
-        }
+
         subscribe<LocalizeFunctionEvent> {
             service.localizeFunction(it)
         }

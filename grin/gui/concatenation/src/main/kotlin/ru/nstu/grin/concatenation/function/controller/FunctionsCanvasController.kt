@@ -8,10 +8,6 @@ class FunctionsCanvasController : Controller() {
     private val service: FunctionCanvasService by inject()
 
     init {
-
-        subscribe<LocalizeFunctionEvent> {
-            service.localizeFunction(it)
-        }
         subscribe<DerivativeFunctionEvent> {
             service.derivativeFunction(it)
         }

@@ -5,12 +5,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.events.LocalizeFunctionEvent
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LocalizeFunctionModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import tornadofx.Controller
-import java.util.*
 
 class LocalizeFunctionController : Controller() {
+    private val functionCanvasService: FunctionCanvasService by inject()
     private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: LocalizeFunctionModel by inject()
@@ -25,10 +26,7 @@ class LocalizeFunctionController : Controller() {
         model.functions.setAll(concatenationCanvasModel.getAllFunctions())
     }
 
-    fun localize(id: UUID) {
-        val event = LocalizeFunctionEvent(
-            id = id
-        )
-        fire(event)
+    fun localize(function: ConcatenationFunction) {
+        functionCanvasService.localizeFunction(function)
     }
 }

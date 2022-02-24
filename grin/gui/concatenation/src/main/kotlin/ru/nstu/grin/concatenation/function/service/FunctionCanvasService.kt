@@ -49,7 +49,9 @@ class FunctionCanvasService : Controller() {
             model.cartesianSpaces.add(found)
         }
         val firstFun = cartesianSpace.functions.first()
-        localizeFunction(LocalizeFunctionEvent(firstFun.id))
+        val foundedFirstFun = model.cartesianSpaces
+            .firstNotNullOf { it.functions.firstOrNull { x -> x.id == firstFun.id } }
+        localizeFunction(foundedFirstFun)
     }
 
     fun copyFunction(originFunction: ConcatenationFunction, newName: String = originFunction.name) {
@@ -128,7 +130,7 @@ class FunctionCanvasService : Controller() {
         function.waveletDetails = WaveletDetails(waveletTransformFun = event.waveletTransformFun, waveletDirection = event.waveletDirection)
 
         view.redraw()
-        localizeFunction(LocalizeFunctionEvent(function.id))
+        localizeFunction(function)
     }
 
     fun calculateIntegral(event: CalculateIntegralEvent) {
@@ -149,9 +151,8 @@ class FunctionCanvasService : Controller() {
         tornadofx.information("Интеграл равен $integral")
     }
 
-    fun localizeFunction(event: LocalizeFunctionEvent) {
-        val cartesianSpace = model.cartesianSpaces.first { it.functions.any { it.id == event.id } }
-        val function = model.cartesianSpaces.map { it.functions }.flatten().first { it.id == event.id }
+    fun localizeFunction(function: ConcatenationFunction) {
+        val cartesianSpace = model.cartesianSpaces.first { it.functions.contains(function) }
         val pixels = function.pixelsToDraw ?: return
 
         val xPoints = pixels.first.map {

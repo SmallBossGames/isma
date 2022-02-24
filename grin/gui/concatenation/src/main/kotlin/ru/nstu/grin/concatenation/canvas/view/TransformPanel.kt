@@ -6,14 +6,15 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
-import ru.nstu.grin.concatenation.function.events.LocalizeFunctionEvent
 import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.MirrorFunctionFragment
 import tornadofx.*
 
 class TransformPanel : Fragment() {
+    private val functionCanvasService: FunctionCanvasService by inject()
     private val model: ConcatenationCanvasModel by inject()
 
     override val root: Parent = toolbar {
@@ -124,8 +125,7 @@ class TransformPanel : Fragment() {
                 if (function == null) {
                     find<LocalizeFunctionFragment>().openModal()
                 } else {
-                    val event = LocalizeFunctionEvent(id = function.id)
-                    fire(event)
+                    functionCanvasService.localizeFunction(function)
                 }
             }
         }

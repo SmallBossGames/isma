@@ -32,7 +32,7 @@ class LocalizeFunctionFragment : Fragment() {
                     error("Необходимо выбрать функцию")
                     return@action
                 }
-                controller.localize(function.id)
+                controller.localize(function)
                 close()
             }
         }

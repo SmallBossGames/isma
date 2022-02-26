@@ -1,13 +1,10 @@
 package ru.nstu.grin.concatenation.cartesian.view
 
 import javafx.scene.Parent
-import javafx.scene.Scene
 import javafx.scene.control.Label
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import javafx.stage.Modality
-import javafx.stage.Stage
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
 import ru.nstu.grin.concatenation.cartesian.events.GetAllCartesiansQuery
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
@@ -33,20 +30,7 @@ class CartesianListView : Fragment() {
                         spacing = 5.0
                         button {
                             action {
-                                val view = find<CopyCartesianFragment>(
-                                    mapOf(
-                                        CopyCartesianFragment::cartesianId to it.id
-                                    )
-                                )
-
-                                Stage().apply {
-                                    scene = Scene(view.root)
-                                    title = "Function parameters"
-                                    initModality(Modality.WINDOW_MODAL)
-                                    initOwner(currentWindow)
-
-                                    show()
-                                }
+                                controller.openCopyModal(it, currentWindow)
                             }
                             val image = Image("copy.png")
                             val imageView = ImageView(image)
@@ -57,20 +41,7 @@ class CartesianListView : Fragment() {
                         }
                         button {
                             action {
-                                val view = find<ChangeCartesianFragment>(
-                                    mapOf(
-                                        ChangeCartesianFragment::cartesianId to it.id
-                                    )
-                                )
-
-                                Stage().apply {
-                                    scene = Scene(view.root)
-                                    title = "Function parameters"
-                                    initModality(Modality.WINDOW_MODAL)
-                                    initOwner(currentWindow)
-
-                                    show()
-                                }
+                                controller.openEditModal(it, currentWindow)
                             }
                             val image = Image("edit-tool.png")
                             val imageView = ImageView(image)
@@ -81,7 +52,7 @@ class CartesianListView : Fragment() {
                         }
                         button {
                             action {
-                                controller.deleteCartesian(it.id)
+                                controller.deleteCartesian(it)
                             }
                             val image = Image("send-to-trash.png")
                             val imageView = ImageView(image)

@@ -9,8 +9,11 @@ import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
 import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
 import tornadofx.Controller
+import tornadofx.Scope
 
-class CartesianListViewController() : Controller() {
+class CartesianListViewController(
+    override val scope: Scope
+) : Controller() {
     fun openCopyModal(cartesianSpace: CartesianSpace, window: Window? = null) {
         val view = find<CopyCartesianFragment>(
             mapOf(

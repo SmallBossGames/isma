@@ -8,9 +8,12 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import tornadofx.Scope
 import tornadofx.ViewModel
 
-class CartesianListViewModel : ViewModel() {
+class CartesianListViewModel(
+    override val scope: Scope
+) : ViewModel() {
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
 

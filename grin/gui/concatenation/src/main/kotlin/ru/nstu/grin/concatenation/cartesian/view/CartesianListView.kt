@@ -10,10 +10,11 @@ import ru.nstu.grin.concatenation.cartesian.events.GetAllCartesiansQuery
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
 import tornadofx.*
 
-class CartesianListView : Fragment() {
-    private val model: CartesianListViewModel by inject()
-    private val controller: CartesianListViewController = find { }
-
+class CartesianListView(
+    override val scope: Scope,
+    model: CartesianListViewModel,
+    controller: CartesianListViewController
+) : Fragment() {
     override val root: Parent = listview(model.cartesianSpaces) {
         cellFormat {
             graphic = borderpane {

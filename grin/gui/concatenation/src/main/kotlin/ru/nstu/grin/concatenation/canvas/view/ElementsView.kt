@@ -14,7 +14,8 @@ import tornadofx.tabpane
 class ElementsView(
     override val scope: Scope,
     functionListView: FunctionListView,
-    axisListView: AxisListView
+    axisListView: AxisListView,
+    cartesianListView: CartesianListView
 ) : Fragment() {
     override val root: Parent = tabpane {
         tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
@@ -25,7 +26,7 @@ class ElementsView(
             add(axisListView)
         }
         tab("Spaces") {
-            add<CartesianListView>()
+            add(cartesianListView)
         }
         tab("Descriptions") {
             add<DescriptionListView>()

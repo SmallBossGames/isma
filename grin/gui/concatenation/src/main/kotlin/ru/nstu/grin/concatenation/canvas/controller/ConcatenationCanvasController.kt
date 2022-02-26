@@ -13,7 +13,6 @@ import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianCanvasController
 import ru.nstu.grin.concatenation.description.controller.DescriptionCanvasController
 import ru.nstu.grin.concatenation.description.view.DescriptionModalView
-import ru.nstu.grin.concatenation.function.controller.FunctionsCanvasController
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import tornadofx.Controller
 
@@ -23,7 +22,6 @@ import tornadofx.Controller
 class ConcatenationCanvasController : Controller() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
-    private val functionsController: FunctionsCanvasController = find { }
     private val cartesianController: CartesianCanvasController = find { }
     private val descriptionController: DescriptionCanvasController = find { }
 

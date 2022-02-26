@@ -2,7 +2,6 @@ package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.Parent
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
-import ru.nstu.grin.concatenation.function.events.FunctionQuery
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
@@ -10,10 +9,9 @@ import tornadofx.*
 
 class ChangeFunctionFragment : Fragment() {
     private val function: ConcatenationFunction by param()
-    private val model: ChangeFunctionModel by inject()
-    private val controller: ChangeFunctionController = find(
-        params = params
-    )
+    private val controller: ChangeFunctionController = find(params = params)
+
+    private val model = ChangeFunctionModel(function)
 
     override val root: Parent = form {
         fieldset {
@@ -24,15 +22,7 @@ class ChangeFunctionFragment : Fragment() {
                 colorpicker().bind(model.functionColorProperty)
             }
             field("Размер линии") {
-                textfield(model.lineSizeProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
-                }
+                textfield(model.lineSizeProperty)
             }
             field("Отображать ли функцию") {
                 checkbox().bind(model.isHideProperty)
@@ -58,16 +48,12 @@ class ChangeFunctionFragment : Fragment() {
                 }
             }
             button("Сохранить") {
-                enableWhen(model.isValid.toProperty())
+                //enableWhen(model.isValid.toProperty())
                 action {
-                    controller.updateFunction()
+                    controller.updateFunction(model)
                     close()
                 }
             }
         }
-    }
-
-    init {
-        fire(FunctionQuery(function.id))
     }
 }

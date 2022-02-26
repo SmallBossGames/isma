@@ -4,10 +4,11 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
-import tornadofx.ViewModel
-import tornadofx.*
+import tornadofx.getValue
+import tornadofx.setValue
 
-class ChangeFunctionModel : ViewModel() {
+class ChangeFunctionModel(val function: ConcatenationFunction) {
+
     var nameProperty = SimpleStringProperty()
     var name by nameProperty
 
@@ -28,4 +29,16 @@ class ChangeFunctionModel : ViewModel() {
 
     var isHideProperty = SimpleBooleanProperty()
     var isHide by isHideProperty
+
+    init {
+        name = function.name
+        functionColor = function.functionColor
+        lineSize = function.lineSize.toString()
+        lineType = function.lineType
+        isHide = !function.isHide
+
+        val mirrorDetails = function.mirrorDetails
+        isMirrorX = mirrorDetails.isMirrorX
+        isMirrorY = mirrorDetails.isMirrorY
+    }
 }

@@ -8,7 +8,7 @@ import tornadofx.Controller
 import tornadofx.Scope
 
 class ChangeFunctionController(
-    override val scope: Scope
+    override val scope: Scope,
 ) : Controller() {
     private val functionCanvasService: FunctionCanvasService by inject()
 

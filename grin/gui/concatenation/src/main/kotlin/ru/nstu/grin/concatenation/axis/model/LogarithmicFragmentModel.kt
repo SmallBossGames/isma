@@ -3,12 +3,11 @@ package ru.nstu.grin.concatenation.axis.model
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
-import tornadofx.ViewModel
 import tornadofx.*
 
-class LogarithmicTypeModel : ViewModel() {
-    private val axis: ConcatenationAxis by param()
-
+class LogarithmicFragmentModel(
+    axis: ConcatenationAxis
+) {
     var logarithmBaseProperty = SimpleDoubleProperty(this, "logarithmBaseProperty", 10.0)
     var logarithmBase by logarithmBaseProperty
 

@@ -12,3 +12,7 @@ class FunctionChangeModalScope: KoinScopeComponent {
     override val scope: Scope by lazy { createScope(this) }
 }
 
+class AxisChangeModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+

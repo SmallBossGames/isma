@@ -5,38 +5,20 @@ import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
-import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
 import tornadofx.*
 
-class AxisChangeFragment : Fragment() {
-    private val model: AxisChangeFragmentModel by inject(params = params)
-    private val logFragmentModel: LogarithmicTypeModel by inject(params = params)
-    private val controller: AxisChangeFragmentController by inject(params = params)
-    private val logFragment = find<LogarithmicTypeFragment>(params = params)
-
+class AxisChangeFragment(
+    private val model: AxisChangeFragmentModel,
+    private val controller: AxisChangeFragmentController,
+    private val logFragment: LogarithmicTypeFragment
+) : Fragment() {
     override val root: Parent = form {
         fieldset("Текст") {
             field("Расстояние между метками") {
-                textfield(model.distanceBetweenMarksProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
-                }
+                textfield(model.distanceBetweenMarksProperty)
             }
             field("Размер шрифта") {
-                textfield(model.textSizeProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
-                }
+                textfield(model.textSizeProperty)
             }
             field("Шрифт") {
                 combobox(model.fontProperty, Font.getFamilies()).bind(model.fontProperty)
@@ -45,26 +27,10 @@ class AxisChangeFragment : Fragment() {
                 colorpicker().bind(model.fontColorProperty)
             }
             field("Минимум") {
-                textfield(model.minProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
-                }
+                textfield(model.minProperty)
             }
             field("Максимум") {
-                textfield(model.maxProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
-                }
+                textfield(model.maxProperty)
             }
         }
         fieldset {
@@ -116,9 +82,6 @@ class AxisChangeFragment : Fragment() {
             }
         }
         button("Сохранить") {
-            enableWhen {
-                model.valid.and(logFragmentModel.valid)
-            }
             action {
                 controller.updateAxis()
                 close()

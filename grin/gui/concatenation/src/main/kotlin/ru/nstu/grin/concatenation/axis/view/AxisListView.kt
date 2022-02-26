@@ -2,24 +2,22 @@ package ru.nstu.grin.concatenation.axis.view
 
 import javafx.geometry.Insets
 import javafx.scene.Parent
-import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.scene.text.Font
-import javafx.stage.Modality
-import javafx.stage.Stage
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import tornadofx.Fragment
 
-class AxisListView : Fragment() {
-    private val model: AxisListViewModel by inject()
-    private val controller: AxisListViewController = find { }
+class AxisListView(
+    viewModel: AxisListViewModel,
+    private val controller: AxisListViewController
+) : Fragment() {
 
-    override val root: Parent = ListView(model.axises).apply {
+    override val root: Parent = ListView(viewModel.axes).apply {
         setCellFactory {
             object : ListCell<ConcatenationAxis>() {
                 override fun updateItem(item: ConcatenationAxis?, empty: Boolean) {
@@ -59,20 +57,7 @@ class AxisListView : Fragment() {
             }).apply {
                 tooltip = Tooltip("Отредактировать")
                 setOnAction {
-                    val view = find<AxisChangeFragment>(
-                        mapOf(
-                            "axis" to item
-                        )
-                    )
-
-                    Stage().apply {
-                        scene = Scene(view.root)
-                        title = "Change axis"
-                        initModality(Modality.WINDOW_MODAL)
-                        initOwner(currentWindow!!)
-
-                        show()
-                    }
+                    controller.editAxis(item, currentWindow)
                 }
             }
         }

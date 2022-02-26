@@ -4,12 +4,11 @@ import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import ru.nstu.grin.concatenation.canvas.model.*
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditMode
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
-import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import tornadofx.Controller
-import tornadofx.Scope
 
 class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
     private val model: ConcatenationCanvasModel by inject()
@@ -72,7 +71,8 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                 cartesianSpace.yAxis.settings.min = minY
                 cartesianSpace.yAxis.settings.max = maxY
             }
-            if (editMode == EditMode.WINDOWED) {
+            //TODO: Disabled until migration to Koin
+           /* if (editMode == EditMode.WINDOWED) {
                 val initData = InitCanvasData(
                     cartesianSpaces = cartesianSpaces,
                     arrows = model.arrows.toList(),
@@ -80,8 +80,8 @@ class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
                 )
                 val scope = Scope()
 
-                ConcatenationView(scope, CanvasProjectLoader(scope), initData).openWindow()
-            }
+                //ConcatenationView(scope, CanvasProjectLoader(scope), initData).openWindow()
+            }*/
 
             model.selectionSettings.reset()
         }

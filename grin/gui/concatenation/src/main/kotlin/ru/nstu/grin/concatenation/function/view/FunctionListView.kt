@@ -11,11 +11,13 @@ import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import tornadofx.Fragment
+import tornadofx.Scope
 
-class FunctionListView : Fragment() {
-    private val model: FunctionListViewModel by inject()
-
-    private val controller: FunctionListViewController = find { }
+class FunctionListView(
+    override val scope: Scope,
+    private val controller: FunctionListViewController,
+    model: FunctionListViewModel,
+) : Fragment() {
 
     override val root: Parent = ListView(model.functions).apply {
         setCellFactory {

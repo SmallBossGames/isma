@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.koin.core.component.KoinComponent
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.project.ProjectSnapshot
 import ru.nstu.grin.concatenation.canvas.model.project.toModel
@@ -15,7 +16,7 @@ import tornadofx.Scope
 import java.io.File
 
 //TODO: implement descriptions and arrows saving
-class CanvasProjectLoader(override val scope: Scope) : Controller() {
+class CanvasProjectLoader(override val scope: Scope) : Controller(), KoinComponent {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
 

@@ -3,16 +3,14 @@ package ru.nstu.grin.concatenation.function.view
 import javafx.scene.Parent
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
-import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
 import tornadofx.*
 
-class ChangeFunctionFragment : Fragment() {
-    private val function: ConcatenationFunction by param()
-    private val controller: ChangeFunctionController = find(params = params)
-
-    private val model = ChangeFunctionModel(function)
-
+class ChangeFunctionFragment(
+    override val scope: Scope,
+    private val model: ChangeFunctionModel,
+    private val controller: ChangeFunctionController,
+) : Fragment() {
     override val root: Parent = form {
         fieldset {
             field("Имя") {

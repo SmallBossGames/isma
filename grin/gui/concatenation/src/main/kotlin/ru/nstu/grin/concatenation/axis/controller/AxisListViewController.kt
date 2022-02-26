@@ -2,6 +2,8 @@ package ru.nstu.grin.concatenation.axis.controller
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
@@ -15,11 +17,12 @@ class AxisListViewController : Controller() {
 
     init {
         coroutineScope.launch {
-            concatenationCanvasModel.axesListUpdatedEvent.collect {
+            merge(
+                flowOf(concatenationCanvasModel.getAllAxes()),
+                concatenationCanvasModel.axesListUpdatedEvent
+            ).collect {
                 model.axises.setAll(it)
             }
         }
-
-        model.axises.setAll(concatenationCanvasModel.getAllAxes())
     }
 }

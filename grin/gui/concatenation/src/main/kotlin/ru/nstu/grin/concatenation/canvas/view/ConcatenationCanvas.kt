@@ -20,7 +20,8 @@ import tornadofx.*
 
 
 class ConcatenationCanvas : View() {
-    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+    private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val model: ConcatenationCanvasModel by inject()
     private val canvasViewModel: CanvasViewModel by inject()
@@ -34,11 +35,15 @@ class ConcatenationCanvas : View() {
 
     init {
         initData?.also { data ->
-            model.cartesianSpaces.addAll(data.cartesianSpaces.toObservable())
-            model.arrows.addAll(data.arrows.toObservable())
-            model.descriptions.addAll(data.descriptions.toObservable())
+            model.cartesianSpaces.setAll(data.cartesianSpaces)
+            model.arrows.setAll(data.arrows)
+            model.descriptions.setAll(data.descriptions)
 
             model.normalizeSpaces()
+
+            coroutineScope.launch {
+                model.reportUpdateAll()
+            }
         }
     }
 
@@ -81,7 +86,7 @@ class ConcatenationCanvas : View() {
             chainDrawer.draw()
         }
 
-        coroutineScope.launch {
+        fxCoroutineScope.launch {
             launch {
                 model.arrows.changeAsFlow().collect { chainDrawer.draw() }
             }
@@ -101,7 +106,7 @@ class ConcatenationCanvas : View() {
      * Cleanup the object on remove
      */
     fun dispose() {
-        coroutineScope.cancel()
+        fxCoroutineScope.cancel()
     }
 
     fun redraw() {

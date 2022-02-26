@@ -2,6 +2,8 @@ package ru.nstu.grin.concatenation.cartesian.controller
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -17,12 +19,13 @@ class CartesianListViewController : Controller() {
 
     init {
         coroutineScope.launch {
-            concatenationCanvasModel.cartesianSpacesListUpdatedEvent.collect{
+            merge(
+                flowOf(concatenationCanvasModel.getAllCartesianSpaces()),
+                concatenationCanvasModel.cartesianSpacesListUpdatedEvent
+            ).collect {
                 model.cartesianSpaces.setAll(it)
             }
         }
-
-        model.cartesianSpaces.setAll(concatenationCanvasModel.getAllCartesianSpaces())
     }
 
     fun deleteCartesian(cartesianId: UUID) {

@@ -14,6 +14,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 import java.util.*
 
 
@@ -25,7 +26,8 @@ class GrinIntegrationFacade: KoinComponent {
             descriptions = listOf()
         )
 
-        val scope = getKoin().createScope<MainGrinScope>()
+        val scopeInstance = MainGrinScope()
+        val scope = scopeInstance.scope
 
         val view = scope.get<ConcatenationView>{ parametersOf(initData) }
 
@@ -36,7 +38,7 @@ class GrinIntegrationFacade: KoinComponent {
                 Modality.WINDOW_MODAL
             )
             setOnCloseRequest {
-                scope.close()
+                scopeInstance.closeScope()
             }
             show()
         }

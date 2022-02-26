@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.geometry.Insets
 import javafx.scene.Parent
 import javafx.stage.FileChooser
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
@@ -11,6 +10,7 @@ import tornadofx.*
 class ConcatenationView(
     override val scope: Scope,
     private val canvasProjectLoader: CanvasProjectLoader,
+    elementsView: ElementsView,
     initData: InitCanvasData?
 ) : View() {
     private val concatenationCanvasController: ConcatenationCanvasController by inject()
@@ -58,9 +58,7 @@ class ConcatenationView(
             )
         }
         right {
-            add<ElementsView>() {
-                padding = Insets(0.0, 0.0, 0.0, 2.0)
-            }
+            add(elementsView)
         }
     }
 

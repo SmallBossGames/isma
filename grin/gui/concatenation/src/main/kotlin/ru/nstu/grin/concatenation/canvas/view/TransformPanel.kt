@@ -1,9 +1,14 @@
 package ru.nstu.grin.concatenation.canvas.view
 
 import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.stage.Modality
+import javafx.stage.Stage
+import org.koin.core.component.KoinComponent
+import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
@@ -11,9 +16,10 @@ import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.MirrorFunctionFragment
+import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
 import tornadofx.*
 
-class TransformPanel : Fragment() {
+class TransformPanel : Fragment(), KoinComponent {
     private val functionCanvasService: FunctionCanvasService by inject()
     private val model: ConcatenationCanvasModel by inject()
 
@@ -29,9 +35,23 @@ class TransformPanel : Fragment() {
             action {
                 val function = model.getSelectedFunction()
                 if (function != null) {
-                    find<ChangeFunctionFragment>(
-                        "function" to function
-                    ).openModal()
+                    //TODO: This scope should be linked to MainGrinScope
+                    val scope = getKoin().createScope<FunctionChangeModalScope>()
+                    val view = scope.get<ChangeFunctionFragment> { parametersOf(function)}
+
+                    Stage().apply {
+                        scene = Scene(view.root)
+                        title = "Change Function"
+                        initModality(Modality.WINDOW_MODAL)
+                        initOwner(currentWindow!!)
+
+                        setOnCloseRequest {
+                            scope.close()
+                        }
+
+                        show()
+                    }
+
                     return@action
                 }
                 val description = model.getSelectedDescription()

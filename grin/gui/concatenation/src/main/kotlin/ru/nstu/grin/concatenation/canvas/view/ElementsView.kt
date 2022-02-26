@@ -7,14 +7,18 @@ import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.function.view.FunctionListView
 import tornadofx.Fragment
+import tornadofx.Scope
 import tornadofx.tab
 import tornadofx.tabpane
 
-class ElementsView : Fragment() {
+class ElementsView(
+    override val scope: Scope,
+    functionListView: FunctionListView
+) : Fragment() {
     override val root: Parent = tabpane {
         tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
         tab("Functions") {
-            add<FunctionListView>()
+            add(functionListView)
         }
         tab("Axes") {
             add<AxisListView>()

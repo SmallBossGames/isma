@@ -3,6 +3,8 @@ package ru.nstu.grin.concatenation.function.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.nstu.grin.common.model.WaveletDirection
+import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
 import ru.nstu.grin.concatenation.axis.model.Direction
@@ -123,10 +125,15 @@ class FunctionCanvasService : Controller() {
         view.redraw()
     }
 
-    fun waveletFunction(event: WaveletFunctionEvent) {
-        val function = getFunction(event.id)
-
-        function.waveletDetails = WaveletDetails(waveletTransformFun = event.waveletTransformFun, waveletDirection = event.waveletDirection)
+    fun waveletFunction(
+        function: ConcatenationFunction,
+        waveletTransformFun: WaveletTransformFun,
+        waveletDirection: WaveletDirection
+    ) {
+        function.waveletDetails = WaveletDetails(
+            waveletTransformFun = waveletTransformFun,
+            waveletDirection = waveletDirection
+        )
 
         view.redraw()
         localizeFunction(function)

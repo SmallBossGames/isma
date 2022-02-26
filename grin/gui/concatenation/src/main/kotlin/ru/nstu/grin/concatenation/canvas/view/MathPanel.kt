@@ -73,7 +73,7 @@ class MathPanel : Fragment() {
                     }
                     find<WaveletFunctionFragment>(
                         mapOf(
-                            WaveletFunctionFragment::functionId to function.id
+                            "function" to function
                         )
                     ).openModal()
                 }

@@ -1,20 +1,20 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.WaveletFunctionEvent
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.WaveletFunctionFragmentModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import tornadofx.Controller
-import java.util.*
 
 class WaveletFunctionFragmentController : Controller() {
+    private val functionCanvasService: FunctionCanvasService by inject()
     private val model: WaveletFunctionFragmentModel by inject()
-    val functionId: UUID by param()
+    private val function: ConcatenationFunction by param()
 
     fun enableWavelet() {
-        val event = WaveletFunctionEvent(
-            id = functionId,
-            waveletDirection = model.waveletDirection,
-            waveletTransformFun = model.waveletTransformFun
+        functionCanvasService.waveletFunction(
+            function,
+            model.waveletTransformFun,
+            model.waveletDirection
         )
-        fire(event)
     }
 }

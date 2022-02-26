@@ -139,20 +139,23 @@ class FunctionCanvasService : Controller() {
         localizeFunction(function)
     }
 
-    fun calculateIntegral(event: CalculateIntegralEvent) {
-        val function = getFunction(event.functionId)
+    fun calculateIntegral(
+        function: ConcatenationFunction,
+        leftBorder: Double,
+        rightBorder: Double
+    ) {
         val min = function.points.minOf { it.x }
         val max = function.points.maxOf { it.x }
-        if (min > event.leftBorder) {
+        if (min > leftBorder) {
             tornadofx.error("Левая граница не может быть меньше минимума функции")
             return
         }
-        if (event.rightBorder > max) {
+        if (rightBorder > max) {
             tornadofx.error("Правя граница не может быть больше максимума функции")
         }
         val integration = Integration()
         val integral =
-            integration.trapeze(function.points.filter { it.x > event.leftBorder && it.x < event.rightBorder }
+            integration.trapeze(function.points.filter { it.x > leftBorder && it.x < rightBorder }
                 .map { MathPoint(it.x, it.y) })
         tornadofx.information("Интеграл равен $integral")
     }

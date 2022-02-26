@@ -8,9 +8,6 @@ class FunctionsCanvasController : Controller() {
     private val service: FunctionCanvasService by inject()
 
     init {
-        subscribe<CalculateIntegralEvent> {
-            service.calculateIntegral(it)
-        }
         subscribe<UpdateFunctionEvent> {
             service.updateFunction(it)
         }

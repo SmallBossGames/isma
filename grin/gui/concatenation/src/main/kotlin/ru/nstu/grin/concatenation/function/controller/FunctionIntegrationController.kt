@@ -1,19 +1,19 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.CalculateIntegralEvent
 import ru.nstu.grin.concatenation.function.events.GetFunctionEvent
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.FunctionIntegrationFragmentModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import tornadofx.Controller
-import java.util.*
 
 class FunctionIntegrationController : Controller() {
-    private val functionId: UUID by param()
+    private val functionCanvasService: FunctionCanvasService by inject()
     private val model: FunctionIntegrationFragmentModel by inject()
-
+    private val function: ConcatenationFunction by param()
 
     init {
         subscribe<GetFunctionEvent> {
-            if (functionId == it.function.id) {
+            if (function.id == it.function.id) {
                 model.leftBorder = it.function.points.map { it.x }.minOrNull() ?: 0.0
                 model.rightBorder = it.function.points.map { it.x }.maxOrNull() ?: 0.0
             }
@@ -21,11 +21,6 @@ class FunctionIntegrationController : Controller() {
     }
 
     fun findIntegral() {
-        val event = CalculateIntegralEvent(
-            functionId = functionId,
-            leftBorder = model.leftBorder,
-            rightBorder = model.rightBorder
-        )
-        fire(event)
+        functionCanvasService.calculateIntegral(function, model.leftBorder, model.rightBorder)
     }
 }

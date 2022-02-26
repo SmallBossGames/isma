@@ -91,7 +91,9 @@ class MathPanel : Fragment() {
                 val function = model.getSelectedFunction()
                 if (function != null) {
                     find<FunctionIntegrationFragment>(
-                        mapOf(FunctionIntegrationFragment::functionId to function.id)
+                        mapOf(
+                            "function" to function.id
+                        )
                     ).openModal()
                 }
             }

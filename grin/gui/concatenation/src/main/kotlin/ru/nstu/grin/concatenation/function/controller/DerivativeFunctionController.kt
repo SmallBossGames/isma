@@ -1,20 +1,16 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.DerivativeFunctionEvent
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.DerivativeFunctionModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import tornadofx.Controller
-import java.util.*
 
 class DerivativeFunctionController : Controller() {
+    private val functionCanvasService: FunctionCanvasService by inject()
     private val model: DerivativeFunctionModel by inject()
-    val functionId: UUID by param()
+    private val function: ConcatenationFunction by param()
 
     fun enableDerivative() {
-        val event = DerivativeFunctionEvent(
-            id = functionId,
-            type = model.derivativeType,
-            degree = model.degree
-        )
-        fire(event)
+        functionCanvasService.derivativeFunction(function, model.derivativeType, model.degree)
     }
 }

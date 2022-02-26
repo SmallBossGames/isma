@@ -8,9 +8,6 @@ class FunctionsCanvasController : Controller() {
     private val service: FunctionCanvasService by inject()
 
     init {
-        subscribe<DerivativeFunctionEvent> {
-            service.derivativeFunction(it)
-        }
         subscribe<WaveletFunctionEvent> {
             service.waveletFunction(it)
         }

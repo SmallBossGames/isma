@@ -15,6 +15,7 @@ import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConver
 import ru.nstu.grin.concatenation.function.events.*
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.DerivativeDetails
+import ru.nstu.grin.concatenation.function.model.DerivativeType
 import ru.nstu.grin.concatenation.function.model.WaveletDetails
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
@@ -116,10 +117,8 @@ class FunctionCanvasService : Controller() {
         view.redraw()
     }
 
-    fun derivativeFunction(event: DerivativeFunctionEvent) {
-        val function = getFunction(event.id)
-
-        function.derivativeDetails = DerivativeDetails(degree = event.degree, type = event.type)
+    fun derivativeFunction(function: ConcatenationFunction, type: DerivativeType, degree: Int) {
+        function.derivativeDetails = DerivativeDetails(degree = degree, type = type)
 
         view.redraw()
     }

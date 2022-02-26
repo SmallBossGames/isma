@@ -48,7 +48,7 @@ class MathPanel : Fragment() {
                     }
                     find<DerivativeFunctionFragment>(
                         mapOf(
-                            DerivativeFunctionFragment::functionId to function.id
+                            "function" to function
                         )
                     ).openModal()
                 }

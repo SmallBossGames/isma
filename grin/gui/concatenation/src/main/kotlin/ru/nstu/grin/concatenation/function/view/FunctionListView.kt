@@ -54,7 +54,7 @@ class FunctionListView : Fragment() {
                 }).apply {
                     tooltip = Tooltip("Отредактировать")
                     setOnAction {
-                        controller.openChangeModal(item.id, currentWindow)
+                        controller.openChangeModal(item, currentWindow)
                     }
                 },
                 Button(null, ImageView(Image("send-to-trash.png")).apply {

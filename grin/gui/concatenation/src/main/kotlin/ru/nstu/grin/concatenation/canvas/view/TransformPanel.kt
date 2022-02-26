@@ -6,7 +6,7 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
-import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
+import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
@@ -30,7 +30,7 @@ class TransformPanel : Fragment() {
                 val function = model.getSelectedFunction()
                 if (function != null) {
                     find<ChangeFunctionFragment>(
-                        ChangeFunctionFragment::functionId to function.id
+                        "function" to function
                     ).openModal()
                     return@action
                 }
@@ -65,18 +65,19 @@ class TransformPanel : Fragment() {
                     ).openModal()
                 } else {
                     val mirrorDetails = function.mirrorDetails
-                    val mirrorEvent = UpdateFunctionEvent(
-                        id = function.id,
+                    val updateFunctionData = UpdateFunctionData(
+                        function = function,
                         name = function.name,
                         color = function.functionColor,
                         lineType = function.lineType,
                         lineSize = function.lineSize,
                         isHide = function.isHide,
-                        mirroDetails = mirrorDetails.copy(
+                        mirrorDetails = mirrorDetails.copy(
                             isMirrorX = !mirrorDetails.isMirrorX
                         )
                     )
-                    fire(mirrorEvent)
+
+                    functionCanvasService.updateFunction(updateFunctionData)
                 }
             }
         }
@@ -97,18 +98,19 @@ class TransformPanel : Fragment() {
                     ).openModal()
                 } else {
                     val mirrorDetails = function.mirrorDetails
-                    val mirrorEvent = UpdateFunctionEvent(
-                        id = function.id,
+                    val updateFunctionData = UpdateFunctionData(
+                        function = function,
                         name = function.name,
                         color = function.functionColor,
                         lineType = function.lineType,
                         lineSize = function.lineSize,
                         isHide = function.isHide,
-                        mirroDetails = mirrorDetails.copy(
+                        mirrorDetails = mirrorDetails.copy(
                             isMirrorY = !mirrorDetails.isMirrorY
                         )
                     )
-                    fire(mirrorEvent)
+
+                    functionCanvasService.updateFunction(updateFunctionData)
                 }
             }
         }

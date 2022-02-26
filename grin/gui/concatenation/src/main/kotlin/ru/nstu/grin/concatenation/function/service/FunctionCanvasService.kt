@@ -14,11 +14,7 @@ import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
-import ru.nstu.grin.concatenation.function.events.*
-import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.model.DerivativeDetails
-import ru.nstu.grin.concatenation.function.model.DerivativeType
-import ru.nstu.grin.concatenation.function.model.WaveletDetails
+import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
@@ -194,18 +190,16 @@ class FunctionCanvasService : Controller() {
         view.redraw()
     }
 
-    fun updateFunction(event: UpdateFunctionEvent) {
-        println("Function updated")
-        val function = model.cartesianSpaces.map {
-            it.functions
-        }.flatten().first { it.id == event.id }
+    fun updateFunction(event: UpdateFunctionData) {
+        event.function.apply {
+            name = event.name
+            functionColor = event.color
+            isHide = event.isHide
+            lineSize = event.lineSize
+            lineType = event.lineType
+            mirrorDetails = event.mirrorDetails
+        }
 
-        function.name = event.name
-        function.functionColor = event.color
-        function.isHide = event.isHide
-        function.lineSize = event.lineSize
-        function.lineType = event.lineType
-        function.mirrorDetails = event.mirroDetails
         view.redraw()
         getAllFunctions()
     }

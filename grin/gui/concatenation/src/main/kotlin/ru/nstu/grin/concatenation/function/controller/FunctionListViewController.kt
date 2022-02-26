@@ -15,12 +15,11 @@ import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import tornadofx.Controller
-import java.util.*
 
 class FunctionListViewController : Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val functionCanvasService: FunctionCanvasService by inject()
     private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
-    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: FunctionListViewModel by inject()
 
     init {
@@ -53,10 +52,10 @@ class FunctionListViewController : Controller() {
         }
     }
 
-    fun openChangeModal(id: UUID, owner: Window? = null) {
+    fun openChangeModal(function: ConcatenationFunction, owner: Window? = null) {
         val view = find<ChangeFunctionFragment>(
             mapOf(
-                ChangeFunctionFragment::functionId to id
+                "function" to function
             )
         )
 

@@ -8,9 +8,6 @@ class FunctionsCanvasController : Controller() {
     private val service: FunctionCanvasService by inject()
 
     init {
-        subscribe<UpdateFunctionEvent> {
-            service.updateFunction(it)
-        }
         subscribe<FunctionQuery> { event ->
             val function = service.getFunction(event.id)
             fire(GetFunctionEvent(function))

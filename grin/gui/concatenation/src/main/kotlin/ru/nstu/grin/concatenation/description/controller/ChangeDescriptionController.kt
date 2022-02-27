@@ -4,8 +4,11 @@ import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
 import ru.nstu.grin.concatenation.description.model.UpdateDescriptionModel
 import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import tornadofx.Controller
+import tornadofx.Scope
 
-class ChangeDescriptionController : Controller() {
+class ChangeDescriptionController(
+    override val scope: Scope
+) : Controller() {
     private val descriptionCanvasService: DescriptionCanvasService by inject()
 
     fun updateDescription(model: ChangeDescriptionModel) {

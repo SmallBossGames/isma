@@ -4,11 +4,12 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.model.Description
-import tornadofx.ViewModel
-import tornadofx.*
+import tornadofx.getValue
+import tornadofx.setValue
 
-class ChangeDescriptionModel : ViewModel() {
-    val description: Description by param()
+class ChangeDescriptionModel(
+    val description: Description
+) {
 
     var textProperty = SimpleStringProperty()
     var text by textProperty

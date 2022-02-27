@@ -14,8 +14,11 @@ import ru.nstu.grin.concatenation.canvas.view.ElementsView
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
 import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
+import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
+import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
+import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
@@ -27,10 +30,7 @@ import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import ru.nstu.grin.concatenation.function.view.FunctionListView
-import ru.nstu.grin.concatenation.koin.AxisChangeModalScope
-import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
-import ru.nstu.grin.concatenation.koin.FunctionCopyModalScope
-import ru.nstu.grin.concatenation.koin.MainGrinScope
+import ru.nstu.grin.concatenation.koin.*
 
 val grinModule = module {
     scope<MainGrinScope> {
@@ -53,7 +53,7 @@ val grinModule = module {
         scoped { CartesianListViewModel(get()) }
 
         scoped { DescriptionListView(get(), get()) }
-        scoped { DescriptionListViewController(get()) }
+        scoped { DescriptionListViewController(get(), get()) }
         scoped { DescriptionListViewModel(get()) }
 
         factory {
@@ -70,6 +70,12 @@ val grinModule = module {
 
         factory {
             FunctionCopyModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            DescriptionChangeModalScope().apply {
                 scope.linkTo(get<MainGrinScope>().scope)
             }
         }
@@ -93,6 +99,12 @@ val grinModule = module {
         scoped { CopyFunctionController(get()) }
         scoped { params -> CopyFunctionFragment(get { params }, get()) }
         scoped { params -> CopyFunctionModel(params.get()) }
+    }
+
+    scope<DescriptionChangeModalScope> {
+        scoped { ChangeDescriptionController(get()) }
+        scoped { params -> ChangeDescriptionFragment(get(), get{ params }) }
+        scoped { params -> ChangeDescriptionModel(params.get()) }
     }
 
     single { GrinIntegrationFacade() }

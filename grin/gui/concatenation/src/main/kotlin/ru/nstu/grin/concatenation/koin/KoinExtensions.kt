@@ -20,3 +20,8 @@ class FunctionCopyModalScope: KoinScopeComponent {
     override val scope: Scope by lazy { createScope(this) }
 }
 
+class DescriptionChangeModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+
+

@@ -10,7 +10,6 @@ import javafx.stage.Stage
 import org.koin.core.component.KoinComponent
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
@@ -54,13 +53,15 @@ class TransformPanel : Fragment(), KoinComponent {
 
                     return@action
                 }
-                val description = model.getSelectedDescription()
+
+                //TODO: disabled until migration to Koin
+                /*val description = model.getSelectedDescription()
                 if (description != null) {
                     find<ChangeDescriptionFragment>(
                         "description" to description
                     ).openModal()
                     return@action
-                }
+                }*/
                 enableWhen {
                     val selectedFunction = model.getSelectedFunction()
                     val selectedDescription = model.getSelectedDescription()

@@ -2,18 +2,19 @@ package ru.nstu.grin.concatenation.description.view
 
 import javafx.collections.FXCollections
 import javafx.geometry.Pos
-import javafx.scene.Parent
 import javafx.scene.control.ComboBox
 import javafx.scene.text.Font
+import javafx.stage.Stage
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
 import tornadofx.*
 
-class ChangeDescriptionFragment : Fragment() {
-    private val model: ChangeDescriptionModel by inject(params = params)
-    private val controller: ChangeDescriptionController by inject()
+class ChangeDescriptionFragment(
+    private val controller: ChangeDescriptionController,
+    private val model: ChangeDescriptionModel
+) : Form() {
 
-    override val root: Parent = form {
+    init {
         fieldset {
             field("Текст") {
                 textfield().bind(model.textProperty)
@@ -37,11 +38,10 @@ class ChangeDescriptionFragment : Fragment() {
             hbox {
                 spacer()
                 button("Сохранить") {
-                    enableWhen { model.valid }
                     alignment = Pos.BASELINE_CENTER
                     action {
                         controller.updateDescription(model)
-                        close()
+                        (scene.window as Stage).close()
                     }
                 }
                 spacing = 20.0

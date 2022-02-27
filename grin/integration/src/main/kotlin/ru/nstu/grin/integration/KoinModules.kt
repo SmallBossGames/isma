@@ -44,7 +44,7 @@ val grinModule = module {
         scoped { AxisListViewController(get()) }
         scoped { AxisListViewModel(get()) }
 
-        scoped { CartesianListView(get(), get(), get()) }
+        scoped { CartesianListView(get(), get()) }
         scoped { CartesianListViewController(get()) }
         scoped { CartesianListViewModel(get()) }
 

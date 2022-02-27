@@ -17,7 +17,7 @@ class ElementsView(
         tabs.addAll(
             Tab("Functions", functionListView),
             Tab("Axes", axisListView),
-            Tab("Spaces", cartesianListView.root),
+            Tab("Spaces", cartesianListView),
             Tab("Descriptions", descriptionListView.root)
         )
     }

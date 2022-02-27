@@ -13,9 +13,12 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.canvas.view.ElementsView
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
+import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianFragmentController
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
+import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
 import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
+import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
@@ -53,7 +56,7 @@ val grinModule = module {
         scoped { AxisListViewModel(get()) }
 
         scoped { CartesianListView(get(), get()) }
-        scoped { CartesianListViewController(get()) }
+        scoped { CartesianListViewController(get(), get()) }
         scoped { CartesianListViewModel(get()) }
 
         scoped { DescriptionListView(get(), get()) }
@@ -80,6 +83,12 @@ val grinModule = module {
 
         factory {
             DescriptionChangeModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            CartesianCopyModalScope().apply {
                 scope.linkTo(get<MainGrinScope>().scope)
             }
         }
@@ -116,6 +125,12 @@ val grinModule = module {
         scoped { ChangeDescriptionController(get()) }
         scoped { params -> ChangeDescriptionFragment(get(), get{ params }) }
         scoped { params -> ChangeDescriptionModel(params.get()) }
+    }
+
+    scope<CartesianCopyModalScope> {
+        scoped { CopyCartesianFragmentController(get()) }
+        scoped { params -> CopyCartesianFragment(get(), get { params }) }
+        scoped { params -> CopyCartesianModel(params.get()) }
     }
 
     single { GrinIntegrationFacade() }

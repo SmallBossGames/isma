@@ -58,38 +58,37 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
         }
     }
 
-    suspend fun drawFunctionsLayer() = coroutineScope {
-        withContext(Dispatchers.JavaFx) {
-            canvasViewModel.functionsLayerContext.apply {
-                val width = canvasViewModel.canvasWidth
-                val height = canvasViewModel.canvasHeight
+    suspend fun drawFunctionsLayer() = withContext(Dispatchers.JavaFx) {
+        canvasViewModel.functionsLayerContext.apply {
+            val width = canvasViewModel.canvasWidth
+            val height = canvasViewModel.canvasHeight
 
-                ClearDrawElement.draw(this, width, height)
+            ClearDrawElement.draw(this, width, height)
 
-                for (cartesianSpace in model.cartesianSpaces) {
-                    if (cartesianSpace.isShowGrid) {
-                        GridDrawElement(
-                            cartesianSpace.xAxis,
-                            cartesianSpace.yAxis,
-                            Color.valueOf("BBBBBB"),
-                            matrixTransformerController
-                        ).draw(this, width, height)
-                        GridDrawElement(
-                            cartesianSpace.xAxis,
-                            cartesianSpace.yAxis,
-                            Color.valueOf("EDEDED"),
-                            matrixTransformerController
-                        ).draw(this, width, height)
-                    }
+            for (cartesianSpace in model.cartesianSpaces) {
+                if (cartesianSpace.isShowGrid) {
+                    GridDrawElement(
+                        cartesianSpace.xAxis,
+                        cartesianSpace.yAxis,
+                        Color.valueOf("BBBBBB"),
+                        matrixTransformerController
+                    ).draw(this, width, height)
+                    GridDrawElement(
+                        cartesianSpace.xAxis,
+                        cartesianSpace.yAxis,
+                        Color.valueOf("EDEDED"),
+                        matrixTransformerController
+                    ).draw(this, width, height)
                 }
-
-                functionDrawElement.draw(this, width, height)
-                axisDrawElement.draw(this, width, height)
             }
+
+            functionDrawElement.draw(this, width, height)
+            axisDrawElement.draw(this, width, height)
         }
     }
 
-    fun drawUiLayer() {
+
+    suspend fun drawUiLayer() = withContext(Dispatchers.JavaFx) {
         canvasViewModel.uiLayerContext.apply {
             val width = canvasViewModel.canvasWidth
             val height = canvasViewModel.canvasHeight

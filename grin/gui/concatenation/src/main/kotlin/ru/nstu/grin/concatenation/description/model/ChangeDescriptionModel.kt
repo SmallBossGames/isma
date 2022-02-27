@@ -3,10 +3,13 @@ package ru.nstu.grin.concatenation.description.model
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
+import ru.nstu.grin.common.model.Description
 import tornadofx.ViewModel
 import tornadofx.*
 
 class ChangeDescriptionModel : ViewModel() {
+    val description: Description by param()
+
     var textProperty = SimpleStringProperty()
     var text by textProperty
 
@@ -18,4 +21,11 @@ class ChangeDescriptionModel : ViewModel() {
 
     var fontProperty = SimpleStringProperty()
     var font by fontProperty
+
+    init {
+        text = description.text
+        textSize = description.textSize.toString()
+        color = description.color
+        font = description.font
+    }
 }

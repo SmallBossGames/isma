@@ -46,7 +46,7 @@ class AxisListView(
                     padding = Insets(5.0)
                 }
             ).apply {
-                spacing = 10.0
+                spacing = 5.0
             }
 
             right = Button(null, ImageView(Image("edit-tool.png")).apply {

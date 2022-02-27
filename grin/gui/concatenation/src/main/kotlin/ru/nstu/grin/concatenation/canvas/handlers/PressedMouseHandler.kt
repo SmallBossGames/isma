@@ -3,14 +3,18 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.model.*
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import tornadofx.Controller
 
 class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val canvasViewModel: CanvasViewModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
@@ -81,7 +85,9 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         }
 
         if(isUiLayerDirty){
-            chainDrawer.drawUiLayer()
+            coroutineScope.launch {
+                chainDrawer.drawUiLayer()
+            }
         }
     }
 

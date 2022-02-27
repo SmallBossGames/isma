@@ -3,14 +3,18 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.*
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import tornadofx.Controller
 
 class DraggedHandler : EventHandler<MouseEvent>, Controller() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val canvasViewModel: CanvasViewModel by inject()
     private val chainDrawer: ConcatenationChainDrawer by inject()
@@ -62,7 +66,9 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         }
 
         if (uiLayerDirty){
-            chainDrawer.drawUiLayer()
+            coroutineScope.launch {
+                chainDrawer.drawUiLayer()
+            }
         }
     }
 

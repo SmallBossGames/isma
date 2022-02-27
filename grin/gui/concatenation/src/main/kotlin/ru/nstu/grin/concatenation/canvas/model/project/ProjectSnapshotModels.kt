@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.canvas.model.project
 
 import javafx.scene.paint.Color
 import kotlinx.serialization.Serializable
+import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
@@ -15,7 +16,19 @@ import java.util.*
 
 @Serializable
 data class ProjectSnapshot(
-    val spaces: List<CartesianSpaceSnapshot>
+    val spaces: List<CartesianSpaceSnapshot>,
+    val descriptions: List<DescriptionSnapshot>
+)
+
+@Serializable
+data class DescriptionSnapshot(
+    val id: String,
+    var text: String,
+    var textSize: Double,
+    var x: Double,
+    var y: Double,
+    var color: ColorSnapshot,
+    var font: String,
 )
 
 @Serializable
@@ -106,6 +119,28 @@ data class AxisSettingsSnapshot(
     val min: Double,
     val max: Double,
 )
+
+fun DescriptionSnapshot.toModel() =
+    Description(
+        id = UUID.fromString(id),
+        text = text,
+        textSize = textSize,
+        x = x,
+        y = y,
+        color = color.toModel(),
+        font = font,
+    )
+
+fun Description.toSnapshot() =
+    DescriptionSnapshot(
+        id = id.toString(),
+        text = text,
+        textSize = textSize,
+        x = x,
+        y = y,
+        color = color.toSnapshot(),
+        font = font,
+    )
 
 fun AxisSettingsSnapshot.toModel() =
     AxisSettings(

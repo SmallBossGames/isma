@@ -57,7 +57,7 @@ class TransformPanel : Fragment(), KoinComponent {
                 val description = model.getSelectedDescription()
                 if (description != null) {
                     find<ChangeDescriptionFragment>(
-                        ChangeDescriptionFragment::descriptionId to description.id
+                        "description" to description
                     ).openModal()
                     return@action
                 }

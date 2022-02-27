@@ -22,7 +22,8 @@ class CanvasProjectLoader(override val scope: Scope) : Controller(), KoinCompone
 
     fun save(path: File) {
         val project = ProjectSnapshot(
-            spaces = model.cartesianSpaces.map { it.toSnapshot() }
+            spaces = model.cartesianSpaces.map { it.toSnapshot() },
+            descriptions = model.descriptions.map { it.toSnapshot() }
         )
 
         path.bufferedWriter(Charsets.UTF_8).use {
@@ -35,7 +36,7 @@ class CanvasProjectLoader(override val scope: Scope) : Controller(), KoinCompone
         val project = Json.decodeFromString<ProjectSnapshot>(json)
 
         model.cartesianSpaces.setAll(project.spaces.map { it.toModel() })
-        model.descriptions.clear()
+        model.descriptions.setAll(project.descriptions.map { it.toModel() })
         model.arrows.clear()
 
         coroutineScope.launch {

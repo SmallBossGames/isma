@@ -3,9 +3,11 @@ package ru.nstu.grin.concatenation.description.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.description.events.*
+import ru.nstu.grin.concatenation.description.model.UpdateDescriptionModel
 import tornadofx.Controller
 
 class DescriptionCanvasService : Controller() {
@@ -13,18 +15,19 @@ class DescriptionCanvasService : Controller() {
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
-    fun add(event: AddDescriptionEvent) {
-        model.descriptions.add(event.description)
+    fun add(description: Description) {
+        model.descriptions.add(description)
+        reportUpdate()
         view.redraw()
     }
 
-    fun update(event: UpdateDescriptionEvent) {
-        val description = model.descriptions.first { it.id == event.id }
-        description.text = event.text
-        description.textSize = event.textSize
-        description.color = event.color
-        description.font = event.font
-        getAll()
+    fun update(descriptionModel: UpdateDescriptionModel) {
+        val description = descriptionModel.description
+        description.text = descriptionModel.text
+        description.textSize = descriptionModel.textSize
+        description.color = descriptionModel.color
+        description.font = descriptionModel.font
+        reportUpdate()
         view.redraw()
     }
 
@@ -33,15 +36,13 @@ class DescriptionCanvasService : Controller() {
         fire(GetDescriptionEvent(description = description))
     }
 
-    fun getAll() {
-        coroutineScope.launch {
-            model.reportDescriptionsListUpdate()
-        }
+    fun reportUpdate() = coroutineScope.launch {
+        model.reportDescriptionsListUpdate()
     }
 
-    fun delete(event: DeleteDescriptionQuery) {
-        model.descriptions.removeIf { it.id == event.id }
-        getAll()
+    fun delete(description: Description) {
+        model.descriptions.remove(description)
+        reportUpdate()
         view.redraw()
     }
 }

@@ -2,12 +2,12 @@ package ru.nstu.grin.concatenation.description.controller
 
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.view.DescriptionViewModel
-import ru.nstu.grin.concatenation.description.events.AddDescriptionEvent
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import tornadofx.Controller
 import java.util.*
 
 class DescriptionModalController : Controller() {
-
+    private val descriptionCanvasService: DescriptionCanvasService by inject()
     private val model: DescriptionViewModel by inject()
 
     fun addDescription() {
@@ -21,6 +21,6 @@ class DescriptionModalController : Controller() {
             font = model.font
         )
 
-        fire(AddDescriptionEvent(description = description))
+        descriptionCanvasService.add(description)
     }
 }

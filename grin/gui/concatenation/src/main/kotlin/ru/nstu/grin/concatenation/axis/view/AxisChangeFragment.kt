@@ -1,6 +1,7 @@
 package ru.nstu.grin.concatenation.axis.view
 
 import javafx.scene.Parent
+import javafx.scene.control.Tab
 import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
@@ -71,7 +72,10 @@ class AxisChangeFragment(
                     show()
                 }
             }
-            tab(logFragment)
+
+            tabs.addAll(
+                Tab(null, logFragment)
+            )
 
             tabMaxHeight = 0.0
             tabMinHeight = 0.0

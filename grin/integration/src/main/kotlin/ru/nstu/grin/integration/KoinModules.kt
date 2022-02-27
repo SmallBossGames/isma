@@ -33,6 +33,7 @@ import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
 import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import ru.nstu.grin.concatenation.function.view.FunctionListView
@@ -99,6 +100,7 @@ val grinModule = module {
         scoped { find<DescriptionCanvasService>(get<Scope>()) }
         scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
         scoped { find<CartesianCanvasService>(get<Scope>()) }
+        scoped { find<FunctionCanvasService>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

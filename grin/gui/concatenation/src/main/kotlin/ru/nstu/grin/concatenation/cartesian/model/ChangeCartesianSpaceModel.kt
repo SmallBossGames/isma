@@ -6,9 +6,16 @@ import tornadofx.ViewModel
 import tornadofx.*
 
 class ChangeCartesianSpaceModel : ViewModel() {
-    var nameProperty = SimpleStringProperty()
+    val space: CartesianSpace by param()
+
+    val nameProperty = SimpleStringProperty()
     var name by nameProperty
 
-    var isShowGridProperty = SimpleBooleanProperty()
+    val isShowGridProperty = SimpleBooleanProperty()
     var isShowGrid by isShowGridProperty
+
+    init {
+        name = space.name
+        isShowGrid = space.isShowGrid
+    }
 }

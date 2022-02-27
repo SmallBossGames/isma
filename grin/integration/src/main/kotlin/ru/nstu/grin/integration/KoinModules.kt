@@ -14,6 +14,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.canvas.view.ElementsView
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
+import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
@@ -88,6 +89,7 @@ val grinModule = module {
 
         scoped { find<DescriptionCanvasService>(get<Scope>()) }
         scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
+        scoped { find<CartesianCanvasService>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

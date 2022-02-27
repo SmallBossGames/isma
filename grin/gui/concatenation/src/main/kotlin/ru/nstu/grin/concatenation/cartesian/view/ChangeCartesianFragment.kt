@@ -2,15 +2,12 @@ package ru.nstu.grin.concatenation.cartesian.view
 
 import javafx.scene.Parent
 import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
-import ru.nstu.grin.concatenation.cartesian.events.CartesianQuery
 import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
 import tornadofx.*
-import java.util.*
 
 class ChangeCartesianFragment : Fragment() {
-    val cartesianId: UUID by param()
-    private val model: ChangeCartesianSpaceModel by inject()
-    private val controller: ChangeCartesianController = find(params = params) { }
+    private val model: ChangeCartesianSpaceModel by inject(params = params)
+    private val controller: ChangeCartesianController by inject()
 
     override val root: Parent = form {
         fieldset {
@@ -23,13 +20,9 @@ class ChangeCartesianFragment : Fragment() {
         }
         button("Сохранить") {
             action {
-                controller.updateCartesianSpace()
+                controller.updateCartesianSpace(model)
                 close()
             }
         }
-    }
-
-    init {
-        fire(CartesianQuery(cartesianId))
     }
 }

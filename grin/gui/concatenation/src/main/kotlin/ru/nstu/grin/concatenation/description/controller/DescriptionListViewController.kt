@@ -16,7 +16,6 @@ class DescriptionListViewController(
     private val mainGrinScope: MainGrinScope,
     private val service: DescriptionCanvasService
 ) {
-
     fun openChangeModal(description: Description, window: Window? = null) {
         val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
 

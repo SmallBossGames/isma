@@ -5,7 +5,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
-import ru.nstu.grin.concatenation.cartesian.events.*
+import ru.nstu.grin.concatenation.cartesian.model.CartesianCopyDataModel
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
+import ru.nstu.grin.concatenation.cartesian.model.UpdateCartesianDataModel
 import tornadofx.Controller
 import java.util.*
 
@@ -14,60 +16,51 @@ class CartesianCanvasService : Controller() {
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
-    fun copyCartesian(event: CartesianCopyQuery) {
-        val oldCartesian = model.cartesianSpaces.first { it.id == event.id }
+    fun copyCartesian(copyDataModel: CartesianCopyDataModel) {
+        val oldCartesian = copyDataModel.origin
         val newCartesian = oldCartesian.clone().copy(
-            id = UUID.randomUUID(), name = event.name,
+            id = UUID.randomUUID(), name = copyDataModel.name,
             xAxis = oldCartesian.xAxis.copy(
                 id = UUID.randomUUID(),
-                name = event.xAxisName,
+                name = copyDataModel.xAxisName,
                 order = oldCartesian.xAxis.order + 1,
                 settings = oldCartesian.xAxis.settings.copy()
             ),
             yAxis = oldCartesian.yAxis.copy(
                 id = UUID.randomUUID(),
-                name = event.yAxisName,
+                name = copyDataModel.yAxisName,
                 order = oldCartesian.yAxis.order + 1,
                 settings = oldCartesian.yAxis.settings.copy()
             )
         )
-        model.cartesianSpaces.add(newCartesian)
+        this.model.cartesianSpaces.add(newCartesian)
+        reportUpdateSpaces()
         view.redraw()
-        getAllCartesianSpaces()
     }
 
-    fun getCartesian(event: CartesianQuery) {
-        val cartesianSpace = model.cartesianSpaces.first { it.id == event.id }
-        fire(GetCartesianEvent(cartesianSpace))
-    }
-
-    fun getAllCartesianSpaces() {
-        coroutineScope.launch {
-            model.reportCartesianSpacesListUpdate()
-        }
-    }
-
-    fun updateCartesian(event: UpdateCartesianEvent) {
-        val cartesian = model.cartesianSpaces.first { it.id == event.id }
-        cartesian.isShowGrid = event.isShowGrid
-        cartesian.name = event.name
+    fun updateCartesian(dataModel: UpdateCartesianDataModel) {
+        val cartesian = dataModel.space
+        cartesian.isShowGrid = dataModel.isShowGrid
+        cartesian.name = dataModel.name
+        reportUpdateSpaces()
         view.redraw()
-        getAllCartesianSpaces()
     }
 
-    fun deleteCartesianSpace(event: DeleteCartesianSpaceQuery) {
-        model.cartesianSpaces.removeIf {
-            it.id == event.id
-        }
-        view.redraw()
+    fun deleteCartesianSpace(space: CartesianSpace) {
+        model.cartesianSpaces.remove(space)
         refreshDependencies()
+        view.redraw()
     }
 
     private fun refreshDependencies() {
-        getAllCartesianSpaces()
         coroutineScope.launch {
-            model.reportFunctionsListUpdate()
-            model.reportAxesListUpdate()
+            model.reportUpdateAll()
+        }
+    }
+
+    private fun reportUpdateSpaces() {
+        coroutineScope.launch {
+            model.reportCartesianSpacesListUpdate()
         }
     }
 }

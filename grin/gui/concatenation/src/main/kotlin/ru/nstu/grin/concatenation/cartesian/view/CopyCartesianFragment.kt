@@ -1,14 +1,16 @@
 package ru.nstu.grin.concatenation.cartesian.view
 
 import javafx.scene.Parent
-import ru.nstu.grin.concatenation.cartesian.events.CartesianCopyQuery
+import ru.nstu.grin.concatenation.cartesian.model.CartesianCopyDataModel
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
+import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 import tornadofx.*
-import java.util.*
 
 class CopyCartesianFragment : Fragment() {
-    val cartesianId: UUID by param()
+    val space: CartesianSpace by param()
     private val model: CopyCartesianModel by inject()
+    private val cartesianCanvasService: CartesianCanvasService by inject()
 
     override val root: Parent = form {
         fieldset {
@@ -24,13 +26,13 @@ class CopyCartesianFragment : Fragment() {
         }
         button("Скопировать") {
             action {
-                val event = CartesianCopyQuery(
-                    id = cartesianId,
+                val data = CartesianCopyDataModel(
+                    origin = space,
                     name = model.name,
                     xAxisName = model.xAxisName,
                     yAxisName = model.yAxisName
                 )
-                fire(event)
+                cartesianCanvasService.copyCartesian(data)
                 close()
             }
         }

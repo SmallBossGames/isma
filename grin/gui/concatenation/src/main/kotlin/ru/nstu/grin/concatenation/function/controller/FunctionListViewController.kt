@@ -4,7 +4,6 @@ import javafx.scene.Scene
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.Window
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
@@ -14,15 +13,11 @@ import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
 import ru.nstu.grin.concatenation.koin.FunctionCopyModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import tornadofx.Controller
-import tornadofx.Scope
 
 class FunctionListViewController(
-    override val scope: Scope,
-    private val mainGrinScope: MainGrinScope
-) : Controller(), KoinComponent {
-    private val functionCanvasService: FunctionCanvasService by inject()
-
+    private val mainGrinScope: MainGrinScope,
+    private val functionCanvasService: FunctionCanvasService
+) {
     fun openCopyModal(function: ConcatenationFunction, window: Window? = null) {
         val functionCopyModalScope = mainGrinScope.get<FunctionCopyModalScope>()
 

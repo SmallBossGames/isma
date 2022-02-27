@@ -28,4 +28,8 @@ class CartesianCopyModalScope: KoinScopeComponent {
     override val scope: Scope by lazy { createScope(this) }
 }
 
+class CartesianChangeModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+
 

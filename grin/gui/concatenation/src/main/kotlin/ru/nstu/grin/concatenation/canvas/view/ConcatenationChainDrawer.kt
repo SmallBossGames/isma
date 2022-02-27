@@ -105,7 +105,6 @@ class ConcatenationChainDrawer : ChainDrawer, Controller() {
                 model,
                 controller,
                 this@ConcatenationChainDrawer,
-                scope
             ).draw(this, width, height)
 
             SelectionDrawElement(model.selectionSettings).draw(this, width, height)

@@ -4,7 +4,7 @@ import ru.nstu.grin.concatenation.cartesian.model.CartesianCopyDataModel
 import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
 import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 
-class CopyCartesianFragmentController(
+class CopyCartesianController(
     private val cartesianCanvasService: CartesianCanvasService
 ) {
     fun copy(model: CopyCartesianModel) {

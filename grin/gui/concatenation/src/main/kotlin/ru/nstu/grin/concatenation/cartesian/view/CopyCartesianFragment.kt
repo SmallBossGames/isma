@@ -1,12 +1,12 @@
 package ru.nstu.grin.concatenation.cartesian.view
 
 import javafx.stage.Stage
-import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianFragmentController
+import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianController
 import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
 import tornadofx.*
 
 class CopyCartesianFragment(
-    private val controller: CopyCartesianFragmentController,
+    private val controller: CopyCartesianController,
     private val model: CopyCartesianModel
 ) : Form() {
     init {

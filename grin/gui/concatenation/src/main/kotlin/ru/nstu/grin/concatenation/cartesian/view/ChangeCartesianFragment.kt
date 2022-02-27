@@ -5,9 +5,10 @@ import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
 import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
 import tornadofx.*
 
-class ChangeCartesianFragment : Fragment() {
-    private val model: ChangeCartesianSpaceModel by inject(params = params)
-    private val controller: ChangeCartesianController by inject()
+class ChangeCartesianFragment(
+    private val model: ChangeCartesianSpaceModel,
+    private val controller: ChangeCartesianController,
+) : Fragment() {
 
     override val root: Parent = form {
         fieldset {

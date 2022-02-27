@@ -19,7 +19,7 @@ class AxisListViewController(
         val view = scope.get<AxisChangeFragment>() { parametersOf(axis) }
 
         Stage().apply {
-            scene = Scene(view.root)
+            scene = Scene(view)
             title = "Change Axis"
 
             initModality(Modality.WINDOW_MODAL)

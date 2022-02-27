@@ -6,18 +6,24 @@ import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
 import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
+import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.axis.view.AxisListView
 import ru.nstu.grin.concatenation.axis.view.LogarithmicTypeFragment
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.view.CanvasWorkPanel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.canvas.view.ElementsView
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
-import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianFragmentController
+import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
+import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianController
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
+import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
 import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
 import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
+import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
 import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
@@ -45,7 +51,7 @@ val grinModule = module {
     scope<MainGrinScope> {
         scoped { CanvasProjectLoader(get()) }
 
-        scoped { params -> ConcatenationView(get(), get(), get(), params.getOrNull()) }
+        scoped { params -> ConcatenationView(get(), get(), get(), get(), get(), params.getOrNull()) }
         scoped { ElementsView(get(), get(), get(), get()) }
 
         scoped { FunctionListView(get(), get()) }
@@ -94,6 +100,12 @@ val grinModule = module {
             }
         }
 
+        factory {
+            CartesianChangeModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
 
@@ -101,6 +113,10 @@ val grinModule = module {
         scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
         scoped { find<CartesianCanvasService>(get<Scope>()) }
         scoped { find<FunctionCanvasService>(get<Scope>()) }
+        scoped { find<AxisCanvasService>(get<Scope>()) }
+        scoped { find<ConcatenationCanvasController>(get<Scope>()) }
+
+        scoped { find<CanvasWorkPanel>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {
@@ -130,9 +146,15 @@ val grinModule = module {
     }
 
     scope<CartesianCopyModalScope> {
-        scoped { CopyCartesianFragmentController(get()) }
+        scoped { CopyCartesianController(get()) }
         scoped { params -> CopyCartesianFragment(get(), get { params }) }
         scoped { params -> CopyCartesianModel(params.get()) }
+    }
+
+    scope<CartesianChangeModalScope> {
+        scoped { ChangeCartesianController(get()) }
+        scoped { params -> ChangeCartesianFragment(get { params }, get()) }
+        scoped { params -> ChangeCartesianSpaceModel(params.get()) }
     }
 
     single { GrinIntegrationFacade() }

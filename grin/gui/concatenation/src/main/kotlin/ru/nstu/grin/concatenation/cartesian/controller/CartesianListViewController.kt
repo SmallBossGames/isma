@@ -10,14 +10,14 @@ import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
 import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
+import ru.nstu.grin.concatenation.koin.CartesianChangeModalScope
 import ru.nstu.grin.concatenation.koin.CartesianCopyModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import tornadofx.Controller
 
 class CartesianListViewController(
     private val cartesianCanvasService: CartesianCanvasService,
     private val mainGrinScope: MainGrinScope,
-) : Controller() {
+) {
     fun openCopyModal(cartesianSpace: CartesianSpace, window: Window? = null) {
         val cartesianCopyModalScope = mainGrinScope.get<CartesianCopyModalScope>()
         val view = cartesianCopyModalScope.get<CopyCartesianFragment> { parametersOf(cartesianSpace) }
@@ -40,11 +40,8 @@ class CartesianListViewController(
     }
 
     fun openEditModal(cartesianSpace: CartesianSpace, window: Window? = null){
-        val view = find<ChangeCartesianFragment>(
-            mapOf(
-                "space" to cartesianSpace
-            )
-        )
+        val cartesianChangeModalScope = mainGrinScope.get<CartesianChangeModalScope>()
+        val view = cartesianChangeModalScope.get<ChangeCartesianFragment> { parametersOf(cartesianSpace) }
 
         Stage().apply {
             scene = Scene(view.root)
@@ -53,6 +50,10 @@ class CartesianListViewController(
 
             if (window != null){
                 initOwner(window)
+            }
+
+            setOnCloseRequest {
+                cartesianChangeModalScope.closeScope()
             }
 
             show()

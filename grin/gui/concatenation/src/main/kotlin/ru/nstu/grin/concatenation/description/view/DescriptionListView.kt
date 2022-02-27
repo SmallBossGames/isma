@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.description.view
 
-import javafx.scene.Parent
 import javafx.scene.control.ListCell
 import javafx.scene.control.ListView
 import javafx.scene.control.Tooltip
@@ -14,9 +13,9 @@ import tornadofx.*
 class DescriptionListView(
     model: DescriptionListViewModel,
     private val controller: DescriptionListViewController
-) : Fragment() {
+) : ListView<Description>(model.descriptions) {
 
-    override val root: Parent = ListView(model.descriptions).apply {
+    init {
         setCellFactory {
             object : ListCell<Description>() {
                 override fun updateItem(item: Description?, empty: Boolean) {

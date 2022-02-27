@@ -37,8 +37,8 @@ val grinModule = module {
         scoped { ElementsView(get(), get(), get(), get()) }
 
         scoped { FunctionListView(get(), get()) }
-        scoped { FunctionListViewController(get(), get(), get()) }
-        scoped { FunctionListViewModel() }
+        scoped { FunctionListViewController(get(), get()) }
+        scoped { FunctionListViewModel(get()) }
 
         scoped { AxisListView(get(), get()) }
         scoped { AxisListViewController(get()) }

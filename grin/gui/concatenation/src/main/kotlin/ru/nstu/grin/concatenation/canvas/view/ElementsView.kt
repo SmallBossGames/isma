@@ -18,7 +18,7 @@ class ElementsView(
             Tab("Functions", functionListView),
             Tab("Axes", axisListView),
             Tab("Spaces", cartesianListView),
-            Tab("Descriptions", descriptionListView.root)
+            Tab("Descriptions", descriptionListView)
         )
     }
 }

@@ -42,7 +42,7 @@ class FunctionListView(
                 }).apply {
                     tooltip = Tooltip("Скопировать")
                     setOnAction {
-                        controller.openCopyModal(item)
+                        controller.openCopyModal(item, scene.window)
                     }
                 },
                 Button(null, ImageView(Image("edit-tool.png")).apply {

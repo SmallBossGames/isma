@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
 import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.axis.view.AxisListView
 import ru.nstu.grin.concatenation.axis.view.LogarithmicTypeFragment
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.canvas.view.ElementsView
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
@@ -18,6 +19,7 @@ import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionContro
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
@@ -31,10 +33,11 @@ import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import ru.nstu.grin.concatenation.function.view.FunctionListView
 import ru.nstu.grin.concatenation.koin.*
+import tornadofx.Scope
+import tornadofx.find
 
 val grinModule = module {
     scope<MainGrinScope> {
-        scoped { tornadofx.Scope() }
         scoped { CanvasProjectLoader(get()) }
 
         scoped { params -> ConcatenationView(get(), get(), get(), params.getOrNull()) }
@@ -79,6 +82,12 @@ val grinModule = module {
                 scope.linkTo(get<MainGrinScope>().scope)
             }
         }
+
+        // Access to the TornadoFX world. Should be removed later.
+        scoped { Scope() }
+
+        scoped { find<DescriptionCanvasService>(get<Scope>()) }
+        scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

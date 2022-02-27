@@ -11,14 +11,11 @@ import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
 import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import tornadofx.Controller
-import tornadofx.Scope
 
 class DescriptionListViewController(
-    override val scope: Scope,
-    private val mainGrinScope: MainGrinScope
-) : Controller() {
-    private val service: DescriptionCanvasService by inject()
+    private val mainGrinScope: MainGrinScope,
+    private val service: DescriptionCanvasService
+) {
 
     fun openChangeModal(description: Description, window: Window? = null) {
         val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()

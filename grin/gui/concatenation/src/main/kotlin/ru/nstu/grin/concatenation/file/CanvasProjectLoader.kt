@@ -15,7 +15,7 @@ import tornadofx.Controller
 import tornadofx.Scope
 import java.io.File
 
-//TODO: implement descriptions and arrows saving
+//TODO: implement arrows saving
 class CanvasProjectLoader(override val scope: Scope) : Controller(), KoinComponent {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()

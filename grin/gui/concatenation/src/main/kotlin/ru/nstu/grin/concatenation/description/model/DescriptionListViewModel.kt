@@ -9,14 +9,11 @@ import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import tornadofx.Scope
-import tornadofx.ViewModel
 
 class DescriptionListViewModel(
-    override val scope: Scope
-) : ViewModel() {
+    private val concatenationCanvasModel: ConcatenationCanvasModel,
+) {
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
-    private val concatenationCanvasModel: ConcatenationCanvasModel by inject()
 
     val descriptions = FXCollections.observableArrayList<Description>()!!
 

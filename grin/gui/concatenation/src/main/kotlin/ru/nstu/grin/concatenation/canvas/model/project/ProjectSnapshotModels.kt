@@ -16,8 +16,8 @@ import java.util.*
 
 @Serializable
 data class ProjectSnapshot(
-    val spaces: List<CartesianSpaceSnapshot>,
-    val descriptions: List<DescriptionSnapshot>
+    val spaces: List<CartesianSpaceSnapshot> = emptyList(),
+    val descriptions: List<DescriptionSnapshot> = emptyList(),
 )
 
 @Serializable

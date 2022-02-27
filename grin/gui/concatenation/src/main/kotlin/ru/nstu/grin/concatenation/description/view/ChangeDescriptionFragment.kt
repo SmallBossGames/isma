@@ -6,7 +6,6 @@ import javafx.scene.Parent
 import javafx.scene.control.ComboBox
 import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
-import ru.nstu.grin.concatenation.description.events.GetDescriptionQuery
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
 import tornadofx.*
 
@@ -50,11 +49,5 @@ class ChangeDescriptionFragment : Fragment() {
             spacing = 20.0
             spacer()
         }
-
-
-    }
-
-    init {
-        fire(GetDescriptionQuery(model.description.id))
     }
 }

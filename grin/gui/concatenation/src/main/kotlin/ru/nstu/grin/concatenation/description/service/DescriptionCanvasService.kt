@@ -6,7 +6,6 @@ import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
-import ru.nstu.grin.concatenation.description.events.*
 import ru.nstu.grin.concatenation.description.model.UpdateDescriptionModel
 import tornadofx.Controller
 
@@ -31,12 +30,7 @@ class DescriptionCanvasService : Controller() {
         view.redraw()
     }
 
-    fun get(event: GetDescriptionQuery) {
-        val description = model.descriptions.first { it.id == event.id }
-        fire(GetDescriptionEvent(description = description))
-    }
-
-    fun reportUpdate() = coroutineScope.launch {
+    private fun reportUpdate() = coroutineScope.launch {
         model.reportDescriptionsListUpdate()
     }
 

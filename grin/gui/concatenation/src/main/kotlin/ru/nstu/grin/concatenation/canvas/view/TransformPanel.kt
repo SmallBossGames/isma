@@ -40,7 +40,7 @@ class TransformPanel : Fragment(), KoinComponent {
                     val view = scope.get<ChangeFunctionFragment> { parametersOf(function)}
 
                     Stage().apply {
-                        scene = Scene(view.root)
+                        scene = Scene(view)
                         title = "Change Function"
                         initModality(Modality.WINDOW_MODAL)
                         initOwner(currentWindow!!)

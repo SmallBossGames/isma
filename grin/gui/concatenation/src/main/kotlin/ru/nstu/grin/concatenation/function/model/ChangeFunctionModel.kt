@@ -8,7 +8,6 @@ import tornadofx.getValue
 import tornadofx.setValue
 
 class ChangeFunctionModel(val function: ConcatenationFunction) {
-
     var nameProperty = SimpleStringProperty()
     var name by nameProperty
 

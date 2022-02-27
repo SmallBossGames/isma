@@ -12,6 +12,7 @@ import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
+import ru.nstu.grin.concatenation.koin.FunctionCopyModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 import tornadofx.Controller
 import tornadofx.Scope
@@ -23,19 +24,21 @@ class FunctionListViewController(
     private val functionCanvasService: FunctionCanvasService by inject()
 
     fun openCopyModal(function: ConcatenationFunction, window: Window? = null) {
-        val view = find<CopyFunctionFragment>(
-            mapOf(
-                "function" to function
-            )
-        )
+        val functionCopyModalScope = mainGrinScope.get<FunctionCopyModalScope>()
+
+        val view = functionCopyModalScope.get<CopyFunctionFragment> { parametersOf(function) }
 
         Stage().apply {
-            scene = Scene(view.root)
+            scene = Scene(view)
             title = "Function parameters"
             initModality(Modality.WINDOW_MODAL)
 
             if (window != null){
                 initOwner(window)
+            }
+
+            setOnCloseRequest {
+                functionCopyModalScope.closeScope()
             }
 
             show()
@@ -48,7 +51,7 @@ class FunctionListViewController(
         val view = functionChangeModalScope.get<ChangeFunctionFragment> { parametersOf(function) }
 
         Stage().apply {
-            scene = Scene(view.root)
+            scene = Scene(view)
             title = "Change Function"
             initModality(Modality.WINDOW_MODAL)
 

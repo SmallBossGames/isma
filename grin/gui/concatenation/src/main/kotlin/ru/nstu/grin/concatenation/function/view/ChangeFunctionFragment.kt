@@ -1,17 +1,19 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
+import javafx.collections.FXCollections
+import javafx.scene.control.ComboBox
+import javafx.scene.control.ListCell
+import javafx.stage.Stage
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
 import ru.nstu.grin.concatenation.function.model.LineType
 import tornadofx.*
 
 class ChangeFunctionFragment(
-    override val scope: Scope,
     private val model: ChangeFunctionModel,
     private val controller: ChangeFunctionController,
-) : Fragment() {
-    override val root: Parent = form {
+) : Form() {
+    init {
         fieldset {
             field("Имя") {
                 textfield().bind(model.nameProperty)
@@ -32,25 +34,38 @@ class ChangeFunctionFragment(
                 checkbox().bind(model.isMirrorYProperty)
             }
             field("Вид линии") {
-                combobox(model.lineTypeProperty, LineType.values().toList()) {
-                    cellFormat {
-                        text = when (it!!) {
-                            LineType.POLYNOM -> "Полином"
-                            LineType.RECT_FILL_DOTES -> "Прямоугольник заполненные точки"
-                            LineType.SEGMENTS -> "Сегменты"
-                            LineType.RECT_UNFIL_DOTES -> "Прямоуголник незаполненные точки"
-                            LineType.CIRCLE_FILL_DOTES -> "Круг заполненные точки"
-                            LineType.CIRCLE_UNFILL_DOTES -> "Круг незаполненные точки"
-                        }
+                val types = FXCollections.observableArrayList(LineType.values().toList())
+                val comboBox = ComboBox(types).apply {
+                    buttonCell = createCell()
+                    setCellFactory {
+                        createCell()
                     }
+                    valueProperty().bindBidirectional(model.lineTypeProperty)
                 }
+                add(comboBox)
             }
             button("Сохранить") {
                 //enableWhen(model.isValid.toProperty())
                 action {
                     controller.updateFunction(model)
-                    close()
+                    (scene.window as Stage).close()
                 }
+            }
+        }
+    }
+
+    private fun createCell() = object : ListCell<LineType>() {
+        override fun updateItem(item: LineType?, empty: Boolean) {
+            super.updateItem(item, empty)
+
+            text = when (item) {
+                LineType.POLYNOM -> "Полином"
+                LineType.RECT_FILL_DOTES -> "Прямоугольник заполненные точки"
+                LineType.SEGMENTS -> "Сегменты"
+                LineType.RECT_UNFIL_DOTES -> "Прямоуголник незаполненные точки"
+                LineType.CIRCLE_FILL_DOTES -> "Круг заполненные точки"
+                LineType.CIRCLE_UNFILL_DOTES -> "Круг незаполненные точки"
+                else -> null
             }
         }
     }

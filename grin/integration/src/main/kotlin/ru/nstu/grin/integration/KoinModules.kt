@@ -19,13 +19,17 @@ import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
+import ru.nstu.grin.concatenation.function.controller.CopyFunctionController
 import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
 import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
+import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
+import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import ru.nstu.grin.concatenation.function.view.FunctionListView
 import ru.nstu.grin.concatenation.koin.AxisChangeModalScope
 import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
+import ru.nstu.grin.concatenation.koin.FunctionCopyModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 
 val grinModule = module {
@@ -63,11 +67,17 @@ val grinModule = module {
                 scope.linkTo(get<MainGrinScope>().scope)
             }
         }
+
+        factory {
+            FunctionCopyModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
     }
 
     scope<FunctionChangeModalScope> {
         scoped { ChangeFunctionController(get()) }
-        scoped { params -> ChangeFunctionFragment(get(), get { params }, get()) }
+        scoped { params -> ChangeFunctionFragment(get { params }, get()) }
         scoped { params -> ChangeFunctionModel(params.get()) }
     }
 
@@ -77,6 +87,12 @@ val grinModule = module {
         scoped { params -> LogarithmicTypeFragment(get { params }) }
         scoped { params -> AxisChangeFragmentModel(params.get()) }
         scoped { params -> LogarithmicFragmentModel(params.get()) }
+    }
+
+    scope<FunctionCopyModalScope> {
+        scoped { CopyFunctionController(get()) }
+        scoped { params -> CopyFunctionFragment(get { params }, get()) }
+        scoped { params -> CopyFunctionModel(params.get()) }
     }
 
     single { GrinIntegrationFacade() }

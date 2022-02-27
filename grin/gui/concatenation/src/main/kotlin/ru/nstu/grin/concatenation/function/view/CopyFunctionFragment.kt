@@ -1,15 +1,15 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
+import javafx.stage.Stage
 import ru.nstu.grin.concatenation.function.controller.CopyFunctionController
 import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
 import tornadofx.*
 
-class CopyFunctionFragment : Fragment() {
-    private val model: CopyFunctionModel by inject(params = params)
-    private val controller: CopyFunctionController by inject(params = params)
-
-    override val root: Parent = form {
+class CopyFunctionFragment(
+    private val model: CopyFunctionModel,
+    private val controller: CopyFunctionController
+): Form() {
+    init {
         fieldset {
             field("Имя новой функции") {
                 textfield().bind(model.nameProperty)
@@ -17,8 +17,8 @@ class CopyFunctionFragment : Fragment() {
         }
         button("Скопировать") {
             action {
-                controller.copy()
-                close()
+                controller.copy(model)
+                (scene.window as Stage).close()
             }
         }
     }

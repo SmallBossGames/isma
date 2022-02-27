@@ -1,7 +1,6 @@
 package ru.nstu.grin.concatenation.axis.view
 
 import javafx.geometry.Insets
-import javafx.scene.Parent
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
@@ -10,14 +9,13 @@ import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import tornadofx.Fragment
 
 class AxisListView(
     viewModel: AxisListViewModel,
     private val controller: AxisListViewController
-) : Fragment() {
+) : ListView<ConcatenationAxis>(viewModel.axes) {
 
-    override val root: Parent = ListView(viewModel.axes).apply {
+    init {
         setCellFactory {
             object : ListCell<ConcatenationAxis>() {
                 override fun updateItem(item: ConcatenationAxis?, empty: Boolean) {
@@ -57,7 +55,7 @@ class AxisListView(
             }).apply {
                 tooltip = Tooltip("Отредактировать")
                 setOnAction {
-                    controller.editAxis(item, currentWindow)
+                    controller.editAxis(item, scene.window)
                 }
             }
         }

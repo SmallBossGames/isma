@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
@@ -10,16 +9,12 @@ import javafx.scene.shape.Rectangle
 import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
-import tornadofx.Fragment
-import tornadofx.Scope
 
 class FunctionListView(
-    override val scope: Scope,
     private val controller: FunctionListViewController,
     model: FunctionListViewModel,
-) : Fragment() {
-
-    override val root: Parent = ListView(model.functions).apply {
+): ListView<ConcatenationFunction>(model.functions) {
+    init {
         setCellFactory {
             object : ListCell<ConcatenationFunction>() {
                 override fun updateItem(item: ConcatenationFunction?, empty: Boolean) {
@@ -56,7 +51,7 @@ class FunctionListView(
                 }).apply {
                     tooltip = Tooltip("Отредактировать")
                     setOnAction {
-                        controller.openChangeModal(item, currentWindow)
+                        controller.openChangeModal(item, scene.window)
                     }
                 },
                 Button(null, ImageView(Image("send-to-trash.png")).apply {

@@ -14,6 +14,9 @@ import ru.nstu.grin.concatenation.canvas.view.ElementsView
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
 import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
+import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
+import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
+import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
@@ -33,7 +36,7 @@ val grinModule = module {
         scoped { params -> ConcatenationView(get(), get(), get(), params.getOrNull()) }
         scoped { ElementsView(get(), get(), get(), get()) }
 
-        scoped { FunctionListView(get(), get(), get()) }
+        scoped { FunctionListView(get(), get()) }
         scoped { FunctionListViewController(get(), get(), get()) }
         scoped { FunctionListViewModel() }
 
@@ -44,6 +47,10 @@ val grinModule = module {
         scoped { CartesianListView(get(), get(), get()) }
         scoped { CartesianListViewController(get()) }
         scoped { CartesianListViewModel(get()) }
+
+        scoped { DescriptionListView(get(), get()) }
+        scoped { DescriptionListViewController(get()) }
+        scoped { DescriptionListViewModel(get()) }
 
         factory {
             FunctionChangeModalScope().apply {

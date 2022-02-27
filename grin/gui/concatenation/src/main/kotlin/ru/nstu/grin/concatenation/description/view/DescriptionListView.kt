@@ -11,9 +11,10 @@ import ru.nstu.grin.concatenation.description.controller.DescriptionListViewCont
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import tornadofx.*
 
-class DescriptionListView : Fragment() {
-    private val model: DescriptionListViewModel by inject()
-    private val controller: DescriptionListViewController = find { }
+class DescriptionListView(
+    model: DescriptionListViewModel,
+    private val controller: DescriptionListViewController
+) : Fragment() {
 
     override val root: Parent = ListView(model.descriptions).apply {
         setCellFactory {
@@ -48,7 +49,7 @@ class DescriptionListView : Fragment() {
                 spacing = 20.0
                 button {
                     action {
-                        controller.openChangeModal(item.id)
+                        controller.openChangeModal(item)
                     }
                     val image = Image("edit-tool.png")
                     val imageView = ImageView(image)
@@ -59,7 +60,7 @@ class DescriptionListView : Fragment() {
                 }
                 button {
                     action {
-                        controller.deleteDescription(item.id)
+                        controller.deleteDescription(item)
                     }
                     val image = Image("send-to-trash.png")
                     val imageView = ImageView(image)

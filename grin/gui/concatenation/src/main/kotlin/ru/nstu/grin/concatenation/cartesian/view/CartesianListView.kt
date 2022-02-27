@@ -6,7 +6,6 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
-import ru.nstu.grin.concatenation.cartesian.events.GetAllCartesiansQuery
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
 import tornadofx.*
 
@@ -66,9 +65,5 @@ class CartesianListView(
                 }
             }
         }
-    }
-
-    init {
-        fire(GetAllCartesiansQuery())
     }
 }

@@ -17,9 +17,6 @@ class CartesianCanvasController : Controller() {
         subscribe<CartesianQuery> { event ->
             service.getCartesian(event)
         }
-        subscribe<GetAllCartesiansQuery> {
-            service.getAllCartesianSpaces()
-        }
         subscribe<DeleteCartesianSpaceQuery> {
             service.deleteCartesianSpace(it)
         }

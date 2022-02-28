@@ -12,13 +12,9 @@ class ElementsView(
     axisListView: AxisListView,
     cartesianListView: CartesianListView,
     descriptionListView: DescriptionListView
-) : TabPane() {
-    init {
-        tabs.addAll(
-            Tab("Functions", functionListView),
-            Tab("Axes", axisListView),
-            Tab("Spaces", cartesianListView),
-            Tab("Descriptions", descriptionListView)
-        )
-    }
-}
+) : TabPane(
+    Tab("Functions", functionListView),
+    Tab("Axes", axisListView),
+    Tab("Spaces", cartesianListView),
+    Tab("Descriptions", descriptionListView)
+)

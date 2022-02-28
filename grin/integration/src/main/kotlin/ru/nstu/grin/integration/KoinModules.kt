@@ -13,10 +13,7 @@ import ru.nstu.grin.concatenation.axis.view.LogarithmicTypeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
-import ru.nstu.grin.concatenation.canvas.view.CanvasWorkPanel
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
-import ru.nstu.grin.concatenation.canvas.view.ElementsView
+import ru.nstu.grin.concatenation.canvas.view.*
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
 import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
 import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianController
@@ -53,7 +50,9 @@ val grinModule = module {
     scope<MainGrinScope> {
         scoped { CanvasProjectLoader(get()) }
 
-        scoped { params -> ConcatenationView(get(), get(), get(), get(), get { params }) }
+        scoped { params -> ConcatenationView(get(), get(), get(), get { params }) }
+        scoped { CanvasMenuBar(get(), get()) }
+        scoped { CanvasToolBar(get(), get(), get(), get()) }
         scoped { ElementsView(get(), get(), get(), get()) }
 
         scoped { FunctionListView(get(), get()) }
@@ -71,6 +70,8 @@ val grinModule = module {
         scoped { DescriptionListView(get(), get()) }
         scoped { DescriptionListViewController(get(), get()) }
         scoped { DescriptionListViewModel(get()) }
+
+        scoped { ChartToolBar(get(), get()) }
 
         factory {
             FunctionChangeModalScope().apply {
@@ -112,13 +113,18 @@ val grinModule = module {
         scoped { Scope() }
 
         scoped { find<DescriptionCanvasService>(get<Scope>()) }
-        scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
         scoped { find<CartesianCanvasService>(get<Scope>()) }
         scoped { find<FunctionCanvasService>(get<Scope>()) }
         scoped { find<AxisCanvasService>(get<Scope>()) }
+        scoped { find<ConcatenationChainDrawer>(get<Scope>()) }
+
+        scoped { find<ModesPanel>(get<Scope>()) }
+        scoped { find<MathPanel>(get<Scope>()) }
+        scoped { find<TransformPanel>(get<Scope>()) }
+
+        scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
         scoped { find<ConcatenationCanvasController>(get<Scope>()) }
 
-        scoped { find<CanvasWorkPanel>(get<Scope>()) }
         scoped { params ->
             find<ConcatenationCanvas>(get(), mapOf("initData" to params.get<InitCanvasData>()))
         }

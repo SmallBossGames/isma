@@ -17,4 +17,8 @@ class ElementsView(
     Tab("Axes", axisListView),
     Tab("Spaces", cartesianListView),
     Tab("Descriptions", descriptionListView)
-)
+){
+    init {
+        tabClosingPolicy = TabClosingPolicy.UNAVAILABLE
+    }
+}

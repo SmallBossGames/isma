@@ -1,9 +1,10 @@
-package ru.nstu.grin.common.view.modal
+package ru.nstu.grin.concatenation.arrow.view
 
 import javafx.scene.Parent
-import ru.nstu.grin.common.controller.ArrowController
+
 import ru.nstu.grin.common.model.CanvasType
 import ru.nstu.grin.common.model.view.ArrowViewModel
+import ru.nstu.grin.concatenation.arrow.controller.ArrowController
 import tornadofx.*
 
 /**

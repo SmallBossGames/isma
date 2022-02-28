@@ -13,4 +13,8 @@ class CanvasToolBar(
     Tab("Modes", modesPanel.root),
     Tab("Math", mathPanel.root),
     Tab("Transform", transformPanel.root)
-)
+) {
+    init {
+        tabClosingPolicy = TabClosingPolicy.UNAVAILABLE
+    }
+}

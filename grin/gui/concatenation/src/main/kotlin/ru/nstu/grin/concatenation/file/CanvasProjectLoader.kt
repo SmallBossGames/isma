@@ -1,5 +1,7 @@
 package ru.nstu.grin.concatenation.file
 
+import javafx.stage.FileChooser
+import javafx.stage.Window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,26 +15,37 @@ import ru.nstu.grin.concatenation.canvas.model.project.toModel
 import ru.nstu.grin.concatenation.canvas.model.project.toSnapshot
 import tornadofx.Controller
 import tornadofx.Scope
-import java.io.File
 
 //TODO: implement arrows saving
 class CanvasProjectLoader(override val scope: Scope) : Controller(), KoinComponent {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
 
-    fun save(path: File) {
+    fun save(window: Window? = null) {
+        val file = FileChooser().run {
+            title = "Save Chart"
+            extensionFilters.addAll(grinChartDataFileFilters)
+            showSaveDialog(window)
+        } ?: return
+
         val project = ProjectSnapshot(
             spaces = model.cartesianSpaces.map { it.toSnapshot() },
             descriptions = model.descriptions.map { it.toSnapshot() }
         )
 
-        path.bufferedWriter(Charsets.UTF_8).use {
+        file.bufferedWriter(Charsets.UTF_8).use {
             it.write(Json.encodeToString(project))
         }
     }
 
-    fun load(path: File) {
-        val json = path.readText(Charsets.UTF_8)
+    fun load(window: Window? = null) {
+        val file = FileChooser().run {
+            title = "Load Chart"
+            extensionFilters.addAll(grinChartDataFileFilters)
+            showOpenDialog(window)
+        } ?: return
+
+        val json = file.readText(Charsets.UTF_8)
         val project = Json.decodeFromString<ProjectSnapshot>(json)
 
         model.cartesianSpaces.setAll(project.spaces.map { it.toModel() })
@@ -42,5 +55,11 @@ class CanvasProjectLoader(override val scope: Scope) : Controller(), KoinCompone
         coroutineScope.launch {
             model.reportUpdateAll()
         }
+    }
+
+    private companion object {
+        val grinChartDataFileFilters = arrayOf(
+            FileChooser.ExtensionFilter("Grin Chart Data", "*.chart.json")
+        )
     }
 }

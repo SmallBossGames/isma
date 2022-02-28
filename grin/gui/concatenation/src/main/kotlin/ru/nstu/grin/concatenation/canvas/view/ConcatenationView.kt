@@ -1,66 +1,48 @@
 package ru.nstu.grin.concatenation.canvas.view
 
+import javafx.scene.control.Menu
+import javafx.scene.control.MenuBar
+import javafx.scene.control.MenuItem
 import javafx.scene.layout.BorderPane
-import javafx.stage.FileChooser
+import javafx.scene.layout.VBox
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
-import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
-import tornadofx.*
 
 class ConcatenationView(
-    private val scope: Scope,
     private val canvasProjectLoader: CanvasProjectLoader,
-    private val elementsView: ElementsView,
     private val concatenationCanvasController: ConcatenationCanvasController,
-    private val canvasWorkPanel: CanvasWorkPanel,
-    initData: InitCanvasData?
+    elementsView: ElementsView,
+    canvasWorkPanel: CanvasWorkPanel,
+    concatenationCanvas: ConcatenationCanvas,
 ) : BorderPane() {
     init {
-        top {
-            vbox {
-                menubar {
-                    menu("Файл") {
-                        item("Сохранить как").action {
-                            val file = FileChooser().run {
-                                title = "Save Chart"
-                                extensionFilters.addAll(grinChartDataFileFilters)
-                                return@run showSaveDialog(scene.window)
-                            } ?: return@action
-
-                            canvasProjectLoader.save(file)
+        top = VBox(
+            MenuBar(
+                Menu("File", null,
+                    MenuItem("Save as...").apply {
+                        setOnAction {
+                            canvasProjectLoader.save(scene.window)
                         }
-                        item("Загрузить").action {
-                            val file = FileChooser().run {
-                                title = "Load Chart"
-                                extensionFilters.addAll(grinChartDataFileFilters)
-                                return@run showOpenDialog(scene.window)
-                            } ?: return@action
-
-                            canvasProjectLoader.load(file)
+                    },
+                    MenuItem("Open").apply {
+                        setOnAction {
+                            canvasProjectLoader.load(scene.window)
                         }
                     }
-                    menu("Полотно") {
-                        item("Очистить все").action {
+                ),
+                Menu("Canvas", null,
+                    MenuItem("Clean all").apply {
+                        setOnAction {
                             concatenationCanvasController.clearCanvas()
                         }
                     }
-                }
-                add(canvasWorkPanel.root)
-            }
-        }
-        center {
-            add(
-                find<ConcatenationCanvas>(scope, mapOf(ConcatenationCanvas::initData to initData)).root
-            )
-        }
-        right {
-            add(elementsView)
-        }
-    }
-
-    private companion object {
-        val grinChartDataFileFilters = arrayOf(
-            FileChooser.ExtensionFilter("Grin Chart Data", "*.chart.json")
+                )
+            ),
+            canvasWorkPanel.root
         )
+
+        center = concatenationCanvas.root
+
+        right = elementsView
     }
 }

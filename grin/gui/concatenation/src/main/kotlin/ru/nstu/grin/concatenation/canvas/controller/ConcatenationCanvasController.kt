@@ -14,9 +14,6 @@ import ru.nstu.grin.concatenation.description.view.DescriptionModalView
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import tornadofx.Controller
 
-/**
- * Разбить по нескольким контроллерам, один для функций, другой для осей и т.д
- */
 class ConcatenationCanvasController : Controller() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()

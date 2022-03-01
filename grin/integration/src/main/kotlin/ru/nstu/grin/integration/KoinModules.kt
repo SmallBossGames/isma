@@ -12,6 +12,7 @@ import ru.nstu.grin.concatenation.axis.view.AxisListView
 import ru.nstu.grin.concatenation.axis.view.LogarithmicTypeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.canvas.view.*
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
@@ -72,6 +73,9 @@ val grinModule = module {
         scoped { DescriptionListViewModel(get()) }
 
         scoped { ChartToolBar(get(), get()) }
+        scoped { ModesToolBar(get()) }
+        scoped { MathToolBar(get(), get(), get()) }
+        scoped { TransformToolBar(get(), get(), get(), get()) }
 
         factory {
             FunctionChangeModalScope().apply {
@@ -118,12 +122,10 @@ val grinModule = module {
         scoped { find<AxisCanvasService>(get<Scope>()) }
         scoped { find<ConcatenationChainDrawer>(get<Scope>()) }
 
-        scoped { find<ModesPanel>(get<Scope>()) }
-        scoped { find<MathPanel>(get<Scope>()) }
-        scoped { find<TransformPanel>(get<Scope>()) }
-
         scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
         scoped { find<ConcatenationCanvasController>(get<Scope>()) }
+
+        scoped { find<ConcatenationViewModel>(get<Scope>()) }
 
         scoped { params ->
             find<ConcatenationCanvas>(get(), mapOf("initData" to params.get<InitCanvasData>()))

@@ -5,14 +5,14 @@ import javafx.scene.control.TabPane
 
 class CanvasToolBar(
     chartToolBar: ChartToolBar,
-    modesPanel: ModesPanel,
-    mathPanel: MathPanel,
-    transformPanel: TransformPanel,
+    modesToolBar: ModesToolBar,
+    mathToolBar: MathToolBar,
+    transformToolBar: TransformToolBar,
 ): TabPane(
     Tab("Chart", chartToolBar),
-    Tab("Modes", modesPanel.root),
-    Tab("Math", mathPanel.root),
-    Tab("Transform", transformPanel.root)
+    Tab("Modes", modesToolBar),
+    Tab("Math", mathToolBar),
+    Tab("Transform", transformToolBar)
 ) {
     init {
         tabClosingPolicy = TabClosingPolicy.UNAVAILABLE

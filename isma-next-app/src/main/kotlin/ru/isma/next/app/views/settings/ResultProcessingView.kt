@@ -13,7 +13,7 @@ class ResultProcessingView(
     override val root =
         ScrollPane(
             propertiesGrid {
-                addComboBox(
+                addNode(
                     "Save result",
                     FXCollections.observableArrayList(SaveTarget.values().toList()),
                     parametersService.resultSaving.savingTargetProperty

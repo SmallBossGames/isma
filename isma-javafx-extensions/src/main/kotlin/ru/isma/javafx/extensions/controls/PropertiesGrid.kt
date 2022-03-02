@@ -4,14 +4,12 @@ import javafx.beans.property.*
 import javafx.collections.ObservableList
 import javafx.geometry.Insets
 import javafx.scene.Node
-import javafx.scene.control.CheckBox
-import javafx.scene.control.ComboBox
-import javafx.scene.control.Label
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.layout.GridPane
+import javafx.scene.paint.Color
 import javafx.util.StringConverter
 
-class PropertiesGrid: GridPane() {
+open class PropertiesGrid: GridPane() {
     fun addNode(title: String, property: DoubleProperty) : TextField {
         return addNode(title, doubleTextField(property))
     }
@@ -34,8 +32,31 @@ class PropertiesGrid: GridPane() {
         return addNode(title, checkbox)
     }
 
-    fun <T> addComboBox(title: String, variants: ObservableList<T>, property: Property<T>): ComboBox<T> {
+    fun addNode(title: String, property: SimpleObjectProperty<Color>) : ColorPicker {
+        val colorPicker = ColorPicker().apply {
+            valueProperty().bindBidirectional(property)
+        }
+        return addNode(title, colorPicker)
+    }
+
+    fun <T> addNode(title: String, variants: ObservableList<T>, property: Property<T>): ComboBox<T> {
         val node = ComboBox(variants).apply {
+            valueProperty().bindBidirectional(property)
+        }
+        return addNode(title, node)
+    }
+
+    fun <T> addNode(
+        title: String,
+        variants: ObservableList<T>,
+        property: Property<T>,
+        cellFactory: () -> ListCell<T>
+    ): ComboBox<T> {
+        val node = ComboBox(variants).apply {
+            buttonCell = cellFactory()
+            setCellFactory{
+                cellFactory()
+            }
             valueProperty().bindBidirectional(property)
         }
         return addNode(title, node)
@@ -44,10 +65,10 @@ class PropertiesGrid: GridPane() {
     private fun <T: Node> addNode(title: String, field: T) : T {
         val row = this.rowCount
         val label = Label(title).apply {
-            padding = Insets(5.0, 10.0,5.0,5.0)
+            padding = Insets(7.0, 10.0,7.0,5.0)
         }
         field.apply {
-            padding = Insets(3.0, 5.0,3.0,3.0)
+            padding = Insets(7.0, 5.0,7.0,3.0)
         }
         add(label, 0, row)
         add(field, 1, row)

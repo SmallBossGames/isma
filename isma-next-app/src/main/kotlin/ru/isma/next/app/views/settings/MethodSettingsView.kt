@@ -11,7 +11,7 @@ class MethodSettingsView(
     override val root =
         ScrollPane(
             propertiesGrid {
-                addComboBox(
+                addNode(
                     "Method",
                     parametersService.integrationMethods,
                     parametersService.integrationMethod.selectedMethodProperty

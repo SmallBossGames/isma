@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import org.controlsfx.control.PopOver
+import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.isma.next.app.extentions.matIconAL
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
@@ -73,7 +74,7 @@ class TasksPopOver(
 
     private fun bindInProgressTasksList() {
         coroutineScope.launch {
-            simulationService.changedTrackingTasks
+            simulationService.trackingTasks.changeAsFlow()
                 .cancellable()
                 .collect {
                     while (it.next()) {
@@ -101,7 +102,7 @@ class TasksPopOver(
 
     private fun bindCompletedSimulationModel() {
         coroutineScope.launch {
-            simulationResultService.changedTrackingTasksResults
+            simulationResultService.trackingTasksResults.changeAsFlow()
                 .cancellable()
                 .collect {
                     while (it.next()) {

@@ -1,7 +1,6 @@
-package ru.isma.next.app.views.controls
+package ru.isma.javafx.extensions.controls
 
 import javafx.beans.property.*
-import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
 import javafx.geometry.Insets
 import javafx.scene.Node
@@ -11,8 +10,6 @@ import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import javafx.scene.layout.GridPane
 import javafx.util.StringConverter
-import ru.isma.next.app.extentions.DoubleConverter
-import ru.isma.next.app.extentions.IntegerConverter
 
 class PropertiesGrid: GridPane() {
     fun addNode(title: String, property: DoubleProperty) : TextField {
@@ -38,7 +35,7 @@ class PropertiesGrid: GridPane() {
     }
 
     fun <T> addComboBox(title: String, variants: ObservableList<T>, property: Property<T>): ComboBox<T> {
-        val node = ComboBox<T>(variants).apply {
+        val node = ComboBox(variants).apply {
             valueProperty().bindBidirectional(property)
         }
         return addNode(title, node)
@@ -82,7 +79,33 @@ class PropertiesGrid: GridPane() {
     }
 
     companion object {
+        class DoubleConverter: StringConverter<Number>() {
+            override fun toString(value: Number?): String {
+                return value?.toString() ?: "0"
+            }
+
+            override fun fromString(string: String?): Number {
+                return string?.toDoubleOrNull() ?: 0.0
+            }
+        }
+
+        class IntegerConverter: StringConverter<Number>() {
+            override fun toString(value: Number?): String {
+                return value?.toString() ?: "0"
+            }
+
+            override fun fromString(string: String?): Number {
+                return string?.toIntOrNull() ?: 0
+            }
+        }
+
         private val doubleConverterInstance = DoubleConverter()
         private val integerConverterInstance = IntegerConverter()
     }
 }
+
+inline fun propertiesGrid(factory: PropertiesGrid.() -> Unit) =
+    PropertiesGrid().apply {
+        factory()
+    }
+

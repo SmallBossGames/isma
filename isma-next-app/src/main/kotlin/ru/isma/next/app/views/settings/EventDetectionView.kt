@@ -1,18 +1,16 @@
 package ru.isma.next.app.views.settings
 
 import javafx.scene.control.ScrollPane
-import ru.isma.next.app.extentions.bindDouble
-import ru.isma.next.app.extentions.numberTextField
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import ru.isma.next.app.views.controls.PropertiesGrid
-import tornadofx.*
+import tornadofx.View
 
 class EventDetectionView(
     private val parametersService: SimulationParametersService
 ) : View("Event detection") {
     override val root =
         ScrollPane(
-            PropertiesGrid().apply {
+            propertiesGrid {
                 addNode("In use", parametersService.eventDetection.isEventDetectionInUseProperty)
                 addNode("Gamma", parametersService.eventDetection.gammaProperty).apply {
                     disableProperty().bind(parametersService.eventDetection.isEventDetectionInUseProperty.not())

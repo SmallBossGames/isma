@@ -8,6 +8,7 @@ import javafx.scene.control.*
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
+import ru.isma.javafx.extensions.controls.cellFactory
 
 private const val LIST_ITEMS_SPACING = 10.0
 
@@ -22,22 +23,14 @@ fun <T> pickItems(item: Iterable<NamedPickerItem<T>>): List<NamedPickerItem<T>> 
         title = "Select variables"
         dialogPane.content = BorderPane().apply {
             center = ListView(FXCollections.observableArrayList(selectionItemViewModels)).apply {
-                setCellFactory {
-                    object : ListCell<SelectionItemViewModel>() {
-                        override fun updateItem(item: SelectionItemViewModel?, empty: Boolean) {
-                            if (empty || item == null || graphic != null) {
-                                return
-                            }
-
-                            graphic = HBox(
-                                CheckBox().apply {
-                                    selectedProperty().bindBidirectional(item.isSelected)
-                                },
-                                Label(item.value.name)
-                            ).apply {
-                                spacing = LIST_ITEMS_SPACING
-                            }
-                        }
+                cellFactory { item ->
+                    HBox(
+                        CheckBox().apply {
+                            item.isSelected.bind(selectedProperty())
+                        },
+                        Label(item.value.name)
+                    ).apply {
+                        spacing = LIST_ITEMS_SPACING
                     }
                 }
             }

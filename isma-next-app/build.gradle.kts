@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":isma-blueprint-editor"))
     implementation(project(":isma-text-editor"))
     implementation(project(":isma-next-services-simulation-abstractions"))
+    implementation(project(":isma-javafx-extensions"))
 
     implementation(project(":grin:integration"))
 

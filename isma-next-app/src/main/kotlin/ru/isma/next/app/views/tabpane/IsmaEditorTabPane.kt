@@ -5,12 +5,14 @@ import javafx.scene.control.TabPane
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import ru.isma.javafx.extensions.coroutines.flow.addedAsFlow
 import ru.isma.next.app.models.projects.BlueprintProjectDataProvider
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
@@ -31,7 +33,7 @@ class IsmaEditorTabPane(
 
     init {
         coroutinesScope.launch {
-            merge(projectController.existedProjects, projectController.newProjects)
+            merge(projectController.projects.asFlow(), projectController.projects.addedAsFlow())
                 .cancellable()
                 .collect {
                     val tab = when (it) {

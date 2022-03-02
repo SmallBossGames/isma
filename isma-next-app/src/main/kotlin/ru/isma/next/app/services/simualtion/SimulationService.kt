@@ -4,7 +4,6 @@ import javafx.collections.FXCollections
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import org.koin.core.component.KoinComponent
-import ru.isma.next.app.javafx.changeAsFlow
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.services.koin.SimulationScope
@@ -23,10 +22,6 @@ class SimulationService(
     private val simulationResult: SimulationResultService,
 ) : KoinComponent {
     val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()!!
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
-    val changedTrackingTasks = trackingTasks.changeAsFlow(coroutineScope)
 
     private val currentSimulationJobs = mutableMapOf<InProgressSimulationModel, Job>()
 

@@ -2,8 +2,8 @@ package ru.isma.next.app.views.settings
 
 import javafx.collections.FXCollections
 import javafx.scene.control.ScrollPane
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import ru.isma.next.app.views.controls.PropertiesGrid
 import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
 import tornadofx.View
 
@@ -12,7 +12,7 @@ class ResultProcessingView(
 ) : View("Result processing") {
     override val root =
         ScrollPane(
-            PropertiesGrid().apply {
+            propertiesGrid {
                 addComboBox(
                     "Save result",
                     FXCollections.observableArrayList(SaveTarget.values().toList()),

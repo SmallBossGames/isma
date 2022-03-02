@@ -8,10 +8,10 @@ class AxisChangeFragmentModel(
     val axis: ConcatenationAxis
 ) {
 
-    var distanceBetweenMarksProperty = SimpleStringProperty(this, "distanceBeetweenMarks", "24.0")
+    var distanceBetweenMarksProperty = SimpleDoubleProperty(24.0)
     var distanceBetweenMarks by distanceBetweenMarksProperty
 
-    var textSizeProperty = SimpleStringProperty(this, "textSizeProperty", "12.0")
+    var textSizeProperty = SimpleDoubleProperty(12.0)
     var textSize by textSizeProperty
 
     var fontProperty = SimpleStringProperty()
@@ -20,10 +20,10 @@ class AxisChangeFragmentModel(
     var fontColorProperty = SimpleObjectProperty<Color>()
     var fontColor by fontColorProperty
 
-    var minProperty = SimpleStringProperty(this, "minProperty", "0.0")
+    var minProperty = SimpleDoubleProperty(0.0)
     var min by minProperty
 
-    var maxProperty = SimpleStringProperty(this, "maxProperty", "0.0")
+    var maxProperty = SimpleDoubleProperty(0.0)
     var max by maxProperty
 
     var isHideProperty = SimpleBooleanProperty()
@@ -37,25 +37,25 @@ class AxisChangeFragmentModel(
 
     init {
         axisColor = axis.backGroundColor
-        distanceBetweenMarks = axis.distanceBetweenMarks.toString()
-        textSize = axis.textSize.toString()
+        distanceBetweenMarks = axis.distanceBetweenMarks
+        textSize = axis.textSize
         font = axis.font
         fontColor = axis.fontColor
         isHide = axis.isHide
-        min = axis.settings.min.toString()
-        max = axis.settings.max.toString()
+        min = axis.settings.min
+        max = axis.settings.max
     }
 
     fun createChangeSet() = UpdateAxisChangeSet(
         id = axis.id,
-        distance = distanceBetweenMarks.toDouble(),
-        textSize = textSize.toDouble(),
+        distance = distanceBetweenMarks,
+        textSize = textSize,
         font = font,
         fontColor = fontColor,
         axisColor = axisColor,
         isHide = isHide,
         axisMarkType = axisMarkType,
-        min = min.toDouble(),
-        max = max.toDouble()
+        min = min,
+        max = max
     )
 }

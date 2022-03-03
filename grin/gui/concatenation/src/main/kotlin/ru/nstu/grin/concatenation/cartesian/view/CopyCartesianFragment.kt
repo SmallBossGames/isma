@@ -1,31 +1,39 @@
 package ru.nstu.grin.concatenation.cartesian.view
 
+import javafx.geometry.Insets
+import javafx.scene.control.Button
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import javafx.stage.Stage
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianController
 import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
-import tornadofx.*
 
 class CopyCartesianFragment(
     private val controller: CopyCartesianController,
     private val model: CopyCartesianModel
-) : Form() {
+) : BorderPane() {
     init {
-        fieldset {
-            field("Имя нового пространства") {
-                textfield().bind(model.nameProperty)
+        top = VBox(
+            propertiesGrid {
+                addNode("New Space Name", model.nameProperty)
+                addNode("X Axis Name", model.xAxisNameProperty)
+                addNode("Y Axis Name", model.yAxisNameProperty)
+            }.apply {
+                padding = Insets(10.0)
+            },
+        )
+
+        bottom = HBox(
+            Button("Copy").apply {
+                setOnAction {
+                    controller.copy(model)
+                    (scene.window as Stage).close()
+                }
             }
-            field("Имя оси абцисс нового пространства") {
-                textfield().bind(model.xAxisNameProperty)
-            }
-            field("Имя оси ординат нового пространства") {
-                textfield().bind(model.yAxisNameProperty)
-            }
-        }
-        button("Скопировать") {
-            action {
-                controller.copy(model)
-                (scene.window as Stage).close()
-            }
+        ).apply {
+            padding = Insets(10.0)
         }
     }
 }

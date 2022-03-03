@@ -1,20 +1,20 @@
 package ru.nstu.grin.concatenation.axis.view
 
+import javafx.geometry.Insets
+import javafx.scene.layout.VBox
+import ru.isma.javafx.extensions.controls.PropertiesGrid
 import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
-import tornadofx.*
 
 class LogarithmicTypeFragment(
-    private val model: LogarithmicFragmentModel,
-) : Fieldset() {
+    model: LogarithmicFragmentModel,
+) : VBox(
+    PropertiesGrid().apply {
+        addNode("Logarithm Base", model.logarithmBaseProperty)
+        addNode("Only Integer Pow", model.onlyIntegerPowProperty)
+        addNode("Integer Step", model.onlyIntegerPowProperty)
+    }
+) {
     init {
-        field("Основание логарифма") {
-            textfield(model.logarithmBaseProperty)
-        }
-        field("Только целые значение степеней") {
-            checkbox().bind(model.onlyIntegerPowProperty)
-        }
-        field("Целочисленные шаг") {
-            textfield(model.integerStepProperty)
-        }
+        padding = Insets(10.0)
     }
 }

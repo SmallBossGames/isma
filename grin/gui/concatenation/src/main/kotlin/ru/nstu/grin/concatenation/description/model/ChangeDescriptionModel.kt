@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.description.model
 
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
@@ -14,7 +15,7 @@ class ChangeDescriptionModel(
     var textProperty = SimpleStringProperty()
     var text by textProperty
 
-    var textSizeProperty = SimpleStringProperty(this, "textSizeProperty", "12.0")
+    var textSizeProperty = SimpleDoubleProperty(12.0)
     var textSize by textSizeProperty
 
     var colorProperty = SimpleObjectProperty<Color>()
@@ -25,7 +26,7 @@ class ChangeDescriptionModel(
 
     init {
         text = description.text
-        textSize = description.textSize.toString()
+        textSize = description.textSize
         color = description.color
         font = description.font
     }

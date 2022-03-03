@@ -29,7 +29,7 @@ class AxisChangeFragmentModel(
     var isHideProperty = SimpleBooleanProperty()
     var isHide by isHideProperty
 
-    var markTypeProperty = SimpleObjectProperty<AxisMarkType>(AxisMarkType.LINEAR)
+    var markTypeProperty = SimpleObjectProperty(AxisMarkType.LINEAR)
     var axisMarkType by markTypeProperty
 
     var axisColorProperty = SimpleObjectProperty<Color>()

@@ -44,7 +44,7 @@ class CartesianListViewController(
         val view = cartesianChangeModalScope.get<ChangeCartesianFragment> { parametersOf(cartesianSpace) }
 
         Stage().apply {
-            scene = Scene(view.root)
+            scene = Scene(view)
             title = "Function parameters"
             initModality(Modality.WINDOW_MODAL)
 

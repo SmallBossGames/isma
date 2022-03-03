@@ -1,53 +1,43 @@
 package ru.nstu.grin.concatenation.description.view
 
-import javafx.collections.FXCollections
-import javafx.geometry.Pos
-import javafx.scene.control.ComboBox
+import javafx.collections.FXCollections.observableArrayList
+import javafx.geometry.Insets
+import javafx.scene.control.Button
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.Stage
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
-import tornadofx.*
 
 class ChangeDescriptionFragment(
     private val controller: ChangeDescriptionController,
     private val model: ChangeDescriptionModel
-) : Form() {
+) : BorderPane() {
 
     init {
-        fieldset {
-            field("Текст") {
-                textfield().bind(model.textProperty)
-            }
-            field("Размер шрифта") {
-                textfield(model.textSizeProperty)
-            }
-            field("Цвет шрифта") {
-                colorpicker().bind(model.colorProperty)
-            }
-            field("Семейство шрифта") {
-                val fontFamilies = FXCollections.observableArrayList(Font.getFamilies())
-                val comboBox = ComboBox(fontFamilies).apply {
-                    valueProperty().bindBidirectional(model.fontProperty)
-                }
-                add(comboBox)
-            }
+        top = VBox(
+            propertiesGrid {
+                addNode("Text", model.textProperty)
+                addNode("Font Size", model.textSizeProperty)
+                addNode("Font Color", model.colorProperty)
+                addNode("Font Family", observableArrayList(Font.getFamilies()), model.fontProperty)
+            }.apply {
+                padding = Insets(10.0)
+            },
+        )
 
-        }
-        vbox {
-            hbox {
-                spacer()
-                button("Сохранить") {
-                    alignment = Pos.BASELINE_CENTER
-                    action {
-                        controller.updateDescription(model)
-                        (scene.window as Stage).close()
-                    }
+        bottom = HBox(
+            Button("Save").apply {
+                setOnAction {
+                    controller.updateDescription(model)
+                    (scene.window as Stage).close()
                 }
-                spacing = 20.0
             }
-            spacing = 20.0
-            spacer()
+        ).apply {
+            padding = Insets(10.0)
         }
     }
 }

@@ -9,7 +9,7 @@ import javafx.scene.layout.GridPane
 import javafx.scene.paint.Color
 import javafx.util.StringConverter
 
-open class PropertiesGrid: GridPane() {
+class PropertiesGrid: GridPane() {
     fun addNode(title: String, property: DoubleProperty) : TextField {
         return addNode(title, doubleTextField(property))
     }

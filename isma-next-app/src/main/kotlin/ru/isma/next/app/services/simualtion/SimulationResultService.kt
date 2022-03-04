@@ -4,7 +4,6 @@ import javafx.collections.FXCollections
 import javafx.stage.FileChooser
 import javafx.stage.Window
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.views.dialogs.NamedPickerItem
@@ -145,15 +144,13 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
     ) : List<List<PointModel>> = runBlocking {
         val tempResult = List(yAxisColumns.size) { mutableListOf<PointModel>() }
 
-        result.resultPointProvider.results
-            .map {
-                it.yForDe + it.rhs[DaeSystem.RHS_AE_PART_IDX] + it.rhs[DaeSystem.RHS_DE_PART_IDX]
+        result.resultPointProvider.results.collect {
+            val row = it.yForDe + it.rhs[DaeSystem.RHS_AE_PART_IDX] + it.rhs[DaeSystem.RHS_DE_PART_IDX]
+
+            yAxisColumns.forEachIndexed { index, item ->
+                tempResult[index].add(PointModel(row[xAxisColumn], row[item]))
             }
-            .collect {
-                yAxisColumns.forEachIndexed { index, item ->
-                    tempResult[index].add(PointModel(it[xAxisColumn], it[item]))
-                }
-            }
+        }
 
         return@runBlocking tempResult
     }

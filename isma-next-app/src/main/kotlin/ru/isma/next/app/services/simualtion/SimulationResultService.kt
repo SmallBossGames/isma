@@ -4,10 +4,12 @@ import javafx.collections.FXCollections
 import javafx.stage.FileChooser
 import javafx.stage.Window
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.views.dialogs.NamedPickerItem
-import ru.isma.next.app.views.dialogs.pickItems
+import ru.isma.next.app.views.dialogs.NamedPickerModel
+import ru.isma.next.app.views.dialogs.pickAxisVariables
 import ru.nstu.grin.integration.FunctionModel
 import ru.nstu.grin.integration.GrinIntegrationFacade
 import ru.nstu.grin.integration.PointModel
@@ -36,18 +38,21 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
     fun showChart(simulationResult: CompletedSimulationModel) {
         val headers = createColumnNamesArray(simulationResult)
 
-        val headerColumnPairs = headers.mapIndexed{i, header -> NamedPickerItem(header, i) }
-
-        val pickedItems = pickItems(headerColumnPairs)
-
-        if(pickedItems.isEmpty()){
-            return
+        val headerColumnPairs = headers.mapIndexed{ i, header ->
+            NamedPickerItem(header, i)
         }
 
-        val selectedColumnIndices = pickedItems.map { it.value }.toIntArray()
-        val selectedColumns = createResultColumns(simulationResult, selectedColumnIndices)
+        val pickerModel = NamedPickerModel(
+            headerColumnPairs.find { it.name == "TIME" }!!,
+            headerColumnPairs
+        )
 
-        val functions = pickedItems.mapIndexed { i, value ->
+        val pickedItems = pickAxisVariables(pickerModel) ?: return
+
+        val selectedColumnIndices = pickedItems.yAxisItems.map { it.value }.toIntArray()
+        val selectedColumns = createResultColumns(simulationResult, pickedItems.xAxisItem.value, selectedColumnIndices)
+
+        val functions = pickedItems.yAxisItems.mapIndexed { i, value ->
             FunctionModel(value.name, selectedColumns[i])
         }
 
@@ -135,57 +140,20 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
 
     private fun createResultColumns(
         result: CompletedSimulationModel,
-        orderedColumnNumbers: IntArray,
+        xAxisColumn: Int,
+        yAxisColumns: IntArray,
     ) : List<List<PointModel>> = runBlocking {
-        val tempResult = List(orderedColumnNumbers.size) { mutableListOf<PointModel>() }
+        val tempResult = List(yAxisColumns.size) { mutableListOf<PointModel>() }
 
-        var indicesInitialized = false
-        var regularIndices = intArrayOf()
-        var aeIndices = intArrayOf()
-        var deIndices = intArrayOf()
-
-        result.resultPointProvider.results.collect {
-            if(!indicesInitialized) {
-                val minRegularIndex = 0
-                val minAeIndex = it.yForDe.size
-                val minDeIndex = it.yForDe.size + it.rhs[DaeSystem.RHS_AE_PART_IDX].size
-                val fullLength = it.yForDe.size + it.rhs[DaeSystem.RHS_AE_PART_IDX].size + it.rhs[DaeSystem.RHS_DE_PART_IDX].size
-
-                regularIndices = orderedColumnNumbers
-                    .filter { x -> x in minRegularIndex until minAeIndex }
-                    .map { x -> x - minRegularIndex }
-                    .toIntArray()
-
-                aeIndices = orderedColumnNumbers
-                    .filter { x -> x in minAeIndex until minDeIndex }
-                    .map { x -> x - minAeIndex }
-                    .toIntArray()
-
-                deIndices = orderedColumnNumbers
-                    .filter { x -> x in minDeIndex until fullLength }
-                    .map { x -> x - minDeIndex }
-                    .toIntArray()
-
-                indicesInitialized = true
+        result.resultPointProvider.results
+            .map {
+                it.yForDe + it.rhs[DaeSystem.RHS_AE_PART_IDX] + it.rhs[DaeSystem.RHS_DE_PART_IDX]
             }
-
-            var resultArrayColumn = 0
-
-            for (j in regularIndices) {
-                tempResult[resultArrayColumn].add(PointModel(it.x, it.yForDe[j]))
-                resultArrayColumn++
+            .collect {
+                yAxisColumns.forEachIndexed { index, item ->
+                    tempResult[index].add(PointModel(it[xAxisColumn], it[item]))
+                }
             }
-
-            for (j in aeIndices) {
-                tempResult[resultArrayColumn].add(PointModel(it.x, it.rhs[DaeSystem.RHS_AE_PART_IDX][j]))
-                resultArrayColumn++
-            }
-
-            for (j in deIndices) {
-                tempResult[resultArrayColumn].add(PointModel(it.x, it.rhs[DaeSystem.RHS_AE_PART_IDX][j]))
-                resultArrayColumn++
-            }
-        }
 
         return@runBlocking tempResult
     }

@@ -11,7 +11,6 @@ class DescriptionDrawElement(
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         for (description in descriptions) {
-            println("Description = $description")
             context.stroke = description.color
             context.font = Font.font(description.font, description.textSize)
             context.strokeText(description.text, description.x, description.y)

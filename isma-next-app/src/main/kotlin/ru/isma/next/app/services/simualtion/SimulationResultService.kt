@@ -18,6 +18,7 @@ import java.io.File
 import java.io.Writer
 
 class SimulationResultService(private val grinIntegrationController: GrinIntegrationFacade) {
+
     val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()!!
 
     private val fileFilers = arrayOf(
@@ -34,7 +35,7 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
             trackingTasksResults.remove(result)
         }
 
-    fun showChart(simulationResult: CompletedSimulationModel) {
+    fun showChart(simulationResult: CompletedSimulationModel) = ResultServiceScope.launch {
         val headers = createColumnNamesArray(simulationResult)
 
         val headerColumnPairs = headers.mapIndexed{ i, header ->
@@ -46,7 +47,9 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
             headerColumnPairs
         )
 
-        val pickedItems = pickAxisVariables(pickerModel) ?: return
+        val pickedItems = withContext(Dispatchers.JavaFx){
+            pickAxisVariables(pickerModel)
+        } ?: return@launch
 
         val selectedColumnIndices = pickedItems.yAxisItems.map { it.value }.toIntArray()
         val selectedColumns = createResultColumns(simulationResult, pickedItems.xAxisItem.value, selectedColumnIndices)
@@ -55,7 +58,9 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
             FunctionModel(value.name, selectedColumns[i])
         }
 
-        grinIntegrationController.openSimpleChart(functions)
+        withContext(Dispatchers.JavaFx){
+            grinIntegrationController.openSimpleChart(functions)
+        }
     }
 
     fun exportToFile(simulationResult: CompletedSimulationModel, ownerWindow: Window? = null){
@@ -137,23 +142,23 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         return outputArray
     }
 
-    private fun createResultColumns(
+     private suspend fun createResultColumns(
         result: CompletedSimulationModel,
         xAxisColumn: Int,
         yAxisColumns: IntArray,
-    ) : List<List<PointModel>> = runBlocking {
-        val tempResult = List(yAxisColumns.size) { mutableListOf<PointModel>() }
+    ) : List<List<PointModel>> {
+         val tempResult = List(yAxisColumns.size) { mutableListOf<PointModel>() }
 
-        result.resultPointProvider.results.collect {
-            val row = it.yForDe + it.rhs[DaeSystem.RHS_AE_PART_IDX] + it.rhs[DaeSystem.RHS_DE_PART_IDX]
+         result.resultPointProvider.results.collect {
+             val row = it.yForDe + it.rhs[DaeSystem.RHS_AE_PART_IDX] + it.rhs[DaeSystem.RHS_DE_PART_IDX]
 
-            yAxisColumns.forEachIndexed { index, item ->
-                tempResult[index].add(PointModel(row[xAxisColumn], row[item]))
-            }
-        }
+             yAxisColumns.forEachIndexed { index, item ->
+                 tempResult[index].add(PointModel(row[xAxisColumn], row[item]))
+             }
+         }
 
-        return@runBlocking tempResult
-    }
+         return tempResult
+     }
 
     companion object {
         private const val COMMA_AND_SPACE = ", "

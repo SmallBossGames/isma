@@ -11,7 +11,7 @@ import javafx.stage.Stage
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
+import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
@@ -59,7 +59,7 @@ class TransformToolBar(
             val description = model.getSelectedDescription()
             if (description != null) {
                 val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
-                val view = descriptionChangeModalScope.get<ChangeDescriptionFragment> { parametersOf(description)}
+                val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(description)}
 
                 Stage().apply {
                     scene = Scene(view)

@@ -8,7 +8,7 @@ import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
-import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
+import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 
@@ -19,7 +19,7 @@ class DescriptionListViewController(
     fun openChangeModal(description: Description, window: Window? = null) {
         val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
 
-        val view = descriptionChangeModalScope.get<ChangeDescriptionFragment> { parametersOf(description) }
+        val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(description) }
 
         Stage().apply {
             scene = Scene(view)

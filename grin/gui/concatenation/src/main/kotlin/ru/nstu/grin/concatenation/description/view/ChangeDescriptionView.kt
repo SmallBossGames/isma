@@ -10,11 +10,11 @@ import javafx.scene.text.Font
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
-import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
+import ru.nstu.grin.concatenation.description.model.DescriptionViewModel
 
-class ChangeDescriptionFragment(
+class ChangeDescriptionView(
     private val controller: ChangeDescriptionController,
-    private val model: ChangeDescriptionModel
+    private val model: DescriptionViewModel
 ) : BorderPane() {
 
     init {
@@ -26,13 +26,13 @@ class ChangeDescriptionFragment(
                 addNode("Font Family", observableArrayList(Font.getFamilies()), model.fontProperty)
             }.apply {
                 padding = Insets(10.0)
-            },
+            }
         )
 
         bottom = HBox(
             Button("Save").apply {
                 setOnAction {
-                    controller.updateDescription(model)
+                    controller.updateOrCreateDescription(model)
                     (scene.window as Stage).close()
                 }
             }

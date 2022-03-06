@@ -27,10 +27,10 @@ import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
 import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
-import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
+import ru.nstu.grin.concatenation.description.model.DescriptionViewModel
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
-import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
+import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
@@ -46,12 +46,18 @@ import ru.nstu.grin.concatenation.function.view.FunctionListView
 import ru.nstu.grin.concatenation.koin.*
 import tornadofx.Scope
 import tornadofx.find
+import tornadofx.setInScope
 
 val grinModule = module {
     scope<MainGrinScope> {
         scoped { CanvasProjectLoader(get()) }
 
-        scoped { params -> ConcatenationView(get(), get(), get(), get { params }) }
+        scoped { params ->
+            // Access from the TornadoFx world. Should be removed later.
+            setInScope(MainGrinScopeWrapper(get()), get())
+
+            ConcatenationView(get(), get(), get(), get { params })
+        }
         scoped { CanvasMenuBar(get(), get()) }
         scoped { CanvasToolBar(get(), get(), get(), get()) }
         scoped { ElementsView(get(), get(), get(), get()) }
@@ -132,6 +138,8 @@ val grinModule = module {
         }
     }
 
+    single(createdAtStart = true) {  }
+
     scope<FunctionChangeModalScope> {
         scoped { ChangeFunctionController(get()) }
         scoped { params -> ChangeFunctionFragment(get { params }, get()) }
@@ -154,8 +162,8 @@ val grinModule = module {
 
     scope<DescriptionChangeModalScope> {
         scoped { ChangeDescriptionController(get()) }
-        scoped { params -> ChangeDescriptionFragment(get(), get{ params }) }
-        scoped { params -> ChangeDescriptionModel(params.get()) }
+        scoped { params -> ChangeDescriptionView(get(), get{ params }) }
+        scoped { params -> DescriptionViewModel(params.getOrNull(), params.getOrNull()) }
     }
 
     scope<CartesianCopyModalScope> {

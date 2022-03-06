@@ -4,29 +4,43 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.common.model.DescriptionDto
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
-import ru.nstu.grin.concatenation.description.model.UpdateDescriptionModel
 import tornadofx.Controller
+import java.util.*
 
 class DescriptionCanvasService : Controller() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: ConcatenationCanvasModel by inject()
     private val view: ConcatenationCanvas by inject()
 
-    fun add(description: Description) {
+    fun add(descriptionModel: DescriptionDto) {
+        val description = Description(
+            id = UUID.randomUUID(),
+            text = descriptionModel.text,
+            textSize = descriptionModel.textSize,
+            x = descriptionModel.x,
+            y = descriptionModel.y,
+            color = descriptionModel.color,
+            font = descriptionModel.font
+        )
+
         model.descriptions.add(description)
         reportUpdate()
         view.redraw()
     }
 
-    fun update(descriptionModel: UpdateDescriptionModel) {
-        val description = descriptionModel.description
+    fun update(description: Description, descriptionModel: DescriptionDto) {
+        description.x = descriptionModel.x
+        description.y = descriptionModel.y
         description.text = descriptionModel.text
         description.textSize = descriptionModel.textSize
         description.color = descriptionModel.color
         description.font = descriptionModel.font
+
         reportUpdate()
+
         view.redraw()
     }
 

@@ -3,10 +3,11 @@ package ru.isma.next.editor.blueprint
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.event.EventHandler
+import javafx.geometry.Insets
 import javafx.scene.control.*
+import javafx.scene.effect.DropShadow
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.Pane
+import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
@@ -255,6 +256,14 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             text = predicate
 
             initMouseRemoveTransactionEvents()
+
+            setShowPopup { node, x, y ->
+                val converted = canvas.sceneToLocal(x, y)
+
+                val popover = createEditPopOver(node, converted.x, converted.y)
+
+                canvas.children.add(popover)
+            }
         }
 
         canvas.children.add(transactionArrow)
@@ -420,6 +429,38 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
                 } else {
                     name = previousName
                 }
+            }
+        }
+    }
+
+    fun createEditPopOver(arrow: StateTransactionArrow, x: Double, y: Double): VBox {
+        return VBox(
+            Label("Alias (optional)"),
+            TextField().apply {
+                textProperty().bindBidirectional(arrow.aliasProperty)
+            },
+            Label("Predicate"),
+            TextField().apply {
+                textProperty().bindBidirectional(arrow.textProperty)
+            },
+        ).apply {
+            translateXProperty().bind(widthProperty().divide(-2).add(x))
+            translateY = y - 2.0
+
+            padding = Insets(5.0)
+
+            background = Background(
+                BackgroundFill(
+                    Color.WHITE,
+                    CornerRadii(5.0),
+                    Insets(0.0)
+                )
+            )
+
+            effect = DropShadow(20.0, Color.LIGHTGRAY)
+
+            setOnMouseExited {
+                canvas.children.remove(this)
             }
         }
     }

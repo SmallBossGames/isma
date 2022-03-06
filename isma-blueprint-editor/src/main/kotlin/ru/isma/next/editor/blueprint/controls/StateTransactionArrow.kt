@@ -8,7 +8,6 @@ import javafx.beans.value.ObservableValue
 import javafx.geometry.Pos
 import javafx.scene.Group
 import javafx.scene.control.Label
-import javafx.scene.control.TextField
 import javafx.scene.input.MouseEvent
 import javafx.scene.shape.Line
 import javafx.scene.shape.Polygon
@@ -26,25 +25,23 @@ class StateTransactionArrow : Group() {
     private val endXProperty = SimpleDoubleProperty(0.0)
     private val endYProperty = SimpleDoubleProperty(0.0)
 
-    private val textProperty = SimpleStringProperty("")
-    private val isTextEditModeProperty = SimpleBooleanProperty(false)
+    val aliasProperty = SimpleStringProperty("")
+    val textProperty = SimpleStringProperty("")
 
     private val mousePressedListeners = arrayListOf<(StateTransactionArrow, MouseEvent) -> Unit>()
+
+    private var onShowPopup: ((node: StateTransactionArrow, x: Double, y: Double) -> Unit)? = null
 
     fun startXProperty() = startXProperty
     fun startYProperty() = startYProperty
     fun endXProperty() = endXProperty
     fun endYProperty() = endYProperty
-    fun isTextEditModeProperty() = isTextEditModeProperty
-
-    fun textProperty() = textProperty
 
     val startX by startXProperty
     val startY by startYProperty
     val endX by endXProperty
     val endY by endYProperty
 
-    var isTextEditMode by isTextEditModeProperty
     var text: String by textProperty
 
     init {
@@ -52,49 +49,32 @@ class StateTransactionArrow : Group() {
         layoutXProperty().bind((endXProperty.subtract(startXProperty)).divide( 2).add(startXProperty))
         layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(startYProperty))
 
-        val predicateText = Group().apply {
-            viewOrder = 5.0
-            children.add(TextField().apply {
-                prefWidth = TextFieldLength
-                translateY = -10.0
-                translateX = -TextFieldLength / 2.0
-                textProperty().bindBidirectional(this@StateTransactionArrow.textProperty)
+        //val popover = createEditPopOver()
 
-                visibleProperty().bind(isTextEditModeProperty)
-                managedProperty().bind(isTextEditModeProperty)
-
-                isTextEditModeProperty().addListener { _, _, value ->
-                    if (value) {
-                        requestFocus()
-                    }
-                }
-
-                focusedProperty().addListener { _, _, value ->
-                    if (!value) {
-                        isTextEditMode = false
-                    }
-                }
-            })
-            children.add(
-                Label().apply {
-                    font = Font("Arial", 16.0)
-                    prefWidth = TextFieldLength
-                    translateY = -10.0
-                    translateX = -TextFieldLength / 2.0
-                    alignment = Pos.CENTER
-                    textProperty().bind(this@StateTransactionArrow.textProperty)
-                    visibleProperty().bind(!isTextEditModeProperty)
-                    managedProperty().bind(!isTextEditModeProperty)
-                }
-            )
+        val predicateText = Label().apply {
+            font = Font("Arial", 16.0)
+            prefWidth = TextFieldLength
+            translateY = -10.0
+            translateX = -TextFieldLength / 2.0
+            alignment = Pos.CENTER
         }
 
-        val arrowhead = Polygon(7.0, -7.0, -7.0, 0.0, 7.0, 7.0).apply {
-            strokeWidth = 3.0
-            viewOrder = 6.0
+        val predicateTextWrapped = Group(predicateText)
+
+        val arrowhead = Group(
+            Polygon(7.0, -7.0, -7.0, 0.0, 7.0, 7.0).apply {
+                strokeWidth = 3.0
+                viewOrder = 6.0
+            }
+        ).apply {
+            setOnMouseClicked {
+                onShowPopup?.also { action ->
+                    action(this@StateTransactionArrow, it.sceneX, it.sceneY)
+                }
+            }
         }
 
-        children.addAll(arrowhead, predicateText)
+        children.addAll(arrowhead, predicateTextWrapped)
 
         line {
             strokeWidth = 3.0
@@ -118,8 +98,8 @@ class StateTransactionArrow : Group() {
                 arrowhead.translateY = offsetY
                 arrowhead.rotate = -angle / PI * 180.0
 
-                predicateText.translateX = textOffsetX
-                predicateText.translateY = textOffsetY
+                predicateTextWrapped.translateX = textOffsetX
+                predicateTextWrapped.translateY = textOffsetY
             }
 
             this@StateTransactionArrow.startXProperty.onChange { updateGeometry() }
@@ -128,14 +108,24 @@ class StateTransactionArrow : Group() {
             this@StateTransactionArrow.endYProperty.onChange { updateGeometry() }
         }
 
+        fun updatePredicateText(){
+            val alias = aliasProperty.value
+            val predicate = textProperty.value
 
-        addEventHandler(MouseEvent.MOUSE_PRESSED) {
-            executeMousePressedListener(it)
+            predicateText.text = if (alias != "") alias else predicate
         }
 
-        addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            isTextEditMode = true
+        aliasProperty.onChange {
+            updatePredicateText()
         }
+
+        textProperty.onChange {
+            updatePredicateText()
+        }
+    }
+
+    fun setShowPopup(action: (node: StateTransactionArrow, x: Double, y: Double) -> Unit) {
+        onShowPopup = action
     }
 
     fun addMousePressedListener(handler: (StateTransactionArrow, MouseEvent) -> Unit){
@@ -161,9 +151,9 @@ class StateTransactionArrow : Group() {
     }
 
     companion object {
-        private const val TextFieldLength = 150.0
+        private const val TextFieldLength = 120.0
 
-        inline fun Group.line(op: Line.() -> Unit){
+        inline fun Group.line(crossinline op: Line.() -> Unit){
             this.children.add(
                 Line().apply(op)
             )

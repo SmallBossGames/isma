@@ -81,7 +81,7 @@ class GrinIntegrationFacade: KoinComponent {
 
         val cartesianSpace = CartesianSpace(
             UUID.randomUUID(),
-            "SomeSpace",
+            "CartesianSpace",
             mappedFunctions,
             xAxis,
             yAxis)

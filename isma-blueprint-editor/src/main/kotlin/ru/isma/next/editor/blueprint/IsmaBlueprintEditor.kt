@@ -149,7 +149,8 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
                 BlueprintTransactionModel(
                     startStateName = it.startStateBox.name,
                     endStateName = it.endStateBox.name,
-                    predicate = it.transactionArrow.text
+                    predicate = it.transactionArrow.text,
+                    alias = it.transactionArrow.alias
                 )
             }
             .toTypedArray()
@@ -173,7 +174,12 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         )
 
         model.transactions.forEach {
-            addTransactionArrow(stateBoxes[it.startStateName]!!, stateBoxes[it.endStateName]!!, it.predicate)
+            addTransactionArrow(
+                stateBoxes[it.startStateName]!!,
+                stateBoxes[it.endStateName]!!,
+                it.predicate,
+                it.alias,
+            )
         }
     }
 
@@ -242,7 +248,12 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         instantiateStateBox(10.0, 200.0)
     }
 
-    private fun addTransactionArrow(startStateBox: StateBox, endStateBox: StateBox, predicate: String = "") {
+    private fun addTransactionArrow(
+        startStateBox: StateBox,
+        endStateBox: StateBox,
+        predicate: String = "",
+        alias: String = ""
+    ) {
         if(transactions.any { it.startStateBox == startStateBox && it.endStateBox == endStateBox }) {
             return
         }
@@ -253,7 +264,8 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             endXProperty().bind(endStateBox.centerXProperty())
             endYProperty().bind(endStateBox.centerYProperty())
 
-            text = predicate
+            this.text = predicate
+            this.alias = alias
 
             initMouseRemoveTransactionEvents()
 

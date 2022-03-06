@@ -1,7 +1,6 @@
 package ru.isma.next.editor.blueprint.controls
 
 
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
@@ -42,6 +41,7 @@ class StateTransactionArrow : Group() {
     val endX by endXProperty
     val endY by endYProperty
 
+    var alias: String by aliasProperty
     var text: String by textProperty
 
     init {

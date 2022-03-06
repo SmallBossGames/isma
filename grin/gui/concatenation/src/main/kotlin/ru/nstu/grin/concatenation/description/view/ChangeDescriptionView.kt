@@ -10,11 +10,11 @@ import javafx.scene.text.Font
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
-import ru.nstu.grin.concatenation.description.model.DescriptionViewModel
+import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
 
 class ChangeDescriptionView(
     private val controller: ChangeDescriptionController,
-    private val model: DescriptionViewModel
+    private val model: ChangeDescriptionViewModel
 ) : BorderPane() {
 
     init {

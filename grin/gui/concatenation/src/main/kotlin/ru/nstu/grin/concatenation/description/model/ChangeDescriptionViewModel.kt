@@ -8,7 +8,7 @@ import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 import ru.nstu.grin.common.model.Description
 
-class DescriptionViewModel(
+class ChangeDescriptionViewModel(
     val description: Description? = null,
     initData: DescriptionModalInitData? = null,
 ) {

@@ -1,13 +1,13 @@
 package ru.nstu.grin.concatenation.description.controller
 
 import ru.nstu.grin.common.model.DescriptionDto
-import ru.nstu.grin.concatenation.description.model.DescriptionViewModel
+import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
 import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 
 class ChangeDescriptionController(
     private val descriptionCanvasService: DescriptionCanvasService
 ) {
-    fun updateOrCreateDescription(model: DescriptionViewModel) {
+    fun updateOrCreateDescription(model: ChangeDescriptionViewModel) {
         val descriptionModel = DescriptionDto(
             x = model.xPosition,
             y = model.yPosition,

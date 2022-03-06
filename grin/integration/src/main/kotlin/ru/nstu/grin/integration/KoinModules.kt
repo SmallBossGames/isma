@@ -27,7 +27,7 @@ import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
 import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
 import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
-import ru.nstu.grin.concatenation.description.model.DescriptionViewModel
+import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
@@ -163,7 +163,7 @@ val grinModule = module {
     scope<DescriptionChangeModalScope> {
         scoped { ChangeDescriptionController(get()) }
         scoped { params -> ChangeDescriptionView(get(), get{ params }) }
-        scoped { params -> DescriptionViewModel(params.getOrNull(), params.getOrNull()) }
+        scoped { params -> ChangeDescriptionViewModel(params.getOrNull(), params.getOrNull()) }
     }
 
     scope<CartesianCopyModalScope> {

@@ -1,52 +1,36 @@
 package ru.nstu.grin.concatenation.canvas.model
 
 import ru.nstu.grin.common.model.Point
+import kotlin.math.max
+import kotlin.math.min
 
 data class SelectionSettings(
-    var isSelected: Boolean = false,
-    var firstPoint: Point = Point(-1.0, -1.0),
-    var secondPoint: Point = Point(-1.0, -1.0)
+    var isFirstPointSelected: Boolean = false,
+    var isSecondPointSelected: Boolean = false,
+    var firstPoint: Point = Point.Zero,
+    var secondPoint: Point = Point.Zero
 ) {
-    fun dropToDefault() {
-        isSelected = false
-        firstPoint = Point(-1.0, -1.0)
-        secondPoint = Point(-1.0, -1.0)
+    fun reset() {
+        isFirstPointSelected = false
+        isSecondPointSelected = false
+        firstPoint = Point.Zero
+        secondPoint = Point.Zero
     }
 
-    fun getArea(): Double {
-        if (secondPoint.x == -1.0 || secondPoint.y == -1.0) return 0.0
-        return (getMaxY() - getMinY()) * (getMaxX() - getMinX())
-    }
-
-    fun getMinX(): Double {
-        return if (firstPoint.x < secondPoint.x) {
-            firstPoint.x
-        } else {
-            secondPoint.x
+    val area get() =
+        if (isFirstPointSelected && isSecondPointSelected) {
+            (maxY - minY) * (maxX - minX)
         }
-    }
-
-    fun getMaxX(): Double {
-        return if (firstPoint.x > secondPoint.x) {
-            firstPoint.x
-        } else {
-            secondPoint.x
+        else {
+            0.0
         }
-    }
 
-    fun getMinY(): Double {
-        return if (firstPoint.y < secondPoint.y) {
-            firstPoint.y
-        } else {
-            secondPoint.y
-        }
-    }
 
-    fun getMaxY(): Double {
-        return if (firstPoint.y > secondPoint.y) {
-            firstPoint.y
-        } else {
-            secondPoint.y
-        }
-    }
+    val minX get() = min(firstPoint.x, secondPoint.x)
+
+    val maxX get() = max(firstPoint.x, secondPoint.x)
+
+    val minY get() = min(firstPoint.y, secondPoint.y)
+
+    val maxY get() = max(firstPoint.y, secondPoint.y)
 }

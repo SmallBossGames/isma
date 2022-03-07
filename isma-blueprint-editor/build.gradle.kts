@@ -9,21 +9,15 @@ group = "ru.nstu.isma"
 version = "1.0.0"
 
 javafx {
-    version = "16"
+    version = "17"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
-repositories {
-    mavenCentral()
-}
-
-val kotlinxSerializationJsonVersion = "1.2.2"
+val kotlinxSerializationJsonVersion = "1.3.2"
 
 dependencies {
-    implementation(kotlin("stdlib"))
-
     implementation(project(":isma-text-editor"))
 
-    implementation ("no.tornado:tornadofx:1.7.20")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.7")
 }

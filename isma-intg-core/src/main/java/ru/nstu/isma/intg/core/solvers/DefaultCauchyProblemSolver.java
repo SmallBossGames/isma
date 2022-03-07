@@ -3,7 +3,7 @@ package ru.nstu.isma.intg.core.solvers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.nstu.isma.intg.api.IntgMetricData;
-import ru.nstu.isma.intg.api.IntgResultPoint;
+import ru.nstu.isma.intg.api.models.IntgResultPoint;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyProblem;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.api.solvers.CauchyProblemSolver;
@@ -16,6 +16,7 @@ import java.util.function.Consumer;
  * @author Maria Nasyrova
  * @since 09.12.2014
  */
+@Deprecated
 public class DefaultCauchyProblemSolver implements CauchyProblemSolver {
 
     private final Logger logger = LoggerFactory.getLogger(DefaultCauchyProblemSolver.class);

@@ -1,32 +1,20 @@
 package ru.isma.next.app.views.settings
 
+import javafx.scene.control.ScrollPane
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import tornadofx.*
+import tornadofx.View
 
 
-class CauchyInitialsView: View("Initials") {
-    private val parametersService: SimulationParametersService by di()
-
+class CauchyInitialsView(
+    private val parametersService: SimulationParametersService
+): View("Initials") {
     override val root =
-        scrollpane {
-            form {
-                fieldset {
-                    field("Start") {
-                        textfield {
-                            bind(parametersService.cauchyInitials.startTimeProperty)
-                        }
-                    }
-                    field("End") {
-                        textfield {
-                            bind(parametersService.cauchyInitials.endTimeProperty)
-                        }
-                    }
-                    field("Step") {
-                        textfield {
-                            bind(parametersService.cauchyInitials.stepProperty)
-                        }
-                    }
-                }
+        ScrollPane(
+            propertiesGrid {
+                addNode("Start", parametersService.cauchyInitials.startTimeProperty())
+                addNode("End", parametersService.cauchyInitials.endTimeProperty())
+                addNode("Step", parametersService.cauchyInitials.stepProperty())
             }
-        }
+        )
 }

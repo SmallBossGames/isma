@@ -1,9 +1,7 @@
 package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.Parent
-import javafx.scene.control.ListView
 import ru.nstu.grin.concatenation.function.controller.MirrorFunctionController
-import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.MirrorFunctionModel
 import tornadofx.*
 
@@ -12,11 +10,8 @@ class MirrorFunctionFragment : Fragment() {
     private val controller: MirrorFunctionController = find { }
     val isMirrorY: Boolean by param()
 
-    private lateinit var list: ListView<ConcatenationFunction>
-
     override val root: Parent = vbox {
-        listview(model.functionsProperty) {
-            list = this
+        val list = listview(model.functions) {
             cellFormat {
                 graphic = form {
                     hbox {
@@ -30,7 +25,7 @@ class MirrorFunctionFragment : Fragment() {
         button("Ок") {
             action {
                 val function = list.selectedItem ?: let {
-                    tornadofx.error("Необходимо выбрать функцию")
+                    error("Необходимо выбрать функцию")
                     return@action
                 }
 
@@ -38,9 +33,5 @@ class MirrorFunctionFragment : Fragment() {
                 close()
             }
         }
-    }
-
-    init {
-        controller.getAllFunctions()
     }
 }

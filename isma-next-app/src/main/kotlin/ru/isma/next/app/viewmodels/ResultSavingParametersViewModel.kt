@@ -1,8 +1,8 @@
 package ru.isma.next.app.viewmodels
 
-import ru.isma.next.app.enumerables.SaveTarget
 import javafx.beans.property.SimpleObjectProperty
-import ru.isma.next.app.models.simulation.ResultSavingParametersModel
+import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
+import ru.isma.next.services.simulation.abstractions.models.ResultSavingParametersModel
 import tornadofx.getValue
 import tornadofx.setValue
 

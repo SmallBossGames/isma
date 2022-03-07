@@ -8,7 +8,7 @@ class ArrowDrawElement(
     private val arrows: List<Arrow>,
     private val pixelCost: Double
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         for (arrow in arrows) {
             context.stroke = arrow.color
             val x = arrow.x * pixelCost

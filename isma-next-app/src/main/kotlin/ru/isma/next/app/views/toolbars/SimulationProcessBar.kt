@@ -1,76 +1,40 @@
 package ru.isma.next.app.views.toolbars
 
+import javafx.event.EventHandler
+import javafx.scene.control.Button
+import javafx.scene.control.Separator
+import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
-import javafx.scene.image.ImageView
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import ru.isma.next.app.services.simualtion.SimulationResultService
+import org.controlsfx.control.PopOver
+import org.koin.core.component.KoinComponent
+import ru.isma.next.app.extentions.matIconMZ
 import ru.isma.next.app.services.simualtion.SimulationService
-import tornadofx.*
 
-class SimulationProcessBar : View() {
-    private val simulationResult: SimulationResultService by di()
-    private val simulationService: SimulationService by di()
+class SimulationProcessBar(
+    private val simulationService: SimulationService,
+    private val tasksPopOver: TasksPopOver,
+) : ToolBar(), KoinComponent {
 
-    override val root = toolbar {
-        button {
-            graphic = ImageView("icons/toolbar/play.png")
-            tooltip = Tooltip("Play")
-            action { GlobalScope.launch { simulationService.simulate() }  }
-            managedWhen(!simulationService.isSimulationInProgressProperty())
-            hiddenWhen(simulationService.isSimulationInProgressProperty())
+    init {
+        tasksPopOver.apply {
+            arrowLocation = PopOver.ArrowLocation.BOTTOM_LEFT
         }
-        button {
-            graphic = ImageView("icons/toolbar/abort.png")
-            tooltip = Tooltip("Play")
-            action { simulationService.simulate() }
-            managedWhen(simulationService.isSimulationInProgressProperty())
-            hiddenWhen(!simulationService.isSimulationInProgressProperty())
-        }
-        separator {
-            managedWhen(simulationService.isSimulationInProgressProperty())
-            hiddenWhen(!simulationService.isSimulationInProgressProperty())
-        }
-        label("Progress: ") {
-            managedWhen(simulationService.isSimulationInProgressProperty())
-            hiddenWhen(!simulationService.isSimulationInProgressProperty())
-        }
-        progressbar {
-            progressProperty().bind(simulationService.progressProperty())
-            managedWhen(simulationService.isSimulationInProgressProperty())
-            hiddenWhen(!simulationService.isSimulationInProgressProperty())
-        }
-        separator {
-            managedWhen(simulationResult.isResultAvailableProperty())
-            hiddenWhen(!simulationResult.isResultAvailableProperty())
-        }
-        label("Results: "){
-            managedWhen(simulationResult.isResultAvailableProperty())
-            hiddenWhen(!simulationResult.isResultAvailableProperty())
-        }
-        button {
-            text = "Show"
-            action {
-                simulationResult.showChart()
+
+        items.addAll(
+            Button().apply {
+                graphic = matIconMZ("play_arrow")
+                tooltip = Tooltip("Play")
+                onAction = EventHandler {
+                    simulationService.simulate()
+                }
+            },
+            Separator(),
+            Button().apply {
+                text = "Tasks"
+                onAction = EventHandler {
+                    tasksPopOver.show(this)
+                }
             }
-            managedWhen(simulationResult.isResultAvailableProperty())
-            hiddenWhen(!simulationResult.isResultAvailableProperty())
-        }
-        button {
-            text = "Export"
-            action {
-                simulationResult.exportToFile()
-            }
-            managedWhen(simulationResult.isResultAvailableProperty())
-            hiddenWhen(!simulationResult.isResultAvailableProperty())
-        }
-        button {
-            text = "Clean"
-            action {
-                simulationResult.clean()
-            }
-            managedWhen(simulationResult.isResultAvailableProperty())
-            hiddenWhen(!simulationResult.isResultAvailableProperty())
-        }
+        )
     }
 }

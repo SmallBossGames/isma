@@ -18,7 +18,7 @@ class SimpleChainDrawer(
         val gridSize = model.settings.pixelCost
 
         val context = canvas.graphicsContext2D
-        ClearDrawElement().draw(context)
+        ClearDrawElement.draw(context)
         ArrowDrawElement(model.arrows, 1.0).draw(context)
         DescriptionDrawElement(model.descriptions).draw(context)
         GridDrawElement(

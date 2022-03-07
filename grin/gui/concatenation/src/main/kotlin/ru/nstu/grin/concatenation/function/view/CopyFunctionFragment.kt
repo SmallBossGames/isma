@@ -1,27 +1,37 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
+import javafx.geometry.Insets
+import javafx.scene.control.Button
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
+import javafx.stage.Stage
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.function.controller.CopyFunctionController
 import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
-import tornadofx.*
-import java.util.*
 
-class CopyFunctionFragment : Fragment() {
-    val functionId: UUID by param()
-    private val model: CopyFunctionModel by inject()
-    private val controller: CopyFunctionController by inject(params = params)
+class CopyFunctionFragment(
+    private val model: CopyFunctionModel,
+    private val controller: CopyFunctionController
+): BorderPane() {
+    init {
+        top = VBox(
+            propertiesGrid {
+                addNode("New Function Name", model.nameProperty)
+            }.apply {
+                padding = Insets(10.0)
+            },
+        )
 
-    override val root: Parent = form {
-        fieldset {
-            field("Имя новой функции") {
-                textfield().bind(model.nameProperty)
+        bottom = HBox(
+            Button("Copy").apply {
+                setOnAction {
+                    controller.copy(model)
+                    (scene.window as Stage).close()
+                }
             }
-        }
-        button("Скопировать") {
-            action {
-                controller.copy()
-                close()
-            }
+        ).apply {
+            padding = Insets(10.0)
         }
     }
 }

@@ -1,13 +1,14 @@
 package ru.nstu.grin.concatenation.function.model
 
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
-import tornadofx.ViewModel
-import tornadofx.*
+import tornadofx.getValue
+import tornadofx.setValue
 
-class ChangeFunctionModel : ViewModel() {
+class ChangeFunctionModel(val function: ConcatenationFunction) {
     var nameProperty = SimpleStringProperty()
     var name by nameProperty
 
@@ -20,7 +21,7 @@ class ChangeFunctionModel : ViewModel() {
     var isMirrorYProperty = SimpleBooleanProperty()
     var isMirrorY by isMirrorYProperty
 
-    var lineSizeProperty = SimpleStringProperty(this, "lineSize")
+    var lineSizeProperty = SimpleDoubleProperty()
     var lineSize by lineSizeProperty
 
     var lineTypeProperty = SimpleObjectProperty<LineType>()
@@ -28,4 +29,16 @@ class ChangeFunctionModel : ViewModel() {
 
     var isHideProperty = SimpleBooleanProperty()
     var isHide by isHideProperty
+
+    init {
+        name = function.name
+        functionColor = function.functionColor
+        lineSize = function.lineSize
+        lineType = function.lineType
+        isHide = !function.isHide
+
+        val mirrorDetails = function.mirrorDetails
+        isMirrorX = mirrorDetails.isMirrorX
+        isMirrorY = mirrorDetails.isMirrorY
+    }
 }

@@ -1,48 +1,68 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.DeleteFunctionQuery
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
-import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
+import javafx.scene.Scene
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.Window
+import org.koin.core.component.get
+import org.koin.core.parameter.parametersOf
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
-import tornadofx.Controller
-import java.util.*
+import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
+import ru.nstu.grin.concatenation.koin.FunctionCopyModalScope
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 
-class FunctionListViewController : Controller() {
-    private val model: FunctionListViewModel by inject()
+class FunctionListViewController(
+    private val mainGrinScope: MainGrinScope,
+    private val functionCanvasService: FunctionCanvasService
+) {
+    fun openCopyModal(function: ConcatenationFunction, window: Window? = null) {
+        val functionCopyModalScope = mainGrinScope.get<FunctionCopyModalScope>()
 
-    init {
-        subscribe<GetAllFunctionsEvent> {
-            if (model.functions != null) {
-                model.functions.clear()
+        val view = functionCopyModalScope.get<CopyFunctionFragment> { parametersOf(function) }
+
+        Stage().apply {
+            scene = Scene(view)
+            title = "Function parameters"
+            initModality(Modality.WINDOW_MODAL)
+
+            if (window != null){
+                initOwner(window)
             }
-            model.functionsProperty.setAll(it.functions)
+
+            setOnCloseRequest {
+                functionCopyModalScope.closeScope()
+            }
+
+            show()
         }
     }
 
-    fun openCopyModal(id: UUID) {
-        find<CopyFunctionFragment>(
-            mapOf(
-                CopyFunctionFragment::functionId to id
-            )
-        ).openModal()
+    fun openChangeModal(function: ConcatenationFunction, window: Window? = null) {
+        val functionChangeModalScope = mainGrinScope.get<FunctionChangeModalScope>()
+
+        val view = functionChangeModalScope.get<ChangeFunctionFragment> { parametersOf(function) }
+
+        Stage().apply {
+            scene = Scene(view)
+            title = "Change Function"
+            initModality(Modality.WINDOW_MODAL)
+
+            if (window != null){
+                initOwner(window)
+            }
+
+            setOnCloseRequest {
+                functionChangeModalScope.closeScope()
+            }
+
+            show()
+        }
     }
 
-    fun openChangeModal(id: UUID) {
-        find<ChangeFunctionFragment>(
-            mapOf(
-                ChangeFunctionFragment::functionId to id
-            )
-        ).openModal()
-    }
-
-    fun getAllFunctions() {
-        fire(GetAllFunctionsQuery())
-    }
-
-    fun deleteFunction(functionId: UUID) {
-        val event = DeleteFunctionQuery(functionId)
-        fire(event)
+    fun deleteFunction(function: ConcatenationFunction) {
+        functionCanvasService.deleteFunction(function)
     }
 }

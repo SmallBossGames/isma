@@ -6,5 +6,5 @@ enum class LineType {
     RECT_UNFIL_DOTES,
     CIRCLE_FILL_DOTES,
     CIRCLE_UNFILL_DOTES,
-    SEGMENTS
+    SEGMENTS;
 }

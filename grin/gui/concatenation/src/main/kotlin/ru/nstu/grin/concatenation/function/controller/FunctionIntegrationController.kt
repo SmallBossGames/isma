@@ -1,31 +1,17 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.CalculateIntegralEvent
-import ru.nstu.grin.concatenation.function.events.GetFunctionEvent
+import org.koin.core.component.get
 import ru.nstu.grin.concatenation.function.model.FunctionIntegrationFragmentModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import tornadofx.Controller
-import java.util.*
 
 class FunctionIntegrationController : Controller() {
-    private val functionId: UUID by param()
-    private val model: FunctionIntegrationFragmentModel by inject()
+    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
 
+    private val functionCanvasService: FunctionCanvasService = mainGrinScope.get()
 
-    init {
-        subscribe<GetFunctionEvent> {
-            if (functionId == it.function.id) {
-                model.leftBorder = it.function.points.map { it.x }.minOrNull() ?: 0.0
-                model.rightBorder = it.function.points.map { it.x }.maxOrNull() ?: 0.0
-            }
-        }
-    }
-
-    fun findIntegral() {
-        val event = CalculateIntegralEvent(
-            functionId = functionId,
-            leftBorder = model.leftBorder,
-            rightBorder = model.rightBorder
-        )
-        fire(event)
+    fun findIntegral(model: FunctionIntegrationFragmentModel) {
+        functionCanvasService.calculateIntegral(model.function, model.leftBorder, model.rightBorder)
     }
 }

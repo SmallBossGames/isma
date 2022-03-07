@@ -1,59 +1,18 @@
 package ru.nstu.grin.common.model
 
 import java.io.Serializable
+import kotlin.math.absoluteValue
 
 data class Point(
     var x: Double,
     var y: Double,
-    var xGraphic: Double? = null,
-    var yGraphic: Double? = null
-) : Serializable, Cloneable {
-    public override fun clone(): Any {
-        return Point(
-            x = x,
-            y = y,
-            xGraphic = xGraphic,
-            yGraphic = yGraphic
-        )
-    }
-
-    fun isNearBy(eventX: Double, eventY: Double): Boolean {
-        val x = xGraphic
-        val y = yGraphic
-        if (x == null || y == null) return false
-
-        return when {
-            (eventX < x + DELTA && eventX > x - DELTA) &&
-                (eventY < y + DELTA && eventY > y - DELTA) -> {
-                true
-            }
-            else -> {
-                false
-            }
-        }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Point
-
-        if (x != other.x) return false
-        if (y != other.y) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = x.hashCode()
-        result = 31 * result + y.hashCode()
-        return result
-    }
-
+) : Serializable {
 
     companion object {
         private const val DELTA = 5
         val Zero = Point(0.0, 0.0)
+
+        fun isNearBy(x1:Double, y1: Double, x2: Double, y2: Double) =
+            (x1 - x2).absoluteValue < DELTA && (y1 - y2).absoluteValue < DELTA
     }
 }

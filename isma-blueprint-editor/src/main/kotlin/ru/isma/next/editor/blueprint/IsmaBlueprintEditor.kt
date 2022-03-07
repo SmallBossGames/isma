@@ -2,21 +2,29 @@ package ru.isma.next.editor.blueprint
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.event.EventHandler
+import javafx.scene.control.*
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
-import tornadofx.*
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
+import ru.isma.next.editor.blueprint.controls.EditArrowPopOver
 import ru.isma.next.editor.blueprint.controls.StateBox
 import ru.isma.next.editor.blueprint.controls.StateTransactionArrow
 import ru.isma.next.editor.blueprint.models.BlueprintEditorTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
-import ru.isma.next.editor.text.IsmaTextEditor
+import ru.isma.next.editor.blueprint.services.ITextEditorFactory
+import ru.isma.next.editor.blueprint.utilities.getValue
+import ru.isma.next.editor.blueprint.utilities.setValue
+import kotlin.math.max
 
-class IsmaBlueprintEditor: Fragment() {
+class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): BorderPane() {
+    private val nameChangingMonitor = NameChangingMonitor("New state")
+
     private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
     private val isRemoveTransactionModeProperty = SimpleBooleanProperty(false)
     private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
@@ -31,7 +39,6 @@ class IsmaBlueprintEditor: Fragment() {
     private fun isRemoveStateModeProperty() = isRemoveStateModeProperty
     private fun isRemoveTransactionModeProperty() = isRemoveTransactionModeProperty
     private fun isAddTransactionModeProperty() = isAddTransactionModeProperty
-    private fun addTransactionStateCounterProperty() = addTransactionStateCounterProperty
 
     private var isRemoveStateMode by isRemoveStateModeProperty
     private var isRemoveTransactionMode by isRemoveTransactionModeProperty
@@ -43,7 +50,7 @@ class IsmaBlueprintEditor: Fragment() {
     private val mainStateBox: StateBox = createMainStateBox()
     private val initStateBox: StateBox = createInitStateBox()
 
-    private val canvas = pane {
+    private val canvas = Pane().apply {
         addMainStateBox()
         addInitStateBox()
 
@@ -54,27 +61,23 @@ class IsmaBlueprintEditor: Fragment() {
         }
     }
 
-    private val tabs = tabpane {
-        tab ("Blueprint") {
-            add(canvas)
+    private val tabs = TabPane(
+        Tab("Blueprint", ScrollPane(canvas)).apply {
+            isClosable = false
         }
-    }
+    )
 
-    override val root = borderpane {
+    init {
         center = tabs
-        bottom = toolbar {
-            button {
-                action {
+        bottom = ToolBar(
+            Button("New state").apply {
+                onAction = EventHandler {
                     resetEditorMode()
                     addStateBox()
                 }
-
-                text = "New state"
-
-                disableClose()
-            }
-            button {
-                action {
+            },
+            Button("New transition").apply {
+                onAction = EventHandler {
                     if(isAddTransactionMode) {
                         resetEditorMode()
                     } else {
@@ -84,19 +87,17 @@ class IsmaBlueprintEditor: Fragment() {
                     }
                 }
 
-                text = "New transition"
-
-                isAddTransactionModeProperty().onChange {
-                    text = if(it) {
+                isAddTransactionModeProperty().addListener { _, _, value ->
+                    text = if(value) {
                         "Stop adding transaction"
                     } else {
                         "New transition"
                     }
                 }
-            }
-            separator()
-            button {
-                action {
+            },
+            Separator(),
+            Button("Remove state").apply {
+                onAction = EventHandler {
                     if (isRemoveStateMode) {
                         resetEditorMode()
                     } else {
@@ -107,16 +108,17 @@ class IsmaBlueprintEditor: Fragment() {
 
                 text = "Remove state"
 
-                isRemoveStateModeProperty().onChange {
-                    text = if(it){
+                isRemoveStateModeProperty().addListener { _, _, value ->
+                    text = if(value){
                         "Stop remove state"
                     } else {
                         "Remove state"
                     }
                 }
-            }
-            button {
-                action {
+            },
+
+            Button("Remove transition").apply {
+                onAction = EventHandler {
                     if (isRemoveTransactionMode) {
                         resetEditorMode()
                     } else {
@@ -124,17 +126,16 @@ class IsmaBlueprintEditor: Fragment() {
                         isRemoveTransactionMode = true
                     }
                 }
-                text = "Remove transition"
 
-                isRemoveTransactionModeProperty().onChange {
-                    text = if(it){
+                isRemoveTransactionModeProperty().addListener { _, _, value ->
+                    text = if(value){
                         "Stop remove transition"
                     } else {
                         "Remove transition"
                     }
                 }
             }
-        }
+        )
     }
 
     fun getBlueprintModel() : BlueprintModel {
@@ -147,7 +148,8 @@ class IsmaBlueprintEditor: Fragment() {
                 BlueprintTransactionModel(
                     startStateName = it.startStateBox.name,
                     endStateName = it.endStateBox.name,
-                    predicate = it.transactionArrow.text
+                    predicate = it.transactionArrow.text,
+                    alias = it.transactionArrow.alias
                 )
             }
             .toTypedArray()
@@ -171,14 +173,19 @@ class IsmaBlueprintEditor: Fragment() {
         )
 
         model.transactions.forEach {
-            addTransactionArrow(stateBoxes[it.startStateName]!!, stateBoxes[it.endStateName]!!, it.predicate)
+            addTransactionArrow(
+                stateBoxes[it.startStateName]!!,
+                stateBoxes[it.endStateName]!!,
+                it.predicate,
+                it.alias,
+            )
         }
     }
 
     private fun StateBox.toBlueprintState() : BlueprintStateModel {
         return BlueprintStateModel(
-            this.translateXProperty().value,
-            this.translateYProperty().value,
+            this.layoutXProperty().value,
+            this.layoutYProperty().value,
             this.name,
             this.text
         )
@@ -186,8 +193,8 @@ class IsmaBlueprintEditor: Fragment() {
 
     private fun StateBox.applyBlueprintState(blueprintState: BlueprintStateModel){
         this.apply {
-            translateXProperty().value = blueprintState.canvasPositionX
-            translateYProperty().value = blueprintState.canvasPositionY
+            layoutXProperty().value = blueprintState.canvasPositionX
+            layoutYProperty().value = blueprintState.canvasPositionY
             name = blueprintState.name
             text = blueprintState.text
         }
@@ -208,7 +215,7 @@ class IsmaBlueprintEditor: Fragment() {
         stateName: String = "",
         stateText: String = "",
     ) : StateBox {
-        val stateBox = find<StateBox> {
+        val stateBox = StateBox().apply {
             color = Color.CORAL
 
             addEditActionListener {
@@ -218,17 +225,20 @@ class IsmaBlueprintEditor: Fragment() {
             initMouseMovingEvents()
             initMouseRemoveStateEvents()
             initMouseLinkTransactionEvents()
+            initNameChangingEvent()
 
-            translateXProperty().value = positionX
-            translateYProperty().value = positionY
-            name = stateName
+            layoutXProperty().value = positionX
+            layoutYProperty().value = positionY
+            name = stateName.ifEmpty { nameChangingMonitor.createNextDefaultName() }
             text = stateText
+
+            nameChangingMonitor.tryRegister(name)
 
             isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
 
         stateBoxes.add(stateBox)
-        canvas.add(stateBox)
+        canvas.children.add(stateBox)
 
         return stateBox
     }
@@ -237,60 +247,76 @@ class IsmaBlueprintEditor: Fragment() {
         instantiateStateBox(10.0, 200.0)
     }
 
-    private fun addTransactionArrow(startStateBox: StateBox, endStateBox: StateBox, predicate: String = "") {
+    private fun addTransactionArrow(
+        startStateBox: StateBox,
+        endStateBox: StateBox,
+        predicate: String = "",
+        alias: String = ""
+    ) {
         if(transactions.any { it.startStateBox == startStateBox && it.endStateBox == endStateBox }) {
             return
         }
 
-        val transactionArrow = find<StateTransactionArrow> {
+        val transactionArrow = StateTransactionArrow().apply {
             startXProperty().bind(startStateBox.centerXProperty())
             startYProperty().bind(startStateBox.centerYProperty())
             endXProperty().bind(endStateBox.centerXProperty())
             endYProperty().bind(endStateBox.centerYProperty())
 
-            text = predicate
+            this.text = predicate
+            this.alias = alias
 
             initMouseRemoveTransactionEvents()
+
+            setShowPopup { node, x, y ->
+                val converted = canvas.sceneToLocal(x, y)
+
+                val popover = createEditPopOver(node, converted.x, converted.y)
+
+                canvas.children.add(popover)
+            }
         }
 
-        canvas.add(transactionArrow)
+        canvas.children.add(transactionArrow)
 
         transactions.add(BlueprintEditorTransactionModel(startStateBox, endStateBox, transactionArrow))
+
+
     }
 
     private fun StateBox.removeFromEditor() {
         transactions
-            .asSequence()
+            .toTypedArray()
             .filter { it.startStateBox == this || it.endStateBox == this }
-            .toList()
             .forEach { removeTransaction(it) }
 
         stateBoxes.remove(this)
-        this.removeFromParent()
+        canvas.children.remove(this)
     }
 
     private fun StateTransactionArrow.removeFromEditor() {
         transactions
+            .toTypedArray()
             .filter { it.transactionArrow == this }
-            .toList()
             .forEach { removeTransaction(it) }
-
-        this.removeFromParent()
     }
 
     private fun removeTransaction(transaction: BlueprintEditorTransactionModel) {
         transactions.remove(transaction)
-        transaction.transactionArrow.removeFromParent()
+
+        canvas.children.remove(transaction.transactionArrow)
     }
 
     private fun createMainStateBox() : StateBox {
-        return find {
+        return StateBox().apply {
             color = Color.LIGHTGREEN
             isEditable = false
             squareHeight = 60.0
             name = MAIN_STATE
-            translateXProperty() += 10
-            translateYProperty() += 10
+            layoutXProperty().value += 10
+            layoutXProperty().value += 10
+
+            nameChangingMonitor.tryRegister(name)
 
             addEditActionListener { openMainTextEditorTab() }
 
@@ -299,14 +325,16 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun createInitStateBox() : StateBox {
-        return find {
+        return StateBox().apply {
             color = Color.LIGHTBLUE
             isEditButtonVisible = false
             isEditable = false
             squareHeight = 60.0
             name = INIT_STATE
-            translateXProperty() += 10
-            translateYProperty() += 100
+            layoutXProperty().value += 10
+            layoutYProperty().value += 100
+
+            nameChangingMonitor.tryRegister(name)
 
             initMouseMovingEvents()
             initMouseLinkTransactionEvents()
@@ -314,16 +342,16 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun Pane.addMainStateBox() {
-        add(mainStateBox)
+        children.add(mainStateBox)
     }
 
     private fun Pane.addInitStateBox() {
-        add(initStateBox)
+        children.add(initStateBox)
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
-        stateBox.translateXProperty().value = positionX
-        stateBox.translateYProperty().value = positionY
+        stateBox.layoutXProperty().value = max(positionX, 0.0)
+        stateBox.layoutYProperty().value = max(positionY, 0.0)
     }
 
     private fun resetEditorMode() {
@@ -333,22 +361,22 @@ class IsmaBlueprintEditor: Fragment() {
     }
 
     private fun openStateTextEditorTab(state: StateBox) {
-        tabs.tab(state.name) {
-            add<IsmaTextEditor> {
-                replaceText(state.text)
-                state.textProperty().bind(textProperty())
-            }
-            textProperty().bind(state.nameProperty())
+        val editor = editorFactory.createTextEditor().apply {
+            replaceText(state.text)
+            state.textProperty().bind(textProperty())
         }
+
+        tabs.tabs.add(Tab(state.name, editor).apply {
+            textProperty().bind(state.nameProperty())
+        })
     }
 
     private fun openMainTextEditorTab() {
-        tabs.tab("Main") {
-            add<IsmaTextEditor> {
-                replaceText(mainStateBox.text)
-                mainStateBox.textProperty().bind(textProperty())
-            }
+        val editor = editorFactory.createTextEditor().apply {
+            replaceText(mainStateBox.text)
+            mainStateBox.textProperty().bind(textProperty())
         }
+        tabs.tabs.add(Tab("Main", editor))
     }
 
     private fun StateBox.initMouseRemoveStateEvents() {
@@ -400,4 +428,27 @@ class IsmaBlueprintEditor: Fragment() {
             return@addMouseClickedListeners
         }
     }
+
+    private fun StateBox.initNameChangingEvent() {
+        var previousName = ""
+        isEditModeEnabledProperty().addListener { _, _, value ->
+            if(value) {
+                previousName = name
+            } else {
+                if(nameChangingMonitor.tryRegister(name)){
+                    nameChangingMonitor.tryUnregister(previousName)
+                } else {
+                    name = previousName
+                }
+            }
+        }
+    }
+
+    private fun createEditPopOver(arrow: StateTransactionArrow, x: Double, y: Double) =
+        EditArrowPopOver(arrow, x, y).apply {
+            setOnMouseExited {
+                canvas.children.remove(this)
+            }
+        }
 }
+

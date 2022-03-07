@@ -1,14 +1,7 @@
 package ru.nstu.grin.concatenation.function.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import javafx.scene.paint.Color
-import javafx.scene.shape.Line
-import javafx.scene.shape.Shape
 import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.file.json.ColorDeserializer
-import ru.nstu.grin.concatenation.file.json.ColorSerializer
 import java.util.*
 
 /**
@@ -21,56 +14,53 @@ data class ConcatenationFunction(
     var isHide: Boolean = false,
     var isSelected: Boolean = false,
 
-    @field:JsonDeserialize(using = ColorDeserializer::class)
-    @field:JsonSerialize(using = ColorSerializer::class)
     var functionColor: Color,
 
     var lineSize: Double,
     var lineType: LineType,
-    val details: MutableList<ConcatenationFunctionDetails> = mutableListOf(MirrorDetails())
+    var mirrorDetails: MirrorDetails = MirrorDetails(),
+    var derivativeDetails: DerivativeDetails? = null,
+    var waveletDetails: WaveletDetails? = null,
 ) : Cloneable {
-    @JsonIgnore
+    var pixelsToDraw: Pair<DoubleArray, DoubleArray>? = null
+
     public override fun clone(): ConcatenationFunction {
         return ConcatenationFunction(
             id = id,
             name = name,
-            points = points.map { it.clone() as Point },
+            points = points.map { it.copy() },
             functionColor = functionColor,
             lineSize = lineSize,
             lineType = lineType,
-            details = details.map {
-                when (it) {
-                    is MirrorDetails -> it.copy()
-                    is DerivativeDetails -> it.copy()
-                    is WaveletDetails -> it.copy()
-                }
-            }.toMutableList()
+            mirrorDetails = mirrorDetails.copy(),
+            derivativeDetails = derivativeDetails?.copy(),
+            waveletDetails = waveletDetails?.copy(),
         )
     }
 
-    @JsonIgnore
-    fun replaceMirrorDetails(details: MirrorDetails) {
-        this.details.removeIf { it is MirrorDetails }
-        this.details.add(details)
-    }
+    companion object {
+        fun isPixelsNearBy(xPixels: DoubleArray, yPixels: DoubleArray, x: Double, y:Double) : Boolean {
+            for (i in xPixels.indices) {
 
-    @JsonIgnore
-    fun getMirrorDetails() = details.filterIsInstance<MirrorDetails>().first()
+                if(Point.isNearBy(x, y, xPixels[i], yPixels[i]))
+                {
+                    return true
+                }
+            }
 
-    @JsonIgnore
-    fun getDerivativeDetails() = details.filterIsInstance<DerivativeDetails>().firstOrNull()
+            return false
+        }
 
-    @JsonIgnore
-    fun getWaveletDetails() = details.filterIsInstance<WaveletDetails>().firstOrNull()
+        fun indexOfPixelsNearBy(xPixels: DoubleArray, yPixels: DoubleArray, x: Double, y:Double) : Int {
+            for (i in xPixels.indices) {
 
-    @JsonIgnore
-    fun removeDerivativeDetails() = details.removeIf { it is DerivativeDetails }
+                if(Point.isNearBy(x, y, xPixels[i], yPixels[i]))
+                {
+                    return i
+                }
+            }
 
-    @JsonIgnore
-    fun removeWaveletDetails() = details.removeIf { it is WaveletDetails }
-
-    @JsonIgnore
-    fun getShape(): Shape {
-        return Line(0.0, 10.0, 0.0, 20.0)
+            return -1
+        }
     }
 }

@@ -14,9 +14,8 @@ include 'grin:gui'
 include 'grin:analytic-fu'
 include 'grin:math'
 
-include 'grin:gui:simple'
+
 include 'grin:gui:concatenation'
-include 'grin:gui:kube'
 include 'grin:gui:main'
 include 'grin:gui:common'
 include 'grin:integration'
@@ -44,6 +43,7 @@ include('isma-intg-parallel-ignite')
 
 
 // Java 8 legacy
+//include 'grin:gui:simple'
 //include('isma-app')
 //include('isma-ui')
 //include('isma-ui-graph')
@@ -51,5 +51,10 @@ include('isma-intg-parallel-ignite')
 //include('isma-intg-demo')
 //include('isma-core')
 //include('isma-tools')
-include 'isma-next-hsm'
+include 'isma-next-math-engine'
+include 'isma-next-math-common'
+include 'isma-next-services-simulation-abstractions'
+include 'isma-next-core-fdm'
+include 'isma-next-core-simulation-gen'
+include 'isma-javafx-extensions'
 

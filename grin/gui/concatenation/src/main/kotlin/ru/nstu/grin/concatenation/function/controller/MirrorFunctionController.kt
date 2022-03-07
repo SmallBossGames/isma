@@ -1,38 +1,47 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsEvent
-import ru.nstu.grin.concatenation.function.events.GetAllFunctionsQuery
-import ru.nstu.grin.concatenation.function.events.UpdateFunctionEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import org.koin.core.component.get
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.MirrorFunctionModel
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import tornadofx.Controller
 
 class MirrorFunctionController : Controller() {
+    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
+
+    private val concatenationCanvasModel: ConcatenationCanvasModel = mainGrinScope.get()
+    private val functionCanvasService: FunctionCanvasService = mainGrinScope.get()
+
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: MirrorFunctionModel by inject()
 
     init {
-        subscribe<GetAllFunctionsEvent> {
-            if (model.functions != null) {
-                model.functions.clear()
+        coroutineScope.launch {
+            concatenationCanvasModel.functionsListUpdatedEvent.collect{
+                model.functions.setAll(it)
             }
-            model.functionsProperty.setAll(it.functions)
         }
-    }
 
-    fun getAllFunctions() {
-        fire(GetAllFunctionsQuery())
+        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
     }
 
     fun mirrorFunction(isY: Boolean, function: ConcatenationFunction) {
-        val mirrorDetails = function.getMirrorDetails()
-        val mirrorEvent = UpdateFunctionEvent(
-            id = function.id,
+        val mirrorDetails = function.mirrorDetails
+        val updateFunctionData = UpdateFunctionData(
+            function = function,
             name = function.name,
             color = function.functionColor,
             lineType = function.lineType,
             lineSize = function.lineSize,
             isHide = function.isHide,
-            mirroDetails = if (isY) {
+            mirrorDetails = if (isY) {
                 mirrorDetails.copy(
                     isMirrorY = !mirrorDetails.isMirrorY
                 )
@@ -42,7 +51,8 @@ class MirrorFunctionController : Controller() {
                 )
             }
         )
-        fire(mirrorEvent)
+
+        functionCanvasService.updateFunction(updateFunctionData)
     }
 
 }

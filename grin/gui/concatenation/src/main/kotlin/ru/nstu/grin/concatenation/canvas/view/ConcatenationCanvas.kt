@@ -1,60 +1,47 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.collections.ListChangeListener
-import javafx.scene.Parent
+import javafx.scene.canvas.Canvas
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
-import javafx.scene.paint.Color
+import javafx.scene.layout.VBox
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
-import ru.nstu.grin.common.model.Arrow
-import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
-import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.axis.model.Direction
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
+import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
-import ru.nstu.grin.concatenation.canvas.model.CanvasModel
-import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
-import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.model.LineType
-import tornadofx.*
-import java.util.*
+import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
-class ConcatenationCanvas : View() {
-    private val model: ConcatenationCanvasModel by inject()
-    private val controller: ConcatenationCanvasController = find { }
-    private val canvasModel: CanvasModel by inject()
-    private var chainDrawer: ConcatenationChainDrawer = find { }
-    private val scalableScrollHandler: ScalableScrollHandler by inject()
-    private val draggedHandler: DraggedHandler by inject()
-    private val pressedMouseHandle: PressedMouseHandler by inject()
-    private val releaseMouseHandler: ReleaseMouseHandler by inject()
-
-    val initData: InitCanvasData? by param()
+class ConcatenationCanvas(
+    private val scalableScrollHandler: ScalableScrollHandler,
+    private val draggedHandler: DraggedHandler,
+    private val pressedMouseHandle: PressedMouseHandler,
+    private val releaseMouseHandler: ReleaseMouseHandler,
+    private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: CanvasViewModel,
+    private val chainDrawer: ConcatenationChainDrawer,
+): Pane() {
+    private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
     init {
-        val data = initData
+        val c1 = Canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()).apply {
+            VBox.setVgrow(this, Priority.ALWAYS)
+            HBox.setHgrow(this, Priority.ALWAYS)
 
-        if (data != null) {
-            model.cartesianSpaces = data.cartesianSpaces.toObservable()
-            model.arrows = data.arrows.toObservable()
-            model.descriptions = data.descriptions.toObservable()
+            canvasViewModel.functionsLayerContext = graphicsContext2D
         }
-    }
 
-    override val root: Parent = stackpane {
-        canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
-            vgrow = Priority.ALWAYS
-            hgrow = Priority.ALWAYS
-            canvasModel.canvas = this
+        val c2 = Canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()).apply {
+            VBox.setVgrow(this, Priority.ALWAYS)
+            HBox.setHgrow(this, Priority.ALWAYS)
 
-            model.arrowsProperty.addListener { _: ListChangeListener.Change<out Arrow> -> chainDrawer.draw() }
-            model.cartesianSpaces.addListener { _: ListChangeListener.Change<out CartesianSpace> -> chainDrawer.draw() }
-            model.descriptionsProperty.addListener { _: ListChangeListener.Change<out Description> -> chainDrawer.draw() }
+            canvasViewModel.uiLayerContext = graphicsContext2D
 
             onScroll = scalableScrollHandler
 
@@ -63,9 +50,39 @@ class ConcatenationCanvas : View() {
             onMousePressed = pressedMouseHandle
 
             onMouseReleased = releaseMouseHandler
+        }
+
+        children.addAll(c1, c2)
+
+        widthProperty().addListener { _ ->
+            c1.width = width
+            c2.width = width
+            canvasViewModel.canvasWidth = width
 
             chainDrawer.draw()
         }
+
+        heightProperty().addListener { _ ->
+            c1.height = height
+            c2.height = height
+            canvasViewModel.canvasHeight = height
+
+            chainDrawer.draw()
+        }
+
+        fxCoroutineScope.launch {
+            launch {
+                model.arrows.changeAsFlow().collect { chainDrawer.draw() }
+            }
+            launch {
+                model.cartesianSpaces.changeAsFlow().collect { chainDrawer.draw() }
+            }
+            launch {
+                model.descriptions.changeAsFlow().collect { chainDrawer.draw() }
+            }
+        }
+
+        chainDrawer.draw()
     }
 
     fun redraw() {

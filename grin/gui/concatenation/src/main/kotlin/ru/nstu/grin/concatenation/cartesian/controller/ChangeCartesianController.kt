@@ -1,30 +1,18 @@
 package ru.nstu.grin.concatenation.cartesian.controller
 
-import ru.nstu.grin.concatenation.cartesian.events.GetCartesianEvent
-import ru.nstu.grin.concatenation.cartesian.events.UpdateCartesianEvent
 import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
-import tornadofx.Controller
-import java.util.*
+import ru.nstu.grin.concatenation.cartesian.model.UpdateCartesianDataModel
+import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 
-class ChangeCartesianController : Controller() {
-    val cartesianId: UUID by param()
-    private val model: ChangeCartesianSpaceModel by inject()
-
-    init {
-        subscribe<GetCartesianEvent> {
-            if (it.cartesianSpace.id == cartesianId) {
-                model.name = it.cartesianSpace.name
-                model.isShowGrid = it.cartesianSpace.isShowGrid
-            }
-        }
-    }
-
-    fun updateCartesianSpace() {
-        val event = UpdateCartesianEvent(
-            id = cartesianId,
+class ChangeCartesianController(
+    private val cartesianCanvasService: CartesianCanvasService
+) {
+    fun updateCartesianSpace(model: ChangeCartesianSpaceModel) {
+        val updateCartesianDataModel = UpdateCartesianDataModel(
+            space = model.space,
             name = model.name,
             isShowGrid = model.isShowGrid
         )
-        fire(event)
+        cartesianCanvasService.updateCartesian(updateCartesianDataModel)
     }
 }

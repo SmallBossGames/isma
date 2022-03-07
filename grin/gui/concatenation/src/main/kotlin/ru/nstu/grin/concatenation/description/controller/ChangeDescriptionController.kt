@@ -1,34 +1,31 @@
 package ru.nstu.grin.concatenation.description.controller
 
-import ru.nstu.grin.concatenation.description.events.GetDescriptionEvent
-import ru.nstu.grin.concatenation.description.events.UpdateDescriptionEvent
-import ru.nstu.grin.concatenation.description.model.ChangeDescriptionModel
-import tornadofx.Controller
-import java.util.*
+import ru.nstu.grin.common.model.DescriptionDto
+import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 
-class ChangeDescriptionController : Controller() {
-    val descriptionId: UUID by param()
-    private val model: ChangeDescriptionModel by inject()
-
-    init {
-        subscribe<GetDescriptionEvent> {
-            if (descriptionId == it.description.id) {
-                model.text = it.description.text
-                model.textSize = it.description.textSize.toString()
-                model.color = it.description.color
-                model.font = it.description.font
-            }
-        }
-    }
-
-    fun updateDescription() {
-        val event = UpdateDescriptionEvent(
-            id = descriptionId,
+class ChangeDescriptionController(
+    private val descriptionCanvasService: DescriptionCanvasService
+) {
+    fun updateOrCreateDescription(model: ChangeDescriptionViewModel) {
+        val descriptionModel = DescriptionDto(
+            x = model.xPosition,
+            y = model.yPosition,
             text = model.text,
-            textSize = model.textSize.toDouble(),
+            textSize = model.textSize,
             color = model.color,
             font = model.font
         )
-        fire(event)
+
+        val description = model.description
+
+        if(description != null){
+            descriptionCanvasService.update(
+                model.description,
+                descriptionModel
+            )
+        } else {
+            descriptionCanvasService.add(descriptionModel)
+        }
     }
 }

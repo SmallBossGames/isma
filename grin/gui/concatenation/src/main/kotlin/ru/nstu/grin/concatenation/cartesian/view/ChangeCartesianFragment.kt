@@ -1,35 +1,39 @@
 package ru.nstu.grin.concatenation.cartesian.view
 
-import javafx.scene.Parent
+import javafx.geometry.Insets
+import javafx.scene.control.Button
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
+import javafx.stage.Stage
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
-import ru.nstu.grin.concatenation.cartesian.events.CartesianQuery
 import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
-import tornadofx.*
-import java.util.*
 
-class ChangeCartesianFragment : Fragment() {
-    val cartesianId: UUID by param()
-    private val model: ChangeCartesianSpaceModel by inject()
-    private val controller: ChangeCartesianController = find(params = params) { }
-
-    override val root: Parent = form {
-        fieldset {
-            field("Имя") {
-                textfield().bind(model.nameProperty)
-            }
-            field("Отображать сетку") {
-                checkbox().bind(model.isShowGridProperty)
-            }
-        }
-        button("Сохранить") {
-            action {
-                controller.updateCartesianSpace()
-                close()
-            }
-        }
-    }
+class ChangeCartesianFragment(
+    private val model: ChangeCartesianSpaceModel,
+    private val controller: ChangeCartesianController,
+) : BorderPane() {
 
     init {
-        fire(CartesianQuery(cartesianId))
+        top = VBox(
+            propertiesGrid {
+                addNode("Name", model.nameProperty)
+                addNode("Show Grid", model.isShowGridProperty)
+            }.apply {
+                padding = Insets(10.0)
+            }
+        )
+
+        bottom = HBox(
+            Button("Save").apply {
+                setOnAction {
+                    controller.updateCartesianSpace(model)
+                    (scene.window as Stage).close()
+                }
+            }
+        ).apply {
+            padding = Insets(10.0)
+        }
     }
 }

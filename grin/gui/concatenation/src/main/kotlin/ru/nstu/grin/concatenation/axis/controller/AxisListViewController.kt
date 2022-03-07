@@ -1,17 +1,38 @@
 package ru.nstu.grin.concatenation.axis.controller
 
-import ru.nstu.grin.concatenation.axis.events.GetAllAxisesEvent
-import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
-import tornadofx.Controller
-import tornadofx.toObservable
+import javafx.scene.Scene
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.Window
+import org.koin.core.component.get
+import org.koin.core.parameter.parametersOf
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
+import ru.nstu.grin.concatenation.koin.AxisChangeModalScope
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 
-class AxisListViewController : Controller() {
-    private val model: AxisListViewModel by inject()
+class AxisListViewController(
+    private val mainGrinScope: MainGrinScope,
+) {
+    fun editAxis(axis: ConcatenationAxis, window: Window? = null){
+        val scope = mainGrinScope.get<AxisChangeModalScope>()
+        val view = scope.get<AxisChangeFragment>() { parametersOf(axis) }
 
-    init {
-        subscribe<GetAllAxisesEvent> {
-            println("Get axises axisListViewController")
-            model.axises = it.axises.toObservable()
+        Stage().apply {
+            scene = Scene(view)
+            title = "Change Axis"
+
+            initModality(Modality.WINDOW_MODAL)
+
+            if(window != null){
+                initOwner(window)
+            }
+
+            setOnCloseRequest {
+                scope.closeScope()
+            }
+
+            show()
         }
     }
 }

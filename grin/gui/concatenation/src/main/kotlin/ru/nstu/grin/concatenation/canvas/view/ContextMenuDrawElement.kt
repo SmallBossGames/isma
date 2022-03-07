@@ -3,37 +3,45 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
+import javafx.stage.Stage
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
-import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
-import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import tornadofx.Scope
+import ru.nstu.grin.concatenation.canvas.model.ContextMenuType
 import tornadofx.action
-import tornadofx.find
 
 class ContextMenuDrawElement(
     private val contextMenu: ContextMenu,
     private val model: ConcatenationCanvasModel,
     private val controller: ConcatenationCanvasController,
     private val chainDrawer: ConcatenationChainDrawer,
-    private val scope: Scope
+    private val stage: Stage,
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         contextMenu.items.clear()
 
         val settings = model.contextMenuSettings
-        val stage = model.primaryStage
         when (model.contextMenuSettings.type) {
             ContextMenuType.AXIS -> {
                 val axises = model.cartesianSpaces.map {
                     listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
                 }.flatten()
-                val axis =
-                    axises.firstOrNull { it.second.isLocated(settings.xGraphic, settings.yGraphic) }?.second ?: return
+                val axis = axises.firstOrNull {
+                    it.second.isLocated(
+                        settings.xGraphic,
+                        settings.yGraphic,
+                        canvasWidth,
+                        canvasHeight
+                    )
+                }?.second ?: return
                 val cartesianSpace = axises.firstOrNull {
-                    it.second.isLocated(settings.xGraphic, settings.yGraphic)
+                    it.second.isLocated(
+                        settings.xGraphic,
+                        settings.yGraphic,
+                        canvasWidth,
+                        canvasHeight
+                    )
                 }?.first ?: return
 
                 val logMenuItem = MenuItem("Включить логарифмический масштаб")
@@ -54,22 +62,31 @@ class ContextMenuDrawElement(
                     chainDrawer.draw()
                 }
 
-                val changeAxis = MenuItem("Изменить ось")
+                // TODO: Disabled until migration to Koin
+               /* val changeAxis = MenuItem("Изменить ось")
                 changeAxis.action {
-                    if (cartesianSpace.xAxis.isLocated(settings.xGraphic, settings.yGraphic)) {
-                        find<AxisChangeFragment>(
-                            scope, mapOf(
-                                AxisChangeFragment::axisId.name to cartesianSpace.xAxis.id
-                            )
-                        ).openModal()
+                    val axisItem = if (cartesianSpace.xAxis.isLocated(settings.xGraphic, settings.yGraphic, canvasWidth, canvasHeight)) {
+                        cartesianSpace.xAxis
                     } else {
-                        find<AxisChangeFragment>(
-                            scope, mapOf(
-                                AxisChangeFragment::axisId.name to cartesianSpace.yAxis.id
-                            )
-                        ).openModal()
+                        cartesianSpace.yAxis
                     }
-                }
+
+                    val scope = mainGrinScope.get<AxisChangeModalScope>()
+                    val view = scope.get<AxisChangeFragment>() { parametersOf(axisItem) }
+
+                    Stage().apply {
+                        scene = Scene(view)
+                        title = "Change Axis"
+
+                        initModality(Modality.WINDOW_MODAL)
+
+                        setOnCloseRequest {
+                            scope.closeScope()
+                        }
+
+                        show()
+                    }
+                }*/
 
                 val hideMenu = MenuItem("Спрятать все функции")
                 hideMenu.action {
@@ -81,7 +98,7 @@ class ContextMenuDrawElement(
 
                 contextMenu.items.add(logMenuItem)
                 contextMenu.items.add(gridItem)
-                contextMenu.items.add(changeAxis)
+                //contextMenu.items.add(changeAxis)
                 contextMenu.items.add(hideMenu)
                 contextMenu.show(context.canvas, stage.x + settings.xGraphic, stage.y + settings.yGraphic)
             }

@@ -18,6 +18,7 @@ import java.util.concurrent.Future;
  * @author Mariya Nasyrova
  * @since 25.02.16
  */
+@Deprecated
 public class DaeSystemThreadPoolStepSolver extends DefaultDaeSystemStepSolver {
 
     private final int threadCount;

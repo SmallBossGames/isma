@@ -1,168 +1,114 @@
 package ru.isma.next.app.services.simualtion
 
-import ru.nstu.isma.next.core.sim.controller.SimulationCoreController
+import javafx.collections.FXCollections
 import kotlinx.coroutines.*
-import ru.isma.next.app.enumerables.SaveTarget
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import ru.isma.next.common.services.lisma.FailedTranslation
-import ru.isma.next.common.services.lisma.services.LismaPdeService
-import ru.isma.next.common.services.lisma.SuccessTranslation
-import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
-import ru.nstu.isma.intg.api.methods.IntgMethod
-import ru.nstu.isma.next.core.sim.controller.parameters.EventDetectionParameters
-import ru.nstu.isma.next.core.sim.controller.parameters.ParallelParameters
-import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
-import ru.isma.next.app.services.ModelErrorService
+import kotlinx.coroutines.javafx.JavaFx
+import org.koin.core.component.KoinComponent
+import ru.isma.next.app.models.simulation.CompletedSimulationModel
+import ru.isma.next.app.models.simulation.InProgressSimulationModel
+import ru.isma.next.app.services.koin.SimulationScope
+import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectService
-import tornadofx.getValue
-import tornadofx.setValue
-import kotlin.math.max
-import kotlin.math.min
+import ru.isma.next.common.services.lisma.models.SuccessTranslation
+import ru.isma.next.services.simulation.abstractions.models.CauchyInitialsModel
+import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
+import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
+import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
+import ru.nstu.isma.next.core.sim.controller.services.controllers.ISimulationCoreController
 
 class SimulationService(
     private val projectService: ProjectService,
     private val lismaPdeService: LismaPdeService,
-    private val simulationParametersService: SimulationParametersService,
     private val simulationResult: SimulationResultService,
-    private val library: IntegrationMethodsLibrary,
-    private val modelService: ModelErrorService,
-) {
+) : KoinComponent {
+    val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()!!
 
-    private val progressProperty = SimpleDoubleProperty();
-    fun progressProperty() = progressProperty
-    var progress by progressProperty
+    private val currentSimulationJobs = mutableMapOf<InProgressSimulationModel, Job>()
 
-    private val isSimulationInProgressProperty = SimpleBooleanProperty();
-    fun isSimulationInProgressProperty() = isSimulationInProgressProperty
-    var isSimulationInProgress by isSimulationInProgressProperty
+    private var taskNumber = 1
 
-    private var currentSimulation: Job? = null
+    fun simulate() {
+        val simulationScope = getKoin().createScope<SimulationScope>()
+        val simulationController: ISimulationCoreController = simulationScope.get()
+        val simulationParameters: SimulationParametersModel = simulationScope.get()
+        val project = projectService.activeProject ?: return
 
-    fun simulate(){
-        val translationResult = lismaPdeService.translateLisma(projectService.activeProject?.lismaText ?: return)
+        val trackingTask = InProgressSimulationModel(
+            taskNumber,
+            project.name,
+            simulationParameters
+        )
 
-        modelService.setErrorList(emptyList())
+        taskNumber++
 
-        when (translationResult) {
-            is FailedTranslation -> {
-                modelService.setErrorList(translationResult.errors)
-                return
-            }
-            is SuccessTranslation -> {
-                val initials = createCauchyInitials()
-                val integrationMethod = createIntegrationMethod()
+        val currentSimulationJob = SimulationScope.launch {
+            try {
+                val sourceCode = project.snapshot()
 
-                initAccuracyController(integrationMethod)
-                initStabilityController(integrationMethod)
+                val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation
+                    ?: return@launch
 
-                translationResult.hsm.initTimeEquation(initials.start)
+                val initials = simulationParameters.cauchyInitials.toCauchyInitials()
 
-                val simulationController = SimulationCoreController(
-                    translationResult.hsm,
-                    initials,
-                    integrationMethod,
-                    createParallelParameters(),
-                    createFileResultParameters(),
-                    createEventDetectionParameters()
+                val hsm = translationResult.hsm.apply {
+                    initTimeEquation(initials.start)
+                }
+
+                val context = IntegratorApiParameters(
+                    hsm = hsm,
+                    initials = initials,
+                    stepChangeHandlers = arrayListOf(
+                        {
+                            val progress = normalizeProgress(initials.start, initials.end, it)
+                            trackingTask.commitProgress(progress)
+                        }
+                    )
                 )
 
-                initProgressTracking(simulationController, initials)
+                withContext(Dispatchers.JavaFx) {
+                    trackingTasks.add(trackingTask)
+                }
 
-                currentSimulation?.cancel()
+                val result = simulationController.simulateAsync(context)
 
-                currentSimulation = startSimualtionJob(simulationController)
+                val resultModel = CompletedSimulationModel(
+                    trackingTask.id,
+                    trackingTask.model,
+                    result.equationIndexProvider,
+                    result.metricData,
+                    result.resultPointProvider,
+                    trackingTask.parameters
+                )
+
+                simulationResult.commitResult(resultModel)
+            }
+            finally {
+                simulationScope.close()
+
+                currentSimulationJobs.remove(trackingTask)
+
+                SimulationScope.launch(Dispatchers.JavaFx) {
+                    trackingTasks.remove(trackingTask)
+                }
             }
         }
 
-
+        currentSimulationJobs[trackingTask] = currentSimulationJob
     }
 
-    private fun createCauchyInitials(): CauchyInitials {
-        return CauchyInitials().apply {
-            start = simulationParametersService.cauchyInitials.startTime
-            end = simulationParametersService.cauchyInitials.endTime
-            stepSize = simulationParametersService.cauchyInitials.step
+    fun stopSimulation(trackingTask: InProgressSimulationModel) {
+        currentSimulationJobs.getOrDefault(trackingTask, null)?.cancel()
+    }
+
+    companion object {
+        private val SimulationSupervisorJob = SupervisorJob()
+
+        val SimulationScope = CoroutineScope(Dispatchers.Default + SimulationSupervisorJob)
+
+        private fun normalizeProgress(start: Double, end: Double, current: Double): Double {
+            return ((current - start) / (end-start)).coerceIn(0.0, 1.0)
         }
-    }
 
-    private fun createIntegrationMethod(): IntgMethod {
-        val selectedMethod = simulationParametersService.integrationMethod.selectedMethod
-        return library.getIntgMethod(selectedMethod)!!
-    }
-
-    private fun createEventDetectionParameters(): EventDetectionParameters? {
-        return if (simulationParametersService.eventDetection.isEventDetectionInUse){
-            val stepLowerBound = if (simulationParametersService.eventDetection.isStepLimitInUse)
-                simulationParametersService.eventDetection.lowBorder
-            else
-                0.0
-
-            EventDetectionParameters(simulationParametersService.eventDetection.gamma, stepLowerBound)
-        }
-        else {
-            null
-        }
-    }
-
-    private fun createParallelParameters(): ParallelParameters? {
-        return if (simulationParametersService.integrationMethod.isParallelInUse){
-            ParallelParameters(
-                    simulationParametersService.integrationMethod.server,
-                    simulationParametersService.integrationMethod.port)
-        }
-        else {
-            null
-        }
-    }
-
-    private fun createFileResultParameters(): String? {
-        return if (simulationParametersService.resultSaving.savingTarget == SaveTarget.FILE)
-            "temp.csv"
-        else
-            null
-    }
-
-
-    private fun normalizeProgress(start: Double, end: Double, current: Double): Double{
-        return max(0.0, min(1.0, (current - start) / (end-start)))
-    }
-
-    private fun initAccuracyController(integrationMethod: IntgMethod){
-        val accuracyController = integrationMethod.accuracyController
-        if (accuracyController != null) {
-            val accuracyInUse = simulationParametersService.integrationMethod.isAccuracyInUse
-            accuracyController.isEnabled = accuracyInUse
-            if (accuracyInUse){
-                accuracyController.accuracy = simulationParametersService.integrationMethod.accuracy
-            }
-        }
-    }
-
-    private fun initStabilityController(integrationMethod: IntgMethod){
-        val stabilityController = integrationMethod.stabilityController
-        if (stabilityController != null) {
-            stabilityController.isEnabled = simulationParametersService.integrationMethod.isStableInUse
-        }
-    }
-
-    private fun initProgressTracking(
-            simulationController: SimulationCoreController,
-            initials: CauchyInitials){
-        simulationController.addStepChangeListener {
-            progress = normalizeProgress(initials.start, initials.end, it)
-        }
-    }
-
-    private fun startSimualtionJob(controller: SimulationCoreController) = GlobalScope.launch {
-        try {
-            isSimulationInProgress = true
-            val result = controller.simulate()
-            simulationResult.simulationResult = result
-        } finally {
-            isSimulationInProgress = false
-            progress = 0.0
-            currentSimulation = null
-        }
+        private fun CauchyInitialsModel.toCauchyInitials() = CauchyInitials(startTime, endTime, initialStep)
     }
 }

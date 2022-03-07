@@ -1,47 +1,20 @@
 package ru.nstu.grin.concatenation.axis.view
 
-import javafx.scene.Parent
-import ru.nstu.grin.concatenation.axis.controller.LogarithmicTypeFragmentController
-import ru.nstu.grin.concatenation.axis.events.AxisQuery
-import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
-import tornadofx.*
-import java.util.*
+import javafx.geometry.Insets
+import javafx.scene.layout.VBox
+import ru.isma.javafx.extensions.controls.PropertiesGrid
+import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
 
-class LogarithmicTypeFragment : Fragment() {
-    val axisId: UUID by param()
-    private val model: LogarithmicTypeModel by inject()
-    private val controller: LogarithmicTypeFragmentController = find(params = params) { }
-
-    override val root: Parent = fieldset {
-        field("Основание логарифма") {
-            textfield(model.logarithmBaseProperty) {
-                validator {
-                    if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
-                        error("Число должно быть плавающим 20,0 и больше нуля")
-                    } else {
-                        null
-                    }
-                }
-            }
-        }
-        field("Только целые значение степеней") {
-            checkbox().bind(model.onlyIntegerPowProperty)
-        }
-        field("Целочисленные шаг") {
-            textfield(model.integerStepProperty) {
-                validator {
-                    if (it?.toIntOrNull() == null || it.toIntOrNull() ?: -1 < 0) {
-                        error("Число должно быть плавающим 20,0 и больше нуля")
-                    } else {
-                        null
-                    }
-                }
-            }
-        }
+class LogarithmicTypeFragment(
+    model: LogarithmicFragmentModel,
+) : VBox(
+    PropertiesGrid().apply {
+        addNode("Logarithm Base", model.logarithmBaseProperty)
+        addNode("Only Integer Pow", model.onlyIntegerPowProperty)
+        addNode("Integer Step", model.onlyIntegerPowProperty)
     }
-
-
+) {
     init {
-        fire(AxisQuery(axisId))
+        padding = Insets(10.0)
     }
 }

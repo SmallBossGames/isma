@@ -2,23 +2,21 @@ package ru.nstu.grin.concatenation.function.view
 
 import javafx.scene.Parent
 import ru.nstu.grin.concatenation.function.controller.FunctionIntegrationController
-import ru.nstu.grin.concatenation.function.events.FunctionQuery
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.FunctionIntegrationFragmentModel
 import ru.nstu.grin.concatenation.function.model.IntegrationMethod
 import tornadofx.*
-import java.util.*
 
 class FunctionIntegrationFragment : Fragment() {
-    val functionId: UUID by param()
-    private val model: FunctionIntegrationFragmentModel by inject()
-    private val controller: FunctionIntegrationController = find(params = params) { }
+    private val model = FunctionIntegrationFragmentModel(params["function"] as ConcatenationFunction)
+    private val controller: FunctionIntegrationController by inject()
 
     override val root: Parent = form {
         fieldset {
             field("Метод интегрирования") {
                 combobox(model.integrationMethodProperty, IntegrationMethod.values().toList()) {
-                    cellFormat {
-                        text = when (it) {
+                    cellFormat { cell ->
+                        text = when (cell!!) {
                             IntegrationMethod.TRAPEZE -> "Метод трапеций"
                         }
                     }
@@ -28,7 +26,7 @@ class FunctionIntegrationFragment : Fragment() {
             field("Левая граница интеграла") {
                 textfield(model.leftBorderProperty) {
                     validator {
-                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                        if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                             error("Число должно быть плавающим 20,0 и больше нуля")
                         } else {
                             null
@@ -39,7 +37,7 @@ class FunctionIntegrationFragment : Fragment() {
             field("Правая граница интеграла") {
                 textfield(model.rightBorderProperty) {
                     validator {
-                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                        if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                             error("Число должно быть плавающим 20,0 и больше нуля")
                         } else {
                             null
@@ -49,15 +47,11 @@ class FunctionIntegrationFragment : Fragment() {
             }
         }
         button("Найти интеграл") {
-            enableWhen(model.isValid.toProperty())
+            //enableWhen(model.isValid.toProperty())
             action {
-                controller.findIntegral()
+                controller.findIntegral(model)
                 close()
             }
         }
-    }
-
-    init {
-        fire(FunctionQuery(functionId))
     }
 }

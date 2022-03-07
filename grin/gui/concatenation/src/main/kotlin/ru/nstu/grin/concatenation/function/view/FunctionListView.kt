@@ -1,79 +1,70 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
-import javafx.scene.control.Tooltip
+import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.shape.Rectangle
 import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
-import tornadofx.*
 
-class FunctionListView : Fragment() {
-    private val model: FunctionListViewModel by inject()
-    private val controller: FunctionListViewController = find { }
+class FunctionListView(
+    private val controller: FunctionListViewController,
+    model: FunctionListViewModel,
+): ListView<ConcatenationFunction>(model.functions) {
+    init {
+        setCellFactory {
+            object : ListCell<ConcatenationFunction>() {
+                override fun updateItem(item: ConcatenationFunction?, empty: Boolean) {
+                    super.updateItem(item, empty)
 
-    override val root: Parent = listview(model.functionsProperty) {
-        cellFormat {
-            graphic = form {
-                hbox {
-                    spacing = 20.0
-                    fieldset("Имя") {
-                        label(it.name)
-                    }
-                    fieldset("цвет") {
-                        label(it.functionColor.toString())
-                    }
-                    fieldset("Размер линии") {
-                        label(it.lineSize.toString())
-                    }
-                    fieldset("Тип рисовки") {
-                        label(it.lineType.toString())
-                    }
-                    fieldset("Отображается") {
-                        label(if (it.isHide) "Нет" else "Да")
-                    }
-                }
-                hbox {
-                    spacing = 20.0
-                    button {
-                        action {
-                            controller.openCopyModal(it.id)
-                        }
-                        val image = Image("copy.png")
-                        val imageView = ImageView(image)
-                        imageView.fitHeight = 20.0
-                        imageView.fitWidth = 20.0
-                        graphic = imageView
-                        tooltip = Tooltip("Скопировать")
-                    }
-                    button {
-                        action {
-                            controller.openChangeModal(it.id)
-                        }
-                        val image = Image("edit-tool.png")
-                        val imageView = ImageView(image)
-                        imageView.fitHeight = 20.0
-                        imageView.fitWidth = 20.0
-                        graphic = imageView
-                        tooltip = Tooltip("Отредактировать")
-                    }
-                    button {
-                        action {
-                            controller.deleteFunction(it.id)
-                        }
-                        val image = Image("send-to-trash.png")
-                        val imageView = ImageView(image)
-                        imageView.fitHeight = 20.0
-                        imageView.fitWidth = 20.0
-                        graphic = imageView
-                        tooltip = Tooltip("Удалить")
-                    }
+                    graphic = if (item == null) null else createItem(item)
                 }
             }
         }
     }
 
-    init {
-        controller.getAllFunctions()
-    }
+    private fun createItem(item: ConcatenationFunction) =
+        BorderPane().apply {
+            left = HBox(
+                Rectangle(15.0, item.lineSize, item.functionColor),
+                Label(item.name)
+            ).apply {
+                spacing = 10.0
+            }
+
+            right = HBox(
+                Button(null, ImageView(Image("copy.png")).apply {
+                    fitHeight = 20.0
+                    fitWidth = 20.0
+                }).apply {
+                    tooltip = Tooltip("Скопировать")
+                    setOnAction {
+                        controller.openCopyModal(item, scene.window)
+                    }
+                },
+                Button(null, ImageView(Image("edit-tool.png")).apply {
+                    fitHeight = 20.0
+                    fitWidth = 20.0
+                }).apply {
+                    tooltip = Tooltip("Отредактировать")
+                    setOnAction {
+                        controller.openChangeModal(item, scene.window)
+                    }
+                },
+                Button(null, ImageView(Image("send-to-trash.png")).apply {
+                    fitHeight = 20.0
+                    fitWidth = 20.0
+                }).apply {
+                    tooltip = Tooltip("Удалить")
+                    setOnAction {
+                        controller.deleteFunction(item)
+                    }
+                },
+            ).apply {
+                spacing = 5.0
+            }
+        }
 }

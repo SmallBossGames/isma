@@ -26,14 +26,14 @@ public class IndexMapper implements IndexProvider, Serializable {
     }
 
     private void prepeare() {
-        hsm.getVariableTable().getOdes().stream()
+        hsm.getVariableTable().getOdes()
                 .forEach(de -> {
                     if (de instanceof HMPartialDerivativeEquation) {
                         throw new RuntimeException("not supported"); // todo изменить на списщк IsmaErrorList
                     }
                     addCode(de.getCode());
                 });
-        hsm.getVariableTable().getAlgs().stream()
+        hsm.getVariableTable().getAlgs()
                 .forEach(a -> addCode(a.getCode()));
         hsm.getLinearSystem().getVars().values()
                 .forEach(v-> addCode(v.getCode()));

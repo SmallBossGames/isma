@@ -48,14 +48,17 @@ public class HMTransaction implements Serializable {
 
         HMTransaction that = (HMTransaction) o;
 
+        if(source == null || that.source == null){
+            return source == null && that.source == null;
+        }
+
         if (!source.equals(that.source)) return false;
         return target.equals(that.target);
     }
 
     @Override
     public int hashCode() {
-        int result = source.hashCode();
-        result = 31 * result + target.hashCode();
-        return result;
+        final var result = source == null ? 0 : source.hashCode();
+        return 31 * result + target.hashCode();
     }
 }

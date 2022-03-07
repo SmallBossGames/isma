@@ -1,53 +1,58 @@
 package ru.nstu.grin.concatenation.file
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import javafx.stage.FileChooser
+import javafx.stage.Window
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.file.model.SavedCanvas
-import tornadofx.Controller
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.nio.file.Path
+import ru.nstu.grin.concatenation.canvas.model.project.ProjectSnapshot
+import ru.nstu.grin.concatenation.canvas.model.project.toModel
+import ru.nstu.grin.concatenation.canvas.model.project.toSnapshot
 
-class CanvasProjectLoader : Controller() {
-    private val model: ConcatenationCanvasModel by inject()
-    private val mapper = createObjectMapper()
+//TODO: implement arrows saving
+class CanvasProjectLoader(
+    private val model: ConcatenationCanvasModel,
+    private val concatenationCanvasController: ConcatenationCanvasController,
+) {
+    fun save(window: Window? = null) {
+        val file = FileChooser().run {
+            title = "Save Chart"
+            extensionFilters.addAll(grinChartDataFileFilters)
+            showSaveDialog(window)
+        } ?: return
 
-    fun save(path: Path) {
-        val savedCanvas = SavedCanvas(
-            cartesians = model.cartesianSpaces,
-            descriptions = model.descriptions,
-            arrows = model.arrows
+        val project = ProjectSnapshot(
+            spaces = model.cartesianSpaces.map { it.toSnapshot() },
+            descriptions = model.descriptions.map { it.toSnapshot() }
         )
-        FileOutputStream(path.toFile()).use {
-            val length = mapper.writeValueAsString(savedCanvas).length
-            println("Length $length")
-            val sequenceWriter = mapper.writer().writeValues(it)
-            sequenceWriter.write(savedCanvas)
+
+        file.bufferedWriter(Charsets.UTF_8).use {
+            it.write(Json.encodeToString(project))
         }
     }
 
-    fun load(path: Path) {
-        val json = FileInputStream(path.toAbsolutePath().toFile()).use {
-            it.readBytes().toString(Charsets.UTF_8)
-        }
+    fun load(window: Window? = null) {
+        val file = FileChooser().run {
+            title = "Load Chart"
+            extensionFilters.addAll(grinChartDataFileFilters)
+            showOpenDialog(window)
+        } ?: return
 
-        val savedCanvas = mapper.readValue<SavedCanvas>(json)
-        model.cartesianSpaces.clear()
-        model.cartesianSpaces.setAll(savedCanvas.cartesians)
-        model.descriptions.clear()
-        model.descriptions.setAll(savedCanvas.descriptions)
-        model.arrows.clear()
-        model.arrows.setAll(savedCanvas.arrows)
+        val json = file.readText(Charsets.UTF_8)
+        val project = Json.decodeFromString<ProjectSnapshot>(json)
+
+        concatenationCanvasController.replaceAll(
+            project.spaces.map { it.toModel() },
+            emptyList(),
+            project.descriptions.map { it.toModel() }
+        )
     }
 
-    fun createObjectMapper(): ObjectMapper {
-        return ObjectMapper()
-            .registerKotlinModule()
-            .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private companion object {
+        val grinChartDataFileFilters = arrayOf(
+            FileChooser.ExtensionFilter("Grin Chart Data", "*.chart.json")
+        )
     }
 }

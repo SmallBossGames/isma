@@ -1,0 +1,20 @@
+.syntax-keyword {
+    -fx-fill: orange;
+    -fx-font-weight: bold;
+}
+
+.syntax-default {
+    -fx-fill: black;
+    -fx-font-weight: normal;
+}
+
+.syntax-decimal {
+    -fx-fill: blue;
+    -fx-font-weight: normal;
+}
+
+.syntax-comment {
+    -fx-fill: gray;
+    -fx-font-weight: normal;
+    -fx-font-style: italic;
+}

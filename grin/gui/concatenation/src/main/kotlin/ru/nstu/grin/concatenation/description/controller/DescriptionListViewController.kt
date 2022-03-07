@@ -1,33 +1,44 @@
 package ru.nstu.grin.concatenation.description.controller
 
-import ru.nstu.grin.concatenation.description.events.DeleteDescriptionQuery
-import ru.nstu.grin.concatenation.description.events.GetAllDescriptionsEvent
-import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
-import ru.nstu.grin.concatenation.description.view.ChangeDescriptionFragment
-import tornadofx.Controller
-import java.util.*
+import javafx.scene.Scene
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.Window
+import org.koin.core.component.get
+import org.koin.core.parameter.parametersOf
+import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
+import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
+import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 
-class DescriptionListViewController : Controller() {
-    private val model: DescriptionListViewModel by inject()
+class DescriptionListViewController(
+    private val mainGrinScope: MainGrinScope,
+    private val service: DescriptionCanvasService
+) {
+    fun openChangeModal(description: Description, window: Window? = null) {
+        val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
 
-    init {
-        subscribe<GetAllDescriptionsEvent> {
-            if (model.descriptions != null) {
-                model.descriptions.clear()
+        val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(description) }
+
+        Stage().apply {
+            scene = Scene(view)
+            title = "Change Description"
+            initModality(Modality.WINDOW_MODAL)
+
+            if(window != null){
+                initOwner(window)
             }
-            model.descriptionsProperty.setAll(it.descriptions)
+
+            setOnCloseRequest {
+                descriptionChangeModalScope.closeScope()
+            }
+
+            show()
         }
     }
 
-    fun openChangeModal(id: UUID) {
-        find<ChangeDescriptionFragment>(
-            mapOf(
-                ChangeDescriptionFragment::descriptionId to id
-            )
-        ).openModal()
-    }
-
-    fun deleteDescription(id: UUID) {
-        fire(DeleteDescriptionQuery(id))
+    fun deleteDescription(description: Description) {
+        service.delete(description)
     }
 }

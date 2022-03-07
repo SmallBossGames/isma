@@ -1,8 +1,8 @@
 package ru.nstu.isma.core.hsm.service;
 
-import error.IsmaError;
-import error.IsmaErrorList;
 import ru.nstu.isma.core.hsm.exp.*;
+import ru.nstu.isma.core.hsm.models.IsmaErrorList;
+import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
 import ru.nstu.isma.core.hsm.var.HMConst;
 import ru.nstu.isma.core.hsm.var.HMUnnamedConst;
 import ru.nstu.isma.core.hsm.var.HMVariable;
@@ -42,8 +42,7 @@ public class ConstValueCalculator {
             c.setValue(value);
         } catch (Exception e) {
             e.printStackTrace();
-            IsmaError err = new IsmaError("ошибка при рассчете константы: " + c.getCode() + "  " + e.getMessage());
-            err.setType(IsmaError.Type.SEM);
+            var err = new IsmaSemanticError("ошибка при рассчете константы: " + c.getCode() + "  " + e.getMessage());
             if (errors != null)
                 errors.add(err);
             value = 0d;

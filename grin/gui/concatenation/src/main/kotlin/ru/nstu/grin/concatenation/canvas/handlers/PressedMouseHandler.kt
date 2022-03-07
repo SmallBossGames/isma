@@ -3,84 +3,130 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.model.*
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointSettings
-import tornadofx.Controller
 
-class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
-    private val model: ConcatenationCanvasModel by inject()
-    private val chainDrawer: ConcatenationChainDrawer by inject()
-    private val concatenationViewModel: ConcatenationViewModel by inject()
+class PressedMouseHandler(
+    private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: CanvasViewModel,
+    private val chainDrawer: ConcatenationChainDrawer,
+    private val concatenationViewModel: ConcatenationViewModel,
+) : EventHandler<MouseEvent> {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     override fun handle(event: MouseEvent) {
+        var isUiLayerDirty = false
+
         model.unselectAll()
         val editMode = concatenationViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
+
         if ((editMode == EditMode.SELECTION || editMode == EditMode.MOVE) && event.button == MouseButton.PRIMARY) {
             val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
             description?.isSelected = true
 
             val function = model.cartesianSpaces.map { it.functions }.flatten()
-                .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } }
+                .firstOrNull {
+                    val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                    return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+                }
             function?.isSelected = true
+
+            isUiLayerDirty = true
         }
 
-        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.button == MouseButton.PRIMARY) {
-                println("Pressed primary button")
-                model.selectionSettings.isSelected = true
+                model.selectionSettings.isFirstPointSelected = true
                 model.selectionSettings.firstPoint = Point(event.x, event.y)
             }
-        }
-        if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
-            handleEditMode(event)
-        }
-        if (event.button == MouseButton.SECONDARY) {
-            println("Set to false")
-            model.pointToolTipSettings.isShow = false
-            model.pointToolTipSettings.pointsSettings.clear()
-        }
-        if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
-            handleViewMode(event)
-        }
-        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
-            handleMoveMode(event)
+
+            isUiLayerDirty = true
         }
 
-        showContextMenu(event)
-        chainDrawer.draw()
+        if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
+            handleEditMode(event)
+
+            isUiLayerDirty = true
+        }
+
+        if (event.button == MouseButton.SECONDARY) {
+            model.pointToolTipSettings.isShow = false
+            model.pointToolTipSettings.pointsSettings.clear()
+
+            isUiLayerDirty = true
+        }
+
+        if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
+            handleViewMode(event)
+
+            isUiLayerDirty = true
+        }
+
+        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+            handleMoveMode(event)
+
+            isUiLayerDirty = true
+        }
+
+        if (event.button == MouseButton.SECONDARY) {
+            showContextMenu(event)
+
+            isUiLayerDirty = true
+        } else {
+            model.contextMenuSettings.type = ContextMenuType.NONE
+        }
+
+        if(isUiLayerDirty){
+            coroutineScope.launch {
+                chainDrawer.drawUiLayer()
+            }
+        }
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten().any { it.isLocated(event.x, event.y) }
+        return model.cartesianSpaces
+            .map { listOf(it.xAxis, it.yAxis) }
+            .flatten()
+            .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
     }
 
     private fun handleViewMode(event: MouseEvent) {
         val cartesianSpace = model.cartesianSpaces.firstOrNull {
             it.functions.any {
-                it.points.any { it.isNearBy(event.x, event.y) }
+                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
             }
         } ?: return
         val nearFunction = model.cartesianSpaces.mapNotNull {
             it.functions.firstOrNull {
-                it.points.any { it.isNearBy(event.x, event.y) }
+                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
             }
         }.firstOrNull() ?: return
 
-        val nearPoint = nearFunction.points.first {
-            it.isNearBy(event.x, event.y)
-        }
-        println("Found nearPoint $nearPoint")
+        val pixels = nearFunction.pixelsToDraw ?: throw java.lang.NullPointerException()
+
+        val nearPointIndex = ConcatenationFunction.indexOfPixelsNearBy(
+            pixels.first, pixels.second, event.x, event.y
+        )
 
         val pointToolTipSettings = model.pointToolTipSettings
         pointToolTipSettings.isShow = true
         val pointSettings = PointSettings(
             cartesianSpace.xAxis.settings,
             cartesianSpace.yAxis.settings,
-            nearPoint.xGraphic ?: 0.0,
-            nearPoint.yGraphic ?: 0.0
+            pixels.first[nearPointIndex],
+            pixels.second[nearPointIndex],
         )
         pointToolTipSettings.pointsSettings.add(pointSettings)
     }
@@ -88,11 +134,21 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleEditMode(event: MouseEvent) {
         println("Pressed primary button")
         val triple = model.cartesianSpaces.mapNotNull {
-            val point = it.functions.filter { it.isHide.not() }.firstOrNull {
-                it.points.firstOrNull { it.isNearBy(event.x, event.y) } != null
-            }?.points?.first {
-                it.isNearBy(event.x, event.y)
-            }
+            val point = it.functions
+                .filter { it.isHide.not() }
+                .firstOrNull {
+                    val pixels = it.pixelsToDraw ?: return@firstOrNull false
+                    ConcatenationFunction.isPixelsNearBy(
+                        pixels.first, pixels.second, event.x, event.y
+                    )
+                }?.run {
+                    val pixels = pixelsToDraw ?: return@run null
+                    val index = ConcatenationFunction.indexOfPixelsNearBy(
+                        pixels.first, pixels.second, event.x, event.y
+                    )
+                    points[index]
+                }
+
             if (point != null) {
                 Triple(it.xAxis, it.yAxis, point)
             } else {
@@ -110,9 +166,19 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     private fun handleMoveMode(event: MouseEvent) {
         val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
         val function = model.cartesianSpaces.map { it.functions }.flatten()
-            .firstOrNull { it.points.any { it.isNearBy(event.x, event.y) } }
+            .firstOrNull {
+                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+            }
         val cartesian =
-            model.cartesianSpaces.firstOrNull { it.functions.any { it.points.any { it.isNearBy(event.x, event.y) } } }
+            model.cartesianSpaces.firstOrNull {
+                it.functions.any {
+                    val pixels = it.pixelsToDraw ?: return@firstOrNull false
+
+                    return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+                }
+            }
 
         if (description != null) {
             model.moveSettings = MoveSettings(
@@ -134,15 +200,12 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun showContextMenu(event: MouseEvent) {
-        if (event.button != MouseButton.SECONDARY) {
-            model.contextMenuSettings.type = ContextMenuType.NONE
-            return
-        }
         val axises = model.cartesianSpaces.map {
             listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
         }.flatten()
+
         val cartesianSpace = axises.firstOrNull {
-            it.second.isLocated(event.x, event.y)
+            it.second.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
         }?.first
 
         if (cartesianSpace == null) {
@@ -150,8 +213,8 @@ class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
         } else {
             model.contextMenuSettings.type = ContextMenuType.AXIS
         }
+
         model.contextMenuSettings.xGraphic = event.x
         model.contextMenuSettings.yGraphic = event.y
-        chainDrawer.draw()
     }
 }

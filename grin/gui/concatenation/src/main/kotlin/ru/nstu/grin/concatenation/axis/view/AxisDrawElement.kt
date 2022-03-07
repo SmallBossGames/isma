@@ -4,28 +4,58 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.view.ChainDrawElement
-import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import tornadofx.Controller
 
-class AxisDrawElement : ChainDrawElement, Controller() {
-    private val model: ConcatenationCanvasModel by inject()
-    private val verticalAxisDraw: VerticalAxisDrawStrategy by inject()
-    private val horizontalAxisDraw: HorizontalAxisDrawStrategy by inject()
-
-    override fun draw(context: GraphicsContext) {
+class AxisDrawElement(
+    private val model: ConcatenationCanvasModel,
+    private val verticalAxisDraw: VerticalAxisDrawStrategy,
+    private val horizontalAxisDraw: HorizontalAxisDrawStrategy,
+) : ChainDrawElement {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         for (cartesianSpace in model.cartesianSpaces) {
             val xAxis = cartesianSpace.xAxis
             val yAxis = cartesianSpace.yAxis
 
-            if (xAxis.isHide.not()) {
-                drawBackground(context, xAxis.order, xAxis.direction, xAxis.backGroundColor)
-                drawAxisMarks(context, xAxis.order, xAxis, xAxis.direction, xAxis.fontColor)
+            if (!xAxis.isHide) {
+                drawBackground(
+                    context,
+                    xAxis.order,
+                    xAxis.direction,
+                    xAxis.backGroundColor,
+                    canvasWidth,
+                    canvasHeight
+                )
+                drawAxisMarks(
+                    context,
+                    xAxis.order,
+                    xAxis,
+                    xAxis.direction,
+                    xAxis.fontColor,
+                    canvasWidth,
+                    canvasHeight
+                )
             }
-            if (yAxis.isHide.not()) {
-                drawBackground(context, yAxis.order, yAxis.direction, yAxis.backGroundColor)
-                drawAxisMarks(context, yAxis.order, yAxis, yAxis.direction, yAxis.fontColor)
+
+            if (!yAxis.isHide) {
+                drawBackground(
+                    context,
+                    yAxis.order,
+                    yAxis.direction,
+                    yAxis.backGroundColor,
+                    canvasWidth,
+                    canvasHeight
+                )
+                drawAxisMarks(
+                    context,
+                    yAxis.order,
+                    yAxis,
+                    yAxis.direction,
+                    yAxis.fontColor,
+                    canvasWidth,
+                    canvasHeight
+                )
             }
         }
     }
@@ -35,39 +65,63 @@ class AxisDrawElement : ChainDrawElement, Controller() {
         order: Int,
         axis: ConcatenationAxis,
         direction: Direction,
-        color: Color
+        color: Color,
+        canvasWidth: Double,
+        canvasHeight: Double
     ) {
         context.stroke = color
+
         val startPoint = order * SettingsProvider.getAxisWidth()
         val marksCoordinate = startPoint + MARKS_MARGIN
 
         when (direction) {
             Direction.LEFT -> {
-                verticalAxisDraw.drawMarks(context, axis, marksCoordinate)
+                verticalAxisDraw.drawMarks(
+                    context,
+                    axis,
+                    marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
+                )
             }
             Direction.RIGHT -> {
                 verticalAxisDraw.drawMarks(
                     context,
                     axis,
-                    SettingsProvider.getCanvasWidth() - marksCoordinate
+                    canvasWidth - marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
                 )
             }
             Direction.TOP -> {
                 horizontalAxisDraw.drawMarks(
-                    context, axis, marksCoordinate
+                    context,
+                    axis,
+                    marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
                 )
             }
             Direction.BOTTOM -> {
                 horizontalAxisDraw.drawMarks(
                     context,
                     axis,
-                    SettingsProvider.getCanvasHeight() - marksCoordinate
+                    canvasHeight - marksCoordinate,
+                    canvasWidth,
+                    canvasHeight
                 )
             }
         }
     }
 
-    private fun drawBackground(context: GraphicsContext, order: Int, direction: Direction, color: Color) {
+    private fun drawBackground(
+        context: GraphicsContext,
+        order: Int,
+        direction: Direction,
+        color: Color,
+        canvasWidth: Double, 
+        canvasHeight: Double
+    ) {
         context.fill = color
         val startPoint = order * SettingsProvider.getAxisWidth()
         when (direction) {
@@ -76,30 +130,30 @@ class AxisDrawElement : ChainDrawElement, Controller() {
                     startPoint,
                     getTopAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                    canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
                 )
             }
             Direction.RIGHT -> {
                 context.fillRect(
-                    SettingsProvider.getCanvasWidth() - startPoint,
+                    canvasWidth - startPoint,
                     getTopAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight() - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                    canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
                 )
             }
             Direction.TOP -> {
                 context.fillRect(
                     getLeftAxisSize() * SettingsProvider.getAxisWidth(),
                     startPoint,
-                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth(),
+                    canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth()
                 )
             }
             Direction.BOTTOM -> {
                 context.fillRect(
                     getLeftAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasHeight() - startPoint - SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getCanvasWidth() - getRightAxisSize() * SettingsProvider.getAxisWidth(),
+                    canvasHeight - startPoint - SettingsProvider.getAxisWidth(),
+                    canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth(),
                     SettingsProvider.getAxisWidth()
                 )
             }

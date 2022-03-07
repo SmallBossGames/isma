@@ -9,15 +9,15 @@ import java.io.Serializable;
  */
 public class CauchyProblem implements Serializable {
 
-    private CauchyInitials cauchyInitials;
+    private CauchyInitialsLegacy cauchyInitials;
     private DaeSystem daeSystem;
 
     /** Возвращает начальные условия. */
-    public CauchyInitials getCauchyInitials() {
+    public CauchyInitialsLegacy getCauchyInitials() {
         return cauchyInitials;
     }
 
-    public void setCauchyInitials(CauchyInitials cauchyInitials) {
+    public void setCauchyInitials(CauchyInitialsLegacy cauchyInitials) {
         this.cauchyInitials = cauchyInitials;
     }
 

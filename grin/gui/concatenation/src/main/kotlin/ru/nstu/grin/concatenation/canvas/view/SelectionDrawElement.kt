@@ -5,21 +5,27 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.canvas.model.SelectionSettings
 import kotlin.math.abs
+import kotlin.math.min
 
 class SelectionDrawElement(
     private val selectionSettings: SelectionSettings
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext) {
-        val (isSelected, firstPoint, secondPoint) = selectionSettings
-        if (isSelected.not()) return
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
+        val (isFirstPointSelected, isSecondPointSelected, firstPoint, secondPoint) = selectionSettings
+
+        if (!isFirstPointSelected || !isSecondPointSelected) {
+            return
+        }
+
         context.stroke = Color.BLACK
+
         context.strokeRect(
-            if (firstPoint.x<secondPoint.x) firstPoint.x else secondPoint.x,
-            if (firstPoint.y<secondPoint.y) firstPoint.y else secondPoint.y,
+            min(firstPoint.x, secondPoint.x),
+            min(firstPoint.y, secondPoint.y),
             abs(secondPoint.x - firstPoint.x),
             abs(secondPoint.y - firstPoint.y)
         )
 
-        println("Stroked rect $selectionSettings")
+        // println("Stroked rect $selectionSettings")
     }
 }

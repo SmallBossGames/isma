@@ -14,7 +14,7 @@ class GridDrawElement(
     private val matrixTransformerController: MatrixTransformerController
 ) : ChainDrawElement {
 
-    override fun draw(context: GraphicsContext) {
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         context.stroke = color
 
         if (xAxis.settings.isOnlyIntegerPow) {
@@ -65,10 +65,13 @@ class GridDrawElement(
     private fun drawXGridForIntegerMarks(context: GraphicsContext) {
         var currentX = xAxis.settings.min.toInt().toDouble()
         val max = xAxis.settings.max
-        val (minYPixel, maxYPixel) = matrixTransformerController.getMinMaxPixel(yAxis.direction)
+        val (minYPixel, maxYPixel) = matrixTransformerController
+            .getMinMaxPixel(yAxis.direction)
 
         while (currentX < max) {
-            val stepX = matrixTransformerController.transformUnitsToPixel(currentX, xAxis.settings, xAxis.direction)
+            val stepX = matrixTransformerController
+                .transformUnitsToPixel(currentX, xAxis.settings, xAxis.direction)
+
             context.strokeLine(
                 stepX,
                 minYPixel,
@@ -82,10 +85,13 @@ class GridDrawElement(
     private fun drawYGridForIntegerMarks(context: GraphicsContext) {
         var currentY = yAxis.settings.max.roundToInt().toDouble()
         val min = yAxis.settings.min
-        val (minXPixel, maxXPixel) = matrixTransformerController.getMinMaxPixel(xAxis.direction)
+        val (minXPixel, maxXPixel) = matrixTransformerController
+            .getMinMaxPixel(xAxis.direction)
 
         while (currentY > min) {
-            val stepY = matrixTransformerController.transformUnitsToPixel(currentY, yAxis.settings, yAxis.direction)
+            val stepY = matrixTransformerController
+                .transformUnitsToPixel(currentY, yAxis.settings, yAxis.direction)
+
             context.strokeLine(
                 minXPixel,
                 stepY,

@@ -3,55 +3,81 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.*
-import tornadofx.Controller
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 
-class DraggedHandler : EventHandler<MouseEvent>, Controller() {
-    private val model: ConcatenationCanvasModel by inject()
-    private val chainDrawer: ConcatenationChainDrawer by inject()
+class DraggedHandler(
+    private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: CanvasViewModel,
+    private val chainDrawer: ConcatenationChainDrawer,
+    private val concatenationViewModel: ConcatenationViewModel,
+    private val matrixTransformer: MatrixTransformerController,
+) : EventHandler<MouseEvent> {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
-    private val concatenationViewModel: ConcatenationViewModel by inject()
-    private val matrixTransformer: MatrixTransformerController by inject()
 
     override fun handle(event: MouseEvent) {
+        var uiLayerDirty = false
+
         val editMode = concatenationViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
-        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && isOnAxis.not()) {
+
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.isPrimaryButtonDown) {
-                println("Primary button down dragged")
-                if (model.selectionSettings.firstPoint.x == -1.0) {
-                    println("I'm here mazahaka")
-                    model.selectionSettings.isSelected = true
+                if (!model.selectionSettings.isFirstPointSelected) {
                     model.selectionSettings.firstPoint = Point(event.x, event.y)
+                    model.selectionSettings.isFirstPointSelected = true
                 } else {
                     model.selectionSettings.secondPoint = Point(event.x, event.y)
+                    model.selectionSettings.isSecondPointSelected = true
                 }
             }
+
             if (!event.isPrimaryButtonDown) {
-                model.selectionSettings.isSelected = false
+                model.selectionSettings.isFirstPointSelected = false
+                model.selectionSettings.isSecondPointSelected = false
             }
-            chainDrawer.draw()
+
+            uiLayerDirty = true
         }
+
         if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
             handleEditMode(event)
+
+            uiLayerDirty = true
         }
 
         if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
             handleDragged(event)
-        }
-        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
-            handleMoveMode(event)
+
+            uiLayerDirty = true
         }
 
-        chainDrawer.draw()
+        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+            handleMoveMode(event)
+
+            uiLayerDirty = true
+        }
+
+        if (uiLayerDirty){
+            coroutineScope.launch {
+                chainDrawer.drawUiLayer()
+            }
+        }
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten().any { it.isLocated(event.x, event.y) }
+        return model.cartesianSpaces
+            .map { listOf(it.xAxis, it.yAxis) }
+            .flatten()
+            .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
     }
 
     private fun handleDragged(event: MouseEvent) {
@@ -62,7 +88,7 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
             listOf(it.xAxis, it.yAxis)
         }.flatten()
         val axis = axises.firstOrNull {
-            it.isLocated(event.x, event.y)
+            it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
         } ?: return
 
         val draggedSettings = getDraggedSettings(axis)
@@ -71,7 +97,7 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         if (draggedSettings.lastY == -1.0) draggedSettings.lastY = event.y
 
 
-        if (axis.isXAxis()) {
+        if (axis.isXAxis) {
             when {
                 event.x < draggedSettings.lastX -> {
                     axis.settings.min -= DELTA
@@ -104,7 +130,6 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
     }
 
     private fun handleEditMode(event: MouseEvent) {
-        println("Dragged primary button")
         val traceSettings = model.traceSettings ?: return
         val x = matrixTransformer.transformPixelToUnits(
             event.x,
@@ -118,7 +143,6 @@ class DraggedHandler : EventHandler<MouseEvent>, Controller() {
         )
         traceSettings.pressedPoint.x = x
         traceSettings.pressedPoint.y = y
-        chainDrawer.draw()
     }
 
     private fun handleMoveMode(event: MouseEvent) {

@@ -1,6 +1,6 @@
 package ru.isma.next.app.viewmodels
 
-import ru.isma.next.app.models.simulation.EventDetectionParametersModel
+import ru.isma.next.services.simulation.abstractions.models.EventDetectionParametersModel
 import tornadofx.booleanProperty
 import tornadofx.doubleProperty
 import tornadofx.getValue

@@ -1,107 +1,82 @@
 package ru.nstu.grin.concatenation.axis.view
 
-import javafx.scene.Parent
+import javafx.collections.FXCollections
+import javafx.geometry.Insets
+import javafx.scene.control.Button
+import javafx.scene.control.ListCell
+import javafx.scene.control.TabPane
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import javafx.scene.text.Font
+import javafx.stage.Stage
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
-import ru.nstu.grin.concatenation.axis.events.AxisQuery
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
-import ru.nstu.grin.concatenation.axis.model.LogarithmicTypeModel
-import tornadofx.*
-import java.util.*
 
-class AxisChangeFragment : Fragment() {
-    val axisId: UUID by param()
-    private val model: AxisChangeFragmentModel by inject()
-    private val controller: AxisChangeFragmentController by inject(params = params)
-    private val logFragment = find<LogarithmicTypeFragment>(params = params)
-    private val logFragmentModel: LogarithmicTypeModel by inject()
+class AxisChangeFragment(
+    private val model: AxisChangeFragmentModel,
+    private val controller: AxisChangeFragmentController,
+    private val logFragment: LogarithmicTypeFragment
+) : BorderPane() {
+    init {
+        top = VBox(
+            propertiesGrid {
+                addNode("Distance between marks", model.distanceBetweenMarksProperty)
+                addNode("Font size", model.textSizeProperty)
+                addNode("Font", FXCollections.observableArrayList( Font.getFamilies()), model.fontProperty)
+                addNode("Font color", model.fontColorProperty)
+                addNode("Min", model.minProperty)
+                addNode("Max", model.maxProperty)
+                addNode("Axis Color", model.axisColorProperty)
+                addNode("Hide Axis", model.isHideProperty)
+                addNode("Scale Mode", FXCollections.observableArrayList(AxisMarkType.values().toList()), model.markTypeProperty){
+                    object : ListCell<AxisMarkType>() {
+                        override fun updateItem(item: AxisMarkType?, empty: Boolean) {
+                            super.updateItem(item, empty)
 
-    override val root: Parent = form {
-        println(controller.params)
-        fieldset("Текст") {
-            field("Расстояние между метками") {
-                textfield(model.distanceBetweenMarksProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
+                            text = when (item) {
+                                AxisMarkType.LINEAR -> "Линейный"
+                                AxisMarkType.LOGARITHMIC -> "Логарифмический"
+                                else -> null
+                            }
                         }
                     }
                 }
-            }
-            field("Размер шрифта") {
-                textfield(model.textSizeProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
+            }.apply {
+                padding = Insets(10.0)
+            },
+            TabPane()
+        )
+
+        bottom = HBox(
+            Button("Save").apply {
+                setOnAction {
+                    controller.updateAxis()
+                    (scene.window as Stage).close()
                 }
             }
-            field("Шрифт") {
-                combobox(model.fontProperty, Font.getFamilies()).bind(model.fontProperty)
-            }
-            field("Цвет шрифта") {
-                colorpicker().bind(model.fontColorProperty)
-            }
-            field("Минимум") {
-                textfield(model.minProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
-                }
-            }
-            field("Максимум") {
-                textfield(model.maxProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
-                    }
-                }
-            }
+        ).apply {
+            padding = Insets(10.0)
         }
-        fieldset {
-            field("Цвет оси") {
-                colorpicker().bind(model.axisColorProperty)
-            }
-            field("Спрятать ось") {
-                checkbox().bind(model.isHideProperty)
-            }
-            field("Режим масштабирования") {
-                combobox(model.markTypeProperty, AxisMarkType.values().toList()) {
-                    cellFormat {
-                        text = when (it) {
-                            AxisMarkType.LINEAR -> "Линейный"
-                            AxisMarkType.LOGARITHMIC -> "Логарифмический"
-                        }
-                    }
-                }
-            }
-        }
-        tabpane {
+
+        //TODO: disabled until log axis completely implemented
+        /*tabpane {
             model.markTypeProperty.onChange {
-                when (model.axisMarkType) {
+                when (model.axisMarkType!!) {
                     AxisMarkType.LINEAR -> {
                         hide()
                     }
                     AxisMarkType.LOGARITHMIC -> {
                         show()
-                        currentStage?.height = 600.0
+                        (scene.window as Stage).apply {
+                            height = 600.0
+                        }
                     }
                 }
             }
-            when (model.axisMarkType) {
+            when (model.axisMarkType!!) {
                 AxisMarkType.LINEAR -> {
                     hide()
                 }
@@ -109,7 +84,10 @@ class AxisChangeFragment : Fragment() {
                     show()
                 }
             }
-            tab(logFragment)
+
+            tabs.addAll(
+                Tab(null, logFragment)
+            )
 
             tabMaxHeight = 0.0
             tabMinHeight = 0.0
@@ -118,19 +96,6 @@ class AxisChangeFragment : Fragment() {
                     visibility = FXVisibility.HIDDEN
                 }
             }
-        }
-        button("Сохранить") {
-            enableWhen {
-                model.valid.and(logFragmentModel.valid)
-            }
-            action {
-                controller.updateAxis()
-                close()
-            }
-        }
-    }
-
-    init {
-        fire(AxisQuery(axisId))
+        }*/
     }
 }

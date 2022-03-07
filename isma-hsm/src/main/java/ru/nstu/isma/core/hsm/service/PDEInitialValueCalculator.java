@@ -17,7 +17,7 @@ import java.util.Stack;
  */
 public class PDEInitialValueCalculator {
 
-    private static final HashSet<String> availableFunctions = new HashSet<String>();
+    private static final HashSet<String> availableFunctions = new HashSet<>();
 
     static {
         availableFunctions.add("cos");
@@ -44,8 +44,7 @@ public class PDEInitialValueCalculator {
         // проверяем что все токены - константы или функции
         // проверяем что калькулятор "знает" применяемые функции
         for (EXPToken t : tokens) {
-            if (t instanceof EXPFunctionOperand) {
-                EXPFunctionOperand f = (EXPFunctionOperand) t;
+            if (t instanceof EXPFunctionOperand f) {
                 if (!availableFunctions.contains(f.getName())) {
                     // TODO семантика
                     throw new RuntimeException("Calculator don't undastand function " + f.getName());
@@ -65,17 +64,14 @@ public class PDEInitialValueCalculator {
 
     private static void avoidLoopCheck(HMExpression expression, HashSet<String> prevCheck) {
 
-        HashSet<String> current = new HashSet<String>();
+        var current = new HashSet<String>();
         if (prevCheck != null) {
-            for (String s : prevCheck) {
-                current.add(s);
-            }
+            current.addAll(prevCheck);
         }
         List<EXPToken> tokens = expression.getTokens();
         for (EXPToken token : tokens) {
-            if (token instanceof EXPFunctionOperand) {
-                EXPFunctionOperand f = (EXPFunctionOperand) token;
-                for(HMExpression fExp : f.getArgs()) {
+            if (token instanceof EXPFunctionOperand f) {
+                for(var fExp : f.getArgs()) {
                     avoidLoopCheck(fExp, current);
                 }
             } else if (token instanceof EXPOperand) {
@@ -93,16 +89,14 @@ public class PDEInitialValueCalculator {
     }
 
     private static Double calcExpression(HMExpression expression) {
-        List<EXPToken> tokens = expression.getTokens();
+        var tokens = expression.getTokens();
 
-        Stack<Double> stack = new Stack<Double>();
+        var stack = new Stack<Double>();
         for (EXPToken token : tokens) {
-            if (token instanceof EXPFunctionOperand) {
-                EXPFunctionOperand f = (EXPFunctionOperand) token;
+            if (token instanceof EXPFunctionOperand f) {
                 stack.push(calculateFunction(f));
-            } else if (token instanceof EXPOperand) {
-                EXPOperand o = (EXPOperand) token;
-                HMConst c = (HMConst) o.getVariable();
+            } else if (token instanceof EXPOperand o) {
+                var c = (HMConst) o.getVariable();
                 stack.push(calculate(c));
             } else if (token instanceof EXPOperator) {
                 doOperation(stack, (EXPOperator) token);
@@ -112,25 +106,18 @@ public class PDEInitialValueCalculator {
     }
 
     private static Double calculateFunction(EXPFunctionOperand function) {
-       List<Double> args = new LinkedList<Double>();
+        var args = new LinkedList<Double>();
         for (HMExpression exp : function.getArgs()) {
             args.add(calcExpression(exp));
         }
-        Double result = new Double(0);
-        if (function.getName().equals("cos")) {
-            result = Math.cos(Math.toRadians(args.get(0)));
-        } else if (function.getName().equals("sin")) {
-            result = Math.sin(Math.toRadians(args.get(0)));
-        } else if (function.getName().equals("exp")) {
-            result = Math.exp(args.get(0));
-        } else if (function.getName().equals("pow")) {
-            result = Math.pow(args.get(0), args.get(1));
-        } else if (function.getName().equals("sqrt")) {
-            result = Math.sqrt(args.get(0));
-        }else {
-            throw new RuntimeException("I undastand function " + function.getName());
-        }
-        return result;
+        return switch (function.getName()) {
+            case "cos" -> Math.cos(Math.toRadians(args.get(0)));
+            case "sin" -> Math.sin(Math.toRadians(args.get(0)));
+            case "exp" -> Math.exp(args.get(0));
+            case "pow" -> Math.pow(args.get(0), args.get(1));
+            case "sqrt" -> Math.sqrt(args.get(0));
+            default -> throw new RuntimeException("I undastand function " + function.getName());
+        };
     }
 
     private static void doOperation(Stack<Double> values, EXPOperator o) {

@@ -1,69 +1,63 @@
 package ru.nstu.grin.concatenation.axis.view
 
-import javafx.scene.Parent
-import javafx.scene.control.Tooltip
+import javafx.geometry.Insets
+import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.layout.*
+import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
-import ru.nstu.grin.concatenation.axis.events.GetAllAxisQuery
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
-import tornadofx.*
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 
-class AxisListView : Fragment() {
-    private val model: AxisListViewModel by inject()
-    private val controller: AxisListViewController = find { }
+class AxisListView(
+    viewModel: AxisListViewModel,
+    private val controller: AxisListViewController
+) : ListView<ConcatenationAxis>(viewModel.axes) {
 
-    override val root: Parent = listview(model.axisesProperty) {
-        cellFormat {
-            graphic = form {
-                hbox {
-                    fieldset("Имя") {
-                        field {
-                            label(it.name)
-                        }
-                    }
-                    spacing = 20.0
-                    fieldset("Цвет") {
-                        field {
-                            label(it.backGroundColor.toString())
-                        }
-                    }
-                    fieldset("Шрифт") {
-                        field {
-                            label(it.font)
-                        }
-                    }
-                    fieldset("Размер шрифта") {
-                        field {
-                            label(it.textSize.toString())
-                        }
-                    }
-                    fieldset("Спрятана") {
-                        field {
-                            label(if (it.isHide) "Да" else "Нет")
-                        }
-                    }
-                }
-                button {
-                    action {
-                        find<AxisChangeFragment>(
-                            mapOf(
-                                AxisChangeFragment::axisId to it.id
-                            )
-                        ).openModal()
-                    }
-                    val image = Image("edit-tool.png")
-                    val imageView = ImageView(image)
-                    imageView.fitHeight = 20.0
-                    imageView.fitWidth = 20.0
-                    graphic = imageView
-                    tooltip = Tooltip("Отредактировать")
+    init {
+        setCellFactory {
+            object : ListCell<ConcatenationAxis>() {
+                override fun updateItem(item: ConcatenationAxis?, empty: Boolean) {
+                    super.updateItem(item, empty)
+
+                    graphic = if (item == null) null else createItem(item)
                 }
             }
         }
     }
 
-    init {
-        fire(GetAllAxisQuery())
+    private fun createItem(item: ConcatenationAxis): BorderPane {
+        return BorderPane().apply {
+            left = HBox(
+                Label(item.name).apply {
+                    textFill = item.fontColor
+                    font = Font(item.font, item.textSize)
+                    background = Background(
+                        BackgroundFill(
+                            item.backGroundColor,
+                            CornerRadii(0.0),
+                            Insets(0.0)
+                        )
+                    )
+                    padding = Insets(5.0)
+                },
+                Label("Direction: ${item.direction}").apply {
+                    padding = Insets(5.0)
+                }
+            ).apply {
+                spacing = 5.0
+            }
+
+            right = Button(null, ImageView(Image("edit-tool.png")).apply {
+                fitHeight = 20.0
+                fitWidth = 20.0
+            }).apply {
+                tooltip = Tooltip("Отредактировать")
+                setOnAction {
+                    controller.editAxis(item, scene.window)
+                }
+            }
+        }
     }
 }

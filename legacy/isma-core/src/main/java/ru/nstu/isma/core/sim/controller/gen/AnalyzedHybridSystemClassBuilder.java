@@ -109,14 +109,14 @@ public class AnalyzedHybridSystemClassBuilder {
     private String renderInitState() {
         final String template = "\t\t" +
                 "hsb.addState(\"${stateCode}\")" +
-                "${differentialEquations}" +
+                "${ru.isma.next.math.engine.differentialEquations}" +
                 "${algebraicEquations}" +
                 "${guards}" +
                 "${setters};";
 
         return StrSubstitutor.replace(template, ImmutableMap.of(
                 "stateCode", HSM.INIT_STATE,
-                "differentialEquations", renderDifferentialEquations(hsm.getVariableTable().getOdes()),
+                "ru.isma.next.math.engine.differentialEquations", renderDifferentialEquations(hsm.getVariableTable().getOdes()),
                 "algebraicEquations", renderAlgebraicEquations(hsm.getVariableTable().getAlgs()),
                 "guards", renderGuards(getTransactions(HSM.INIT_STATE)),
                 "setters", renderSetters(hsm.getVariableTable().getSetters())
@@ -133,14 +133,14 @@ public class AnalyzedHybridSystemClassBuilder {
     private String renderState(HMState state) {
         final String template = "\n\n\t\t" +
                 "hsb.addState(\"${stateCode}\")" +
-                "${differentialEquations}" +
+                "${ru.isma.next.math.engine.differentialEquations}" +
                 "${algebraicEquations}" +
                 "${guards}" +
                 "${setters};";
 
         return StrSubstitutor.replace(template, ImmutableMap.<String, String> builder()
                 .put("stateCode", state.getCode())
-                .put("differentialEquations", renderDifferentialEquations(state.getVariables().getOdes()))
+                .put("ru.isma.next.math.engine.differentialEquations", renderDifferentialEquations(state.getVariables().getOdes()))
                 .put("algebraicEquations", renderAlgebraicEquations(state.getVariables().getAlgs()))
                 .put("guards", renderGuards(getTransactions(state.getCode())))
                 .put("setters", renderSetters(state.getVariables().getSetters()))
@@ -176,13 +176,13 @@ public class AnalyzedHybridSystemClassBuilder {
     private String renderPseudoState(HMPseudoState state) {
         final String template = "\n\n\t\t" +
                 "hsb.addPseudoState(\"${stateCode}\")" +
-                "${differentialEquations}" +
+                "${ru.isma.next.math.engine.differentialEquations}" +
                 "${algebraicEquations}" +
                 "${setters};";
 
         return StrSubstitutor.replace(template, ImmutableMap.of(
                 "stateCode", state.getCode(),
-                "differentialEquations", renderDifferentialEquations(state.getVariables().getOdes()),
+                "ru.isma.next.math.engine.differentialEquations", renderDifferentialEquations(state.getVariables().getOdes()),
                 "algebraicEquations", renderAlgebraicEquations(state.getVariables().getAlgs()),
                 "setters", renderSetters(state.getVariables().getSetters())
         ));

@@ -1,12 +1,30 @@
 package ru.nstu.grin.concatenation.description.model
 
-import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Description
-import tornadofx.ViewModel
-import tornadofx.*
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
-class DescriptionListViewModel : ViewModel() {
-    var descriptionsProperty = SimpleListProperty<Description>(FXCollections.observableArrayList())
-    var descriptions by descriptionsProperty
+class DescriptionListViewModel(
+    private val concatenationCanvasModel: ConcatenationCanvasModel,
+) {
+    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+
+    val descriptions = FXCollections.observableArrayList<Description>()!!
+
+    init {
+        coroutineScope.launch {
+            merge(
+                flowOf(concatenationCanvasModel.getAllDescriptions()),
+                concatenationCanvasModel.descriptionsListUpdatedEvent
+            ).collect{
+                descriptions.setAll(it)
+            }
+        }
+    }
 }

@@ -1,31 +1,17 @@
 package ru.nstu.grin.concatenation.axis.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.concatenation.file.json.ColorDeserializer
-import ru.nstu.grin.concatenation.file.json.ColorSerializer
 import java.util.*
 
-/**
- * @param zeroPoint - Точка нуля, где он располжен
- * @param marksProvider - поставитель меток оси
- * @param order -
- */
 data class ConcatenationAxis(
     val id: UUID,
     val name: String,
     val order: Int,
     val direction: Direction,
 
-    @field:JsonDeserialize(using = ColorDeserializer::class)
-    @field:JsonSerialize(using = ColorSerializer::class)
     var backGroundColor: Color,
 
-    @field:JsonDeserialize(using = ColorDeserializer::class)
-    @field:JsonSerialize(using = ColorSerializer::class)
     var fontColor: Color,
 
     var distanceBetweenMarks: Double,
@@ -36,12 +22,10 @@ data class ConcatenationAxis(
     val settings: AxisSettings = AxisSettings()
 ) : Cloneable {
 
-    @JsonIgnore
     fun isLogarithmic(): Boolean {
         return axisMarkType == AxisMarkType.LOGARITHMIC
     }
 
-    @JsonIgnore
     override fun clone(): Any {
         return ConcatenationAxis(
             id = id,
@@ -57,8 +41,7 @@ data class ConcatenationAxis(
         )
     }
 
-    @JsonIgnore
-    fun isLocated(x: Double, y: Double): Boolean {
+    fun isLocated(x: Double, y: Double, canvasWidth: Double, canvasHeight: Double): Boolean {
         when (direction) {
             Direction.LEFT -> {
                 val maxX = (order + 1) * SettingsProvider.getAxisWidth()
@@ -66,8 +49,8 @@ data class ConcatenationAxis(
                 return x < maxX && x > minX
             }
             Direction.RIGHT -> {
-                val maxX = SettingsProvider.getCanvasWidth() - order * SettingsProvider.getAxisWidth()
-                val minX = SettingsProvider.getCanvasWidth() - (order + 1) * SettingsProvider.getAxisWidth()
+                val maxX = canvasWidth - order * SettingsProvider.getAxisWidth()
+                val minX = canvasWidth - (order + 1) * SettingsProvider.getAxisWidth()
 
                 return x > minX && x < maxX
             }
@@ -78,21 +61,15 @@ data class ConcatenationAxis(
                 return y > minY && y < maxY
             }
             Direction.BOTTOM -> {
-                val maxY = SettingsProvider.getCanvasHeight() - order * SettingsProvider.getAxisWidth()
-                val minY = SettingsProvider.getCanvasHeight() - (order + 1) * SettingsProvider.getAxisWidth()
+                val maxY = canvasHeight - order * SettingsProvider.getAxisWidth()
+                val minY = canvasHeight - (order + 1) * SettingsProvider.getAxisWidth()
 
                 return y > minY && y < maxY
             }
         }
     }
 
-    @JsonIgnore
-    fun isXAxis(): Boolean {
-        return direction == Direction.TOP || direction == Direction.BOTTOM
-    }
+    val isXAxis get() = direction == Direction.TOP || direction == Direction.BOTTOM
 
-    @JsonIgnore
-    fun isYAxis(): Boolean {
-        return !isXAxis()
-    }
+    val isYAxis get() = direction == Direction.RIGHT || direction == Direction.LEFT
 }

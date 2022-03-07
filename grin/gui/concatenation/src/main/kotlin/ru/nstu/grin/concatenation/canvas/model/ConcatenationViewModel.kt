@@ -1,7 +1,5 @@
 package ru.nstu.grin.concatenation.canvas.model
 
-import tornadofx.ViewModel
-
-class ConcatenationViewModel : ViewModel() {
+class ConcatenationViewModel {
     var currentEditMode: EditMode = EditMode.VIEW
 }

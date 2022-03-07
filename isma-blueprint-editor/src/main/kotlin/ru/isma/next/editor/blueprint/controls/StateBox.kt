@@ -1,16 +1,27 @@
 package ru.isma.next.editor.blueprint.controls
 
 import javafx.beans.binding.DoubleBinding
-import javafx.beans.property.*
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
+import javafx.event.EventHandler
+import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Group
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
-import tornadofx.*
+import javafx.scene.shape.Rectangle
+import javafx.scene.text.Font
+import ru.isma.next.editor.blueprint.utilities.getValue
+import ru.isma.next.editor.blueprint.utilities.setValue
 
-class StateBox : Fragment() {
+class StateBox : Group() {
     private val mousePressedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseReleasedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
     private val mouseClickedListeners = arrayListOf<(StateBox, MouseEvent) -> Unit>()
@@ -21,81 +32,85 @@ class StateBox : Fragment() {
     private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
     private val nameProperty = SimpleStringProperty("")
     private val textProperty = SimpleStringProperty("")
-    private val squareWidthProperty = SimpleDoubleProperty(150.0)
-    private val squareHeightProperty = SimpleDoubleProperty(80.0)
+    private val squareWidthProperty = SimpleDoubleProperty(110.0)
+    private val squareHeightProperty = SimpleDoubleProperty(65.0)
     private val colorProperty = SimpleObjectProperty<Paint>(Color.WHITE)
 
     private var isEditModeEnabled by isEditModeEnabledProperty
     private var isDragged = false
 
-    public var isEditable by isEditableProperty
-    public var isEditButtonVisible by isEditButtonVisibleProperty
-    public var name: String by nameProperty
-    public var text: String by textProperty
-    public var squareWidth by squareWidthProperty
-    public var squareHeight by squareHeightProperty
-    public var color: Paint by colorProperty
+    var isEditable by isEditableProperty
+    var isEditButtonVisible by isEditButtonVisibleProperty
+    var name: String by nameProperty
+    var text: String by textProperty
+    var squareWidth by squareWidthProperty
+    var squareHeight by squareHeightProperty
+    var color: Paint by colorProperty
 
-    private fun isEditModeEnabledProperty() = isEditModeEnabledProperty
+    fun isEditModeEnabledProperty() = isEditModeEnabledProperty
+    fun isEditableProperty() = isEditableProperty
+    fun isEditButtonVisible() = isEditButtonVisibleProperty
+    fun nameProperty() = nameProperty
+    fun textProperty() = textProperty
+    fun squareWidthProperty() = squareWidthProperty
+    fun squareHeightProperty() = squareHeightProperty
+    fun colorProperty() = colorProperty
 
-    public fun isEditableProperty() = isEditableProperty
-    public fun isEditButtonVisible() = isEditButtonVisibleProperty
-    public fun nameProperty() = nameProperty
-    public fun textProperty() = textProperty
-    public fun squareWidthProperty() = squareWidthProperty
-    public fun squareHeightProperty() = squareHeightProperty
-    public fun colorProperty() = colorProperty
+    fun centerXProperty(): DoubleBinding = layoutXProperty().add(squareWidth / 2)
+    fun centerYProperty(): DoubleBinding = layoutYProperty().add(squareHeight / 2)
 
-    fun translateXProperty(): DoubleProperty = root.layoutXProperty()
-    fun translateYProperty(): DoubleProperty = root.layoutYProperty()
-
-    fun centerXProperty(): DoubleBinding = root.layoutXProperty() + squareWidth / 2
-    fun centerYProperty(): DoubleBinding = root.layoutYProperty() + squareHeight / 2
-
-    override val root = group {
-        rectangle {
+    init {
+        children.add(Rectangle().apply {
             heightProperty().bind(squareHeightProperty())
             widthProperty().bind(squareWidthProperty())
             fillProperty().bind(colorProperty())
             viewOrder = 3.0
             arcWidth = 20.0
             arcHeight = 20.0
-        }
+        })
 
         val nameTextArea = TextArea().apply {
-            textProperty().bindBidirectional(nameProperty())
-            visibleWhen(isEditModeEnabledProperty())
-            managedWhen(isEditModeEnabledProperty())
-            focusedProperty().onChange {
-                if(!it){
+            visibleProperty().bind(isEditModeEnabledProperty())
+            managedProperty().bind(isEditModeEnabledProperty())
+            focusedProperty().addListener { _, _, value ->
+                if (value) {
+                    text = name
+                } else {
+                    name = text
                     isEditModeEnabled = false
                 }
             }
         }
 
-        val boxLabel = Label().label {
+        val boxLabel = Label().apply {
+            font = Font("Arial", 16.0)
             textProperty().bind(nameProperty())
-            visibleWhen(!isEditModeEnabledProperty())
-            managedWhen(!isEditModeEnabledProperty())
+            visibleProperty().bind(!isEditModeEnabledProperty())
+            managedProperty().bind(!isEditModeEnabledProperty())
         }
 
-        hbox {
-            prefHeightProperty().bind(squareHeightProperty() - 20.0)
-            prefWidthProperty().bind(squareWidthProperty() - 20.0)
+        children.add(HBox().apply {
+            prefHeightProperty().bind(squareHeightProperty().subtract(20.0))
+            prefWidthProperty().bind(squareWidthProperty().subtract(20.0))
             translateX += 10.0
             translateY += 10.0
             alignment = Pos.CENTER
-            add(boxLabel)
-            add(nameTextArea)
-        }
+            children.add(boxLabel)
+            children.add(nameTextArea)
+        })
 
-        button("Edit") {
+        children.add(Button("Edit").apply {
+            padding = Insets(2.0, 5.0,2.0,5.0)
+
             val isVisibleBinding = isEditModeEnabledProperty().not().and(isEditButtonVisible())
 
-            action { executeEditActionListeners() }
-            visibleWhen(isVisibleBinding)
-            managedWhen(isVisibleBinding)
-        }
+            onAction = EventHandler {
+                executeEditActionListeners()
+            }
+
+            visibleProperty().bind(isVisibleBinding)
+            managedProperty().bind(isVisibleBinding)
+        })
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
             if (!isDragged && isEditable) {
@@ -118,11 +133,11 @@ class StateBox : Fragment() {
     }
 
     fun addMousePressedListener(handler: (StateBox, MouseEvent) -> Unit){
-        mousePressedListeners.add(handler);
+        mousePressedListeners.add(handler)
     }
 
     fun removeMousePressedListener(handler: (StateBox, MouseEvent) -> Unit){
-        mousePressedListeners.remove(handler);
+        mousePressedListeners.remove(handler)
     }
 
     private fun executeMousePressedListener(event: MouseEvent){
@@ -134,11 +149,11 @@ class StateBox : Fragment() {
     }
 
     fun addMouseReleasedListener(handler: (StateBox, MouseEvent) -> Unit){
-        mouseReleasedListeners.add(handler);
+        mouseReleasedListeners.add(handler)
     }
 
     fun removeMouseReleasedListeners(handler: (StateBox, MouseEvent) -> Unit){
-        mouseReleasedListeners.remove(handler);
+        mouseReleasedListeners.remove(handler)
     }
 
     private fun executeMouseReleasedListeners(event: MouseEvent) {
@@ -148,11 +163,11 @@ class StateBox : Fragment() {
     }
 
     fun addMouseClickedListeners(handler: (StateBox, MouseEvent) -> Unit){
-        mouseClickedListeners.add(handler);
+        mouseClickedListeners.add(handler)
     }
 
     fun removeMouseClickedListeners(handler: (StateBox, MouseEvent) -> Unit){
-        mouseClickedListeners.remove(handler);
+        mouseClickedListeners.remove(handler)
     }
 
     private fun executeMouseClickedListeners(event: MouseEvent){
@@ -162,11 +177,11 @@ class StateBox : Fragment() {
     }
 
     fun addEditActionListener(op: () -> Unit){
-        editActionListeners.add(op);
+        editActionListeners.add(op)
     }
 
     fun removeEditActionListener(op: () -> Unit){
-        editActionListeners.remove(op);
+        editActionListeners.remove(op)
     }
 
     private fun executeEditActionListeners(){

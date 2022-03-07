@@ -1,10 +1,12 @@
 package ru.nstu.grin.concatenation.cartesian.model
 
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.ViewModel
-import tornadofx.*
+import tornadofx.getValue
+import tornadofx.setValue
 
-class CopyCartesianModel : ViewModel() {
+class CopyCartesianModel(
+    val space: CartesianSpace
+) {
     var nameProperty = SimpleStringProperty()
     var name by nameProperty
 

@@ -1,7 +1,7 @@
 package ru.isma.next.editor.blueprint.models
 
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.*
+import ru.isma.next.editor.blueprint.utilities.*
 
 class LismaStateModel {
     private val textProperty = SimpleStringProperty("")

@@ -26,12 +26,11 @@ class GrinIntegrationFacade: KoinComponent {
             descriptions = listOf()
         )
 
-        val scopeInstance = MainGrinScope()
-        val scope = scopeInstance.scope
-
-        val view = scope.get<ConcatenationView>{ parametersOf(initData) }
-
         Stage().apply {
+            val scopeInstance = MainGrinScope(this)
+            val scope = scopeInstance.scope
+            val view = scope.get<ConcatenationView>{ parametersOf(initData) }
+
             scene = Scene(view)
             title = "GRIN"
             initModality(

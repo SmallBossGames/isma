@@ -5,10 +5,10 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.model.LineType
-import tornadofx.Controller
 
-class ConcatenationFunctionDrawElement : ChainDrawElement, Controller() {
-    private val model: ConcatenationCanvasModel by inject()
+class ConcatenationFunctionDrawElement(
+    private val model: ConcatenationCanvasModel
+) : ChainDrawElement {
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val previousLineSize = context.lineWidth

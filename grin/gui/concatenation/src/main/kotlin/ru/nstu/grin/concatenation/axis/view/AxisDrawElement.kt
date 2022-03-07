@@ -4,16 +4,15 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.view.ChainDrawElement
-import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import tornadofx.Controller
 
-class AxisDrawElement : ChainDrawElement, Controller() {
-    private val model: ConcatenationCanvasModel by inject()
-    private val verticalAxisDraw: VerticalAxisDrawStrategy by inject()
-    private val horizontalAxisDraw: HorizontalAxisDrawStrategy by inject()
-
+class AxisDrawElement(
+    private val model: ConcatenationCanvasModel,
+    private val verticalAxisDraw: VerticalAxisDrawStrategy,
+    private val horizontalAxisDraw: HorizontalAxisDrawStrategy,
+) : ChainDrawElement {
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         for (cartesianSpace in model.cartesianSpaces) {
             val xAxis = cartesianSpace.xAxis

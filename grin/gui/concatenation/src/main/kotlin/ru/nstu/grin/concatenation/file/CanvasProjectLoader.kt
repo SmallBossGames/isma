@@ -5,20 +5,17 @@ import javafx.stage.Window
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.koin.core.component.KoinComponent
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.project.ProjectSnapshot
 import ru.nstu.grin.concatenation.canvas.model.project.toModel
 import ru.nstu.grin.concatenation.canvas.model.project.toSnapshot
-import tornadofx.Controller
-import tornadofx.Scope
 
 //TODO: implement arrows saving
-class CanvasProjectLoader(override val scope: Scope) : Controller(), KoinComponent {
-    private val model: ConcatenationCanvasModel by inject()
-    private val concatenationCanvasController: ConcatenationCanvasController by inject()
-
+class CanvasProjectLoader(
+    private val model: ConcatenationCanvasModel,
+    private val concatenationCanvasController: ConcatenationCanvasController,
+) {
     fun save(window: Window? = null) {
         val file = FileChooser().run {
             title = "Save Chart"

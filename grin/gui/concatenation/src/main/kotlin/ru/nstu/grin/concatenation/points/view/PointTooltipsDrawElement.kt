@@ -7,17 +7,19 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 import ru.nstu.grin.concatenation.points.model.PointSettings
-import tornadofx.Controller
 import kotlin.math.pow
 
-class PointTooltipsDrawElement : ChainDrawElement, Controller() {
+class PointTooltipsDrawElement(
+    private val mainGrinScope: MainGrinScope,
+    private val model: ConcatenationCanvasModel,
+    private val transformer: MatrixTransformerController,
+) : ChainDrawElement {
     private val pointTooltips = mutableListOf<Tooltip>()
-    private val model: ConcatenationCanvasModel by inject()
-    private val transformer: MatrixTransformerController by inject()
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
-        val stage = model.primaryStage
+        val stage = mainGrinScope.primaryStage
         val filteredPoints = model.pointToolTipSettings.pointsSettings.filter { pointSettings ->
             !pointTooltips.any { it.text == formatText(pointSettings) }
         }

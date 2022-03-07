@@ -3,7 +3,6 @@ package ru.nstu.grin.concatenation.canvas.controller
 import javafx.scene.Scene
 import javafx.stage.Modality
 import javafx.stage.Stage
-import javafx.stage.StageStyle
 import javafx.stage.Window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,24 +12,20 @@ import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.common.converters.model.ArrowConverter
 import ru.nstu.grin.common.dto.ArrowDTO
 import ru.nstu.grin.common.model.Arrow
-import ru.nstu.grin.common.model.ConcatenationType
 import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.concatenation.arrow.view.ArrowModalView
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.description.model.DescriptionModalInitData
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
-import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
-import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
-import tornadofx.Controller
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 
-class ConcatenationCanvasController : Controller() {
+class ConcatenationCanvasController(
+    private val model: ConcatenationCanvasModel,
+    private val mainGrinScope: MainGrinScope,
+) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private val model: ConcatenationCanvasModel by inject()
-
-    private val mainGrinScope: MainGrinScopeWrapper by inject()
 
     fun replaceAll(
         cartesianSpaces: List<CartesianSpace>,
@@ -56,26 +51,28 @@ class ConcatenationCanvasController : Controller() {
         xExistDirection: List<ExistDirection>,
         yExistDirection: List<ExistDirection>
     ) {
-        find<AddFunctionModalView>(
+        // TODO: Disabled until migration to Koin
+        /*find<AddFunctionModalView>(
             mapOf(
                 AddFunctionModalView::xExistDirections to xExistDirection,
                 AddFunctionModalView::yExistDirections to yExistDirection
             )
-        ).openModal()
+        ).openModal()*/
     }
 
     fun openArrowModal(x: Double, y: Double, window: Window?) {
-        find<ArrowModalView>(
+        // TODO: Disabled until migration to Koin
+        /*find<ArrowModalView>(
             mapOf(
                 ArrowModalView::type to ConcatenationType,
                 ArrowModalView::x to x,
                 ArrowModalView::y to y
             )
-        ).openModal(stageStyle = StageStyle.UTILITY)
+        ).openModal(stageStyle = StageStyle.UTILITY)*/
     }
 
     fun openDescriptionModal(x: Double, y: Double, window: Window? = null) {
-        val descriptionChangeModalScope = mainGrinScope.koinScope.get<DescriptionChangeModalScope>()
+        val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
 
         val initData = DescriptionModalInitData(x, y)
         val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(initData)}

@@ -3,7 +3,6 @@ package ru.nstu.grin.concatenation.function.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.koin.core.component.get
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
@@ -16,23 +15,18 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
 import ru.nstu.grin.model.MathPoint
-import tornadofx.Controller
 
-class FunctionCanvasService : Controller() {
+class FunctionCanvasService(
+    private val view: ConcatenationCanvas,
+    private val matrixTransformer: MatrixTransformerController,
+    private val model: ConcatenationCanvasModel,
+) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
-    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
-
-    private val view = mainGrinScope.get<ConcatenationCanvas>()
-
-    private val model: ConcatenationCanvasModel by inject()
-    private val matrixTransformer: MatrixTransformerController by inject()
 
     fun addFunction(cartesianSpace: CartesianSpaceDTO) {
         val found = model.cartesianSpaces.firstOrNull {

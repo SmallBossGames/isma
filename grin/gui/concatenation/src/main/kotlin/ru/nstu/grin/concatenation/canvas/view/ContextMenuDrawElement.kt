@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
+import javafx.stage.Stage
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
@@ -15,12 +16,12 @@ class ContextMenuDrawElement(
     private val model: ConcatenationCanvasModel,
     private val controller: ConcatenationCanvasController,
     private val chainDrawer: ConcatenationChainDrawer,
+    private val stage: Stage,
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         contextMenu.items.clear()
 
         val settings = model.contextMenuSettings
-        val stage = model.primaryStage
         when (model.contextMenuSettings.type) {
             ContextMenuType.AXIS -> {
                 val axises = model.cartesianSpaces.map {

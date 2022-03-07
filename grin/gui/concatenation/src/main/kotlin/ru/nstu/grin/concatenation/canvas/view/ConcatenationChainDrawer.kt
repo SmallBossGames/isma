@@ -15,11 +15,13 @@ import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class ConcatenationChainDrawer(
+    private val mainGrinScope: MainGrinScope,
     private val canvasViewModel: CanvasViewModel,
     private val model: ConcatenationCanvasModel,
     private val functionDrawElement: ConcatenationFunctionDrawElement,
@@ -103,6 +105,7 @@ class ConcatenationChainDrawer(
                 model,
                 controller,
                 this@ConcatenationChainDrawer,
+                mainGrinScope.primaryStage
             ).draw(this, width, height)
 
             SelectionDrawElement(model.selectionSettings).draw(this, width, height)

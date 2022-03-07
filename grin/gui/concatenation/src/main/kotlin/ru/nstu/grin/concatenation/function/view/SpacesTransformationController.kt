@@ -35,10 +35,10 @@ import tornadofx.Controller
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class SpacesTransformationController: Controller() {
-    private val matrixTransformer: MatrixTransformerController by inject()
-    private val model: ConcatenationCanvasModel by inject()
-
+class SpacesTransformationController(
+    private val matrixTransformer: MatrixTransformerController,
+    private val model: ConcatenationCanvasModel,
+) {
     private val derivativesCache = ConcurrentHashMap<DerivativeCacheKey, List<Point>>()
     private val waveletCache = ConcurrentHashMap<WaveletCacheKey, List<Point>>()
 

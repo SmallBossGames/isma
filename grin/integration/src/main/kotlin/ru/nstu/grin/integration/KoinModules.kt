@@ -9,6 +9,7 @@ import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
 import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
 import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
+import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
 import ru.nstu.grin.concatenation.axis.view.AxisListView
 import ru.nstu.grin.concatenation.axis.view.LogarithmicTypeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
@@ -45,12 +46,11 @@ import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
 import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
 import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
-import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
-import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
-import ru.nstu.grin.concatenation.function.view.FunctionListView
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
+import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Scope
 import tornadofx.find
 import tornadofx.setInScope
@@ -81,6 +81,7 @@ val grinModule = module {
         scopedOf(::ElementsView)
 
         scopedOf(::ConcatenationCanvas)
+        scopedOf(::ConcatenationChainDrawer)
 
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)
@@ -111,6 +112,8 @@ val grinModule = module {
         scopedOf(::DraggedHandler)
         scopedOf(::PressedMouseHandler)
         scopedOf(::ReleaseMouseHandler)
+
+        scopedOf(::SpacesTransformationController)
 
         factory {
             FunctionChangeModalScope().apply {
@@ -152,7 +155,6 @@ val grinModule = module {
         scoped { Scope() }
 
         scoped { find<FunctionCanvasService>(get<Scope>()) }
-        scoped { find<ConcatenationChainDrawer>(get<Scope>()) }
 
         scoped { find<ConcatenationCanvasModel>(get<Scope>()) }
         scoped { find<ConcatenationCanvasController>(get<Scope>()) }
@@ -161,6 +163,11 @@ val grinModule = module {
 
         scoped { find<CanvasViewModel>(get<Scope>()) }
         scoped { find<MatrixTransformerController>(get<Scope>()) }
+
+        scoped { find<ConcatenationFunctionDrawElement>(get<Scope>()) }
+        scoped { find<PointTooltipsDrawElement>(get<Scope>()) }
+
+        scoped { find<AxisDrawElement>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

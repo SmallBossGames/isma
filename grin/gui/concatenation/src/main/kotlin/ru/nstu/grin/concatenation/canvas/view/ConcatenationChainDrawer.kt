@@ -16,21 +16,19 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
 import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
-import tornadofx.Controller
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
-class ConcatenationChainDrawer : ChainDrawer, Controller() {
-    private val canvasViewModel: CanvasViewModel by inject()
-    private val model: ConcatenationCanvasModel by inject()
-
-    private val functionDrawElement: ConcatenationFunctionDrawElement by inject()
-    private val pointTooltipsDrawElement: PointTooltipsDrawElement by inject()
-
-    private val controller: ConcatenationCanvasController by inject()
-    private val spacesTransformationController: SpacesTransformationController by inject()
-    private val axisDrawElement: AxisDrawElement by inject()
-    private val matrixTransformerController: MatrixTransformerController by inject()
+class ConcatenationChainDrawer(
+    private val canvasViewModel: CanvasViewModel,
+    private val model: ConcatenationCanvasModel,
+    private val functionDrawElement: ConcatenationFunctionDrawElement,
+    private val pointTooltipsDrawElement: PointTooltipsDrawElement,
+    private val controller: ConcatenationCanvasController,
+    private val spacesTransformationController: SpacesTransformationController,
+    private val axisDrawElement: AxisDrawElement,
+    private val matrixTransformerController: MatrixTransformerController,
+) : ChainDrawer {
 
     private val contextMenu = ContextMenu()
 

@@ -12,6 +12,9 @@ import ru.nstu.grin.concatenation.axis.view.AxisChangeFragment
 import ru.nstu.grin.concatenation.axis.view.AxisListView
 import ru.nstu.grin.concatenation.axis.view.LogarithmicTypeFragment
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
+import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
@@ -44,6 +47,8 @@ import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.CopyFunctionFragment
 import ru.nstu.grin.concatenation.function.view.FunctionListView
+import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
+import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.koin.*
 import tornadofx.Scope
 import tornadofx.find
@@ -99,6 +104,10 @@ val grinModule = module {
         scopedOf(::DescriptionCanvasService)
         scopedOf(::AxisCanvasService)
 
+        scopedOf(::ScalableScrollHandler)
+        scopedOf(::DraggedHandler)
+        scopedOf(::PressedMouseHandler)
+
         factory {
             FunctionChangeModalScope().apply {
                 scope.linkTo(get<MainGrinScope>().scope)
@@ -150,6 +159,9 @@ val grinModule = module {
             val initData = params.getOrNull<InitCanvasData>()
             find<ConcatenationCanvas>(get(), mapOf("initData" to initData))
         }
+
+        scoped { find<CanvasViewModel>(get<Scope>()) }
+        scoped { find<MatrixTransformerController>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
+import org.koin.core.component.get
 import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
@@ -14,18 +15,24 @@ import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import tornadofx.*
 
 
 class ConcatenationCanvas : View() {
     private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
-    private val model: ConcatenationCanvasModel by inject()
+    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
+
+    private val scalableScrollHandler = mainGrinScope.get<ScalableScrollHandler>()
+    private val draggedHandler = mainGrinScope.get<DraggedHandler>()
+    private val pressedMouseHandle = mainGrinScope.get<PressedMouseHandler>()
+
+    private val model = mainGrinScope.get<ConcatenationCanvasModel>()
+
     private val canvasViewModel: CanvasViewModel by inject()
     private val chainDrawer: ConcatenationChainDrawer = find { }
-    private val scalableScrollHandler: ScalableScrollHandler by inject()
-    private val draggedHandler: DraggedHandler by inject()
-    private val pressedMouseHandle: PressedMouseHandler by inject()
+
     private val releaseMouseHandler: ReleaseMouseHandler by inject()
 
     override val root: Parent = pane {

@@ -11,16 +11,17 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
-import tornadofx.Controller
 
-class DraggedHandler : EventHandler<MouseEvent>, Controller() {
+class DraggedHandler(
+    private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: CanvasViewModel,
+    private val chainDrawer: ConcatenationChainDrawer,
+    private val concatenationViewModel: ConcatenationViewModel,
+    private val matrixTransformer: MatrixTransformerController,
+) : EventHandler<MouseEvent> {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private val model: ConcatenationCanvasModel by inject()
-    private val canvasViewModel: CanvasViewModel by inject()
-    private val chainDrawer: ConcatenationChainDrawer by inject()
+
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
-    private val concatenationViewModel: ConcatenationViewModel by inject()
-    private val matrixTransformer: MatrixTransformerController by inject()
 
     override fun handle(event: MouseEvent) {
         var uiLayerDirty = false

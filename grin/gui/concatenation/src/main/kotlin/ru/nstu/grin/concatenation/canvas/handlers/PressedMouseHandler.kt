@@ -11,14 +11,14 @@ import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointSettings
-import tornadofx.Controller
 
-class PressedMouseHandler : EventHandler<MouseEvent>, Controller() {
+class PressedMouseHandler(
+    private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: CanvasViewModel,
+    private val chainDrawer: ConcatenationChainDrawer,
+    private val concatenationViewModel: ConcatenationViewModel,
+) : EventHandler<MouseEvent> {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private val model: ConcatenationCanvasModel by inject()
-    private val canvasViewModel: CanvasViewModel by inject()
-    private val chainDrawer: ConcatenationChainDrawer by inject()
-    private val concatenationViewModel: ConcatenationViewModel by inject()
 
     override fun handle(event: MouseEvent) {
         var isUiLayerDirty = false

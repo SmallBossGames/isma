@@ -3,14 +3,14 @@ package ru.isma.next.editor.blueprint
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.event.EventHandler
-import javafx.geometry.Insets
 import javafx.scene.control.*
-import javafx.scene.effect.DropShadow
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.*
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
+import ru.isma.next.editor.blueprint.controls.EditArrowPopOver
 import ru.isma.next.editor.blueprint.controls.StateBox
 import ru.isma.next.editor.blueprint.controls.StateTransactionArrow
 import ru.isma.next.editor.blueprint.models.BlueprintEditorTransactionModel
@@ -39,7 +39,6 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     private fun isRemoveStateModeProperty() = isRemoveStateModeProperty
     private fun isRemoveTransactionModeProperty() = isRemoveTransactionModeProperty
     private fun isAddTransactionModeProperty() = isAddTransactionModeProperty
-    private fun addTransactionStateCounterProperty() = addTransactionStateCounterProperty
 
     private var isRemoveStateMode by isRemoveStateModeProperty
     private var isRemoveTransactionMode by isRemoveTransactionModeProperty
@@ -445,36 +444,11 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         }
     }
 
-    fun createEditPopOver(arrow: StateTransactionArrow, x: Double, y: Double): VBox {
-        return VBox(
-            Label("Alias (optional)"),
-            TextField().apply {
-                textProperty().bindBidirectional(arrow.aliasProperty)
-            },
-            Label("Predicate"),
-            TextField().apply {
-                textProperty().bindBidirectional(arrow.textProperty)
-            },
-        ).apply {
-            translateXProperty().bind(widthProperty().divide(-2).add(x))
-            translateY = y - 2.0
-
-            padding = Insets(5.0)
-
-            background = Background(
-                BackgroundFill(
-                    Color.WHITE,
-                    CornerRadii(5.0),
-                    Insets(0.0)
-                )
-            )
-
-            effect = DropShadow(20.0, Color.LIGHTGRAY)
-
+    private fun createEditPopOver(arrow: StateTransactionArrow, x: Double, y: Double) =
+        EditArrowPopOver(arrow, x, y).apply {
             setOnMouseExited {
                 canvas.children.remove(this)
             }
         }
-    }
 }
 

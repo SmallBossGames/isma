@@ -96,6 +96,8 @@ val grinModule = module {
         scopedOf(::TransformToolBar)
 
         scopedOf(::CartesianCanvasService)
+        scopedOf(::DescriptionCanvasService)
+        scopedOf(::AxisCanvasService)
 
         factory {
             FunctionChangeModalScope().apply {
@@ -136,10 +138,7 @@ val grinModule = module {
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
 
-        scoped { find<DescriptionCanvasService>(get<Scope>()) }
-
         scoped { find<FunctionCanvasService>(get<Scope>()) }
-        scoped { find<AxisCanvasService>(get<Scope>()) }
         scoped { find<ConcatenationChainDrawer>(get<Scope>()) }
 
         scoped { find<ConcatenationCanvasModel>(get<Scope>()) }

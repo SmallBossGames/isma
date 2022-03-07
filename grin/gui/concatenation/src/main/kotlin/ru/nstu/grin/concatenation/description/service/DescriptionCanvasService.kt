@@ -7,13 +7,13 @@ import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.DescriptionDto
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
-import tornadofx.Controller
 import java.util.*
 
-class DescriptionCanvasService : Controller() {
+class DescriptionCanvasService(
+    private val model: ConcatenationCanvasModel,
+    private val view: ConcatenationCanvas,
+) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private val model: ConcatenationCanvasModel by inject()
-    private val view: ConcatenationCanvas by inject()
 
     fun add(descriptionModel: DescriptionDto) {
         val description = Description(

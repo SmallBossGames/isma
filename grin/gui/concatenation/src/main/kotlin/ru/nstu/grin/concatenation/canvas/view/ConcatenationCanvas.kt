@@ -4,7 +4,6 @@ import javafx.scene.Parent
 import javafx.scene.layout.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
@@ -23,7 +22,7 @@ class ConcatenationCanvas : View() {
 
     private val model: ConcatenationCanvasModel by inject()
     private val canvasViewModel: CanvasViewModel by inject()
-    private var chainDrawer: ConcatenationChainDrawer = find { }
+    private val chainDrawer: ConcatenationChainDrawer = find { }
     private val scalableScrollHandler: ScalableScrollHandler by inject()
     private val draggedHandler: DraggedHandler by inject()
     private val pressedMouseHandle: PressedMouseHandler by inject()
@@ -82,13 +81,6 @@ class ConcatenationCanvas : View() {
 
 
         chainDrawer.draw()
-    }
-
-    /**
-     * Cleanup the object on remove
-     */
-    fun dispose() {
-        fxCoroutineScope.cancel()
     }
 
     fun redraw() {

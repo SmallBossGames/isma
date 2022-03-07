@@ -3,18 +3,18 @@ package ru.nstu.grin.concatenation.axis.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.nstu.grin.concatenation.axis.model.UpdateAxisChangeSet
-import ru.nstu.grin.concatenation.axis.model.UpdateLogarithmicTypeChangeSet
 import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.UpdateAxisChangeSet
+import ru.nstu.grin.concatenation.axis.model.UpdateLogarithmicTypeChangeSet
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
-import tornadofx.Controller
 
-class AxisCanvasService : Controller() {
+class AxisCanvasService(
+    private val model: ConcatenationCanvasModel,
+    private val view: ConcatenationCanvas,
+) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private val model: ConcatenationCanvasModel by inject()
-    private val view: ConcatenationCanvas by inject()
 
     fun getAllAxises() {
         coroutineScope.launch {

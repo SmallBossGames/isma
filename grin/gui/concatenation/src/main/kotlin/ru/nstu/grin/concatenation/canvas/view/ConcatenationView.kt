@@ -15,7 +15,7 @@ class ConcatenationView(
             canvasToolBar
         )
 
-        center = concatenationCanvas.root
+        center = concatenationCanvas
 
         right = elementsView
     }

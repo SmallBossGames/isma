@@ -15,6 +15,7 @@ import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasControlle
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
+import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
@@ -79,6 +80,8 @@ val grinModule = module {
         scopedOf(::CanvasToolBar)
         scopedOf(::ElementsView)
 
+        scopedOf(::ConcatenationCanvas)
+
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)
         scopedOf(::FunctionListViewModel)
@@ -107,6 +110,7 @@ val grinModule = module {
         scopedOf(::ScalableScrollHandler)
         scopedOf(::DraggedHandler)
         scopedOf(::PressedMouseHandler)
+        scopedOf(::ReleaseMouseHandler)
 
         factory {
             FunctionChangeModalScope().apply {
@@ -154,11 +158,6 @@ val grinModule = module {
         scoped { find<ConcatenationCanvasController>(get<Scope>()) }
 
         scoped { find<ConcatenationViewModel>(get<Scope>()) }
-
-        scoped { params ->
-            val initData = params.getOrNull<InitCanvasData>()
-            find<ConcatenationCanvas>(get(), mapOf("initData" to initData))
-        }
 
         scoped { find<CanvasViewModel>(get<Scope>()) }
         scoped { find<MatrixTransformerController>(get<Scope>()) }

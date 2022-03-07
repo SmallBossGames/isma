@@ -8,13 +8,13 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.EditMode
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
-import tornadofx.Controller
 
-class ReleaseMouseHandler : EventHandler<MouseEvent>, Controller() {
-    private val model: ConcatenationCanvasModel by inject()
-    private val chainDrawer: ConcatenationChainDrawer by inject()
-    private val concatenationViewModel: ConcatenationViewModel by inject()
-    private val matrixTransformer: MatrixTransformerController by inject()
+class ReleaseMouseHandler(
+    private val model: ConcatenationCanvasModel,
+    private val chainDrawer: ConcatenationChainDrawer,
+    private val concatenationViewModel: ConcatenationViewModel,
+    private val matrixTransformer: MatrixTransformerController,
+) : EventHandler<MouseEvent> {
 
     override fun handle(event: MouseEvent) {
         val editMode = concatenationViewModel.currentEditMode

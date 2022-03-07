@@ -1,12 +1,14 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.scene.Parent
+import javafx.scene.canvas.Canvas
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
-import org.koin.core.component.get
 import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
@@ -15,37 +17,29 @@ import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
-import tornadofx.*
 
-
-class ConcatenationCanvas : View() {
+class ConcatenationCanvas(
+    private val scalableScrollHandler: ScalableScrollHandler,
+    private val draggedHandler: DraggedHandler,
+    private val pressedMouseHandle: PressedMouseHandler,
+    private val releaseMouseHandler: ReleaseMouseHandler,
+    private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: CanvasViewModel,
+    private val chainDrawer: ConcatenationChainDrawer,
+): Pane() {
     private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
-    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
-
-    private val scalableScrollHandler = mainGrinScope.get<ScalableScrollHandler>()
-    private val draggedHandler = mainGrinScope.get<DraggedHandler>()
-    private val pressedMouseHandle = mainGrinScope.get<PressedMouseHandler>()
-
-    private val model = mainGrinScope.get<ConcatenationCanvasModel>()
-
-    private val canvasViewModel: CanvasViewModel by inject()
-    private val chainDrawer: ConcatenationChainDrawer = find { }
-
-    private val releaseMouseHandler: ReleaseMouseHandler by inject()
-
-    override val root: Parent = pane {
-        val c1 = canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
-            vgrow = Priority.ALWAYS
-            hgrow = Priority.ALWAYS
+    init {
+        val c1 = Canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()).apply {
+            VBox.setVgrow(this, Priority.ALWAYS)
+            HBox.setHgrow(this, Priority.ALWAYS)
 
             canvasViewModel.functionsLayerContext = graphicsContext2D
         }
 
-        val c2 = canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {
-            vgrow = Priority.ALWAYS
-            hgrow = Priority.ALWAYS
+        val c2 = Canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()).apply {
+            VBox.setVgrow(this, Priority.ALWAYS)
+            HBox.setHgrow(this, Priority.ALWAYS)
 
             canvasViewModel.uiLayerContext = graphicsContext2D
 
@@ -57,6 +51,8 @@ class ConcatenationCanvas : View() {
 
             onMouseReleased = releaseMouseHandler
         }
+
+        children.addAll(c1, c2)
 
         widthProperty().addListener { _ ->
             c1.width = width
@@ -85,7 +81,6 @@ class ConcatenationCanvas : View() {
                 model.descriptions.changeAsFlow().collect { chainDrawer.draw() }
             }
         }
-
 
         chainDrawer.draw()
     }

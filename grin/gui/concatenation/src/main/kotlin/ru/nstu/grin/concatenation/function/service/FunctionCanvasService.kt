@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.function.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.get
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
@@ -15,19 +16,22 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
 import ru.nstu.grin.model.MathPoint
 import tornadofx.Controller
-import java.util.*
 
 class FunctionCanvasService : Controller() {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
+    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
+
+    private val view = mainGrinScope.get<ConcatenationCanvas>()
+
     private val model: ConcatenationCanvasModel by inject()
-    private val view: ConcatenationCanvas by inject()
     private val matrixTransformer: MatrixTransformerController by inject()
 
     fun addFunction(cartesianSpace: CartesianSpaceDTO) {
@@ -57,7 +61,7 @@ class FunctionCanvasService : Controller() {
         val newFunction = originFunction.clone().copy(name = newName)
         val cartesianSpace = model.cartesianSpaces.first { it.functions.contains(originFunction) }
         cartesianSpace.functions.add(newFunction)
-        getAllFunctions()
+        reportFunctionsUpdate()
     }
 
     fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
@@ -200,16 +204,12 @@ class FunctionCanvasService : Controller() {
             mirrorDetails = event.mirrorDetails
         }
 
+        reportFunctionsUpdate()
+
         view.redraw()
-        getAllFunctions()
     }
 
-    fun getFunction(id: UUID): ConcatenationFunction = model.cartesianSpaces.map {
-        it.functions
-    }.flatten().first { it.id == id }
-
-
-    fun getAllFunctions() {
+    fun reportFunctionsUpdate() {
         coroutineScope.launch {
             model.reportFunctionsListUpdate()
         }
@@ -219,7 +219,7 @@ class FunctionCanvasService : Controller() {
         model.cartesianSpaces.forEach {
             it.functions.remove(function)
         }
-        getAllFunctions()
+        reportFunctionsUpdate()
         view.redraw()
     }
 

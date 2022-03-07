@@ -20,7 +20,7 @@ application {
         "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
 }
 
-val koinVersion = "3.1.5"
+val koinVersion = "3.2.0-beta-1"
 val kotlinReflectVersion = "1.6.0"
 val kotlinxCoroutinesVersion = "1.6.0"
 val kotlinxSerializationJsonVersion = "1.3.2"

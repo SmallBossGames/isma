@@ -1,5 +1,6 @@
 package ru.nstu.grin.integration
 
+import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
@@ -50,38 +51,51 @@ import tornadofx.setInScope
 
 val grinModule = module {
     scope<MainGrinScope> {
-        scoped { CanvasProjectLoader(get()) }
-
         scoped { params ->
             // Access from the TornadoFx world. Should be removed later.
             setInScope(MainGrinScopeWrapper(get()), get())
 
-            ConcatenationView(get(), get(), get(), get { params })
+            val initData = params.getOrNull<InitCanvasData>()
+
+            if(initData!=null){
+                get<ConcatenationCanvasController>().replaceAll(
+                    initData.cartesianSpaces,
+                    initData.arrows,
+                    initData.descriptions
+                )
+            }
+
+            ConcatenationView(get(), get(), get(), get())
         }
-        scoped { CanvasMenuBar(get(), get()) }
-        scoped { CanvasToolBar(get(), get(), get(), get()) }
-        scoped { ElementsView(get(), get(), get(), get()) }
 
-        scoped { FunctionListView(get(), get()) }
-        scoped { FunctionListViewController(get(), get()) }
-        scoped { FunctionListViewModel(get()) }
+        scopedOf(::CanvasProjectLoader)
 
-        scoped { AxisListView(get(), get()) }
-        scoped { AxisListViewController(get()) }
-        scoped { AxisListViewModel(get()) }
+        scopedOf(::CanvasMenuBar)
+        scopedOf(::CanvasToolBar)
+        scopedOf(::ElementsView)
 
-        scoped { CartesianListView(get(), get()) }
-        scoped { CartesianListViewController(get(), get()) }
-        scoped { CartesianListViewModel(get()) }
+        scopedOf(::FunctionListView)
+        scopedOf(::FunctionListViewController)
+        scopedOf(::FunctionListViewModel)
 
-        scoped { DescriptionListView(get(), get()) }
-        scoped { DescriptionListViewController(get(), get()) }
-        scoped { DescriptionListViewModel(get()) }
+        scopedOf(::AxisListView)
+        scopedOf(::AxisListViewController)
+        scopedOf(::AxisListViewModel)
 
-        scoped { ChartToolBar(get(), get()) }
-        scoped { ModesToolBar(get()) }
-        scoped { MathToolBar(get(), get(), get()) }
-        scoped { TransformToolBar(get(), get(), get(), get()) }
+        scopedOf(::CartesianListView)
+        scopedOf(::CartesianListViewController)
+        scopedOf(::CartesianListViewModel)
+
+        scopedOf(::DescriptionListView)
+        scopedOf(::DescriptionListViewController)
+        scopedOf(::DescriptionListViewModel)
+
+        scopedOf(::ChartToolBar)
+        scopedOf(::ModesToolBar)
+        scopedOf(::MathToolBar)
+        scopedOf(::TransformToolBar)
+
+        scopedOf(::CartesianCanvasService)
 
         factory {
             FunctionChangeModalScope().apply {
@@ -123,7 +137,7 @@ val grinModule = module {
         scoped { Scope() }
 
         scoped { find<DescriptionCanvasService>(get<Scope>()) }
-        scoped { find<CartesianCanvasService>(get<Scope>()) }
+
         scoped { find<FunctionCanvasService>(get<Scope>()) }
         scoped { find<AxisCanvasService>(get<Scope>()) }
         scoped { find<ConcatenationChainDrawer>(get<Scope>()) }
@@ -134,11 +148,10 @@ val grinModule = module {
         scoped { find<ConcatenationViewModel>(get<Scope>()) }
 
         scoped { params ->
-            find<ConcatenationCanvas>(get(), mapOf("initData" to params.get<InitCanvasData>()))
+            val initData = params.getOrNull<InitCanvasData>()
+            find<ConcatenationCanvas>(get(), mapOf("initData" to initData))
         }
     }
-
-    single(createdAtStart = true) {  }
 
     scope<FunctionChangeModalScope> {
         scoped { ChangeFunctionController(get()) }

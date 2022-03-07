@@ -12,10 +12,13 @@ import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.common.converters.model.ArrowConverter
 import ru.nstu.grin.common.dto.ArrowDTO
+import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.ConcatenationType
+import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.arrow.view.ArrowModalView
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.description.model.DescriptionModalInitData
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
@@ -28,6 +31,22 @@ class ConcatenationCanvasController : Controller() {
     private val model: ConcatenationCanvasModel by inject()
 
     private val mainGrinScope: MainGrinScopeWrapper by inject()
+
+    fun replaceAll(
+        cartesianSpaces: List<CartesianSpace>,
+        arrows: List<Arrow>,
+        descriptions: List<Description>
+    ){
+        model.cartesianSpaces.setAll(cartesianSpaces)
+        model.arrows.setAll(arrows)
+        model.descriptions.setAll(descriptions)
+
+        model.normalizeSpaces()
+
+        coroutineScope.launch {
+            model.reportUpdateAll()
+        }
+    }
 
     fun addArrow(arrow: ArrowDTO) {
         model.arrows.add(ArrowConverter.convert(arrow))

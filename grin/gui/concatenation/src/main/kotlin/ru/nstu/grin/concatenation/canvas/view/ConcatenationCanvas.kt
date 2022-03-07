@@ -15,13 +15,11 @@ import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import tornadofx.*
 
 
 class ConcatenationCanvas : View() {
     private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val model: ConcatenationCanvasModel by inject()
     private val canvasViewModel: CanvasViewModel by inject()
@@ -30,22 +28,6 @@ class ConcatenationCanvas : View() {
     private val draggedHandler: DraggedHandler by inject()
     private val pressedMouseHandle: PressedMouseHandler by inject()
     private val releaseMouseHandler: ReleaseMouseHandler by inject()
-
-    val initData: InitCanvasData? by param()
-
-    init {
-        initData?.also { data ->
-            model.cartesianSpaces.setAll(data.cartesianSpaces)
-            model.arrows.setAll(data.arrows)
-            model.descriptions.setAll(data.descriptions)
-
-            model.normalizeSpaces()
-
-            coroutineScope.launch {
-                model.reportUpdateAll()
-            }
-        }
-    }
 
     override val root: Parent = pane {
         val c1 = canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()) {

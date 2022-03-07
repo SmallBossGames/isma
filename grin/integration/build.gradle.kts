@@ -7,7 +7,7 @@ javafx {
     modules = listOf("javafx.controls", "javafx.graphics")
 }
 
-val koinVersion = "3.1.5"
+val koinVersion = "3.2.0-beta-1"
 
 dependencies {
     implementation("no.tornado:tornadofx:1.7.20")

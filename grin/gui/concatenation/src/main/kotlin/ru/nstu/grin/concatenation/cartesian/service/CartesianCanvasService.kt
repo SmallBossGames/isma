@@ -8,13 +8,13 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.model.CartesianCopyDataModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.cartesian.model.UpdateCartesianDataModel
-import tornadofx.Controller
 import java.util.*
 
-class CartesianCanvasService : Controller() {
+class CartesianCanvasService(
+    private val model: ConcatenationCanvasModel,
+    private val view: ConcatenationCanvas,
+) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private val model: ConcatenationCanvasModel by inject()
-    private val view: ConcatenationCanvas by inject()
 
     fun copyCartesian(copyDataModel: CartesianCopyDataModel) {
         val oldCartesian = copyDataModel.origin

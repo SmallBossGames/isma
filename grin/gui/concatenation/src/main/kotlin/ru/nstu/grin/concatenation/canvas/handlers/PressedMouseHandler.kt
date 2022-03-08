@@ -1,6 +1,7 @@
 package ru.nstu.grin.concatenation.canvas.handlers
 
 import javafx.event.EventHandler
+import javafx.scene.Node
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import kotlinx.coroutines.CoroutineScope
@@ -9,10 +10,12 @@ import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
+import ru.nstu.grin.concatenation.canvas.view.CartesianCanvasContextMenuController
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointSettings
 
 class PressedMouseHandler(
+    private val contextMenuDrawElement: CartesianCanvasContextMenuController,
     private val model: ConcatenationCanvasModel,
     private val canvasViewModel: CanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
@@ -22,6 +25,8 @@ class PressedMouseHandler(
 
     override fun handle(event: MouseEvent) {
         var isUiLayerDirty = false
+
+        closeContextMenu()
 
         model.unselectAll()
         val editMode = concatenationViewModel.currentEditMode
@@ -78,10 +83,6 @@ class PressedMouseHandler(
 
         if (event.button == MouseButton.SECONDARY) {
             showContextMenu(event)
-
-            isUiLayerDirty = true
-        } else {
-            model.contextMenuSettings.type = ContextMenuType.NONE
         }
 
         if(isUiLayerDirty){
@@ -199,6 +200,10 @@ class PressedMouseHandler(
         }
     }
 
+    private fun closeContextMenu(){
+        contextMenuDrawElement.hide()
+    }
+
     private fun showContextMenu(event: MouseEvent) {
         val axises = model.cartesianSpaces.map {
             listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
@@ -209,12 +214,9 @@ class PressedMouseHandler(
         }?.first
 
         if (cartesianSpace == null) {
-            model.contextMenuSettings.type = ContextMenuType.MAIN
+            contextMenuDrawElement.showForMain(event.source as Node, event.x, event.y)
         } else {
-            model.contextMenuSettings.type = ContextMenuType.AXIS
+            contextMenuDrawElement.showForAxis(event.source as Node, event.x, event.y)
         }
-
-        model.contextMenuSettings.xGraphic = event.x
-        model.contextMenuSettings.yGraphic = event.y
     }
 }

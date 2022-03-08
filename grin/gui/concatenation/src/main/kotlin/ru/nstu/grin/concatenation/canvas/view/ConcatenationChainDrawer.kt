@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.scene.control.ContextMenu
 import javafx.scene.paint.Color
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
@@ -9,31 +8,24 @@ import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
-import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
-import ru.nstu.grin.concatenation.koin.MainGrinScope
 import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class ConcatenationChainDrawer(
-    private val mainGrinScope: MainGrinScope,
     private val canvasViewModel: CanvasViewModel,
     private val model: ConcatenationCanvasModel,
     private val functionDrawElement: ConcatenationFunctionDrawElement,
     private val pointTooltipsDrawElement: PointTooltipsDrawElement,
-    private val controller: ConcatenationCanvasController,
     private val spacesTransformationController: SpacesTransformationController,
     private val axisDrawElement: AxisDrawElement,
     private val matrixTransformerController: MatrixTransformerController,
 ) : ChainDrawer {
-
-    private val contextMenu = ContextMenu()
-
     private val drawingInProgress = AtomicBoolean(false)
     private val transformationJob = AtomicReference<Job>(null)
 
@@ -99,14 +91,6 @@ class ConcatenationChainDrawer(
             DescriptionDrawElement(model.descriptions).draw(this, width, height)
 
             pointTooltipsDrawElement.draw(this, width, height)
-
-            ContextMenuDrawElement(
-                contextMenu,
-                model,
-                controller,
-                this@ConcatenationChainDrawer,
-                mainGrinScope.primaryStage
-            ).draw(this, width, height)
 
             SelectionDrawElement(model.selectionSettings).draw(this, width, height)
         }

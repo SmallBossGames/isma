@@ -89,6 +89,7 @@ val grinModule = module {
         scopedOf(::PointTooltipsDrawElement)
         scopedOf(::ConcatenationFunctionDrawElement)
         scopedOf(::MatrixTransformerController)
+        scopedOf(::CartesianCanvasContextMenuController)
 
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)

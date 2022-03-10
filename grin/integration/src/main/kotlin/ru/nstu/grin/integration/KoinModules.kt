@@ -2,6 +2,8 @@ package ru.nstu.grin.integration
 
 import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
+import ru.nstu.grin.common.draw.elements.ArrowDrawElement
+import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
@@ -90,6 +92,10 @@ val grinModule = module {
         scopedOf(::ConcatenationFunctionDrawElement)
         scopedOf(::MatrixTransformerController)
         scopedOf(::CartesianCanvasContextMenuController)
+
+        scoped { DescriptionDrawElement(get<ConcatenationCanvasModel>().descriptions) }
+        scoped { SelectionDrawElement(get<ConcatenationCanvasModel>().selectionSettings) }
+        scoped { ArrowDrawElement(get<ConcatenationCanvasModel>().arrows, 1.0) }
 
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)

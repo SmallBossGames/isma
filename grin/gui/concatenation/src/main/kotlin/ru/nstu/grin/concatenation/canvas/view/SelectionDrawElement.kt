@@ -25,7 +25,5 @@ class SelectionDrawElement(
             abs(secondPoint.x - firstPoint.x),
             abs(secondPoint.y - firstPoint.y)
         )
-
-        // println("Stroked rect $selectionSettings")
     }
 }

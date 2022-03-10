@@ -205,11 +205,11 @@ class PressedMouseHandler(
     }
 
     private fun showContextMenu(event: MouseEvent) {
-        val axises = model.cartesianSpaces.map {
+        val axes = model.cartesianSpaces.map {
             listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
         }.flatten()
 
-        val cartesianSpace = axises.firstOrNull {
+        val cartesianSpace = axes.firstOrNull {
             it.second.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
         }?.first
 

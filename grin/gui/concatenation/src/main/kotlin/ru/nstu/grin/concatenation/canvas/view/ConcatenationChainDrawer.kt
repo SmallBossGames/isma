@@ -21,9 +21,12 @@ class ConcatenationChainDrawer(
     private val canvasViewModel: CanvasViewModel,
     private val model: ConcatenationCanvasModel,
     private val functionDrawElement: ConcatenationFunctionDrawElement,
+    private val selectionDrawElement: SelectionDrawElement,
     private val pointTooltipsDrawElement: PointTooltipsDrawElement,
     private val spacesTransformationController: SpacesTransformationController,
     private val axisDrawElement: AxisDrawElement,
+    private val arrowDrawElement: ArrowDrawElement,
+    private val descriptionDrawElement: DescriptionDrawElement,
     private val matrixTransformerController: MatrixTransformerController,
 ) : ChainDrawer {
     private val drawingInProgress = AtomicBoolean(false)
@@ -87,12 +90,10 @@ class ConcatenationChainDrawer(
 
             ClearDrawElement.draw(this, width, height)
 
-            ArrowDrawElement(model.arrows, 1.0).draw(this, width, height)
-            DescriptionDrawElement(model.descriptions).draw(this, width, height)
-
+            arrowDrawElement.draw(this, width, height)
+            descriptionDrawElement.draw(this, width, height)
             pointTooltipsDrawElement.draw(this, width, height)
-
-            SelectionDrawElement(model.selectionSettings).draw(this, width, height)
+            selectionDrawElement.draw(this, width, height)
         }
     }
 

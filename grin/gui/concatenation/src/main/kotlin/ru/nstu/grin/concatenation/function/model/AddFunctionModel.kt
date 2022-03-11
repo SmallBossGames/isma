@@ -6,8 +6,8 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
 import ru.nstu.grin.concatenation.axis.model.Direction
 import tornadofx.ViewModel
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 import java.awt.Font
 
 class AddFunctionModel : ViewModel() {
@@ -72,8 +72,8 @@ class AddFunctionModel : ViewModel() {
     var stepProperty = SimpleIntegerProperty(this, "stepProperty", 1)
     var step by stepProperty
 
-    var inputWayProperty = SimpleObjectProperty<InputWay>(InputWay.FILE)
-    var inputWay by inputWayProperty
+    var inputWayProperty = SimpleObjectProperty(InputWay.FILE)
+    var inputWay: InputWay by inputWayProperty
 
     var details: FunctionDetails = FileFunctionModel()
 }

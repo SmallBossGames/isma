@@ -40,17 +40,17 @@ import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
+import ru.nstu.grin.concatenation.function.controller.AddFunctionController
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.controller.CopyFunctionController
 import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
-import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
-import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
-import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
+import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
 import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Scope
+import tornadofx.find
 import tornadofx.setInScope
 
 val grinModule = module {
@@ -129,6 +129,7 @@ val grinModule = module {
         scopedOf(::ReleaseMouseHandler)
 
         scopedOf(::SpacesTransformationController)
+        scopedOf(::AddFunctionModalView)
 
         factory {
             FunctionChangeModalScope().apply {
@@ -168,6 +169,10 @@ val grinModule = module {
 
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
+        scoped { find<AddFunctionController>(get<Scope>()) }
+        scoped { find<AddFunctionModel>(get<Scope>()) }
+        scoped { find<FileFunctionModel>(get<Scope>()) }
+        scoped { find<ManualFunctionModel>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

@@ -14,10 +14,10 @@ import ru.nstu.grin.common.dto.ArrowDTO
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.description.model.DescriptionModalInitData
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
+import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 
@@ -47,17 +47,22 @@ class ConcatenationCanvasController(
         model.arrows.add(ArrowConverter.convert(arrow))
     }
 
-    fun openFunctionModal(
-        xExistDirection: List<ExistDirection>,
-        yExistDirection: List<ExistDirection>
-    ) {
-        // TODO: Disabled until migration to Koin
-        /*find<AddFunctionModalView>(
-            mapOf(
-                AddFunctionModalView::xExistDirections to xExistDirection,
-                AddFunctionModalView::yExistDirections to yExistDirection
-            )
-        ).openModal()*/
+    fun openFunctionModal(window: Window?) {
+        val view = mainGrinScope.get<AddFunctionModalView>()
+
+        Stage().apply {
+            scene = Scene(view)
+            title = "Add Function"
+            isIconified = false
+
+            initModality(Modality.WINDOW_MODAL)
+
+            if(window != null){
+                initOwner(window)
+            }
+
+            show()
+        }
     }
 
     fun openArrowModal(x: Double, y: Double, window: Window?) {

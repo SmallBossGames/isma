@@ -85,7 +85,7 @@ class CartesianCanvasContextMenuController(
         contextMenu.items.setAll(
             MenuItem("Добавить функцию").apply {
                 setOnAction {
-                    controller.openFunctionModal(listOf(), listOf())
+                    controller.openFunctionModal(stage)
                 }
             },
             MenuItem("Добавить указатель").apply {

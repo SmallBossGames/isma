@@ -1,24 +1,25 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
+import javafx.collections.FXCollections
+import javafx.scene.control.ComboBox
+import javafx.scene.control.ListCell
 import javafx.scene.layout.Priority
 import javafx.scene.text.Font
+import javafx.stage.Stage
+import ru.isma.javafx.extensions.controls.comboBox
 import ru.nstu.grin.concatenation.axis.model.Direction
-import ru.nstu.grin.concatenation.canvas.model.ExistDirection
 import ru.nstu.grin.concatenation.function.controller.AddFunctionController
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import tornadofx.*
 
-class AddFunctionModalView : Fragment() {
-    val xExistDirections: List<ExistDirection> by param()
-    val yExistDirections: List<ExistDirection> by param()
-    private val controller: AddFunctionController by inject()
-    private val model: AddFunctionModel by inject()
-    private val fileFunctionModel: FileFunctionModel by inject()
-    private val manualFunctionModel: ManualFunctionModel by inject()
+class AddFunctionModalView(
+    private val controller: AddFunctionController,
+    private val model: AddFunctionModel,
+    private val fileFunctionModel: FileFunctionModel,
+    private val manualFunctionModel: ManualFunctionModel,
+) : Form() {
 
-    override val root: Parent = form {
+    init {
         fieldset {
             field("Введите имя пространства") {
                 textfield(model.cartesianSpaceNameProperty).required()
@@ -38,18 +39,25 @@ class AddFunctionModalView : Fragment() {
                 }
             }
             field("Выберите как отображать функцию") {
-                combobox(model.functionLineTypeProperty, LineType.values().toList()) {
-                    cellFormat {
-                        text = when (it) {
-                            LineType.POLYNOM -> "Полином"
-                            LineType.RECT_FILL_DOTES -> "Прямоугольник заполненные точки"
-                            LineType.SEGMENTS -> "Сегменты"
-                            LineType.RECT_UNFIL_DOTES -> "Прямоуголник незаполненные точки"
-                            LineType.CIRCLE_FILL_DOTES -> "Круг заполненные точки"
-                            LineType.CIRCLE_UNFILL_DOTES -> "Круг незаполненные точки"
+                add(
+                    comboBox(FXCollections.observableList(LineType.values().toList()), model.functionLineTypeProperty) {
+                        object : ListCell<LineType>() {
+                            override fun updateItem(item: LineType?, empty: Boolean) {
+                                super.updateItem(item, empty)
+
+                                text = when (item) {
+                                    LineType.POLYNOM -> "Полином"
+                                    LineType.RECT_FILL_DOTES -> "Прямоугольник заполненные точки"
+                                    LineType.SEGMENTS -> "Сегменты"
+                                    LineType.RECT_UNFIL_DOTES -> "Прямоуголник незаполненные точки"
+                                    LineType.CIRCLE_FILL_DOTES -> "Круг заполненные точки"
+                                    LineType.CIRCLE_UNFILL_DOTES -> "Круг незаполненные точки"
+                                    else -> null
+                                }
+                            }
                         }
                     }
-                }
+                )
             }
             field("Цвет функций") {
                 colorpicker().bind(model.functionColorProperty)
@@ -57,7 +65,7 @@ class AddFunctionModalView : Fragment() {
             field("Шаг рисования") {
                 textfield(model.stepProperty) {
                     validator {
-                        if (it?.toIntOrNull() == null || it.toIntOrNull() ?: -1 < 0) {
+                        if (it?.toIntOrNull() == null || (it.toIntOrNull() ?: -1) < 0) {
                             error("Число должно быть целым больше 0")
                         } else {
                             null
@@ -68,15 +76,22 @@ class AddFunctionModalView : Fragment() {
         }
         fieldset {
             field("Выберите способ ввода") {
-                combobox(model.inputWayProperty, InputWay.values().toList()) {
-                    cellFormat {
-                        text = when (it) {
-                            InputWay.FILE -> "Файл"
-                            InputWay.ANALYTIC -> "Аналитически"
-                            InputWay.MANUAL -> "Вручную"
+                add(
+                    comboBox(FXCollections.observableList(InputWay.values().toList()), model.inputWayProperty) {
+                        object: ListCell<InputWay>() {
+                            override fun updateItem(item: InputWay?, empty: Boolean) {
+                                super.updateItem(item, empty)
+
+                                text = when (item) {
+                                    InputWay.FILE -> "Файл"
+                                    InputWay.ANALYTIC -> "Аналитически"
+                                    InputWay.MANUAL -> "Вручную"
+                                    else -> null
+                                }
+                            }
                         }
                     }
-                }
+                )
             }
         }
         tabpane {
@@ -121,16 +136,16 @@ class AddFunctionModalView : Fragment() {
                     textfield().bind(model.xAxisNameProperty)
                 }
                 field("Направление") {
-                    combobox(model.xDirectionProperty, listOf(Direction.BOTTOM, Direction.TOP)) {
-                        cellFormat {
-                            text = it.name
+                    add(
+                        ComboBox(FXCollections.observableArrayList(Direction.BOTTOM, Direction.TOP)).apply {
+                            valueProperty().bindBidirectional(model.xDirectionProperty)
                         }
-                    }
+                    )
                 }
                 field("Расстояние между метками") {
                     textfield(model.xDistanceBetweenMarksProperty) {
                         validator {
-                            if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                                 error("Число должно быть плавающим 20,0 и больше нуля")
                             } else {
                                 null
@@ -141,7 +156,7 @@ class AddFunctionModalView : Fragment() {
                 field("Размер шрифта меток") {
                     textfield(model.xTextSizeProperty) {
                         validator {
-                            if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                                 error("Число должно быть плавающим 20,0 и больше нуля")
                             } else {
                                 null
@@ -165,16 +180,16 @@ class AddFunctionModalView : Fragment() {
                     textfield().bind(model.yAxisNameProperty)
                 }
                 field("Направление") {
-                    combobox(model.yDirectionProperty, listOf(Direction.LEFT, Direction.RIGHT)) {
-                        cellFormat {
-                            text = it.name
+                    add(
+                        ComboBox(FXCollections.observableArrayList(Direction.LEFT, Direction.RIGHT)).apply {
+                            valueProperty().bindBidirectional(model.xDirectionProperty)
                         }
-                    }
+                    )
                 }
                 field("Расстояние между метками") {
                     textfield(model.yDistanceBetweenMarksProperty) {
                         validator {
-                            if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                                 error("Число должно быть плавающим 20,0 и больше нуля")
                             } else {
                                 null
@@ -185,7 +200,7 @@ class AddFunctionModalView : Fragment() {
                 field("Размер шрифта меток") {
                     textfield(model.yTextSizeProperty) {
                         validator {
-                            if (it?.toDoubleOrNull() == null || it.toDoubleOrNull() ?: -1.0 < 0.0) {
+                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
                                 error("Число должно быть плавающим 20,0 и больше нуля")
                             } else {
                                 null
@@ -219,15 +234,16 @@ class AddFunctionModalView : Fragment() {
             vgrow = Priority.ALWAYS
             action {
                 controller.addFunction()
-                close()
+
+                (scene.window as Stage).close()
             }
         }
     }
 
     init {
-        subscribe<FileCheckedEvent> {
+/*        subscribe<FileCheckedEvent> {
             fileFunctionModel.points = it.points
             fileFunctionModel.addFunctionsMode = it.addFunctionsMode
-        }
+        }*/
     }
 }

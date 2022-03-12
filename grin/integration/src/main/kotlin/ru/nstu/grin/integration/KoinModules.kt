@@ -40,10 +40,7 @@ import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
-import ru.nstu.grin.concatenation.function.controller.AddFunctionController
-import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
-import ru.nstu.grin.concatenation.function.controller.CopyFunctionController
-import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
+import ru.nstu.grin.concatenation.function.controller.*
 import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.*
@@ -129,7 +126,11 @@ val grinModule = module {
         scopedOf(::ReleaseMouseHandler)
 
         scopedOf(::SpacesTransformationController)
+
         scopedOf(::AddFunctionModalView)
+        scopedOf(::FileFunctionFragment)
+        scopedOf(::AnalyticFunctionFragment)
+        scopedOf(::ManualFunctionFragment)
 
         factory {
             FunctionChangeModalScope().apply {
@@ -173,6 +174,8 @@ val grinModule = module {
         scoped { find<AddFunctionModel>(get<Scope>()) }
         scoped { find<FileFunctionModel>(get<Scope>()) }
         scoped { find<ManualFunctionModel>(get<Scope>()) }
+        scoped { find<FileFragmentController>(get<Scope>()) }
+        scoped { find<AnalyticFunctionModel>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

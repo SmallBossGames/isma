@@ -1,21 +1,17 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
+import javafx.scene.layout.VBox
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.function.model.AnalyticFunctionModel
-import tornadofx.*
 
 /**
  * @author Konstantin Volivach
  */
-class AnalyticFunctionFragment : Fragment() {
-    val model: AnalyticFunctionModel by inject()
-
-    override val root: Parent = fieldset("Введите формулу") {
-        field("формула") {
-            textfield().bind(model.textFunctionProperty)
-        }
-        field("Delta") {
-            textfield().bind(model.deltaProperty)
-        }
+class AnalyticFunctionFragment(
+    val model: AnalyticFunctionModel
+) : VBox(
+    propertiesGrid {
+        addNode("Formula", model.textFunctionProperty)
+        addNode("Delta", model.deltaProperty)
     }
-}
+)

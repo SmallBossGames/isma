@@ -1,7 +1,6 @@
 package ru.nstu.grin.concatenation.function.controller
 
 import org.koin.core.component.get
-import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.controller.PointsBuilder
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.model.Point
@@ -27,7 +26,7 @@ class AddFunctionController : Controller() {
     private val pointsBuilder = PointsBuilder()
 
     fun addFunction() {
-        when (model.inputWay!!) {
+        when (model.inputWay) {
             InputWay.FILE -> addFileFunction()
             InputWay.ANALYTIC -> addAnalyticFunction()
             InputWay.MANUAL -> addManualFunction()
@@ -51,35 +50,15 @@ class AddFunctionController : Controller() {
             },
             functionColor = model.functionColor,
             lineType = model.functionLineType,
-            lineSize = model.functionLineSize.toDouble()
+            lineSize = model.functionLineSize
         )
 
         val cartesianSpace = CartesianSpaceDTO(
             id = UUID.randomUUID(),
             name = model.cartesianSpaceName,
             functions = listOf(function),
-            xAxis = ConcatenationAxisDTO(
-                id = UUID.randomUUID(),
-                name = model.xAxisName,
-                backGroundColor = model.xAxisColor,
-                delimeterColor = model.xDelimiterColor,
-                direction = model.xDirection,
-                zeroPoint = SettingsProvider.getCanvasWidth() / 2,
-                distanceBetweenMarks = model.xDistanceBetweenMarks.toDouble(),
-                textSize = model.xTextSize.toDouble(),
-                font = model.xFont
-            ),
-            yAxis = ConcatenationAxisDTO(
-                id = UUID.randomUUID(),
-                name = model.yAxisName,
-                backGroundColor = model.yAxisColor,
-                delimeterColor = model.yDelimeterColor,
-                direction = model.yDirection,
-                zeroPoint = SettingsProvider.getCanvasHeight() / 2,
-                distanceBetweenMarks = model.yDistanceBetweenMarks.toDouble(),
-                textSize = model.yTextSize.toDouble(),
-                font = model.yFont
-            )
+            xAxis = createXAxis(),
+            yAxis = createYAxis()
         )
         functionsCanvasService.addFunction(cartesianSpace)
     }
@@ -114,7 +93,7 @@ class AddFunctionController : Controller() {
                         },
                         functionColor = model.functionColor,
                         lineType = model.functionLineType,
-                        lineSize = model.functionLineSize.toDouble()
+                        lineSize = model.functionLineSize
                     )
                 }
                 val cartesianSpace = CartesianSpaceDTO(
@@ -140,7 +119,7 @@ class AddFunctionController : Controller() {
                         },
                         functionColor = model.functionColor,
                         lineType = model.functionLineType,
-                        lineSize = model.functionLineSize.toDouble()
+                        lineSize = model.functionLineSize
                     )
                     val xAxis = createXAxis()
                     val yAxis = createYAxis()
@@ -159,33 +138,29 @@ class AddFunctionController : Controller() {
         }
     }
 
-    private fun createXAxis(): ConcatenationAxisDTO {
-        return ConcatenationAxisDTO(
+    private fun createXAxis() =
+        ConcatenationAxisDTO(
             id = UUID.randomUUID(),
-            name = model.xAxisName,
-            backGroundColor = model.xAxisColor,
-            delimeterColor = model.xDelimiterColor,
-            direction = model.xDirection,
-            zeroPoint = SettingsProvider.getCanvasWidth() / 2,
-            distanceBetweenMarks = model.xDistanceBetweenMarks.toDouble(),
-            font = model.xFont,
-            textSize = model.xTextSize.toDouble()
+            name = model.xAxis.name,
+            backGroundColor = model.xAxis.color,
+            delimeterColor = model.xAxis.delimeterColor,
+            direction = model.xAxis.direction,
+            distanceBetweenMarks = model.xAxis.distanceBetweenMarks,
+            textSize = model.xAxis.textSize,
+            font = model.xAxis.font
         )
-    }
 
-    private fun createYAxis(): ConcatenationAxisDTO {
-        return ConcatenationAxisDTO(
+    private fun createYAxis() =
+        ConcatenationAxisDTO(
             id = UUID.randomUUID(),
-            name = model.yAxisName,
-            backGroundColor = model.yAxisColor,
-            delimeterColor = model.yDelimeterColor,
-            direction = model.yDirection,
-            zeroPoint = SettingsProvider.getCanvasHeight() / 2,
-            distanceBetweenMarks = model.yDistanceBetweenMarks.toDouble(),
-            font = model.yFont,
-            textSize = model.yTextSize.toDouble()
+            name = model.yAxis.name,
+            backGroundColor = model.yAxis.color,
+            delimeterColor = model.yAxis.delimeterColor,
+            direction = model.yAxis.direction,
+            distanceBetweenMarks = model.yAxis.distanceBetweenMarks,
+            textSize = model.yAxis.textSize,
+            font = model.yAxis.font
         )
-    }
 
     private fun parsePoints(): List<Point> {
         val x = manualFunctionModel.xPoints.split(DELIMITER)
@@ -210,36 +185,14 @@ class AddFunctionController : Controller() {
             },
             functionColor = model.functionColor,
             lineType = model.functionLineType,
-            lineSize = model.functionLineSize.toDouble()
-        )
-        val xAxis = ConcatenationAxisDTO(
-            id = UUID.randomUUID(),
-            name = model.xAxisName,
-            backGroundColor = model.xAxisColor,
-            delimeterColor = model.xDelimiterColor,
-            direction = model.xDirection,
-            zeroPoint = SettingsProvider.getCanvasWidth() / 2,
-            distanceBetweenMarks = model.xDistanceBetweenMarks.toDouble(),
-            font = model.xFont,
-            textSize = model.xTextSize.toDouble()
-        )
-        val yAxis = ConcatenationAxisDTO(
-            id = UUID.randomUUID(),
-            name = model.yAxisName,
-            backGroundColor = model.yAxisColor,
-            delimeterColor = model.yDelimeterColor,
-            direction = model.yDirection,
-            zeroPoint = SettingsProvider.getCanvasHeight() / 2,
-            distanceBetweenMarks = model.yDistanceBetweenMarks.toDouble(),
-            font = model.yFont,
-            textSize = model.yTextSize.toDouble()
+            lineSize = model.functionLineSize
         )
         val cartesianSpace = CartesianSpaceDTO(
             id = UUID.randomUUID(),
             name = model.cartesianSpaceName,
             functions = listOf(function),
-            xAxis = xAxis,
-            yAxis = yAxis
+            xAxis = createXAxis(),
+            yAxis = createYAxis()
         )
 
         functionsCanvasService.addFunction(cartesianSpace)

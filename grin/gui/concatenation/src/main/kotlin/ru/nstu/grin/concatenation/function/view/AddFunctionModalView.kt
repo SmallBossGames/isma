@@ -1,12 +1,14 @@
 package ru.nstu.grin.concatenation.function.view
 
 import javafx.collections.FXCollections
-import javafx.scene.control.ComboBox
+import javafx.scene.control.Button
 import javafx.scene.control.ListCell
-import javafx.scene.layout.Priority
-import javafx.scene.text.Font
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import javafx.stage.Stage
-import ru.isma.javafx.extensions.controls.comboBox
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.function.controller.AddFunctionController
 import ru.nstu.grin.concatenation.function.model.*
@@ -16,31 +18,17 @@ class AddFunctionModalView(
     private val controller: AddFunctionController,
     private val model: AddFunctionModel,
     private val fileFunctionModel: FileFunctionModel,
-    private val manualFunctionModel: ManualFunctionModel,
 ) : Form() {
 
     init {
-        fieldset {
-            field("Введите имя пространства") {
-                textfield(model.cartesianSpaceNameProperty).required()
-            }
-            field("Введите имя функции") {
-                textfield(model.functionNameProperty).required()
-            }
-            field("Введите размер линий") {
-                textfield(model.functionLineSizeProperty) {
-                    validator {
-                        if (it?.toDoubleOrNull() == null) {
-                            error("Число должно быть плавающим, например 22,3")
-                        } else {
-                            null
-                        }
-                    }
-                }
-            }
-            field("Выберите как отображать функцию") {
-                add(
-                    comboBox(FXCollections.observableList(LineType.values().toList()), model.functionLineTypeProperty) {
+        add(
+            VBox(5.0,
+                propertiesGrid {
+                    addNode("Space Name", model.cartesianSpaceNameProperty)
+                    addNode("Function Name", model.functionNameProperty)
+                    addNode("Line Size", model.functionLineSizeProperty)
+                    addNode("Line Color", model.functionColorProperty)
+                    addNode("Show As", FXCollections.observableList(LineType.values().toList()), model.functionLineTypeProperty){
                         object : ListCell<LineType>() {
                             override fun updateItem(item: LineType?, empty: Boolean) {
                                 super.updateItem(item, empty)
@@ -57,27 +45,10 @@ class AddFunctionModalView(
                             }
                         }
                     }
-                )
-            }
-            field("Цвет функций") {
-                colorpicker().bind(model.functionColorProperty)
-            }
-            field("Шаг рисования") {
-                textfield(model.stepProperty) {
-                    validator {
-                        if (it?.toIntOrNull() == null || (it.toIntOrNull() ?: -1) < 0) {
-                            error("Число должно быть целым больше 0")
-                        } else {
-                            null
-                        }
-                    }
-                }
-            }
-        }
-        fieldset {
-            field("Выберите способ ввода") {
-                add(
-                    comboBox(FXCollections.observableList(InputWay.values().toList()), model.inputWayProperty) {
+                    addNode("Drawing Step", model.stepProperty)
+                },
+                propertiesGrid {
+                    addNode("Input Type", FXCollections.observableList(InputWay.values().toList()), model.inputWayProperty) {
                         object: ListCell<InputWay>() {
                             override fun updateItem(item: InputWay?, empty: Boolean) {
                                 super.updateItem(item, empty)
@@ -91,153 +62,52 @@ class AddFunctionModalView(
                             }
                         }
                     }
+                },
+                VBox().apply {
+                    val fileFunctionFragment = find<FileFunctionFragment>()
+                    val analyticFunctionFragment = find<AnalyticFunctionFragment>()
+                    val manualFunctionFragment = find<ManualFunctionFragment>()
+
+                    fun replaceInputWayControl(){
+                        when (model.inputWay) {
+                            InputWay.FILE -> {
+                                children.setAll(fileFunctionFragment.root)
+                            }
+                            InputWay.ANALYTIC -> {
+                                children.setAll(analyticFunctionFragment.root)
+                            }
+                            InputWay.MANUAL -> {
+                                children.setAll(manualFunctionFragment.root)
+                            }
+                        }
+                    }
+
+                    replaceInputWayControl()
+
+                    model.inputWayProperty.addListener { _,_,_ ->
+                        replaceInputWayControl()
+
+                        // TODO: Temporary solution
+                        (scene.window as Stage).sizeToScene()
+                    }
+                },
+                TabPane(
+                    Tab("X Axis", createAxisView(model.xAxis)),
+                    Tab("Y Axis", createAxisView(model.yAxis)),
+                ).apply {
+                    tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+                },
+                HBox(
+                    Button("Add").apply {
+                        setOnAction {
+                            controller.addFunction()
+
+                            (scene.window as Stage).close()
+                        }
+                    }
                 )
-            }
-        }
-        tabpane {
-            model.inputWayProperty.onChange {
-                when (model.inputWay) {
-                    InputWay.FILE -> {
-                        selectionModel.select(0)
-                    }
-                    InputWay.ANALYTIC -> {
-                        selectionModel.select(1)
-                    }
-                    InputWay.MANUAL -> {
-                        selectionModel.select(2)
-                    }
-                }
-            }
-            when (model.inputWay) {
-                InputWay.FILE -> {
-                    selectionModel.select(0)
-                }
-                InputWay.ANALYTIC -> {
-                    selectionModel.select(1)
-                }
-                InputWay.MANUAL -> {
-                    selectionModel.select(2)
-                }
-            }
-            tab<FileFunctionFragment>()
-            tab<AnalyticFunctionFragment>()
-            tab<ManualFunctionFragment>()
-            tabMaxHeight = 0.0
-            tabMinHeight = 0.0
-            stylesheet {
-                Stylesheet.tabHeaderArea {
-                    visibility = FXVisibility.HIDDEN
-                }
-            }
-        }
-        hbox {
-            fieldset("Ось x") {
-                field("Имя") {
-                    textfield().bind(model.xAxisNameProperty)
-                }
-                field("Направление") {
-                    add(
-                        ComboBox(FXCollections.observableArrayList(Direction.BOTTOM, Direction.TOP)).apply {
-                            valueProperty().bindBidirectional(model.xDirectionProperty)
-                        }
-                    )
-                }
-                field("Расстояние между метками") {
-                    textfield(model.xDistanceBetweenMarksProperty) {
-                        validator {
-                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
-                                error("Число должно быть плавающим 20,0 и больше нуля")
-                            } else {
-                                null
-                            }
-                        }
-                    }
-                }
-                field("Размер шрифта меток") {
-                    textfield(model.xTextSizeProperty) {
-                        validator {
-                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
-                                error("Число должно быть плавающим 20,0 и больше нуля")
-                            } else {
-                                null
-                            }
-                        }
-                    }
-                }
-                field("Шрифт") {
-                    combobox(model.xFontProperty, Font.getFamilies())
-                }
-                field("Цвет x оси") {
-                    colorpicker().bind(model.xAxisColorProperty)
-                }
-                field("Цвет дельт оси x") {
-                    colorpicker().bind(model.xDelimeterColorProperty)
-                }
-            }
-            spacing = 20.0
-            fieldset("Ось y") {
-                field("Имя") {
-                    textfield().bind(model.yAxisNameProperty)
-                }
-                field("Направление") {
-                    add(
-                        ComboBox(FXCollections.observableArrayList(Direction.LEFT, Direction.RIGHT)).apply {
-                            valueProperty().bindBidirectional(model.xDirectionProperty)
-                        }
-                    )
-                }
-                field("Расстояние между метками") {
-                    textfield(model.yDistanceBetweenMarksProperty) {
-                        validator {
-                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
-                                error("Число должно быть плавающим 20,0 и больше нуля")
-                            } else {
-                                null
-                            }
-                        }
-                    }
-                }
-                field("Размер шрифта меток") {
-                    textfield(model.yTextSizeProperty) {
-                        validator {
-                            if (it?.toDoubleOrNull() == null || (it.toDoubleOrNull() ?: -1.0) < 0.0) {
-                                error("Число должно быть плавающим 20,0 и больше нуля")
-                            } else {
-                                null
-                            }
-                        }
-                    }
-                }
-                field("Шрифт") {
-                    combobox(model.yFontProperty, Font.getFamilies())
-                }
-                field("Цвет y оси") {
-                    colorpicker().bind(model.yAxisColorProperty)
-                }
-                field("Цвте дельт оси y") {
-                    colorpicker().bind(model.yDelimiterColorProperty)
-                }
-            }
-        }
-        button("Добавить") {
-            enableWhen {
-                when (model.inputWay) {
-                    InputWay.FILE -> model.valid
-                    InputWay.ANALYTIC -> model.valid
-                    InputWay.MANUAL -> {
-                        model.valid.and(manualFunctionModel.valid)
-                    }
-                }
-            }
-
-            hgrow = Priority.ALWAYS
-            vgrow = Priority.ALWAYS
-            action {
-                controller.addFunction()
-
-                (scene.window as Stage).close()
-            }
-        }
+            )
+        )
     }
 
     init {
@@ -245,5 +115,20 @@ class AddFunctionModalView(
             fileFunctionModel.points = it.points
             fileFunctionModel.addFunctionsMode = it.addFunctionsMode
         }*/
+    }
+
+    companion object {
+        private fun createAxisView(axisViewModel: AxisViewModel) =
+            HBox(
+                propertiesGrid {
+                    addNode("Name", axisViewModel.nameProperty)
+                    addNode("Direction", FXCollections.observableArrayList(Direction.BOTTOM, Direction.TOP), axisViewModel.directionProperty)
+                    addNode("Distance Between Marks", axisViewModel.distanceBetweenMarksProperty)
+                    addNode("Font", axisViewModel.textSizeProperty)
+                    addNode("Font Size", axisViewModel.fontProperty)
+                    addNode("Axis Color", axisViewModel.colorProperty)
+                    addNode("Delta Axis Color", axisViewModel.delimiterColorProperty)
+                }
+            )
     }
 }

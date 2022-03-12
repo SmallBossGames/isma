@@ -92,8 +92,6 @@ class AddFunctionModalView(
 
                 model.inputWayProperty.addListener { _,_,_ ->
                     replaceInputWayControl()
-
-                    (scene.window as Stage).sizeToScene()
                 }
             },
         ).apply {

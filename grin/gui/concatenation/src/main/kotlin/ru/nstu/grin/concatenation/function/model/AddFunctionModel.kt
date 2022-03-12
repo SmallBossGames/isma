@@ -5,13 +5,12 @@ import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
-import ru.nstu.grin.concatenation.axis.model.Direction
-import tornadofx.ViewModel
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
+import ru.nstu.grin.concatenation.axis.model.Direction
 import java.awt.Font
 
-class AddFunctionModel : ViewModel() {
+class AddFunctionModel {
     var cartesianSpaceNameProperty = SimpleStringProperty("Space 1")
     var cartesianSpaceName: String by cartesianSpaceNameProperty
 
@@ -19,7 +18,7 @@ class AddFunctionModel : ViewModel() {
     var functionName: String by functionNameProperty
 
     var functionColorProperty = SimpleObjectProperty(Color.BLACK)
-    var functionColor by functionColorProperty
+    var functionColor: Color by functionColorProperty
 
     var functionLineSizeProperty = SimpleDoubleProperty(4.0)
     var functionLineSize by functionLineSizeProperty

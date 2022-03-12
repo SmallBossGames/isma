@@ -40,6 +40,7 @@ import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
+import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.controller.*
 import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
@@ -131,6 +132,12 @@ val grinModule = module {
         scopedOf(::FileFunctionFragment)
         scopedOf(::AnalyticFunctionFragment)
         scopedOf(::ManualFunctionFragment)
+        scopedOf(::AddFunctionController)
+        scopedOf(::AddFunctionModel)
+        scopedOf(::FileFunctionModel)
+        scopedOf(::ManualFunctionModel)
+        scopedOf(::AnalyticFunctionModel)
+        scoped{ FileFragmentController(lazy { get() }, lazy {  get() }) }
 
         factory {
             FunctionChangeModalScope().apply {
@@ -170,12 +177,9 @@ val grinModule = module {
 
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
-        scoped { find<AddFunctionController>(get<Scope>()) }
-        scoped { find<AddFunctionModel>(get<Scope>()) }
-        scoped { find<FileFunctionModel>(get<Scope>()) }
-        scoped { find<ManualFunctionModel>(get<Scope>()) }
-        scoped { find<FileFragmentController>(get<Scope>()) }
-        scoped { find<AnalyticFunctionModel>(get<Scope>()) }
+
+        scoped { find<FileModel>(get<Scope>()) }
+        scoped { find<FileOptionsView>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

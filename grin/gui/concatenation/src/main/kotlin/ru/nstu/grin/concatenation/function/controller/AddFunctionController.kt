@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.function.controller
 
-import org.koin.core.component.get
 import ru.nstu.grin.common.controller.PointsBuilder
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.model.Point
@@ -9,20 +8,16 @@ import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
 import ru.nstu.grin.concatenation.function.dto.ConcatenationFunctionDTO
 import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
-import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
-import tornadofx.Controller
 import java.util.*
 
-class AddFunctionController : Controller() {
-    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
-
-    private val functionsCanvasService: FunctionCanvasService = mainGrinScope.get()
-
-    private val model: AddFunctionModel by inject()
-    private val analyticFunctionModel: AnalyticFunctionModel by inject()
-    private val manualFunctionModel: ManualFunctionModel by inject()
-    private val fileFunctionModel: FileFunctionModel by inject()
+class AddFunctionController(
+    private val functionsCanvasService: FunctionCanvasService,
+    private val model: AddFunctionModel,
+    private val analyticFunctionModel: AnalyticFunctionModel,
+    private val manualFunctionModel: ManualFunctionModel,
+    private val fileFunctionModel: FileFunctionModel,
+) {
     private val pointsBuilder = PointsBuilder()
 
     fun addFunction() {

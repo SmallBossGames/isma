@@ -1,25 +1,34 @@
 package ru.nstu.grin.concatenation.function.controller
 
+import javafx.scene.control.Alert
 import javafx.stage.FileChooser
+import javafx.stage.Window
 import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.model.FileModel
-import tornadofx.Controller
-import tornadofx.FileChooserMode
 
-class FileFragmentController : Controller() {
-    private val model: FileModel by inject()
+class FileFragmentController(
+    private val model: Lazy<FileModel>,
+    private val fileOptionsView: Lazy<FileOptionsView>,
+) {
+    fun chooseFile(window: Window? = null) {
+        val file = FileChooser().run {
+            title = "Choose File"
+            extensionFilters.addAll(
+                FileChooser.ExtensionFilter("File Path", "*.csv", "*.xls", "*.xlsx")
+            )
 
-    fun chooseFile() {
-        val files = tornadofx.chooseFile(
-            title = "Файл",
-            filters = arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.csv", "*.xls", "*.xlsx")),
-            mode = FileChooserMode.Single
-        )
-        if (files.isEmpty()) {
-            tornadofx.error("Файл не был выбран")
+            showOpenDialog(window)
+        }
+
+        if (file == null) {
+            Alert(Alert.AlertType.ERROR).apply {
+                contentText = "File not selected"
+                showAndWait()
+            }
             return
         }
-        model.file = files[0]
-        find<FileOptionsView>().openModal()
+
+        model.value.file = file
+        fileOptionsView.value.openModal()
     }
 }

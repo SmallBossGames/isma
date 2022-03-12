@@ -8,7 +8,7 @@ import ru.nstu.grin.concatenation.function.model.AnalyticFunctionModel
  * @author Konstantin Volivach
  */
 class AnalyticFunctionFragment(
-    val model: AnalyticFunctionModel
+    private val model: AnalyticFunctionModel
 ) : VBox(
     propertiesGrid {
         addNode("Formula", model.textFunctionProperty)

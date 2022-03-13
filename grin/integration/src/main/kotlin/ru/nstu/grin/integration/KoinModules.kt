@@ -180,23 +180,23 @@ val grinModule = module {
     }
 
     scope<FunctionChangeModalScope> {
-        scoped { ChangeFunctionController(get()) }
-        scoped { params -> ChangeFunctionFragment(get { params }, get()) }
-        scoped { params -> ChangeFunctionModel(params.get()) }
+        scopedOf(::ChangeFunctionController)
+        scopedOf(::ChangeFunctionFragment)
+        scopedOf(::ChangeFunctionModel)
     }
 
     scope<AxisChangeModalScope> {
-        scoped { params -> AxisChangeFragmentController(get(), get { params }, get { params }) }
-        scoped { params -> AxisChangeFragment(get { params }, get { params }, get { params }) }
-        scoped { params -> LogarithmicTypeFragment(get { params }) }
-        scoped { params -> AxisChangeFragmentModel(params.get()) }
-        scoped { params -> LogarithmicFragmentModel(params.get()) }
+        scopedOf(::AxisChangeFragmentController)
+        scopedOf(::AxisChangeFragment)
+        scopedOf(::LogarithmicTypeFragment)
+        scopedOf(::AxisChangeFragmentModel)
+        scopedOf(::LogarithmicFragmentModel)
     }
 
     scope<FunctionCopyModalScope> {
-        scoped { CopyFunctionController(get()) }
-        scoped { params -> CopyFunctionFragment(get { params }, get()) }
-        scoped { params -> CopyFunctionModel(params.get()) }
+        scopedOf(::CopyFunctionController)
+        scopedOf(::CopyFunctionFragment)
+        scopedOf(::CopyFunctionModel)
     }
 
     scope<DescriptionChangeModalScope> {
@@ -206,15 +206,15 @@ val grinModule = module {
     }
 
     scope<CartesianCopyModalScope> {
-        scoped { CopyCartesianController(get()) }
-        scoped { params -> CopyCartesianFragment(get(), get { params }) }
-        scoped { params -> CopyCartesianModel(params.get()) }
+        scopedOf(::CopyCartesianController)
+        scopedOf(::CopyCartesianFragment)
+        scopedOf(::CopyCartesianModel)
     }
 
     scope<CartesianChangeModalScope> {
-        scoped { ChangeCartesianController(get()) }
-        scoped { params -> ChangeCartesianFragment(get { params }, get()) }
-        scoped { params -> ChangeCartesianSpaceModel(params.get()) }
+        scopedOf(::ChangeCartesianController)
+        scopedOf(::ChangeCartesianFragment)
+        scopedOf(::ChangeCartesianSpaceModel)
     }
 
     scope<AddFunctionModalScope> {

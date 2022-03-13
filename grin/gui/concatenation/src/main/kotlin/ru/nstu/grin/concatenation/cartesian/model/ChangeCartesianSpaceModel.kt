@@ -2,15 +2,15 @@ package ru.nstu.grin.concatenation.cartesian.model
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.setValue
+import ru.isma.javafx.extensions.helpers.getValue
 
 class ChangeCartesianSpaceModel(
     val space: CartesianSpace
 ) {
 
-    val nameProperty = SimpleStringProperty()
-    var name by nameProperty
+    val nameProperty = SimpleStringProperty("")
+    var name:String by nameProperty
 
     val isShowGridProperty = SimpleBooleanProperty()
     var isShowGrid by isShowGridProperty

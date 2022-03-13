@@ -18,6 +18,7 @@ import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.description.model.DescriptionModalInitData
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
+import ru.nstu.grin.concatenation.koin.AddFunctionModalScope
 import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 
@@ -48,7 +49,8 @@ class ConcatenationCanvasController(
     }
 
     fun openFunctionModal(window: Window?) {
-        val view = mainGrinScope.get<AddFunctionModalView>()
+        val modalScope = mainGrinScope.get<AddFunctionModalScope>()
+        val view = modalScope.get<AddFunctionModalView>()
 
         Stage().apply {
             scene = Scene(view)
@@ -59,6 +61,10 @@ class ConcatenationCanvasController(
 
             if(window != null){
                 initOwner(window)
+            }
+
+            setOnCloseRequest {
+                modalScope.closeScope()
             }
 
             show()

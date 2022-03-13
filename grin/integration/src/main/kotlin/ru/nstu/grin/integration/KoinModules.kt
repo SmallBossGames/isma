@@ -128,15 +128,6 @@ val grinModule = module {
 
         scopedOf(::SpacesTransformationController)
 
-        scopedOf(::AddFunctionModalView)
-        scopedOf(::FileFunctionFragment)
-        scopedOf(::AnalyticFunctionFragment)
-        scopedOf(::ManualFunctionFragment)
-        scopedOf(::AddFunctionController)
-        scopedOf(::AddFunctionModel)
-        scopedOf(::FileFunctionModel)
-        scopedOf(::ManualFunctionModel)
-        scopedOf(::AnalyticFunctionModel)
         scoped{ FileFragmentController(lazy { get() }, lazy {  get() }) }
 
         factory {
@@ -171,6 +162,12 @@ val grinModule = module {
 
         factory {
             CartesianChangeModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            AddFunctionModalScope().apply {
                 scope.linkTo(get<MainGrinScope>().scope)
             }
         }
@@ -218,6 +215,21 @@ val grinModule = module {
         scoped { ChangeCartesianController(get()) }
         scoped { params -> ChangeCartesianFragment(get { params }, get()) }
         scoped { params -> ChangeCartesianSpaceModel(params.get()) }
+    }
+
+    scope<AddFunctionModalScope> {
+        scopedOf(::AddFunctionModalView)
+        scopedOf(::AddFunctionController)
+        scopedOf(::AddFunctionModel)
+
+        scopedOf(::FileFunctionFragment)
+        scopedOf(::FileFunctionModel)
+
+        scopedOf(::AnalyticFunctionFragment)
+        scopedOf(::AnalyticFunctionModel)
+
+        scopedOf(::ManualFunctionFragment)
+        scopedOf(::ManualFunctionModel)
     }
 
     single { GrinIntegrationFacade() }

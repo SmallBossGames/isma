@@ -101,8 +101,8 @@ class AddFunctionModalView(
         top = TabPane(
             Tab("Input", inputView),
             Tab("General", generalView),
-            Tab("X Axis", createAxisView(model.xAxis)),
-            Tab("Y Axis", createAxisView(model.yAxis)),
+            Tab("X Axis", createAxisView(model.xAxis, listOf(Direction.TOP, Direction.BOTTOM))),
+            Tab("Y Axis", createAxisView(model.yAxis, listOf(Direction.LEFT, Direction.RIGHT))),
         ).apply {
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
         }
@@ -128,11 +128,11 @@ class AddFunctionModalView(
     }
 
     companion object {
-        private fun createAxisView(axisViewModel: AxisViewModel) =
+        private fun createAxisView(axisViewModel: AxisViewModel, directions: List<Direction>) =
             HBox(
                 propertiesGrid {
                     addNode("Name", axisViewModel.nameProperty)
-                    addNode("Direction", FXCollections.observableArrayList(Direction.BOTTOM, Direction.TOP), axisViewModel.directionProperty)
+                    addNode("Direction", FXCollections.observableList(directions), axisViewModel.directionProperty)
                     addNode("Distance Between Marks", axisViewModel.distanceBetweenMarksProperty)
                     addNode("Font", axisViewModel.textSizeProperty)
                     addNode("Font Size", axisViewModel.fontProperty)

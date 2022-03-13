@@ -34,15 +34,7 @@ class FileOptionsView : Fragment() {
                         textfield().bind(details.sheetNameProperty)
                     }
                     field("Диапозон ячеек") {
-                        textfield(details.rangeProperty) {
-//                            validator {
-//                                if (it == null || !it.contains(":")) {
-//                                    error("Формат должен быть записан в следующем виде A0:B2")
-//                                } else {
-//                                    null
-//                                }
-//                            }
-                        }
+                        textfield(details.rangeProperty)
                     }
                 }
                 is CsvDetails -> {
@@ -66,7 +58,7 @@ class FileOptionsView : Fragment() {
             action {
                 when (val details = model.details) {
                     is ExcelDetails -> {
-                        if (details.range == null || !details.range.contains(":")) {
+                        if (!details.range.contains(":")) {
                             error("Формат должен быть записан в следующем виде A0:B2")
                         } else {
                             controller.openPointsWindow()

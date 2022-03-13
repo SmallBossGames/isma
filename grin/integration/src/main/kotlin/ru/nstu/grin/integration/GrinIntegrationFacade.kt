@@ -83,7 +83,8 @@ class GrinIntegrationFacade: KoinComponent {
             "CartesianSpace",
             mappedFunctions,
             xAxis,
-            yAxis)
+            yAxis
+        )
 
         open(listOf(cartesianSpace))
     }

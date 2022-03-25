@@ -6,12 +6,10 @@ import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.DescriptionDto
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import java.util.*
 
 class DescriptionCanvasService(
     private val model: ConcatenationCanvasModel,
-    private val view: ConcatenationCanvas,
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -27,8 +25,8 @@ class DescriptionCanvasService(
         )
 
         model.descriptions.add(description)
+
         reportUpdate()
-        view.redraw()
     }
 
     fun update(description: Description, descriptionModel: DescriptionDto) {
@@ -40,17 +38,15 @@ class DescriptionCanvasService(
         description.font = descriptionModel.font
 
         reportUpdate()
-
-        view.redraw()
-    }
-
-    private fun reportUpdate() = coroutineScope.launch {
-        model.reportDescriptionsListUpdate()
     }
 
     fun delete(description: Description) {
         model.descriptions.remove(description)
+
         reportUpdate()
-        view.redraw()
+    }
+
+    private fun reportUpdate() = coroutineScope.launch {
+        model.reportDescriptionsListUpdate()
     }
 }

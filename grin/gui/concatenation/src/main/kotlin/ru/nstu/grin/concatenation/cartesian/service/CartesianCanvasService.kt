@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.cartesian.model.CartesianCopyDataModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.cartesian.model.UpdateCartesianDataModel
@@ -12,7 +11,6 @@ import java.util.*
 
 class CartesianCanvasService(
     private val model: ConcatenationCanvasModel,
-    private val view: ConcatenationCanvas,
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -35,7 +33,6 @@ class CartesianCanvasService(
         )
         this.model.cartesianSpaces.add(newCartesian)
         reportUpdateSpaces()
-        view.redraw()
     }
 
     fun updateCartesian(dataModel: UpdateCartesianDataModel) {
@@ -43,13 +40,11 @@ class CartesianCanvasService(
         cartesian.isShowGrid = dataModel.isShowGrid
         cartesian.name = dataModel.name
         reportUpdateSpaces()
-        view.redraw()
     }
 
     fun deleteCartesianSpace(space: CartesianSpace) {
         model.cartesianSpaces.remove(space)
         refreshDependencies()
-        view.redraw()
     }
 
     private fun refreshDependencies() {

@@ -8,19 +8,11 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.UpdateAxisChangeSet
 import ru.nstu.grin.concatenation.axis.model.UpdateLogarithmicTypeChangeSet
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 
 class AxisCanvasService(
     private val model: ConcatenationCanvasModel,
-    private val view: ConcatenationCanvas,
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
-    fun getAllAxises() {
-        coroutineScope.launch {
-            model.reportAxesListUpdate()
-        }
-    }
 
     fun updateAxis(
         axis: ConcatenationAxis,
@@ -46,7 +38,9 @@ class AxisCanvasService(
         axis.settings.min = axisChangeSet.min
         axis.settings.max = axisChangeSet.max
         axis.isHide = axisChangeSet.isHide
-        view.redraw()
-        getAllAxises()
+
+        coroutineScope.launch {
+            model.reportAxesListUpdate()
+        }
     }
 }

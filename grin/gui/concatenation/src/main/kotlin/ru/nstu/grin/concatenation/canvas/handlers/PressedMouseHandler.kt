@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.view.CartesianCanvasContextMenuController
@@ -16,7 +17,8 @@ import ru.nstu.grin.concatenation.points.model.PointSettings
 
 class PressedMouseHandler(
     private val contextMenuDrawElement: CartesianCanvasContextMenuController,
-    private val model: ConcatenationCanvasModel,
+    private val canvasModel: ConcatenationCanvasModel,
+    private val canvasController: ConcatenationCanvasController,
     private val canvasViewModel: CanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
@@ -28,15 +30,15 @@ class PressedMouseHandler(
 
         closeContextMenu()
 
-        model.unselectAll()
+        canvasController.unselectAll()
         val editMode = concatenationViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
 
         if ((editMode == EditMode.SELECTION || editMode == EditMode.MOVE) && event.button == MouseButton.PRIMARY) {
-            val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
+            val description = canvasModel.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
             description?.isSelected = true
 
-            val function = model.cartesianSpaces.map { it.functions }.flatten()
+            val function = canvasModel.cartesianSpaces.map { it.functions }.flatten()
                 .firstOrNull {
                     val pixels = it.pixelsToDraw ?: return@firstOrNull false
 
@@ -49,8 +51,8 @@ class PressedMouseHandler(
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.button == MouseButton.PRIMARY) {
-                model.selectionSettings.isFirstPointSelected = true
-                model.selectionSettings.firstPoint = Point(event.x, event.y)
+                canvasModel.selectionSettings.isFirstPointSelected = true
+                canvasModel.selectionSettings.firstPoint = Point(event.x, event.y)
             }
 
             isUiLayerDirty = true
@@ -63,8 +65,8 @@ class PressedMouseHandler(
         }
 
         if (event.button == MouseButton.SECONDARY) {
-            model.pointToolTipSettings.isShow = false
-            model.pointToolTipSettings.pointsSettings.clear()
+            canvasModel.pointToolTipSettings.isShow = false
+            canvasModel.pointToolTipSettings.pointsSettings.clear()
 
             isUiLayerDirty = true
         }
@@ -93,21 +95,21 @@ class PressedMouseHandler(
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return model.cartesianSpaces
+        return canvasModel.cartesianSpaces
             .map { listOf(it.xAxis, it.yAxis) }
             .flatten()
             .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
     }
 
     private fun handleViewMode(event: MouseEvent) {
-        val cartesianSpace = model.cartesianSpaces.firstOrNull {
+        val cartesianSpace = canvasModel.cartesianSpaces.firstOrNull {
             it.functions.any {
                 val pixels = it.pixelsToDraw ?: return@firstOrNull false
 
                 return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
             }
         } ?: return
-        val nearFunction = model.cartesianSpaces.mapNotNull {
+        val nearFunction = canvasModel.cartesianSpaces.mapNotNull {
             it.functions.firstOrNull {
                 val pixels = it.pixelsToDraw ?: return@firstOrNull false
 
@@ -121,7 +123,7 @@ class PressedMouseHandler(
             pixels.first, pixels.second, event.x, event.y
         )
 
-        val pointToolTipSettings = model.pointToolTipSettings
+        val pointToolTipSettings = canvasModel.pointToolTipSettings
         pointToolTipSettings.isShow = true
         val pointSettings = PointSettings(
             cartesianSpace.xAxis.settings,
@@ -134,7 +136,7 @@ class PressedMouseHandler(
 
     private fun handleEditMode(event: MouseEvent) {
         println("Pressed primary button")
-        val triple = model.cartesianSpaces.mapNotNull {
+        val triple = canvasModel.cartesianSpaces.mapNotNull {
             val point = it.functions
                 .filter { it.isHide.not() }
                 .firstOrNull {
@@ -157,7 +159,7 @@ class PressedMouseHandler(
             }
         }.firstOrNull() ?: return
         val (xAxis, yAxis, point) = triple
-        model.traceSettings = TraceSettings(
+        canvasModel.traceSettings = TraceSettings(
             pressedPoint = point,
             xAxis = xAxis,
             yAxis = yAxis
@@ -165,15 +167,15 @@ class PressedMouseHandler(
     }
 
     private fun handleMoveMode(event: MouseEvent) {
-        val description = model.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
-        val function = model.cartesianSpaces.map { it.functions }.flatten()
+        val description = canvasModel.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
+        val function = canvasModel.cartesianSpaces.map { it.functions }.flatten()
             .firstOrNull {
                 val pixels = it.pixelsToDraw ?: return@firstOrNull false
 
                 return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
             }
         val cartesian =
-            model.cartesianSpaces.firstOrNull {
+            canvasModel.cartesianSpaces.firstOrNull {
                 it.functions.any {
                     val pixels = it.pixelsToDraw ?: return@firstOrNull false
 
@@ -182,14 +184,14 @@ class PressedMouseHandler(
             }
 
         if (description != null) {
-            model.moveSettings = MoveSettings(
+            canvasModel.moveSettings = MoveSettings(
                 id = description.id,
                 type = MovedElementType.DESCRIPTION,
                 pressedX = event.x,
                 pressedY = event.y
             )
         } else if (function != null && cartesian != null) {
-            model.moveSettings = MoveSettings(
+            canvasModel.moveSettings = MoveSettings(
                 id = function.id,
                 type = MovedElementType.FUNCTION,
                 xAxis = cartesian.xAxis,
@@ -205,7 +207,7 @@ class PressedMouseHandler(
     }
 
     private fun showContextMenu(event: MouseEvent) {
-        val axes = model.cartesianSpaces.map {
+        val axes = canvasModel.cartesianSpaces.map {
             listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
         }.flatten()
 

@@ -3,10 +3,10 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.event.EventHandler
 import javafx.scene.control.Button
 import javafx.scene.control.ToolBar
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 
 class ChartToolBar(
-    concatenationCanvasModel: ConcatenationCanvasModel,
+    concatenationCanvasModel: ConcatenationCanvasController,
     chainDrawer: ConcatenationChainDrawer
 ): ToolBar() {
     init {

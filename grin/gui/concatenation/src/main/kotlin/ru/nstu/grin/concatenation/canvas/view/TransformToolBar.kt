@@ -13,6 +13,7 @@ import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
+import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
@@ -27,6 +28,7 @@ class TransformToolBar(
     private val scope: Scope,
     private val mainGrinScope: MainGrinScope,
     private val functionCanvasService: FunctionCanvasService,
+    private val functionsOperationsService: FunctionsOperationsService,
     private val model: ConcatenationCanvasModel,
 ) : ToolBar(
     Button(null, ImageView(Image("edit-tool.png")).apply {
@@ -36,7 +38,7 @@ class TransformToolBar(
         tooltip = Tooltip("Edit")
 
         setOnAction {
-            val function = model.getSelectedFunction()
+            val function = model.selectedFunction
             if (function != null) {
                 val functionChangeModalScope = mainGrinScope.get<FunctionChangeModalScope>()
                 val view = functionChangeModalScope.get<ChangeFunctionFragment> { parametersOf(function)}
@@ -56,7 +58,7 @@ class TransformToolBar(
                 return@setOnAction
             }
 
-            val description = model.getSelectedDescription()
+            val description = model.selectedDescription
             if (description != null) {
                 val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
                 val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(description)}
@@ -84,7 +86,7 @@ class TransformToolBar(
         tooltip = Tooltip("Mirror X")
 
         setOnAction {
-            val function = model.getSelectedFunction()
+            val function = model.selectedFunction
 
             if (function == null) {
                 find<MirrorFunctionFragment>(
@@ -116,7 +118,7 @@ class TransformToolBar(
         tooltip = Tooltip("Mirror Y")
 
         setOnAction {
-            val function = model.getSelectedFunction()
+            val function = model.selectedFunction
 
             if (function == null) {
                 find<MirrorFunctionFragment>(
@@ -148,11 +150,11 @@ class TransformToolBar(
         tooltip = Tooltip("Localize")
 
         setOnAction {
-            val function = model.getSelectedFunction()
+            val function = model.selectedFunction
             if (function == null) {
                 find<LocalizeFunctionFragment>().openModal()
             } else {
-                functionCanvasService.localizeFunction(function)
+                functionsOperationsService.localizeFunction(function)
             }
         }
     },

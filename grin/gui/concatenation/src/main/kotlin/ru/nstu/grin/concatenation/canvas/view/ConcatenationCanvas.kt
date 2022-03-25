@@ -7,6 +7,8 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
@@ -71,14 +73,16 @@ class ConcatenationCanvas(
         }
 
         fxCoroutineScope.launch {
-            launch {
-                model.arrows.changeAsFlow().collect { chainDrawer.draw() }
-            }
-            launch {
-                model.cartesianSpaces.changeAsFlow().collect { chainDrawer.draw() }
-            }
-            launch {
-                model.descriptions.changeAsFlow().collect { chainDrawer.draw() }
+            merge(
+                model.arrows.changeAsFlow(),
+                model.cartesianSpaces.changeAsFlow(),
+                model.descriptions.changeAsFlow(),
+                model.axesListUpdatedEvent,
+                model.functionsListUpdatedEvent,
+                model.descriptionsListUpdatedEvent,
+                model.cartesianSpacesListUpdatedEvent,
+            ).collectLatest {
+                chainDrawer.draw()
             }
         }
 

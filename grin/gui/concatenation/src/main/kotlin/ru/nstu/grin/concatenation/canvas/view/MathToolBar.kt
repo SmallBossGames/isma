@@ -35,7 +35,7 @@ class MathToolBar(
         tooltip = Tooltip("Apply derivative")
 
         setOnAction {
-            val function = model.getSelectedFunction()
+            val function = model.selectedFunction
             if (function != null) {
                 val derivativeDetails = function.derivativeDetails
                 if (derivativeDetails != null) {
@@ -59,7 +59,7 @@ class MathToolBar(
         tooltip = Tooltip("Apply wavelet")
 
         setOnAction {
-            val function = model.getSelectedFunction()
+            val function = model.selectedFunction
             if (function != null) {
                 val waveletDetails = function.waveletDetails
                 if (waveletDetails != null) {
@@ -83,7 +83,7 @@ class MathToolBar(
         tooltip = Tooltip("Find integral")
 
         setOnAction {
-            val function = model.getSelectedFunction()
+            val function = model.selectedFunction
             if (function != null) {
                 find<FunctionIntegrationFragment>(
                     scope,

@@ -43,6 +43,7 @@ import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.controller.*
 import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
@@ -120,6 +121,7 @@ val grinModule = module {
         scopedOf(::DescriptionCanvasService)
         scopedOf(::AxisCanvasService)
         scopedOf(::FunctionCanvasService)
+        scopedOf(::FunctionsOperationsService)
 
         scopedOf(::ScalableScrollHandler)
         scopedOf(::DraggedHandler)

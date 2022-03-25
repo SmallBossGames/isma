@@ -47,7 +47,6 @@ class AxisChangeFragmentModel(
     }
 
     fun createChangeSet() = UpdateAxisChangeSet(
-        id = axis.id,
         distance = distanceBetweenMarks,
         textSize = textSize,
         font = font,

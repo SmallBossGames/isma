@@ -33,7 +33,6 @@ data class DescriptionSnapshot(
 
 @Serializable
 data class CartesianSpaceSnapshot(
-    val id: String,
     val name: String,
     val functions: List<ConcatenationFunctionSnapshot>,
     val xAxis: ConcatenationAxisSnapshot,
@@ -94,7 +93,6 @@ data class WaveletDetailsSnapshot(
 
 @Serializable
 data class ConcatenationAxisSnapshot(
-    val id: String,
     val name: String,
     val order: Int,
     val direction: Direction,
@@ -170,7 +168,6 @@ fun Color.toSnapshot() =
 
 fun ConcatenationAxisSnapshot.toModel() =
     ConcatenationAxis(
-        id = UUID.fromString(id),
         name = name,
         order = order,
         direction = direction,
@@ -186,7 +183,6 @@ fun ConcatenationAxisSnapshot.toModel() =
 
 fun ConcatenationAxis.toSnapshot() =
     ConcatenationAxisSnapshot(
-        id = id.toString(),
         name = name,
         order = order,
         direction = direction,
@@ -248,7 +244,6 @@ fun ConcatenationFunction.toSnapshot() =
 
 fun CartesianSpaceSnapshot.toModel() =
     CartesianSpace(
-        id = UUID.fromString(id),
         name = name,
         functions = functions.map { it.toModel() }.toMutableList(),
         xAxis = xAxis.toModel(),
@@ -258,7 +253,6 @@ fun CartesianSpaceSnapshot.toModel() =
 
 fun CartesianSpace.toSnapshot() =
     CartesianSpaceSnapshot(
-        id = id.toString(),
         name = name,
         functions = functions.map { it.toSnapshot() },
         xAxis = xAxis.toSnapshot(),

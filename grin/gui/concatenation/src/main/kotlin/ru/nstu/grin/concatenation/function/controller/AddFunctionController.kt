@@ -49,7 +49,6 @@ class AddFunctionController(
         )
 
         val cartesianSpace = CartesianSpaceDTO(
-            id = UUID.randomUUID(),
             name = model.cartesianSpaceName,
             functions = listOf(function),
             xAxis = createXAxis(),
@@ -92,7 +91,6 @@ class AddFunctionController(
                     )
                 }
                 val cartesianSpace = CartesianSpaceDTO(
-                    id = UUID.randomUUID(),
                     name = model.cartesianSpaceName,
                     functions = functions,
                     xAxis = xAxis,
@@ -120,7 +118,6 @@ class AddFunctionController(
                     val yAxis = createYAxis()
 
                     val cartesianSpace = CartesianSpaceDTO(
-                        id = UUID.randomUUID(),
                         name = model.cartesianSpaceName,
                         functions = listOf(function),
                         xAxis = xAxis,
@@ -183,7 +180,6 @@ class AddFunctionController(
             lineSize = model.functionLineSize
         )
         val cartesianSpace = CartesianSpaceDTO(
-            id = UUID.randomUUID(),
             name = model.cartesianSpaceName,
             functions = listOf(function),
             xAxis = createXAxis(),

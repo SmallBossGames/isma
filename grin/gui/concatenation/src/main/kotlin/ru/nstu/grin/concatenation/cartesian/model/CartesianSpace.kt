@@ -5,7 +5,6 @@ import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import java.util.*
 
 data class CartesianSpace(
-    val id: UUID,
     var name: String,
     val functions: MutableList<ConcatenationFunction>,
     val xAxis: ConcatenationAxis,
@@ -15,13 +14,12 @@ data class CartesianSpace(
 
     public override fun clone(): CartesianSpace {
         return CartesianSpace(
-            id = UUID.randomUUID(),
             name = name,
             functions = functions
                 .map { it.copy(id = UUID.randomUUID(), points = it.points.map { it.copy() }) }
                 .toMutableList(),
-            xAxis = xAxis.copy(id = UUID.randomUUID(), settings = xAxis.settings.copy()),
-            yAxis = yAxis.copy(id = UUID.randomUUID(), settings = yAxis.settings.copy()),
+            xAxis = xAxis.copy(settings = xAxis.settings.copy()),
+            yAxis = yAxis.copy(settings = yAxis.settings.copy()),
             isShowGrid = isShowGrid
         )
     }

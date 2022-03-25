@@ -6,7 +6,6 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 object ConcatenationAxisConverter {
     fun merge(source: ConcatenationAxisDTO, order: Int): ConcatenationAxis {
         return ConcatenationAxis(
-            id = source.id,
             name = source.name,
             order = order,
             direction = source.direction,

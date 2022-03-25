@@ -45,7 +45,6 @@ class GrinIntegrationFacade: KoinComponent {
 
     fun openSimpleChart(functions: Collection<FunctionModel>) {
         val xAxis = ConcatenationAxis(
-            id = UUID.randomUUID(),
             name = "X axis",
             order = 0,
             direction = Direction.BOTTOM,
@@ -57,7 +56,6 @@ class GrinIntegrationFacade: KoinComponent {
         )
 
         val yAxis = ConcatenationAxis(
-            id = UUID.randomUUID(),
             name = "Y axis",
             order = 0,
             direction = Direction.LEFT,
@@ -79,7 +77,6 @@ class GrinIntegrationFacade: KoinComponent {
         }.toMutableList()
 
         val cartesianSpace = CartesianSpace(
-            UUID.randomUUID(),
             "CartesianSpace",
             mappedFunctions,
             xAxis,

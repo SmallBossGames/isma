@@ -2,10 +2,8 @@ package ru.nstu.grin.concatenation.axis.model
 
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
-import java.util.*
 
 data class ConcatenationAxis(
-    val id: UUID,
     val name: String,
     val order: Int,
     val direction: Direction,
@@ -28,7 +26,6 @@ data class ConcatenationAxis(
 
     override fun clone(): Any {
         return ConcatenationAxis(
-            id = id,
             name = name,
             order = order,
             direction = direction,

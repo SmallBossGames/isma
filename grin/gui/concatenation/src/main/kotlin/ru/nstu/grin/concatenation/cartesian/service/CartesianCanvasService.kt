@@ -7,7 +7,6 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianCopyDataModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.cartesian.model.UpdateCartesianDataModel
-import java.util.*
 
 class CartesianCanvasService(
     private val model: ConcatenationCanvasModel,
@@ -17,15 +16,13 @@ class CartesianCanvasService(
     fun copyCartesian(copyDataModel: CartesianCopyDataModel) {
         val oldCartesian = copyDataModel.origin
         val newCartesian = oldCartesian.clone().copy(
-            id = UUID.randomUUID(), name = copyDataModel.name,
+            name = copyDataModel.name,
             xAxis = oldCartesian.xAxis.copy(
-                id = UUID.randomUUID(),
                 name = copyDataModel.xAxisName,
                 order = oldCartesian.xAxis.order + 1,
                 settings = oldCartesian.xAxis.settings.copy()
             ),
             yAxis = oldCartesian.yAxis.copy(
-                id = UUID.randomUUID(),
                 name = copyDataModel.yAxisName,
                 order = oldCartesian.yAxis.order + 1,
                 settings = oldCartesian.yAxis.settings.copy()

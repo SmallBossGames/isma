@@ -4,9 +4,6 @@ import javafx.scene.Scene
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.Window
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.common.converters.model.ArrowConverter
@@ -28,7 +25,6 @@ class ConcatenationCanvasController(
     private val model: ConcatenationCanvasModel,
     private val mainGrinScope: MainGrinScope,
 ) {
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     fun replaceAll(
         cartesianSpaces: List<CartesianSpace>,
@@ -40,10 +36,6 @@ class ConcatenationCanvasController(
         model.descriptions.setAll(descriptions)
 
         normalizeSpaces()
-
-        coroutineScope.launch {
-            model.reportUpdateAll()
-        }
     }
 
     fun addArrow(arrow: ArrowDTO) {
@@ -150,14 +142,10 @@ class ConcatenationCanvasController(
     }
 
     fun clearCanvas() {
-        coroutineScope.launch {
-            model.apply {
-                cartesianSpaces.clear()
-                arrows.clear()
-                descriptions.clear()
-
-                reportUpdateAll()
-            }
+        model.apply {
+            cartesianSpaces.clear()
+            arrows.clear()
+            descriptions.clear()
         }
     }
 

@@ -29,7 +29,7 @@ class MirrorFunctionController : Controller() {
             }
         }
 
-        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
+        model.functions.setAll(concatenationCanvasModel.functions)
     }
 
     fun mirrorFunction(isY: Boolean, function: ConcatenationFunction) {

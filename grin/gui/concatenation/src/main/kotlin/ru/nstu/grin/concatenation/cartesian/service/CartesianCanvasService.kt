@@ -32,28 +32,17 @@ class CartesianCanvasService(
             )
         )
         this.model.cartesianSpaces.add(newCartesian)
-        reportUpdateSpaces()
+    }
+
+    fun deleteCartesianSpace(space: CartesianSpace) {
+        model.cartesianSpaces.remove(space)
     }
 
     fun updateCartesian(dataModel: UpdateCartesianDataModel) {
         val cartesian = dataModel.space
         cartesian.isShowGrid = dataModel.isShowGrid
         cartesian.name = dataModel.name
-        reportUpdateSpaces()
-    }
 
-    fun deleteCartesianSpace(space: CartesianSpace) {
-        model.cartesianSpaces.remove(space)
-        refreshDependencies()
-    }
-
-    private fun refreshDependencies() {
-        coroutineScope.launch {
-            model.reportUpdateAll()
-        }
-    }
-
-    private fun reportUpdateSpaces() {
         coroutineScope.launch {
             model.reportCartesianSpacesListUpdate()
         }

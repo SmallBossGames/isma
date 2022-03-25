@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
-import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
@@ -74,13 +73,11 @@ class ConcatenationCanvas(
 
         fxCoroutineScope.launch {
             merge(
-                model.arrows.changeAsFlow(),
-                model.cartesianSpaces.changeAsFlow(),
-                model.descriptions.changeAsFlow(),
                 model.axesListUpdatedEvent,
                 model.functionsListUpdatedEvent,
                 model.descriptionsListUpdatedEvent,
                 model.cartesianSpacesListUpdatedEvent,
+                model.arrowsListUpdatedEvent
             ).collectLatest {
                 chainDrawer.draw()
             }

@@ -20,7 +20,7 @@ class DescriptionListViewModel(
     init {
         coroutineScope.launch {
             merge(
-                flowOf(concatenationCanvasModel.getAllDescriptions()),
+                flowOf(concatenationCanvasModel.descriptions),
                 concatenationCanvasModel.descriptionsListUpdatedEvent
             ).collect{
                 descriptions.setAll(it)

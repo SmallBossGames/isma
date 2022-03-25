@@ -28,7 +28,7 @@ class IntersectionFunctionController : Controller() {
             }
         }
 
-        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
+        model.functions.setAll(concatenationCanvasModel.functions)
     }
 
     fun findIntersection(list: List<ConcatenationFunction>) {

@@ -28,7 +28,7 @@ class LocalizeFunctionController : Controller() {
             }
         }
 
-        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
+        model.functions.setAll(concatenationCanvasModel.functions)
     }
 
     fun localize(function: ConcatenationFunction) {

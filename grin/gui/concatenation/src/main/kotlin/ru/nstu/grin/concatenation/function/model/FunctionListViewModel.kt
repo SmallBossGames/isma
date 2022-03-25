@@ -19,7 +19,7 @@ class FunctionListViewModel(
     init {
         coroutineScope.launch {
             merge(
-                flowOf(concatenationCanvasModel.getAllFunctions()),
+                flowOf(concatenationCanvasModel.functions),
                 concatenationCanvasModel.functionsListUpdatedEvent
             ).collect {
                 functions.setAll(it)

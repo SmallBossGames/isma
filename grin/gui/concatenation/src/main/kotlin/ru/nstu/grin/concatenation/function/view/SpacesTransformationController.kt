@@ -55,7 +55,7 @@ class SpacesTransformationController(
     )
 
     suspend fun transformSpaces() = coroutineScope {
-        model.cartesianSpaces.map { space ->
+        model.cartesianSpaces.forEach { space ->
             space.functions.forEach { function ->
                 ensureActive()
 

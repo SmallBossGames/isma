@@ -23,10 +23,6 @@ class ConcatenationCanvasModel {
 
     val descriptions = observableArrayList<Description>()!!
 
-    val functions get() = cartesianSpaces.map { it.functions }.flatten()
-
-    val axes get() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
-
     val pointToolTipSettings = PointToolTipsSettings(false, mutableSetOf())
 
     val selectionSettings = SelectionSettings()
@@ -35,7 +31,11 @@ class ConcatenationCanvasModel {
 
     var moveSettings: MoveSettings? = null
 
-    val selectedFunction get() = cartesianSpaces.map { it.functions }.flatten().firstOrNull { it.isSelected }
+    val functions get() = cartesianSpaces.map { it.functions }.flatten()
+
+    val axes get() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
+
+    val selectedFunction get() = functions.firstOrNull { it.isSelected }
 
     val selectedDescription get() = descriptions.firstOrNull { it.isSelected }
 

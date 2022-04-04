@@ -14,15 +14,12 @@ class FileFunctionController : Controller() {
     private val model: FileFunctionModel by inject()
 
     fun chooseFile() {
-        val files = tornadofx.chooseFile(
-            title = "Файл",
-            filters = arrayOf(FileChooser.ExtensionFilter("Путь к файлу", "*.gf")),
-            mode = FileChooserMode.Single
-        )
-        if (files.isEmpty()) {
-            tornadofx.error("Файл не был выбран")
-            return
-        }
+        val file = FileChooser().run {
+            title = "Function File"
+            extensionFilters.addAll(FileChooser.ExtensionFilter("File Path", "*.gf"))
+            return@run showOpenDialog(window)
+        } ?: return
+
         find<FileOptionsModalView>(
             mapOf(
                 FileOptionsModel::file to files[0]

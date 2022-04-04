@@ -10,7 +10,7 @@ val moduleName by extra("isma.isma.next.core.simulation.gen.main")
 dependencies {
     implementation(kotlin("stdlib"))
 
-    implementation ("com.google.guava:guava:31.0.1-jre")
+    implementation ("com.google.guava:guava:31.1-jre")
     implementation ("org.apache.commons:commons-text:1.9")
     implementation ("org.slf4j:slf4j-api:1.7.36")
 

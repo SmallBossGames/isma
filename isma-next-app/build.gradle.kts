@@ -21,7 +21,7 @@ application {
 }
 
 val koinVersion = "3.2.0-beta-1"
-val kotlinReflectVersion = "1.6.0"
+val kotlinReflectVersion = "1.6.10"
 val kotlinxCoroutinesVersion = "1.6.0"
 val kotlinxSerializationJsonVersion = "1.3.2"
 
@@ -33,9 +33,9 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
     implementation ("io.insert-koin:koin-core:$koinVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
-    implementation("org.kordamp.ikonli:ikonli-javafx:12.3.0")
-    implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.0")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.7")
+    implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
+    implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
+    implementation ("org.fxmisc.richtext:richtextfx:0.10.9")
     implementation("org.controlsfx:controlsfx:11.1.1")
 
     implementation(project(":isma-hsm"))

@@ -57,4 +57,14 @@ include 'isma-next-services-simulation-abstractions'
 include 'isma-next-core-fdm'
 include 'isma-next-core-simulation-gen'
 include 'isma-javafx-extensions'
+include 'grin:app'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            library("koin-core", "io.insert-koin:koin-core:3.2.0-beta-1")
+            library("tornadofx", "no.tornado:tornadofx:1.7.20")
+        }
+    }
+}
 

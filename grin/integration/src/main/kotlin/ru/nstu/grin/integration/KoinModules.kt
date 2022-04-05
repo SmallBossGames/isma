@@ -52,7 +52,7 @@ import tornadofx.Scope
 import tornadofx.find
 import tornadofx.setInScope
 
-val grinModule = module {
+val grinGuiModule = module {
     scope<MainGrinScope> {
         scoped { params ->
             // Access from the TornadoFx world. Should be removed later.
@@ -233,6 +233,8 @@ val grinModule = module {
         scopedOf(::ManualFunctionFragment)
         scopedOf(::ManualFunctionModel)
     }
+}
 
+val grinIntegrationModule = module {
     single { GrinIntegrationFacade() }
 }

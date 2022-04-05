@@ -11,7 +11,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
-    implementation ("io.insert-koin:koin-core:3.2.0-beta-1")
+    implementation (libs.koin.core)
 
     api(project(":grin:gui:common"))
     implementation(project(":grin:math"))

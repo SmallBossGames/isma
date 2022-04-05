@@ -8,16 +8,17 @@ plugins {
 }
 
 javafx {
-    version = "17"
+    version = "17.0.2"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 application {
-    mainClass.set("ru.isma.next.app.launcher.LauncherKt")
+    mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
 
-    applicationDefaultJvmArgs = listOf(
+    /*applicationDefaultJvmArgs = listOf(
         "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
+        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+    )*/
 }
 
 val kotlinReflectVersion = "1.6.10"

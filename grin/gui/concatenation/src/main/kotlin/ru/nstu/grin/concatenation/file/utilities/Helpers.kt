@@ -3,8 +3,8 @@ package ru.nstu.grin.concatenation.file.utilities
 import ru.nstu.grin.concatenation.function.model.FileType
 import java.io.File
 
-fun getFileType(file: File) =
-    when (file.extension) {
+fun File.getFileType() =
+    when (extension) {
         "xls" -> {
             FileType.XLS
         }

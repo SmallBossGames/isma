@@ -15,7 +15,7 @@ class FileOptionsView : Fragment() {
     private val controller: FileOptionsController by inject()
 
     init {
-        when (getFileType(model.file)) {
+        when (model.file.getFileType()) {
             FileType.XLS, FileType.XLSX -> {
                 model.details = ExcelDetails()
             }

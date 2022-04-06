@@ -9,8 +9,8 @@ javafx {
 
 
 dependencies {
-    implementation(libs.tornadofx)
-    implementation(libs.koin.core)
+    implementation("no.tornado:tornadofx:${PackageVersion.tornadoFx}")
+    implementation("io.insert-koin:koin-core:${PackageVersion.koin}")
 
     api(project(":grin:gui:concatenation"))
     api(project(":grin:gui:common"))

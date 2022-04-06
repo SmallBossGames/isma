@@ -13,11 +13,9 @@ javafx {
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
-val kotlinxSerializationJsonVersion = "1.3.2"
-
 dependencies {
     implementation(project(":isma-text-editor"))
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${PackageVersion.kotlinxSerializationJson}")
     implementation ("org.fxmisc.richtext:richtextfx:0.10.9")
 }

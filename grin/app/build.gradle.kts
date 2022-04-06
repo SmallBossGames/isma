@@ -20,12 +20,12 @@ application {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(libs.tornadofx)
-    implementation(libs.koin.core)
+    implementation("no.tornado:tornadofx:${PackageVersion.tornadoFx}")
+    implementation("io.insert-koin:koin-core:${PackageVersion.koin}")
 
     implementation(project(":grin:integration"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 

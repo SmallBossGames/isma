@@ -21,18 +21,14 @@ application {
     )*/
 }
 
-val kotlinReflectVersion = "1.6.10"
-val kotlinxCoroutinesVersion = "1.6.0"
-val kotlinxSerializationJsonVersion = "1.3.2"
-
 dependencies {
-    implementation (libs.tornadofx)
+    implementation ("no.tornado:tornadofx:${PackageVersion.tornadoFx}")
     implementation ("org.antlr:antlr4-runtime:4.9.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:$kotlinxCoroutinesVersion")
-    implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
-    implementation (libs.koin.core)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:${PackageVersion.kotlinxCoroutines}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${PackageVersion.kotlinxCoroutines}")
+    implementation ("org.jetbrains.kotlin:kotlin-reflect:${PackageVersion.kotlinReflect}")
+    implementation ("io.insert-koin:koin-core:${PackageVersion.koin}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${PackageVersion.kotlinxSerializationJson}")
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
     implementation ("org.fxmisc.richtext:richtextfx:0.10.9")

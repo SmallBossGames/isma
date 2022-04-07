@@ -24,6 +24,7 @@ class AxisDrawElement(
                     xAxis.order,
                     xAxis.direction,
                     xAxis.backGroundColor,
+                    xAxis.fontColor,
                     canvasWidth,
                     canvasHeight
                 )
@@ -43,6 +44,7 @@ class AxisDrawElement(
                     yAxis.order,
                     yAxis.direction,
                     yAxis.backGroundColor,
+                    yAxis.fontColor,
                     canvasWidth,
                     canvasHeight
                 )
@@ -105,44 +107,51 @@ class AxisDrawElement(
         context: GraphicsContext,
         order: Int,
         direction: Direction,
-        color: Color,
-        canvasWidth: Double, 
+        backgroundColor: Color,
+        lineColor: Color,
+        canvasWidth: Double,
         canvasHeight: Double
     ) {
-        context.fill = color
+        context.fill = backgroundColor
+        context.stroke = lineColor
+
         val startPoint = order * SettingsProvider.getAxisWidth()
         when (direction) {
             Direction.LEFT -> {
-                context.fillRect(
-                    startPoint,
-                    getTopAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getAxisWidth(),
-                    canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-                )
+                val x = startPoint
+                val y = getTopAxisSize() * SettingsProvider.getAxisWidth()
+                val width = SettingsProvider.getAxisWidth()
+                val height = canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+
+                context.strokeLine(x + width, y, x + width, y + height)
+                context.fillRect(x, y, width, height)
             }
             Direction.RIGHT -> {
-                context.fillRect(
-                    canvasWidth - startPoint,
-                    getTopAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getAxisWidth(),
-                    canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-                )
+                val x = canvasWidth - startPoint
+                val y = getTopAxisSize() * SettingsProvider.getAxisWidth()
+                val width = SettingsProvider.getAxisWidth()
+                val height = canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+
+                context.strokeLine(x, y, x, y + height)
+                context.fillRect(x, y, width, height)
             }
             Direction.TOP -> {
-                context.fillRect(
-                    getLeftAxisSize() * SettingsProvider.getAxisWidth(),
-                    startPoint,
-                    canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getAxisWidth()
-                )
+                val x = getLeftAxisSize() * SettingsProvider.getAxisWidth()
+                val y = startPoint
+                val width = canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth()
+                val height = SettingsProvider.getAxisWidth()
+
+                context.strokeLine(x, y + height, x + width, y + height)
+                context.fillRect(x, y, width, height)
             }
             Direction.BOTTOM -> {
-                context.fillRect(
-                    getLeftAxisSize() * SettingsProvider.getAxisWidth(),
-                    canvasHeight - startPoint - SettingsProvider.getAxisWidth(),
-                    canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth(),
-                    SettingsProvider.getAxisWidth()
-                )
+                val x = getLeftAxisSize() * SettingsProvider.getAxisWidth()
+                val y = canvasHeight - startPoint - SettingsProvider.getAxisWidth()
+                val width = canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth()
+                val height = SettingsProvider.getAxisWidth()
+
+                context.strokeLine(x, y, x + width, y)
+                context.fillRect(x, y, width, height)
             }
         }
     }

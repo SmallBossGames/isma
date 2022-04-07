@@ -73,7 +73,10 @@ class HorizontalAxisDrawStrategy(
             val text = createStringValue(currentValue, axis)
             val (width, _) = estimateTextSize(text, context.font)
 
-            if(nextMarkPixel - width / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition && nextMarkPixel + width / 2 < maxDrawingPixel){
+            if(nextMarkPixel - width / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition
+                && nextMarkPixel + width / 2 < maxDrawingPixel
+                && nextMarkPixel - width / 2 > minDrawingPixel
+            ){
                 filledPosition = nextMarkPixel + width / 2
                 context.fillText(text, nextMarkPixel, marksCoordinate)
             }
@@ -91,7 +94,10 @@ class HorizontalAxisDrawStrategy(
             val text = createStringValue(currentValue, axis)
             val (width, _) = estimateTextSize(text, context.font)
 
-            if(nextMarkPixel + width / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition && nextMarkPixel - width / 2 > minDrawingPixel) {
+            if(nextMarkPixel + width / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition
+                && nextMarkPixel + width / 2 < maxDrawingPixel
+                && nextMarkPixel - width / 2 > minDrawingPixel
+            ) {
                 filledPosition = nextMarkPixel - width / 2
                 context.fillText(text, nextMarkPixel, marksCoordinate)
             }

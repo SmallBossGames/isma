@@ -76,7 +76,10 @@ class VerticalAxisDrawStrategy(
             val text = createStringValue(currentValue, axis)
             val (_, height) = estimateTextSize(text, context.font)
 
-            if(nextMarkPixel - height / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition && nextMarkPixel + height / 2 < maxDrawingPixel){
+            if(nextMarkPixel - height / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition
+                && nextMarkPixel + height / 2 < maxDrawingPixel
+                && nextMarkPixel - height / 2 > minDrawingPixel
+            ){
                 filledPosition = nextMarkPixel + height / 2
                 context.fillText(text, marksCoordinate, nextMarkPixel)
             }
@@ -94,7 +97,10 @@ class VerticalAxisDrawStrategy(
             val text = createStringValue(currentValue, axis)
             val (_, height) = estimateTextSize(text, context.font)
 
-            if(nextMarkPixel + height / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition && nextMarkPixel - height / 2 > minDrawingPixel) {
+            if(nextMarkPixel + height / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition
+                && nextMarkPixel + height / 2 < maxDrawingPixel
+                && nextMarkPixel - height / 2 > minDrawingPixel
+            ) {
                 filledPosition = nextMarkPixel - height / 2
                 context.fillText(text, marksCoordinate, nextMarkPixel)
             }

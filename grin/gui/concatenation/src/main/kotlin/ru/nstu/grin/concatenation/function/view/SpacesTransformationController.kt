@@ -10,15 +10,13 @@ import jwave.transforms.wavelets.coiflet.Coiflet5
 import jwave.transforms.wavelets.haar.Haar1
 import jwave.transforms.wavelets.legendre.Legendre3
 import jwave.transforms.wavelets.other.DiscreteMayer
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
-import ru.nstu.grin.concatenation.axis.model.AxisMarkType
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.project.ConcatenationAxisSnapshot
 import ru.nstu.grin.concatenation.canvas.model.project.toModel
@@ -27,16 +25,13 @@ import ru.nstu.grin.concatenation.function.model.DerivativeDetails
 import ru.nstu.grin.concatenation.function.model.DerivativeType
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
 import ru.nstu.grin.concatenation.function.model.WaveletDetails
-import ru.nstu.grin.concatenation.function.transform.LogTransform
-import ru.nstu.grin.concatenation.function.transform.MirrorTransform
 import ru.nstu.grin.math.Derivatives
 import ru.nstu.grin.model.MathPoint
-import tornadofx.Controller
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class SpacesTransformationController(
-    private val matrixTransformer: MatrixTransformerController,
+    private val matrixTransformer: MatrixTransformer,
     private val model: ConcatenationCanvasModel,
 ) {
     private val derivativesCache = ConcurrentHashMap<DerivativeCacheKey, List<Point>>()

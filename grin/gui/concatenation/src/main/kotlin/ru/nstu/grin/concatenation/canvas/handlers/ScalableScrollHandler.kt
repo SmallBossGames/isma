@@ -4,7 +4,7 @@ import javafx.event.EventHandler
 import javafx.scene.input.ScrollEvent
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
@@ -13,7 +13,7 @@ class ScalableScrollHandler(
     private val model: ConcatenationCanvasModel,
     private val canvasViewModel: CanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
-    private val matrixTransformer: MatrixTransformerController,
+    private val matrixTransformer: MatrixTransformer,
 ) : EventHandler<ScrollEvent> {
     override fun handle(event: ScrollEvent) {
         val axes = model.cartesianSpaces.map {

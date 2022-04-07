@@ -7,7 +7,7 @@ import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import kotlin.math.abs
 
-class MatrixTransformerController(
+class MatrixTransformer(
     private val canvasViewModel: CanvasViewModel,
     private val concatenationCanvasModel: ConcatenationCanvasModel,
 ) {

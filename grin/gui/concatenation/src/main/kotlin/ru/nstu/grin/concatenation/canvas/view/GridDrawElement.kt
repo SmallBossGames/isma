@@ -4,14 +4,14 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import kotlin.math.roundToInt
 
 class GridDrawElement(
     private val xAxis: ConcatenationAxis,
     private val yAxis: ConcatenationAxis,
     private val color: Color,
-    private val matrixTransformerController: MatrixTransformerController
+    private val matrixTransformer: MatrixTransformer
 ) : ChainDrawElement {
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
@@ -31,8 +31,8 @@ class GridDrawElement(
     }
 
     private fun drawXGridForDoubleMarks(context: GraphicsContext) {
-        val (minYPixel, maxYPixel) = matrixTransformerController.getMinMaxPixel(yAxis.direction)
-        val (minXPixel, maxXPixel) = matrixTransformerController.getMinMaxPixel(xAxis.direction)
+        val (minYPixel, maxYPixel) = matrixTransformer.getMinMaxPixel(yAxis.direction)
+        val (minXPixel, maxXPixel) = matrixTransformer.getMinMaxPixel(xAxis.direction)
 
         var currentX = minXPixel + 10.0
         while (currentX < maxXPixel) {
@@ -47,8 +47,8 @@ class GridDrawElement(
     }
 
     private fun drawYGridForDoubleMarks(context: GraphicsContext) {
-        val (minYPixel, maxYPixel) = matrixTransformerController.getMinMaxPixel(yAxis.direction)
-        val (minXPixel, maxXPixel) = matrixTransformerController.getMinMaxPixel(xAxis.direction)
+        val (minYPixel, maxYPixel) = matrixTransformer.getMinMaxPixel(yAxis.direction)
+        val (minXPixel, maxXPixel) = matrixTransformer.getMinMaxPixel(xAxis.direction)
 
         var currentY = maxYPixel - 10.0
         while (currentY > minYPixel) {
@@ -65,11 +65,11 @@ class GridDrawElement(
     private fun drawXGridForIntegerMarks(context: GraphicsContext) {
         var currentX = xAxis.settings.min.toInt().toDouble()
         val max = xAxis.settings.max
-        val (minYPixel, maxYPixel) = matrixTransformerController
+        val (minYPixel, maxYPixel) = matrixTransformer
             .getMinMaxPixel(yAxis.direction)
 
         while (currentX < max) {
-            val stepX = matrixTransformerController
+            val stepX = matrixTransformer
                 .transformUnitsToPixel(currentX, xAxis.settings, xAxis.direction)
 
             context.strokeLine(
@@ -85,11 +85,11 @@ class GridDrawElement(
     private fun drawYGridForIntegerMarks(context: GraphicsContext) {
         var currentY = yAxis.settings.max.roundToInt().toDouble()
         val min = yAxis.settings.min
-        val (minXPixel, maxXPixel) = matrixTransformerController
+        val (minXPixel, maxXPixel) = matrixTransformer
             .getMinMaxPixel(xAxis.direction)
 
         while (currentY > min) {
-            val stepY = matrixTransformerController
+            val stepY = matrixTransformer
                 .transformUnitsToPixel(currentY, yAxis.settings, yAxis.direction)
 
             context.strokeLine(

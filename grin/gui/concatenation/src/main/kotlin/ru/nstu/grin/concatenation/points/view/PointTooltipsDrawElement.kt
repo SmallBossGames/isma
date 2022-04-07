@@ -5,7 +5,7 @@ import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.Direction
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 import ru.nstu.grin.concatenation.points.model.PointSettings
@@ -14,7 +14,7 @@ import kotlin.math.pow
 class PointTooltipsDrawElement(
     private val mainGrinScope: MainGrinScope,
     private val model: ConcatenationCanvasModel,
-    private val transformer: MatrixTransformerController,
+    private val transformer: MatrixTransformer,
 ) : ChainDrawElement {
     private val pointTooltips = mutableListOf<Tooltip>()
 

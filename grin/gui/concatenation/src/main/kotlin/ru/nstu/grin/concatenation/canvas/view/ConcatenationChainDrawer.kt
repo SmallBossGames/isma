@@ -8,7 +8,7 @@ import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
@@ -27,7 +27,7 @@ class ConcatenationChainDrawer(
     private val axisDrawElement: AxisDrawElement,
     private val arrowDrawElement: ArrowDrawElement,
     private val descriptionDrawElement: DescriptionDrawElement,
-    private val matrixTransformerController: MatrixTransformerController,
+    private val matrixTransformer: MatrixTransformer,
 ) : ChainDrawer {
     private val drawingInProgress = AtomicBoolean(false)
     private val transformationJob = AtomicReference<Job>(null)
@@ -66,13 +66,13 @@ class ConcatenationChainDrawer(
                         cartesianSpace.xAxis,
                         cartesianSpace.yAxis,
                         Color.valueOf("BBBBBB"),
-                        matrixTransformerController
+                        matrixTransformer
                     ).draw(this, width, height)
                     GridDrawElement(
                         cartesianSpace.xAxis,
                         cartesianSpace.yAxis,
                         Color.valueOf("EDEDED"),
-                        matrixTransformerController
+                        matrixTransformer
                     ).draw(this, width, height)
                 }
             }

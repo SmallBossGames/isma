@@ -8,13 +8,13 @@ import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.utilities.createStringValue
 import ru.nstu.grin.concatenation.axis.utilities.estimateTextSize
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
 class HorizontalAxisDrawStrategy(
-    private val matrixTransformerController: MatrixTransformerController
+    private val matrixTransformer: MatrixTransformer
 ) : AxisMarksDrawStrategy {
 
     override fun drawMarks(
@@ -28,7 +28,7 @@ class HorizontalAxisDrawStrategy(
         context.textBaseline = VPos.CENTER
         context.font = Font.font(axis.font, axis.textSize)
 
-        val zeroPixel = matrixTransformerController
+        val zeroPixel = matrixTransformer
             .transformUnitsToPixel(0.0, axis.settings, axis.direction)
 
         if (axis.settings.isOnlyIntegerPow) {
@@ -44,7 +44,7 @@ class HorizontalAxisDrawStrategy(
         marksCoordinate: Double,
         zeroPixel: Double
     ) {
-        val (minPixel, maxPixel) = matrixTransformerController.getMinMaxPixel(axis.direction)
+        val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixel(axis.direction)
 
         val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
         val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
@@ -67,7 +67,7 @@ class HorizontalAxisDrawStrategy(
         var filledPosition = zeroPixel + zeroPixelOffset
 
         while (nextMarkPixel < maxDrawingPixel) {
-            val currentValue = matrixTransformerController
+            val currentValue = matrixTransformer
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
@@ -85,7 +85,7 @@ class HorizontalAxisDrawStrategy(
         filledPosition = zeroPixel - zeroPixelOffset
 
         while (nextMarkPixel > minDrawingPixel) {
-            val currentValue = matrixTransformerController
+            val currentValue = matrixTransformer
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
@@ -109,7 +109,7 @@ class HorizontalAxisDrawStrategy(
         var currentX = axis.settings.min.toInt().toDouble()
         val max = axis.settings.max
         while (currentX < max) {
-            val stepX = matrixTransformerController
+            val stepX = matrixTransformer
                 .transformUnitsToPixel(currentX, axis.settings, axis.direction)
 
             if (axis.settings.max > 0 && axis.settings.min < 0) {

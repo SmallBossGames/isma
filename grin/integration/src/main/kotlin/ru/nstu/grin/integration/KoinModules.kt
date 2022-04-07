@@ -12,7 +12,7 @@ import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
 import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 import ru.nstu.grin.concatenation.axis.view.*
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
@@ -89,7 +89,7 @@ val grinGuiModule = module {
         scopedOf(::HorizontalAxisDrawStrategy)
         scopedOf(::PointTooltipsDrawElement)
         scopedOf(::ConcatenationFunctionDrawElement)
-        scopedOf(::MatrixTransformerController)
+        scopedOf(::MatrixTransformer)
         scopedOf(::CartesianCanvasContextMenuController)
 
         scoped { DescriptionDrawElement(get<ConcatenationCanvasModel>().descriptions) }

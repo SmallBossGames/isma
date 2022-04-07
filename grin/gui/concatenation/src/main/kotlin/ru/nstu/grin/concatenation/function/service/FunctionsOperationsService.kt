@@ -2,7 +2,7 @@ package ru.nstu.grin.concatenation.function.service
 
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
@@ -17,7 +17,7 @@ import ru.nstu.grin.model.MathPoint
 
 class FunctionsOperationsService(
     private val view: ConcatenationCanvas,
-    private val matrixTransformer: MatrixTransformerController,
+    private val matrixTransformer: MatrixTransformer,
     private val canvasModel: ConcatenationCanvasModel,
 ) {
     fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {

@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 
@@ -17,7 +17,7 @@ class DraggedHandler(
     private val canvasViewModel: CanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
-    private val matrixTransformer: MatrixTransformerController,
+    private val matrixTransformer: MatrixTransformer,
 ) : EventHandler<MouseEvent> {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 

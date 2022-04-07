@@ -3,7 +3,7 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.EditMode
@@ -13,7 +13,7 @@ class ReleaseMouseHandler(
     private val model: ConcatenationCanvasModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
-    private val matrixTransformer: MatrixTransformerController,
+    private val matrixTransformer: MatrixTransformer,
 ) : EventHandler<MouseEvent> {
 
     override fun handle(event: MouseEvent) {

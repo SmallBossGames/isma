@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.axis.view
 
+import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.text.Font
 import javafx.scene.text.TextAlignment
@@ -26,6 +27,7 @@ class HorizontalAxisDrawStrategy(
         context.stroke = axis.fontColor
         context.fill = axis.fontColor
         context.textAlign = TextAlignment.CENTER
+        context.textBaseline = VPos.CENTER
         context.font = Font.font(axis.font, axis.textSize)
 
         val zeroPixel = matrixTransformerController
@@ -51,7 +53,7 @@ class HorizontalAxisDrawStrategy(
 
         val zeroPixelOffset = if(zeroPixel < maxDrawingPixel && zeroPixel > minDrawingPixel){
             val text = createStringValue(0.0, axis)
-            val (width, height) = estimateTextSize(text, context.font)
+            val (width, _) = estimateTextSize(text, context.font)
 
             if(zeroPixel + width / 2 < maxDrawingPixel && zeroPixel - width / 2 > minDrawingPixel){
                 context.fillText(text, zeroPixel, marksCoordinate)
@@ -63,38 +65,40 @@ class HorizontalAxisDrawStrategy(
             0.0
         }
 
-        var currentPixel = max(zeroPixel + zeroPixelOffset + axis.distanceBetweenMarks, minDrawingPixel)
+        var nextMarkPixel = max(zeroPixel + axis.distanceBetweenMarks, minDrawingPixel)
+        var filledPosition = zeroPixel + zeroPixelOffset
 
-        while (currentPixel < maxDrawingPixel) {
+        while (nextMarkPixel < maxDrawingPixel) {
             val currentValue = matrixTransformerController
-                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+                .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (width, height) = estimateTextSize(text, context.font)
+            val (width, _) = estimateTextSize(text, context.font)
 
-            if(currentPixel + width < maxDrawingPixel){
-                context.fillText(text, currentPixel + width / 2, marksCoordinate)
+            if(nextMarkPixel - width / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition && nextMarkPixel + width / 2 < maxDrawingPixel){
+                filledPosition = nextMarkPixel + width / 2
+                context.fillText(text, nextMarkPixel, marksCoordinate)
             }
 
-            currentPixel += axis.distanceBetweenMarks + width
+            nextMarkPixel += axis.distanceBetweenMarks
         }
 
-        currentPixel = min(zeroPixel - zeroPixelOffset - axis.distanceBetweenMarks, maxDrawingPixel)
+        nextMarkPixel = min(zeroPixel - axis.distanceBetweenMarks, maxDrawingPixel)
+        filledPosition = zeroPixel - zeroPixelOffset
 
-        while (currentPixel > minDrawingPixel) {
+        while (nextMarkPixel > minDrawingPixel) {
             val currentValue = matrixTransformerController
-                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
+                .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (width, height) = estimateTextSize(text, context.font)
+            val (width, _) = estimateTextSize(text, context.font)
 
-            println(width)
-
-            if(currentPixel - width > minDrawingPixel){
-                context.fillText(text, currentPixel - width / 2, marksCoordinate)
+            if(nextMarkPixel + width / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition && nextMarkPixel - width / 2 > minDrawingPixel) {
+                filledPosition = nextMarkPixel - width / 2
+                context.fillText(text, nextMarkPixel, marksCoordinate)
             }
 
-            currentPixel -= axis.distanceBetweenMarks + width
+            nextMarkPixel -= axis.distanceBetweenMarks
         }
     }
 
@@ -134,5 +138,6 @@ class HorizontalAxisDrawStrategy(
 
     private companion object {
         const val TEXT_VERTICAL_BORDERS_OFFSET = 5.0
+        const val MIN_SPACE_BETWEEN_MARKS = 5.0
     }
 }

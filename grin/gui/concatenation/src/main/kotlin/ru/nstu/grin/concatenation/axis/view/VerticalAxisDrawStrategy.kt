@@ -23,38 +23,51 @@ class VerticalAxisDrawStrategy(
         axis: ConcatenationAxis,
         marksCoordinate: Double,
     ) {
+        context.save()
+
         context.stroke = axis.fontColor
         context.fill = axis.fontColor
         context.textAlign = TextAlignment.CENTER
         context.textBaseline = VPos.CENTER
         context.font = Font.font(axis.font, axis.textSize)
 
-        val zeroPixel = matrixTransformer
-            .transformUnitsToPixel(0.0, axis.settings, axis.direction)
 
-        if (axis.settings.isOnlyIntegerPow) {
+        // TODO: drawOnlyIntegerMark is temporary unavailable
+        /*if (axis.settings.isOnlyIntegerPow) {
             println("IsOnlyIntger")
             drawOnlyIntegerMark(context, axis, marksCoordinate, zeroPixel)
         } else {
             drawDoubleMarks(context, axis, marksCoordinate, zeroPixel)
-        }
+        }*/
+
+        val (marksWidth, _) = drawDoubleMarks(context, axis, marksCoordinate)
+        val (_, labelHeight) = estimateTextSize(axis.name, context.font)
+
+        drawAxisLabel(context, axis, marksCoordinate - marksWidth / 2 - DISTANCE_TO_LABEL - labelHeight / 2)
+
+        context.restore()
     }
 
     private fun drawDoubleMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
         marksCoordinate: Double,
-        zeroPixel: Double,
-    ) {
+    ): Pair<Double, Double> {
         val (minPixel, maxPixel) = matrixTransformer
             .getMinMaxPixel(axis.direction)
 
         val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
         val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
 
+        val zeroPixel = matrixTransformer.transformUnitsToPixel(0.0, axis.settings, axis.direction)
+
+        var maxWidth = 0.0
+
         val zeroPixelOffset = if(zeroPixel < maxDrawingPixel && zeroPixel > minDrawingPixel){
             val text = createStringValue(0.0, axis)
-            val (_, height) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, context.font)
+
+            maxWidth = max(maxWidth, width)
 
             if(zeroPixel + height / 2 < maxDrawingPixel && zeroPixel - height / 2 > minDrawingPixel){
                 context.fillText(text, marksCoordinate, zeroPixel)
@@ -74,7 +87,9 @@ class VerticalAxisDrawStrategy(
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (_, height) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, context.font)
+
+            maxWidth = max(maxWidth, width)
 
             if(nextMarkPixel - height / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition
                 && nextMarkPixel + height / 2 < maxDrawingPixel
@@ -95,7 +110,9 @@ class VerticalAxisDrawStrategy(
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (_, height) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, context.font)
+
+            maxWidth = max(maxWidth, width)
 
             if(nextMarkPixel + height / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition
                 && nextMarkPixel + height / 2 < maxDrawingPixel
@@ -107,6 +124,24 @@ class VerticalAxisDrawStrategy(
 
             nextMarkPixel -= axis.distanceBetweenMarks
         }
+
+        return Pair(maxWidth, maxDrawingPixel - minDrawingPixel)
+    }
+
+    private fun drawAxisLabel(
+        context: GraphicsContext,
+        axis: ConcatenationAxis,
+        labelCoordinate: Double,
+    ){
+        context.save()
+
+        val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixel(axis.direction)
+
+        context.translate(labelCoordinate, minPixel + (maxPixel - minPixel) / 2)
+        context.rotate(-90.0)
+        context.fillText(axis.name, 0.0, 0.0)
+
+        context.restore()
     }
 
     private fun drawOnlyIntegerMark(
@@ -147,5 +182,6 @@ class VerticalAxisDrawStrategy(
     private companion object {
         const val TEXT_VERTICAL_BORDERS_OFFSET = 5.0
         const val MIN_SPACE_BETWEEN_MARKS = 5.0
+        const val DISTANCE_TO_LABEL = 2.0
     }
 }

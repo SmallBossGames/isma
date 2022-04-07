@@ -22,38 +22,50 @@ class HorizontalAxisDrawStrategy(
         axis: ConcatenationAxis,
         marksCoordinate: Double
     ) {
+        context.save()
+
         context.stroke = axis.fontColor
         context.fill = axis.fontColor
         context.textAlign = TextAlignment.CENTER
         context.textBaseline = VPos.CENTER
         context.font = Font.font(axis.font, axis.textSize)
 
-        val zeroPixel = matrixTransformer
-            .transformUnitsToPixel(0.0, axis.settings, axis.direction)
-
-        if (axis.settings.isOnlyIntegerPow) {
+        // TODO: drawOnlyIntegerMark is temporary unavailable
+        /*if (axis.settings.isOnlyIntegerPow) {
             drawOnlyIntegerMark(context, axis, marksCoordinate, zeroPixel)
         } else {
             drawDoubleMarks(context, axis, marksCoordinate, zeroPixel)
-        }
+        }*/
+
+        val (_, marksHeight) = drawDoubleMarks(context, axis, marksCoordinate)
+        val (_, labelHeight) = estimateTextSize(axis.name, context.font)
+
+        drawAxisLabel(context, axis, marksCoordinate + marksHeight / 2 + DISTANCE_TO_LABEL + labelHeight / 2)
+
+        context.restore()
     }
 
     private fun drawDoubleMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
         marksCoordinate: Double,
-        zeroPixel: Double
-    ) {
+    ): Pair<Double, Double> {
         val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixel(axis.direction)
 
         val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
         val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
 
+        val zeroPixel = matrixTransformer.transformUnitsToPixel(0.0, axis.settings, axis.direction)
+
+        var maxHeight = 0.0
+
         val zeroPixelOffset = if(zeroPixel < maxDrawingPixel && zeroPixel > minDrawingPixel){
             val text = createStringValue(0.0, axis)
-            val (width, _) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, context.font)
 
             if(zeroPixel + width / 2 < maxDrawingPixel && zeroPixel - width / 2 > minDrawingPixel){
+                maxHeight = max(maxHeight, height)
+
                 context.fillText(text, zeroPixel, marksCoordinate)
                 width / 2
             } else{
@@ -71,13 +83,15 @@ class HorizontalAxisDrawStrategy(
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (width, _) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, context.font)
 
             if(nextMarkPixel - width / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition
                 && nextMarkPixel + width / 2 < maxDrawingPixel
                 && nextMarkPixel - width / 2 > minDrawingPixel
             ){
                 filledPosition = nextMarkPixel + width / 2
+                maxHeight = max(maxHeight, height)
+
                 context.fillText(text, nextMarkPixel, marksCoordinate)
             }
 
@@ -92,18 +106,38 @@ class HorizontalAxisDrawStrategy(
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (width, _) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, context.font)
 
             if(nextMarkPixel + width / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition
                 && nextMarkPixel + width / 2 < maxDrawingPixel
                 && nextMarkPixel - width / 2 > minDrawingPixel
             ) {
                 filledPosition = nextMarkPixel - width / 2
+                maxHeight = max(maxHeight, height)
+
                 context.fillText(text, nextMarkPixel, marksCoordinate)
             }
 
             nextMarkPixel -= axis.distanceBetweenMarks
         }
+
+        return Pair(maxDrawingPixel - minDrawingPixel, maxHeight)
+    }
+
+    private fun drawAxisLabel(
+        context: GraphicsContext,
+        axis: ConcatenationAxis,
+        labelCoordinate: Double,
+    ){
+        context.save()
+
+        val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixel(axis.direction)
+
+        context.translate(minPixel + (maxPixel - minPixel) / 2, labelCoordinate)
+        context.rotate(0.0)
+        context.fillText(axis.name, 0.0, 0.0)
+
+        context.restore()
     }
 
     private fun drawOnlyIntegerMark(
@@ -143,5 +177,6 @@ class HorizontalAxisDrawStrategy(
     private companion object {
         const val TEXT_VERTICAL_BORDERS_OFFSET = 5.0
         const val MIN_SPACE_BETWEEN_MARKS = 5.0
+        const val DISTANCE_TO_LABEL = 2.0
     }
 }

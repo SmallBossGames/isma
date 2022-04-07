@@ -110,8 +110,10 @@ class AxisDrawElement(
         backgroundColor: Color,
         lineColor: Color,
         canvasWidth: Double,
-        canvasHeight: Double
+        canvasHeight: Double,
     ) {
+        context.save()
+
         context.fill = backgroundColor
         context.stroke = lineColor
 
@@ -154,6 +156,8 @@ class AxisDrawElement(
                 context.fillRect(x, y, width, height)
             }
         }
+
+        context.restore()
     }
 
     private fun getTopAxisSize(): Int {
@@ -176,6 +180,6 @@ class AxisDrawElement(
         .filter { it.direction == direction }
 
     private companion object {
-        const val MARKS_MARGIN = 20.0
+        const val MARKS_MARGIN = 35.0
     }
 }

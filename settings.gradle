@@ -13,12 +13,11 @@ include('isma-text-editor')
 include 'grin:gui'
 include 'grin:analytic-fu'
 include 'grin:math'
-
-
 include 'grin:gui:concatenation'
 include 'grin:gui:main'
 include 'grin:gui:common'
 include 'grin:integration'
+include 'grin:app'
 
 //Java 8 projects
 include('isma-hsm')
@@ -57,5 +56,4 @@ include 'isma-next-services-simulation-abstractions'
 include 'isma-next-core-fdm'
 include 'isma-next-core-simulation-gen'
 include 'isma-javafx-extensions'
-include 'grin:app'
 

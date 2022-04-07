@@ -32,7 +32,6 @@ class AxisDrawElement(
                     xAxis.order,
                     xAxis,
                     xAxis.direction,
-                    xAxis.fontColor,
                     canvasWidth,
                     canvasHeight
                 )
@@ -52,7 +51,6 @@ class AxisDrawElement(
                     yAxis.order,
                     yAxis,
                     yAxis.direction,
-                    yAxis.fontColor,
                     canvasWidth,
                     canvasHeight
                 )
@@ -65,12 +63,9 @@ class AxisDrawElement(
         order: Int,
         axis: ConcatenationAxis,
         direction: Direction,
-        color: Color,
         canvasWidth: Double,
         canvasHeight: Double
     ) {
-        context.stroke = color
-
         val startPoint = order * SettingsProvider.getAxisWidth()
         val marksCoordinate = startPoint + MARKS_MARGIN
 

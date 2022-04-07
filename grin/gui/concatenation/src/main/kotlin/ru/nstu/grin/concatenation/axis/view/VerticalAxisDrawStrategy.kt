@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.axis.view
 
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.text.Font
+import javafx.scene.text.TextAlignment
 import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
@@ -21,7 +22,11 @@ class VerticalAxisDrawStrategy(
         canvasWidth: Double,
         canvasHeight: Double
     ) {
+        context.stroke = axis.fontColor
+        context.fill = axis.fontColor
+        context.textAlign = TextAlignment.LEFT
         context.font = Font.font(axis.font, axis.textSize)
+
         val zeroPixel = matrixTransformerController
             .transformUnitsToPixel(0.0, axis.settings, axis.direction)
 
@@ -46,11 +51,10 @@ class VerticalAxisDrawStrategy(
             NumberFormatter.format(value)
         }
 
-        context.strokeText(
+        context.fillText(
             text,
             marksCoordinate - LEFT_BORDER_OFFSET,
-            pixel,
-            MAX_TEXT_WIDTH
+            pixel
         )
     }
 
@@ -118,11 +122,10 @@ class VerticalAxisDrawStrategy(
                 NumberFormatter.format(currentY)
             }
 
-            context.strokeText(
+            context.fillText(
                 text,
                 marksCoordinate - 15.0,
-                stepY,
-                MAX_TEXT_WIDTH
+                stepY
             )
 
             currentY -= axis.settings.integerStep
@@ -130,7 +133,6 @@ class VerticalAxisDrawStrategy(
     }
 
     private companion object {
-        const val MAX_TEXT_WIDTH = 30.0
         const val TEXT_VERTICAL_BORDERS_OFFSET = 10.0
         const val LEFT_BORDER_OFFSET = 15.0
     }

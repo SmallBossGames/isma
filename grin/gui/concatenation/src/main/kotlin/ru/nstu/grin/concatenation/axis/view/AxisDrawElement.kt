@@ -75,8 +75,6 @@ class AxisDrawElement(
                     context,
                     axis,
                     marksCoordinate,
-                    canvasWidth,
-                    canvasHeight
                 )
             }
             Direction.RIGHT -> {
@@ -84,8 +82,6 @@ class AxisDrawElement(
                     context,
                     axis,
                     canvasWidth - marksCoordinate,
-                    canvasWidth,
-                    canvasHeight
                 )
             }
             Direction.TOP -> {
@@ -93,8 +89,6 @@ class AxisDrawElement(
                     context,
                     axis,
                     marksCoordinate,
-                    canvasWidth,
-                    canvasHeight
                 )
             }
             Direction.BOTTOM -> {
@@ -102,8 +96,6 @@ class AxisDrawElement(
                     context,
                     axis,
                     canvasHeight - marksCoordinate,
-                    canvasWidth,
-                    canvasHeight
                 )
             }
         }

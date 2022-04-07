@@ -20,9 +20,7 @@ class HorizontalAxisDrawStrategy(
     override fun drawMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
-        marksCoordinate: Double,
-        canvasWidth: Double,
-        canvasHeight: Double
+        marksCoordinate: Double
     ) {
         context.stroke = axis.fontColor
         context.fill = axis.fontColor

@@ -8,7 +8,5 @@ interface AxisMarksDrawStrategy {
         context: GraphicsContext,
         axis: ConcatenationAxis,
         marksCoordinate: Double,
-        canvasWidth: Double,
-        canvasHeight: Double,
     )
 }

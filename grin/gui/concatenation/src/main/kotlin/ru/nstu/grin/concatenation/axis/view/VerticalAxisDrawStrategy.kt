@@ -22,8 +22,6 @@ class VerticalAxisDrawStrategy(
         context: GraphicsContext,
         axis: ConcatenationAxis,
         marksCoordinate: Double,
-        canvasWidth: Double,
-        canvasHeight: Double
     ) {
         context.stroke = axis.fontColor
         context.fill = axis.fontColor

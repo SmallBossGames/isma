@@ -69,7 +69,7 @@ class AxisDrawElement(
         canvasHeight: Double
     ) {
         val startPoint = order * SettingsProvider.getAxisWidth()
-        val marksCoordinate = startPoint + MARKS_MARGIN
+        val marksCoordinate = startPoint + SettingsProvider.getAxisWidth() / 2
 
         when (direction) {
             Direction.LEFT -> {
@@ -178,8 +178,4 @@ class AxisDrawElement(
 
     private fun filterAxis(direction: Direction) = model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
         .filter { it.direction == direction }
-
-    private companion object {
-        const val MARKS_MARGIN = 35.0
-    }
 }

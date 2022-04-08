@@ -40,21 +40,28 @@ class VerticalAxisDrawStrategy(
             drawDoubleMarks(context, axis, marksCoordinate, zeroPixel)
         }*/
 
-        val (marksWidth, _) = drawDoubleMarks(context, axis, marksCoordinate)
         val (_, labelHeight) = estimateTextSize(axis.name, context.font)
 
-        drawAxisLabel(context, axis, marksCoordinate - marksWidth / 2 - DISTANCE_TO_LABEL - labelHeight / 2)
+        val marks = buildDoubleMarksArray(axis, context.font)
+        val marksWidth = marks.maxOf { it.width }
+
+        val offset = marksWidth - (labelHeight + marksWidth) / 2
+
+        val marksX = marksCoordinate + marksWidth / 2 + DISTANCE_TO_LABEL / 2 - offset
+        val labelX = marksCoordinate - labelHeight / 2 - DISTANCE_TO_LABEL / 2  - offset
+
+        marks.forEach { context.fillText(it.text, marksX, it.y) }
+        drawAxisLabel(context, axis, labelX)
 
         context.restore()
     }
 
-    private fun drawDoubleMarks(
-        context: GraphicsContext,
-        axis: ConcatenationAxis,
-        marksCoordinate: Double,
-    ): Pair<Double, Double> {
-        val (minPixel, maxPixel) = matrixTransformer
-            .getMinMaxPixel(axis.direction)
+    private data class Mark(val text: String, val y: Double, val height: Double, val width: Double)
+
+    private fun buildDoubleMarksArray(axis: ConcatenationAxis, font: Font): List<Mark> {
+        val result = mutableListOf<Mark>()
+
+        val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixel(axis.direction)
 
         val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
         val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
@@ -65,12 +72,12 @@ class VerticalAxisDrawStrategy(
 
         val zeroPixelOffset = if(zeroPixel < maxDrawingPixel && zeroPixel > minDrawingPixel){
             val text = createStringValue(0.0, axis)
-            val (width, height) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, font)
 
             maxWidth = max(maxWidth, width)
 
             if(zeroPixel + height / 2 < maxDrawingPixel && zeroPixel - height / 2 > minDrawingPixel){
-                context.fillText(text, marksCoordinate, zeroPixel)
+                result.add(Mark(text, zeroPixel, height, width))
                 height / 2
             } else{
                 0.0
@@ -87,7 +94,7 @@ class VerticalAxisDrawStrategy(
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (width, height) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, font)
 
             maxWidth = max(maxWidth, width)
 
@@ -96,7 +103,7 @@ class VerticalAxisDrawStrategy(
                 && nextMarkPixel - height / 2 > minDrawingPixel
             ){
                 filledPosition = nextMarkPixel + height / 2
-                context.fillText(text, marksCoordinate, nextMarkPixel)
+                result.add(Mark(text, nextMarkPixel, height, width))
             }
 
             nextMarkPixel += axis.distanceBetweenMarks
@@ -110,7 +117,7 @@ class VerticalAxisDrawStrategy(
                 .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
 
             val text = createStringValue(currentValue, axis)
-            val (width, height) = estimateTextSize(text, context.font)
+            val (width, height) = estimateTextSize(text, font)
 
             maxWidth = max(maxWidth, width)
 
@@ -119,13 +126,13 @@ class VerticalAxisDrawStrategy(
                 && nextMarkPixel - height / 2 > minDrawingPixel
             ) {
                 filledPosition = nextMarkPixel - height / 2
-                context.fillText(text, marksCoordinate, nextMarkPixel)
+                result.add(Mark(text, nextMarkPixel, height, width))
             }
 
             nextMarkPixel -= axis.distanceBetweenMarks
         }
 
-        return Pair(maxWidth, maxDrawingPixel - minDrawingPixel)
+        return result
     }
 
     private fun drawAxisLabel(

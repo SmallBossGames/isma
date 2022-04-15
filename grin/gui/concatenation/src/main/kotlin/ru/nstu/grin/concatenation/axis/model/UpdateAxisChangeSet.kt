@@ -4,6 +4,7 @@ import javafx.scene.paint.Color
 
 data class UpdateAxisChangeSet(
     val distance: Double,
+    val marksDistanceType: MarksDistanceType,
     val textSize: Double,
     val font: String,
     val fontColor: Color,

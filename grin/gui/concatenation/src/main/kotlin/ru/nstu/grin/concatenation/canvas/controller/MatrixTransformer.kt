@@ -13,11 +13,11 @@ class MatrixTransformer(
 ) {
     fun transformPixelToUnits(
         number: Double,
-        axisProperties: AxisScaleProperties,
+        scaleProperties: AxisScaleProperties,
         direction: Direction,
     ): Double {
-        val min = axisProperties.minValue
-        val max = axisProperties.maxValue
+        val min = scaleProperties.minValue
+        val max = scaleProperties.maxValue
         val sumUnits = abs(max - min)
 
         val (minPixel, maxPixel) = getMinMaxPixel(direction)
@@ -36,11 +36,11 @@ class MatrixTransformer(
 
     fun transformUnitsToPixel(
         number: Double,
-        axisProperties: AxisScaleProperties,
+        scaleProperties: AxisScaleProperties,
         direction: Direction,
     ): Double {
-        val min = axisProperties.minValue
-        val max = axisProperties.maxValue
+        val min = scaleProperties.minValue
+        val max = scaleProperties.maxValue
         val sumUnits = abs(max - min)
 
         val (minPixel, maxPixel) = getMinMaxPixel(direction)

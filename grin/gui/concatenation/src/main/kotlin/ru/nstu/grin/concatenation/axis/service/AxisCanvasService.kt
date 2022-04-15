@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 import ru.nstu.grin.concatenation.axis.model.UpdateAxisChangeSet
 import ru.nstu.grin.concatenation.axis.model.UpdateLogarithmicTypeChangeSet
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -29,7 +28,7 @@ class AxisCanvasService(
 
         axis.styleProperties = axis.styleProperties.copy(
             backgroundColor = axisChangeSet.axisColor,
-            marksDistanceType = MarksDistanceType.PIXEL,
+            marksDistanceType = axisChangeSet.marksDistanceType,
             marksDistance = axisChangeSet.distance,
             marksColor = axisChangeSet.fontColor,
             marksFont = Font.font(axisChangeSet.font, axisChangeSet.textSize),

@@ -7,9 +7,11 @@ import tornadofx.*
 class AxisChangeFragmentModel(
     val axis: ConcatenationAxis
 ) {
-
     var distanceBetweenMarksProperty = SimpleDoubleProperty(24.0)
     var distanceBetweenMarks by distanceBetweenMarksProperty
+
+    var marksDistanceTypeProperty = SimpleObjectProperty(MarksDistanceType.PIXEL)
+    var marksDistanceType by marksDistanceTypeProperty
 
     var textSizeProperty = SimpleDoubleProperty(12.0)
     var textSize by textSizeProperty
@@ -36,18 +38,23 @@ class AxisChangeFragmentModel(
     var axisColor by axisColorProperty
 
     init {
-        axisColor = axis.styleProperties.backgroundColor
-        distanceBetweenMarks = axis.styleProperties.marksDistance
-        textSize = axis.styleProperties.marksFont.size
-        font = axis.styleProperties.marksFont.family
-        fontColor = axis.styleProperties.marksColor
-        isHide = axis.styleProperties.isVisible
-        min = axis.scaleProperties.minValue
-        max = axis.scaleProperties.maxValue
+        val styleProperties = axis.styleProperties
+        val scaleProperties = axis.scaleProperties
+
+        distanceBetweenMarks = styleProperties.marksDistance
+        marksDistanceType = styleProperties.marksDistanceType
+        axisColor = styleProperties.backgroundColor
+        textSize = styleProperties.marksFont.size
+        font = styleProperties.marksFont.family
+        fontColor = styleProperties.marksColor
+        isHide = styleProperties.isVisible
+        min = scaleProperties.minValue
+        max = scaleProperties.maxValue
     }
 
     fun createChangeSet() = UpdateAxisChangeSet(
         distance = distanceBetweenMarks,
+        marksDistanceType = marksDistanceType,
         textSize = textSize,
         font = font,
         fontColor = fontColor,

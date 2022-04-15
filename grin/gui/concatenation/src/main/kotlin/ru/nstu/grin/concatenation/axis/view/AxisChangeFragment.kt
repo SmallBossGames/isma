@@ -14,6 +14,7 @@ import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.model.AxisScalingType
+import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 
 class AxisChangeFragment(
     private val model: AxisChangeFragmentModel,
@@ -21,17 +22,22 @@ class AxisChangeFragment(
     private val logFragment: LogarithmicTypeFragment
 ) : BorderPane() {
     init {
+        val distanceTypes = FXCollections.observableArrayList(MarksDistanceType.values().toList())
+        val scalingTypes = FXCollections.observableArrayList(AxisScalingType.values().toList())
+        val fontFamilies = FXCollections.observableArrayList(Font.getFamilies())
+
         top = VBox(
             propertiesGrid {
                 addNode("Distance between marks", model.distanceBetweenMarksProperty)
+                addNode("Distance type", distanceTypes, model.marksDistanceTypeProperty)
                 addNode("Font size", model.textSizeProperty)
-                addNode("Font", FXCollections.observableArrayList( Font.getFamilies()), model.fontProperty)
+                addNode("Font", fontFamilies, model.fontProperty)
                 addNode("Font color", model.fontColorProperty)
                 addNode("Min", model.minProperty)
                 addNode("Max", model.maxProperty)
                 addNode("Axis Color", model.axisColorProperty)
                 addNode("Hide Axis", model.isHideProperty)
-                addNode("Scale Mode", FXCollections.observableArrayList(AxisScalingType.values().toList()), model.markTypeProperty){
+                addNode("Scale Mode", scalingTypes, model.markTypeProperty){
                     object : ListCell<AxisScalingType>() {
                         override fun updateItem(item: AxisScalingType?, empty: Boolean) {
                             super.updateItem(item, empty)

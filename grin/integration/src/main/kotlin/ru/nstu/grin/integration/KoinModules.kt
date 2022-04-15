@@ -87,6 +87,8 @@ val grinGuiModule = module {
         scopedOf(::AxisDrawElement)
         scopedOf(::VerticalAxisDrawStrategy)
         scopedOf(::HorizontalAxisDrawStrategy)
+        scopedOf(::HorizontalPixelMarksArrayBuilder)
+        scopedOf(::HorizontalValueMarksArrayBuilder)
         scopedOf(::PointTooltipsDrawElement)
         scopedOf(::ConcatenationFunctionDrawElement)
         scopedOf(::MatrixTransformer)

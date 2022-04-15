@@ -1,10 +1,11 @@
 package ru.nstu.grin.concatenation.axis.service
 
+import javafx.scene.text.Font
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 import ru.nstu.grin.concatenation.axis.model.UpdateAxisChangeSet
 import ru.nstu.grin.concatenation.axis.model.UpdateLogarithmicTypeChangeSet
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -19,25 +20,21 @@ class AxisCanvasService(
         axisChangeSet: UpdateAxisChangeSet,
         logarithmicChangeSet: UpdateLogarithmicTypeChangeSet
     ) {
-        axis.settings.isLogarithmic = axisChangeSet.axisMarkType == AxisMarkType.LOGARITHMIC
+        axis.scaleProperties = axis.scaleProperties.copy(
+            scalingType = axisChangeSet.axisScalingType,
+            scalingLogBase = logarithmicChangeSet.logarithmBase,
+            minValue = axisChangeSet.min,
+            maxValue = axisChangeSet.max,
+        )
 
-        if (axisChangeSet.axisMarkType == AxisMarkType.LINEAR) {
-            axis.settings.isLogarithmic = false
-            axis.settings.isOnlyIntegerPow = false
-        }
-
-        axis.axisMarkType = axisChangeSet.axisMarkType
-        axis.distanceBetweenMarks = axisChangeSet.distance
-        axis.textSize = axisChangeSet.textSize
-        axis.font = axisChangeSet.font
-        axis.fontColor = axisChangeSet.fontColor
-        axis.backGroundColor = axisChangeSet.axisColor
-        axis.settings.logarithmBase = logarithmicChangeSet.logarithmBase
-        axis.settings.isOnlyIntegerPow = logarithmicChangeSet.isOnlyIntegerPow
-        axis.settings.integerStep = logarithmicChangeSet.integerStep
-        axis.settings.min = axisChangeSet.min
-        axis.settings.max = axisChangeSet.max
-        axis.isHide = axisChangeSet.isHide
+        axis.styleProperties = axis.styleProperties.copy(
+            backgroundColor = axisChangeSet.axisColor,
+            marksDistanceType = MarksDistanceType.PIXEL,
+            marksDistance = axisChangeSet.distance,
+            marksColor = axisChangeSet.fontColor,
+            marksFont = Font.font(axisChangeSet.font, axisChangeSet.textSize),
+            isVisible = axisChangeSet.isHide
+        )
 
         coroutineScope.launch {
             model.reportAxesListUpdate()

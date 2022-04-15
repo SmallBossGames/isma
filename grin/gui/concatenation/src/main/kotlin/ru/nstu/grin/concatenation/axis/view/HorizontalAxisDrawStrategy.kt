@@ -2,14 +2,14 @@ package ru.nstu.grin.concatenation.axis.view
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.text.Font
 import javafx.scene.text.TextAlignment
-import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
+import ru.nstu.grin.concatenation.axis.model.AxisScaleProperties
+import ru.nstu.grin.concatenation.axis.model.AxisStyleProperties
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.utilities.createStringValue
 import ru.nstu.grin.concatenation.axis.utilities.estimateTextSize
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
-import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
@@ -24,11 +24,14 @@ class HorizontalAxisDrawStrategy(
     ) {
         context.save()
 
-        context.stroke = axis.fontColor
-        context.fill = axis.fontColor
+        val scaleProperties = axis.scaleProperties
+        val styleProperties = axis.styleProperties
+
+        context.stroke = styleProperties.marksColor
+        context.fill = styleProperties.marksColor
         context.textAlign = TextAlignment.CENTER
         context.textBaseline = VPos.CENTER
-        context.font = Font.font(axis.font, axis.textSize)
+        context.font = styleProperties.marksFont
 
         // TODO: drawOnlyIntegerMark is temporary unavailable
         /*if (axis.settings.isOnlyIntegerPow) {
@@ -39,7 +42,7 @@ class HorizontalAxisDrawStrategy(
 
         val (_, labelHeight) = estimateTextSize(axis.name, context.font)
 
-        val marks = buildDoubleMarksArray(axis, context.font)
+        val marks = buildDoubleMarksArray(scaleProperties, styleProperties, axis.direction)
         val marksHeight = marks.maxOf { it.height }
 
         val offset = marksHeight - (labelHeight + marksHeight) / 2
@@ -55,19 +58,23 @@ class HorizontalAxisDrawStrategy(
 
     private data class Mark(val text: String, val x: Double, val height: Double, val width: Double)
 
-    private fun buildDoubleMarksArray(axis: ConcatenationAxis, font: Font): List<Mark> {
+    private fun buildDoubleMarksArray(
+        scaleProperties: AxisScaleProperties,
+        styleProperties: AxisStyleProperties,
+        direction: Direction
+    ): List<Mark> {
         val result = mutableListOf<Mark>()
 
-        val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixel(axis.direction)
+        val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixelHorizontal()
 
         val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
         val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
 
-        val zeroPixel = matrixTransformer.transformUnitsToPixel(0.0, axis.settings, axis.direction)
+        val zeroPixel = matrixTransformer.transformUnitsToPixel(0.0, scaleProperties, direction)
 
         val zeroPixelOffset = if(zeroPixel < maxDrawingPixel && zeroPixel > minDrawingPixel){
-            val text = createStringValue(0.0, axis)
-            val (width, height) = estimateTextSize(text, font)
+            val text = createStringValue(0.0, scaleProperties)
+            val (width, height) = estimateTextSize(text, styleProperties.marksFont)
 
             if(zeroPixel + width / 2 < maxDrawingPixel && zeroPixel - width / 2 > minDrawingPixel){
                 result.add(Mark(text, zeroPixel, height, width))
@@ -79,15 +86,15 @@ class HorizontalAxisDrawStrategy(
             0.0
         }
 
-        var nextMarkPixel = max(zeroPixel + axis.distanceBetweenMarks, minDrawingPixel)
+        var nextMarkPixel = max(zeroPixel + styleProperties.marksDistance, minDrawingPixel)
         var filledPosition = zeroPixel + zeroPixelOffset
 
         while (nextMarkPixel < maxDrawingPixel) {
             val currentValue = matrixTransformer
-                .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
+                .transformPixelToUnits(nextMarkPixel, scaleProperties, direction)
 
-            val text = createStringValue(currentValue, axis)
-            val (width, height) = estimateTextSize(text, font)
+            val text = createStringValue(currentValue, scaleProperties)
+            val (width, height) = estimateTextSize(text, styleProperties.marksFont)
 
             if(nextMarkPixel - width / 2 - MIN_SPACE_BETWEEN_MARKS > filledPosition
                 && nextMarkPixel + width / 2 < maxDrawingPixel
@@ -98,18 +105,18 @@ class HorizontalAxisDrawStrategy(
                 result.add(Mark(text, nextMarkPixel, height, width))
             }
 
-            nextMarkPixel += axis.distanceBetweenMarks
+            nextMarkPixel += styleProperties.marksDistance
         }
 
-        nextMarkPixel = min(zeroPixel - axis.distanceBetweenMarks, maxDrawingPixel)
+        nextMarkPixel = min(zeroPixel - styleProperties.marksDistance, maxDrawingPixel)
         filledPosition = zeroPixel - zeroPixelOffset
 
         while (nextMarkPixel > minDrawingPixel) {
             val currentValue = matrixTransformer
-                .transformPixelToUnits(nextMarkPixel, axis.settings, axis.direction)
+                .transformPixelToUnits(nextMarkPixel, scaleProperties, direction)
 
-            val text = createStringValue(currentValue, axis)
-            val (width, height) = estimateTextSize(text, font)
+            val text = createStringValue(currentValue, scaleProperties)
+            val (width, height) = estimateTextSize(text, styleProperties.marksFont)
 
             if(nextMarkPixel + width / 2 + MIN_SPACE_BETWEEN_MARKS < filledPosition
                 && nextMarkPixel + width / 2 < maxDrawingPixel
@@ -120,7 +127,7 @@ class HorizontalAxisDrawStrategy(
                 result.add(Mark(text, nextMarkPixel, height, width))
             }
 
-            nextMarkPixel -= axis.distanceBetweenMarks
+            nextMarkPixel -= styleProperties.marksDistance
         }
 
         return result
@@ -140,40 +147,6 @@ class HorizontalAxisDrawStrategy(
         context.fillText(axis.name, 0.0, 0.0)
 
         context.restore()
-    }
-
-    private fun drawOnlyIntegerMark(
-        context: GraphicsContext,
-        axis: ConcatenationAxis,
-        marksCoordinate: Double,
-        zeroPixel: Double
-    ) {
-        var currentX = axis.settings.min.toInt().toDouble()
-        val max = axis.settings.max
-        while (currentX < max) {
-            val stepX = matrixTransformer
-                .transformUnitsToPixel(currentX, axis.settings, axis.direction)
-
-            if (axis.settings.max > 0 && axis.settings.min < 0) {
-                if ((stepX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {
-                    currentX += axis.settings.integerStep
-                    continue
-                }
-            }
-
-            val text = if (axis.isLogarithmic()) {
-                NumberFormatter.formatLogarithmic(currentX, axis.settings.logarithmBase)
-            } else {
-                NumberFormatter.format(currentX)
-            }
-
-            context.fillText(
-                text,
-                stepX,
-                marksCoordinate
-            )
-            currentX += axis.settings.integerStep
-        }
     }
 
     private companion object {

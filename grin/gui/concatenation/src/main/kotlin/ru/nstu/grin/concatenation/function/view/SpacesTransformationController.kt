@@ -16,11 +16,9 @@ import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.project.ConcatenationAxisSnapshot
-import ru.nstu.grin.concatenation.canvas.model.project.toModel
-import ru.nstu.grin.concatenation.canvas.model.project.toSnapshot
 import ru.nstu.grin.concatenation.function.model.DerivativeDetails
 import ru.nstu.grin.concatenation.function.model.DerivativeType
 import ru.nstu.grin.concatenation.function.model.MirrorDetails
@@ -61,8 +59,8 @@ class SpacesTransformationController(
                         function.pixelsToDraw = transformPoints(
                             function.id,
                             function.points,
-                            space.xAxis.toSnapshot(),
-                            space.yAxis.toSnapshot(),
+                            space.xAxis,
+                            space.yAxis,
                             function.mirrorDetails,
                             function.derivativeDetails,
                             function.waveletDetails,
@@ -76,12 +74,14 @@ class SpacesTransformationController(
     private suspend fun transformPoints(
         functionId: UUID,
         points: List<Point>,
-        xAxis: ConcatenationAxisSnapshot,
-        yAxis: ConcatenationAxisSnapshot,
+        xAxis: ConcatenationAxis,
+        yAxis: ConcatenationAxis,
         mirrorDetails: MirrorDetails,
         derivativeDetails: DerivativeDetails?,
         waveletDetails: WaveletDetails?
     ): Pair<DoubleArray, DoubleArray> = coroutineScope {
+        val xScaleProperties = xAxis.scaleProperties
+        val yScaleProperties = yAxis.scaleProperties
 
         /*val transforms = listOf(
             LogTransform(
@@ -135,12 +135,12 @@ class SpacesTransformationController(
 
             xResults[i] = matrixTransformer.transformUnitsToPixel(
                 transformedPoints[i].x,
-                xAxis.settings.toModel(),
+                xScaleProperties,
                 xAxis.direction,
             )
             yResults[i] = matrixTransformer.transformUnitsToPixel(
                 transformedPoints[i].y,
-                yAxis.settings.toModel(),
+                yScaleProperties,
                 yAxis.direction,
             )
         }

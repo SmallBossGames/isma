@@ -86,11 +86,15 @@ class ConcatenationCanvasController(
             val indentX = (maxX - minX) * DEFAULT_INDENT
             val indentY = (maxY - minY) * DEFAULT_INDENT
 
-            space.xAxis.settings.min = minX - indentX
-            space.xAxis.settings.max = maxX + indentX
+            space.xAxis.scaleProperties = space.xAxis.scaleProperties.copy(
+                minValue = minX - indentX,
+                maxValue = maxX + indentX,
+            )
 
-            space.yAxis.settings.min = minY - indentY
-            space.yAxis.settings.max = maxY + indentY
+            space.yAxis.scaleProperties = space.yAxis.scaleProperties.copy(
+                minValue = minY - indentY,
+                maxValue = maxY + indentY,
+            )
         }
     }
 

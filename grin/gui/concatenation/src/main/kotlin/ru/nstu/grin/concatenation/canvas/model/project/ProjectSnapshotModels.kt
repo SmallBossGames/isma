@@ -1,15 +1,13 @@
 package ru.nstu.grin.concatenation.canvas.model.project
 
 import javafx.scene.paint.Color
+import javafx.scene.text.Font
 import kotlinx.serialization.Serializable
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
-import ru.nstu.grin.concatenation.axis.model.AxisMarkType
-import ru.nstu.grin.concatenation.axis.model.AxisSettings
-import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.axis.model.*
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.*
 import java.util.*
@@ -71,6 +69,12 @@ data class ColorSnapshot(
 )
 
 @Serializable
+data class FontSnapshot(
+    val family: String,
+    val size: Double,
+)
+
+@Serializable
 sealed class ConcatenationFunctionDetailsSnapshot
 
 @Serializable
@@ -96,26 +100,27 @@ data class ConcatenationAxisSnapshot(
     val name: String,
     val order: Int,
     val direction: Direction,
-    val backGroundColor: ColorSnapshot,
-    val fontColor: ColorSnapshot,
-    val distanceBetweenMarks: Double,
-    val textSize: Double,
-    val font: String,
-    val isHide: Boolean,
-    val axisMarkType: AxisMarkType,
-    val settings: AxisSettingsSnapshot,
+    val styleProperties: AxisStylePropertiesSnapshot,
+    val scaleProperties: AxisScalePropertiesSnapshot,
 )
 
 @Serializable
-data class AxisSettingsSnapshot(
-    val isOnlyIntegerPow: Boolean,
-    val integerStep: Int,
+data class AxisStylePropertiesSnapshot(
+    val backgroundColor: ColorSnapshot,
+    val marksDistanceType: MarksDistanceType,
+    val marksDistance: Double,
+    val marksColor: ColorSnapshot,
+    val marksFont: FontSnapshot,
+    val isVisible: Boolean,
+)
 
-    val isLogarithmic: Boolean,
-    val logarithmBase: Double,
+@Serializable
+data class AxisScalePropertiesSnapshot(
+    val scalingType: AxisScalingType = AxisScalingType.LINEAR,
+    val scalingLogBase: Double = 10.0,
 
-    val min: Double,
-    val max: Double,
+    val minValue: Double = 0.0,
+    val maxValue: Double = 10.0,
 )
 
 fun DescriptionSnapshot.toModel() =
@@ -140,24 +145,40 @@ fun Description.toSnapshot() =
         font = font,
     )
 
-fun AxisSettingsSnapshot.toModel() =
-    AxisSettings(
-        isOnlyIntegerPow = isOnlyIntegerPow,
-        integerStep = integerStep,
-        isLogarithmic = isLogarithmic,
-        logarithmBase = logarithmBase,
-        min = min,
-        max = max,
+fun AxisStylePropertiesSnapshot.toModel() =
+    AxisStyleProperties(
+        backgroundColor = backgroundColor.toModel(),
+        marksDistanceType = marksDistanceType,
+        marksDistance = marksDistance,
+        marksColor = marksColor.toModel(),
+        marksFont = marksFont.toModel(),
+        isVisible = isVisible
     )
 
-fun AxisSettings.toSnapshot() =
-    AxisSettingsSnapshot(
-        isOnlyIntegerPow = isOnlyIntegerPow,
-        integerStep = integerStep,
-        isLogarithmic = isLogarithmic,
-        logarithmBase = logarithmBase,
-        min = min,
-        max = max,
+fun AxisStyleProperties.toSnapshot() =
+    AxisStylePropertiesSnapshot(
+        backgroundColor = backgroundColor.toSnapshot(),
+        marksDistanceType = marksDistanceType,
+        marksDistance = marksDistance,
+        marksColor = marksColor.toSnapshot(),
+        marksFont = marksFont.toSnapshot(),
+        isVisible = isVisible
+    )
+
+fun AxisScalePropertiesSnapshot.toModel() =
+    AxisScaleProperties(
+        scalingType = scalingType,
+        scalingLogBase = scalingLogBase,
+        minValue = minValue,
+        maxValue = maxValue
+    )
+
+fun AxisScaleProperties.toSnapshot() =
+    AxisScalePropertiesSnapshot(
+        scalingType = scalingType,
+        scalingLogBase = scalingLogBase,
+        minValue = minValue,
+        maxValue = maxValue
     )
 
 fun ColorSnapshot.toModel() =
@@ -166,19 +187,19 @@ fun ColorSnapshot.toModel() =
 fun Color.toSnapshot() =
     ColorSnapshot(red, green, blue)
 
+fun FontSnapshot.toModel() =
+    Font.font(family, size)
+
+fun Font.toSnapshot() =
+    FontSnapshot(family, size)
+
 fun ConcatenationAxisSnapshot.toModel() =
     ConcatenationAxis(
         name = name,
         order = order,
         direction = direction,
-        backGroundColor = backGroundColor.toModel(),
-        fontColor = fontColor.toModel(),
-        distanceBetweenMarks = distanceBetweenMarks,
-        textSize = textSize,
-        font = font,
-        isHide = isHide,
-        axisMarkType = axisMarkType,
-        settings = settings.toModel()
+        styleProperties = styleProperties.toModel(),
+        scaleProperties = scaleProperties.toModel(),
     )
 
 fun ConcatenationAxis.toSnapshot() =
@@ -186,14 +207,8 @@ fun ConcatenationAxis.toSnapshot() =
         name = name,
         order = order,
         direction = direction,
-        backGroundColor = backGroundColor.toSnapshot(),
-        fontColor = fontColor.toSnapshot(),
-        distanceBetweenMarks = distanceBetweenMarks,
-        textSize = textSize,
-        font = font,
-        isHide = isHide,
-        axisMarkType = axisMarkType,
-        settings = settings.toSnapshot()
+        styleProperties = styleProperties.toSnapshot(),
+        scaleProperties = scaleProperties.toSnapshot(),
     )
 
 fun PointSnapshot.toModel() = Point(x, y)

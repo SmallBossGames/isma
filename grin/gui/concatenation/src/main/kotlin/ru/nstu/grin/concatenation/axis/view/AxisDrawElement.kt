@@ -18,13 +18,13 @@ class AxisDrawElement(
             val xAxis = cartesianSpace.xAxis
             val yAxis = cartesianSpace.yAxis
 
-            if (!xAxis.isHide) {
+            if (!xAxis.styleProperties.isVisible) {
                 drawBackground(
                     context,
                     xAxis.order,
                     xAxis.direction,
-                    xAxis.backGroundColor,
-                    xAxis.fontColor,
+                    xAxis.styleProperties.backgroundColor,
+                    xAxis.styleProperties.marksColor,
                     canvasWidth,
                     canvasHeight
                 )
@@ -38,13 +38,13 @@ class AxisDrawElement(
                 )
             }
 
-            if (!yAxis.isHide) {
+            if (!xAxis.styleProperties.isVisible) {
                 drawBackground(
                     context,
                     yAxis.order,
                     yAxis.direction,
-                    yAxis.backGroundColor,
-                    yAxis.fontColor,
+                    yAxis.styleProperties.backgroundColor,
+                    yAxis.styleProperties.marksColor,
                     canvasWidth,
                     canvasHeight
                 )

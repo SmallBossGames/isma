@@ -46,30 +46,36 @@ class ReleaseMouseHandler(
             for (cartesianSpace in cartesianSpaces) {
                 val minX = matrixTransformer.transformPixelToUnits(
                     selectionSettings.minX,
-                    cartesianSpace.xAxis.settings,
+                    cartesianSpace.xAxis.scaleProperties,
                     cartesianSpace.xAxis.direction
                 )
                 val maxX = matrixTransformer.transformPixelToUnits(
                     selectionSettings.maxX,
-                    cartesianSpace.xAxis.settings,
+                    cartesianSpace.xAxis.scaleProperties,
                     cartesianSpace.xAxis.direction
                 )
-                cartesianSpace.xAxis.settings.min = minX
-                cartesianSpace.xAxis.settings.max = maxX
+
+                cartesianSpace.xAxis.scaleProperties = cartesianSpace.xAxis.scaleProperties.copy(
+                    minValue = minX,
+                    maxValue = maxX,
+                )
 
                 // These values are inverted because we count pixels from the top of the canvas
                 val minY = matrixTransformer.transformPixelToUnits(
                     selectionSettings.maxY,
-                    cartesianSpace.yAxis.settings,
+                    cartesianSpace.yAxis.scaleProperties,
                     cartesianSpace.yAxis.direction
                 )
                 val maxY = matrixTransformer.transformPixelToUnits(
                     selectionSettings.minY,
-                    cartesianSpace.yAxis.settings,
+                    cartesianSpace.yAxis.scaleProperties,
                     cartesianSpace.yAxis.direction
                 )
-                cartesianSpace.yAxis.settings.min = minY
-                cartesianSpace.yAxis.settings.max = maxY
+
+                cartesianSpace.yAxis.scaleProperties = cartesianSpace.yAxis.scaleProperties.copy(
+                    minValue = minY,
+                    maxValue = maxY,
+                )
             }
             //TODO: Disabled until migration to Koin
            /* if (editMode == EditMode.WINDOWED) {

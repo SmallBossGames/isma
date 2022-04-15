@@ -126,8 +126,8 @@ class PressedMouseHandler(
         val pointToolTipSettings = canvasModel.pointToolTipSettings
         pointToolTipSettings.isShow = true
         val pointSettings = PointSettings(
-            cartesianSpace.xAxis.settings,
-            cartesianSpace.yAxis.settings,
+            cartesianSpace.xAxis.scaleProperties,
+            cartesianSpace.yAxis.scaleProperties,
             pixels.first[nearPointIndex],
             pixels.second[nearPointIndex],
         )

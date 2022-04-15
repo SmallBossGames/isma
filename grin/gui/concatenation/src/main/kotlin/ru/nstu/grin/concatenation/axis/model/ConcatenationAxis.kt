@@ -1,43 +1,17 @@
 package ru.nstu.grin.concatenation.axis.model
 
-import javafx.scene.paint.Color
 import ru.nstu.grin.common.common.SettingsProvider
+
+enum class Direction { LEFT, RIGHT, TOP, BOTTOM }
 
 data class ConcatenationAxis(
     val name: String,
     val order: Int,
     val direction: Direction,
+    var styleProperties: AxisStyleProperties = AxisStyleProperties(),
+    var scaleProperties: AxisScaleProperties = AxisScaleProperties(),
 
-    var backGroundColor: Color,
-
-    var fontColor: Color,
-
-    var distanceBetweenMarks: Double,
-    var textSize: Double,
-    var font: String,
-    var isHide: Boolean = false,
-    var axisMarkType: AxisMarkType = AxisMarkType.LINEAR,
-    val settings: AxisSettings = AxisSettings()
-) : Cloneable {
-
-    fun isLogarithmic(): Boolean {
-        return axisMarkType == AxisMarkType.LOGARITHMIC
-    }
-
-    override fun clone(): Any {
-        return ConcatenationAxis(
-            name = name,
-            order = order,
-            direction = direction,
-            backGroundColor = backGroundColor,
-            fontColor = fontColor,
-            distanceBetweenMarks = distanceBetweenMarks,
-            textSize = textSize,
-            font = font,
-            settings = settings.copy()
-        )
-    }
-
+) {
     fun isLocated(x: Double, y: Double, canvasWidth: Double, canvasHeight: Double): Boolean {
         when (direction) {
             Direction.LEFT -> {

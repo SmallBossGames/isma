@@ -1,7 +1,7 @@
 package ru.nstu.grin.concatenation.canvas.controller
 
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.concatenation.axis.model.AxisSettings
+import ru.nstu.grin.concatenation.axis.model.AxisScaleProperties
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -13,11 +13,11 @@ class MatrixTransformer(
 ) {
     fun transformPixelToUnits(
         number: Double,
-        axisSettings: AxisSettings,
+        axisProperties: AxisScaleProperties,
         direction: Direction,
     ): Double {
-        val min = axisSettings.min
-        val max = axisSettings.max
+        val min = axisProperties.minValue
+        val max = axisProperties.maxValue
         val sumUnits = abs(max - min)
 
         val (minPixel, maxPixel) = getMinMaxPixel(direction)
@@ -36,11 +36,11 @@ class MatrixTransformer(
 
     fun transformUnitsToPixel(
         number: Double,
-        axisSettings: AxisSettings,
+        axisProperties: AxisScaleProperties,
         direction: Direction,
     ): Double {
-        val min = axisSettings.min
-        val max = axisSettings.max
+        val min = axisProperties.minValue
+        val max = axisProperties.maxValue
         val sumUnits = abs(max - min)
 
         val (minPixel, maxPixel) = getMinMaxPixel(direction)
@@ -62,20 +62,20 @@ class MatrixTransformer(
      */
     fun getMinMaxPixel(direction: Direction): Pair<Double, Double> {
         return when (direction) {
-            Direction.LEFT, Direction.RIGHT -> {
-                Pair(
-                    getTopAxisSize() * SettingsProvider.getAxisWidth(),
-                    canvasViewModel.canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
-                )
-            }
-            Direction.TOP, Direction.BOTTOM -> {
-                Pair(
-                    getLeftAxisSize() * SettingsProvider.getAxisWidth(),
-                    canvasViewModel.canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth()
-                )
-            }
+            Direction.LEFT, Direction.RIGHT -> getMinMaxPixelVertical()
+            Direction.TOP, Direction.BOTTOM -> getMinMaxPixelHorizontal()
         }
     }
+
+    fun getMinMaxPixelVertical() = Pair(
+        getTopAxisSize() * SettingsProvider.getAxisWidth(),
+        canvasViewModel.canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+    )
+
+    fun getMinMaxPixelHorizontal() = Pair(
+        getLeftAxisSize() * SettingsProvider.getAxisWidth(),
+        canvasViewModel.canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth()
+    )
 
     private fun getLeftAxisSize(): Int {
         return concatenationCanvasModel.cartesianSpaces

@@ -96,16 +96,21 @@ class DraggedHandler(
         if (draggedSettings.lastX == -1.0) draggedSettings.lastX = event.x
         if (draggedSettings.lastY == -1.0) draggedSettings.lastY = event.y
 
+        val scaleProperties = axis.scaleProperties
 
         if (axis.isXAxis) {
             when {
                 event.x < draggedSettings.lastX -> {
-                    axis.settings.min -= DELTA
-                    axis.settings.max -= DELTA
+                    axis.scaleProperties = axis.scaleProperties.copy(
+                        minValue = scaleProperties.minValue - DELTA,
+                        maxValue = scaleProperties.maxValue - DELTA,
+                    )
                 }
                 event.x > draggedSettings.lastX -> {
-                    axis.settings.min += DELTA
-                    axis.settings.max += DELTA
+                    axis.scaleProperties = axis.scaleProperties.copy(
+                        minValue = scaleProperties.minValue + DELTA,
+                        maxValue = scaleProperties.maxValue + DELTA,
+                    )
                 }
                 else -> {
                 }
@@ -113,12 +118,16 @@ class DraggedHandler(
         } else {
             when {
                 event.y < draggedSettings.lastY -> {
-                    axis.settings.min -= DELTA
-                    axis.settings.max -= DELTA
+                    axis.scaleProperties = axis.scaleProperties.copy(
+                        minValue = scaleProperties.minValue - DELTA,
+                        maxValue = scaleProperties.maxValue - DELTA,
+                    )
                 }
                 event.y > draggedSettings.lastY -> {
-                    axis.settings.min += DELTA
-                    axis.settings.max += DELTA
+                    axis.scaleProperties = axis.scaleProperties.copy(
+                        minValue = scaleProperties.minValue + DELTA,
+                        maxValue = scaleProperties.maxValue + DELTA,
+                    )
                 }
                 else -> {
                 }
@@ -133,12 +142,12 @@ class DraggedHandler(
         val traceSettings = model.traceSettings ?: return
         val x = matrixTransformer.transformPixelToUnits(
             event.x,
-            traceSettings.xAxis.settings,
+            traceSettings.xAxis.scaleProperties,
             traceSettings.xAxis.direction
         )
         val y = matrixTransformer.transformPixelToUnits(
             event.y,
-            traceSettings.yAxis.settings,
+            traceSettings.yAxis.scaleProperties,
             traceSettings.yAxis.direction
         )
         traceSettings.pressedPoint.x = x
@@ -153,22 +162,22 @@ class DraggedHandler(
                 val yAxis = requireNotNull(moveSettings.yAxis) { "Function move event can't have null axises" }
                 val xLeft = matrixTransformer.transformPixelToUnits(
                     moveSettings.pressedX,
-                    xAxis.settings,
+                    xAxis.scaleProperties,
                     xAxis.direction
                 )
                 val yLeft = matrixTransformer.transformPixelToUnits(
                     moveSettings.pressedY,
-                    yAxis.settings,
+                    yAxis.scaleProperties,
                     yAxis.direction
                 )
                 val xRight = matrixTransformer.transformPixelToUnits(
                     event.x,
-                    xAxis.settings,
+                    xAxis.scaleProperties,
                     xAxis.direction
                 )
                 val yRight = matrixTransformer.transformPixelToUnits(
                     event.y,
-                    yAxis.settings,
+                    yAxis.scaleProperties,
                     yAxis.direction
                 )
                 val x = xLeft - xRight

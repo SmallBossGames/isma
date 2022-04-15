@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
+import ru.nstu.grin.concatenation.axis.model.AxisScalingType
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -57,34 +58,34 @@ class PointTooltipsDrawElement(
     }
 
     private fun formatText(pointSettings: PointSettings): String {
-        val x = if (pointSettings.xAxisSettings.isLogarithmic) {
-            pointSettings.xAxisSettings.logarithmBase.pow(
+        val x = if (pointSettings.xAxisProperties.scalingType == AxisScalingType.LOGARITHMIC) {
+            pointSettings.xAxisProperties.scalingLogBase.pow(
                 transformer.transformPixelToUnits(
                     pointSettings.xGraphic,
-                    pointSettings.xAxisSettings,
+                    pointSettings.xAxisProperties,
                     Direction.BOTTOM
                 )
             )
         } else {
             transformer.transformPixelToUnits(
                 pointSettings.xGraphic,
-                pointSettings.xAxisSettings,
+                pointSettings.xAxisProperties,
                 Direction.BOTTOM
             )
         }
 
-        val y = if (pointSettings.yAxisSettings.isLogarithmic) {
-            pointSettings.yAxisSettings.logarithmBase.pow(
+        val y = if (pointSettings.xAxisProperties.scalingType == AxisScalingType.LOGARITHMIC) {
+            pointSettings.yAxisProperties.scalingLogBase.pow(
                 transformer.transformPixelToUnits(
                     pointSettings.yGraphic,
-                    pointSettings.yAxisSettings,
+                    pointSettings.yAxisProperties,
                     Direction.LEFT
                 )
             )
         } else {
             transformer.transformPixelToUnits(
                 pointSettings.yGraphic,
-                pointSettings.yAxisSettings,
+                pointSettings.yAxisProperties,
                 Direction.LEFT
             )
         }

@@ -48,22 +48,12 @@ class GrinIntegrationFacade: KoinComponent {
             name = "X axis",
             order = 0,
             direction = Direction.BOTTOM,
-            backGroundColor = Color.BLACK,
-            fontColor = Color.CYAN,
-            distanceBetweenMarks = 40.0,
-            textSize = 12.0,
-            font = "Arial"
         )
 
         val yAxis = ConcatenationAxis(
             name = "Y axis",
             order = 0,
             direction = Direction.LEFT,
-            backGroundColor = Color.BLACK,
-            fontColor = Color.CYAN,
-            distanceBetweenMarks = 40.0,
-            textSize = 12.0,
-            font = "Arial"
         )
 
         val step = 360.0 / functions.size

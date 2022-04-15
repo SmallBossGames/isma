@@ -9,7 +9,7 @@ data class UpdateAxisChangeSet(
     val fontColor: Color,
     val axisColor: Color,
     val isHide: Boolean,
-    val axisMarkType: AxisMarkType,
+    val axisScalingType: AxisScalingType,
     val min: Double,
     val max: Double
 )

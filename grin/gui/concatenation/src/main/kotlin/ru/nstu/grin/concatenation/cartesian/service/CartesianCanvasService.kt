@@ -19,13 +19,11 @@ class CartesianCanvasService(
             name = copyDataModel.name,
             xAxis = oldCartesian.xAxis.copy(
                 name = copyDataModel.xAxisName,
-                order = oldCartesian.xAxis.order + 1,
-                settings = oldCartesian.xAxis.settings.copy()
+                order = oldCartesian.xAxis.order + 1
             ),
             yAxis = oldCartesian.yAxis.copy(
                 name = copyDataModel.yAxisName,
-                order = oldCartesian.yAxis.order + 1,
-                settings = oldCartesian.yAxis.settings.copy()
+                order = oldCartesian.yAxis.order + 1
             )
         )
         this.model.cartesianSpaces.add(newCartesian)

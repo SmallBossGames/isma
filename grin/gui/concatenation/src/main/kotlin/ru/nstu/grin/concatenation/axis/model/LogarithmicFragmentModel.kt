@@ -2,8 +2,8 @@ package ru.nstu.grin.concatenation.axis.model
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
-import tornadofx.*
+import tornadofx.getValue
+import tornadofx.setValue
 
 class LogarithmicFragmentModel(
     axis: ConcatenationAxis
@@ -14,18 +14,13 @@ class LogarithmicFragmentModel(
     var onlyIntegerPowProperty = SimpleBooleanProperty(true)
     var isOnlyIntegerPow by onlyIntegerPowProperty
 
-    var integerStepProperty = SimpleIntegerProperty(this, "integerStepProperty", 1)
-    var integerStep by integerStepProperty
-
     init {
-        logarithmBase = axis.settings.logarithmBase
-        isOnlyIntegerPow = axis.settings.isOnlyIntegerPow
-        integerStep = axis.settings.integerStep
+        logarithmBase = axis.scaleProperties.scalingLogBase
+        isOnlyIntegerPow = axis.styleProperties.marksDistanceType == MarksDistanceType.VALUE
     }
 
     fun createChangeSet() = UpdateLogarithmicTypeChangeSet(
         logarithmBase = logarithmBase,
         isOnlyIntegerPow = isOnlyIntegerPow,
-        integerStep = integerStep,
     )
 }

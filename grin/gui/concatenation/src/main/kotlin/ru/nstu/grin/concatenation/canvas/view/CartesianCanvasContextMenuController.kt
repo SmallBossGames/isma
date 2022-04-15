@@ -4,7 +4,6 @@ import javafx.scene.Node
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
-import ru.nstu.grin.concatenation.axis.model.AxisMarkType
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -26,27 +25,23 @@ class CartesianCanvasContextMenuController(
             listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
         }.flatten()
 
-        val axis = axes.firstOrNull {
-            it.second.isLocated(x, y, canvasWidth, canvasHeight)
-        }?.second ?: return
-
         val cartesianSpace = axes.firstOrNull {
             it.second.isLocated(x, y, canvasWidth, canvasHeight)
         }?.first ?: return
 
         contextMenu.items.setAll(
-            MenuItem("On/Off Logarithmic").apply {
+/*            MenuItem("On/Off Logarithmic").apply {
                 setOnAction {
                     axis.settings.isLogarithmic = !axis.settings.isLogarithmic
                     axis.settings.logarithmBase = 10.0
-                    if (axis.axisMarkType == AxisMarkType.LINEAR) {
-                        axis.axisMarkType = AxisMarkType.LOGARITHMIC
+                    if (axis.axisMarkType == AxisScalingType.LINEAR) {
+                        axis.axisMarkType = AxisScalingType.LOGARITHMIC
                     } else {
-                        axis.axisMarkType = AxisMarkType.LINEAR
+                        axis.axisMarkType = AxisScalingType.LINEAR
                     }
                     chainDrawer.draw()
                 }
-            },
+            },*/
             MenuItem("On/Off Grid").apply {
                 setOnAction {
                     cartesianSpace.isShowGrid = !cartesianSpace.isShowGrid

@@ -5,7 +5,6 @@ import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
-import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
@@ -31,11 +30,11 @@ class AxisListView(
         return BorderPane().apply {
             left = HBox(
                 Label(item.name).apply {
-                    textFill = item.fontColor
-                    font = Font(item.font, item.textSize)
+                    textFill = item.styleProperties.marksColor
+                    font = item.styleProperties.marksFont
                     background = Background(
                         BackgroundFill(
-                            item.backGroundColor,
+                            item.styleProperties.backgroundColor,
                             CornerRadii(0.0),
                             Insets(0.0)
                         )

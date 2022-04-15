@@ -37,22 +37,25 @@ class ScalableScrollHandler(
 
     private fun handleScaleByAxis(event: ScrollEvent, axis: ConcatenationAxis) {
         val delta = event.deltaY
-        val oldMin = axis.settings.min
-        val oldMax = axis.settings.max
+        val scaleProperties = axis.scaleProperties
 
         val units = when(axis.direction){
             Direction.LEFT, Direction.RIGHT ->
-                matrixTransformer.transformPixelToUnits(event.y, axis.settings, axis.direction)
+                matrixTransformer.transformPixelToUnits(event.y, scaleProperties, axis.direction)
             Direction.TOP, Direction.BOTTOM ->
-                matrixTransformer.transformPixelToUnits(event.x, axis.settings, axis.direction)
+                matrixTransformer.transformPixelToUnits(event.x, scaleProperties, axis.direction)
         }
 
         if(delta > 0) {
-            axis.settings.min = oldMin * (1.0 - delta * AXIS_SCALING_COEFFICIENT) + units * delta * AXIS_SCALING_COEFFICIENT
-            axis.settings.max = oldMax * (1.0 - delta * AXIS_SCALING_COEFFICIENT) + units * delta * AXIS_SCALING_COEFFICIENT
+            axis.scaleProperties = scaleProperties.copy(
+                minValue = scaleProperties.minValue * (1.0 - delta * AXIS_SCALING_COEFFICIENT) + units * delta * AXIS_SCALING_COEFFICIENT,
+                maxValue = scaleProperties.maxValue * (1.0 - delta * AXIS_SCALING_COEFFICIENT) + units * delta * AXIS_SCALING_COEFFICIENT
+            )
         } else {
-            axis.settings.min = (oldMin + units * delta * AXIS_SCALING_COEFFICIENT) / (1.0 + delta * AXIS_SCALING_COEFFICIENT)
-            axis.settings.max = (oldMax + units * delta * AXIS_SCALING_COEFFICIENT) / (1.0 + delta * AXIS_SCALING_COEFFICIENT)
+            axis.scaleProperties = scaleProperties.copy(
+                minValue = (scaleProperties.minValue + units * delta * AXIS_SCALING_COEFFICIENT) / (1.0 + delta * AXIS_SCALING_COEFFICIENT),
+                maxValue = (scaleProperties.maxValue + units * delta * AXIS_SCALING_COEFFICIENT) / (1.0 + delta * AXIS_SCALING_COEFFICIENT)
+            )
         }
     }
 

@@ -18,8 +18,8 @@ data class CartesianSpace(
             functions = functions
                 .map { it.copy(id = UUID.randomUUID(), points = it.points.map { it.copy() }) }
                 .toMutableList(),
-            xAxis = xAxis.copy(settings = xAxis.settings.copy()),
-            yAxis = yAxis.copy(settings = yAxis.settings.copy()),
+            xAxis = xAxis.copy(),
+            yAxis = yAxis.copy(),
             isShowGrid = isShowGrid
         )
     }

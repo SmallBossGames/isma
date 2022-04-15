@@ -29,21 +29,21 @@ class AxisChangeFragmentModel(
     var isHideProperty = SimpleBooleanProperty()
     var isHide by isHideProperty
 
-    var markTypeProperty = SimpleObjectProperty(AxisMarkType.LINEAR)
-    var axisMarkType by markTypeProperty
+    var markTypeProperty = SimpleObjectProperty(AxisScalingType.LINEAR)
+    var markType by markTypeProperty
 
     var axisColorProperty = SimpleObjectProperty<Color>()
     var axisColor by axisColorProperty
 
     init {
-        axisColor = axis.backGroundColor
-        distanceBetweenMarks = axis.distanceBetweenMarks
-        textSize = axis.textSize
-        font = axis.font
-        fontColor = axis.fontColor
-        isHide = axis.isHide
-        min = axis.settings.min
-        max = axis.settings.max
+        axisColor = axis.styleProperties.backgroundColor
+        distanceBetweenMarks = axis.styleProperties.marksDistance
+        textSize = axis.styleProperties.marksFont.size
+        font = axis.styleProperties.marksFont.family
+        fontColor = axis.styleProperties.marksColor
+        isHide = axis.styleProperties.isVisible
+        min = axis.scaleProperties.minValue
+        max = axis.scaleProperties.maxValue
     }
 
     fun createChangeSet() = UpdateAxisChangeSet(
@@ -53,7 +53,7 @@ class AxisChangeFragmentModel(
         fontColor = fontColor,
         axisColor = axisColor,
         isHide = isHide,
-        axisMarkType = axisMarkType,
+        axisScalingType = markType,
         min = min,
         max = max
     )

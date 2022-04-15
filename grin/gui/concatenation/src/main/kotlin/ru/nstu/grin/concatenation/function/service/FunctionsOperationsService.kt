@@ -40,30 +40,42 @@ class FunctionsOperationsService(
         val minX = xArrays.minOrNull()!! - INTERSECTION_CORRELATION
         val maxY = yArrays.maxOrNull()!! + INTERSECTION_CORRELATION
         val minY = yArrays.minOrNull()!! - INTERSECTION_CORRELATION
-        firstCartesianSpace.xAxis.settings.min = minX
-        firstCartesianSpace.xAxis.settings.max = maxX
-        firstCartesianSpace.yAxis.settings.min = minY
-        firstCartesianSpace.yAxis.settings.max = maxY
-        secondCartesianSpace.xAxis.settings.min = minX
-        secondCartesianSpace.xAxis.settings.max = maxX
-        secondCartesianSpace.yAxis.settings.min = minY
-        secondCartesianSpace.yAxis.settings.max = maxY
+
+        firstCartesianSpace.xAxis.scaleProperties = firstCartesianSpace.xAxis.scaleProperties.copy(
+            minValue = minX,
+            maxValue = maxX
+        )
+
+        firstCartesianSpace.yAxis.scaleProperties = firstCartesianSpace.yAxis.scaleProperties.copy(
+            minValue = minY,
+            maxValue = maxY
+        )
+
+        secondCartesianSpace.xAxis.scaleProperties = firstCartesianSpace.xAxis.scaleProperties.copy(
+            minValue = minX,
+            maxValue = maxX
+        )
+
+        secondCartesianSpace.yAxis.scaleProperties = firstCartesianSpace.yAxis.scaleProperties.copy(
+            minValue = minY,
+            maxValue = maxY
+        )
 
         val transformed = intersections
             .map {
                 val xGraphic = matrixTransformer.transformUnitsToPixel(
                     it.first,
-                    firstCartesianSpace.xAxis.settings,
+                    firstCartesianSpace.xAxis.scaleProperties,
                     firstCartesianSpace.xAxis.direction
                 )
                 val yGraphic = matrixTransformer.transformUnitsToPixel(
                     it.second,
-                    firstCartesianSpace.yAxis.settings,
+                    firstCartesianSpace.yAxis.scaleProperties,
                     firstCartesianSpace.yAxis.direction
                 )
                 PointSettings(
-                    firstCartesianSpace.xAxis.settings,
-                    firstCartesianSpace.yAxis.settings,
+                    firstCartesianSpace.xAxis.scaleProperties,
+                    firstCartesianSpace.yAxis.scaleProperties,
                     xGraphic = xGraphic,
                     yGraphic = yGraphic
                 )
@@ -123,7 +135,7 @@ class FunctionsOperationsService(
         val xPoints = pixels.first.map {
             matrixTransformer.transformPixelToUnits(
                 it,
-                cartesianSpace.xAxis.settings,
+                cartesianSpace.xAxis.scaleProperties,
                 cartesianSpace.xAxis.direction
             )
         }
@@ -131,7 +143,7 @@ class FunctionsOperationsService(
         val yPoints = pixels.second.map {
             matrixTransformer.transformPixelToUnits(
                 it,
-                cartesianSpace.xAxis.settings,
+                cartesianSpace.xAxis.scaleProperties,
                 cartesianSpace.xAxis.direction
             )
         }
@@ -141,11 +153,15 @@ class FunctionsOperationsService(
         val minX = xPoints.minOrNull() ?: return
         val maxX = xPoints.maxOrNull() ?: return
 
-        cartesianSpace.yAxis.settings.min = minY
-        cartesianSpace.yAxis.settings.max = maxY
+        cartesianSpace.xAxis.scaleProperties = cartesianSpace.xAxis.scaleProperties.copy(
+            minValue = minX,
+            maxValue = maxX
+        )
 
-        cartesianSpace.xAxis.settings.min = minX
-        cartesianSpace.xAxis.settings.max = maxX
+        cartesianSpace.yAxis.scaleProperties = cartesianSpace.yAxis.scaleProperties.copy(
+            minValue = minY,
+            maxValue = maxY
+        )
 
         view.redraw()
     }

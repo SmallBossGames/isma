@@ -13,7 +13,7 @@ import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
-import ru.nstu.grin.concatenation.axis.model.AxisMarkType
+import ru.nstu.grin.concatenation.axis.model.AxisScalingType
 
 class AxisChangeFragment(
     private val model: AxisChangeFragmentModel,
@@ -31,14 +31,14 @@ class AxisChangeFragment(
                 addNode("Max", model.maxProperty)
                 addNode("Axis Color", model.axisColorProperty)
                 addNode("Hide Axis", model.isHideProperty)
-                addNode("Scale Mode", FXCollections.observableArrayList(AxisMarkType.values().toList()), model.markTypeProperty){
-                    object : ListCell<AxisMarkType>() {
-                        override fun updateItem(item: AxisMarkType?, empty: Boolean) {
+                addNode("Scale Mode", FXCollections.observableArrayList(AxisScalingType.values().toList()), model.markTypeProperty){
+                    object : ListCell<AxisScalingType>() {
+                        override fun updateItem(item: AxisScalingType?, empty: Boolean) {
                             super.updateItem(item, empty)
 
                             text = when (item) {
-                                AxisMarkType.LINEAR -> "Линейный"
-                                AxisMarkType.LOGARITHMIC -> "Логарифмический"
+                                AxisScalingType.LINEAR -> "Линейный"
+                                AxisScalingType.LOGARITHMIC -> "Логарифмический"
                                 else -> null
                             }
                         }

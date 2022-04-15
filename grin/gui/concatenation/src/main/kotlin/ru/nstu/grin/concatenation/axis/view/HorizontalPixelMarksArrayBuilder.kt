@@ -9,10 +9,6 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import kotlin.math.max
 import kotlin.math.min
 
-data class Mark(val text: String, val x: Double, val height: Double, val width: Double)
-
-
-
 class HorizontalPixelMarksArrayBuilder(
     private val matrixTransformer: MatrixTransformer
 ) {
@@ -20,8 +16,8 @@ class HorizontalPixelMarksArrayBuilder(
         scaleProperties: AxisScaleProperties,
         styleProperties: AxisStyleProperties,
         direction: Direction
-    ): List<Mark> {
-        val result = mutableListOf<Mark>()
+    ): List<DrawingMark> {
+        val result = mutableListOf<DrawingMark>()
 
         val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixelHorizontal()
 
@@ -35,7 +31,7 @@ class HorizontalPixelMarksArrayBuilder(
             val (width, height) = estimateTextSize(text, styleProperties.marksFont)
 
             if(zeroPixel + width / 2 < maxDrawingPixel && zeroPixel - width / 2 > minDrawingPixel){
-                result.add(Mark(text, zeroPixel, height, width))
+                result.add(DrawingMark(text, zeroPixel, height, width))
                 width / 2
             } else{
                 0.0
@@ -60,7 +56,7 @@ class HorizontalPixelMarksArrayBuilder(
             ){
                 filledPosition = nextMarkPixel + width / 2
 
-                result.add(Mark(text, nextMarkPixel, height, width))
+                result.add(DrawingMark(text, nextMarkPixel, height, width))
             }
 
             nextMarkPixel += styleProperties.marksDistance
@@ -82,7 +78,7 @@ class HorizontalPixelMarksArrayBuilder(
             ) {
                 filledPosition = nextMarkPixel - width / 2
 
-                result.add(Mark(text, nextMarkPixel, height, width))
+                result.add(DrawingMark(text, nextMarkPixel, height, width))
             }
 
             nextMarkPixel -= styleProperties.marksDistance

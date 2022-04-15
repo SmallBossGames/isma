@@ -46,7 +46,7 @@ class HorizontalAxisDrawStrategy(
         val marksY = marksCoordinate - DISTANCE_TO_LABEL / 2 - marksHeight / 2 + offset
         val labelY = marksCoordinate + DISTANCE_TO_LABEL / 2 + labelHeight / 2 + offset
 
-        marks.forEach { context.fillText(it.text, it.x, marksY) }
+        marks.forEach { context.fillText(it.text, it.coordinate, marksY) }
         drawAxisLabel(context, axis, labelY)
 
         context.restore()

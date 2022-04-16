@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "1.6.20" apply false
     id("org.openjfx.javafxplugin") version "0.0.12" apply false
@@ -24,7 +26,7 @@ subprojects {
         targetCompatibility = "17"
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>{
+    tasks.withType<KotlinCompile>{
         targetCompatibility = "17"
         kotlinOptions {
             jvmTarget = "17"

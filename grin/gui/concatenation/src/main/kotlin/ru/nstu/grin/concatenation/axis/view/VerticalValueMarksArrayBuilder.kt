@@ -6,8 +6,7 @@ import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.utilities.createStringValue
 import ru.nstu.grin.concatenation.axis.utilities.estimateTextSize
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.floor
 
 class VerticalValueMarksArrayBuilder(
     private val matrixTransformer: MatrixTransformer
@@ -40,10 +39,13 @@ class VerticalValueMarksArrayBuilder(
             0.0
         }
 
-        var nextMarkPixel = max(
-            minPixel,
-            matrixTransformer.transformUnitsToPixel(styleProperties.marksDistance, scaleProperties, direction)
-        )
+        val step = styleProperties.marksDistance
+        val overflowLeft = matrixTransformer.transformPixelToUnits(minPixel, scaleProperties, direction)
+        val skipLeft = if (overflowLeft > 0) floor(overflowLeft / step) * step else 0.0
+        val overflowRight = -matrixTransformer.transformPixelToUnits(maxPixel, scaleProperties, direction)
+        val skipRight = if (overflowLeft > 0) floor(overflowRight / step) * step else 0.0
+
+        var nextMarkPixel = matrixTransformer.transformUnitsToPixel(styleProperties.marksDistance + skipLeft, scaleProperties, direction)
         var nextMarkValue = matrixTransformer.transformPixelToUnits(nextMarkPixel, scaleProperties, direction)
         var filledPosition = zeroPixel + zeroPixelOffset
 
@@ -63,10 +65,7 @@ class VerticalValueMarksArrayBuilder(
             nextMarkPixel = matrixTransformer.transformUnitsToPixel(nextMarkValue, scaleProperties, direction)
         }
 
-        nextMarkPixel = min(
-            maxPixel,
-            matrixTransformer.transformUnitsToPixel(-styleProperties.marksDistance, scaleProperties, direction)
-        )
+        nextMarkPixel = matrixTransformer.transformUnitsToPixel(-styleProperties.marksDistance - skipRight, scaleProperties, direction)
         nextMarkValue = matrixTransformer.transformPixelToUnits(nextMarkPixel, scaleProperties, direction)
         filledPosition = zeroPixel - zeroPixelOffset
 

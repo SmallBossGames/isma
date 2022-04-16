@@ -61,7 +61,7 @@ class VerticalPixelMarksArrayBuilder(
             nextMarkPixel += styleProperties.marksDistance
         }
 
-        nextMarkPixel = min(zeroPixel - zeroPixelOffset - styleProperties.marksDistance, maxDrawingPixel)
+        nextMarkPixel = min(zeroPixel - styleProperties.marksDistance, maxDrawingPixel)
         filledPosition = zeroPixel - zeroPixelOffset
 
         while (nextMarkPixel > minDrawingPixel) {

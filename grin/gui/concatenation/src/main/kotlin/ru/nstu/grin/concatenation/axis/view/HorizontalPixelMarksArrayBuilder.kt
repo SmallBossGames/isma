@@ -6,8 +6,7 @@ import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.utilities.createStringValue
 import ru.nstu.grin.concatenation.axis.utilities.estimateTextSize
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.floor
 
 class HorizontalPixelMarksArrayBuilder(
     private val matrixTransformer: MatrixTransformer
@@ -40,7 +39,13 @@ class HorizontalPixelMarksArrayBuilder(
             0.0
         }
 
-        var nextMarkPixel = max(zeroPixel + styleProperties.marksDistance, minDrawingPixel)
+        val step = styleProperties.marksDistance
+        val overflowLeft = minDrawingPixel - zeroPixel
+        val skipLeft = if (overflowLeft > 0) floor(overflowLeft / step) * step else 0.0
+        val overflowRight = zeroPixel - maxDrawingPixel
+        val skipRight = if (overflowLeft > 0) floor(overflowRight / step) * step else 0.0
+
+        var nextMarkPixel = zeroPixel + styleProperties.marksDistance + skipLeft
         var filledPosition = zeroPixel + zeroPixelOffset
 
         while (nextMarkPixel < maxDrawingPixel) {
@@ -62,7 +67,7 @@ class HorizontalPixelMarksArrayBuilder(
             nextMarkPixel += styleProperties.marksDistance
         }
 
-        nextMarkPixel = min(zeroPixel - styleProperties.marksDistance, maxDrawingPixel)
+        nextMarkPixel = zeroPixel - styleProperties.marksDistance - skipRight
         filledPosition = zeroPixel - zeroPixelOffset
 
         while (nextMarkPixel > minDrawingPixel) {

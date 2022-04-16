@@ -40,9 +40,9 @@ class VerticalValueMarksArrayBuilder(
         }
 
         val step = styleProperties.marksDistance
-        val overflowLeft = matrixTransformer.transformPixelToUnits(minPixel, scaleProperties, direction)
+        val overflowLeft = matrixTransformer.transformPixelToUnits(minDrawingPixel, scaleProperties, direction)
         val skipLeft = if (overflowLeft > 0) floor(overflowLeft / step) * step else 0.0
-        val overflowRight = -matrixTransformer.transformPixelToUnits(maxPixel, scaleProperties, direction)
+        val overflowRight = -matrixTransformer.transformPixelToUnits(maxDrawingPixel, scaleProperties, direction)
         val skipRight = if (overflowLeft > 0) floor(overflowRight / step) * step else 0.0
 
         var nextMarkPixel = matrixTransformer.transformUnitsToPixel(styleProperties.marksDistance + skipLeft, scaleProperties, direction)

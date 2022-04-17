@@ -98,7 +98,6 @@ data class WaveletDetailsSnapshot(
 @Serializable
 data class ConcatenationAxisSnapshot(
     val name: String,
-    val order: Int,
     val direction: Direction,
     val styleProperties: AxisStylePropertiesSnapshot,
     val scaleProperties: AxisScalePropertiesSnapshot,
@@ -196,7 +195,6 @@ fun Font.toSnapshot() =
 fun ConcatenationAxisSnapshot.toModel() =
     ConcatenationAxis(
         name = name,
-        order = order,
         direction = direction,
         styleProperties = styleProperties.toModel(),
         scaleProperties = scaleProperties.toModel(),
@@ -205,7 +203,6 @@ fun ConcatenationAxisSnapshot.toModel() =
 fun ConcatenationAxis.toSnapshot() =
     ConcatenationAxisSnapshot(
         name = name,
-        order = order,
         direction = direction,
         styleProperties = styleProperties.toSnapshot(),
         scaleProperties = scaleProperties.toSnapshot(),

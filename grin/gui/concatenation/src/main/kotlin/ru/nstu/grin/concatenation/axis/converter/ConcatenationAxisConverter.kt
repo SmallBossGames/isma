@@ -6,10 +6,9 @@ import ru.nstu.grin.concatenation.axis.model.AxisStyleProperties
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 
 object ConcatenationAxisConverter {
-    fun merge(source: ConcatenationAxisDTO, order: Int): ConcatenationAxis {
+    fun merge(source: ConcatenationAxisDTO): ConcatenationAxis {
         return ConcatenationAxis(
             name = source.name,
-            order = order,
             direction = source.direction,
             styleProperties = AxisStyleProperties(
                 backgroundColor = source.backGroundColor,

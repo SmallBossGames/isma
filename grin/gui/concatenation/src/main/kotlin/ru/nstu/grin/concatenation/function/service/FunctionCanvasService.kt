@@ -4,8 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.axis.converter.ConcatenationAxisConverter
-import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
-import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.converter.CartesianSpaceConverter
 import ru.nstu.grin.concatenation.canvas.dto.CartesianSpaceDTO
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -24,8 +22,8 @@ class FunctionCanvasService(
                 && it.yAxis.name == cartesianSpace.yAxis.name
         }
         if (found == null) {
-            val xAxis = cartesianSpace.xAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
-            val yAxis = cartesianSpace.yAxis.let { ConcatenationAxisConverter.merge(it, it.getOrder()) }
+            val xAxis = cartesianSpace.xAxis.let { ConcatenationAxisConverter.merge(it) }
+            val yAxis = cartesianSpace.yAxis.let { ConcatenationAxisConverter.merge(it) }
             val added = CartesianSpaceConverter.merge(cartesianSpace, xAxis, yAxis)
             model.cartesianSpaces.add(added)
         } else {
@@ -72,24 +70,4 @@ class FunctionCanvasService(
         }
     }
 
-    private fun ConcatenationAxisDTO.getOrder(): Int {
-        return when (direction) {
-            Direction.LEFT -> {
-                model.cartesianSpaces.filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
-                    .size
-            }
-            Direction.RIGHT -> {
-                model.cartesianSpaces.filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
-                    .size
-            }
-            Direction.TOP -> {
-                model.cartesianSpaces.filter { it.xAxis.direction == Direction.TOP || it.yAxis.direction == Direction.TOP }
-                    .size
-            }
-            Direction.BOTTOM -> {
-                model.cartesianSpaces.filter { it.xAxis.direction == Direction.BOTTOM || it.yAxis.direction == Direction.BOTTOM }
-                    .size
-            }
-        }
-    }
 }

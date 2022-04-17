@@ -4,7 +4,6 @@ enum class Direction { LEFT, RIGHT, TOP, BOTTOM }
 
 data class ConcatenationAxis(
     val name: String,
-    val order: Int,
     val direction: Direction,
     var styleProperties: AxisStyleProperties = AxisStyleProperties(),
     var scaleProperties: AxisScaleProperties = AxisScaleProperties(),

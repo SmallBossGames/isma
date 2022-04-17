@@ -30,42 +30,48 @@ class ConcatenationCanvas(
 ): Pane() {
     private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
+    private val functionsCanvas = Canvas(
+        SettingsProvider.getCanvasWidth(),
+        SettingsProvider.getCanvasHeight()
+    ).apply {
+        VBox.setVgrow(this, Priority.ALWAYS)
+        HBox.setHgrow(this, Priority.ALWAYS)
+
+        canvasViewModel.functionsLayerContext = graphicsContext2D
+    }
+
+    private val uiCanvas = Canvas(
+        SettingsProvider.getCanvasWidth(),
+        SettingsProvider.getCanvasHeight()
+    ).apply {
+        VBox.setVgrow(this, Priority.ALWAYS)
+        HBox.setHgrow(this, Priority.ALWAYS)
+
+        canvasViewModel.uiLayerContext = graphicsContext2D
+
+        onScroll = scalableScrollHandler
+
+        onMouseDragged = draggedHandler
+
+        onMousePressed = pressedMouseHandle
+
+        onMouseReleased = releaseMouseHandler
+    }
+
     init {
-        val c1 = Canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()).apply {
-            VBox.setVgrow(this, Priority.ALWAYS)
-            HBox.setHgrow(this, Priority.ALWAYS)
-
-            canvasViewModel.functionsLayerContext = graphicsContext2D
-        }
-
-        val c2 = Canvas(SettingsProvider.getCanvasWidth(), SettingsProvider.getCanvasHeight()).apply {
-            VBox.setVgrow(this, Priority.ALWAYS)
-            HBox.setHgrow(this, Priority.ALWAYS)
-
-            canvasViewModel.uiLayerContext = graphicsContext2D
-
-            onScroll = scalableScrollHandler
-
-            onMouseDragged = draggedHandler
-
-            onMousePressed = pressedMouseHandle
-
-            onMouseReleased = releaseMouseHandler
-        }
-
-        children.addAll(c1, c2)
+        children.addAll(functionsCanvas, uiCanvas)
 
         widthProperty().addListener { _ ->
-            c1.width = width
-            c2.width = width
+            functionsCanvas.width = width
+            uiCanvas.width = width
             canvasViewModel.canvasWidth = width
 
             chainDrawer.draw()
         }
 
         heightProperty().addListener { _ ->
-            c1.height = height
-            c2.height = height
+            functionsCanvas.height = height
+            uiCanvas.height = height
             canvasViewModel.canvasHeight = height
 
             chainDrawer.draw()

@@ -1,15 +1,12 @@
 package ru.nstu.grin.concatenation.canvas.controller
 
-import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.concatenation.axis.model.AxisScaleProperties
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import kotlin.math.abs
 
 class MatrixTransformer(
     private val canvasViewModel: CanvasViewModel,
-    private val concatenationCanvasModel: ConcatenationCanvasModel,
 ) {
     fun transformPixelToUnits(
         number: Double,
@@ -68,36 +65,12 @@ class MatrixTransformer(
     }
 
     fun getMinMaxPixelVertical() = Pair(
-        getTopAxisSize() * SettingsProvider.getAxisWidth(),
-        canvasViewModel.canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+        canvasViewModel.functionsArea.top,
+        canvasViewModel.canvasHeight - canvasViewModel.functionsArea.bottom
     )
 
     fun getMinMaxPixelHorizontal() = Pair(
-        getLeftAxisSize() * SettingsProvider.getAxisWidth(),
-        canvasViewModel.canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth()
+        canvasViewModel.functionsArea.left,
+        canvasViewModel.canvasWidth - canvasViewModel.functionsArea.right
     )
-
-    private fun getLeftAxisSize(): Int {
-        return concatenationCanvasModel.cartesianSpaces
-            .filter { it.xAxis.direction == Direction.LEFT || it.yAxis.direction == Direction.LEFT }
-            .size
-    }
-
-    private fun getRightAxisSize(): Int {
-        return concatenationCanvasModel.cartesianSpaces
-            .filter { it.xAxis.direction == Direction.RIGHT || it.yAxis.direction == Direction.RIGHT }
-            .size
-    }
-
-    private fun getBottomAxisSize(): Int {
-        return concatenationCanvasModel.cartesianSpaces
-            .filter { it.xAxis.direction == Direction.BOTTOM || it.yAxis.direction == Direction.BOTTOM }
-            .size
-    }
-
-    private fun getTopAxisSize(): Int {
-        return concatenationCanvasModel.cartesianSpaces
-            .filter { it.xAxis.direction == Direction.TOP || it.yAxis.direction == Direction.TOP }
-            .size
-    }
 }

@@ -12,6 +12,8 @@ data class CartesianSpace(
     var isShowGrid: Boolean = false
 ) : Cloneable {
 
+    val axes = listOf(xAxis, yAxis)
+
     public override fun clone(): CartesianSpace {
         return CartesianSpace(
             name = name,

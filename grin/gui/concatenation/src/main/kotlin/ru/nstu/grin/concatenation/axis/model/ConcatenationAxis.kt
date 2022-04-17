@@ -10,7 +10,6 @@ data class ConcatenationAxis(
     val direction: Direction,
     var styleProperties: AxisStyleProperties = AxisStyleProperties(),
     var scaleProperties: AxisScaleProperties = AxisScaleProperties(),
-
 ) {
     fun isLocated(x: Double, y: Double, canvasWidth: Double, canvasHeight: Double): Boolean {
         when (direction) {

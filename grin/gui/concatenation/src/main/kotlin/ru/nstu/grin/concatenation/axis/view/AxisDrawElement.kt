@@ -1,75 +1,103 @@
 package ru.nstu.grin.concatenation.axis.view
 
+import javafx.geometry.Insets
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
-import ru.nstu.grin.common.common.SettingsProvider
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 
 class AxisDrawElement(
-    private val model: ConcatenationCanvasModel,
+    private val canvasModel: ConcatenationCanvasModel,
+    private val canvasViewModel: CanvasViewModel,
     private val verticalAxisDraw: VerticalAxisDrawStrategy,
     private val horizontalAxisDraw: HorizontalAxisDrawStrategy,
 ) : ChainDrawElement {
-    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
-        for (cartesianSpace in model.cartesianSpaces) {
-            val xAxis = cartesianSpace.xAxis
-            val yAxis = cartesianSpace.yAxis
-
-            if (!xAxis.styleProperties.isVisible) {
-                drawBackground(
-                    context,
-                    xAxis.order,
-                    xAxis.direction,
-                    xAxis.styleProperties.backgroundColor,
-                    xAxis.styleProperties.marksColor,
-                    canvasWidth,
-                    canvasHeight
-                )
-                drawAxisMarks(
-                    context,
-                    xAxis.order,
-                    xAxis,
-                    xAxis.direction,
-                    canvasWidth,
-                    canvasHeight
-                )
+    data class Offsets(
+        var top: Double = 0.0,
+        var right: Double = 0.0,
+        var bottom: Double = 0.0,
+        var left: Double = 0.0,
+    ) {
+        fun increase(height: Double, direction: Direction){
+            when(direction){
+                Direction.LEFT -> left += height
+                Direction.RIGHT -> right += height
+                Direction.TOP -> top += height
+                Direction.BOTTOM -> bottom += height
             }
+        }
 
-            if (!xAxis.styleProperties.isVisible) {
-                drawBackground(
-                    context,
-                    yAxis.order,
-                    yAxis.direction,
-                    yAxis.styleProperties.backgroundColor,
-                    yAxis.styleProperties.marksColor,
-                    canvasWidth,
-                    canvasHeight
-                )
-                drawAxisMarks(
-                    context,
-                    yAxis.order,
-                    yAxis,
-                    yAxis.direction,
-                    canvasWidth,
-                    canvasHeight
-                )
+        fun getByDirection(direction: Direction) = when(direction){
+            Direction.LEFT -> left
+            Direction.RIGHT -> right
+            Direction.TOP -> top
+            Direction.BOTTOM -> bottom
+        }
+    }
+
+    override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
+        val spaces = canvasModel.cartesianSpaces
+
+        canvasViewModel.functionsArea = findFunctionsAreaInsets(spaces)
+
+        val offsets = Offsets()
+
+        for (cartesianSpace in canvasModel.cartesianSpaces) {
+            for (axis in cartesianSpace.axes){
+                if (!axis.styleProperties.isVisible) {
+                    context.drawAxisBackground(
+                        offsets,
+                        axis.styleProperties.borderHigh,
+                        axis.direction,
+                        axis.styleProperties.backgroundColor,
+                        axis.styleProperties.marksColor,
+                    )
+                    drawAxisMarks(
+                        context,
+                        offsets,
+                        axis
+                    )
+                    offsets.increase(
+                        axis.styleProperties.borderHigh,
+                        axis.direction
+                    )
+                }
             }
         }
     }
 
+    private fun findFunctionsAreaInsets(cartesianSpaces: List<CartesianSpace>): Insets {
+        val offsets = Offsets()
+
+        for(space in cartesianSpaces) {
+            for(axis in space.axes){
+                if (!axis.styleProperties.isVisible){
+                    offsets.increase(
+                        axis.styleProperties.borderHigh,
+                        axis.direction
+                    )
+                }
+            }
+        }
+
+        return Insets(offsets.top, offsets.right, offsets.bottom, offsets.left)
+    }
+
     private fun drawAxisMarks(
         context: GraphicsContext,
-        order: Int,
+        offsets: Offsets,
         axis: ConcatenationAxis,
-        direction: Direction,
-        canvasWidth: Double,
-        canvasHeight: Double
     ) {
-        val startPoint = order * SettingsProvider.getAxisWidth()
-        val marksCoordinate = startPoint + SettingsProvider.getAxisWidth() / 2
+        val direction = axis.direction
+        val axisHeight = axis.styleProperties.borderHigh
+        val canvasWidth = canvasViewModel.canvasWidth
+        val canvasHeight = canvasViewModel.canvasHeight
+
+        val marksCoordinate = offsets.getByDirection(direction) + axisHeight / 2
 
         when (direction) {
             Direction.LEFT -> {
@@ -103,79 +131,58 @@ class AxisDrawElement(
         }
     }
 
-    private fun drawBackground(
-        context: GraphicsContext,
-        order: Int,
+    private fun GraphicsContext.drawAxisBackground(
+        offsets: Offsets,
+        axisHeight: Double,
         direction: Direction,
         backgroundColor: Color,
         lineColor: Color,
-        canvasWidth: Double,
-        canvasHeight: Double,
     ) {
-        context.save()
+        save()
 
-        context.fill = backgroundColor
-        context.stroke = lineColor
+        val canvasWidth = canvasViewModel.canvasWidth
+        val canvasHeight = canvasViewModel.canvasHeight
+        val functionsArea = canvasViewModel.functionsArea
 
-        val startPoint = order * SettingsProvider.getAxisWidth()
+        fill = backgroundColor
+        stroke = lineColor
+
         when (direction) {
             Direction.LEFT -> {
-                val x = startPoint
-                val y = getTopAxisSize() * SettingsProvider.getAxisWidth()
-                val width = SettingsProvider.getAxisWidth()
-                val height = canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                val x = offsets.left
+                val y = functionsArea.top
+                val height = canvasHeight - functionsArea.top - functionsArea.bottom
 
-                context.strokeLine(x + width, y, x + width, y + height)
-                context.fillRect(x, y, width, height)
+                strokeLine(x + axisHeight, y, x + axisHeight, y + height)
+                fillRect(x, y, axisHeight, height)
             }
             Direction.RIGHT -> {
-                val x = canvasWidth - startPoint
-                val y = getTopAxisSize() * SettingsProvider.getAxisWidth()
-                val width = SettingsProvider.getAxisWidth()
-                val height = canvasHeight - getBottomAxisSize() * SettingsProvider.getAxisWidth()
+                val x = canvasWidth - offsets.right - axisHeight
+                val y = functionsArea.top
+                val height = canvasHeight - functionsArea.top - functionsArea.bottom
 
-                context.strokeLine(x, y, x, y + height)
-                context.fillRect(x, y, width, height)
+                strokeLine(x, y, x, y + height)
+                fillRect(x, y, axisHeight, height)
             }
             Direction.TOP -> {
-                val x = getLeftAxisSize() * SettingsProvider.getAxisWidth()
-                val y = startPoint
-                val width = canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth()
-                val height = SettingsProvider.getAxisWidth()
+                val x = functionsArea.left
+                val y = offsets.top
+                val width = canvasWidth - functionsArea.left - functionsArea.right
 
-                context.strokeLine(x, y + height, x + width, y + height)
-                context.fillRect(x, y, width, height)
+                strokeLine(x, y + axisHeight, x + width, y + axisHeight)
+                fillRect(x, y, width, axisHeight)
             }
             Direction.BOTTOM -> {
-                val x = getLeftAxisSize() * SettingsProvider.getAxisWidth()
-                val y = canvasHeight - startPoint - SettingsProvider.getAxisWidth()
-                val width = canvasWidth - getRightAxisSize() * SettingsProvider.getAxisWidth()
-                val height = SettingsProvider.getAxisWidth()
+                val x = functionsArea.left
+                val y = canvasHeight - offsets.bottom - axisHeight
+                val width = canvasWidth - functionsArea.left - functionsArea.right
 
-                context.strokeLine(x, y, x + width, y)
-                context.fillRect(x, y, width, height)
+                strokeLine(x, y , x + width, y)
+                fillRect(x, y, width, axisHeight)
             }
         }
 
-        context.restore()
+        restore()
     }
 
-    private fun getTopAxisSize(): Int {
-        return filterAxis(Direction.TOP).size
-    }
-
-    private fun getBottomAxisSize(): Int {
-        return filterAxis(Direction.BOTTOM).size
-    }
-
-    private fun getLeftAxisSize(): Int {
-        return filterAxis(Direction.LEFT).size
-    }
-
-    private fun getRightAxisSize(): Int {
-        return filterAxis(Direction.RIGHT).size
-    }
-
-    private fun filterAxis(direction: Direction) = model.cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
-        .filter { it.direction == direction }
 }

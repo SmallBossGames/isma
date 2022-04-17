@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
@@ -95,10 +96,7 @@ class PressedMouseHandler(
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return canvasModel.cartesianSpaces
-            .map { listOf(it.xAxis, it.yAxis) }
-            .flatten()
-            .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
+        return canvasModel.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel) != null
     }
 
     private fun handleViewMode(event: MouseEvent) {
@@ -207,18 +205,12 @@ class PressedMouseHandler(
     }
 
     private fun showContextMenu(event: MouseEvent) {
-        val axes = canvasModel.cartesianSpaces.map {
-            listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
-        }.flatten()
+        val axis = canvasModel.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel)
 
-        val cartesianSpace = axes.firstOrNull {
-            it.second.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
-        }?.first
-
-        if (cartesianSpace == null) {
+        if (axis == null) {
             contextMenuDrawElement.showForMain(event.source as Node, event.x, event.y)
         } else {
-            contextMenuDrawElement.showForAxis(event.source as Node, event.x, event.y)
+            contextMenuDrawElement.showForAxis(event.source as Node, axis, event.x, event.y)
         }
     }
 }

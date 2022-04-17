@@ -3,6 +3,7 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.ScrollEvent
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
@@ -16,13 +17,7 @@ class ScalableScrollHandler(
     private val matrixTransformer: MatrixTransformer,
 ) : EventHandler<ScrollEvent> {
     override fun handle(event: ScrollEvent) {
-        val axes = model.cartesianSpaces.map {
-            listOf(it.xAxis, it.yAxis)
-        }.flatten()
-
-        val axis = axes.firstOrNull {
-            it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
-        }
+        val axis = model.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel)
 
         if (axis != null) {
             handleScaleByAxis(event, axis)

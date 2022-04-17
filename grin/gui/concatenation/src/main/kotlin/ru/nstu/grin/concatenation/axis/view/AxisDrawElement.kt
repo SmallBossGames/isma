@@ -6,6 +6,7 @@ import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.axis.model.Offsets
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
@@ -16,28 +17,6 @@ class AxisDrawElement(
     private val verticalAxisDraw: VerticalAxisDrawStrategy,
     private val horizontalAxisDraw: HorizontalAxisDrawStrategy,
 ) : ChainDrawElement {
-    data class Offsets(
-        var top: Double = 0.0,
-        var right: Double = 0.0,
-        var bottom: Double = 0.0,
-        var left: Double = 0.0,
-    ) {
-        fun increase(height: Double, direction: Direction){
-            when(direction){
-                Direction.LEFT -> left += height
-                Direction.RIGHT -> right += height
-                Direction.TOP -> top += height
-                Direction.BOTTOM -> bottom += height
-            }
-        }
-
-        fun getByDirection(direction: Direction) = when(direction){
-            Direction.LEFT -> left
-            Direction.RIGHT -> right
-            Direction.TOP -> top
-            Direction.BOTTOM -> bottom
-        }
-    }
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val spaces = canvasModel.cartesianSpaces

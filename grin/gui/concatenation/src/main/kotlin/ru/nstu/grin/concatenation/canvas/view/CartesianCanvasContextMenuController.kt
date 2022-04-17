@@ -4,8 +4,8 @@ import javafx.scene.Node
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
 class CartesianCanvasContextMenuController(
@@ -13,21 +13,11 @@ class CartesianCanvasContextMenuController(
     private val model: ConcatenationCanvasModel,
     private val controller: ConcatenationCanvasController,
     private val axisListViewController: AxisListViewController,
-    private val canvasViewModel: CanvasViewModel,
 ) {
     private val contextMenu = ContextMenu()
 
-    fun showForAxis(parent: Node, x: Double, y: Double) {
-        val canvasWidth = canvasViewModel.canvasWidth
-        val canvasHeight = canvasViewModel.canvasHeight
-
-        val axes = model.cartesianSpaces.map {
-            listOf(Pair(it, it.xAxis), Pair(it, it.yAxis))
-        }.flatten()
-
-        val cartesianSpace = axes.firstOrNull {
-            it.second.isLocated(x, y, canvasWidth, canvasHeight)
-        }?.first ?: return
+    fun showForAxis(parent: Node, axis: ConcatenationAxis, x: Double, y: Double) {
+        val cartesianSpace = model.cartesianSpaces.firstOrNull { it.axes.contains(axis) } ?: return
 
         contextMenu.items.setAll(
 /*            MenuItem("On/Off Logarithmic").apply {
@@ -50,13 +40,7 @@ class CartesianCanvasContextMenuController(
             },
             MenuItem("Change Axis").apply {
                 setOnAction {
-                    val axisItem = if (cartesianSpace.xAxis.isLocated(x, y, canvasWidth, canvasHeight)) {
-                        cartesianSpace.xAxis
-                    } else {
-                        cartesianSpace.yAxis
-                    }
-
-                    axisListViewController.editAxis(axisItem)
+                    axisListViewController.editAxis(axis)
                 }
             },
             MenuItem("Спрятать все функции").apply {

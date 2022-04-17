@@ -8,5 +8,5 @@ class CanvasViewModel {
     lateinit var uiLayerContext: GraphicsContext
     var canvasWidth = 0.0
     var canvasHeight = 0.0
-    var functionsArea = Insets.EMPTY
+    var functionsArea = Insets.EMPTY!!
 }

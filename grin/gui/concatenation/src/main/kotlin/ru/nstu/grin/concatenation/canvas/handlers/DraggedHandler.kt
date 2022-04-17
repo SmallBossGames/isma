@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
@@ -74,22 +76,18 @@ class DraggedHandler(
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return model.cartesianSpaces
-            .map { listOf(it.xAxis, it.yAxis) }
-            .flatten()
-            .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
+        return model.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel) != null
     }
 
     private fun handleDragged(event: MouseEvent) {
+        if(isOnAxis(event)){
+            return
+        }
+
         model.pointToolTipSettings.isShow = false
         model.pointToolTipSettings.pointsSettings.clear()
 
-        val axises = model.cartesianSpaces.map {
-            listOf(it.xAxis, it.yAxis)
-        }.flatten()
-        val axis = axises.firstOrNull {
-            it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
-        } ?: return
+        val axis = model.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel) ?: return
 
         val draggedSettings = getDraggedSettings(axis)
 
@@ -98,41 +96,43 @@ class DraggedHandler(
 
         val scaleProperties = axis.scaleProperties
 
-        if (axis.isXAxis) {
-            when {
-                event.x < draggedSettings.lastX -> {
-                    axis.scaleProperties = axis.scaleProperties.copy(
-                        minValue = scaleProperties.minValue - DELTA,
-                        maxValue = scaleProperties.maxValue - DELTA,
-                    )
-                }
-                event.x > draggedSettings.lastX -> {
-                    axis.scaleProperties = axis.scaleProperties.copy(
-                        minValue = scaleProperties.minValue + DELTA,
-                        maxValue = scaleProperties.maxValue + DELTA,
-                    )
-                }
-                else -> {
+        when(axis.direction) {
+            Direction.LEFT, Direction.RIGHT -> {
+                when {
+                    event.y < draggedSettings.lastY -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue - DELTA,
+                            maxValue = scaleProperties.maxValue - DELTA,
+                        )
+                    }
+                    event.y > draggedSettings.lastY -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue + DELTA,
+                            maxValue = scaleProperties.maxValue + DELTA,
+                        )
+                    }
+                    else -> throw IllegalStateException()
                 }
             }
-        } else {
-            when {
-                event.y < draggedSettings.lastY -> {
-                    axis.scaleProperties = axis.scaleProperties.copy(
-                        minValue = scaleProperties.minValue - DELTA,
-                        maxValue = scaleProperties.maxValue - DELTA,
-                    )
-                }
-                event.y > draggedSettings.lastY -> {
-                    axis.scaleProperties = axis.scaleProperties.copy(
-                        minValue = scaleProperties.minValue + DELTA,
-                        maxValue = scaleProperties.maxValue + DELTA,
-                    )
-                }
-                else -> {
+            Direction.TOP, Direction.BOTTOM -> {
+                when {
+                    event.x < draggedSettings.lastX -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue - DELTA,
+                            maxValue = scaleProperties.maxValue - DELTA,
+                        )
+                    }
+                    event.x > draggedSettings.lastX -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue + DELTA,
+                            maxValue = scaleProperties.maxValue + DELTA,
+                        )
+                    }
+                    else -> throw IllegalStateException()
                 }
             }
         }
+
         draggedSettings.lastX = event.x
         draggedSettings.lastY = event.y
         currentCanvasSettings[axis] = draggedSettings

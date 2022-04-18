@@ -4,6 +4,7 @@ import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.text.TextAlignment
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 import ru.nstu.grin.concatenation.axis.utilities.estimateTextSize
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
@@ -40,11 +41,22 @@ class HorizontalAxisDrawStrategy(
         }
 
         val marksHeight = if (marks.isEmpty()) 0.0 else marks.maxOf { it.height }
-
         val offset = marksHeight - (labelHeight + marksHeight) / 2
 
-        val marksY = marksCoordinate - DISTANCE_TO_LABEL / 2 - marksHeight / 2 + offset
-        val labelY = marksCoordinate + DISTANCE_TO_LABEL / 2 + labelHeight / 2 + offset
+        val marksY: Double
+        val labelY: Double
+
+        when(axis.direction){
+            Direction.TOP -> {
+                marksY = marksCoordinate + DISTANCE_TO_LABEL / 2 + marksHeight / 2 - offset
+                labelY = marksCoordinate - DISTANCE_TO_LABEL / 2 - labelHeight / 2 - offset
+            }
+            Direction.BOTTOM -> {
+                marksY = marksCoordinate - DISTANCE_TO_LABEL / 2 - marksHeight / 2 + offset
+                labelY = marksCoordinate + DISTANCE_TO_LABEL / 2 + labelHeight / 2 + offset
+            }
+            else -> throw IllegalStateException()
+        }
 
         marks.forEach { context.fillText(it.text, it.coordinate, marksY) }
         drawAxisLabel(context, axis, labelY)

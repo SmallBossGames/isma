@@ -41,9 +41,6 @@ class AxisListView(
                     )
                     padding = Insets(5.0)
                 },
-                Label("Direction: ${item.direction}").apply {
-                    padding = Insets(5.0)
-                }
             ).apply {
                 spacing = 5.0
             }

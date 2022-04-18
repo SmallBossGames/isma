@@ -4,6 +4,7 @@ import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.text.TextAlignment
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 import ru.nstu.grin.concatenation.axis.utilities.estimateTextSize
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
@@ -13,7 +14,6 @@ class VerticalAxisDrawStrategy(
     private val pixelMarksArrayBuilder: VerticalPixelMarksArrayBuilder,
     private val valueMarksArrayBuilder: VerticalValueMarksArrayBuilder,
 ) : AxisMarksDrawStrategy {
-
     override fun drawMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
@@ -40,11 +40,22 @@ class VerticalAxisDrawStrategy(
         }
 
         val marksWidth = if (marks.isEmpty()) 0.0 else marks.maxOf { it.width }
-
         val offset = marksWidth - (labelHeight + marksWidth) / 2
 
-        val marksX = marksCoordinate + marksWidth / 2 + DISTANCE_TO_LABEL / 2 - offset
-        val labelX = marksCoordinate - labelHeight / 2 - DISTANCE_TO_LABEL / 2  - offset
+        val marksX: Double
+        val labelX: Double
+
+        when(axis.direction){
+            Direction.LEFT -> {
+                marksX = marksCoordinate + marksWidth / 2 + DISTANCE_TO_LABEL / 2 - offset
+                labelX = marksCoordinate - labelHeight / 2 - DISTANCE_TO_LABEL / 2  - offset
+            }
+            Direction.RIGHT -> {
+                marksX = marksCoordinate - marksWidth / 2 - DISTANCE_TO_LABEL / 2 + offset
+                labelX = marksCoordinate + labelHeight / 2 + DISTANCE_TO_LABEL / 2 + offset
+            }
+            else -> throw IllegalStateException()
+        }
 
         marks.forEach { context.fillText(it.text, marksX, it.coordinate) }
         drawAxisLabel(context, axis, labelX)

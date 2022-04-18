@@ -66,6 +66,7 @@ data class ColorSnapshot(
     val red: Double,
     val green: Double,
     val blue: Double,
+    val opacity: Double,
 )
 
 @Serializable
@@ -181,10 +182,10 @@ fun AxisScaleProperties.toSnapshot() =
     )
 
 fun ColorSnapshot.toModel() =
-    Color.color(red, green, blue)
+    Color.color(red, green, blue, opacity)
 
 fun Color.toSnapshot() =
-    ColorSnapshot(red, green, blue)
+    ColorSnapshot(red, green, blue, opacity)
 
 fun FontSnapshot.toModel() =
     Font.font(family, size)

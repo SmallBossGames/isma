@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.common.SettingsProvider
+import ru.nstu.grin.concatenation.axis.extensions.findFunctionsAreaInsets
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
@@ -60,6 +61,8 @@ class ConcatenationCanvas(
 
     init {
         children.addAll(functionsCanvas, uiCanvas)
+
+        canvasViewModel.functionsArea = model.cartesianSpaces.findFunctionsAreaInsets()
 
         widthProperty().addListener { _ ->
             functionsCanvas.width = width

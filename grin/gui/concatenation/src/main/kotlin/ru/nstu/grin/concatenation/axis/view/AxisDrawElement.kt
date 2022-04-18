@@ -1,6 +1,5 @@
 package ru.nstu.grin.concatenation.axis.view
 
-import javafx.geometry.Insets
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
@@ -9,7 +8,7 @@ import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.Offsets
 import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
+import ru.nstu.grin.concatenation.axis.extensions.findFunctionsAreaInsets
 
 class AxisDrawElement(
     private val canvasModel: ConcatenationCanvasModel,
@@ -21,7 +20,7 @@ class AxisDrawElement(
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val spaces = canvasModel.cartesianSpaces
 
-        canvasViewModel.functionsArea = findFunctionsAreaInsets(spaces)
+        canvasViewModel.functionsArea = spaces.findFunctionsAreaInsets()
 
         val offsets = Offsets()
 
@@ -47,23 +46,6 @@ class AxisDrawElement(
                 }
             }
         }
-    }
-
-    private fun findFunctionsAreaInsets(cartesianSpaces: List<CartesianSpace>): Insets {
-        val offsets = Offsets()
-
-        for(space in cartesianSpaces) {
-            for(axis in space.axes){
-                if (!axis.styleProperties.isVisible){
-                    offsets.increase(
-                        axis.styleProperties.borderHeight,
-                        axis.direction
-                    )
-                }
-            }
-        }
-
-        return Insets(offsets.top, offsets.right, offsets.bottom, offsets.left)
     }
 
     private fun drawAxisMarks(
@@ -163,5 +145,4 @@ class AxisDrawElement(
 
         restore()
     }
-
 }

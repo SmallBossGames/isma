@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.axis.extensions
 
+import javafx.geometry.Insets
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.Offsets
@@ -60,4 +61,21 @@ fun List<CartesianSpace>.findLocatedAxisOrNull(
     }
 
     return null
+}
+
+fun List<CartesianSpace>.findFunctionsAreaInsets(): Insets {
+    val offsets = Offsets()
+
+    for(space in this) {
+        for(axis in space.axes){
+            if (!axis.styleProperties.isVisible){
+                offsets.increase(
+                    axis.styleProperties.borderHeight,
+                    axis.direction
+                )
+            }
+        }
+    }
+
+    return Insets(offsets.top, offsets.right, offsets.bottom, offsets.left)
 }

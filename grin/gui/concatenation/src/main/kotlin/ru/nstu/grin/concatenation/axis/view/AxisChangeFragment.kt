@@ -14,20 +14,26 @@ import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.model.AxisScalingType
+import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 
 class AxisChangeFragment(
     private val model: AxisChangeFragmentModel,
-    private val controller: AxisChangeFragmentController,
-    private val logFragment: LogarithmicTypeFragment
+    private val controller: AxisChangeFragmentController
 ) : BorderPane() {
     init {
         val distanceTypes = FXCollections.observableArrayList(MarksDistanceType.values().toList())
         val scalingTypes = FXCollections.observableArrayList(AxisScalingType.values().toList())
         val fontFamilies = FXCollections.observableArrayList(Font.getFamilies())
+        val availableDirections = when(model.direction){
+            Direction.LEFT, Direction.RIGHT -> FXCollections.observableArrayList(Direction.LEFT, Direction.RIGHT)
+            Direction.TOP, Direction.BOTTOM -> FXCollections.observableArrayList(Direction.TOP, Direction.BOTTOM)
+        }
 
         top = VBox(
             propertiesGrid {
+                addNode("Name", model.nameProperty)
+                addNode("Name", availableDirections, model.directionProperty)
                 addNode("Distance between marks", model.distanceBetweenMarksProperty)
                 addNode("Distance type", distanceTypes, model.marksDistanceTypeProperty)
                 addNode("Border height", model.borderHeightProperty)
@@ -60,49 +66,12 @@ class AxisChangeFragment(
         bottom = HBox(
             Button("Save").apply {
                 setOnAction {
-                    controller.updateAxis()
+                    controller.updateAxis(model)
                     (scene.window as Stage).close()
                 }
             }
         ).apply {
             padding = Insets(10.0)
         }
-
-        //TODO: disabled until log axis completely implemented
-        /*tabpane {
-            model.markTypeProperty.onChange {
-                when (model.axisMarkType!!) {
-                    AxisMarkType.LINEAR -> {
-                        hide()
-                    }
-                    AxisMarkType.LOGARITHMIC -> {
-                        show()
-                        (scene.window as Stage).apply {
-                            height = 600.0
-                        }
-                    }
-                }
-            }
-            when (model.axisMarkType!!) {
-                AxisMarkType.LINEAR -> {
-                    hide()
-                }
-                AxisMarkType.LOGARITHMIC -> {
-                    show()
-                }
-            }
-
-            tabs.addAll(
-                Tab(null, logFragment)
-            )
-
-            tabMaxHeight = 0.0
-            tabMinHeight = 0.0
-            stylesheet {
-                Stylesheet.tabHeaderArea {
-                    visibility = FXVisibility.HIDDEN
-                }
-            }
-        }*/
     }
 }

@@ -8,7 +8,6 @@ import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
-import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
 import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 import ru.nstu.grin.concatenation.axis.view.*
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
@@ -194,9 +193,7 @@ val grinGuiModule = module {
     scope<AxisChangeModalScope> {
         scopedOf(::AxisChangeFragmentController)
         scopedOf(::AxisChangeFragment)
-        scopedOf(::LogarithmicTypeFragment)
         scopedOf(::AxisChangeFragmentModel)
-        scopedOf(::LogarithmicFragmentModel)
     }
 
     scope<FunctionCopyModalScope> {

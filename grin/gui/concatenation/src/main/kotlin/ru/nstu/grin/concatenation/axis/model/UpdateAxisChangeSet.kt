@@ -3,8 +3,9 @@ package ru.nstu.grin.concatenation.axis.model
 import javafx.scene.paint.Color
 
 data class UpdateAxisChangeSet(
-    val distance: Double,
+    val marksDistance: Double,
     val marksDistanceType: MarksDistanceType,
+    val borderHeight: Double,
     val textSize: Double,
     val font: String,
     val fontColor: Color,

@@ -28,8 +28,9 @@ class AxisCanvasService(
 
         axis.styleProperties = axis.styleProperties.copy(
             backgroundColor = axisChangeSet.axisColor,
+            borderHeight = axisChangeSet.borderHeight,
             marksDistanceType = axisChangeSet.marksDistanceType,
-            marksDistance = axisChangeSet.distance,
+            marksDistance = axisChangeSet.marksDistance,
             marksColor = axisChangeSet.fontColor,
             marksFont = Font.font(axisChangeSet.font, axisChangeSet.textSize),
             isVisible = axisChangeSet.isHide

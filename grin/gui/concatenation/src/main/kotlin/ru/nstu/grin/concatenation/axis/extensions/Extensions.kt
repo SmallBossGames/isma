@@ -22,7 +22,7 @@ fun List<CartesianSpace>.findLocatedAxisOrNull(
                 continue
             }
 
-            val axisHeight = axis.styleProperties.borderHigh
+            val axisHeight = axis.styleProperties.borderHeight
 
             val isFound = when (axis.direction) {
                 Direction.LEFT -> {

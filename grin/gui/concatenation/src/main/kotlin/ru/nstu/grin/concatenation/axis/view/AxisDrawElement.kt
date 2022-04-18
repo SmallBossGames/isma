@@ -30,7 +30,7 @@ class AxisDrawElement(
                 if (!axis.styleProperties.isVisible) {
                     context.drawAxisBackground(
                         offsets,
-                        axis.styleProperties.borderHigh,
+                        axis.styleProperties.borderHeight,
                         axis.direction,
                         axis.styleProperties.backgroundColor,
                         axis.styleProperties.marksColor,
@@ -41,7 +41,7 @@ class AxisDrawElement(
                         axis
                     )
                     offsets.increase(
-                        axis.styleProperties.borderHigh,
+                        axis.styleProperties.borderHeight,
                         axis.direction
                     )
                 }
@@ -56,7 +56,7 @@ class AxisDrawElement(
             for(axis in space.axes){
                 if (!axis.styleProperties.isVisible){
                     offsets.increase(
-                        axis.styleProperties.borderHigh,
+                        axis.styleProperties.borderHeight,
                         axis.direction
                     )
                 }
@@ -72,7 +72,7 @@ class AxisDrawElement(
         axis: ConcatenationAxis,
     ) {
         val direction = axis.direction
-        val axisHeight = axis.styleProperties.borderHigh
+        val axisHeight = axis.styleProperties.borderHeight
         val canvasWidth = canvasViewModel.canvasWidth
         val canvasHeight = canvasViewModel.canvasHeight
 

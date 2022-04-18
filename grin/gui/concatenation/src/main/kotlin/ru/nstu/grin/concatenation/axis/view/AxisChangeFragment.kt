@@ -30,6 +30,7 @@ class AxisChangeFragment(
             propertiesGrid {
                 addNode("Distance between marks", model.distanceBetweenMarksProperty)
                 addNode("Distance type", distanceTypes, model.marksDistanceTypeProperty)
+                addNode("Border height", model.borderHeightProperty)
                 addNode("Font size", model.textSizeProperty)
                 addNode("Font", fontFamilies, model.fontProperty)
                 addNode("Font color", model.fontColorProperty)

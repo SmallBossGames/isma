@@ -15,14 +15,12 @@ data class CartesianSpace(
     val axes = listOf(xAxis, yAxis)
 
     public override fun clone(): CartesianSpace {
-        return CartesianSpace(
-            name = name,
+        return copy(
             functions = functions
                 .map { it.copy(id = UUID.randomUUID(), points = it.points.map { it.copy() }) }
                 .toMutableList(),
             xAxis = xAxis.copy(),
             yAxis = yAxis.copy(),
-            isShowGrid = isShowGrid
         )
     }
 

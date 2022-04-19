@@ -12,5 +12,5 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${PackageVersion.kotlinxSerializationJson}")
+    implementation(libs.kotlinx.serialization.json)
 }

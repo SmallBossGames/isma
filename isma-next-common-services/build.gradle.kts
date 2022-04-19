@@ -10,5 +10,5 @@ dependencies {
     implementation(project(":isma-lisma"))
     implementation(project(":isma-next-core"))
 
-    implementation ("org.antlr:antlr4-runtime:4.9.3")
+    implementation (libs.tornadofx.core)
 }

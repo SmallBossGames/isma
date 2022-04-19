@@ -7,7 +7,7 @@ group = "ru.nstu.isma"
 version = "1.0.0"
 
 javafx {
-    version = "17"
+    version = "17.0.2"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -15,6 +15,6 @@ dependencies {
     implementation(project(":isma-next-common-services"))
     implementation(project(":isma-lisma"))
 
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.9")
-    implementation ("org.antlr:antlr4-runtime:4.9.3")
+    implementation(libs.fxmisc.richtext.core)
+    implementation(libs.antlr4.runtime)
 }

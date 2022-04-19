@@ -5,10 +5,11 @@ plugins {
 val moduleName by extra("isma.isma.lisma.main")
 
 dependencies {
-    implementation(project(":isma-hsm"))
-    implementation("org.antlr:antlr4-runtime:4.9.3")
+    implementation(libs.antlr4.runtime)
 
     testImplementation("junit:junit:4.13.2")
+
+    implementation(project(":isma-hsm"))
 }
 
 tasks {

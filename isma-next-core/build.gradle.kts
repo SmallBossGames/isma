@@ -25,9 +25,9 @@ dependencies {
     implementation ("org.apache.commons:commons-text:1.9")
     implementation ("org.slf4j:slf4j-api:1.7.36")
     implementation ("com.google.guava:guava:31.1-jre")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${PackageVersion.kotlinxCoroutines}")
+    implementation(libs.kotlinx.coroutines.core)
 
-    implementation ("io.insert-koin:koin-core:${PackageVersion.koin}")
+    implementation (libs.koin.core)
 
     testImplementation ("junit:junit:4.13.2")
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")
@@ -44,7 +44,9 @@ tasks {
     //check { dependsOn(integTestTask) }
 }
 
+val coroutinesCoreVersion = libs.kotlinx.coroutines.core.get().versionConstraint.requiredVersion
+
 extraJavaModuleInfo {
-    automaticModule("kotlinx-coroutines-core-jvm-${PackageVersion.kotlinxCoroutines}.jar", "kotlinx.coroutines.core.jvm")
+    automaticModule("kotlinx-coroutines-core-jvm-$coroutinesCoreVersion.jar", "kotlinx.coroutines.core.jvm")
     failOnMissingModuleInfo.set(false)
 }

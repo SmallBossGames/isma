@@ -5,13 +5,18 @@ plugins {
 dependencies {
     implementation("org.apache.poi:poi:5.2.2")
     implementation("org.apache.poi:poi-ooxml:5.2.2")
+    implementation("de.sciss:jwave:1.0.3")
 
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:${PackageVersion.kotlinxCoroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${PackageVersion.kotlinxCoroutines}")
+    implementation(libs.tornadofx.core)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.javafx)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${PackageVersion.kotlinxSerializationJson}")
+    implementation(libs.kotlinx.serialization.json)
 
-    implementation ("io.insert-koin:koin-core:${PackageVersion.koin}")
+    implementation(libs.koin.core)
+
+    testImplementation ("ru.kontur.kinfra.kfixture:kfixture:0.6.0")
+    testImplementation ("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 
     api(project(":grin:gui:common"))
     implementation(project(":grin:math"))

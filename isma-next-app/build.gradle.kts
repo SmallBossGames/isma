@@ -22,16 +22,16 @@ application {
 }
 
 dependencies {
-    implementation ("no.tornado:tornadofx:${PackageVersion.tornadoFx}")
-    implementation ("org.antlr:antlr4-runtime:4.9.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:${PackageVersion.kotlinxCoroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:${PackageVersion.kotlinxCoroutines}")
-    implementation ("org.jetbrains.kotlin:kotlin-reflect:${PackageVersion.kotlinReflect}")
-    implementation ("io.insert-koin:koin-core:${PackageVersion.koin}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${PackageVersion.kotlinxSerializationJson}")
+    implementation(libs.antlr4.runtime)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.javafx)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.koin.core)
+    implementation(libs.tornadofx.core)
+    implementation(libs.fxmisc.richtext.core)
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.9")
     implementation("org.controlsfx:controlsfx:11.1.1")
 
     implementation(project(":isma-hsm"))

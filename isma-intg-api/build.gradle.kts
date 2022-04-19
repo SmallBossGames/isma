@@ -6,7 +6,7 @@ plugins {
 val moduleName by extra("isma.isma.intg.api.main")
 
 dependencies{
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${PackageVersion.kotlinxCoroutines}")
+    implementation(libs.kotlinx.coroutines.core)
     implementation("org.jetbrains:annotations:23.0.0")
 }
 
@@ -20,7 +20,9 @@ tasks {
     //check { dependsOn(integTestTask) }
 }
 
+val coroutinesCoreVersion = libs.kotlinx.coroutines.core.get().versionConstraint.requiredVersion
+
 extraJavaModuleInfo {
-    automaticModule("kotlinx-coroutines-core-jvm-${PackageVersion.kotlinxCoroutines}.jar", "kotlinx.coroutines.core.jvm")
+    automaticModule("kotlinx-coroutines-core-jvm-$coroutinesCoreVersion.jar", "kotlinx.coroutines.core.jvm")
     failOnMissingModuleInfo.set(false)
 }

@@ -15,12 +15,6 @@ class ChangeFunctionModel(val function: ConcatenationFunction) {
     var functionColorProperty = SimpleObjectProperty<Color>()
     var functionColor by functionColorProperty
 
-    var isMirrorXProperty = SimpleBooleanProperty()
-    var isMirrorX by isMirrorXProperty
-
-    var isMirrorYProperty = SimpleBooleanProperty()
-    var isMirrorY by isMirrorYProperty
-
     var lineSizeProperty = SimpleDoubleProperty()
     var lineSize by lineSizeProperty
 
@@ -36,9 +30,5 @@ class ChangeFunctionModel(val function: ConcatenationFunction) {
         lineSize = function.lineSize
         lineType = function.lineType
         isHide = !function.isHide
-
-        val mirrorDetails = function.mirrorDetails
-        isMirrorX = mirrorDetails.isMirrorX
-        isMirrorY = mirrorDetails.isMirrorY
     }
 }

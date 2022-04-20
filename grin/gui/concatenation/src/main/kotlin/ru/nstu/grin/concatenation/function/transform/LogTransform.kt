@@ -1,28 +1,30 @@
 package ru.nstu.grin.concatenation.function.transform
 
-import ru.nstu.grin.common.model.Point
+import kotlin.math.log
 import kotlin.math.log10
+import kotlin.math.log2
 
-class LogTransform(
+class LogTransformer(
     private val isXLogarithm: Boolean,
     private val xLogBase: Double,
     private val isYLogarithm: Boolean,
     private val yLogBase: Double
-) : Transform {
-    override fun transform(point: Point): Point? {
-        val x = logarithmTransform(point.x, isXLogarithm) ?: return null
-        val y = logarithmTransform(point.y, isYLogarithm) ?: return null
-        return Point(x, y)
+): IAsyncPointsTransformer {
+    override suspend fun transform(x: DoubleArray, y: DoubleArray) {
+        if(isXLogarithm){
+            logArray(x, xLogBase)
+        }
+
+        if(isYLogarithm){
+            logArray(y, yLogBase)
+        }
     }
 
-    private fun logarithmTransform(number: Double, condition: Boolean): Double? = when {
-        condition -> {
-            if (number < 0) {
-                null
-            } else {
-                log10(number)
-            }
+    private fun logArray(values: DoubleArray, logBase: Double){
+        when (logBase){
+            2.0 -> for (i in values.indices) log2(values[i])
+            10.0 -> for (i in values.indices) log10(values[i])
+            else -> for (i in values.indices) log(values[i], logBase)
         }
-        else -> number
     }
 }

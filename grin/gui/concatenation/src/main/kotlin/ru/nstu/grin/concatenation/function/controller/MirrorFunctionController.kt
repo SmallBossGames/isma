@@ -6,10 +6,10 @@ import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import org.koin.core.component.get
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.MirrorFunctionModel
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.transform.MirrorTransformer
 import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import tornadofx.Controller
 
@@ -33,26 +33,25 @@ class MirrorFunctionController : Controller() {
     }
 
     fun mirrorFunction(isY: Boolean, function: ConcatenationFunction) {
-        val mirrorDetails = function.mirrorDetails
-        val updateFunctionData = UpdateFunctionData(
-            function = function,
-            name = function.name,
-            color = function.functionColor,
-            lineType = function.lineType,
-            lineSize = function.lineSize,
-            isHide = function.isHide,
-            mirrorDetails = if (isY) {
-                mirrorDetails.copy(
-                    isMirrorY = !mirrorDetails.isMirrorY
-                )
-            } else {
-                mirrorDetails.copy(
-                    isMirrorX = !mirrorDetails.isMirrorX
-                )
-            }
-        )
+        functionCanvasService.updateTransformer(function) { transformers ->
+            val index = transformers.indexOfFirst { it is MirrorTransformer }
 
-        functionCanvasService.updateFunction(updateFunctionData)
+            if(index < 0){
+                if(isY){
+                    arrayOf(MirrorTransformer(mirrorY = true), *transformers)
+                } else{
+                    arrayOf(MirrorTransformer(mirrorX = true), *transformers)
+                }
+            } else{
+                val newTransformers = transformers.clone()
+                val mirror = newTransformers[index] as MirrorTransformer
+                newTransformers[index] =
+                    if(isY) mirror.copy(mirrorY = !mirror.mirrorY)
+                    else mirror.copy(mirrorX = !mirror.mirrorY)
+
+                newTransformers
+            }
+        }
     }
 
 }

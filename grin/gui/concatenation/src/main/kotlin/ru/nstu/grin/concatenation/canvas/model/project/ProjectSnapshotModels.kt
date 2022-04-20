@@ -49,7 +49,6 @@ data class ConcatenationFunctionSnapshot(
 
     val lineSize: Double,
     val lineType: LineType,
-    var mirrorDetails: MirrorDetailsSnapshot,
     var derivativeDetails: DerivativeDetailsSnapshot?,
     var waveletDetails: WaveletDetailsSnapshot?,
 )
@@ -76,12 +75,6 @@ data class FontSnapshot(
 
 @Serializable
 sealed class ConcatenationFunctionDetailsSnapshot
-
-@Serializable
-data class MirrorDetailsSnapshot(
-    val isMirrorX: Boolean,
-    val isMirrorY: Boolean,
-) : ConcatenationFunctionDetailsSnapshot()
 
 @Serializable
 data class DerivativeDetailsSnapshot(
@@ -216,10 +209,6 @@ fun DerivativeDetailsSnapshot.toModel() = DerivativeDetails(degree, type)
 
 fun DerivativeDetails.toSnapshot() = DerivativeDetailsSnapshot(degree, type)
 
-fun MirrorDetailsSnapshot.toModel() = MirrorDetails(isMirrorX, isMirrorY)
-
-fun MirrorDetails.toSnapshot() = MirrorDetailsSnapshot(isMirrorX, isMirrorY)
-
 fun WaveletDetailsSnapshot.toModel() = WaveletDetails(waveletTransformFun, waveletDirection)
 
 fun WaveletDetails.toSnapshot() = WaveletDetailsSnapshot(waveletTransformFun, waveletDirection)
@@ -233,7 +222,6 @@ fun ConcatenationFunctionSnapshot.toModel() =
         functionColor = functionColor.toModel(),
         lineSize = lineSize,
         lineType = lineType,
-        mirrorDetails = mirrorDetails.toModel(),
         derivativeDetails = derivativeDetails?.toModel(),
         waveletDetails = waveletDetails?.toModel(),
     )
@@ -247,7 +235,6 @@ fun ConcatenationFunction.toSnapshot() =
         functionColor = functionColor.toSnapshot(),
         lineSize = lineSize,
         lineType = lineType,
-        mirrorDetails = mirrorDetails.toSnapshot(),
         derivativeDetails = derivativeDetails?.toSnapshot(),
         waveletDetails = waveletDetails?.toSnapshot(),
     )

@@ -19,34 +19,14 @@ import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.model.DerivativeDetails
-import ru.nstu.grin.concatenation.function.model.DerivativeType
-import ru.nstu.grin.concatenation.function.model.MirrorDetails
-import ru.nstu.grin.concatenation.function.model.WaveletDetails
+import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.math.Derivatives
 import ru.nstu.grin.model.MathPoint
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 class SpacesTransformationController(
     private val matrixTransformer: MatrixTransformer,
     private val model: ConcatenationCanvasModel,
 ) {
-    private val derivativesCache = ConcurrentHashMap<DerivativeCacheKey, List<Point>>()
-    private val waveletCache = ConcurrentHashMap<WaveletCacheKey, List<Point>>()
-
-    data class DerivativeCacheKey(
-        val functionId: UUID,
-        val type: DerivativeType,
-        val degree: Int
-    )
-
-    data class WaveletCacheKey(
-        val functionId: UUID,
-        val waveletTransformFun: WaveletTransformFun,
-        val waveletDirection: WaveletDirection
-    )
-
     suspend fun transformSpaces() = coroutineScope {
         model.cartesianSpaces.forEach { space ->
             space.functions.forEach { function ->
@@ -57,13 +37,9 @@ class SpacesTransformationController(
                 } else{
                     launch {
                         function.pixelsToDraw = transformPoints(
-                            function.id,
-                            function.points,
+                            function,
                             space.xAxis,
                             space.yAxis,
-                            function.mirrorDetails,
-                            function.derivativeDetails,
-                            function.waveletDetails,
                         )
                     }
                 }
@@ -72,13 +48,9 @@ class SpacesTransformationController(
     }
 
     private suspend fun transformPoints(
-        functionId: UUID,
-        points: List<Point>,
+        function: ConcatenationFunction,
         xAxis: ConcatenationAxis,
         yAxis: ConcatenationAxis,
-        mirrorDetails: MirrorDetails,
-        derivativeDetails: DerivativeDetails?,
-        waveletDetails: WaveletDetails?
     ): Pair<DoubleArray, DoubleArray> = coroutineScope {
         val xScaleProperties = xAxis.scaleProperties
         val yScaleProperties = yAxis.scaleProperties
@@ -125,21 +97,21 @@ class SpacesTransformationController(
             }
         } ?: waveletPoints*/
 
-        val transformedPoints = points
+        val transformedPoints = function.transformedPoints
 
-        val xResults = DoubleArray(transformedPoints.size)
-        val yResults = DoubleArray(transformedPoints.size)
+        val xResults = DoubleArray(transformedPoints.first.size)
+        val yResults = DoubleArray(transformedPoints.second.size)
 
-        for (i in transformedPoints.indices) {
+        for (i in transformedPoints.first.indices) {
             ensureActive()
 
             xResults[i] = matrixTransformer.transformUnitsToPixel(
-                transformedPoints[i].x,
+                transformedPoints.first[i],
                 xScaleProperties,
                 xAxis.direction,
             )
             yResults[i] = matrixTransformer.transformUnitsToPixel(
-                transformedPoints[i].y,
+                transformedPoints.second[i],
                 yScaleProperties,
                 yAxis.direction,
             )

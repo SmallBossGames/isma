@@ -10,6 +10,7 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.converter.ConcatenationFunctionConverter
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
+import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
 
 class FunctionCanvasService(
     private val model: ConcatenationCanvasModel,
@@ -52,12 +53,24 @@ class FunctionCanvasService(
             isHide = event.isHide
             lineSize = event.lineSize
             lineType = event.lineType
-            mirrorDetails = event.mirrorDetails
         }
 
         coroutineScope.launch {
             model.reportFunctionsListUpdate()
         }
+    }
+
+    fun updateTransformer(
+        function: ConcatenationFunction,
+        operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
+    ) = coroutineScope.launch {
+        do {
+            if (function.updateTransformersTransaction(operation)){
+                break
+            }
+        } while (true)
+
+        model.reportFunctionsListUpdate()
     }
 
     fun deleteFunction(function: ConcatenationFunction) {

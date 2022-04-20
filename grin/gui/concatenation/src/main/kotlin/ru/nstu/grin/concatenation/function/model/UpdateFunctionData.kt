@@ -9,5 +9,4 @@ data class UpdateFunctionData(
     val lineSize: Double,
     val lineType: LineType,
     val isHide: Boolean,
-    val mirrorDetails: MirrorDetails
 )

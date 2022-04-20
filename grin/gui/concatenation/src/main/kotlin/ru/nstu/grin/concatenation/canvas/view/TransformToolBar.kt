@@ -12,9 +12,9 @@ import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
-import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
-import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
+import ru.nstu.grin.concatenation.function.transform.MirrorTransformer
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.MirrorFunctionFragment
@@ -94,20 +94,20 @@ class TransformToolBar(
                     mapOf(MirrorFunctionFragment::isMirrorY to false)
                 ).openModal()
             } else {
-                val mirrorDetails = function.mirrorDetails
-                val updateFunctionData = UpdateFunctionData(
-                    function = function,
-                    name = function.name,
-                    color = function.functionColor,
-                    lineType = function.lineType,
-                    lineSize = function.lineSize,
-                    isHide = function.isHide,
-                    mirrorDetails = mirrorDetails.copy(
-                        isMirrorX = !mirrorDetails.isMirrorX
-                    )
-                )
+                functionCanvasService.updateTransformer(function) { transformers ->
+                    val index = transformers.indexOfFirst { it is MirrorTransformer }
 
-                functionCanvasService.updateFunction(updateFunctionData)
+                    if(index < 0){
+                        arrayOf(MirrorTransformer(mirrorX = true), *transformers)
+                    } else{
+                        val newTransformers = transformers.clone()
+                        val mirror = newTransformers[index] as MirrorTransformer
+                        newTransformers[index] = mirror.copy(mirrorX = !mirror.mirrorX)
+
+                        newTransformers
+                    }
+
+                }
             }
         }
     },
@@ -126,20 +126,19 @@ class TransformToolBar(
                     mapOf(MirrorFunctionFragment::isMirrorY to true)
                 ).openModal()
             } else {
-                val mirrorDetails = function.mirrorDetails
-                val updateFunctionData = UpdateFunctionData(
-                    function = function,
-                    name = function.name,
-                    color = function.functionColor,
-                    lineType = function.lineType,
-                    lineSize = function.lineSize,
-                    isHide = function.isHide,
-                    mirrorDetails = mirrorDetails.copy(
-                        isMirrorY = !mirrorDetails.isMirrorY
-                    )
-                )
+                functionCanvasService.updateTransformer(function) { transformers ->
+                    val index = transformers.indexOfFirst { it is MirrorTransformer }
 
-                functionCanvasService.updateFunction(updateFunctionData)
+                    if(index < 0){
+                        arrayOf(MirrorTransformer(mirrorY = true), *transformers)
+                    } else{
+                        val newTransformers = transformers.clone()
+                        val mirror = newTransformers[index] as MirrorTransformer
+                        newTransformers[index] = mirror.copy(mirrorY = !mirror.mirrorY)
+
+                        newTransformers
+                    }
+                }
             }
         }
     },

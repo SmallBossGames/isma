@@ -1,7 +1,5 @@
 package ru.nstu.grin.concatenation.function.transform
 
-import ru.nstu.grin.common.model.Point
-
-interface Transform {
-    fun transform(point: Point): Point?
+interface IAsyncPointsTransformer {
+    suspend fun transform(x: DoubleArray, y: DoubleArray)
 }

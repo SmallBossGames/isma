@@ -24,8 +24,6 @@ class ChangeFunctionFragment(
             addNode("Color", model.functionColorProperty)
             addNode("Thickness", model.lineSizeProperty)
             addNode("Hide", model.isHideProperty)
-            addNode("Mirror X", model.isMirrorXProperty)
-            addNode("Mirror Y", model.isMirrorYProperty)
             addNode("Line Type", types, model.lineTypeProperty) {
                 createCell()
             }

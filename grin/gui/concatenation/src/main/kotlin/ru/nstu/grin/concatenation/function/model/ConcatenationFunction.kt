@@ -1,8 +1,38 @@
 package ru.nstu.grin.concatenation.function.model
 
 import javafx.scene.paint.Color
+import kotlinx.coroutines.coroutineScope
 import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
 import java.util.*
+import java.util.concurrent.atomic.AtomicReference
+
+class PointsCache(
+    val transformers: Array<IAsyncPointsTransformer>,
+    val transformedPointsX: DoubleArray,
+    val transformedPointsY: DoubleArray,
+) {
+    companion object {
+        suspend fun create(
+            points: List<Point>,
+            transformers: Array<IAsyncPointsTransformer>
+        ): PointsCache = coroutineScope {
+            val xPoints = DoubleArray(points.size)
+            val yPoints = DoubleArray(points.size)
+
+            for (i in points.indices){
+                xPoints[i] = points[i].x
+                yPoints[i] = points[i].y
+            }
+
+            for (transformer in transformers){
+                transformer.transform(xPoints, yPoints)
+            }
+
+            PointsCache(transformers, xPoints, yPoints)
+        }
+    }
+}
 
 /**
  * @author kostya05983
@@ -17,11 +47,42 @@ data class ConcatenationFunction(
 
     var lineSize: Double,
     var lineType: LineType,
-    var mirrorDetails: MirrorDetails = MirrorDetails(),
+
+    //TODO: Should be removed
     var derivativeDetails: DerivativeDetails? = null,
     var waveletDetails: WaveletDetails? = null,
 ) : Cloneable {
+
+    private val transformedPointCache = AtomicReference(
+        PointsCache(
+            arrayOf(),
+            points.map { it.x }.toDoubleArray(),
+            points.map { it.y }.toDoubleArray(),
+        )
+    )
+
+    val transformedPoints: Pair<DoubleArray, DoubleArray> get() {
+        val cache = transformedPointCache.get()
+
+        return Pair(cache.transformedPointsX, cache.transformedPointsY)
+    }
+
     var pixelsToDraw: Pair<DoubleArray, DoubleArray>? = null
+
+    suspend fun updateTransformersTransaction(
+        operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
+    ): Boolean {
+        val transformersState = transformedPointCache
+
+        val oldValue = transformersState.get()
+
+        val newValue = PointsCache.create(
+            points,
+            operation(oldValue.transformers),
+        )
+
+        return transformersState.compareAndSet(oldValue, newValue)
+    }
 
     public override fun clone(): ConcatenationFunction {
         return ConcatenationFunction(
@@ -31,7 +92,6 @@ data class ConcatenationFunction(
             functionColor = functionColor,
             lineSize = lineSize,
             lineType = lineType,
-            mirrorDetails = mirrorDetails.copy(),
             derivativeDetails = derivativeDetails?.copy(),
             waveletDetails = waveletDetails?.copy(),
         )

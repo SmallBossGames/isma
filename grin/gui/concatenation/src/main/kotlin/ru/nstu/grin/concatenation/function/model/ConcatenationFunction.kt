@@ -12,7 +12,6 @@ data class ConcatenationFunction(
     var name: String,
     val points: List<Point>,
     var isHide: Boolean = false,
-    var isSelected: Boolean = false,
 
     var functionColor: Color,
 

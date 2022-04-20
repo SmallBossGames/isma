@@ -35,8 +35,6 @@ class ConcatenationCanvasModel {
 
     val axes get() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
 
-    val selectedFunction get() = functions.firstOrNull { it.isSelected }
-
     val selectedDescription get() = descriptions.firstOrNull { it.isSelected }
 
     private val functionsListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationFunction>>()

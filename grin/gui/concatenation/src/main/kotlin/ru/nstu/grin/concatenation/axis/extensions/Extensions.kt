@@ -4,13 +4,13 @@ import javafx.geometry.Insets
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.Offsets
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 
 fun List<CartesianSpace>.findLocatedAxisOrNull(
     x: Double,
     y: Double,
-    canvasViewModel: CanvasViewModel,
+    canvasViewModel: ConcatenationCanvasViewModel,
 ): ConcatenationAxis? {
     val offsets = Offsets()
 

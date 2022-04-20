@@ -4,10 +4,12 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.function.model.LineType
 
 class ConcatenationFunctionDrawElement(
-    private val model: ConcatenationCanvasModel
+    private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
 ) : ChainDrawElement {
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
@@ -29,7 +31,7 @@ class ConcatenationFunctionDrawElement(
                     xPoints.size
                 }
 
-                if (function.isSelected) {
+                if (canvasViewModel.selectedFunctions.contains(function)) {
                     context.fill = Color.RED
                     context.stroke = Color.RED
                 }

@@ -11,6 +11,7 @@ import javafx.stage.Stage
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
 import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
@@ -27,6 +28,7 @@ import tornadofx.find
 class TransformToolBar(
     private val scope: Scope,
     private val mainGrinScope: MainGrinScope,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val functionCanvasService: FunctionCanvasService,
     private val functionsOperationsService: FunctionsOperationsService,
     private val model: ConcatenationCanvasModel,
@@ -38,7 +40,7 @@ class TransformToolBar(
         tooltip = Tooltip("Edit")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 val functionChangeModalScope = mainGrinScope.get<FunctionChangeModalScope>()
                 val view = functionChangeModalScope.get<ChangeFunctionFragment> { parametersOf(function)}
@@ -86,7 +88,7 @@ class TransformToolBar(
         tooltip = Tooltip("Mirror X")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
 
             if (function == null) {
                 find<MirrorFunctionFragment>(
@@ -118,7 +120,7 @@ class TransformToolBar(
         tooltip = Tooltip("Mirror Y")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
 
             if (function == null) {
                 find<MirrorFunctionFragment>(
@@ -150,7 +152,8 @@ class TransformToolBar(
         tooltip = Tooltip("Localize")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
+
             if (function == null) {
                 find<LocalizeFunctionFragment>().openModal()
             } else {

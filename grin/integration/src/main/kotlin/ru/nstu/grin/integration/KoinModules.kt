@@ -16,7 +16,7 @@ import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
@@ -78,7 +78,7 @@ val grinGuiModule = module {
 
         scopedOf(::ConcatenationCanvas)
         scopedOf(::ConcatenationViewModel)
-        scopedOf(::CanvasViewModel)
+        scopedOf(::ConcatenationCanvasViewModel)
         scopedOf(::ConcatenationCanvasController)
         scopedOf(::ConcatenationCanvasModel)
 

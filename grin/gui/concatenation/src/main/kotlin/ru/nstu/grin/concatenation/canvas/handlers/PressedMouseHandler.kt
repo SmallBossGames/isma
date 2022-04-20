@@ -20,7 +20,7 @@ class PressedMouseHandler(
     private val contextMenuDrawElement: CartesianCanvasContextMenuController,
     private val canvasModel: ConcatenationCanvasModel,
     private val canvasController: ConcatenationCanvasController,
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
 ) : EventHandler<MouseEvent> {
@@ -45,7 +45,10 @@ class PressedMouseHandler(
 
                     return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
                 }
-            function?.isSelected = true
+
+            if(function != null){
+                canvasViewModel.selectedFunctions.add(function)
+            }
 
             isUiLayerDirty = true
         }

@@ -44,7 +44,6 @@ data class ConcatenationFunctionSnapshot(
     val name: String,
     val points: List<PointSnapshot>,
     val isHide: Boolean,
-    val isSelected: Boolean,
 
     val functionColor: ColorSnapshot,
 
@@ -231,7 +230,6 @@ fun ConcatenationFunctionSnapshot.toModel() =
         name = name,
         points = points.map { it.toModel() },
         isHide = isHide,
-        isSelected = isSelected,
         functionColor = functionColor.toModel(),
         lineSize = lineSize,
         lineType = lineType,
@@ -246,7 +244,6 @@ fun ConcatenationFunction.toSnapshot() =
         name = name,
         points = points.map { it.toSnapshot() },
         isHide = isHide,
-        isSelected = isSelected,
         functionColor = functionColor.toSnapshot(),
         lineSize = lineSize,
         lineType = lineType,

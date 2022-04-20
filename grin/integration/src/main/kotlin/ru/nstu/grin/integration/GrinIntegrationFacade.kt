@@ -84,7 +84,6 @@ class GrinIntegrationFacade: KoinComponent {
             name = name,
             points = points,
             isHide = false,
-            isSelected = false,
             functionColor = color,
             lineSize = 2.0,
             lineType = LineType.POLYNOM

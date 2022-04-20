@@ -5,7 +5,7 @@ import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.function.view.DerivativeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.FunctionIntegrationFragment
 import ru.nstu.grin.concatenation.function.view.IntersectionFunctionFragment
@@ -15,7 +15,7 @@ import tornadofx.find
 
 class MathToolBar(
     scope: Scope,
-    model: ConcatenationCanvasModel,
+    canvasViewModel: ConcatenationCanvasViewModel,
     drawer: ConcatenationChainDrawer,
 ): ToolBar(
     Button(null, ImageView(Image("intersection.png")).apply {
@@ -35,7 +35,7 @@ class MathToolBar(
         tooltip = Tooltip("Apply derivative")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 val derivativeDetails = function.derivativeDetails
                 if (derivativeDetails != null) {
@@ -59,7 +59,7 @@ class MathToolBar(
         tooltip = Tooltip("Apply wavelet")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 val waveletDetails = function.waveletDetails
                 if (waveletDetails != null) {
@@ -83,7 +83,7 @@ class MathToolBar(
         tooltip = Tooltip("Find integral")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 find<FunctionIntegrationFragment>(
                     scope,

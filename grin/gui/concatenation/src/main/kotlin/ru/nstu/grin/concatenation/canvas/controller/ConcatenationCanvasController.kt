@@ -11,6 +11,7 @@ import ru.nstu.grin.common.dto.ArrowDTO
 import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.description.model.DescriptionModalInitData
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
@@ -23,6 +24,7 @@ import kotlin.math.min
 
 class ConcatenationCanvasController(
     private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val mainGrinScope: MainGrinScope,
 ) {
 
@@ -133,16 +135,7 @@ class ConcatenationCanvasController(
     }
 
     fun unselectAll() {
-        model.apply {
-            for (cartesianSpace in cartesianSpaces) {
-                for (function in cartesianSpace.functions) {
-                    function.isSelected = false
-                }
-            }
-            for (description in descriptions) {
-                description.isSelected = false
-            }
-        }
+        canvasViewModel.selectedFunctions.clear()
     }
 
     fun clearCanvas() {

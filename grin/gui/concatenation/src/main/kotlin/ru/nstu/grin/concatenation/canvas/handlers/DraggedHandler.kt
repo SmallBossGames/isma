@@ -16,7 +16,7 @@ import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 
 class DraggedHandler(
     private val model: ConcatenationCanvasModel,
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
     private val matrixTransformer: MatrixTransformer,

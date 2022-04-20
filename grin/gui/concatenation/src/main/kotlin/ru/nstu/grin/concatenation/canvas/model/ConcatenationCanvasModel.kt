@@ -19,23 +19,19 @@ class ConcatenationCanvasModel {
 
     val cartesianSpaces = observableArrayList<CartesianSpace>()!!
 
+    val functions get() = cartesianSpaces.map { it.functions }.flatten()
+
+    val axes get() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
+
     val arrows = observableArrayList<Arrow>()!!
 
     val descriptions = observableArrayList<Description>()!!
 
     val pointToolTipSettings = PointToolTipsSettings(false, mutableSetOf())
 
-    val selectionSettings = SelectionSettings()
-
     var traceSettings: TraceSettings? = null
 
     var moveSettings: MoveSettings? = null
-
-    val functions get() = cartesianSpaces.map { it.functions }.flatten()
-
-    val axes get() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
-
-    val selectedDescription get() = descriptions.firstOrNull { it.isSelected }
 
     private val functionsListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationFunction>>()
     val functionsListUpdatedEvent = functionsListUpdatedEventInternal.asSharedFlow()

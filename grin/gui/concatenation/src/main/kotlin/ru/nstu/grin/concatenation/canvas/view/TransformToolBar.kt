@@ -10,7 +10,6 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.model.UpdateFunctionData
@@ -31,7 +30,6 @@ class TransformToolBar(
     private val canvasViewModel: ConcatenationCanvasViewModel,
     private val functionCanvasService: FunctionCanvasService,
     private val functionsOperationsService: FunctionsOperationsService,
-    private val model: ConcatenationCanvasModel,
 ) : ToolBar(
     Button(null, ImageView(Image("edit-tool.png")).apply {
         fitWidth = 20.0
@@ -60,7 +58,7 @@ class TransformToolBar(
                 return@setOnAction
             }
 
-            val description = model.selectedDescription
+            val description = canvasViewModel.selectedDescriptions.firstOrNull()
             if (description != null) {
                 val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
                 val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(description)}

@@ -33,18 +33,18 @@ class DraggedHandler(
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.isPrimaryButtonDown) {
-                if (!model.selectionSettings.isFirstPointSelected) {
-                    model.selectionSettings.firstPoint = Point(event.x, event.y)
-                    model.selectionSettings.isFirstPointSelected = true
+                if (!canvasViewModel.selectionSettings.isFirstPointSelected) {
+                    canvasViewModel.selectionSettings.firstPoint = Point(event.x, event.y)
+                    canvasViewModel.selectionSettings.isFirstPointSelected = true
                 } else {
-                    model.selectionSettings.secondPoint = Point(event.x, event.y)
-                    model.selectionSettings.isSecondPointSelected = true
+                    canvasViewModel.selectionSettings.secondPoint = Point(event.x, event.y)
+                    canvasViewModel.selectionSettings.isSecondPointSelected = true
                 }
             }
 
             if (!event.isPrimaryButtonDown) {
-                model.selectionSettings.isFirstPointSelected = false
-                model.selectionSettings.isSecondPointSelected = false
+                canvasViewModel.selectionSettings.isFirstPointSelected = false
+                canvasViewModel.selectionSettings.isSecondPointSelected = false
             }
 
             uiLayerDirty = true

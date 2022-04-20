@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.canvas.model
 
 import javafx.geometry.Insets
 import javafx.scene.canvas.GraphicsContext
+import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 
 class ConcatenationCanvasViewModel {
@@ -12,4 +13,7 @@ class ConcatenationCanvasViewModel {
     var functionsArea = Insets.EMPTY!!
 
     val selectedFunctions = HashSet<ConcatenationFunction>()
+    val selectedDescriptions = HashSet<Description>()
+
+    val selectionSettings = SelectionSettings()
 }

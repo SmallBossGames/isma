@@ -2,12 +2,12 @@ package ru.nstu.grin.concatenation.function.model
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleObjectProperty
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
-import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
-import ru.nstu.grin.concatenation.function.transform.LogTransformer
-import ru.nstu.grin.concatenation.function.transform.MirrorTransformer
-import ru.nstu.grin.concatenation.function.transform.TranslateTransformer
+import ru.nstu.grin.common.model.WaveletDirection
+import ru.nstu.grin.common.model.WaveletTransformFun
+import ru.nstu.grin.concatenation.function.transform.*
 
 sealed interface IAsyncPointsTransformerViewModel
 
@@ -56,10 +56,26 @@ class MirrorPointsTransformerViewModel(
     var mirrorY by mirrorYProperty
 }
 
+class WaveletTransformerViewModel(
+    waveletTransformFun: WaveletTransformFun = WaveletTransformFun.HAAR1,
+    waveletDirection: WaveletDirection = WaveletDirection.BOTH
+): IAsyncPointsTransformerViewModel {
+    val waveletTransformFunProperty = SimpleObjectProperty(waveletTransformFun)
+    var waveletTransformFun: WaveletTransformFun by waveletTransformFunProperty
+
+    val waveletDirectionProperty = SimpleObjectProperty(waveletDirection)
+    var waveletDirection: WaveletDirection by waveletDirectionProperty
+
+    companion object{
+        const val title = "Wavelet"
+    }
+}
+
 fun IAsyncPointsTransformer.toViewModel(): IAsyncPointsTransformerViewModel = when(this){
     is MirrorTransformer -> toViewModel()
     is LogTransformer -> toViewModel()
     is TranslateTransformer -> toViewModel()
+    is WaveletTransformer -> toViewModel()
     else -> throw NotImplementedError()
 }
 
@@ -67,6 +83,7 @@ fun IAsyncPointsTransformerViewModel.toModel(): IAsyncPointsTransformer = when(t
     is MirrorPointsTransformerViewModel -> toModel()
     is LogPointsTransformerViewModel -> toModel()
     is TranslateTransformerViewModel -> toModel()
+    is WaveletTransformerViewModel -> toModel()
 }
 
 fun MirrorTransformer.toViewModel() = MirrorPointsTransformerViewModel(mirrorX, mirrorY)
@@ -77,3 +94,6 @@ fun LogPointsTransformerViewModel.toModel() = LogTransformer(isXLogarithm, xLoga
 
 fun TranslateTransformer.toViewModel() = TranslateTransformerViewModel(translateX, translateY)
 fun TranslateTransformerViewModel.toModel() = TranslateTransformer(translateX, translateY)
+
+fun WaveletTransformer.toViewModel() = WaveletTransformerViewModel(waveletTransformFun, waveletDirection)
+fun WaveletTransformerViewModel.toModel() = WaveletTransformer(waveletTransformFun, waveletDirection)

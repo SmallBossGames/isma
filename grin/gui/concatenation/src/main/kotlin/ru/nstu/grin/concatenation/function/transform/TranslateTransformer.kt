@@ -4,7 +4,7 @@ data class TranslateTransformer(
     val translateX: Double,
     val translateY: Double,
 ): IAsyncPointsTransformer {
-    override suspend fun transform(x: DoubleArray, y: DoubleArray) {
+    override suspend fun transform(x: DoubleArray, y: DoubleArray): Pair<DoubleArray, DoubleArray> {
         for (i in x.indices){
             x[i] = x[i] + translateX
         }
@@ -12,5 +12,7 @@ data class TranslateTransformer(
         for (i in y.indices){
             y[i] = y[i] + translateY
         }
+
+        return Pair(x, y)
     }
 }

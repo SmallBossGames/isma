@@ -17,8 +17,8 @@ class PointsCache(
             points: List<Point>,
             transformers: Array<IAsyncPointsTransformer>
         ): PointsCache = coroutineScope {
-            val xPoints = DoubleArray(points.size)
-            val yPoints = DoubleArray(points.size)
+            var xPoints = DoubleArray(points.size)
+            var yPoints = DoubleArray(points.size)
 
             for (i in points.indices){
                 xPoints[i] = points[i].x
@@ -26,7 +26,10 @@ class PointsCache(
             }
 
             for (transformer in transformers){
-                transformer.transform(xPoints, yPoints)
+                val (newXPoints, newYPoints) = transformer.transform(xPoints, yPoints)
+
+                xPoints = newXPoints
+                yPoints = newYPoints
             }
 
             PointsCache(transformers, xPoints, yPoints)
@@ -42,9 +45,7 @@ data class ConcatenationFunction(
     var name: String,
     val points: List<Point>,
     var isHide: Boolean = false,
-
     var functionColor: Color,
-
     var lineSize: Double,
     var lineType: LineType,
 ) : Cloneable {

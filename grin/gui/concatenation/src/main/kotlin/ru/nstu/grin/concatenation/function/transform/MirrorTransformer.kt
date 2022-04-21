@@ -18,6 +18,8 @@ data class MirrorTransformer(
                 y[i] = -y[i]
             }
         }
+
+        Pair(x, y)
     }
 
 }

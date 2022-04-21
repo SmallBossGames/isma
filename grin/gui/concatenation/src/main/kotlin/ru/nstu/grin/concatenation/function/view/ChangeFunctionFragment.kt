@@ -11,6 +11,8 @@ import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.PropertiesGrid
 import ru.isma.javafx.extensions.controls.propertiesGrid
+import ru.nstu.grin.common.model.WaveletDirection
+import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.model.*
 
@@ -58,6 +60,11 @@ class ChangeFunctionFragment(
                             setOnAction {
                                 model.addModifier(::TranslateTransformerViewModel)
                             }
+                        },
+                        MenuItem(WaveletTransformerViewModel.title).apply {
+                            setOnAction {
+                                model.addModifier(::WaveletTransformerViewModel)
+                            }
                         }
                     )
 
@@ -84,6 +91,7 @@ class ChangeFunctionFragment(
                                             is MirrorPointsTransformerViewModel -> "Mirror"
                                             is LogPointsTransformerViewModel -> "Logarithm"
                                             is TranslateTransformerViewModel -> TranslateTransformerViewModel.title
+                                            is WaveletTransformerViewModel -> WaveletTransformerViewModel.title
                                             null -> null
                                         }
                                     }
@@ -144,7 +152,16 @@ class ChangeFunctionFragment(
             is MirrorPointsTransformerViewModel -> propertyGridContainerContent(item)
             is LogPointsTransformerViewModel -> propertyGridContainerContent(item)
             is TranslateTransformerViewModel -> propertyGridContainerContent(item)
+            is WaveletTransformerViewModel -> propertyGridContainerContent(item)
         }
+
+        fun propertyGridContainerContent(item: WaveletTransformerViewModel) =
+            propertiesGrid {
+                addNode("Wavelet Function", FXCollections.observableList(WaveletTransformFun.values().asList()), item.waveletTransformFunProperty)
+                addNode("Wavelet Direction", FXCollections.observableList(WaveletDirection.values().asList()), item.waveletDirectionProperty)
+            }.apply {
+                padding = Insets(5.0)
+            }
 
         fun propertyGridContainerContent(item: TranslateTransformerViewModel) =
             propertiesGrid {

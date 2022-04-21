@@ -11,10 +11,7 @@ import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.model.*
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
-import ru.nstu.grin.concatenation.function.transform.LogTransformer
-import ru.nstu.grin.concatenation.function.transform.MirrorTransformer
-import ru.nstu.grin.concatenation.function.transform.TranslateTransformer
+import ru.nstu.grin.concatenation.function.transform.*
 import java.util.*
 
 @Serializable
@@ -85,12 +82,6 @@ data class DerivativeDetailsSnapshot(
 ) : ConcatenationFunctionDetailsSnapshot()
 
 @Serializable
-data class WaveletDetailsSnapshot(
-    val waveletTransformFun: WaveletTransformFun,
-    val waveletDirection: WaveletDirection
-) : ConcatenationFunctionDetailsSnapshot()
-
-@Serializable
 data class ConcatenationAxisSnapshot(
     val name: String,
     val direction: Direction,
@@ -139,6 +130,12 @@ class TranslateTransformerSnapshot(
     val translateX: Double,
     val translateY: Double,
 ): TransformerSnapshot()
+
+@Serializable
+data class WaveletTransformerSnapshot(
+    val waveletTransformFun: WaveletTransformFun,
+    val waveletDirection: WaveletDirection
+) : TransformerSnapshot()
 
 fun DescriptionSnapshot.toModel() =
     Description(
@@ -284,6 +281,7 @@ fun IAsyncPointsTransformer.toSnapshot(): TransformerSnapshot = when(this){
     is LogTransformer -> LogTransformerSnapshot(isXLogarithm, xLogBase, isYLogarithm, yLogBase)
     is MirrorTransformer -> MirrorTransformerSnapshot(mirrorX, mirrorY)
     is TranslateTransformer -> TranslateTransformerSnapshot(translateX, translateY)
+    is WaveletTransformer -> WaveletTransformerSnapshot(waveletTransformFun, waveletDirection)
     else -> throw NotImplementedError()
 }
 
@@ -291,4 +289,5 @@ fun TransformerSnapshot.toModel(): IAsyncPointsTransformer = when(this){
     is LogTransformerSnapshot -> LogTransformer(isXLogarithm, xLogBase, isYLogarithm, yLogBase)
     is MirrorTransformerSnapshot -> MirrorTransformer(mirrorX, mirrorY)
     is TranslateTransformerSnapshot -> TranslateTransformer(translateX, translateY)
+    is WaveletTransformerSnapshot -> WaveletTransformer(waveletTransformFun, waveletDirection)
 }

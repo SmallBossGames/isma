@@ -10,7 +10,7 @@ data class LogTransformer(
     val isYLogarithm: Boolean,
     val yLogBase: Double
 ): IAsyncPointsTransformer {
-    override suspend fun transform(x: DoubleArray, y: DoubleArray) {
+    override suspend fun transform(x: DoubleArray, y: DoubleArray): Pair<DoubleArray, DoubleArray> {
         if(isXLogarithm){
             logArray(x, xLogBase)
         }
@@ -18,6 +18,8 @@ data class LogTransformer(
         if(isYLogarithm){
             logArray(y, yLogBase)
         }
+
+        return Pair(x, y)
     }
 
     private fun logArray(values: DoubleArray, logBase: Double){

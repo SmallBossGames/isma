@@ -15,7 +15,8 @@ class DerivativeFunctionController : Controller() {
     private val model: DerivativeFunctionModel by inject()
     private val function: ConcatenationFunction by param()
 
+    //TODO: disabled until migration to Async Transformers
     fun enableDerivative() {
-        functionCanvasService.derivativeFunction(function, model.derivativeType, model.degree)
+        /*functionCanvasService.derivativeFunction(function, model.derivativeType, model.degree)*/
     }
 }

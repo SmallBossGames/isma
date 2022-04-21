@@ -47,10 +47,6 @@ data class ConcatenationFunction(
 
     var lineSize: Double,
     var lineType: LineType,
-
-    //TODO: Should be removed
-    var derivativeDetails: DerivativeDetails? = null,
-    var waveletDetails: WaveletDetails? = null,
 ) : Cloneable {
 
     private val transformedPointCache = AtomicReference(
@@ -94,8 +90,6 @@ data class ConcatenationFunction(
             functionColor = functionColor,
             lineSize = lineSize,
             lineType = lineType,
-            derivativeDetails = derivativeDetails?.copy(),
-            waveletDetails = waveletDetails?.copy(),
         )
     }
 

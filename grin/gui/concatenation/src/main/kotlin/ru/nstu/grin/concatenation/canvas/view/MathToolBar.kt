@@ -35,7 +35,8 @@ class MathToolBar(
         tooltip = Tooltip("Apply derivative")
 
         setOnAction {
-            val function = canvasViewModel.selectedFunctions.firstOrNull()
+            //TODO: disabled until migration to Async Transformers
+            /*val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 val derivativeDetails = function.derivativeDetails
                 if (derivativeDetails != null) {
@@ -49,7 +50,7 @@ class MathToolBar(
                         "function" to function
                     )
                 ).openModal()
-            }
+            }*/
         }
     },
     Button(null, ImageView(Image("wavelet.png")).apply {
@@ -58,7 +59,8 @@ class MathToolBar(
     }).apply {
         tooltip = Tooltip("Apply wavelet")
 
-        setOnAction {
+        //TODO: disabled until migration to Async Transformers
+        /*setOnAction {
             val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 val waveletDetails = function.waveletDetails
@@ -74,7 +76,7 @@ class MathToolBar(
                     )
                 ).openModal()
             }
-        }
+        }*/
     },
     Button(null, ImageView(Image("integral.png")).apply {
         fitWidth = 20.0

@@ -25,11 +25,14 @@ class ConcatenationFunctionDrawElement(
                 val xPoints = points.first
                 val yPoints = points.second
 
-                val n = if (function.derivativeDetails != null) {
+                val n = xPoints.size
+
+                //TODO: disabled until migration to Async Transformers
+               /* val n = if (function.derivativeDetails != null) {
                     xPoints.size - 2
                 } else {
                     xPoints.size
-                }
+                }*/
 
                 if (canvasViewModel.selectedFunctions.contains(function)) {
                     context.fill = Color.RED

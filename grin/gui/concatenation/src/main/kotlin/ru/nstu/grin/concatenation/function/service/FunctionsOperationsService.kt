@@ -87,24 +87,28 @@ class FunctionsOperationsService(
         view.redraw()
     }
 
+    //TODO: disabled until migration to Async Transformers
     fun derivativeFunction(function: ConcatenationFunction, type: DerivativeType, degree: Int) {
-        function.derivativeDetails = DerivativeDetails(degree = degree, type = type)
+        TODO("Disabled until migration to Async Transformers")
+        /*function.derivativeDetails = DerivativeDetails(degree = degree, type = type)
 
-        view.redraw()
+        view.redraw()*/
     }
 
+    //TODO: disabled until migration to Async Transformers
     fun waveletFunction(
         function: ConcatenationFunction,
         waveletTransformFun: WaveletTransformFun,
         waveletDirection: WaveletDirection
     ) {
-        function.waveletDetails = WaveletDetails(
+        TODO("Disabled until migration to Async Transformers")
+        /*function.waveletDetails = WaveletDetails(
             waveletTransformFun = waveletTransformFun,
             waveletDirection = waveletDirection
         )
 
         view.redraw()
-        localizeFunction(function)
+        localizeFunction(function)*/
     }
 
     fun calculateIntegral(

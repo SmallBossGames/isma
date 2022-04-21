@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.canvas.model.project
 
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.Point
@@ -10,6 +11,10 @@ import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.model.*
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
+import ru.nstu.grin.concatenation.function.transform.LogTransformer
+import ru.nstu.grin.concatenation.function.transform.MirrorTransformer
+import ru.nstu.grin.concatenation.function.transform.TranslateTransformer
 import java.util.*
 
 @Serializable
@@ -44,13 +49,10 @@ data class ConcatenationFunctionSnapshot(
     val name: String,
     val points: List<PointSnapshot>,
     val isHide: Boolean,
-
     val functionColor: ColorSnapshot,
-
     val lineSize: Double,
     val lineType: LineType,
-    var derivativeDetails: DerivativeDetailsSnapshot?,
-    var waveletDetails: WaveletDetailsSnapshot?,
+    val transformers: List<TransformerSnapshot>
 )
 
 @Serializable
@@ -114,6 +116,29 @@ data class AxisScalePropertiesSnapshot(
     val minValue: Double = 0.0,
     val maxValue: Double = 10.0,
 )
+
+@Serializable
+sealed class TransformerSnapshot
+
+@Serializable
+class LogTransformerSnapshot(
+    val isXLogarithm: Boolean,
+    val xLogBase: Double,
+    val isYLogarithm: Boolean,
+    val yLogBase: Double
+): TransformerSnapshot()
+
+@Serializable
+class MirrorTransformerSnapshot(
+    val mirrorX: Boolean,
+    val mirrorY: Boolean,
+): TransformerSnapshot()
+
+@Serializable
+class TranslateTransformerSnapshot(
+    val translateX: Double,
+    val translateY: Double,
+): TransformerSnapshot()
 
 fun DescriptionSnapshot.toModel() =
     Description(
@@ -205,16 +230,10 @@ fun PointSnapshot.toModel() = Point(x, y)
 
 fun Point.toSnapshot() = PointSnapshot(x, y)
 
-fun DerivativeDetailsSnapshot.toModel() = DerivativeDetails(degree, type)
+fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
+    val transformersFromSnapshot = transformers.map { it.toModel() }.toTypedArray()
 
-fun DerivativeDetails.toSnapshot() = DerivativeDetailsSnapshot(degree, type)
-
-fun WaveletDetailsSnapshot.toModel() = WaveletDetails(waveletTransformFun, waveletDirection)
-
-fun WaveletDetails.toSnapshot() = WaveletDetailsSnapshot(waveletTransformFun, waveletDirection)
-
-fun ConcatenationFunctionSnapshot.toModel() =
-    ConcatenationFunction(
+    return ConcatenationFunction(
         id = UUID.fromString(id),
         name = name,
         points = points.map { it.toModel() },
@@ -222,9 +241,14 @@ fun ConcatenationFunctionSnapshot.toModel() =
         functionColor = functionColor.toModel(),
         lineSize = lineSize,
         lineType = lineType,
-        derivativeDetails = derivativeDetails?.toModel(),
-        waveletDetails = waveletDetails?.toModel(),
-    )
+    ).apply {
+        runBlocking {
+            updateTransformersTransaction { transformersFromSnapshot }
+        }
+    }
+
+
+}
 
 fun ConcatenationFunction.toSnapshot() =
     ConcatenationFunctionSnapshot(
@@ -235,8 +259,7 @@ fun ConcatenationFunction.toSnapshot() =
         functionColor = functionColor.toSnapshot(),
         lineSize = lineSize,
         lineType = lineType,
-        derivativeDetails = derivativeDetails?.toSnapshot(),
-        waveletDetails = waveletDetails?.toSnapshot(),
+        transformers = transformers.map { it.toSnapshot() }
     )
 
 fun CartesianSpaceSnapshot.toModel() =
@@ -256,3 +279,16 @@ fun CartesianSpace.toSnapshot() =
         yAxis = yAxis.toSnapshot(),
         isShowGrid = isShowGrid,
     )
+
+fun IAsyncPointsTransformer.toSnapshot(): TransformerSnapshot = when(this){
+    is LogTransformer -> LogTransformerSnapshot(isXLogarithm, xLogBase, isYLogarithm, yLogBase)
+    is MirrorTransformer -> MirrorTransformerSnapshot(mirrorX, mirrorY)
+    is TranslateTransformer -> TranslateTransformerSnapshot(translateX, translateY)
+    else -> throw NotImplementedError()
+}
+
+fun TransformerSnapshot.toModel(): IAsyncPointsTransformer = when(this){
+    is LogTransformerSnapshot -> LogTransformer(isXLogarithm, xLogBase, isYLogarithm, yLogBase)
+    is MirrorTransformerSnapshot -> MirrorTransformer(mirrorX, mirrorY)
+    is TranslateTransformerSnapshot -> TranslateTransformer(translateX, translateY)
+}

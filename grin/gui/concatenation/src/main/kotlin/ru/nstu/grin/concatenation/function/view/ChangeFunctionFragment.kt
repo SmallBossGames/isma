@@ -38,7 +38,7 @@ class ChangeFunctionFragment(
             Tab("Modifiers",
                 BorderPane().apply {
                     val propertyGridContainer = VBox().apply {
-                        minWidth = 200.0
+                        minWidth = 300.0
                     }
 
                     var selectedItem: IAsyncPointsTransformerViewModel? = null
@@ -52,6 +52,11 @@ class ChangeFunctionFragment(
                         MenuItem("Logarithm").apply {
                             setOnAction {
                                 model.addModifier(::LogPointsTransformerViewModel)
+                            }
+                        },
+                        MenuItem(TranslateTransformerViewModel.title).apply {
+                            setOnAction {
+                                model.addModifier(::TranslateTransformerViewModel)
                             }
                         }
                     )
@@ -78,6 +83,7 @@ class ChangeFunctionFragment(
                                         text = when(item){
                                             is MirrorPointsTransformerViewModel -> "Mirror"
                                             is LogPointsTransformerViewModel -> "Logarithm"
+                                            is TranslateTransformerViewModel -> TranslateTransformerViewModel.title
                                             null -> null
                                         }
                                     }
@@ -137,7 +143,16 @@ class ChangeFunctionFragment(
         fun propertyGridContainerContent(item: IAsyncPointsTransformerViewModel): PropertiesGrid = when(item){
             is MirrorPointsTransformerViewModel -> propertyGridContainerContent(item)
             is LogPointsTransformerViewModel -> propertyGridContainerContent(item)
+            is TranslateTransformerViewModel -> propertyGridContainerContent(item)
         }
+
+        fun propertyGridContainerContent(item: TranslateTransformerViewModel) =
+            propertiesGrid {
+                addNode("Translate X", item.translateXProperty)
+                addNode("Translate Y", item.translateYProperty)
+            }.apply {
+                padding = Insets(5.0)
+            }
 
         fun propertyGridContainerContent(item: LogPointsTransformerViewModel) =
             propertiesGrid {

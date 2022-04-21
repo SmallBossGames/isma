@@ -67,6 +67,8 @@ data class ConcatenationFunction(
         return Pair(cache.transformedPointsX, cache.transformedPointsY)
     }
 
+    val transformers get() = transformedPointCache.get().transformers
+
     var pixelsToDraw: Pair<DoubleArray, DoubleArray>? = null
 
     suspend fun updateTransformersTransaction(

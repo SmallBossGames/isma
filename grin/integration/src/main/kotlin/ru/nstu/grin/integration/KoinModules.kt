@@ -187,7 +187,7 @@ val grinGuiModule = module {
     scope<FunctionChangeModalScope> {
         scopedOf(::ChangeFunctionController)
         scopedOf(::ChangeFunctionFragment)
-        scopedOf(::ChangeFunctionModel)
+        scopedOf(::ChangeFunctionViewModel)
     }
 
     scope<AxisChangeModalScope> {

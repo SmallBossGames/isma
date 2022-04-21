@@ -73,6 +73,19 @@ class FunctionCanvasService(
         model.reportFunctionsListUpdate()
     }
 
+    fun updateTransformer(
+        function: ConcatenationFunction,
+        transformers: Array<IAsyncPointsTransformer>
+    ) = coroutineScope.launch {
+        do {
+            if (function.updateTransformersTransaction{ transformers }){
+                break
+            }
+        } while (true)
+
+        model.reportFunctionsListUpdate()
+    }
+
     fun deleteFunction(function: ConcatenationFunction) {
         model.cartesianSpaces.forEach {
             it.functions.remove(function)

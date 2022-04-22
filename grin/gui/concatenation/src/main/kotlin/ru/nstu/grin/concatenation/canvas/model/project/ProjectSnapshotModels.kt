@@ -72,8 +72,6 @@ data class FontSnapshot(
     val size: Double,
 )
 
-
-
 @Serializable
 data class ConcatenationAxisSnapshot(
     val name: String,

@@ -76,12 +76,16 @@ class ConcatenationCanvasController(
             var maxY = Double.NEGATIVE_INFINITY
 
             space.functions.forEach{ function ->
-                function.points.forEach { point ->
-                    minX = min(point.x, minX)
-                    maxX = max(point.x, maxX)
+                val (xPoints, yPoints) = function.transformedPoints
 
-                    minY = min(point.y, minY)
-                    maxY = max(point.y, maxY)
+                for (x in xPoints) {
+                    minX = min(x, minX)
+                    maxX = max(x, maxX)
+                }
+
+                for (y in yPoints) {
+                    minY = min(y, minY)
+                    maxY = max(y, maxY)
                 }
             }
 

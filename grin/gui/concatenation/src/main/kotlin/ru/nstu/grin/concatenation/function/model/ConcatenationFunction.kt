@@ -71,16 +71,11 @@ data class ConcatenationFunction(
     suspend fun updateTransformersTransaction(
         operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
     ): Boolean {
-        val transformersState = transformedPointCache
+        val oldValue = transformedPointCache.get()
 
-        val oldValue = transformersState.get()
+        val newValue = PointsCache.create(points, operation(oldValue.transformers))
 
-        val newValue = PointsCache.create(
-            points,
-            operation(oldValue.transformers),
-        )
-
-        return transformersState.compareAndSet(oldValue, newValue)
+        return transformedPointCache.compareAndSet(oldValue, newValue)
     }
 
     public override fun clone(): ConcatenationFunction {

@@ -72,14 +72,7 @@ data class FontSnapshot(
     val size: Double,
 )
 
-@Serializable
-sealed class ConcatenationFunctionDetailsSnapshot
 
-@Serializable
-data class DerivativeDetailsSnapshot(
-    val degree: Int,
-    val type: DerivativeType
-) : ConcatenationFunctionDetailsSnapshot()
 
 @Serializable
 data class ConcatenationAxisSnapshot(
@@ -135,6 +128,13 @@ class TranslateTransformerSnapshot(
 data class WaveletTransformerSnapshot(
     val waveletTransformFun: WaveletTransformFun,
     val waveletDirection: WaveletDirection
+) : TransformerSnapshot()
+
+@Serializable
+data class DerivativeTransformerSnapshot(
+    val degree: Int,
+    val derivativeType: DerivativeType,
+    val derivativeAxis: DerivativeAxis,
 ) : TransformerSnapshot()
 
 fun DescriptionSnapshot.toModel() =
@@ -282,6 +282,7 @@ fun IAsyncPointsTransformer.toSnapshot(): TransformerSnapshot = when(this){
     is MirrorTransformer -> MirrorTransformerSnapshot(mirrorX, mirrorY)
     is TranslateTransformer -> TranslateTransformerSnapshot(translateX, translateY)
     is WaveletTransformer -> WaveletTransformerSnapshot(waveletTransformFun, waveletDirection)
+    is DerivativeTransformer -> DerivativeTransformerSnapshot(degree, type, axis)
     else -> throw NotImplementedError()
 }
 
@@ -290,4 +291,5 @@ fun TransformerSnapshot.toModel(): IAsyncPointsTransformer = when(this){
     is MirrorTransformerSnapshot -> MirrorTransformer(mirrorX, mirrorY)
     is TranslateTransformerSnapshot -> TranslateTransformer(translateX, translateY)
     is WaveletTransformerSnapshot -> WaveletTransformer(waveletTransformFun, waveletDirection)
+    is DerivativeTransformerSnapshot -> DerivativeTransformer(degree, derivativeType, derivativeAxis)
 }

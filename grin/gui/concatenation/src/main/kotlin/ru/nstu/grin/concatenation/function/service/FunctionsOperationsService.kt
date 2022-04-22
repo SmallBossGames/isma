@@ -6,9 +6,7 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.model.DerivativeDetails
-import ru.nstu.grin.concatenation.function.model.DerivativeType
-import ru.nstu.grin.concatenation.function.model.WaveletDetails
+import ru.nstu.grin.concatenation.function.transform.DerivativeType
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher

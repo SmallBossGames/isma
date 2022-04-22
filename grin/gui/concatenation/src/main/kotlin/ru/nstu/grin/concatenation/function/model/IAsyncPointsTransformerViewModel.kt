@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.function.model
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
@@ -71,11 +72,31 @@ class WaveletTransformerViewModel(
     }
 }
 
+class DerivativeTransformerViewModel(
+    degree: Int = 1,
+    type: DerivativeType = DerivativeType.BOTH,
+    axis: DerivativeAxis = DerivativeAxis.Y_BY_X,
+): IAsyncPointsTransformerViewModel {
+    val degreeProperty = SimpleIntegerProperty(degree)
+    var degree by degreeProperty
+
+    val typeProperty = SimpleObjectProperty(type)
+    var type: DerivativeType by typeProperty
+
+    val axisProperty = SimpleObjectProperty(axis)
+    val axis by axisProperty
+
+    companion object{
+        const val title = "Derivative"
+    }
+}
+
 fun IAsyncPointsTransformer.toViewModel(): IAsyncPointsTransformerViewModel = when(this){
     is MirrorTransformer -> toViewModel()
     is LogTransformer -> toViewModel()
     is TranslateTransformer -> toViewModel()
     is WaveletTransformer -> toViewModel()
+    is DerivativeTransformer -> toViewModel()
     else -> throw NotImplementedError()
 }
 
@@ -84,6 +105,7 @@ fun IAsyncPointsTransformerViewModel.toModel(): IAsyncPointsTransformer = when(t
     is LogPointsTransformerViewModel -> toModel()
     is TranslateTransformerViewModel -> toModel()
     is WaveletTransformerViewModel -> toModel()
+    is DerivativeTransformerViewModel -> toModel()
 }
 
 fun MirrorTransformer.toViewModel() = MirrorPointsTransformerViewModel(mirrorX, mirrorY)
@@ -97,3 +119,6 @@ fun TranslateTransformerViewModel.toModel() = TranslateTransformer(translateX, t
 
 fun WaveletTransformer.toViewModel() = WaveletTransformerViewModel(waveletTransformFun, waveletDirection)
 fun WaveletTransformerViewModel.toModel() = WaveletTransformer(waveletTransformFun, waveletDirection)
+
+fun DerivativeTransformer.toViewModel() = DerivativeTransformerViewModel(degree, type, axis)
+fun DerivativeTransformerViewModel.toModel() = DerivativeTransformer(degree, type, axis)

@@ -1,48 +1,33 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
+import javafx.collections.FXCollections
+import javafx.scene.control.Button
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
+import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.concatenation.function.controller.DerivativeFunctionController
-import ru.nstu.grin.concatenation.function.model.DerivativeFunctionModel
-import ru.nstu.grin.concatenation.function.model.DerivativeType
-import tornadofx.*
-import java.util.*
+import ru.nstu.grin.concatenation.function.model.DerivativeTransformerViewModel
+import ru.nstu.grin.concatenation.function.transform.DerivativeAxis
+import ru.nstu.grin.concatenation.function.transform.DerivativeType
 
-class DerivativeFunctionFragment : Fragment() {
-    private val model: DerivativeFunctionModel by inject()
-    private val controller: DerivativeFunctionController = find(params = params) { }
-    val functionId: UUID by param()
-
-    override val root: Parent = form {
-        fieldset {
-            field("Степень") {
-                textfield(model.degreeProperty) {
-                    validator {
-                        if (it?.toIntOrNull() == null || it.toIntOrNull() ?: -1 < 0) {
-                            error("Число должно быть плавающим 20,0 и больше нуля")
-                        } else {
-                            null
-                        }
+class DerivativeFunctionFragment(
+    private val model: DerivativeTransformerViewModel,
+    private val controller: DerivativeFunctionController,
+) : VBox() {
+    init {
+        children.addAll(
+            propertiesGrid {
+                addNode("Degree", model.degreeProperty)
+                addNode("Type", FXCollections.observableList(DerivativeType.values().asList()), model.typeProperty)
+                addNode("Axis", FXCollections.observableList(DerivativeAxis.values().asList()), model.axisProperty)
+            },
+            HBox(
+                Button("Apply").apply {
+                    setOnAction {
+                        controller.enableDerivative(model)
                     }
                 }
-            }
-            field("Тип производной") {
-                combobox(model.derivativeTypeProperty, DerivativeType.values().toList()) {
-                    cellFormat {
-                        text = when (it) {
-                            DerivativeType.LEFT -> "Левая"
-                            DerivativeType.RIGHT -> "Правая"
-                            DerivativeType.BOTH -> "Обе"
-                        }
-                    }
-                }
-            }
-            button("Найти производную") {
-                enableWhen(model.isValid.toProperty())
-                action {
-                    controller.enableDerivative()
-                    close()
-                }
-            }
-        }
+            )
+        )
     }
 }

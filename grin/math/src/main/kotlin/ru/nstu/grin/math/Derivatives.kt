@@ -1,53 +1,49 @@
 package ru.nstu.grin.math
 
-import ru.nstu.grin.model.MathPoint
-
-class Derivatives {
-    fun leftDerivative(current: List<MathPoint>, degree: Int): List<MathPoint> {
-        val result = mutableListOf<MathPoint>()
-        if (degree == 0) return current
-
-        for (i in 0 until current.size - 1) {
-            result.add(
-                MathPoint(
-                    current[i].x,
-                    (current[i + 1].y - current[i].y) / (current[i + 1].x - current[i].x)
-                )
-            )
+object Derivatives {
+    fun leftDerivative(x: DoubleArray, y: DoubleArray, degree: Int): Pair<DoubleArray, DoubleArray> {
+        if (degree == 0){
+            return Pair(x, y)
         }
 
-        return leftDerivative(result, degree - 1)
+        for(i in 1..degree){
+            for(j in 0 until (y.size - i)){
+                y[j] = (y[j + 1] - y[j]) / (x[j + 1] - x[j])
+            }
+        }
+
+        return Pair(x.copyOfRange(0, x.size - degree), y.copyOfRange(0, y.size - degree))
     }
 
-    fun rightDerivative(current: List<MathPoint>, degree: Int): List<MathPoint> {
-        val result = mutableListOf<MathPoint>()
-        if (degree == 0) return current
-
-        for (i in 1 until current.size) {
-            result.add(
-                MathPoint(
-                    current[i].x,
-                    (current[i].y - current[i - 1].y) / (current[i].x - current[i - 1].x)
-                )
-            )
+    fun rightDerivative(x: DoubleArray, y: DoubleArray, degree: Int): Pair<DoubleArray, DoubleArray> {
+        if (degree == 0){
+            return Pair(x, y)
         }
 
-        return leftDerivative(result, degree - 1)
+        for(i in 1..degree){
+            for(j in (y.size - 1) downTo i) {
+                y[j] = (y[j] - y[j - 1]) / (x[j] - x[j - 1])
+            }
+        }
+
+        return Pair(x.copyOfRange(degree, x.size), y.copyOfRange(degree, y.size))
     }
 
-    fun bothDerivatives(current: List<MathPoint>, degree: Int): List<MathPoint> {
-        val result = mutableListOf<MathPoint>()
-
-        if (degree == 0) return current
-
-        for (i in 1 until current.size - 1) {
-            result.add(
-                MathPoint(
-                    current[i].x,
-                    (current[i + 1].y - current[i - 1].y) / (current[i + 1].x - current[i - 1].x)
-                )
-            )
+    fun bothDerivatives(x: DoubleArray, y: DoubleArray, degree: Int): Pair<DoubleArray, DoubleArray> {
+        if (degree == 0){
+            return Pair(x, y)
         }
-        return leftDerivative(result, degree - 1)
+
+        val tempY = DoubleArray(y.size)
+
+        for(i in 1..degree){
+            for(j in i until (y.size - i)){
+                tempY[j] = (y[j + 1] - y[j - 1]) / (x[j + 1] - x[j - 1])
+            }
+
+            tempY.copyInto(y)
+        }
+
+        return Pair(x.copyOfRange(degree, x.size - degree), y.copyOfRange(degree, y.size - degree))
     }
 }

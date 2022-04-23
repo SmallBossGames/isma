@@ -135,6 +135,13 @@ data class DerivativeTransformerSnapshot(
     val derivativeAxis: DerivativeAxis,
 ) : TransformerSnapshot()
 
+@Serializable
+class IntegratorTransformerSnapshot(
+    val initialValue: Double,
+    val method: IntegrationMethod,
+    val axis: IntegrationAxis,
+): TransformerSnapshot()
+
 fun DescriptionSnapshot.toModel() =
     Description(
         id = UUID.fromString(id),
@@ -281,6 +288,7 @@ fun IAsyncPointsTransformer.toSnapshot(): TransformerSnapshot = when(this){
     is TranslateTransformer -> TranslateTransformerSnapshot(translateX, translateY)
     is WaveletTransformer -> WaveletTransformerSnapshot(waveletTransformFun, waveletDirection)
     is DerivativeTransformer -> DerivativeTransformerSnapshot(degree, type, axis)
+    is IntegratorTransformer -> IntegratorTransformerSnapshot(initialValue, method, axis)
     else -> throw NotImplementedError()
 }
 
@@ -290,4 +298,5 @@ fun TransformerSnapshot.toModel(): IAsyncPointsTransformer = when(this){
     is TranslateTransformerSnapshot -> TranslateTransformer(translateX, translateY)
     is WaveletTransformerSnapshot -> WaveletTransformer(waveletTransformFun, waveletDirection)
     is DerivativeTransformerSnapshot -> DerivativeTransformer(degree, derivativeType, derivativeAxis)
+    is IntegratorTransformerSnapshot -> IntegratorTransformer(initialValue, method, axis)
 }

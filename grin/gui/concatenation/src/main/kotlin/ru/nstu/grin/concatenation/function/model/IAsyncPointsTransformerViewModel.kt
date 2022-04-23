@@ -9,13 +9,18 @@ import ru.isma.javafx.extensions.helpers.setValue
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.function.transform.*
+import ru.nstu.grin.concatenation.function.transform.IntegrationMethod
 
-sealed interface IAsyncPointsTransformerViewModel
+sealed interface IAsyncPointsTransformerViewModel{
+    val title: String
+}
 
 class TranslateTransformerViewModel(
     translateX: Double = 0.0,
     translateY: Double = 0.0,
 ): IAsyncPointsTransformerViewModel {
+    override val title = Companion.title
+
     val translateXProperty = SimpleDoubleProperty(translateX)
     val translateX by translateXProperty
 
@@ -33,6 +38,8 @@ class LogPointsTransformerViewModel(
     isYLogarithm: Boolean = false,
     yLogBase: Double = 2.0
 ): IAsyncPointsTransformerViewModel {
+    override val title = Companion.title
+
     val isXLogarithmProperty = SimpleBooleanProperty(isXLogarithm)
     val isXLogarithm by isXLogarithmProperty
 
@@ -44,23 +51,35 @@ class LogPointsTransformerViewModel(
 
     val yLogarithmBaseProperty = SimpleDoubleProperty(yLogBase)
     val yLogarithmBase by yLogarithmBaseProperty
+
+    companion object {
+        const val title = "Logarithm"
+    }
 }
 
 class MirrorPointsTransformerViewModel(
     mirrorX: Boolean = false,
     mirrorY: Boolean = false,
 ): IAsyncPointsTransformerViewModel {
+    override val title = Companion.title
+
     val mirrorXProperty = SimpleBooleanProperty(mirrorX)
     var mirrorX by mirrorXProperty
 
     val mirrorYProperty = SimpleBooleanProperty(mirrorY)
     var mirrorY by mirrorYProperty
+
+    companion object{
+        const val title = "Mirror"
+    }
 }
 
 class WaveletTransformerViewModel(
     waveletTransformFun: WaveletTransformFun = WaveletTransformFun.HAAR1,
     waveletDirection: WaveletDirection = WaveletDirection.BOTH
 ): IAsyncPointsTransformerViewModel {
+    override val title = Companion.title
+
     val waveletTransformFunProperty = SimpleObjectProperty(waveletTransformFun)
     var waveletTransformFun: WaveletTransformFun by waveletTransformFunProperty
 
@@ -77,6 +96,8 @@ class DerivativeTransformerViewModel(
     type: DerivativeType = DerivativeType.BOTH,
     axis: DerivativeAxis = DerivativeAxis.Y_BY_X,
 ): IAsyncPointsTransformerViewModel {
+    override val title = Companion.title
+
     val degreeProperty = SimpleIntegerProperty(degree)
     var degree by degreeProperty
 
@@ -91,12 +112,34 @@ class DerivativeTransformerViewModel(
     }
 }
 
+class IntegratorTransformerViewModel(
+    initialValue: Double = 0.0,
+    method: IntegrationMethod = IntegrationMethod.TRAPEZE,
+    axis: IntegrationAxis = IntegrationAxis.Y_BY_X,
+): IAsyncPointsTransformerViewModel {
+    override val title = Companion.title
+
+    val initialValueProperty = SimpleDoubleProperty(initialValue)
+    var initialValue by initialValueProperty
+
+    val methodProperty = SimpleObjectProperty(method)
+    var method by methodProperty
+
+    val axisProperty = SimpleObjectProperty(axis)
+    var axis by axisProperty
+
+    companion object {
+        const val title = "Integrator"
+    }
+}
+
 fun IAsyncPointsTransformer.toViewModel(): IAsyncPointsTransformerViewModel = when(this){
     is MirrorTransformer -> toViewModel()
     is LogTransformer -> toViewModel()
     is TranslateTransformer -> toViewModel()
     is WaveletTransformer -> toViewModel()
     is DerivativeTransformer -> toViewModel()
+    is IntegratorTransformer -> toViewModel()
     else -> throw NotImplementedError()
 }
 
@@ -106,6 +149,7 @@ fun IAsyncPointsTransformerViewModel.toModel(): IAsyncPointsTransformer = when(t
     is TranslateTransformerViewModel -> toModel()
     is WaveletTransformerViewModel -> toModel()
     is DerivativeTransformerViewModel -> toModel()
+    is IntegratorTransformerViewModel -> toModel()
 }
 
 fun MirrorTransformer.toViewModel() = MirrorPointsTransformerViewModel(mirrorX, mirrorY)
@@ -122,3 +166,6 @@ fun WaveletTransformerViewModel.toModel() = WaveletTransformer(waveletTransformF
 
 fun DerivativeTransformer.toViewModel() = DerivativeTransformerViewModel(degree, type, axis)
 fun DerivativeTransformerViewModel.toModel() = DerivativeTransformer(degree, type, axis)
+
+fun IntegratorTransformer.toViewModel() = IntegratorTransformerViewModel(initialValue, method, axis)
+fun IntegratorTransformerViewModel.toModel() = IntegratorTransformer(initialValue, method, axis)

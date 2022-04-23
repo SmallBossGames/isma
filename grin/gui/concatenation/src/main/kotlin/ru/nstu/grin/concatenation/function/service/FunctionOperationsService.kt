@@ -6,7 +6,6 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.transform.DerivativeType
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
@@ -86,14 +85,6 @@ class FunctionOperationsService(
     }
 
     //TODO: disabled until migration to Async Transformers
-    fun derivativeFunction(function: ConcatenationFunction, type: DerivativeType, degree: Int) {
-        TODO("Disabled until migration to Async Transformers")
-        /*function.derivativeDetails = DerivativeDetails(degree = degree, type = type)
-
-        view.redraw()*/
-    }
-
-    //TODO: disabled until migration to Async Transformers
     fun waveletFunction(
         function: ConcatenationFunction,
         waveletTransformFun: WaveletTransformFun,
@@ -121,12 +112,13 @@ class FunctionOperationsService(
             return
         }
         if (rightBorder > max) {
-            tornadofx.error("Правя граница не может быть больше максимума функции")
+            tornadofx.error("Правaя граница не может быть больше максимума функции")
         }
-        val integration = Integration()
-        val integral =
-            integration.trapeze(function.points.filter { it.x > leftBorder && it.x < rightBorder }
-                .map { MathPoint(it.x, it.y) })
+        val integral = Integration.trapeze(
+            function.points
+                .filter { it.x > leftBorder && it.x < rightBorder }
+                .map { MathPoint(it.x, it.y) }
+        )
         tornadofx.information("Интеграл равен $integral")
     }
 

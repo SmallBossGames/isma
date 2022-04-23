@@ -15,8 +15,7 @@ import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.function.transform.DerivativeAxis
-import ru.nstu.grin.concatenation.function.transform.DerivativeType
+import ru.nstu.grin.concatenation.function.transform.*
 
 class ChangeFunctionFragment(
     private val model: ChangeFunctionViewModel,
@@ -48,12 +47,12 @@ class ChangeFunctionFragment(
                     var selectedItem: IAsyncPointsTransformerViewModel? = null
 
                     val addContextMenu = ContextMenu(
-                        MenuItem("Mirror").apply {
+                        MenuItem(MirrorPointsTransformerViewModel.title).apply {
                             setOnAction {
                                 model.addModifier(::MirrorPointsTransformerViewModel)
                             }
                         },
-                        MenuItem("Logarithm").apply {
+                        MenuItem(LogPointsTransformerViewModel.title).apply {
                             setOnAction {
                                 model.addModifier(::LogPointsTransformerViewModel)
                             }
@@ -71,6 +70,11 @@ class ChangeFunctionFragment(
                         MenuItem(DerivativeTransformerViewModel.title).apply {
                             setOnAction {
                                 model.addModifier(::DerivativeTransformerViewModel)
+                            }
+                        },
+                        MenuItem(IntegratorTransformerViewModel.title).apply {
+                            setOnAction {
+                                model.addModifier(::IntegratorTransformerViewModel)
                             }
                         }
                     )
@@ -100,6 +104,7 @@ class ChangeFunctionFragment(
                                             is TranslateTransformerViewModel -> TranslateTransformerViewModel.title
                                             is WaveletTransformerViewModel -> WaveletTransformerViewModel.title
                                             is DerivativeTransformerViewModel -> DerivativeTransformerViewModel.title
+                                            is IntegratorTransformerViewModel -> IntegratorTransformerViewModel.title
                                             null -> null
                                         }
                                     }
@@ -162,6 +167,7 @@ class ChangeFunctionFragment(
             is TranslateTransformerViewModel -> propertyGridContainerContent(item)
             is WaveletTransformerViewModel -> propertyGridContainerContent(item)
             is DerivativeTransformerViewModel -> propertyGridContainerContent(item)
+            is IntegratorTransformerViewModel -> propertyGridContainerContent(item)
         }.apply {
             padding = Insets(5.0)
         }
@@ -197,6 +203,13 @@ class ChangeFunctionFragment(
                 addNode("Degree", item.degreeProperty)
                 addNode("Type", FXCollections.observableList(DerivativeType.values().asList()), item.typeProperty)
                 addNode("Axis", FXCollections.observableList(DerivativeAxis.values().asList()), item.axisProperty)
+            }
+
+        fun propertyGridContainerContent(item: IntegratorTransformerViewModel) =
+            propertiesGrid {
+                addNode("Degree", item.initialValueProperty)
+                addNode("Type", FXCollections.observableList(IntegrationMethod.values().asList()), item.methodProperty)
+                addNode("Axis", FXCollections.observableList(IntegrationAxis.values().asList()), item.axisProperty)
             }
     }
 

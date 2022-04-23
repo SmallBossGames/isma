@@ -3,7 +3,7 @@ package ru.nstu.grin.concatenation.function.transform
 import ru.nstu.grin.math.Derivatives
 
 enum class DerivativeType { LEFT, RIGHT, BOTH }
-enum class DerivativeAxis { X_BY_Y, Y_BY_X}
+enum class DerivativeAxis { X_BY_Y, Y_BY_X }
 
 data class DerivativeTransformer(
     val degree: Int,

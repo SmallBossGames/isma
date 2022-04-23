@@ -5,6 +5,7 @@ import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
@@ -27,8 +28,7 @@ class GrinIntegrationFacade: KoinComponent {
         )
 
         Stage().apply {
-            val scopeInstance = MainGrinScope(this)
-            val scope = scopeInstance.scope
+            val scope = MainGrinScope(this)
             val view = scope.get<ConcatenationView>{ parametersOf(initData) }
 
             scene = Scene(view)
@@ -37,7 +37,7 @@ class GrinIntegrationFacade: KoinComponent {
                 Modality.WINDOW_MODAL
             )
             setOnCloseRequest {
-                scopeInstance.closeScope()
+                scope.closeScope()
             }
             show()
         }
@@ -84,7 +84,6 @@ class GrinIntegrationFacade: KoinComponent {
             name = name,
             points = points,
             isHide = false,
-            isSelected = false,
             functionColor = color,
             lineSize = 2.0,
             lineType = LineType.POLYNOM

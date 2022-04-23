@@ -5,12 +5,14 @@ import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.EditMode
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 
 class ReleaseMouseHandler(
     private val model: ConcatenationCanvasModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
     private val matrixTransformer: MatrixTransformer,
@@ -29,11 +31,11 @@ class ReleaseMouseHandler(
         }
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && event.button == MouseButton.PRIMARY) {
-            val selectionSettings = model.selectionSettings
+            val selectionSettings = canvasViewModel.selectionSettings
 
             val area = selectionSettings.area
             if (area < 10.0) {
-                model.selectionSettings.reset()
+                selectionSettings.reset()
                 return
             }
 
@@ -89,7 +91,7 @@ class ReleaseMouseHandler(
                 //ConcatenationView(scope, CanvasProjectLoader(scope), initData).openWindow()
             }*/
 
-            model.selectionSettings.reset()
+            selectionSettings.reset()
         }
         chainDrawer.draw()
     }

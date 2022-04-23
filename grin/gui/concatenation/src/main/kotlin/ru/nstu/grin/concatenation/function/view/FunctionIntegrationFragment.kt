@@ -4,7 +4,7 @@ import javafx.scene.Parent
 import ru.nstu.grin.concatenation.function.controller.FunctionIntegrationController
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.FunctionIntegrationFragmentModel
-import ru.nstu.grin.concatenation.function.model.IntegrationMethod
+import ru.nstu.grin.concatenation.function.transform.IntegrationMethod
 import tornadofx.*
 
 class FunctionIntegrationFragment : Fragment() {

@@ -2,11 +2,11 @@ package ru.nstu.grin.concatenation.canvas.controller
 
 import ru.nstu.grin.concatenation.axis.model.AxisScaleProperties
 import ru.nstu.grin.concatenation.axis.model.Direction
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import kotlin.math.abs
 
 class MatrixTransformer(
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
 ) {
     fun transformPixelToUnits(
         number: Double,

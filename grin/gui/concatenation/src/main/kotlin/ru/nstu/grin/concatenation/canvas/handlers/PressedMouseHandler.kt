@@ -20,7 +20,7 @@ class PressedMouseHandler(
     private val contextMenuDrawElement: CartesianCanvasContextMenuController,
     private val canvasModel: ConcatenationCanvasModel,
     private val canvasController: ConcatenationCanvasController,
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
 ) : EventHandler<MouseEvent> {
@@ -37,7 +37,9 @@ class PressedMouseHandler(
 
         if ((editMode == EditMode.SELECTION || editMode == EditMode.MOVE) && event.button == MouseButton.PRIMARY) {
             val description = canvasModel.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
-            description?.isSelected = true
+            if(description != null){
+                canvasViewModel.selectedDescriptions.add(description)
+            }
 
             val function = canvasModel.cartesianSpaces.map { it.functions }.flatten()
                 .firstOrNull {
@@ -45,15 +47,18 @@ class PressedMouseHandler(
 
                     return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
                 }
-            function?.isSelected = true
+
+            if(function != null){
+                canvasViewModel.selectedFunctions.add(function)
+            }
 
             isUiLayerDirty = true
         }
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.button == MouseButton.PRIMARY) {
-                canvasModel.selectionSettings.isFirstPointSelected = true
-                canvasModel.selectionSettings.firstPoint = Point(event.x, event.y)
+                canvasViewModel.selectionSettings.isFirstPointSelected = true
+                canvasViewModel.selectionSettings.firstPoint = Point(event.x, event.y)
             }
 
             isUiLayerDirty = true

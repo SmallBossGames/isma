@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.canvas.model.project
 
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.common.model.Point
@@ -10,6 +11,7 @@ import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.model.*
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.function.transform.*
 import java.util.*
 
 @Serializable
@@ -44,15 +46,10 @@ data class ConcatenationFunctionSnapshot(
     val name: String,
     val points: List<PointSnapshot>,
     val isHide: Boolean,
-    val isSelected: Boolean,
-
     val functionColor: ColorSnapshot,
-
     val lineSize: Double,
     val lineType: LineType,
-    var mirrorDetails: MirrorDetailsSnapshot,
-    var derivativeDetails: DerivativeDetailsSnapshot?,
-    var waveletDetails: WaveletDetailsSnapshot?,
+    val transformers: List<TransformerSnapshot>
 )
 
 @Serializable
@@ -74,27 +71,6 @@ data class FontSnapshot(
     val family: String,
     val size: Double,
 )
-
-@Serializable
-sealed class ConcatenationFunctionDetailsSnapshot
-
-@Serializable
-data class MirrorDetailsSnapshot(
-    val isMirrorX: Boolean,
-    val isMirrorY: Boolean,
-) : ConcatenationFunctionDetailsSnapshot()
-
-@Serializable
-data class DerivativeDetailsSnapshot(
-    val degree: Int,
-    val type: DerivativeType
-) : ConcatenationFunctionDetailsSnapshot()
-
-@Serializable
-data class WaveletDetailsSnapshot(
-    val waveletTransformFun: WaveletTransformFun,
-    val waveletDirection: WaveletDirection
-) : ConcatenationFunctionDetailsSnapshot()
 
 @Serializable
 data class ConcatenationAxisSnapshot(
@@ -122,6 +98,49 @@ data class AxisScalePropertiesSnapshot(
     val minValue: Double = 0.0,
     val maxValue: Double = 10.0,
 )
+
+@Serializable
+sealed class TransformerSnapshot
+
+@Serializable
+class LogTransformerSnapshot(
+    val isXLogarithm: Boolean,
+    val xLogBase: Double,
+    val isYLogarithm: Boolean,
+    val yLogBase: Double
+): TransformerSnapshot()
+
+@Serializable
+class MirrorTransformerSnapshot(
+    val mirrorX: Boolean,
+    val mirrorY: Boolean,
+): TransformerSnapshot()
+
+@Serializable
+class TranslateTransformerSnapshot(
+    val translateX: Double,
+    val translateY: Double,
+): TransformerSnapshot()
+
+@Serializable
+data class WaveletTransformerSnapshot(
+    val waveletTransformFun: WaveletTransformFun,
+    val waveletDirection: WaveletDirection
+) : TransformerSnapshot()
+
+@Serializable
+data class DerivativeTransformerSnapshot(
+    val degree: Int,
+    val derivativeType: DerivativeType,
+    val derivativeAxis: DerivativeAxis,
+) : TransformerSnapshot()
+
+@Serializable
+class IntegratorTransformerSnapshot(
+    val initialValue: Double,
+    val method: IntegrationMethod,
+    val axis: IntegrationAxis,
+): TransformerSnapshot()
 
 fun DescriptionSnapshot.toModel() =
     Description(
@@ -213,32 +232,25 @@ fun PointSnapshot.toModel() = Point(x, y)
 
 fun Point.toSnapshot() = PointSnapshot(x, y)
 
-fun DerivativeDetailsSnapshot.toModel() = DerivativeDetails(degree, type)
+fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
+    val transformersFromSnapshot = transformers.map { it.toModel() }.toTypedArray()
 
-fun DerivativeDetails.toSnapshot() = DerivativeDetailsSnapshot(degree, type)
-
-fun MirrorDetailsSnapshot.toModel() = MirrorDetails(isMirrorX, isMirrorY)
-
-fun MirrorDetails.toSnapshot() = MirrorDetailsSnapshot(isMirrorX, isMirrorY)
-
-fun WaveletDetailsSnapshot.toModel() = WaveletDetails(waveletTransformFun, waveletDirection)
-
-fun WaveletDetails.toSnapshot() = WaveletDetailsSnapshot(waveletTransformFun, waveletDirection)
-
-fun ConcatenationFunctionSnapshot.toModel() =
-    ConcatenationFunction(
+    return ConcatenationFunction(
         id = UUID.fromString(id),
         name = name,
         points = points.map { it.toModel() },
         isHide = isHide,
-        isSelected = isSelected,
         functionColor = functionColor.toModel(),
         lineSize = lineSize,
         lineType = lineType,
-        mirrorDetails = mirrorDetails.toModel(),
-        derivativeDetails = derivativeDetails?.toModel(),
-        waveletDetails = waveletDetails?.toModel(),
-    )
+    ).apply {
+        runBlocking {
+            updateTransformersTransaction { transformersFromSnapshot }
+        }
+    }
+
+
+}
 
 fun ConcatenationFunction.toSnapshot() =
     ConcatenationFunctionSnapshot(
@@ -246,13 +258,10 @@ fun ConcatenationFunction.toSnapshot() =
         name = name,
         points = points.map { it.toSnapshot() },
         isHide = isHide,
-        isSelected = isSelected,
         functionColor = functionColor.toSnapshot(),
         lineSize = lineSize,
         lineType = lineType,
-        mirrorDetails = mirrorDetails.toSnapshot(),
-        derivativeDetails = derivativeDetails?.toSnapshot(),
-        waveletDetails = waveletDetails?.toSnapshot(),
+        transformers = transformers.map { it.toSnapshot() }
     )
 
 fun CartesianSpaceSnapshot.toModel() =
@@ -272,3 +281,22 @@ fun CartesianSpace.toSnapshot() =
         yAxis = yAxis.toSnapshot(),
         isShowGrid = isShowGrid,
     )
+
+fun IAsyncPointsTransformer.toSnapshot(): TransformerSnapshot = when(this){
+    is LogTransformer -> LogTransformerSnapshot(isXLogarithm, xLogBase, isYLogarithm, yLogBase)
+    is MirrorTransformer -> MirrorTransformerSnapshot(mirrorX, mirrorY)
+    is TranslateTransformer -> TranslateTransformerSnapshot(translateX, translateY)
+    is WaveletTransformer -> WaveletTransformerSnapshot(waveletTransformFun, waveletDirection)
+    is DerivativeTransformer -> DerivativeTransformerSnapshot(degree, type, axis)
+    is IntegratorTransformer -> IntegratorTransformerSnapshot(initialValue, method, axis)
+    else -> throw NotImplementedError()
+}
+
+fun TransformerSnapshot.toModel(): IAsyncPointsTransformer = when(this){
+    is LogTransformerSnapshot -> LogTransformer(isXLogarithm, xLogBase, isYLogarithm, yLogBase)
+    is MirrorTransformerSnapshot -> MirrorTransformer(mirrorX, mirrorY)
+    is TranslateTransformerSnapshot -> TranslateTransformer(translateX, translateY)
+    is WaveletTransformerSnapshot -> WaveletTransformer(waveletTransformFun, waveletDirection)
+    is DerivativeTransformerSnapshot -> DerivativeTransformer(degree, derivativeType, derivativeAxis)
+    is IntegratorTransformerSnapshot -> IntegratorTransformer(initialValue, method, axis)
+}

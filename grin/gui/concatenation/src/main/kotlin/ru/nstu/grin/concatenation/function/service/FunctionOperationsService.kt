@@ -6,16 +6,13 @@ import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.model.DerivativeDetails
-import ru.nstu.grin.concatenation.function.model.DerivativeType
-import ru.nstu.grin.concatenation.function.model.WaveletDetails
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
 import ru.nstu.grin.model.MathPoint
 
-class FunctionsOperationsService(
+class FunctionOperationsService(
     private val view: ConcatenationCanvas,
     private val matrixTransformer: MatrixTransformer,
     private val canvasModel: ConcatenationCanvasModel,
@@ -87,24 +84,20 @@ class FunctionsOperationsService(
         view.redraw()
     }
 
-    fun derivativeFunction(function: ConcatenationFunction, type: DerivativeType, degree: Int) {
-        function.derivativeDetails = DerivativeDetails(degree = degree, type = type)
-
-        view.redraw()
-    }
-
+    //TODO: disabled until migration to Async Transformers
     fun waveletFunction(
         function: ConcatenationFunction,
         waveletTransformFun: WaveletTransformFun,
         waveletDirection: WaveletDirection
     ) {
-        function.waveletDetails = WaveletDetails(
+        TODO("Disabled until migration to Async Transformers")
+        /*function.waveletDetails = WaveletDetails(
             waveletTransformFun = waveletTransformFun,
             waveletDirection = waveletDirection
         )
 
         view.redraw()
-        localizeFunction(function)
+        localizeFunction(function)*/
     }
 
     fun calculateIntegral(
@@ -119,12 +112,13 @@ class FunctionsOperationsService(
             return
         }
         if (rightBorder > max) {
-            tornadofx.error("Правя граница не может быть больше максимума функции")
+            tornadofx.error("Правaя граница не может быть больше максимума функции")
         }
-        val integration = Integration()
-        val integral =
-            integration.trapeze(function.points.filter { it.x > leftBorder && it.x < rightBorder }
-                .map { MathPoint(it.x, it.y) })
+        val integral = Integration.trapeze(
+            function.points
+                .filter { it.x > leftBorder && it.x < rightBorder }
+                .map { MathPoint(it.x, it.y) }
+        )
         tornadofx.information("Интеграл равен $integral")
     }
 

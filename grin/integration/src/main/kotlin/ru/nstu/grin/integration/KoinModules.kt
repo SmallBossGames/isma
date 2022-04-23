@@ -3,7 +3,7 @@ package ru.nstu.grin.integration
 import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
-import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
+import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
@@ -16,7 +16,7 @@ import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
@@ -42,7 +42,7 @@ import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.controller.*
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
@@ -78,7 +78,7 @@ val grinGuiModule = module {
 
         scopedOf(::ConcatenationCanvas)
         scopedOf(::ConcatenationViewModel)
-        scopedOf(::CanvasViewModel)
+        scopedOf(::ConcatenationCanvasViewModel)
         scopedOf(::ConcatenationCanvasController)
         scopedOf(::ConcatenationCanvasModel)
 
@@ -92,11 +92,11 @@ val grinGuiModule = module {
         scopedOf(::HorizontalValueMarksArrayBuilder)
         scopedOf(::PointTooltipsDrawElement)
         scopedOf(::ConcatenationFunctionDrawElement)
+        scopedOf(::SelectionDrawElement)
+        scopedOf(::DescriptionDrawElement)
         scopedOf(::MatrixTransformer)
         scopedOf(::CartesianCanvasContextMenuController)
 
-        scoped { DescriptionDrawElement(get<ConcatenationCanvasModel>().descriptions) }
-        scoped { SelectionDrawElement(get<ConcatenationCanvasModel>().selectionSettings) }
         scoped { ArrowDrawElement(get<ConcatenationCanvasModel>().arrows, 1.0) }
 
         scopedOf(::FunctionListView)
@@ -117,14 +117,18 @@ val grinGuiModule = module {
 
         scopedOf(::ChartToolBar)
         scopedOf(::ModesToolBar)
+
         scopedOf(::MathToolBar)
+        scopedOf(::DerivativeFunctionController)
+
         scopedOf(::TransformToolBar)
+        scopedOf(::MirrorFunctionController)
 
         scopedOf(::CartesianCanvasService)
         scopedOf(::DescriptionCanvasService)
         scopedOf(::AxisCanvasService)
         scopedOf(::FunctionCanvasService)
-        scopedOf(::FunctionsOperationsService)
+        scopedOf(::FunctionOperationsService)
 
         scopedOf(::ScalableScrollHandler)
         scopedOf(::DraggedHandler)
@@ -187,7 +191,7 @@ val grinGuiModule = module {
     scope<FunctionChangeModalScope> {
         scopedOf(::ChangeFunctionController)
         scopedOf(::ChangeFunctionFragment)
-        scopedOf(::ChangeFunctionModel)
+        scopedOf(::ChangeFunctionViewModel)
     }
 
     scope<AxisChangeModalScope> {

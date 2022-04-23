@@ -5,18 +5,17 @@ import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.function.view.DerivativeFunctionFragment
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.function.controller.DerivativeFunctionController
 import ru.nstu.grin.concatenation.function.view.FunctionIntegrationFragment
 import ru.nstu.grin.concatenation.function.view.IntersectionFunctionFragment
-import ru.nstu.grin.concatenation.function.view.WaveletFunctionFragment
 import tornadofx.Scope
 import tornadofx.find
 
 class MathToolBar(
     scope: Scope,
-    model: ConcatenationCanvasModel,
-    drawer: ConcatenationChainDrawer,
+    canvasViewModel: ConcatenationCanvasViewModel,
+    derivativeFunctionController: DerivativeFunctionController,
 ): ToolBar(
     Button(null, ImageView(Image("intersection.png")).apply {
         fitWidth = 20.0
@@ -35,20 +34,8 @@ class MathToolBar(
         tooltip = Tooltip("Apply derivative")
 
         setOnAction {
-            val function = model.selectedFunction
-            if (function != null) {
-                val derivativeDetails = function.derivativeDetails
-                if (derivativeDetails != null) {
-                    function.derivativeDetails = null
-                    drawer.draw()
-                    return@setOnAction
-                }
-                find<DerivativeFunctionFragment>(
-                    scope,
-                    mapOf(
-                        "function" to function
-                    )
-                ).openModal()
+            canvasViewModel.selectedFunctions.forEach { function ->
+                derivativeFunctionController.applyDerivative(function)
             }
         }
     },
@@ -58,8 +45,9 @@ class MathToolBar(
     }).apply {
         tooltip = Tooltip("Apply wavelet")
 
-        setOnAction {
-            val function = model.selectedFunction
+        //TODO: disabled until migration to Async Transformers
+        /*setOnAction {
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 val waveletDetails = function.waveletDetails
                 if (waveletDetails != null) {
@@ -74,7 +62,7 @@ class MathToolBar(
                     )
                 ).openModal()
             }
-        }
+        }*/
     },
     Button(null, ImageView(Image("integral.png")).apply {
         fitWidth = 20.0
@@ -83,7 +71,7 @@ class MathToolBar(
         tooltip = Tooltip("Find integral")
 
         setOnAction {
-            val function = model.selectedFunction
+            val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 find<FunctionIntegrationFragment>(
                     scope,

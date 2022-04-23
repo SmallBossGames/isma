@@ -17,7 +17,7 @@ import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
 class ConcatenationCanvas(
@@ -26,7 +26,7 @@ class ConcatenationCanvas(
     private val pressedMouseHandle: PressedMouseHandler,
     private val releaseMouseHandler: ReleaseMouseHandler,
     private val model: ConcatenationCanvasModel,
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
 ): Pane() {
     private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)

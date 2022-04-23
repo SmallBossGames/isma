@@ -6,13 +6,13 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.Offsets
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.axis.extensions.findFunctionsAreaInsets
 
 class AxisDrawElement(
     private val canvasModel: ConcatenationCanvasModel,
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val verticalAxisDraw: VerticalAxisDrawStrategy,
     private val horizontalAxisDraw: HorizontalAxisDrawStrategy,
 ) : ChainDrawElement {

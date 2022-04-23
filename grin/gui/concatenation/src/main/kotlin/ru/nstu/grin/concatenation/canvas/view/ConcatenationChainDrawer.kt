@@ -5,11 +5,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
-import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
+import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class ConcatenationChainDrawer(
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val model: ConcatenationCanvasModel,
     private val functionDrawElement: ConcatenationFunctionDrawElement,
     private val selectionDrawElement: SelectionDrawElement,

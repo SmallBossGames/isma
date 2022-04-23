@@ -13,7 +13,7 @@ import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
 import ru.nstu.grin.model.MathPoint
 
-class FunctionsOperationsService(
+class FunctionOperationsService(
     private val view: ConcatenationCanvas,
     private val matrixTransformer: MatrixTransformer,
     private val canvasModel: ConcatenationCanvasModel,

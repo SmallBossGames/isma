@@ -2,11 +2,11 @@ package ru.nstu.grin.concatenation.function.controller
 
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.DerivativeTransformerViewModel
-import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 
 class DerivativeFunctionController(
     private val function: ConcatenationFunction,
-    private val functionCanvasService: FunctionsOperationsService
+    private val functionCanvasService: FunctionOperationsService
 ){
     //TODO: disabled until migration to Async Transformers
     fun enableDerivative(model: DerivativeTransformerViewModel) {

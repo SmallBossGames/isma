@@ -12,24 +12,20 @@ import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
-import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
-import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
-import ru.nstu.grin.concatenation.function.transform.MirrorTransformer
+import ru.nstu.grin.concatenation.function.controller.MirrorFunctionController
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.view.ChangeFunctionFragment
 import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
-import ru.nstu.grin.concatenation.function.view.MirrorFunctionFragment
 import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
 import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import tornadofx.Scope
 import tornadofx.find
 
 class TransformToolBar(
-    private val scope: Scope,
     private val mainGrinScope: MainGrinScope,
     private val canvasViewModel: ConcatenationCanvasViewModel,
-    private val functionCanvasService: FunctionCanvasService,
-    private val functionsOperationsService: FunctionsOperationsService,
+    private val functionOperationsService: FunctionOperationsService,
+    private val mirrorFunctionController: MirrorFunctionController,
 ) : ToolBar(
     Button(null, ImageView(Image("edit-tool.png")).apply {
         fitWidth = 20.0
@@ -86,28 +82,8 @@ class TransformToolBar(
         tooltip = Tooltip("Mirror X")
 
         setOnAction {
-            val function = canvasViewModel.selectedFunctions.firstOrNull()
-
-            if (function == null) {
-                find<MirrorFunctionFragment>(
-                    scope,
-                    mapOf(MirrorFunctionFragment::isMirrorY to false)
-                ).openModal()
-            } else {
-                functionCanvasService.updateTransformer(function) { transformers ->
-                    val index = transformers.indexOfFirst { it is MirrorTransformer }
-
-                    if(index < 0){
-                        arrayOf(MirrorTransformer(mirrorX = true), *transformers)
-                    } else{
-                        val newTransformers = transformers.clone()
-                        val mirror = newTransformers[index] as MirrorTransformer
-                        newTransformers[index] = mirror.copy(mirrorX = !mirror.mirrorX)
-
-                        newTransformers
-                    }
-
-                }
+            canvasViewModel.selectedFunctions.forEach{
+                mirrorFunctionController.toggleMirrorFunction(it, byX = true)
             }
         }
     },
@@ -118,27 +94,8 @@ class TransformToolBar(
         tooltip = Tooltip("Mirror Y")
 
         setOnAction {
-            val function = canvasViewModel.selectedFunctions.firstOrNull()
-
-            if (function == null) {
-                find<MirrorFunctionFragment>(
-                    scope,
-                    mapOf(MirrorFunctionFragment::isMirrorY to true)
-                ).openModal()
-            } else {
-                functionCanvasService.updateTransformer(function) { transformers ->
-                    val index = transformers.indexOfFirst { it is MirrorTransformer }
-
-                    if(index < 0){
-                        arrayOf(MirrorTransformer(mirrorY = true), *transformers)
-                    } else{
-                        val newTransformers = transformers.clone()
-                        val mirror = newTransformers[index] as MirrorTransformer
-                        newTransformers[index] = mirror.copy(mirrorY = !mirror.mirrorY)
-
-                        newTransformers
-                    }
-                }
+            canvasViewModel.selectedFunctions.forEach{
+                mirrorFunctionController.toggleMirrorFunction(it, byY = true)
             }
         }
     },
@@ -154,7 +111,7 @@ class TransformToolBar(
             if (function == null) {
                 find<LocalizeFunctionFragment>().openModal()
             } else {
-                functionsOperationsService.localizeFunction(function)
+                functionOperationsService.localizeFunction(function)
             }
         }
     },

@@ -73,7 +73,7 @@ data class ConcatenationFunction(
     ): Boolean {
         val oldValue = transformedPointCache.get()
 
-        val newValue = PointsCache.create(points, operation(oldValue.transformers))
+        val newValue = PointsCache.create(points, operation(oldValue.transformers.clone()))
 
         return transformedPointCache.compareAndSet(oldValue, newValue)
     }

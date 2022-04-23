@@ -42,7 +42,7 @@ import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.controller.*
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.function.service.FunctionsOperationsService
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
@@ -118,13 +118,15 @@ val grinGuiModule = module {
         scopedOf(::ChartToolBar)
         scopedOf(::ModesToolBar)
         scopedOf(::MathToolBar)
+
         scopedOf(::TransformToolBar)
+        scopedOf(::MirrorFunctionController)
 
         scopedOf(::CartesianCanvasService)
         scopedOf(::DescriptionCanvasService)
         scopedOf(::AxisCanvasService)
         scopedOf(::FunctionCanvasService)
-        scopedOf(::FunctionsOperationsService)
+        scopedOf(::FunctionOperationsService)
 
         scopedOf(::ScalableScrollHandler)
         scopedOf(::DraggedHandler)

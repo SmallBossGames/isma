@@ -86,6 +86,23 @@ class FunctionCanvasService(
         model.reportFunctionsListUpdate()
     }
 
+    inline fun <reified T: IAsyncPointsTransformer> addOrUpdateLastTransformer(
+        function: ConcatenationFunction,
+        noinline operation: (T?) -> T
+    ) {
+        updateTransformer(function){ transformers ->
+            val last = transformers.lastOrNull()
+
+            if(last is T){
+                transformers[transformers.size - 1] = operation(last)
+
+                transformers
+            } else {
+                arrayOf(*transformers, operation(null))
+            }
+        }
+    }
+
     fun deleteFunction(function: ConcatenationFunction) {
         model.cartesianSpaces.forEach {
             it.functions.remove(function)

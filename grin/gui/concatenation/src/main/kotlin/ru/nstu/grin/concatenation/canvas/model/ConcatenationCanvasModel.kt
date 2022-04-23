@@ -31,7 +31,7 @@ class ConcatenationCanvasModel {
 
     var traceSettings: TraceSettings? = null
 
-    var moveSettings: MoveSettings? = null
+    var moveSettings: IMoveSettings? = null
 
     private val functionsListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationFunction>>()
     val functionsListUpdatedEvent = functionsListUpdatedEventInternal.asSharedFlow()

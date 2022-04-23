@@ -13,6 +13,8 @@ import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.transform.TranslateTransformer
 
 class DraggedHandler(
     private val model: ConcatenationCanvasModel,
@@ -20,6 +22,7 @@ class DraggedHandler(
     private val chainDrawer: ConcatenationChainDrawer,
     private val concatenationViewModel: ConcatenationViewModel,
     private val matrixTransformer: MatrixTransformer,
+    private val functionCanvasService: FunctionCanvasService,
 ) : EventHandler<MouseEvent> {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -63,9 +66,11 @@ class DraggedHandler(
         }
 
         if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
-            handleMoveMode(event)
+            val settings = model.moveSettings
 
-            uiLayerDirty = true
+            if(settings != null){
+                uiLayerDirty = handleMoveMode(event, settings)
+            }
         }
 
         if (uiLayerDirty){
@@ -154,47 +159,45 @@ class DraggedHandler(
         traceSettings.pressedPoint.y = y
     }
 
-    private fun handleMoveMode(event: MouseEvent) {
-        val moveSettings = model.moveSettings ?: return
-        when (moveSettings.type) {
-            MovedElementType.FUNCTION -> {
-                val xAxis = requireNotNull(moveSettings.xAxis) { "Function move event can't have null axises" }
-                val yAxis = requireNotNull(moveSettings.yAxis) { "Function move event can't have null axises" }
-                val xLeft = matrixTransformer.transformPixelToUnits(
+    private fun handleMoveMode(event: MouseEvent, moveSettings: IMoveSettings) : Boolean {
+        when(moveSettings){
+            is FunctionMoveSettings -> {
+                val startX = matrixTransformer.transformPixelToUnits(
                     moveSettings.pressedX,
-                    xAxis.scaleProperties,
-                    xAxis.direction
+                    moveSettings.xAxis.scaleProperties,
+                    moveSettings.xAxis.direction
                 )
-                val yLeft = matrixTransformer.transformPixelToUnits(
+                val startY = matrixTransformer.transformPixelToUnits(
                     moveSettings.pressedY,
-                    yAxis.scaleProperties,
-                    yAxis.direction
+                    moveSettings.yAxis.scaleProperties,
+                    moveSettings.yAxis.direction
                 )
-                val xRight = matrixTransformer.transformPixelToUnits(
+                val endX = matrixTransformer.transformPixelToUnits(
                     event.x,
-                    xAxis.scaleProperties,
-                    xAxis.direction
+                    moveSettings.xAxis.scaleProperties,
+                    moveSettings.xAxis.direction
                 )
-                val yRight = matrixTransformer.transformPixelToUnits(
+                val endY = matrixTransformer.transformPixelToUnits(
                     event.y,
-                    yAxis.scaleProperties,
-                    yAxis.direction
+                    moveSettings.yAxis.scaleProperties,
+                    moveSettings.yAxis.direction
                 )
-                val x = xLeft - xRight
-                val y = yLeft - yRight
-                println("Moved x=$x y=$y")
-                val function =
-                    model.cartesianSpaces.map { it.functions }.flatten().firstOrNull { it.id == moveSettings.id }
-                        ?: return
-                function.points.forEach {
-                    it.x -= x
-                    it.y -= y
+                val x = endX - startX
+                val y = endY - startY
+
+                functionCanvasService.addOrUpdateLastTransformer<TranslateTransformer>(moveSettings.function){
+                    TranslateTransformer(x, y)
                 }
+
+                return false
             }
-            MovedElementType.DESCRIPTION -> {
-                val description = model.descriptions.firstOrNull { it.id == moveSettings.id } ?: return
-                description.x = event.x
-                description.y = event.y
+            is DescriptionMoveSettings -> {
+                moveSettings.description.apply {
+                    x = event.x
+                    y = event.y
+                }
+
+                return true
             }
         }
     }

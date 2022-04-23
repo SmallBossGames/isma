@@ -8,20 +8,14 @@ class MirrorFunctionController(
     private val functionCanvasService: FunctionCanvasService,
 ) {
     fun toggleMirrorFunction(function: ConcatenationFunction, byX: Boolean = false, byY: Boolean = false){
-        functionCanvasService.updateTransformer(function) { transformers ->
-            val lastTransformer = transformers.lastOrNull()
+        functionCanvasService.addOrUpdateLastTransformer<MirrorTransformer>(function){ transformer ->
+            if(transformer != null){
+                val mirrorX = if(byX) !transformer.mirrorX else transformer.mirrorX
+                val mirrorY = if(byY) !transformer.mirrorY else transformer.mirrorY
 
-            if (lastTransformer is MirrorTransformer){
-                val mirrorX = if(byX) !lastTransformer.mirrorX else lastTransformer.mirrorX
-                val mirrorY = if(byY) !lastTransformer.mirrorY else lastTransformer.mirrorY
-
-                transformers[transformers.size - 1] = MirrorTransformer(mirrorX, mirrorY)
-
-                transformers
+                MirrorTransformer(mirrorX, mirrorY)
             } else {
-                val newArray = arrayOf(*transformers, MirrorTransformer(byX, byY))
-
-                newArray
+                MirrorTransformer(byX, byY)
             }
         }
     }

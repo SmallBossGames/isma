@@ -187,16 +187,14 @@ class PressedMouseHandler(
             }
 
         if (description != null) {
-            canvasModel.moveSettings = MoveSettings(
-                id = description.id,
-                type = MovedElementType.DESCRIPTION,
+            canvasModel.moveSettings = DescriptionMoveSettings(
+                description = description,
                 pressedX = event.x,
                 pressedY = event.y
             )
         } else if (function != null && cartesian != null) {
-            canvasModel.moveSettings = MoveSettings(
-                id = function.id,
-                type = MovedElementType.FUNCTION,
+            canvasModel.moveSettings = FunctionMoveSettings(
+                function = function,
                 xAxis = cartesian.xAxis,
                 yAxis = cartesian.yAxis,
                 pressedX = event.x,

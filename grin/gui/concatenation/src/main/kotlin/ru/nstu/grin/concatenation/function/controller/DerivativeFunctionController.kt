@@ -10,26 +10,10 @@ class DerivativeFunctionController(
     private val functionCanvasService: FunctionCanvasService
 ){
     fun applyDerivative(function: ConcatenationFunction) {
-        functionCanvasService.updateTransformer(function) { transformers ->
-            val lastTransformer = transformers.lastOrNull()
-
-            if (lastTransformer is DerivativeTransformer){
-                transformers[transformers.size - 1] = lastTransformer.copy(
-                    degree = lastTransformer.degree + 1
-                )
-
-                transformers
-            } else {
-                val transformer = DerivativeTransformer(
-                    degree = 1,
-                    type = DerivativeType.LEFT,
-                    axis = DerivativeAxis.Y_BY_X
-                )
-
-                val newArray = arrayOf(*transformers, transformer)
-
-                newArray
-            }
+        functionCanvasService.addOrUpdateLastTransformer<DerivativeTransformer>(function){ transformer ->
+            transformer
+                ?.copy(degree = transformer.degree + 1)
+                ?: DerivativeTransformer(1, DerivativeType.LEFT, DerivativeAxis.Y_BY_X)
         }
     }
 }

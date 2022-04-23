@@ -6,17 +6,16 @@ import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
-import ru.nstu.grin.concatenation.function.view.DerivativeFunctionFragment
+import ru.nstu.grin.concatenation.function.controller.DerivativeFunctionController
 import ru.nstu.grin.concatenation.function.view.FunctionIntegrationFragment
 import ru.nstu.grin.concatenation.function.view.IntersectionFunctionFragment
-import ru.nstu.grin.concatenation.function.view.WaveletFunctionFragment
 import tornadofx.Scope
 import tornadofx.find
 
 class MathToolBar(
     scope: Scope,
     canvasViewModel: ConcatenationCanvasViewModel,
-    drawer: ConcatenationChainDrawer,
+    derivativeFunctionController: DerivativeFunctionController,
 ): ToolBar(
     Button(null, ImageView(Image("intersection.png")).apply {
         fitWidth = 20.0
@@ -35,22 +34,9 @@ class MathToolBar(
         tooltip = Tooltip("Apply derivative")
 
         setOnAction {
-            //TODO: disabled until migration to Async Transformers
-            /*val function = canvasViewModel.selectedFunctions.firstOrNull()
-            if (function != null) {
-                val derivativeDetails = function.derivativeDetails
-                if (derivativeDetails != null) {
-                    function.derivativeDetails = null
-                    drawer.draw()
-                    return@setOnAction
-                }
-                find<DerivativeFunctionFragment>(
-                    scope,
-                    mapOf(
-                        "function" to function
-                    )
-                ).openModal()
-            }*/
+            canvasViewModel.selectedFunctions.forEach { function ->
+                derivativeFunctionController.applyDerivative(function)
+            }
         }
     },
     Button(null, ImageView(Image("wavelet.png")).apply {

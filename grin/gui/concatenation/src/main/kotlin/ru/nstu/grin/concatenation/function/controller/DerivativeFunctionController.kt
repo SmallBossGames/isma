@@ -1,15 +1,35 @@
 package ru.nstu.grin.concatenation.function.controller
 
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.model.DerivativeTransformerViewModel
-import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.transform.DerivativeAxis
+import ru.nstu.grin.concatenation.function.transform.DerivativeTransformer
+import ru.nstu.grin.concatenation.function.transform.DerivativeType
 
 class DerivativeFunctionController(
-    private val function: ConcatenationFunction,
-    private val functionCanvasService: FunctionOperationsService
+    private val functionCanvasService: FunctionCanvasService
 ){
-    //TODO: disabled until migration to Async Transformers
-    fun enableDerivative(model: DerivativeTransformerViewModel) {
-        functionCanvasService.derivativeFunction(function, model.type, model.degree)
+    fun applyDerivative(function: ConcatenationFunction) {
+        functionCanvasService.updateTransformer(function) { transformers ->
+            val lastTransformer = transformers.lastOrNull()
+
+            if (lastTransformer is DerivativeTransformer){
+                transformers[transformers.size - 1] = lastTransformer.copy(
+                    degree = lastTransformer.degree + 1
+                )
+
+                transformers
+            } else {
+                val transformer = DerivativeTransformer(
+                    degree = 1,
+                    type = DerivativeType.LEFT,
+                    axis = DerivativeAxis.Y_BY_X
+                )
+
+                val newArray = arrayOf(*transformers, transformer)
+
+                newArray
+            }
+        }
     }
 }

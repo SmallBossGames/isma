@@ -117,7 +117,9 @@ val grinGuiModule = module {
 
         scopedOf(::ChartToolBar)
         scopedOf(::ModesToolBar)
+
         scopedOf(::MathToolBar)
+        scopedOf(::DerivativeFunctionController)
 
         scopedOf(::TransformToolBar)
         scopedOf(::MirrorFunctionController)

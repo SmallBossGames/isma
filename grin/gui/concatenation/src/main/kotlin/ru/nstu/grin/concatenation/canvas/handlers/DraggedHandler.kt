@@ -3,12 +3,9 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
-import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
+import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.*
@@ -24,8 +21,6 @@ class DraggedHandler(
     private val matrixTransformer: MatrixTransformer,
     private val functionCanvasService: FunctionCanvasService,
 ) : EventHandler<MouseEvent> {
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
 
     override fun handle(event: MouseEvent) {
@@ -73,10 +68,8 @@ class DraggedHandler(
             }
         }
 
-        if (uiLayerDirty){
-            coroutineScope.launch {
-                chainDrawer.drawUiLayer()
-            }
+        if (uiLayerDirty) {
+            chainDrawer.drawUiLayer()
         }
     }
 

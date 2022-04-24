@@ -4,15 +4,12 @@ import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.*
-import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.canvas.view.CartesianCanvasContextMenuController
+import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointSettings
 
@@ -24,7 +21,6 @@ class PressedMouseHandler(
     private val chainDrawer: ConcatenationChainDrawer,
     private val editModeViewModel: EditModeViewModel,
 ) : EventHandler<MouseEvent> {
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     override fun handle(event: MouseEvent) {
         contextMenuDrawElement.hide()
@@ -38,10 +34,8 @@ class PressedMouseHandler(
             else -> false
         }
 
-        if(updateUi){
-            coroutineScope.launch {
-                chainDrawer.drawUiLayer()
-            }
+        if(updateUi) {
+            chainDrawer.drawUiLayer()
         }
     }
 

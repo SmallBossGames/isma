@@ -5,16 +5,15 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
-import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
 import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class ConcatenationChainDrawer(
@@ -29,31 +28,30 @@ class ConcatenationChainDrawer(
     private val descriptionDrawElement: DescriptionDrawElement,
     private val matrixTransformer: MatrixTransformer,
 ) : ChainDrawer {
-    private val drawingInProgress = AtomicBoolean(false)
-    private val transformationJob = AtomicReference<Job>(null)
+    private val coroutinesScope = CoroutineScope(Dispatchers.Default)
+
+    private val drawingJob = AtomicReference<Job?>(null)
 
     override fun draw() {
-        val transformationJobLocal = transformationJob.getAndSet(
-            CoroutinesScope.launch {
-                spacesTransformationController.transformSpaces()
+        val newJob = coroutinesScope.launch {
+            spacesTransformationController.transformSpaces()
+
+            withContext(Dispatchers.JavaFx){
+                drawFunctionsLayerInternal()
+                drawUiLayerInternal()
             }
-        )
 
-        transformationJobLocal?.cancel()
-
-        if (drawingInProgress.compareAndSet(false, true)) {
-            CoroutinesScope.launch {
-                while (transformationJob.getAndSet(null)?.join() != null){
-                    drawFunctionsLayer()
-                    drawUiLayer()
-                }
-
-                drawingInProgress.set(false)
-            }
+            drawingJob.setRelease(null)
         }
+
+        drawingJob.getAndSet(newJob)?.cancel()
     }
 
-    suspend fun drawFunctionsLayer() = withContext(Dispatchers.JavaFx) {
+    fun drawUiLayer() = coroutinesScope.launch(Dispatchers.JavaFx) {
+        drawUiLayerInternal()
+    }
+
+    private fun drawFunctionsLayerInternal() {
         canvasViewModel.functionsLayerContext.apply {
             val width = canvasViewModel.canvasWidth
             val height = canvasViewModel.canvasHeight
@@ -82,8 +80,7 @@ class ConcatenationChainDrawer(
         }
     }
 
-
-    suspend fun drawUiLayer() = withContext(Dispatchers.JavaFx) {
+    private fun drawUiLayerInternal() {
         canvasViewModel.uiLayerContext.apply {
             val width = canvasViewModel.canvasWidth
             val height = canvasViewModel.canvasHeight
@@ -95,9 +92,5 @@ class ConcatenationChainDrawer(
             pointTooltipsDrawElement.draw(this, width, height)
             selectionDrawElement.draw(this, width, height)
         }
-    }
-
-    private companion object {
-        val CoroutinesScope = CoroutineScope(Dispatchers.Default)
     }
 }

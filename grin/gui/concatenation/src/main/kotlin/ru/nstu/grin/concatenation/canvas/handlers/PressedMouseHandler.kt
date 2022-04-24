@@ -54,7 +54,7 @@ class PressedMouseHandler(
                 .firstOrNull {
                     val pixels = it.pixelsToDraw ?: return@firstOrNull false
 
-                    return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+                    ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
                 }
 
             if(function != null){
@@ -171,21 +171,9 @@ class PressedMouseHandler(
     }
 
     private fun handleMoveMode(event: MouseEvent) {
-        val description = canvasModel.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
-        val function = canvasModel.cartesianSpaces.map { it.functions }.flatten()
-            .firstOrNull {
-                val pixels = it.pixelsToDraw ?: return@firstOrNull false
-
-                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
-            }
-        val cartesian =
-            canvasModel.cartesianSpaces.firstOrNull {
-                it.functions.any {
-                    val pixels = it.pixelsToDraw ?: return@firstOrNull false
-
-                    return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
-                }
-            }
+        val description = canvasViewModel.selectedDescriptions.firstOrNull()
+        val function = canvasViewModel.selectedFunctions.firstOrNull()
+        val cartesian = canvasModel.cartesianSpaces.firstOrNull{ it.functions.contains(function) }
 
         if (description != null) {
             editModeViewModel.moveSettings = DescriptionMoveSettings(

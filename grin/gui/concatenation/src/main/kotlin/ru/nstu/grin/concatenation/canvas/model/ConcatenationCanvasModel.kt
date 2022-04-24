@@ -12,7 +12,6 @@ import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.points.model.PointToolTipsSettings
 
 class ConcatenationCanvasModel {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
@@ -26,12 +25,6 @@ class ConcatenationCanvasModel {
     val arrows = observableArrayList<Arrow>()!!
 
     val descriptions = observableArrayList<Description>()!!
-
-    val pointToolTipSettings = PointToolTipsSettings(false, mutableSetOf())
-
-    var traceSettings: TraceSettings? = null
-
-    var moveSettings: IMoveSettings? = null
 
     private val functionsListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationFunction>>()
     val functionsListUpdatedEvent = functionsListUpdatedEventInternal.asSharedFlow()

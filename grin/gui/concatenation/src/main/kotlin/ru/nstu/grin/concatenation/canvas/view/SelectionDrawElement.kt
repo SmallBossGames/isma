@@ -3,15 +3,15 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.paint.Color
 import ru.nstu.grin.common.view.ChainDrawElement
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
 import kotlin.math.abs
 import kotlin.math.min
 
 class SelectionDrawElement(
-    private val canvasViewModel: ConcatenationCanvasViewModel,
+    private val editModeViewModel: EditModeViewModel,
 ) : ChainDrawElement {
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
-        val (isFirstPointSelected, isSecondPointSelected, firstPoint, secondPoint) = canvasViewModel.selectionSettings
+        val (isFirstPointSelected, isSecondPointSelected, firstPoint, secondPoint) = editModeViewModel.selectionSettings
 
         if (!isFirstPointSelected || !isSecondPointSelected) {
             return

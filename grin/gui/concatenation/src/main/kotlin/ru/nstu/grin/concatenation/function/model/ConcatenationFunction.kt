@@ -1,41 +1,18 @@
 package ru.nstu.grin.concatenation.function.model
 
 import javafx.scene.paint.Color
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 class PointsCache(
+    val transformersCandidate: Array<IAsyncPointsTransformer>,
     val transformers: Array<IAsyncPointsTransformer>,
     val transformedPointsX: DoubleArray,
     val transformedPointsY: DoubleArray,
-) {
-    companion object {
-        suspend fun create(
-            points: List<Point>,
-            transformers: Array<IAsyncPointsTransformer>
-        ): PointsCache = coroutineScope {
-            var xPoints = DoubleArray(points.size)
-            var yPoints = DoubleArray(points.size)
-
-            for (i in points.indices){
-                xPoints[i] = points[i].x
-                yPoints[i] = points[i].y
-            }
-
-            for (transformer in transformers){
-                val (newXPoints, newYPoints) = transformer.transform(xPoints, yPoints)
-
-                xPoints = newXPoints
-                yPoints = newYPoints
-            }
-
-            PointsCache(transformers, xPoints, yPoints)
-        }
-    }
-}
+)
 
 /**
  * @author kostya05983
@@ -52,7 +29,8 @@ data class ConcatenationFunction(
 
     private val transformedPointCache = AtomicReference(
         PointsCache(
-            arrayOf(),
+            emptyTransformersArray,
+            emptyTransformersArray,
             points.map { it.x }.toDoubleArray(),
             points.map { it.y }.toDoubleArray(),
         )
@@ -68,14 +46,78 @@ data class ConcatenationFunction(
 
     var pixelsToDraw: Pair<DoubleArray, DoubleArray>? = null
 
+    private val cacheUpdateJob = AtomicReference<Job?>(null)
+
     suspend fun updateTransformersTransaction(
         operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
-    ): Boolean {
-        val oldValue = transformedPointCache.get()
+    ): Boolean = coroutineScope {
+        val oldCache = transformedPointCache.get()
 
-        val newValue = PointsCache.create(points, operation(oldValue.transformers.clone()))
+        val newCache = PointsCache(
+            operation(oldCache.transformersCandidate.clone()),
+            oldCache.transformers,
+            oldCache.transformedPointsX,
+            oldCache.transformedPointsY,
+        )
 
-        return transformedPointCache.compareAndSet(oldValue, newValue)
+        if (!transformedPointCache.compareAndSet(oldCache, newCache)) {
+            return@coroutineScope false
+        }
+
+        val updateJob = launch(start = CoroutineStart.LAZY) {
+            applyCacheCandidate()
+        }
+
+        val currentJob = cacheUpdateJob.compareAndExchangeAcquire(null, updateJob) ?: updateJob
+
+        currentJob.join()
+
+        cacheUpdateJob.setRelease(null)
+
+        return@coroutineScope true
+    }
+
+
+    private suspend fun applyCacheCandidate() {
+        mainLoop@ do {
+            val originCache = transformedPointCache.get()
+
+            if (originCache.transformersCandidate === originCache.transformers) {
+                break
+            }
+
+            val newTransformers = originCache.transformersCandidate
+
+            var xPoints = DoubleArray(points.size)
+            var yPoints = DoubleArray(points.size)
+
+            for (i in points.indices) {
+                xPoints[i] = points[i].x
+                yPoints[i] = points[i].y
+            }
+
+            for (transformer in newTransformers) {
+                if (transformedPointCache.get() !== originCache) {
+                    continue@mainLoop
+                }
+
+                val (newXPoints, newYPoints) = transformer.transform(xPoints, yPoints)
+
+                xPoints = newXPoints
+                yPoints = newYPoints
+            }
+
+            val newCache = PointsCache(
+                newTransformers,
+                newTransformers,
+                xPoints,
+                yPoints
+            )
+
+            if (transformedPointCache.compareAndSet(originCache, newCache)) {
+                break
+            }
+        } while (true)
     }
 
     public override fun clone(): ConcatenationFunction {
@@ -90,6 +132,8 @@ data class ConcatenationFunction(
     }
 
     companion object {
+        private val emptyTransformersArray = emptyArray<IAsyncPointsTransformer>()
+
         fun isPixelsNearBy(xPixels: DoubleArray, yPixels: DoubleArray, x: Double, y:Double) : Boolean {
             for (i in xPixels.indices) {
 

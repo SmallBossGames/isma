@@ -5,33 +5,31 @@ import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
 import ru.nstu.grin.concatenation.canvas.model.EditMode
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 
 class ReleaseMouseHandler(
     private val model: ConcatenationCanvasModel,
-    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
-    private val concatenationViewModel: ConcatenationViewModel,
+    private val editModeViewModel: EditModeViewModel,
     private val matrixTransformer: MatrixTransformer,
 ) : EventHandler<MouseEvent> {
 
     override fun handle(event: MouseEvent) {
-        val editMode = concatenationViewModel.currentEditMode
+        val editMode = editModeViewModel.currentEditMode
 
         if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
             println("Release primary button")
-            model.traceSettings = null
+            editModeViewModel.traceSettings = null
         }
 
         if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
-            model.moveSettings = null
+            editModeViewModel.moveSettings = null
         }
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && event.button == MouseButton.PRIMARY) {
-            val selectionSettings = canvasViewModel.selectionSettings
+            val selectionSettings = editModeViewModel.selectionSettings
 
             val area = selectionSettings.area
             if (area < 10.0) {

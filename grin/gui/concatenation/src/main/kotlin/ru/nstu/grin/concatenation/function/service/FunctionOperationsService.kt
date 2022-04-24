@@ -4,6 +4,7 @@ import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointSettings
@@ -16,6 +17,7 @@ class FunctionOperationsService(
     private val view: ConcatenationCanvas,
     private val matrixTransformer: MatrixTransformer,
     private val canvasModel: ConcatenationCanvasModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
 ) {
     fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
         val interactionSearcher = IntersectionSearcher()
@@ -78,8 +80,8 @@ class FunctionOperationsService(
                 )
             }
 
-        canvasModel.pointToolTipSettings.isShow = true
-        canvasModel.pointToolTipSettings.pointsSettings.addAll(transformed)
+        canvasViewModel.pointToolTipSettings.isShow = true
+        canvasViewModel.pointToolTipSettings.pointsSettings.addAll(transformed)
 
         view.redraw()
     }

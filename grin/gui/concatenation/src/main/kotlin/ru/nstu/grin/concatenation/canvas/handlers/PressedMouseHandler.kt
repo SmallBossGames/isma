@@ -22,23 +22,38 @@ class PressedMouseHandler(
     private val canvasController: ConcatenationCanvasController,
     private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
-    private val concatenationViewModel: ConcatenationViewModel,
+    private val editModeViewModel: EditModeViewModel,
 ) : EventHandler<MouseEvent> {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     override fun handle(event: MouseEvent) {
-        var isUiLayerDirty = false
-
-        closeContextMenu()
-
+        contextMenuDrawElement.hide()
         canvasController.unselectAll()
-        val editMode = concatenationViewModel.currentEditMode
-        val isOnAxis = isOnAxis(event)
 
-        if ((editMode == EditMode.SELECTION || editMode == EditMode.MOVE) && event.button == MouseButton.PRIMARY) {
+        val editMode = editModeViewModel.currentEditMode
+
+        val updateUi = when(event.button) {
+            MouseButton.PRIMARY -> handlePrimaryButtonDown(event, editMode)
+            MouseButton.SECONDARY -> handleSecondaryButtonDown(event)
+            else -> false
+        }
+
+        if(updateUi){
+            coroutineScope.launch {
+                chainDrawer.drawUiLayer()
+            }
+        }
+    }
+
+    private fun handlePrimaryButtonDown(event: MouseEvent, editMode: EditMode): Boolean {
+        var updateUI = false
+
+        if (editMode == EditMode.SELECTION || editMode == EditMode.MOVE) {
             val description = canvasModel.descriptions.firstOrNull { it.isLocated(event.x, event.y) }
             if(description != null){
                 canvasViewModel.selectedDescriptions.add(description)
+
+                updateUI = true
             }
 
             val function = canvasModel.cartesianSpaces.map { it.functions }.flatten()
@@ -50,54 +65,46 @@ class PressedMouseHandler(
 
             if(function != null){
                 canvasViewModel.selectedFunctions.add(function)
-            }
 
-            isUiLayerDirty = true
+                updateUI = true
+            }
         }
 
-        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
-            if (event.button == MouseButton.PRIMARY) {
-                canvasViewModel.selectionSettings.isFirstPointSelected = true
-                canvasViewModel.selectionSettings.firstPoint = Point(event.x, event.y)
-            }
+        if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis(event)) {
+            editModeViewModel.selectionSettings.isFirstPointSelected = true
+            editModeViewModel.selectionSettings.firstPoint = Point(event.x, event.y)
 
-            isUiLayerDirty = true
+            updateUI = true
         }
 
-        if (editMode == EditMode.EDIT && event.button == MouseButton.PRIMARY) {
+        if (editMode == EditMode.EDIT) {
             handleEditMode(event)
 
-            isUiLayerDirty = true
+            updateUI = true
         }
 
-        if (event.button == MouseButton.SECONDARY) {
-            canvasModel.pointToolTipSettings.isShow = false
-            canvasModel.pointToolTipSettings.pointsSettings.clear()
-
-            isUiLayerDirty = true
-        }
-
-        if (editMode == EditMode.VIEW && event.button == MouseButton.PRIMARY) {
+        if (editMode == EditMode.VIEW) {
             handleViewMode(event)
 
-            isUiLayerDirty = true
+            updateUI = true
         }
 
-        if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
+        if (editMode == EditMode.MOVE) {
             handleMoveMode(event)
 
-            isUiLayerDirty = true
+            updateUI = true
         }
 
-        if (event.button == MouseButton.SECONDARY) {
-            showContextMenu(event)
-        }
+        return updateUI
+    }
 
-        if(isUiLayerDirty){
-            coroutineScope.launch {
-                chainDrawer.drawUiLayer()
-            }
-        }
+    private fun handleSecondaryButtonDown(event: MouseEvent): Boolean {
+        canvasViewModel.pointToolTipSettings.isShow = false
+        canvasViewModel.pointToolTipSettings.pointsSettings.clear()
+
+        showContextMenu(event)
+
+        return true
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
@@ -126,7 +133,7 @@ class PressedMouseHandler(
             pixels.first, pixels.second, event.x, event.y
         )
 
-        val pointToolTipSettings = canvasModel.pointToolTipSettings
+        val pointToolTipSettings = canvasViewModel.pointToolTipSettings
         pointToolTipSettings.isShow = true
         val pointSettings = PointSettings(
             cartesianSpace.xAxis.scaleProperties,
@@ -162,7 +169,7 @@ class PressedMouseHandler(
             }
         }.firstOrNull() ?: return
         val (xAxis, yAxis, point) = triple
-        canvasModel.traceSettings = TraceSettings(
+        editModeViewModel.traceSettings = TraceSettings(
             pressedPoint = point,
             xAxis = xAxis,
             yAxis = yAxis
@@ -187,24 +194,20 @@ class PressedMouseHandler(
             }
 
         if (description != null) {
-            canvasModel.moveSettings = DescriptionMoveSettings(
+            editModeViewModel.moveSettings = DescriptionMoveSettings(
                 description = description,
-                pressedX = event.x,
-                pressedY = event.y
+                currentX = event.x,
+                currentY = event.y
             )
         } else if (function != null && cartesian != null) {
-            canvasModel.moveSettings = FunctionMoveSettings(
+            editModeViewModel.moveSettings = FunctionMoveSettings(
                 function = function,
                 xAxis = cartesian.xAxis,
                 yAxis = cartesian.yAxis,
-                pressedX = event.x,
-                pressedY = event.y
+                currentX = event.x,
+                currentY = event.y
             )
         }
-    }
-
-    private fun closeContextMenu(){
-        contextMenuDrawElement.hide()
     }
 
     private fun showContextMenu(event: MouseEvent) {

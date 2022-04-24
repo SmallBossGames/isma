@@ -7,21 +7,21 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.AxisScalingType
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 import ru.nstu.grin.concatenation.points.model.PointSettings
 import kotlin.math.pow
 
 class PointTooltipsDrawElement(
     private val mainGrinScope: MainGrinScope,
-    private val model: ConcatenationCanvasModel,
     private val transformer: MatrixTransformer,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
 ) : ChainDrawElement {
     private val pointTooltips = mutableListOf<Tooltip>()
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
         val stage = mainGrinScope.primaryStage
-        val filteredPoints = model.pointToolTipSettings.pointsSettings.filter { pointSettings ->
+        val filteredPoints = canvasViewModel.pointToolTipSettings.pointsSettings.filter { pointSettings ->
             !pointTooltips.any { it.text == formatText(pointSettings) }
         }
         context.stroke = Color.BLACK
@@ -37,7 +37,7 @@ class PointTooltipsDrawElement(
             context.stroke = Color.BLACK
             pointTooltips.add(pointToolTip)
         }
-        for (pointSettings in model.pointToolTipSettings.pointsSettings) {
+        for (pointSettings in canvasViewModel.pointToolTipSettings.pointsSettings) {
             context.strokeLine(
                 pointSettings.xGraphic - SIZE_OF_CROSS,
                 pointSettings.yGraphic,
@@ -51,7 +51,7 @@ class PointTooltipsDrawElement(
                 pointSettings.yGraphic + SIZE_OF_CROSS
             )
         }
-        if (model.pointToolTipSettings.isShow.not()) {
+        if (canvasViewModel.pointToolTipSettings.isShow.not()) {
             pointTooltips.forEach { it.hide() }
             pointTooltips.clear()
         }

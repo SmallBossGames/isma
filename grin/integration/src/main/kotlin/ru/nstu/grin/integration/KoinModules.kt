@@ -18,7 +18,7 @@ import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.canvas.view.*
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
@@ -77,7 +77,7 @@ val grinGuiModule = module {
         scopedOf(::ElementsView)
 
         scopedOf(::ConcatenationCanvas)
-        scopedOf(::ConcatenationViewModel)
+        scopedOf(::EditModeViewModel)
         scopedOf(::ConcatenationCanvasViewModel)
         scopedOf(::ConcatenationCanvasController)
         scopedOf(::ConcatenationCanvasModel)

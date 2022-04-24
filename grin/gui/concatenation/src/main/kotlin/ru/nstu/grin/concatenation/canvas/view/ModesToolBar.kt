@@ -5,11 +5,11 @@ import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
 import ru.nstu.grin.concatenation.canvas.model.EditMode
 
 class ModesToolBar(
-    private val model: ConcatenationViewModel
+    private val model: EditModeViewModel
 ): ToolBar(
     Button(null, ImageView(Image("view-tool.png")).apply {
         fitWidth = 20.0

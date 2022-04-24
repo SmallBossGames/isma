@@ -5,20 +5,20 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 
 sealed interface IMoveSettings {
-    val pressedX: Double
-    val pressedY: Double
+    val currentX: Double
+    val currentY: Double
 }
 
 data class FunctionMoveSettings(
-    override val pressedX: Double,
-    override val pressedY: Double,
+    override var currentX: Double,
+    override var currentY: Double,
     val function: ConcatenationFunction,
     val xAxis: ConcatenationAxis,
     val yAxis: ConcatenationAxis,
 ) : IMoveSettings
 
 data class DescriptionMoveSettings(
-    override val pressedX: Double,
-    override val pressedY: Double,
+    override val currentX: Double,
+    override val currentY: Double,
     val description: Description,
 ) : IMoveSettings

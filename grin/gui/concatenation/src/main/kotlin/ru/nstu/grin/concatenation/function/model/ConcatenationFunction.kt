@@ -21,7 +21,8 @@ class PointsCache(
  */
 class ConcatenationFunction(
     var name: String,
-    val points: List<Point>,
+    val xPoints: DoubleArray,
+    val yPoints: DoubleArray,
     var isHide: Boolean = false,
     var functionColor: Color,
     var lineSize: Double,
@@ -32,8 +33,8 @@ class ConcatenationFunction(
         PointsCache(
             emptyTransformersArray,
             emptyTransformersArray,
-            points.map { it.x }.toDoubleArray(),
-            points.map { it.y }.toDoubleArray(),
+            xPoints,
+            yPoints,
         )
     )
 
@@ -87,13 +88,8 @@ class ConcatenationFunction(
 
             val newTransformers = originCache.transformersCandidate
 
-            var xPoints = DoubleArray(points.size)
-            var yPoints = DoubleArray(points.size)
-
-            for (i in points.indices) {
-                xPoints[i] = points[i].x
-                yPoints[i] = points[i].y
-            }
+            var xPoints = xPoints.clone()
+            var yPoints = yPoints.clone()
 
             for (transformer in newTransformers) {
                 if (transformedPointCache.get() !== originCache) {
@@ -123,13 +119,14 @@ class ConcatenationFunction(
 
     fun copy(
         name: String = this.name,
-        points: List<Point> = this.points,
+        xPoints: DoubleArray = this.xPoints,
+        yPoints: DoubleArray = this.yPoints,
         isHide: Boolean = this.isHide,
         functionColor: Color = this.functionColor,
         lineSize: Double = this.lineSize,
         lineType: LineType = this.lineType,
     ): ConcatenationFunction {
-        return ConcatenationFunction(name, points, isHide, functionColor, lineSize, lineType).also {
+        return ConcatenationFunction(name, xPoints, yPoints, isHide, functionColor, lineSize, lineType).also {
             it.transformedPointCache.set(transformedPointCache.get())
         }
     }

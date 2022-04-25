@@ -153,7 +153,7 @@ class PressedMouseHandler(
                     val index = ConcatenationFunction.indexOfPixelsNearBy(
                         pixels.first, pixels.second, event.x, event.y
                     )
-                    points[index]
+                    Point(xPoints[index], yPoints[index])
                 }
 
             if (point != null) {

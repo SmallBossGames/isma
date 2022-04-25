@@ -5,12 +5,12 @@ import javafx.scene.text.Font
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.model.*
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
-import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.function.transform.*
 import java.util.*
 
@@ -43,18 +43,13 @@ data class CartesianSpaceSnapshot(
 @Serializable
 data class ConcatenationFunctionSnapshot(
     val name: String,
-    val points: List<PointSnapshot>,
+    val xPoints: List<Double>,
+    val yPoints: List<Double>,
     val isHide: Boolean,
     val functionColor: ColorSnapshot,
     val lineSize: Double,
     val lineType: LineType,
     val transformers: List<TransformerSnapshot>
-)
-
-@Serializable
-data class PointSnapshot(
-    val x: Double,
-    val y: Double,
 )
 
 @Serializable
@@ -227,16 +222,13 @@ fun ConcatenationAxis.toSnapshot() =
         scaleProperties = scaleProperties.toSnapshot(),
     )
 
-fun PointSnapshot.toModel() = Point(x, y)
-
-fun Point.toSnapshot() = PointSnapshot(x, y)
-
 fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
     val transformersFromSnapshot = transformers.map { it.toModel() }.toTypedArray()
 
     return ConcatenationFunction(
         name = name,
-        points = points.map { it.toModel() },
+        xPoints = xPoints.toDoubleArray(),
+        yPoints = yPoints.toDoubleArray(),
         isHide = isHide,
         functionColor = functionColor.toModel(),
         lineSize = lineSize,
@@ -253,7 +245,8 @@ fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
 fun ConcatenationFunction.toSnapshot() =
     ConcatenationFunctionSnapshot(
         name = name,
-        points = points.map { it.toSnapshot() },
+        xPoints = xPoints.toList(),
+        yPoints = yPoints.toList(),
         isHide = isHide,
         functionColor = functionColor.toSnapshot(),
         lineSize = lineSize,

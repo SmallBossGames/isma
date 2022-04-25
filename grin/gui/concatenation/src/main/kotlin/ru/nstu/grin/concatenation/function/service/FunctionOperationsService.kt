@@ -11,7 +11,6 @@ import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
 import ru.nstu.grin.model.Function
-import ru.nstu.grin.model.MathPoint
 
 class FunctionOperationsService(
     private val view: ConcatenationCanvas,
@@ -21,12 +20,18 @@ class FunctionOperationsService(
 ) {
     fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
         val interactionSearcher = IntersectionSearcher()
+
+        val firstTransformedPoints = firstFunction.transformedPoints
         val firstFunc = Function(
-            firstFunction.points.map { Pair(it.x.round(), it.y.round()) }
+            firstTransformedPoints.first.roundValues(),
+            firstTransformedPoints.second.roundValues(),
         )
         val firstCartesianSpace = canvasModel.cartesianSpaces.first { it.functions.contains(firstFunction) }
+
+        val secondTransformedPoints = firstFunction.transformedPoints
         val secondFunc = Function(
-            secondFunction.points.map { Pair(it.x.round(), it.y.round()) }
+            secondTransformedPoints.first.roundValues(),
+            secondTransformedPoints.second.roundValues(),
         )
         val secondCartesianSpace = canvasModel.cartesianSpaces.first { it.functions.contains(secondFunction) }
 
@@ -107,8 +112,9 @@ class FunctionOperationsService(
         leftBorder: Double,
         rightBorder: Double
     ) {
-        val min = function.points.minOf { it.x }
-        val max = function.points.maxOf { it.x }
+        val transformedPoints = function.transformedPoints
+        val min = transformedPoints.first.minOrNull() ?: 0.0
+        val max = transformedPoints.second.maxOrNull() ?: 0.0
         if (min > leftBorder) {
             tornadofx.error("Левая граница не может быть меньше минимума функции")
             return
@@ -117,9 +123,9 @@ class FunctionOperationsService(
             tornadofx.error("Правaя граница не может быть больше максимума функции")
         }
         val integral = Integration.trapeze(
-            function.points
-                .filter { it.x > leftBorder && it.x < rightBorder }
-                .map { MathPoint(it.x, it.y) }
+            transformedPoints.first,
+            transformedPoints.second,
+            0.0
         )
         tornadofx.information("Интеграл равен $integral")
     }
@@ -166,6 +172,14 @@ class FunctionOperationsService(
 
     private companion object {
         const val INTERSECTION_CORRELATION = 5.0
+
+        fun DoubleArray.roundValues(): DoubleArray {
+            val values = DoubleArray(size)
+            for (i in values.indices){
+                values[i] = this[i].round()
+            }
+            return values
+        }
 
         fun Double.round(decimals: Int = 2): Double =
             String.format("%.${decimals}f", this).replace(",", ".").toDouble()

@@ -8,7 +8,8 @@ object ConcatenationFunctionConverter : Converter<ConcatenationFunctionDTO, Conc
     override fun convert(source: ConcatenationFunctionDTO): ConcatenationFunction {
         return ConcatenationFunction(
             name = source.name,
-            points = source.points,
+            xPoints = source.points.map { it.x }.toDoubleArray(),
+            yPoints = source.points.map { it.y }.toDoubleArray(),
             functionColor = source.functionColor,
             lineSize = source.lineSize,
             lineType = source.lineType

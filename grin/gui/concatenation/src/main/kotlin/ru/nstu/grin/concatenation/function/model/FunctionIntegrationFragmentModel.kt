@@ -17,7 +17,7 @@ class FunctionIntegrationFragmentModel(val function: ConcatenationFunction) {
     var rightBorder by rightBorderProperty
 
     init {
-        leftBorder = function.points.minOfOrNull { point -> point.x } ?: 0.0
-        rightBorder = function.points.maxOfOrNull { point -> point.x } ?: 0.0
+        leftBorder = function.xPoints.minOrNull() ?: 0.0
+        rightBorder = function.xPoints.maxOrNull() ?: 0.0
     }
 }

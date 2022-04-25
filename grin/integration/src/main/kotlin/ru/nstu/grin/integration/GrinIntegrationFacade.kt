@@ -80,7 +80,8 @@ class GrinIntegrationFacade: KoinComponent {
     ) : ConcatenationFunction {
         return ConcatenationFunction(
             name = name,
-            points = points,
+            xPoints = points.map { it.x }.toDoubleArray(),
+            yPoints = points.map { it.y }.toDoubleArray(),
             isHide = false,
             functionColor = color,
             lineSize = 2.0,

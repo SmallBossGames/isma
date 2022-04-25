@@ -74,10 +74,7 @@ class MathToolBar(
             val function = canvasViewModel.selectedFunctions.firstOrNull()
             if (function != null) {
                 find<FunctionIntegrationFragment>(
-                    scope,
-                    mapOf(
-                        "function" to function.id
-                    )
+                    scope
                 ).openModal()
             }
         }

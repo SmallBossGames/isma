@@ -37,7 +37,7 @@ class FunctionCanvasService(
     }
 
     fun copyFunction(originFunction: ConcatenationFunction, newName: String = originFunction.name) {
-        val newFunction = originFunction.clone().copy(name = newName)
+        val newFunction = originFunction.copy(name = newName)
         val cartesianSpace = model.cartesianSpaces.first { it.functions.contains(originFunction) }
         cartesianSpace.functions.add(newFunction)
 

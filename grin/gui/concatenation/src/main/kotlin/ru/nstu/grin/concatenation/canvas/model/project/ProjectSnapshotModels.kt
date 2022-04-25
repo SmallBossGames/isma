@@ -42,7 +42,6 @@ data class CartesianSpaceSnapshot(
 
 @Serializable
 data class ConcatenationFunctionSnapshot(
-    val id: String,
     val name: String,
     val points: List<PointSnapshot>,
     val isHide: Boolean,
@@ -236,7 +235,6 @@ fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
     val transformersFromSnapshot = transformers.map { it.toModel() }.toTypedArray()
 
     return ConcatenationFunction(
-        id = UUID.fromString(id),
         name = name,
         points = points.map { it.toModel() },
         isHide = isHide,
@@ -254,7 +252,6 @@ fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
 
 fun ConcatenationFunction.toSnapshot() =
     ConcatenationFunctionSnapshot(
-        id = id.toString(),
         name = name,
         points = points.map { it.toSnapshot() },
         isHide = isHide,

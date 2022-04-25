@@ -2,7 +2,6 @@ package ru.nstu.grin.concatenation.cartesian.model
 
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import java.util.*
 
 data class CartesianSpace(
     var name: String,
@@ -16,9 +15,7 @@ data class CartesianSpace(
 
     public override fun clone(): CartesianSpace {
         return copy(
-            functions = functions
-                .map { it.copy(id = UUID.randomUUID(), points = it.points.map { it.copy() }) }
-                .toMutableList(),
+            functions = functions.map { it.copy() }.toMutableList(),
             xAxis = xAxis.copy(),
             yAxis = yAxis.copy(),
         )

@@ -1,10 +1,12 @@
 package ru.nstu.grin.concatenation.function.model
 
 import javafx.scene.paint.Color
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
-import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 class PointsCache(
@@ -17,15 +19,14 @@ class PointsCache(
 /**
  * @author kostya05983
  */
-data class ConcatenationFunction(
-    val id: UUID,
+class ConcatenationFunction(
     var name: String,
     val points: List<Point>,
     var isHide: Boolean = false,
     var functionColor: Color,
     var lineSize: Double,
     var lineType: LineType,
-) : Cloneable {
+) {
 
     private val transformedPointCache = AtomicReference(
         PointsCache(
@@ -72,8 +73,6 @@ data class ConcatenationFunction(
 
         currentJob.join()
 
-        cacheUpdateJob.setRelease(null)
-
         return@coroutineScope true
     }
 
@@ -118,17 +117,21 @@ data class ConcatenationFunction(
                 break
             }
         } while (true)
+
+        cacheUpdateJob.setRelease(null)
     }
 
-    public override fun clone(): ConcatenationFunction {
-        return ConcatenationFunction(
-            id = id,
-            name = name,
-            points = points.map { it.copy() },
-            functionColor = functionColor,
-            lineSize = lineSize,
-            lineType = lineType,
-        )
+    fun copy(
+        name: String = this.name,
+        points: List<Point> = this.points,
+        isHide: Boolean = this.isHide,
+        functionColor: Color = this.functionColor,
+        lineSize: Double = this.lineSize,
+        lineType: LineType = this.lineType,
+    ): ConcatenationFunction {
+        return ConcatenationFunction(name, points, isHide, functionColor, lineSize, lineType).also {
+            it.transformedPointCache.set(transformedPointCache.get())
+        }
     }
 
     companion object {

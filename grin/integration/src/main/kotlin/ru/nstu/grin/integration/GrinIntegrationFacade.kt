@@ -16,7 +16,6 @@ import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import java.util.*
 
 
 class GrinIntegrationFacade: KoinComponent {
@@ -80,7 +79,6 @@ class GrinIntegrationFacade: KoinComponent {
         color: Color
     ) : ConcatenationFunction {
         return ConcatenationFunction(
-            id = UUID.randomUUID(),
             name = name,
             points = points,
             isHide = false,

@@ -2,7 +2,6 @@ package ru.nstu.grin.concatenation.description.view
 
 import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.text.Font
 import javafx.scene.text.TextAlignment
 import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
@@ -25,7 +24,7 @@ class DescriptionDrawElement(
             for (description in space.descriptions){
                 context.stroke = description.color
                 context.fill = description.color
-                context.font = Font.font(description.font, description.textSize)
+                context.font = description.font
 
                 val x = matrixTransformer.transformUnitsToPixel(
                     description.x,

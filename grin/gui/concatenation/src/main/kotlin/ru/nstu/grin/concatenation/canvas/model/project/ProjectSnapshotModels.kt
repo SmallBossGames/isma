@@ -20,12 +20,11 @@ data class ProjectSnapshot(
 
 @Serializable
 data class DescriptionSnapshot(
-    var text: String,
-    var textSize: Double,
-    var x: Double,
-    var y: Double,
-    var color: ColorSnapshot,
-    var font: String,
+    val text: String,
+    val x: Double,
+    val y: Double,
+    val color: ColorSnapshot,
+    val font: FontSnapshot,
 )
 
 @Serializable
@@ -137,21 +136,19 @@ class IntegratorTransformerSnapshot(
 fun DescriptionSnapshot.toModel() =
     Description(
         text = text,
-        textSize = textSize,
         x = x,
         y = y,
         color = color.toModel(),
-        font = font,
+        font = font.toModel(),
     )
 
 fun Description.toSnapshot() =
     DescriptionSnapshot(
         text = text,
-        textSize = textSize,
         x = x,
         y = y,
         color = color.toSnapshot(),
-        font = font,
+        font = font.toSnapshot(),
     )
 
 fun AxisStylePropertiesSnapshot.toModel() =

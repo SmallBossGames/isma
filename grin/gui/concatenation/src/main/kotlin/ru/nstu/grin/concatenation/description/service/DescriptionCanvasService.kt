@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.description.service
 
+import javafx.scene.text.Font
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,11 +16,10 @@ class DescriptionCanvasService(
     fun add(descriptionModel: DescriptionDto) {
         val description = Description(
             text = descriptionModel.text,
-            textSize = descriptionModel.textSize,
             x = descriptionModel.x,
             y = descriptionModel.y,
             color = descriptionModel.color,
-            font = descriptionModel.font
+            font = Font(descriptionModel.font, descriptionModel.textSize)
         )
 
         descriptionModel.space.descriptions.add(description)
@@ -32,9 +32,8 @@ class DescriptionCanvasService(
             x = descriptionModel.x
             y = descriptionModel.y
             text = descriptionModel.text
-            textSize = descriptionModel.textSize
             color = descriptionModel.color
-            font = descriptionModel.font
+            font = Font(descriptionModel.font, descriptionModel.textSize)
         }
 
         val currentSpace = model.cartesianSpaces.first { it.descriptions.contains(description) }

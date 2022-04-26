@@ -61,8 +61,8 @@ class ChangeDescriptionViewModel(
                 )
                 text = initData.description.text
                 color = initData.description.color
-                textSize = initData.description.textSize
-                font = initData.description.font
+                textSize = initData.description.font.size
+                font = initData.description.font.family
             }
         }
     }

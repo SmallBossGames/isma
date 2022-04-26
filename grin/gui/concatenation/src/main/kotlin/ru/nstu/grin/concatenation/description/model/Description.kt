@@ -1,20 +1,20 @@
 package ru.nstu.grin.concatenation.description.model
 
 import javafx.scene.paint.Color
+import javafx.scene.text.Font
 
 /**
  * @author kostya05983
  */
 data class Description(
     var text: String,
-    var textSize: Double,
     var x: Double,
     var y: Double,
     var color: Color,
-    var font: String,
+    var font: Font,
 ) {
     fun isLocated(eventX: Double, eventY: Double): Boolean {
-        return x - textSize*2 < eventX && eventX < x + textSize*2 && y - textSize*2 < eventY && eventY < y + textSize*2
+        return x - font.size*2 < eventX && eventX < x + font.size*2 && y - font.size*2 < eventY && eventY < y + font.size*2
     }
 }
 

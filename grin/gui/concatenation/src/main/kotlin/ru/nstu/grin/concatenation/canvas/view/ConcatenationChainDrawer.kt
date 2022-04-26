@@ -3,7 +3,6 @@ package ru.nstu.grin.concatenation.canvas.view
 import javafx.scene.paint.Color
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
@@ -13,7 +12,6 @@ import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
-import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import java.util.concurrent.atomic.AtomicReference
 
 class ConcatenationChainDrawer(
@@ -21,12 +19,12 @@ class ConcatenationChainDrawer(
     private val model: ConcatenationCanvasModel,
     private val functionDrawElement: ConcatenationFunctionDrawElement,
     private val selectionDrawElement: SelectionDrawElement,
-    private val pointTooltipsDrawElement: PointTooltipsDrawElement,
     private val spacesTransformationController: SpacesTransformationController,
     private val axisDrawElement: AxisDrawElement,
-    private val arrowDrawElement: ArrowDrawElement,
     private val descriptionDrawElement: DescriptionDrawElement,
     private val matrixTransformer: MatrixTransformer,
+    // private val pointTooltipsDrawElement: PointTooltipsDrawElement,
+    // private val arrowDrawElement: ArrowDrawElement,
 ) : ChainDrawer {
     private val coroutinesScope = CoroutineScope(Dispatchers.Default)
 
@@ -87,10 +85,10 @@ class ConcatenationChainDrawer(
 
             ClearDrawElement.draw(this, width, height)
 
-            arrowDrawElement.draw(this, width, height)
             descriptionDrawElement.draw(this, width, height)
-            pointTooltipsDrawElement.draw(this, width, height)
             selectionDrawElement.draw(this, width, height)
+            // arrowDrawElement.draw(this, width, height)
+            // pointTooltipsDrawElement.draw(this, width, height)
         }
     }
 }

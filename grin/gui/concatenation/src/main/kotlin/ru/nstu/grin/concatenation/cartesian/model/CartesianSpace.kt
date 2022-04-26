@@ -1,11 +1,13 @@
 package ru.nstu.grin.concatenation.cartesian.model
 
+import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 
 data class CartesianSpace(
     var name: String,
     val functions: MutableList<ConcatenationFunction>,
+    val descriptions: MutableList<Description>,
     val xAxis: ConcatenationAxis,
     val yAxis: ConcatenationAxis,
     var isShowGrid: Boolean = false

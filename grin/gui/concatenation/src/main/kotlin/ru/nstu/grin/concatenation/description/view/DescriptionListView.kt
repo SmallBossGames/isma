@@ -6,7 +6,7 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.text.Font
-import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 

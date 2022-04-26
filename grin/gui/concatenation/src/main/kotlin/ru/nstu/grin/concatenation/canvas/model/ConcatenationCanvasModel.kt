@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.nstu.grin.common.model.Arrow
-import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
@@ -22,9 +22,9 @@ class ConcatenationCanvasModel {
 
     val axes get() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
 
-    val arrows = observableArrayList<Arrow>()!!
+    val descriptions get() = cartesianSpaces.map { it.descriptions }.flatten()
 
-    val descriptions = observableArrayList<Description>()!!
+    val arrows = observableArrayList<Arrow>()!!
 
     private val functionsListUpdatedEventInternal = MutableSharedFlow<List<ConcatenationFunction>>()
     val functionsListUpdatedEvent = functionsListUpdatedEventInternal.asSharedFlow()
@@ -63,14 +63,6 @@ class ConcatenationCanvasModel {
                     reportCartesianSpacesListUpdate()
                     reportAxesListUpdate()
                     reportFunctionsListUpdate()
-                }
-            }
-        }
-
-        coroutineScope.launch {
-            descriptions.apply {
-                changeAsFlow().collect {
-                    reportDescriptionsListUpdate()
                 }
             }
         }

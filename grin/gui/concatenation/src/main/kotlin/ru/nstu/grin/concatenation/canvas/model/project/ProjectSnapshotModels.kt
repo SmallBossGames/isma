@@ -4,7 +4,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.model.*
@@ -12,17 +12,14 @@ import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.function.transform.*
-import java.util.*
 
 @Serializable
 data class ProjectSnapshot(
     val spaces: List<CartesianSpaceSnapshot> = emptyList(),
-    val descriptions: List<DescriptionSnapshot> = emptyList(),
 )
 
 @Serializable
 data class DescriptionSnapshot(
-    val id: String,
     var text: String,
     var textSize: Double,
     var x: Double,
@@ -35,6 +32,7 @@ data class DescriptionSnapshot(
 data class CartesianSpaceSnapshot(
     val name: String,
     val functions: List<ConcatenationFunctionSnapshot>,
+    val descriptions: List<DescriptionSnapshot>,
     val xAxis: ConcatenationAxisSnapshot,
     val yAxis: ConcatenationAxisSnapshot,
     val isShowGrid: Boolean,
@@ -138,7 +136,6 @@ class IntegratorTransformerSnapshot(
 
 fun DescriptionSnapshot.toModel() =
     Description(
-        id = UUID.fromString(id),
         text = text,
         textSize = textSize,
         x = x,
@@ -149,7 +146,6 @@ fun DescriptionSnapshot.toModel() =
 
 fun Description.toSnapshot() =
     DescriptionSnapshot(
-        id = id.toString(),
         text = text,
         textSize = textSize,
         x = x,
@@ -258,6 +254,7 @@ fun CartesianSpaceSnapshot.toModel() =
     CartesianSpace(
         name = name,
         functions = functions.map { it.toModel() }.toMutableList(),
+        descriptions = descriptions.map { it.toModel() }.toMutableList(),
         xAxis = xAxis.toModel(),
         yAxis = yAxis.toModel(),
         isShowGrid = isShowGrid,
@@ -267,6 +264,7 @@ fun CartesianSpace.toSnapshot() =
     CartesianSpaceSnapshot(
         name = name,
         functions = functions.map { it.toSnapshot() },
+        descriptions = descriptions.map { it.toSnapshot() },
         xAxis = xAxis.toSnapshot(),
         yAxis = yAxis.toSnapshot(),
         isShowGrid = isShowGrid,

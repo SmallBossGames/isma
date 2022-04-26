@@ -62,8 +62,7 @@ val grinGuiModule = module {
             if(initData!=null){
                 get<ConcatenationCanvasController>().replaceAll(
                     initData.cartesianSpaces,
-                    initData.arrows,
-                    initData.descriptions
+                    initData.arrows
                 )
             }
 
@@ -207,9 +206,9 @@ val grinGuiModule = module {
     }
 
     scope<DescriptionChangeModalScope> {
-        scoped { ChangeDescriptionController(get()) }
-        scoped { params -> ChangeDescriptionView(get(), get{ params }) }
-        scoped { params -> ChangeDescriptionViewModel(params.getOrNull(), params.getOrNull()) }
+        scopedOf(::ChangeDescriptionController)
+        scopedOf(::ChangeDescriptionView)
+        scopedOf(::ChangeDescriptionViewModel)
     }
 
     scope<CartesianCopyModalScope> {

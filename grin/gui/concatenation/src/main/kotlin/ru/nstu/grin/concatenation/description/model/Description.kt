@@ -1,13 +1,11 @@
-package ru.nstu.grin.common.model
+package ru.nstu.grin.concatenation.description.model
 
 import javafx.scene.paint.Color
-import java.util.*
 
 /**
  * @author kostya05983
  */
 data class Description(
-    val id: UUID,
     var text: String,
     var textSize: Double,
     var x: Double,

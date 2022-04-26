@@ -2,6 +2,7 @@ package ru.nstu.grin.concatenation.canvas.view
 
 import javafx.scene.Node
 import javafx.scene.control.ContextMenu
+import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
@@ -12,6 +13,7 @@ class CartesianCanvasContextMenuController(
     private val chainDrawer: ConcatenationChainDrawer,
     private val model: ConcatenationCanvasModel,
     private val controller: ConcatenationCanvasController,
+    private val canvasModel: ConcatenationCanvasModel,
     private val axisListViewController: AxisListViewController,
 ) {
     private val contextMenu = ContextMenu()
@@ -62,20 +64,24 @@ class CartesianCanvasContextMenuController(
         val stage = parent.scene.window
 
         contextMenu.items.setAll(
-            MenuItem("Добавить функцию").apply {
+            MenuItem("Add function").apply {
                 setOnAction {
                     controller.openFunctionModal(stage)
                 }
             },
-            MenuItem("Добавить указатель").apply {
+            MenuItem("Add pointer").apply {
                 setOnAction {
                     controller.openArrowModal(stage.x + x, stage.y + y, stage)
                 }
             },
-            MenuItem("Добавить описание").apply {
-                setOnAction {
-                    controller.openDescriptionModal(x, y)
-                }
+            Menu("Description for...").apply {
+                 items.addAll(canvasModel.cartesianSpaces.map { space ->
+                     MenuItem(space.name).apply {
+                         setOnAction {
+                             controller.openDescriptionModal(space, x, y)
+                         }
+                     }
+                 })
             }
         )
 

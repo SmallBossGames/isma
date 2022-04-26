@@ -16,7 +16,6 @@ class ChangeDescriptionView(
     private val controller: ChangeDescriptionController,
     private val model: ChangeDescriptionViewModel
 ) : BorderPane() {
-
     init {
         top = VBox(
             propertiesGrid {

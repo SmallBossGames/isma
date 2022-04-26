@@ -20,6 +20,12 @@ class PointTooltipsDrawElement(
     private val pointTooltips = mutableListOf<Tooltip>()
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
+        if(!canvasViewModel.pointToolTipSettings.isShow) {
+            pointTooltips.forEach { it.hide() }
+            pointTooltips.clear()
+            return
+        }
+
         val stage = mainGrinScope.primaryStage
         val filteredPoints = canvasViewModel.pointToolTipSettings.pointsSettings.filter { pointSettings ->
             !pointTooltips.any { it.text == formatText(pointSettings) }
@@ -50,10 +56,6 @@ class PointTooltipsDrawElement(
                 pointSettings.xGraphic,
                 pointSettings.yGraphic + SIZE_OF_CROSS
             )
-        }
-        if (canvasViewModel.pointToolTipSettings.isShow.not()) {
-            pointTooltips.forEach { it.hide() }
-            pointTooltips.clear()
         }
     }
 

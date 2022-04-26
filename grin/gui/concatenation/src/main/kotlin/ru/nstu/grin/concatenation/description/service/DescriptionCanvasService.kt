@@ -3,10 +3,9 @@ package ru.nstu.grin.concatenation.description.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.common.model.DescriptionDto
+import ru.nstu.grin.concatenation.description.model.Description
+import ru.nstu.grin.concatenation.description.model.DescriptionDto
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import java.util.*
 
 class DescriptionCanvasService(
     private val model: ConcatenationCanvasModel,
@@ -15,7 +14,6 @@ class DescriptionCanvasService(
 
     fun add(descriptionModel: DescriptionDto) {
         val description = Description(
-            id = UUID.randomUUID(),
             text = descriptionModel.text,
             textSize = descriptionModel.textSize,
             x = descriptionModel.x,
@@ -24,24 +22,36 @@ class DescriptionCanvasService(
             font = descriptionModel.font
         )
 
-        model.descriptions.add(description)
+        descriptionModel.space.descriptions.add(description)
 
         reportUpdate()
     }
 
     fun update(description: Description, descriptionModel: DescriptionDto) {
-        description.x = descriptionModel.x
-        description.y = descriptionModel.y
-        description.text = descriptionModel.text
-        description.textSize = descriptionModel.textSize
-        description.color = descriptionModel.color
-        description.font = descriptionModel.font
+        description.apply {
+            x = descriptionModel.x
+            y = descriptionModel.y
+            text = descriptionModel.text
+            textSize = descriptionModel.textSize
+            color = descriptionModel.color
+            font = descriptionModel.font
+        }
+
+        val currentSpace = model.cartesianSpaces.first { it.descriptions.contains(description) }
+        val newSpace = descriptionModel.space
+
+        if(currentSpace !== newSpace){
+            currentSpace.descriptions.remove(description)
+            newSpace.descriptions.add(description)
+        }
 
         reportUpdate()
     }
 
     fun delete(description: Description) {
-        model.descriptions.remove(description)
+        val space = model.cartesianSpaces.first{ it.descriptions.contains(description) }
+
+        space.descriptions.remove(description)
 
         reportUpdate()
     }

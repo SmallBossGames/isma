@@ -25,7 +25,6 @@ class CanvasProjectLoader(
 
         val project = ProjectSnapshot(
             spaces = model.cartesianSpaces.map { it.toSnapshot() },
-            descriptions = model.descriptions.map { it.toSnapshot() }
         )
 
         file.bufferedWriter(Charsets.UTF_8).use {
@@ -45,8 +44,7 @@ class CanvasProjectLoader(
 
         concatenationCanvasController.replaceAll(
             project.spaces.map { it.toModel() },
-            emptyList(),
-            project.descriptions.map { it.toModel() }
+            emptyList()
         )
     }
 

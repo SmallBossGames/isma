@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
-import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
 class DescriptionListViewModel(

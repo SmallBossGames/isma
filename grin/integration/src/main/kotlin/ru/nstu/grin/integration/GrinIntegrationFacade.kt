@@ -66,6 +66,7 @@ class GrinIntegrationFacade: KoinComponent {
         val cartesianSpace = CartesianSpace(
             "CartesianSpace",
             mappedFunctions,
+            mutableListOf(),
             xAxis,
             yAxis
         )

@@ -2,7 +2,7 @@ package ru.nstu.grin.concatenation.canvas.model
 
 import javafx.geometry.Insets
 import javafx.scene.canvas.GraphicsContext
-import ru.nstu.grin.common.model.Description
+import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.points.model.PointToolTipsSettings
 

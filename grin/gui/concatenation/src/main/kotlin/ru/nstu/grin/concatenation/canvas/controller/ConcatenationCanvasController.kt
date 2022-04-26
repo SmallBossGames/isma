@@ -9,11 +9,10 @@ import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.common.converters.model.ArrowConverter
 import ru.nstu.grin.common.dto.ArrowDTO
 import ru.nstu.grin.common.model.Arrow
-import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
-import ru.nstu.grin.concatenation.description.model.DescriptionModalInitData
+import ru.nstu.grin.concatenation.description.model.DescriptionModalForCreate
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import ru.nstu.grin.concatenation.koin.AddFunctionModalScope
@@ -30,12 +29,10 @@ class ConcatenationCanvasController(
 
     fun replaceAll(
         cartesianSpaces: List<CartesianSpace>,
-        arrows: List<Arrow>,
-        descriptions: List<Description>
+        arrows: List<Arrow>
     ){
         model.cartesianSpaces.setAll(cartesianSpaces)
         model.arrows.setAll(arrows)
-        model.descriptions.setAll(descriptions)
 
         normalizeSpaces()
     }
@@ -115,11 +112,11 @@ class ConcatenationCanvasController(
         ).openModal(stageStyle = StageStyle.UTILITY)*/
     }
 
-    fun openDescriptionModal(x: Double, y: Double, window: Window? = null) {
+    fun openDescriptionModal(space: CartesianSpace, x: Double, y: Double, window: Window? = null) {
         val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
 
-        val initData = DescriptionModalInitData(x, y)
-        val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(initData)}
+        val initData = DescriptionModalForCreate(space, x, y)
+        val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(initData) }
 
         Stage().apply {
             scene = Scene(view)
@@ -146,7 +143,6 @@ class ConcatenationCanvasController(
         model.apply {
             cartesianSpaces.clear()
             arrows.clear()
-            descriptions.clear()
         }
     }
 

@@ -15,10 +15,11 @@ javafx {
 application {
     mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
 
-    /*applicationDefaultJvmArgs = listOf(
-        "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
-    )*/
+    applicationDefaultJvmArgs = listOf(
+        "--add-modules=jdk.incubator.vector",
+        //"--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        //"--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+    )
 }
 
 dependencies {

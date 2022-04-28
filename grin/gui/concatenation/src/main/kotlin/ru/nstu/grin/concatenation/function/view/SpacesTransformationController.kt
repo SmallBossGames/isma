@@ -45,20 +45,19 @@ class SpacesTransformationController(
         val xResults = DoubleArray(transformedPoints.first.size)
         val yResults = DoubleArray(transformedPoints.second.size)
 
-        for (i in transformedPoints.first.indices) {
-            ensureActive()
+        matrixTransformer.transformUnitsToPixel(
+            transformedPoints.first,
+            xResults,
+            xScaleProperties,
+            xAxis.direction,
+        )
 
-            xResults[i] = matrixTransformer.transformUnitsToPixel(
-                transformedPoints.first[i],
-                xScaleProperties,
-                xAxis.direction,
-            )
-            yResults[i] = matrixTransformer.transformUnitsToPixel(
-                transformedPoints.second[i],
-                yScaleProperties,
-                yAxis.direction,
-            )
-        }
+        matrixTransformer.transformUnitsToPixel(
+            transformedPoints.second,
+            yResults,
+            yScaleProperties,
+            yAxis.direction,
+        )
 
         Pair(xResults, yResults)
     }

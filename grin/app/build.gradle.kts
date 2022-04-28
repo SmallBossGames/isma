@@ -14,8 +14,10 @@ application {
     mainClass.set("ru.nstu.isma.grin.launcher.LauncherKt")
 
     applicationDefaultJvmArgs = listOf(
-        "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
+        "--add-modules=jdk.incubator.vector",
+        //"--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        //"--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+    )
 }
 
 dependencies {

@@ -43,8 +43,7 @@ class CanvasProjectLoader(
         val project = Json.decodeFromString<ProjectSnapshot>(json)
 
         concatenationCanvasController.replaceAll(
-            project.spaces.map { it.toModel() },
-            emptyList()
+            project.spaces.map { it.toModel() }
         )
     }
 

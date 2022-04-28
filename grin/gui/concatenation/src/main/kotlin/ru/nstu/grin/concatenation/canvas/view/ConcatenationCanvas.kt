@@ -86,7 +86,6 @@ class ConcatenationCanvas(
                 model.functionsListUpdatedEvent,
                 model.descriptionsListUpdatedEvent,
                 model.cartesianSpacesListUpdatedEvent,
-                model.arrowsListUpdatedEvent
             ).collectLatest {
                 chainDrawer.draw()
             }

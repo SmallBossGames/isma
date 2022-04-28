@@ -82,9 +82,6 @@ class DraggedHandler(
             return
         }
 
-        canvasViewModel.pointToolTipSettings.isShow = false
-        canvasViewModel.pointToolTipSettings.pointsSettings.clear()
-
         val axis = model.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel) ?: return
 
         val draggedSettings = getDraggedSettings(axis)

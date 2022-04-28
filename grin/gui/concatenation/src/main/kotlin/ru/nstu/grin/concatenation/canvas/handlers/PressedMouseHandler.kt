@@ -7,11 +7,12 @@ import javafx.scene.input.MouseEvent
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.CartesianCanvasContextMenuController
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
+import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.points.model.PointSettings
 
 class PressedMouseHandler(
     private val contextMenuDrawElement: CartesianCanvasContextMenuController,
@@ -20,6 +21,7 @@ class PressedMouseHandler(
     private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
     private val editModeViewModel: EditModeViewModel,
+    private val matrixTransformer: MatrixTransformer,
 ) : EventHandler<MouseEvent> {
 
     override fun handle(event: MouseEvent) {
@@ -93,9 +95,6 @@ class PressedMouseHandler(
     }
 
     private fun handleSecondaryButtonDown(event: MouseEvent): Boolean {
-        canvasViewModel.pointToolTipSettings.isShow = false
-        canvasViewModel.pointToolTipSettings.pointsSettings.clear()
-
         showContextMenu(event)
 
         return true
@@ -106,36 +105,41 @@ class PressedMouseHandler(
     }
 
     private fun handleViewMode(event: MouseEvent) {
-        val cartesianSpace = canvasModel.cartesianSpaces.firstOrNull {
-            it.functions.any {
-                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+        var selectedSpace: CartesianSpace? = null
+        var bestDistance = Double.POSITIVE_INFINITY
+        var bestX = 0.0
+        var bestY = 0.0
 
-                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
+        for(space in canvasModel.cartesianSpaces){
+            for(function in space.functions){
+                val (xPixels, yPixels) = function.pixelsToDraw ?: Pair(doubleArrayOf(), doubleArrayOf())
+
+                for (i in xPixels.indices){
+                    val distance = Point.estimateDistance(xPixels[i], yPixels[i], event.x, event.y)
+
+                    if(distance < 20.0 && distance < bestDistance){
+                        bestDistance = distance
+                        selectedSpace = space
+                        bestX = xPixels[i]
+                        bestY = yPixels[i]
+                    }
+                }
             }
-        } ?: return
-        val nearFunction = canvasModel.cartesianSpaces.mapNotNull {
-            it.functions.firstOrNull {
-                val pixels = it.pixelsToDraw ?: return@firstOrNull false
+        }
 
-                return@firstOrNull ConcatenationFunction.isPixelsNearBy(pixels.first, pixels.second, event.x, event.y)
-            }
-        }.firstOrNull() ?: return
+        if(selectedSpace != null){
+            val xScaleProperties = selectedSpace.xAxis.scaleProperties
+            val xDirection = selectedSpace.xAxis.direction
 
-        val pixels = nearFunction.pixelsToDraw ?: throw java.lang.NullPointerException()
+            val yScaleProperties = selectedSpace.yAxis.scaleProperties
+            val yDirection = selectedSpace.yAxis.direction
 
-        val nearPointIndex = ConcatenationFunction.indexOfPixelsNearBy(
-            pixels.first, pixels.second, event.x, event.y
-        )
-
-        val pointToolTipSettings = canvasViewModel.pointToolTipSettings
-        pointToolTipSettings.isShow = true
-        val pointSettings = PointSettings(
-            cartesianSpace.xAxis.scaleProperties,
-            cartesianSpace.yAxis.scaleProperties,
-            pixels.first[nearPointIndex],
-            pixels.second[nearPointIndex],
-        )
-        pointToolTipSettings.pointsSettings.add(pointSettings)
+            canvasController.addPointDescription(
+                selectedSpace,
+                matrixTransformer.transformPixelToUnits(bestX, xScaleProperties, xDirection),
+                matrixTransformer.transformPixelToUnits(bestY, yScaleProperties, yDirection),
+            )
+        }
     }
 
     private fun handleEditMode(event: MouseEvent) {

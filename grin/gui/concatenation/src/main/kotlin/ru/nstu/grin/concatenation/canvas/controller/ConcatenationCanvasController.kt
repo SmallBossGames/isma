@@ -1,18 +1,18 @@
 package ru.nstu.grin.concatenation.canvas.controller
 
 import javafx.scene.Scene
+import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.Window
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
-import ru.nstu.grin.common.converters.model.ArrowConverter
-import ru.nstu.grin.common.dto.ArrowDTO
-import ru.nstu.grin.common.model.Arrow
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
+import ru.nstu.grin.concatenation.description.model.DescriptionDto
 import ru.nstu.grin.concatenation.description.model.DescriptionModalForCreate
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.view.AddFunctionModalView
 import ru.nstu.grin.concatenation.koin.AddFunctionModalScope
@@ -25,20 +25,15 @@ class ConcatenationCanvasController(
     private val model: ConcatenationCanvasModel,
     private val canvasViewModel: ConcatenationCanvasViewModel,
     private val mainGrinScope: MainGrinScope,
+    private val descriptionCanvasService: DescriptionCanvasService,
 ) {
 
     fun replaceAll(
-        cartesianSpaces: List<CartesianSpace>,
-        arrows: List<Arrow>
+        cartesianSpaces: List<CartesianSpace>
     ){
         model.cartesianSpaces.setAll(cartesianSpaces)
-        model.arrows.setAll(arrows)
 
         normalizeSpaces()
-    }
-
-    fun addArrow(arrow: ArrowDTO) {
-        model.arrows.add(ArrowConverter.convert(arrow))
     }
 
     fun openFunctionModal(window: Window?) {
@@ -101,17 +96,6 @@ class ConcatenationCanvasController(
         }
     }
 
-    fun openArrowModal(x: Double, y: Double, window: Window?) {
-        // TODO: Disabled until migration to Koin
-        /*find<ArrowModalView>(
-            mapOf(
-                ArrowModalView::type to ConcatenationType,
-                ArrowModalView::x to x,
-                ArrowModalView::y to y
-            )
-        ).openModal(stageStyle = StageStyle.UTILITY)*/
-    }
-
     fun openDescriptionModal(space: CartesianSpace, x: Double, y: Double, window: Window? = null) {
         val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
 
@@ -135,6 +119,22 @@ class ConcatenationCanvasController(
         }
     }
 
+    fun addPointDescription(space: CartesianSpace, pointX: Double, pointY: Double){
+        val description = DescriptionDto(
+            space = space,
+            text = "Point (${String.format("%.3f", pointX)}; ${String.format("%.3f", pointY)})",
+            textOffsetX = 30.0,
+            textOffsetY = 30.0,
+            color = Color.BLACK,
+            font = "Arial",
+            textSize = 12.0,
+            pointerX = pointX,
+            pointerY = pointY
+        )
+
+        descriptionCanvasService.add(description)
+    }
+
     fun unselectAll() {
         canvasViewModel.selectedFunctions.clear()
     }
@@ -142,7 +142,6 @@ class ConcatenationCanvasController(
     fun clearCanvas() {
         model.apply {
             cartesianSpaces.clear()
-            arrows.clear()
         }
     }
 

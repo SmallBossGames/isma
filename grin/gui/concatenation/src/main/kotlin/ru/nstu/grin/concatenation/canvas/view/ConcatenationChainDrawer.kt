@@ -23,8 +23,6 @@ class ConcatenationChainDrawer(
     private val axisDrawElement: AxisDrawElement,
     private val descriptionDrawElement: DescriptionDrawElement,
     private val matrixTransformer: MatrixTransformer,
-    // private val pointTooltipsDrawElement: PointTooltipsDrawElement,
-    // private val arrowDrawElement: ArrowDrawElement,
 ) : ChainDrawer {
     private val coroutinesScope = CoroutineScope(Dispatchers.Default)
 
@@ -87,8 +85,6 @@ class ConcatenationChainDrawer(
 
             descriptionDrawElement.draw(this, width, height)
             selectionDrawElement.draw(this, width, height)
-            // arrowDrawElement.draw(this, width, height)
-            // pointTooltipsDrawElement.draw(this, width, height)
         }
     }
 }

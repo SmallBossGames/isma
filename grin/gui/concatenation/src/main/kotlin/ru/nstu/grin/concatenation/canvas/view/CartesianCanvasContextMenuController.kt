@@ -69,11 +69,6 @@ class CartesianCanvasContextMenuController(
                     controller.openFunctionModal(stage)
                 }
             },
-            MenuItem("Add pointer").apply {
-                setOnAction {
-                    controller.openArrowModal(stage.x + x, stage.y + y, stage)
-                }
-            },
             Menu("Description for...").apply {
                  items.addAll(canvasModel.cartesianSpaces.map { space ->
                      MenuItem(space.name).apply {

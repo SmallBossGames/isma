@@ -2,7 +2,6 @@ package ru.nstu.grin.integration
 
 import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
-import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
@@ -46,7 +45,6 @@ import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
-import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Scope
 import tornadofx.find
 import tornadofx.setInScope
@@ -61,8 +59,7 @@ val grinGuiModule = module {
 
             if(initData!=null){
                 get<ConcatenationCanvasController>().replaceAll(
-                    initData.cartesianSpaces,
-                    initData.arrows
+                    initData.cartesianSpaces
                 )
             }
 
@@ -89,14 +86,11 @@ val grinGuiModule = module {
         scopedOf(::HorizontalAxisDrawStrategy)
         scopedOf(::HorizontalPixelMarksArrayBuilder)
         scopedOf(::HorizontalValueMarksArrayBuilder)
-        scopedOf(::PointTooltipsDrawElement)
         scopedOf(::ConcatenationFunctionDrawElement)
         scopedOf(::SelectionDrawElement)
         scopedOf(::DescriptionDrawElement)
         scopedOf(::MatrixTransformer)
         scopedOf(::CartesianCanvasContextMenuController)
-
-        scoped { ArrowDrawElement(get<ConcatenationCanvasModel>().arrows, 1.0) }
 
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)

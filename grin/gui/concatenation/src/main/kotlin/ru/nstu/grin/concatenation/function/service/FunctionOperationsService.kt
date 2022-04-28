@@ -85,9 +85,6 @@ class FunctionOperationsService(
                 )
             }
 
-        canvasViewModel.pointToolTipSettings.isShow = true
-        canvasViewModel.pointToolTipSettings.pointsSettings.addAll(transformed)
-
         view.redraw()
     }
 

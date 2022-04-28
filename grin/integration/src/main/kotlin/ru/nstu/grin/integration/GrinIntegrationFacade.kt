@@ -22,8 +22,6 @@ class GrinIntegrationFacade: KoinComponent {
     fun open(spaces: List<CartesianSpace>) {
         val initData = InitCanvasData(
             cartesianSpaces = spaces,
-            arrows = listOf(),
-            descriptions = listOf()
         )
 
         Stage().apply {

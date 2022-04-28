@@ -6,8 +6,8 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.scene.paint.Color
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 
 class ChangeFunctionViewModel(val function: ConcatenationFunction) {
     val nameProperty = SimpleStringProperty()

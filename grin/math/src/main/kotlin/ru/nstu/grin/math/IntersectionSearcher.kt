@@ -2,7 +2,7 @@ package ru.nstu.grin.math
 
 import ru.nstu.grin.model.Function
 
-class IntersectionSearcher {
+object IntersectionSearcher {
     fun findIntersections(first: Function, second: Function): List<Pair<Double, Double>> {
         val firstSet = mutableSetOf<Pair<Double, Double>>()
         val secondSet = mutableSetOf<Pair<Double, Double>>()
@@ -16,5 +16,14 @@ class IntersectionSearcher {
         }
 
         return firstSet.intersect(secondSet).toList()
+    }
+
+    fun findIntersections(
+        firstX: DoubleArray,
+        firstY: DoubleArray,
+        secondX: DoubleArray,
+        secondY: DoubleArray
+    ): Pair<DoubleArray, DoubleArray> {
+        TODO("Not implemented yet")
     }
 }

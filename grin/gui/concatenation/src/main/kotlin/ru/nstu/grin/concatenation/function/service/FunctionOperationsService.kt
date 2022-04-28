@@ -19,8 +19,6 @@ class FunctionOperationsService(
     private val canvasViewModel: ConcatenationCanvasViewModel,
 ) {
     fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
-        val interactionSearcher = IntersectionSearcher()
-
         val firstTransformedPoints = firstFunction.transformedPoints
         val firstFunc = Function(
             firstTransformedPoints.first.roundValues(),
@@ -35,7 +33,7 @@ class FunctionOperationsService(
         )
         val secondCartesianSpace = canvasModel.cartesianSpaces.first { it.functions.contains(secondFunction) }
 
-        val intersections = interactionSearcher.findIntersections(firstFunc, secondFunc)
+        val intersections = IntersectionSearcher.findIntersections(firstFunc, secondFunc)
 
         val xArrays = intersections.map { it.first }
         val yArrays = intersections.map { it.second }

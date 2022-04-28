@@ -5,8 +5,8 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import ru.isma.next.services.simulation.abstractions.models.IntegrationMethodParametersModel
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 
 class IntegrationMethodParametersViewModel {
     val selectedMethodProperty = SimpleStringProperty()

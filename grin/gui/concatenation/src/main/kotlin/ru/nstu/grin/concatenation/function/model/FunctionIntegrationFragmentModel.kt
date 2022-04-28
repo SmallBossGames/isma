@@ -3,8 +3,8 @@ package ru.nstu.grin.concatenation.function.model
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import ru.nstu.grin.concatenation.function.transform.IntegrationMethod
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 
 class FunctionIntegrationFragmentModel(val function: ConcatenationFunction) {
     var integrationMethodProperty = SimpleObjectProperty(IntegrationMethod.TRAPEZE)

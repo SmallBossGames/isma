@@ -195,8 +195,8 @@ class DraggedHandler(
             }
             is DescriptionMoveSettings -> {
                 moveSettings.description.apply {
-                    x = event.x
-                    y = event.y
+                    textOffsetX = event.x
+                    textOffsetY = event.y
                 }
 
                 return true

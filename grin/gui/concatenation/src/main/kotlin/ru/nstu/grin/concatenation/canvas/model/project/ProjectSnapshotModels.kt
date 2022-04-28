@@ -21,8 +21,10 @@ data class ProjectSnapshot(
 @Serializable
 data class DescriptionSnapshot(
     val text: String,
-    val x: Double,
-    val y: Double,
+    val pointerX: Double,
+    val pointerY: Double,
+    val textOffsetX: Double,
+    val textOffsetY: Double,
     val color: ColorSnapshot,
     val font: FontSnapshot,
 )
@@ -136,17 +138,21 @@ class IntegratorTransformerSnapshot(
 fun DescriptionSnapshot.toModel() =
     Description(
         text = text,
-        x = x,
-        y = y,
+        textOffsetX = textOffsetX,
+        textOffsetY = textOffsetY,
         color = color.toModel(),
         font = font.toModel(),
+        pointerX = pointerX,
+        pointerY = pointerY,
     )
 
 fun Description.toSnapshot() =
     DescriptionSnapshot(
         text = text,
-        x = x,
-        y = y,
+        pointerX = pointerX,
+        pointerY = pointerY,
+        textOffsetX = textOffsetX,
+        textOffsetY = textOffsetY,
         color = color.toSnapshot(),
         font = font.toSnapshot(),
     )

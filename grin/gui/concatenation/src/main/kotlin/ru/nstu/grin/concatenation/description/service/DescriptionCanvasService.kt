@@ -16,10 +16,12 @@ class DescriptionCanvasService(
     fun add(descriptionModel: DescriptionDto) {
         val description = Description(
             text = descriptionModel.text,
-            x = descriptionModel.x,
-            y = descriptionModel.y,
+            textOffsetX = descriptionModel.textOffsetX,
+            textOffsetY = descriptionModel.textOffsetY,
             color = descriptionModel.color,
-            font = Font(descriptionModel.font, descriptionModel.textSize)
+            font = Font(descriptionModel.font, descriptionModel.textSize),
+            pointerX = descriptionModel.pointerX,
+            pointerY = descriptionModel.pointerY,
         )
 
         descriptionModel.space.descriptions.add(description)
@@ -29,8 +31,10 @@ class DescriptionCanvasService(
 
     fun update(description: Description, descriptionModel: DescriptionDto) {
         description.apply {
-            x = descriptionModel.x
-            y = descriptionModel.y
+            textOffsetX = descriptionModel.textOffsetX
+            textOffsetY = descriptionModel.textOffsetY
+            pointerX = descriptionModel.pointerX
+            pointerY = descriptionModel.pointerY
             text = descriptionModel.text
             color = descriptionModel.color
             font = Font(descriptionModel.font, descriptionModel.textSize)

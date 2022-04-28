@@ -28,8 +28,10 @@ class ChangeDescriptionController(
 
         val descriptionModel = DescriptionDto(
             space = model.cartesianSpace,
-            x = x,
-            y = y,
+            textOffsetX = model.textOffsetX,
+            textOffsetY = model.textOffsetY,
+            pointerX = x,
+            pointerY = y,
             text = model.text,
             textSize = model.textSize,
             color = model.color,

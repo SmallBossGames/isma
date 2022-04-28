@@ -24,6 +24,12 @@ class ChangeDescriptionViewModel(
     val yPositionProperty = SimpleDoubleProperty()
     var yPosition by yPositionProperty
 
+    val textOffsetXProperty = SimpleDoubleProperty()
+    var textOffsetX by textOffsetXProperty
+
+    val textOffsetYProperty = SimpleDoubleProperty()
+    var textOffsetY by textOffsetYProperty
+
     val textProperty = SimpleStringProperty()
     var text: String by textProperty
 
@@ -42,6 +48,8 @@ class ChangeDescriptionViewModel(
                 cartesianSpace = initData.cartesianSpace
                 xPosition = initData.xPosition
                 yPosition = initData.yPosition
+                textOffsetX = 30.0
+                textOffsetY = 30.0
                 text = ""
                 color = Color.BLACK
                 textSize = 12.0
@@ -50,15 +58,17 @@ class ChangeDescriptionViewModel(
             is DescriptionModalForUpdate -> {
                 cartesianSpace = initData.cartesianSpace
                 xPosition = matrixTransformer.transformUnitsToPixel(
-                    initData.description.x,
+                    initData.description.pointerX,
                     initData.cartesianSpace.xAxis.scaleProperties,
                     initData.cartesianSpace.xAxis.direction
                 )
                 yPosition = matrixTransformer.transformUnitsToPixel(
-                    initData.description.y,
+                    initData.description.pointerY,
                     initData.cartesianSpace.yAxis.scaleProperties,
                     initData.cartesianSpace.yAxis.direction
                 )
+                textOffsetX = initData.description.textOffsetX
+                textOffsetY = initData.description.textOffsetY
                 text = initData.description.text
                 color = initData.description.color
                 textSize = initData.description.font.size

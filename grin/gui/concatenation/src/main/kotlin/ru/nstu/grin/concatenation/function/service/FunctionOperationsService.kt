@@ -25,7 +25,7 @@ class FunctionOperationsService(
             val (xPoints1, yPoints1) = firstFunction.pixelsToDraw!!
             val (xPoints2, yPoints2) = secondFunction.pixelsToDraw!!
 
-            val points = IntersectionSearcher.findIntersections(xPoints1, yPoints1, xPoints2, yPoints2)
+
 
             val space = canvasModel.cartesianSpaces.first{ it.functions.contains(firstFunction) }
 
@@ -35,14 +35,19 @@ class FunctionOperationsService(
             val yScaleProps = space.yAxis.scaleProperties
             val yDirection = space.yAxis.direction
 
+            val points = IntersectionSearcher
+                .findIntersections(xPoints1, yPoints1, xPoints2, yPoints2)
+                .map {
+                    Pair(
+                        matrixTransformer.transformPixelToUnits(it.first, xScaleProps, xDirection),
+                        matrixTransformer.transformPixelToUnits(it.second, yScaleProps, yDirection),
+                    )
+                }.mergeIntervals(0.1)
+
             println("Found ${points.size} points from ${xPoints1.size}")
             launch(Dispatchers.JavaFx) {
                 for(point in points){
-                    canvasController.addPointDescription(
-                        space,
-                        matrixTransformer.transformPixelToUnits(point.first, xScaleProps, xDirection),
-                        matrixTransformer.transformPixelToUnits(point.second, yScaleProps, yDirection),
-                    )
+                    canvasController.addPointDescription(space, point.first, point.second)
                 }
             }
         }
@@ -123,5 +128,38 @@ class FunctionOperationsService(
         )
 
         view.redraw()
+    }
+
+    companion object {
+        @JvmStatic
+        fun List<Pair<Double, Double>>.mergeIntervals(mergeDistance: Double): List<Pair<Double, Double>> {
+            if (this.isEmpty()) return this
+
+            val powMergeDistance = mergeDistance * mergeDistance
+            val resultList = mutableListOf(this[0])
+
+            var beginInterval = this[0]
+
+            for (i in 1 until this.size){
+                val current = resultList.last()
+                val next = this[i]
+                val dX = next.first - current.first
+                val dY = next.second - current.second
+                val distance = dX * dX + dY * dY
+
+                if(distance < powMergeDistance){
+                    if (current === beginInterval){
+                        resultList.add(next)
+                    } else {
+                        resultList[resultList.lastIndex] = next
+                    }
+                } else {
+                    resultList.add(next)
+                    beginInterval = next
+                }
+            }
+
+            return resultList
+        }
     }
 }

@@ -1,5 +1,6 @@
 package ru.nstu.grin.math
 
+import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 object IntersectionSearcher {
@@ -11,7 +12,6 @@ object IntersectionSearcher {
         secondY: DoubleArray
     ): List<Pair<Double, Double>> {
         val resultIndices = mutableListOf<Pair<Double, Double>>()
-        var intersectionsInARow = false
 
         for (i in 0 until firstX.size - 1) {
             for (j in 0 until secondX.size - 1) {
@@ -27,8 +27,7 @@ object IntersectionSearcher {
                 val leftUpCross = cross(leftCenterX, leftCenterY, leftUpX, leftUpY)
                 val leftDownCross = cross(leftCenterX, leftCenterY, leftDownX, leftDownY)
 
-                if(leftUpCross.sign == leftDownCross.sign){
-                    intersectionsInARow = false
+                if (leftUpCross.sign == leftDownCross.sign) {
                     continue
                 }
 
@@ -44,15 +43,17 @@ object IntersectionSearcher {
                 val rightUpCross = cross(rightCenterX, rightCenterY, rightUpX, rightUpY)
                 val rightDownCross = cross(rightCenterX, rightCenterY, rightDownX, rightDownY)
 
-                if(rightUpCross.sign == rightDownCross.sign){
-                    intersectionsInARow = false
+                if (rightUpCross.sign == rightDownCross.sign) {
                     continue
                 }
 
-                if(!intersectionsInARow){
-                    intersectionsInARow = true
-                    resultIndices.add(Pair(firstX[i], firstY[i]))
-                }
+
+                val intersectionPointX =
+                    firstX[i] + leftCenterX * leftUpCross.absoluteValue / (leftDownCross - leftUpCross).absoluteValue
+                val intersectionPointY =
+                    firstY[i] + leftCenterY * leftUpCross.absoluteValue / (leftDownCross - leftUpCross).absoluteValue
+
+                resultIndices.add(Pair(intersectionPointX, intersectionPointY))
             }
         }
 

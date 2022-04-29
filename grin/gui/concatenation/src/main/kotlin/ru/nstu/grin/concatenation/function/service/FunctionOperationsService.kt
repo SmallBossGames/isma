@@ -1,89 +1,51 @@
 package ru.nstu.grin.concatenation.function.service
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.points.model.PointSettings
 import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
-import ru.nstu.grin.model.Function
 
 class FunctionOperationsService(
     private val view: ConcatenationCanvas,
     private val matrixTransformer: MatrixTransformer,
     private val canvasModel: ConcatenationCanvasModel,
-    private val canvasViewModel: ConcatenationCanvasViewModel,
+    private val canvasController: ConcatenationCanvasController,
 ) {
-    fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
-        val firstTransformedPoints = firstFunction.transformedPoints
-        val firstFunc = Function(
-            firstTransformedPoints.first.roundValues(),
-            firstTransformedPoints.second.roundValues(),
-        )
-        val firstCartesianSpace = canvasModel.cartesianSpaces.first { it.functions.contains(firstFunction) }
+    suspend fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
+        coroutineScope {
+            val (xPoints1, yPoints1) = firstFunction.pixelsToDraw!!
+            val (xPoints2, yPoints2) = secondFunction.pixelsToDraw!!
 
-        val secondTransformedPoints = firstFunction.transformedPoints
-        val secondFunc = Function(
-            secondTransformedPoints.first.roundValues(),
-            secondTransformedPoints.second.roundValues(),
-        )
-        val secondCartesianSpace = canvasModel.cartesianSpaces.first { it.functions.contains(secondFunction) }
+            val points = IntersectionSearcher.findIntersections(xPoints1, yPoints1, xPoints2, yPoints2)
 
-        val intersections = IntersectionSearcher.findIntersections(firstFunc, secondFunc)
+            val space = canvasModel.cartesianSpaces.first{ it.functions.contains(firstFunction) }
 
-        val xArrays = intersections.map { it.first }
-        val yArrays = intersections.map { it.second }
+            val xScaleProps = space.xAxis.scaleProperties
+            val xDirection = space.xAxis.direction
 
-        val maxX = xArrays.maxOrNull()!! + INTERSECTION_CORRELATION
-        val minX = xArrays.minOrNull()!! - INTERSECTION_CORRELATION
-        val maxY = yArrays.maxOrNull()!! + INTERSECTION_CORRELATION
-        val minY = yArrays.minOrNull()!! - INTERSECTION_CORRELATION
+            val yScaleProps = space.yAxis.scaleProperties
+            val yDirection = space.yAxis.direction
 
-        firstCartesianSpace.xAxis.scaleProperties = firstCartesianSpace.xAxis.scaleProperties.copy(
-            minValue = minX,
-            maxValue = maxX
-        )
-
-        firstCartesianSpace.yAxis.scaleProperties = firstCartesianSpace.yAxis.scaleProperties.copy(
-            minValue = minY,
-            maxValue = maxY
-        )
-
-        secondCartesianSpace.xAxis.scaleProperties = firstCartesianSpace.xAxis.scaleProperties.copy(
-            minValue = minX,
-            maxValue = maxX
-        )
-
-        secondCartesianSpace.yAxis.scaleProperties = firstCartesianSpace.yAxis.scaleProperties.copy(
-            minValue = minY,
-            maxValue = maxY
-        )
-
-        val transformed = intersections
-            .map {
-                val xGraphic = matrixTransformer.transformUnitsToPixel(
-                    it.first,
-                    firstCartesianSpace.xAxis.scaleProperties,
-                    firstCartesianSpace.xAxis.direction
-                )
-                val yGraphic = matrixTransformer.transformUnitsToPixel(
-                    it.second,
-                    firstCartesianSpace.yAxis.scaleProperties,
-                    firstCartesianSpace.yAxis.direction
-                )
-                PointSettings(
-                    firstCartesianSpace.xAxis.scaleProperties,
-                    firstCartesianSpace.yAxis.scaleProperties,
-                    xGraphic = xGraphic,
-                    yGraphic = yGraphic
-                )
+            println("Found ${points.size} points from ${xPoints1.size}")
+            launch(Dispatchers.JavaFx) {
+                for(point in points){
+                    canvasController.addPointDescription(
+                        space,
+                        matrixTransformer.transformPixelToUnits(point.first, xScaleProps, xDirection),
+                        matrixTransformer.transformPixelToUnits(point.second, yScaleProps, yDirection),
+                    )
+                }
             }
-
-        view.redraw()
+        }
     }
 
     //TODO: disabled until migration to Async Transformers
@@ -161,22 +123,5 @@ class FunctionOperationsService(
         )
 
         view.redraw()
-    }
-
-
-
-    private companion object {
-        const val INTERSECTION_CORRELATION = 5.0
-
-        fun DoubleArray.roundValues(): DoubleArray {
-            val values = DoubleArray(size)
-            for (i in values.indices){
-                values[i] = this[i].round()
-            }
-            return values
-        }
-
-        fun Double.round(decimals: Int = 2): Double =
-            String.format("%.${decimals}f", this).replace(",", ".").toDouble()
     }
 }

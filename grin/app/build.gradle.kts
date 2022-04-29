@@ -15,8 +15,8 @@ application {
 
     applicationDefaultJvmArgs = listOf(
         "--add-modules=jdk.incubator.vector",
-        //"--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        //"--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+        "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
     )
 }
 

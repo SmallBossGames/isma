@@ -2,6 +2,8 @@ package ru.nstu.grin.concatenation.function.controller
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import org.koin.core.component.get
@@ -18,20 +20,24 @@ class IntersectionFunctionController : Controller() {
     private val concatenationCanvasModel: ConcatenationCanvasModel = mainGrinScope.get()
     private val functionCanvasService: FunctionOperationsService = mainGrinScope.get()
 
-    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+    private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val model: IntersectionFunctionModel by inject()
 
     init {
-        coroutineScope.launch {
-            concatenationCanvasModel.functionsListUpdatedEvent.collect{
+        fxCoroutineScope.launch {
+            merge(
+                flowOf(concatenationCanvasModel.functions),
+                concatenationCanvasModel.functionsListUpdatedEvent
+            ).collect{
                 model.functions.setAll(it)
             }
         }
-
-        model.functions.setAll(concatenationCanvasModel.functions)
     }
 
     fun findIntersection(list: List<ConcatenationFunction>) {
-        functionCanvasService.showInterSections(list[0], list[1])
+        coroutineScope.launch {
+            functionCanvasService.showInterSections(list[0], list[1])
+        }
     }
 }

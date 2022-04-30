@@ -20,12 +20,14 @@ class FunctionOperationsService(
     private val canvasModel: ConcatenationCanvasModel,
     private val canvasController: ConcatenationCanvasController,
 ) {
-    suspend fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
+    suspend fun showInterSections(
+        firstFunction: ConcatenationFunction,
+        secondFunction: ConcatenationFunction,
+        mergeDistance: Double,
+    ) {
         coroutineScope {
             val (xPoints1, yPoints1) = firstFunction.pixelsToDraw!!
             val (xPoints2, yPoints2) = secondFunction.pixelsToDraw!!
-
-
 
             val space = canvasModel.cartesianSpaces.first{ it.functions.contains(firstFunction) }
 
@@ -42,9 +44,8 @@ class FunctionOperationsService(
                         matrixTransformer.transformPixelToUnits(it.first, xScaleProps, xDirection),
                         matrixTransformer.transformPixelToUnits(it.second, yScaleProps, yDirection),
                     )
-                }.mergeIntervals(0.1)
+                }.mergeIntervals(mergeDistance)
 
-            println("Found ${points.size} points from ${xPoints1.size}")
             launch(Dispatchers.JavaFx) {
                 for(point in points){
                     canvasController.addPointDescription(space, point.first, point.second)

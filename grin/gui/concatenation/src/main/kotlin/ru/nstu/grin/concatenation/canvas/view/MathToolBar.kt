@@ -1,14 +1,20 @@
 package ru.nstu.grin.concatenation.canvas.view
 
+import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.stage.Modality
+import javafx.stage.Stage
+import org.koin.core.component.get
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.function.controller.DerivativeFunctionController
 import ru.nstu.grin.concatenation.function.view.FunctionIntegrationFragment
-import ru.nstu.grin.concatenation.function.view.IntersectionFunctionFragment
+import ru.nstu.grin.concatenation.function.view.IntersectionFunctionView
+import ru.nstu.grin.concatenation.koin.MainGrinScope
+import ru.nstu.grin.concatenation.koin.SearchIntersectionsModalScope
 import tornadofx.Scope
 import tornadofx.find
 
@@ -16,6 +22,7 @@ class MathToolBar(
     scope: Scope,
     canvasViewModel: ConcatenationCanvasViewModel,
     derivativeFunctionController: DerivativeFunctionController,
+    mainGrinScope: MainGrinScope,
 ): ToolBar(
     Button(null, ImageView(Image("intersection.png")).apply {
         fitWidth = 20.0
@@ -24,7 +31,27 @@ class MathToolBar(
         tooltip = Tooltip("Find intersections")
 
         setOnAction {
-            find<IntersectionFunctionFragment>(scope).openModal()
+            val searchIntersectionsScope = mainGrinScope.get<SearchIntersectionsModalScope>()
+            val view = searchIntersectionsScope.get<IntersectionFunctionView>()
+
+            val window = scene.window
+
+            Stage().apply {
+                scene = Scene(view)
+                title = view.title
+
+                initModality(Modality.WINDOW_MODAL)
+
+                if(window != null){
+                    initOwner(window)
+                }
+
+                setOnCloseRequest {
+                    searchIntersectionsScope.closeScope()
+                }
+
+                show()
+            }
         }
     },
     Button(null, ImageView(Image("derivative.png")).apply {

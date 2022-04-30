@@ -174,6 +174,12 @@ val grinGuiModule = module {
             }
         }
 
+        factory {
+            SearchIntersectionsModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
 
@@ -230,6 +236,12 @@ val grinGuiModule = module {
 
         scopedOf(::ManualFunctionFragment)
         scopedOf(::ManualFunctionModel)
+    }
+
+    scope<SearchIntersectionsModalScope>{
+        scopedOf(::IntersectionFunctionView)
+        scopedOf(::IntersectionFunctionController)
+        scopedOf(::IntersectionFunctionViewModel)
     }
 }
 

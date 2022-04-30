@@ -103,6 +103,15 @@ class FunctionCanvasService(
         }
     }
 
+    fun addLastTransformer(
+        function: ConcatenationFunction,
+        transformer: IAsyncPointsTransformer,
+    ) {
+        updateTransformer(function){ transformers ->
+            arrayOf(*transformers, transformer)
+        }
+    }
+
     fun deleteFunction(function: ConcatenationFunction) {
         model.cartesianSpaces.forEach {
             it.functions.remove(function)

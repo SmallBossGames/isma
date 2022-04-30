@@ -181,6 +181,12 @@ val grinGuiModule = module {
             }
         }
 
+        factory {
+            FunctionIntegrationModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
 
@@ -243,6 +249,12 @@ val grinGuiModule = module {
         scopedOf(::IntersectionFunctionView)
         scopedOf(::IntersectionFunctionController)
         scopedOf(::IntersectionFunctionViewModel)
+    }
+
+    scope<FunctionIntegrationModalScope>{
+        scopedOf(::FunctionIntegrationView)
+        scopedOf(::FunctionIntegrationController)
+        scopedOf(::FunctionIntegrationViewModel)
     }
 }
 

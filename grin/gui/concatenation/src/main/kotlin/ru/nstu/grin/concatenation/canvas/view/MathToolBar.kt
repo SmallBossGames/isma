@@ -9,17 +9,16 @@ import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import javafx.stage.Stage
 import org.koin.core.component.get
+import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.function.controller.DerivativeFunctionController
-import ru.nstu.grin.concatenation.function.view.FunctionIntegrationFragment
+import ru.nstu.grin.concatenation.function.view.FunctionIntegrationView
 import ru.nstu.grin.concatenation.function.view.IntersectionFunctionView
+import ru.nstu.grin.concatenation.koin.FunctionIntegrationModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 import ru.nstu.grin.concatenation.koin.SearchIntersectionsModalScope
-import tornadofx.Scope
-import tornadofx.find
 
 class MathToolBar(
-    scope: Scope,
     canvasViewModel: ConcatenationCanvasViewModel,
     derivativeFunctionController: DerivativeFunctionController,
     mainGrinScope: MainGrinScope,
@@ -98,11 +97,28 @@ class MathToolBar(
         tooltip = Tooltip("Find integral")
 
         setOnAction {
-            val function = canvasViewModel.selectedFunctions.firstOrNull()
-            if (function != null) {
-                find<FunctionIntegrationFragment>(
-                    scope
-                ).openModal()
+            val selectedFunction = canvasViewModel.selectedFunctions.firstOrNull() ?: return@setOnAction
+
+            val functionIntegrationModalScope = mainGrinScope.get<FunctionIntegrationModalScope>()
+            val view = functionIntegrationModalScope.get<FunctionIntegrationView>{ parametersOf(selectedFunction) }
+
+            val window = scene.window
+
+            Stage().apply {
+                scene = Scene(view)
+                title = view.title
+
+                initModality(Modality.WINDOW_MODAL)
+
+                if(window != null){
+                    initOwner(window)
+                }
+
+                setOnCloseRequest {
+                    functionIntegrationModalScope.closeScope()
+                }
+
+                show()
             }
         }
     },

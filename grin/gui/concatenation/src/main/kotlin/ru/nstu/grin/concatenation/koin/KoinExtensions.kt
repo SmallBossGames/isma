@@ -45,5 +45,8 @@ class AddFunctionModalScope: KoinScopeComponent {
 class SearchIntersectionsModalScope: KoinScopeComponent {
     override val scope: Scope by lazy { createScope(this) }
 }
+class FunctionIntegrationModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
 
 

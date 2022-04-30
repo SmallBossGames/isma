@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 
 class ChartToolBar(
-    concatenationCanvasModel: ConcatenationCanvasController,
+    concatenationCanvasController: ConcatenationCanvasController,
     chainDrawer: ConcatenationChainDrawer
 ): ToolBar() {
     val coroutineScope = CoroutineScope(Dispatchers.Default)
@@ -18,7 +18,7 @@ class ChartToolBar(
             Button("Normalize").apply {
                 setOnAction {
                     coroutineScope.launch {
-                        concatenationCanvasModel.normalizeSpaces()
+                        concatenationCanvasController.normalizeSpaces()
                         chainDrawer.draw()
                     }
                 }

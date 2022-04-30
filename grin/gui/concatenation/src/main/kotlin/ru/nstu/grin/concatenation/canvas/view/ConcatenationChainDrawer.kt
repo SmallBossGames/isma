@@ -1,12 +1,11 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.scene.paint.Color
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
+import ru.nstu.grin.concatenation.axis.extensions.findFunctionsAreaInsets
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
@@ -22,14 +21,17 @@ class ConcatenationChainDrawer(
     private val spacesTransformationController: SpacesTransformationController,
     private val axisDrawElement: AxisDrawElement,
     private val descriptionDrawElement: DescriptionDrawElement,
-    private val matrixTransformer: MatrixTransformer,
 ) : ChainDrawer {
     private val coroutinesScope = CoroutineScope(Dispatchers.Default)
 
     private val drawingJob = AtomicReference<Job?>(null)
 
     override fun draw() {
-        val newJob = coroutinesScope.launch {
+        coroutinesScope.launch {
+            drawingJob.getAndSet(coroutineContext.job)?.cancel()
+
+            canvasViewModel.functionsArea = model.cartesianSpaces.findFunctionsAreaInsets()
+
             spacesTransformationController.transformSpaces()
 
             withContext(Dispatchers.JavaFx){
@@ -40,7 +42,6 @@ class ConcatenationChainDrawer(
             drawingJob.setRelease(null)
         }
 
-        drawingJob.getAndSet(newJob)?.cancel()
     }
 
     fun drawUiLayer() = coroutinesScope.launch(Dispatchers.JavaFx) {
@@ -48,13 +49,14 @@ class ConcatenationChainDrawer(
     }
 
     private fun drawFunctionsLayerInternal() {
+
         canvasViewModel.functionsLayerContext.apply {
             val width = canvasViewModel.canvasWidth
             val height = canvasViewModel.canvasHeight
 
             ClearDrawElement.draw(this, width, height)
 
-            for (cartesianSpace in model.cartesianSpaces) {
+            /*for (cartesianSpace in model.cartesianSpaces) {
                 if (cartesianSpace.isShowGrid) {
                     GridDrawElement(
                         cartesianSpace.xAxis,
@@ -69,10 +71,11 @@ class ConcatenationChainDrawer(
                         matrixTransformer
                     ).draw(this, width, height)
                 }
-            }
+            }*/
 
             functionDrawElement.draw(this, width, height)
             axisDrawElement.draw(this, width, height)
+            descriptionDrawElement.draw(this, width, height)
         }
     }
 
@@ -83,7 +86,6 @@ class ConcatenationChainDrawer(
 
             ClearDrawElement.draw(this, width, height)
 
-            descriptionDrawElement.draw(this, width, height)
             selectionDrawElement.draw(this, width, height)
         }
     }

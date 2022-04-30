@@ -59,7 +59,8 @@ val grinGuiModule = module {
 
             if(initData!=null){
                 get<ConcatenationCanvasController>().replaceAll(
-                    initData.cartesianSpaces
+                    cartesianSpaces = initData.cartesianSpaces,
+                    normalizeSpaces = true,
                 )
             }
 

@@ -21,11 +21,15 @@ class SpacesTransformationController(
                     function.pixelsToDraw = null
                 } else{
                     launch {
-                        function.pixelsToDraw = transformPoints(
+                        val pixels = transformPoints(
                             function,
                             space.xAxis,
                             space.yAxis,
                         )
+
+                        ensureActive()
+
+                        function.pixelsToDraw = pixels
                     }
                 }
             }

@@ -12,13 +12,12 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import ru.nstu.grin.common.common.SettingsProvider
-import ru.nstu.grin.concatenation.axis.extensions.findFunctionsAreaInsets
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 
 class ConcatenationCanvas(
     private val scalableScrollHandler: ScalableScrollHandler,
@@ -61,8 +60,6 @@ class ConcatenationCanvas(
 
     init {
         children.addAll(functionsCanvas, uiCanvas)
-
-        canvasViewModel.functionsArea = model.cartesianSpaces.findFunctionsAreaInsets()
 
         widthProperty().addListener { _ ->
             functionsCanvas.width = width

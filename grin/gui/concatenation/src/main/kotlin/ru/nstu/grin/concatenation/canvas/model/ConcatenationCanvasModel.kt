@@ -1,21 +1,14 @@
 package ru.nstu.grin.concatenation.canvas.model
 
-import javafx.collections.FXCollections.observableArrayList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
-import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
-import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
+import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 
 class ConcatenationCanvasModel {
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
-    val cartesianSpaces = observableArrayList<CartesianSpace>()!!
+    val cartesianSpaces = mutableListOf<CartesianSpace>()
 
     val functions get() = cartesianSpaces.map { it.functions }.flatten()
 
@@ -46,16 +39,4 @@ class ConcatenationCanvasModel {
 
     suspend fun reportDescriptionsListUpdate() =
         descriptionsListUpdatedEventInternal.emit(descriptions)
-
-    init {
-        coroutineScope.launch {
-            cartesianSpaces.apply {
-                changeAsFlow().collect {
-                    reportCartesianSpacesListUpdate()
-                    reportAxesListUpdate()
-                    reportFunctionsListUpdate()
-                }
-            }
-        }
-    }
 }

@@ -5,6 +5,10 @@ import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.Window
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -27,13 +31,23 @@ class ConcatenationCanvasController(
     private val mainGrinScope: MainGrinScope,
     private val descriptionCanvasService: DescriptionCanvasService,
 ) {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     fun replaceAll(
-        cartesianSpaces: List<CartesianSpace>
+        cartesianSpaces: List<CartesianSpace>,
+        normalizeSpaces: Boolean = false
     ){
-        model.cartesianSpaces.setAll(cartesianSpaces)
+        model.cartesianSpaces.clear()
+        model.cartesianSpaces.addAll(cartesianSpaces)
 
-        normalizeSpaces()
+        coroutineScope.launch {
+            if(normalizeSpaces) normalizeSpaces()
+
+            model.reportAxesListUpdate()
+            model.reportCartesianSpacesListUpdate()
+            model.reportDescriptionsListUpdate()
+            model.reportFunctionsListUpdate()
+        }
     }
 
     fun openFunctionModal(window: Window?) {
@@ -59,7 +73,7 @@ class ConcatenationCanvasController(
         }
     }
 
-    fun normalizeSpaces(){
+    suspend fun normalizeSpaces() = coroutineScope {
         model.cartesianSpaces.forEach { space ->
             var minX = Double.POSITIVE_INFINITY
             var maxX = Double.NEGATIVE_INFINITY

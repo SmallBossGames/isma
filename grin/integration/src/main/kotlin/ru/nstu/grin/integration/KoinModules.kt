@@ -187,6 +187,12 @@ val grinGuiModule = module {
             }
         }
 
+        factory {
+            FunctionWaveletModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
 
@@ -255,6 +261,12 @@ val grinGuiModule = module {
         scopedOf(::FunctionIntegrationView)
         scopedOf(::FunctionIntegrationController)
         scopedOf(::FunctionIntegrationViewModel)
+    }
+
+    scope<FunctionWaveletModalScope>{
+        scopedOf(::FunctionWaveletView)
+        scopedOf(::FunctionWaveletController)
+        scopedOf(::FunctionWaveletViewModel)
     }
 }
 

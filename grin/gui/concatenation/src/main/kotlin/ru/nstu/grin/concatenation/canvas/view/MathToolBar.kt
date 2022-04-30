@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.canvas.view
 
+import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.ToolBar
@@ -8,13 +9,17 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.stage.Modality
 import javafx.stage.Stage
+import javafx.stage.Window
+import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.function.controller.DerivativeFunctionController
 import ru.nstu.grin.concatenation.function.view.FunctionIntegrationView
+import ru.nstu.grin.concatenation.function.view.FunctionWaveletView
 import ru.nstu.grin.concatenation.function.view.IntersectionFunctionView
 import ru.nstu.grin.concatenation.koin.FunctionIntegrationModalScope
+import ru.nstu.grin.concatenation.koin.FunctionWaveletModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
 import ru.nstu.grin.concatenation.koin.SearchIntersectionsModalScope
 
@@ -35,22 +40,7 @@ class MathToolBar(
 
             val window = scene.window
 
-            Stage().apply {
-                scene = Scene(view)
-                title = view.title
-
-                initModality(Modality.WINDOW_MODAL)
-
-                if(window != null){
-                    initOwner(window)
-                }
-
-                setOnCloseRequest {
-                    searchIntersectionsScope.closeScope()
-                }
-
-                show()
-            }
+            openModal(view, window, searchIntersectionsScope, view.title)
         }
     },
     Button(null, ImageView(Image("derivative.png")).apply {
@@ -70,6 +60,17 @@ class MathToolBar(
         fitHeight = 20.0
     }).apply {
         tooltip = Tooltip("Apply wavelet")
+
+        setOnAction {
+            val selectedFunction = canvasViewModel.selectedFunctions.firstOrNull() ?: return@setOnAction
+
+            val functionIntegrationModalScope = mainGrinScope.get<FunctionWaveletModalScope>()
+            val view = functionIntegrationModalScope.get<FunctionWaveletView>{ parametersOf(selectedFunction) }
+
+            val window = scene.window
+
+            openModal(view, window, functionIntegrationModalScope, view.title)
+        }
 
         //TODO: disabled until migration to Async Transformers
         /*setOnAction {
@@ -104,22 +105,31 @@ class MathToolBar(
 
             val window = scene.window
 
-            Stage().apply {
-                scene = Scene(view)
-                title = view.title
-
-                initModality(Modality.WINDOW_MODAL)
-
-                if(window != null){
-                    initOwner(window)
-                }
-
-                setOnCloseRequest {
-                    functionIntegrationModalScope.closeScope()
-                }
-
-                show()
-            }
+            openModal(view, window, functionIntegrationModalScope, view.title)
         }
     },
 )
+
+private fun openModal(
+    view: Parent,
+    window: Window?,
+    searchIntersectionsScope: KoinScopeComponent,
+    windowTitle: String
+) {
+    Stage().apply {
+        scene = Scene(view)
+        title = windowTitle
+
+        initModality(Modality.WINDOW_MODAL)
+
+        if (window != null) {
+            initOwner(window)
+        }
+
+        setOnCloseRequest {
+            searchIntersectionsScope.closeScope()
+        }
+
+        show()
+    }
+}

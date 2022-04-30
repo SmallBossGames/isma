@@ -49,4 +49,8 @@ class FunctionIntegrationModalScope: KoinScopeComponent {
     override val scope: Scope by lazy { createScope(this) }
 }
 
+class FunctionWaveletModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+
 

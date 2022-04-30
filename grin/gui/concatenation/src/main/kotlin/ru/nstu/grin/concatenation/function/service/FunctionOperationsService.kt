@@ -4,14 +4,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
-import ru.nstu.grin.common.model.WaveletDirection
-import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
 
 class FunctionOperationsService(
@@ -52,45 +49,6 @@ class FunctionOperationsService(
                 }
             }
         }
-    }
-
-    //TODO: disabled until migration to Async Transformers
-    fun waveletFunction(
-        function: ConcatenationFunction,
-        waveletTransformFun: WaveletTransformFun,
-        waveletDirection: WaveletDirection
-    ) {
-        TODO("Disabled until migration to Async Transformers")
-        /*function.waveletDetails = WaveletDetails(
-            waveletTransformFun = waveletTransformFun,
-            waveletDirection = waveletDirection
-        )
-
-        view.redraw()
-        localizeFunction(function)*/
-    }
-
-    fun calculateIntegral(
-        function: ConcatenationFunction,
-        leftBorder: Double,
-        rightBorder: Double
-    ) {
-        val transformedPoints = function.transformedPoints
-        val min = transformedPoints.first.minOrNull() ?: 0.0
-        val max = transformedPoints.second.maxOrNull() ?: 0.0
-        if (min > leftBorder) {
-            tornadofx.error("Левая граница не может быть меньше минимума функции")
-            return
-        }
-        if (rightBorder > max) {
-            tornadofx.error("Правaя граница не может быть больше максимума функции")
-        }
-        val integral = Integration.trapeze(
-            transformedPoints.first,
-            transformedPoints.second,
-            0.0
-        )
-        tornadofx.information("Интеграл равен $integral")
     }
 
     fun localizeFunction(function: ConcatenationFunction) {

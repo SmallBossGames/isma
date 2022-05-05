@@ -6,9 +6,8 @@ import ru.nstu.grin.common.view.ChainDrawElement
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.Offsets
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.axis.extensions.findFunctionsAreaInsets
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 
 class AxisDrawElement(
     private val canvasModel: ConcatenationCanvasModel,
@@ -18,10 +17,6 @@ class AxisDrawElement(
 ) : ChainDrawElement {
 
     override fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double) {
-        val spaces = canvasModel.cartesianSpaces
-
-        canvasViewModel.functionsArea = spaces.findFunctionsAreaInsets()
-
         val offsets = Offsets()
 
         for (cartesianSpace in canvasModel.cartesianSpaces) {

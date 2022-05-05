@@ -1,125 +1,54 @@
 package ru.nstu.grin.concatenation.function.service
 
-import ru.nstu.grin.common.model.WaveletDirection
-import ru.nstu.grin.common.model.WaveletTransformFun
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationCanvas
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.points.model.PointSettings
-import ru.nstu.grin.math.Integration
 import ru.nstu.grin.math.IntersectionSearcher
-import ru.nstu.grin.model.Function
-import ru.nstu.grin.model.MathPoint
 
 class FunctionOperationsService(
     private val view: ConcatenationCanvas,
     private val matrixTransformer: MatrixTransformer,
     private val canvasModel: ConcatenationCanvasModel,
+    private val canvasController: ConcatenationCanvasController,
 ) {
-    fun showInterSections(firstFunction: ConcatenationFunction, secondFunction: ConcatenationFunction) {
-        val interactionSearcher = IntersectionSearcher()
-        val firstFunc = Function(
-            firstFunction.points.map { Pair(it.x.round(), it.y.round()) }
-        )
-        val firstCartesianSpace = canvasModel.cartesianSpaces.first { it.functions.contains(firstFunction) }
-        val secondFunc = Function(
-            secondFunction.points.map { Pair(it.x.round(), it.y.round()) }
-        )
-        val secondCartesianSpace = canvasModel.cartesianSpaces.first { it.functions.contains(secondFunction) }
+    suspend fun showInterSections(
+        firstFunction: ConcatenationFunction,
+        secondFunction: ConcatenationFunction,
+        mergeDistance: Double,
+    ) {
+        coroutineScope {
+            val (xPoints1, yPoints1) = firstFunction.pixelsToDraw!!
+            val (xPoints2, yPoints2) = secondFunction.pixelsToDraw!!
 
-        val intersections = interactionSearcher.findIntersections(firstFunc, secondFunc)
+            val space = canvasModel.cartesianSpaces.first{ it.functions.contains(firstFunction) }
 
-        val xArrays = intersections.map { it.first }
-        val yArrays = intersections.map { it.second }
+            val xScaleProps = space.xAxis.scaleProperties
+            val xDirection = space.xAxis.direction
 
-        val maxX = xArrays.maxOrNull()!! + INTERSECTION_CORRELATION
-        val minX = xArrays.minOrNull()!! - INTERSECTION_CORRELATION
-        val maxY = yArrays.maxOrNull()!! + INTERSECTION_CORRELATION
-        val minY = yArrays.minOrNull()!! - INTERSECTION_CORRELATION
+            val yScaleProps = space.yAxis.scaleProperties
+            val yDirection = space.yAxis.direction
 
-        firstCartesianSpace.xAxis.scaleProperties = firstCartesianSpace.xAxis.scaleProperties.copy(
-            minValue = minX,
-            maxValue = maxX
-        )
+            val points = IntersectionSearcher
+                .findIntersections(xPoints1, yPoints1, xPoints2, yPoints2)
+                .map {
+                    Pair(
+                        matrixTransformer.transformPixelToUnits(it.first, xScaleProps, xDirection),
+                        matrixTransformer.transformPixelToUnits(it.second, yScaleProps, yDirection),
+                    )
+                }.mergeIntervals(mergeDistance)
 
-        firstCartesianSpace.yAxis.scaleProperties = firstCartesianSpace.yAxis.scaleProperties.copy(
-            minValue = minY,
-            maxValue = maxY
-        )
-
-        secondCartesianSpace.xAxis.scaleProperties = firstCartesianSpace.xAxis.scaleProperties.copy(
-            minValue = minX,
-            maxValue = maxX
-        )
-
-        secondCartesianSpace.yAxis.scaleProperties = firstCartesianSpace.yAxis.scaleProperties.copy(
-            minValue = minY,
-            maxValue = maxY
-        )
-
-        val transformed = intersections
-            .map {
-                val xGraphic = matrixTransformer.transformUnitsToPixel(
-                    it.first,
-                    firstCartesianSpace.xAxis.scaleProperties,
-                    firstCartesianSpace.xAxis.direction
-                )
-                val yGraphic = matrixTransformer.transformUnitsToPixel(
-                    it.second,
-                    firstCartesianSpace.yAxis.scaleProperties,
-                    firstCartesianSpace.yAxis.direction
-                )
-                PointSettings(
-                    firstCartesianSpace.xAxis.scaleProperties,
-                    firstCartesianSpace.yAxis.scaleProperties,
-                    xGraphic = xGraphic,
-                    yGraphic = yGraphic
-                )
+            launch(Dispatchers.JavaFx) {
+                for(point in points){
+                    canvasController.addPointDescription(space, point.first, point.second)
+                }
             }
-
-        canvasModel.pointToolTipSettings.isShow = true
-        canvasModel.pointToolTipSettings.pointsSettings.addAll(transformed)
-
-        view.redraw()
-    }
-
-    //TODO: disabled until migration to Async Transformers
-    fun waveletFunction(
-        function: ConcatenationFunction,
-        waveletTransformFun: WaveletTransformFun,
-        waveletDirection: WaveletDirection
-    ) {
-        TODO("Disabled until migration to Async Transformers")
-        /*function.waveletDetails = WaveletDetails(
-            waveletTransformFun = waveletTransformFun,
-            waveletDirection = waveletDirection
-        )
-
-        view.redraw()
-        localizeFunction(function)*/
-    }
-
-    fun calculateIntegral(
-        function: ConcatenationFunction,
-        leftBorder: Double,
-        rightBorder: Double
-    ) {
-        val min = function.points.minOf { it.x }
-        val max = function.points.maxOf { it.x }
-        if (min > leftBorder) {
-            tornadofx.error("Левая граница не может быть меньше минимума функции")
-            return
         }
-        if (rightBorder > max) {
-            tornadofx.error("Правaя граница не может быть больше максимума функции")
-        }
-        val integral = Integration.trapeze(
-            function.points
-                .filter { it.x > leftBorder && it.x < rightBorder }
-                .map { MathPoint(it.x, it.y) }
-        )
-        tornadofx.information("Интеграл равен $integral")
     }
 
     fun localizeFunction(function: ConcatenationFunction) {
@@ -160,12 +89,36 @@ class FunctionOperationsService(
         view.redraw()
     }
 
+    companion object {
+        @JvmStatic
+        fun List<Pair<Double, Double>>.mergeIntervals(mergeDistance: Double): List<Pair<Double, Double>> {
+            if (this.isEmpty()) return this
 
+            val powMergeDistance = mergeDistance * mergeDistance
+            val resultList = mutableListOf(this[0])
 
-    private companion object {
-        const val INTERSECTION_CORRELATION = 5.0
+            var beginInterval = this[0]
 
-        fun Double.round(decimals: Int = 2): Double =
-            String.format("%.${decimals}f", this).replace(",", ".").toDouble()
+            for (i in 1 until this.size){
+                val current = resultList.last()
+                val next = this[i]
+                val dX = next.first - current.first
+                val dY = next.second - current.second
+                val distance = dX * dX + dY * dY
+
+                if(distance < powMergeDistance){
+                    if (current === beginInterval){
+                        resultList.add(next)
+                    } else {
+                        resultList[resultList.lastIndex] = next
+                    }
+                } else {
+                    resultList.add(next)
+                    beginInterval = next
+                }
+            }
+
+            return resultList
+        }
     }
 }

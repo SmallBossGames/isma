@@ -2,8 +2,6 @@ package ru.nstu.grin.integration
 
 import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
-import ru.nstu.grin.common.draw.elements.ArrowDrawElement
-import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
 import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
@@ -16,9 +14,9 @@ import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.canvas.view.*
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
@@ -37,16 +35,16 @@ import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
+import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
 import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.controller.*
 import ru.nstu.grin.concatenation.function.model.*
-import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
-import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Scope
 import tornadofx.find
 import tornadofx.setInScope
@@ -61,9 +59,8 @@ val grinGuiModule = module {
 
             if(initData!=null){
                 get<ConcatenationCanvasController>().replaceAll(
-                    initData.cartesianSpaces,
-                    initData.arrows,
-                    initData.descriptions
+                    cartesianSpaces = initData.cartesianSpaces,
+                    normalizeSpaces = true,
                 )
             }
 
@@ -77,7 +74,7 @@ val grinGuiModule = module {
         scopedOf(::ElementsView)
 
         scopedOf(::ConcatenationCanvas)
-        scopedOf(::ConcatenationViewModel)
+        scopedOf(::EditModeViewModel)
         scopedOf(::ConcatenationCanvasViewModel)
         scopedOf(::ConcatenationCanvasController)
         scopedOf(::ConcatenationCanvasModel)
@@ -90,14 +87,11 @@ val grinGuiModule = module {
         scopedOf(::HorizontalAxisDrawStrategy)
         scopedOf(::HorizontalPixelMarksArrayBuilder)
         scopedOf(::HorizontalValueMarksArrayBuilder)
-        scopedOf(::PointTooltipsDrawElement)
         scopedOf(::ConcatenationFunctionDrawElement)
         scopedOf(::SelectionDrawElement)
         scopedOf(::DescriptionDrawElement)
         scopedOf(::MatrixTransformer)
         scopedOf(::CartesianCanvasContextMenuController)
-
-        scoped { ArrowDrawElement(get<ConcatenationCanvasModel>().arrows, 1.0) }
 
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)
@@ -181,6 +175,24 @@ val grinGuiModule = module {
             }
         }
 
+        factory {
+            SearchIntersectionsModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            FunctionIntegrationModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            FunctionWaveletModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
 
@@ -207,9 +219,9 @@ val grinGuiModule = module {
     }
 
     scope<DescriptionChangeModalScope> {
-        scoped { ChangeDescriptionController(get()) }
-        scoped { params -> ChangeDescriptionView(get(), get{ params }) }
-        scoped { params -> ChangeDescriptionViewModel(params.getOrNull(), params.getOrNull()) }
+        scopedOf(::ChangeDescriptionController)
+        scopedOf(::ChangeDescriptionView)
+        scopedOf(::ChangeDescriptionViewModel)
     }
 
     scope<CartesianCopyModalScope> {
@@ -237,6 +249,24 @@ val grinGuiModule = module {
 
         scopedOf(::ManualFunctionFragment)
         scopedOf(::ManualFunctionModel)
+    }
+
+    scope<SearchIntersectionsModalScope>{
+        scopedOf(::IntersectionFunctionView)
+        scopedOf(::IntersectionFunctionController)
+        scopedOf(::IntersectionFunctionViewModel)
+    }
+
+    scope<FunctionIntegrationModalScope>{
+        scopedOf(::FunctionIntegrationView)
+        scopedOf(::FunctionIntegrationController)
+        scopedOf(::FunctionIntegrationViewModel)
+    }
+
+    scope<FunctionWaveletModalScope>{
+        scopedOf(::FunctionWaveletView)
+        scopedOf(::FunctionWaveletController)
+        scopedOf(::FunctionWaveletViewModel)
     }
 }
 

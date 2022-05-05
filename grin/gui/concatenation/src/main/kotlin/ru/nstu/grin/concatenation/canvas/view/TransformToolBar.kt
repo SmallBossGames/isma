@@ -10,7 +10,9 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.description.model.DescriptionModalForUpdate
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.function.controller.MirrorFunctionController
 import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
@@ -24,6 +26,7 @@ import tornadofx.find
 class TransformToolBar(
     private val mainGrinScope: MainGrinScope,
     private val canvasViewModel: ConcatenationCanvasViewModel,
+    private val canvasModel: ConcatenationCanvasModel,
     private val functionOperationsService: FunctionOperationsService,
     private val mirrorFunctionController: MirrorFunctionController,
 ) : ToolBar(
@@ -57,7 +60,11 @@ class TransformToolBar(
             val description = canvasViewModel.selectedDescriptions.firstOrNull()
             if (description != null) {
                 val descriptionChangeModalScope = mainGrinScope.get<DescriptionChangeModalScope>()
-                val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(description)}
+                val initData = DescriptionModalForUpdate(
+                    cartesianSpace = canvasModel.cartesianSpaces.first { it.descriptions.contains(description) },
+                    description = description,
+                )
+                val view = descriptionChangeModalScope.get<ChangeDescriptionView> { parametersOf(initData)}
 
                 Stage().apply {
                     scene = Scene(view)

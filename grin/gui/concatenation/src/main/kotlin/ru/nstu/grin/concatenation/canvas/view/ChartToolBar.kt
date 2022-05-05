@@ -1,20 +1,26 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.event.EventHandler
 import javafx.scene.control.Button
 import javafx.scene.control.ToolBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 
 class ChartToolBar(
-    concatenationCanvasModel: ConcatenationCanvasController,
+    concatenationCanvasController: ConcatenationCanvasController,
     chainDrawer: ConcatenationChainDrawer
 ): ToolBar() {
+    val coroutineScope = CoroutineScope(Dispatchers.Default)
+
     init {
         items.addAll(
             Button("Normalize").apply {
-                onAction = EventHandler {
-                    concatenationCanvasModel.normalizeSpaces()
-                    chainDrawer.draw()
+                setOnAction {
+                    coroutineScope.launch {
+                        concatenationCanvasController.normalizeSpaces()
+                        chainDrawer.draw()
+                    }
                 }
             }
         )

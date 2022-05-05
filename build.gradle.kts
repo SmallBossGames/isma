@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.20" apply false
+    kotlin("jvm") version "1.6.21" apply false
     id("org.openjfx.javafxplugin") version "0.0.12" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.20" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21" apply false
     id("de.jjohannes.extra-java-module-info") version "0.11" apply false
 }
 

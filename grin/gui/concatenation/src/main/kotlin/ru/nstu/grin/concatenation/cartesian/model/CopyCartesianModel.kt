@@ -1,8 +1,8 @@
 package ru.nstu.grin.concatenation.cartesian.model
 
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 
 class CopyCartesianModel(
     val space: CartesianSpace

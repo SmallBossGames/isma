@@ -16,15 +16,12 @@ import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import java.util.*
 
 
 class GrinIntegrationFacade: KoinComponent {
     fun open(spaces: List<CartesianSpace>) {
         val initData = InitCanvasData(
             cartesianSpaces = spaces,
-            arrows = listOf(),
-            descriptions = listOf()
         )
 
         Stage().apply {
@@ -67,6 +64,7 @@ class GrinIntegrationFacade: KoinComponent {
         val cartesianSpace = CartesianSpace(
             "CartesianSpace",
             mappedFunctions,
+            mutableListOf(),
             xAxis,
             yAxis
         )
@@ -80,9 +78,9 @@ class GrinIntegrationFacade: KoinComponent {
         color: Color
     ) : ConcatenationFunction {
         return ConcatenationFunction(
-            id = UUID.randomUUID(),
             name = name,
-            points = points,
+            xPoints = points.map { it.x }.toDoubleArray(),
+            yPoints = points.map { it.y }.toDoubleArray(),
             isHide = false,
             functionColor = color,
             lineSize = 2.0,

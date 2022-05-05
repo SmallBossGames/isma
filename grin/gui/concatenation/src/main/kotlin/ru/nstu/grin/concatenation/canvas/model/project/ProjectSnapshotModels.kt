@@ -4,37 +4,36 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import ru.nstu.grin.common.model.Description
-import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.concatenation.description.model.Description
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import ru.nstu.grin.concatenation.axis.model.*
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
-import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
+import ru.nstu.grin.concatenation.function.model.LineType
 import ru.nstu.grin.concatenation.function.transform.*
-import java.util.*
 
 @Serializable
 data class ProjectSnapshot(
     val spaces: List<CartesianSpaceSnapshot> = emptyList(),
-    val descriptions: List<DescriptionSnapshot> = emptyList(),
 )
 
 @Serializable
 data class DescriptionSnapshot(
-    val id: String,
-    var text: String,
-    var textSize: Double,
-    var x: Double,
-    var y: Double,
-    var color: ColorSnapshot,
-    var font: String,
+    val text: String,
+    val pointerX: Double,
+    val pointerY: Double,
+    val textOffsetX: Double,
+    val textOffsetY: Double,
+    val color: ColorSnapshot,
+    val font: FontSnapshot,
 )
 
 @Serializable
 data class CartesianSpaceSnapshot(
     val name: String,
     val functions: List<ConcatenationFunctionSnapshot>,
+    val descriptions: List<DescriptionSnapshot>,
     val xAxis: ConcatenationAxisSnapshot,
     val yAxis: ConcatenationAxisSnapshot,
     val isShowGrid: Boolean,
@@ -42,20 +41,14 @@ data class CartesianSpaceSnapshot(
 
 @Serializable
 data class ConcatenationFunctionSnapshot(
-    val id: String,
     val name: String,
-    val points: List<PointSnapshot>,
+    val xPoints: List<Double>,
+    val yPoints: List<Double>,
     val isHide: Boolean,
     val functionColor: ColorSnapshot,
     val lineSize: Double,
     val lineType: LineType,
     val transformers: List<TransformerSnapshot>
-)
-
-@Serializable
-data class PointSnapshot(
-    val x: Double,
-    val y: Double,
 )
 
 @Serializable
@@ -144,24 +137,24 @@ class IntegratorTransformerSnapshot(
 
 fun DescriptionSnapshot.toModel() =
     Description(
-        id = UUID.fromString(id),
         text = text,
-        textSize = textSize,
-        x = x,
-        y = y,
+        textOffsetX = textOffsetX,
+        textOffsetY = textOffsetY,
         color = color.toModel(),
-        font = font,
+        font = font.toModel(),
+        pointerX = pointerX,
+        pointerY = pointerY,
     )
 
 fun Description.toSnapshot() =
     DescriptionSnapshot(
-        id = id.toString(),
         text = text,
-        textSize = textSize,
-        x = x,
-        y = y,
+        pointerX = pointerX,
+        pointerY = pointerY,
+        textOffsetX = textOffsetX,
+        textOffsetY = textOffsetY,
         color = color.toSnapshot(),
-        font = font,
+        font = font.toSnapshot(),
     )
 
 fun AxisStylePropertiesSnapshot.toModel() =
@@ -228,17 +221,13 @@ fun ConcatenationAxis.toSnapshot() =
         scaleProperties = scaleProperties.toSnapshot(),
     )
 
-fun PointSnapshot.toModel() = Point(x, y)
-
-fun Point.toSnapshot() = PointSnapshot(x, y)
-
 fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
     val transformersFromSnapshot = transformers.map { it.toModel() }.toTypedArray()
 
     return ConcatenationFunction(
-        id = UUID.fromString(id),
         name = name,
-        points = points.map { it.toModel() },
+        xPoints = xPoints.toDoubleArray(),
+        yPoints = yPoints.toDoubleArray(),
         isHide = isHide,
         functionColor = functionColor.toModel(),
         lineSize = lineSize,
@@ -254,9 +243,9 @@ fun ConcatenationFunctionSnapshot.toModel(): ConcatenationFunction {
 
 fun ConcatenationFunction.toSnapshot() =
     ConcatenationFunctionSnapshot(
-        id = id.toString(),
         name = name,
-        points = points.map { it.toSnapshot() },
+        xPoints = xPoints.toList(),
+        yPoints = yPoints.toList(),
         isHide = isHide,
         functionColor = functionColor.toSnapshot(),
         lineSize = lineSize,
@@ -268,6 +257,7 @@ fun CartesianSpaceSnapshot.toModel() =
     CartesianSpace(
         name = name,
         functions = functions.map { it.toModel() }.toMutableList(),
+        descriptions = descriptions.map { it.toModel() }.toMutableList(),
         xAxis = xAxis.toModel(),
         yAxis = yAxis.toModel(),
         isShowGrid = isShowGrid,
@@ -277,6 +267,7 @@ fun CartesianSpace.toSnapshot() =
     CartesianSpaceSnapshot(
         name = name,
         functions = functions.map { it.toSnapshot() },
+        descriptions = descriptions.map { it.toSnapshot() },
         xAxis = xAxis.toSnapshot(),
         yAxis = yAxis.toSnapshot(),
         isShowGrid = isShowGrid,

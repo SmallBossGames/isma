@@ -207,8 +207,8 @@ class ChangeFunctionFragment(
 
         fun propertyGridContainerContent(item: IntegratorTransformerViewModel) =
             propertiesGrid {
-                addNode("Degree", item.initialValueProperty)
-                addNode("Type", FXCollections.observableList(IntegrationMethod.values().asList()), item.methodProperty)
+                addNode("Initial", item.initialValueProperty)
+                addNode("Method", FXCollections.observableList(IntegrationMethod.values().asList()), item.methodProperty)
                 addNode("Axis", FXCollections.observableList(IntegrationAxis.values().asList()), item.axisProperty)
             }
     }

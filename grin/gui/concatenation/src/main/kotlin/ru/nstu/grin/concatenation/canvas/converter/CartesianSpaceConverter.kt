@@ -14,6 +14,7 @@ object CartesianSpaceConverter {
                     it
                 )
             }.toMutableList(),
+            descriptions = mutableListOf(),
             xAxis = xAxis,
             yAxis = yAxis
         )

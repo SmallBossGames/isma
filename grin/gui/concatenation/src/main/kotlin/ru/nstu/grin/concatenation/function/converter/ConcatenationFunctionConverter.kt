@@ -7,9 +7,9 @@ import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 object ConcatenationFunctionConverter : Converter<ConcatenationFunctionDTO, ConcatenationFunction> {
     override fun convert(source: ConcatenationFunctionDTO): ConcatenationFunction {
         return ConcatenationFunction(
-            id = source.id,
             name = source.name,
-            points = source.points,
+            xPoints = source.points.map { it.x }.toDoubleArray(),
+            yPoints = source.points.map { it.y }.toDoubleArray(),
             functionColor = source.functionColor,
             lineSize = source.lineSize,
             lineType = source.lineType

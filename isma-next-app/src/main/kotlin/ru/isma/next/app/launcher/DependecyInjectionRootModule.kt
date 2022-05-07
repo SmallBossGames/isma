@@ -1,7 +1,6 @@
 package ru.isma.next.app.launcher
 
 import org.koin.core.context.GlobalContext.startKoin
-import ru.isma.next.app.models.koin.projectsModule
 import ru.isma.next.app.services.koin.*
 import ru.isma.next.app.views.koin.*
 import ru.nstu.grin.integration.grinIntegrationModule
@@ -26,10 +25,6 @@ fun ismaKoinStart() = startKoin {
         settingsPanelModule,
         editorTabPaneModule,
         lismaTextEditorModule,
-        blueprintEditorModule
-    )
-
-    modules(
-        projectsModule
+        blueprintEditorModule,
     )
 }

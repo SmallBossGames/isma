@@ -7,7 +7,7 @@ import org.koin.core.component.createScope
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
-import ru.isma.next.app.models.koin.IsmaEditorQualifier
+import ru.isma.next.app.views.koin.IsmaEditorQualifier
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.File

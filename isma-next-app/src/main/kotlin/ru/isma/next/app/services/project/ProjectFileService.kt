@@ -31,7 +31,7 @@ class ProjectFileService(private val projectController: ProjectService) {
     fun open(ownerWindow: Window? = null) {
         val file = FileChooser().run {
             title = "Open Project File"
-            extensionFilters.addAll(fileFilters)
+            extensionFilters.addAll(allProjectFileFilters)
             return@run showOpenDialog(ownerWindow)
         } ?: return
 
@@ -58,18 +58,18 @@ class ProjectFileService(private val projectController: ProjectService) {
             TEXT_ISMA_PROJECT_FILE.contains(file.extension) -> {
                 LismaProjectModel().apply {
                     this.name = file.name
-                    this.lismaText = file.readText()
                     this.file = file
+                    this.lismaText = file.readText()
                     projectController.addText(this)
                 }
             }
             STATE_CHART_ISMA_PROJECT_FILE.contains(file.extension) -> {
-                val blueprint = BlueprintProjectModel().apply {
+                BlueprintProjectModel().apply {
                     this.name = file.name
                     this.file = file
                     this.blueprint = Json.decodeFromString(file.readText())
+                    projectController.addBlueprint(this)
                 }
-                projectController.addBlueprint(blueprint)
             }
         }
     }
@@ -134,8 +134,8 @@ class ProjectFileService(private val projectController: ProjectService) {
 
     companion object {
         private val textProjectFileFilters = arrayOf(
-            FileChooser.ExtensionFilter("ISMA Project file", OLD_ISMA_PROJECT_FILE),
             FileChooser.ExtensionFilter("ISMA Next Project file", TEXT_ISMA_PROJECT_FILE),
+            FileChooser.ExtensionFilter("ISMA Project file", OLD_ISMA_PROJECT_FILE),
         )
 
         private val stateChartProjectFileFilters = arrayOf(
@@ -143,9 +143,7 @@ class ProjectFileService(private val projectController: ProjectService) {
         )
 
         private val allProjectFileFilters = arrayOf(
-            FileChooser.ExtensionFilter("All ISMA project files", STATE_CHART_ISMA_PROJECT_FILE),
+            FileChooser.ExtensionFilter("All ISMA project files", TEXT_ISMA_PROJECT_FILE, STATE_CHART_ISMA_PROJECT_FILE),
         )
-
-        private val fileFilters = arrayOf(*allProjectFileFilters, *textProjectFileFilters, *stateChartProjectFileFilters)
     }
 }

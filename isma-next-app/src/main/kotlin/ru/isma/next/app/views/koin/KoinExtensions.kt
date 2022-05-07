@@ -6,19 +6,18 @@ import ru.isma.next.app.views.MainView
 import ru.isma.next.app.views.settings.*
 import ru.isma.next.app.views.tabpane.IsmaEditorTabPane
 import ru.isma.next.app.views.toolbars.*
-import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.text.IsmaTextEditor
 import ru.isma.next.editor.text.services.LismaHighlightingService
 import ru.isma.next.editor.text.services.contracts.IHighlightingService
 
-val lismaTextEditorModule =  module {
+val lismaTextEditorModule = module {
     factory { IsmaTextEditor(get(), get()) }
     single<IHighlightingService> { LismaHighlightingService() }
 }
 
 val blueprintEditorModule = module {
-    factory { IsmaBlueprintEditor(get()) }
+    //factory { IsmaBlueprintEditor(get()) }
     single<ITextEditorFactory> { TextEditorFactory() }
 }
 

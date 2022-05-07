@@ -34,10 +34,15 @@ class ProjectService {
 
     fun close(project: IProjectModel){
         projects.remove(project)
+        project.dispose()
     }
 
     fun closeAll() {
+        val temp = projects.toTypedArray()
+
         projects.clear()
+
+        temp.forEach { it.dispose() }
     }
 
     fun getAllProjects() = projects.toTypedArray()

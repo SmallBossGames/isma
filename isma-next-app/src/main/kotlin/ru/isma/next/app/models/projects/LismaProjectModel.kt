@@ -5,10 +5,12 @@ import javafx.scene.Node
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.createScope
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
-import ru.isma.next.editor.text.IsmaTextEditor
+import ru.isma.next.app.models.koin.IsmaEditorQualifier
+import tornadofx.getValue
+import tornadofx.setValue
 import java.io.File
-import tornadofx.*
 
 class LismaProjectModel: IProjectModel, KoinScopeComponent {
     override val scope: Scope by lazy { createScope() }
@@ -32,7 +34,7 @@ class LismaProjectModel: IProjectModel, KoinScopeComponent {
 
     override var file: File? = null
 
-    override val editor: Node by inject<IsmaTextEditor>()
+    override val editor: Node by inject(named<IsmaEditorQualifier>())
 
     init {
         pushText()

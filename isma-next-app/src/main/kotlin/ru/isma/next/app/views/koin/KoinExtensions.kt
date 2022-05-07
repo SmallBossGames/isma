@@ -17,7 +17,6 @@ val lismaTextEditorModule = module {
 }
 
 val blueprintEditorModule = module {
-    //factory { IsmaBlueprintEditor(get()) }
     single<ITextEditorFactory> { TextEditorFactory() }
 }
 

@@ -5,9 +5,10 @@ import javafx.scene.Node
 import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.createScope
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import ru.isma.next.app.models.koin.IsmaEditorQualifier
 import ru.isma.next.app.utilities.convertToLisma
-import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import tornadofx.getValue
 import tornadofx.setValue
@@ -26,7 +27,7 @@ class BlueprintProjectModel : IProjectModel, KoinScopeComponent {
 
     override var file: File? = null
 
-    override val editor: Node by inject<IsmaBlueprintEditor>()
+    override val editor: Node by inject(named<IsmaEditorQualifier>())
 
     init {
         pushBlueprint()

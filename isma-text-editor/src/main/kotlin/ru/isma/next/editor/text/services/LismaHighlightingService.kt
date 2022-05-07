@@ -6,7 +6,7 @@ import org.fxmisc.richtext.model.StyleSpansBuilder
 import ru.isma.next.editor.text.services.contracts.IHighlightingService
 import ru.nstu.isma.lisma.analysis.gen.LismaLexer
 
-class LismaHighlightingService() : IHighlightingService {
+class LismaHighlightingService : IHighlightingService {
     override fun createHighlightingStyleSpans(source: String): StyleSpans<Collection<String>>? {
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
         var lastKeyword = 0

@@ -14,8 +14,6 @@ javafx {
 }
 
 dependencies {
-    implementation(project(":isma-text-editor"))
-
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.fxmisc.richtext.core)
 }

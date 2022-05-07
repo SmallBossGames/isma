@@ -64,11 +64,7 @@ class FunctionCanvasService(
         function: ConcatenationFunction,
         operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
     ) = coroutineScope.launch {
-        do {
-            if (function.updateTransformersTransaction(operation)){
-                break
-            }
-        } while (true)
+        function.updateTransformersTransaction(operation)
 
         model.reportFunctionsListUpdate()
     }
@@ -77,11 +73,7 @@ class FunctionCanvasService(
         function: ConcatenationFunction,
         transformers: Array<IAsyncPointsTransformer>
     ) = coroutineScope.launch {
-        do {
-            if (function.updateTransformersTransaction{ transformers }){
-                break
-            }
-        } while (true)
+        function.updateTransformersTransaction{ transformers }
 
         model.reportFunctionsListUpdate()
     }

@@ -1,6 +1,5 @@
 module isma.isma.blueprint.editor.main {
     requires kotlin.stdlib;
-    requires isma.isma.text.editor.main;
     requires org.fxmisc.richtext;
     requires kotlinx.serialization.core;
     requires javafx.graphics;

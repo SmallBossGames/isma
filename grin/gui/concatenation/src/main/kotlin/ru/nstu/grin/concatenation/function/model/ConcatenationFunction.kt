@@ -1,10 +1,7 @@
 package ru.nstu.grin.concatenation.function.model
 
 import javafx.scene.paint.Color
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.function.transform.IAsyncPointsTransformer
 import java.util.concurrent.atomic.AtomicReference
@@ -52,7 +49,31 @@ class ConcatenationFunction(
 
     suspend fun updateTransformersTransaction(
         operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
-    ): Boolean = coroutineScope {
+    ) = coroutineScope {
+
+        while (true){
+            if (tryUpdateCacheCandidate(operation)){
+                break
+            }
+        }
+
+        val updateJob = launch(start = CoroutineStart.LAZY) {
+            while (true){
+                if (tryApplyCacheCandidate()){
+                    cacheUpdateJob.compareAndExchangeRelease(coroutineContext.job, null)
+                    break
+                }
+            }
+        }
+
+        val currentJob = cacheUpdateJob.compareAndExchangeAcquire(null, updateJob) ?: updateJob
+
+        currentJob.join()
+    }
+
+    private fun tryUpdateCacheCandidate(
+        operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
+    ): Boolean {
         val oldCache = transformedPointCache.get()
 
         val newCache = PointsCache(
@@ -62,28 +83,14 @@ class ConcatenationFunction(
             oldCache.transformedPointsY,
         )
 
-        if (!transformedPointCache.compareAndSet(oldCache, newCache)) {
-            return@coroutineScope false
-        }
-
-        val updateJob = launch(start = CoroutineStart.LAZY) {
-            applyCacheCandidate()
-        }
-
-        val currentJob = cacheUpdateJob.compareAndExchangeAcquire(null, updateJob) ?: updateJob
-
-        currentJob.join()
-
-        return@coroutineScope true
+        return transformedPointCache.compareAndSet(oldCache, newCache)
     }
 
-
-    private suspend fun applyCacheCandidate() {
-        mainLoop@ do {
+    private suspend fun tryApplyCacheCandidate(): Boolean {
             val originCache = transformedPointCache.get()
 
             if (originCache.transformersCandidate === originCache.transformers) {
-                break
+                return true
             }
 
             val newTransformers = originCache.transformersCandidate
@@ -93,7 +100,7 @@ class ConcatenationFunction(
 
             for (transformer in newTransformers) {
                 if (transformedPointCache.get() !== originCache) {
-                    continue@mainLoop
+                    return false
                 }
 
                 val (newXPoints, newYPoints) = transformer.transform(xPoints, yPoints)
@@ -109,12 +116,7 @@ class ConcatenationFunction(
                 yPoints
             )
 
-            if (transformedPointCache.compareAndSet(originCache, newCache)) {
-                break
-            }
-        } while (true)
-
-        cacheUpdateJob.setRelease(null)
+            return transformedPointCache.compareAndSet(originCache, newCache)
     }
 
     fun copy(

@@ -10,13 +10,13 @@ import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import ru.isma.next.app.services.simualtion.SimulationService
-import ru.isma.next.editor.text.services.contracts.ITextEditorService
+import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 
 class IsmaMenuBar(
     private val projectController: ProjectService,
     private val projectFileService: ProjectFileService,
     private val simulationService: SimulationService,
-    private val textEditorService: ITextEditorService,
+    private val textEditorService: IEditorPlatformService,
     private val simulationParametersService: SimulationParametersService,
 ): MenuBar() {
     init {

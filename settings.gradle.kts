@@ -2,7 +2,6 @@ rootProject.name = "isma"
 //JAVA 11+ projects
 include("isma-next-app")
 
-include("state-chart")
 include("isma-next-core")
 include("isma-next-tools")
 include("isma-next-integration-library")
@@ -49,6 +48,8 @@ include("isma-intg-parallel-ignite")
 //include("isma-intg-demo")
 //include("isma-core")
 //include("isma-tools")
+//include("state-chart")
+
 include("isma-next-math-engine")
 include("isma-next-math-common")
 include("isma-next-services-simulation-abstractions")

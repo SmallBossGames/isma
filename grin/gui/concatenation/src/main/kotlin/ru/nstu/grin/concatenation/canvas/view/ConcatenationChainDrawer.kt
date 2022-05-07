@@ -39,9 +39,8 @@ class ConcatenationChainDrawer(
                 drawUiLayerInternal()
             }
 
-            drawingJob.setRelease(null)
+            drawingJob.compareAndExchange(coroutineContext.job, null)
         }
-
     }
 
     fun drawUiLayer() = coroutinesScope.launch(Dispatchers.JavaFx) {

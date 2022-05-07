@@ -8,8 +8,8 @@ import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.*
-import ru.isma.next.editor.text.services.TextEditorService
-import ru.isma.next.editor.text.services.contracts.ITextEditorService
+import ru.isma.next.editor.text.services.EditorPlatformService
+import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.lisma.InputTranslator
@@ -33,7 +33,7 @@ class SimulationScope
 
 val externalServicesModule = module {
     single { IntegrationMethodLibraryLoader.load() }
-    single<ITextEditorService> { TextEditorService() }
+    single<IEditorPlatformService> { EditorPlatformService() }
     single<IHsmCompiler> { HsmCompiler() }
     single<InputTranslator> { LismaTranslator() }
 }

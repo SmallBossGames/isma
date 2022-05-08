@@ -24,5 +24,3 @@ extraJavaModuleInfo {
     automaticModule("kotlinx-coroutines-core-jvm-$coroutinesCoreVersion.jar", "kotlinx.coroutines.core.jvm")
     failOnMissingModuleInfo.set(false)
 }
-
-

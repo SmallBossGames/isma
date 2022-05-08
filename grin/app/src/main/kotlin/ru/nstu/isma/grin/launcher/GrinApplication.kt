@@ -7,7 +7,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationView
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import tornadofx.FX
 
 class GrinApplication: Application(), KoinComponent {
     lateinit var scope: MainGrinScope
@@ -24,9 +23,6 @@ class GrinApplication: Application(), KoinComponent {
 
         scope.primaryStage.initWindow(scene, "GrIn 22")
         scope.primaryStage.show()
-
-        // Initialize GRIN Legacy
-        FX.registerApplication(this, scope.primaryStage)
     }
 
     override fun stop() {

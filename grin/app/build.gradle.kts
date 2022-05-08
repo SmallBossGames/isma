@@ -11,18 +11,18 @@ javafx {
 }
 
 application {
+    mainModule.set("isma.grin.app.main")
     mainClass.set("ru.nstu.isma.grin.launcher.LauncherKt")
 
     applicationDefaultJvmArgs = listOf(
         "--add-modules=jdk.incubator.vector",
-        "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+        //"--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        //"--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
     )
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(libs.tornadofx.core)
     implementation(libs.koin.core)
 
     implementation(project(":grin:integration"))

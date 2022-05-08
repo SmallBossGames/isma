@@ -8,9 +8,7 @@ module isma.grin.gui.common.main {
     exports ru.nstu.grin.common.converters;
     exports ru.nstu.grin.common.draw.elements;
     exports ru.nstu.grin.common.extensions;
-    exports ru.nstu.grin.common.file;
     exports ru.nstu.grin.common.model;
-    exports ru.nstu.grin.common.utils;
     exports ru.nstu.grin.common.view;
 
 }

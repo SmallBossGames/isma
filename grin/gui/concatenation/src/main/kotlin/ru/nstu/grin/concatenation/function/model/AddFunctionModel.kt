@@ -8,7 +8,6 @@ import javafx.scene.paint.Color
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 import ru.nstu.grin.concatenation.axis.model.Direction
-import java.awt.Font
 
 class AddFunctionModel {
     var cartesianSpaceNameProperty = SimpleStringProperty("Space 1")
@@ -43,7 +42,7 @@ class AxisViewModel(
     color: Color = Color.LIGHTGREY,
     delimeterColor: Color = Color.BLACK,
     distanceBetweenMarks: Double = 40.0,
-    font: String = Font.SANS_SERIF,
+    font: String = "Arial",
     textSize: Double = 10.0
 ) {
     val directionProperty = SimpleObjectProperty(direction)

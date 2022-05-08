@@ -7,14 +7,12 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.function.controller.FunctionIntegrationController
 import ru.nstu.grin.concatenation.function.model.FunctionIntegrationViewModel
 import ru.nstu.grin.concatenation.function.transform.IntegrationAxis
 import ru.nstu.grin.concatenation.function.transform.IntegrationMethod
 
 class FunctionIntegrationView(
-    viewModel: FunctionIntegrationViewModel,
-    controller: FunctionIntegrationController
+    viewModel: FunctionIntegrationViewModel
 ): BorderPane() {
     val title = "Find Integral"
 
@@ -33,7 +31,7 @@ class FunctionIntegrationView(
         bottom = HBox(
             Button("Find").apply {
                 setOnAction {
-                    controller.findIntegral(viewModel)
+                    viewModel.commit()
                 }
             }
         ).apply {

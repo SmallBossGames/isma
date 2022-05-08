@@ -11,40 +11,38 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
-import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
+import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentViewModel
 import ru.nstu.grin.concatenation.axis.model.AxisScalingType
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 
 class AxisChangeFragment(
-    private val model: AxisChangeFragmentModel,
-    private val controller: AxisChangeFragmentController
+    private val viewModel: AxisChangeFragmentViewModel,
 ) : BorderPane() {
     init {
         val distanceTypes = FXCollections.observableArrayList(MarksDistanceType.values().toList())
         val scalingTypes = FXCollections.observableArrayList(AxisScalingType.values().toList())
         val fontFamilies = FXCollections.observableArrayList(Font.getFamilies())
-        val availableDirections = when(model.direction){
+        val availableDirections = when(viewModel.direction){
             Direction.LEFT, Direction.RIGHT -> FXCollections.observableArrayList(Direction.LEFT, Direction.RIGHT)
             Direction.TOP, Direction.BOTTOM -> FXCollections.observableArrayList(Direction.TOP, Direction.BOTTOM)
         }
 
         top = VBox(
             propertiesGrid {
-                addNode("Name", model.nameProperty)
-                addNode("Name", availableDirections, model.directionProperty)
-                addNode("Distance between marks", model.distanceBetweenMarksProperty)
-                addNode("Distance type", distanceTypes, model.marksDistanceTypeProperty)
-                addNode("Border height", model.borderHeightProperty)
-                addNode("Font size", model.textSizeProperty)
-                addNode("Font", fontFamilies, model.fontProperty)
-                addNode("Font color", model.fontColorProperty)
-                addNode("Min", model.minProperty)
-                addNode("Max", model.maxProperty)
-                addNode("Axis Color", model.axisColorProperty)
-                addNode("Hide Axis", model.isHideProperty)
-                addNode("Scale Mode", scalingTypes, model.markTypeProperty){
+                addNode("Name", viewModel.nameProperty)
+                addNode("Name", availableDirections, viewModel.directionProperty)
+                addNode("Distance between marks", viewModel.distanceBetweenMarksProperty)
+                addNode("Distance type", distanceTypes, viewModel.marksDistanceTypeProperty)
+                addNode("Border height", viewModel.borderHeightProperty)
+                addNode("Font size", viewModel.textSizeProperty)
+                addNode("Font", fontFamilies, viewModel.fontProperty)
+                addNode("Font color", viewModel.fontColorProperty)
+                addNode("Min", viewModel.minProperty)
+                addNode("Max", viewModel.maxProperty)
+                addNode("Axis Color", viewModel.axisColorProperty)
+                addNode("Hide Axis", viewModel.isHideProperty)
+                addNode("Scale Mode", scalingTypes, viewModel.markTypeProperty){
                     object : ListCell<AxisScalingType>() {
                         override fun updateItem(item: AxisScalingType?, empty: Boolean) {
                             super.updateItem(item, empty)
@@ -66,7 +64,7 @@ class AxisChangeFragment(
         bottom = HBox(
             Button("Save").apply {
                 setOnAction {
-                    controller.updateAxis(model)
+                    viewModel.commit()
                     (scene.window as Stage).close()
                 }
             }

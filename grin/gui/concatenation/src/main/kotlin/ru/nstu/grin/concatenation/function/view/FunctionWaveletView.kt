@@ -10,12 +10,10 @@ import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
-import ru.nstu.grin.concatenation.function.controller.FunctionWaveletController
 import ru.nstu.grin.concatenation.function.model.FunctionWaveletViewModel
 
 class FunctionWaveletView(
     private val viewModel: FunctionWaveletViewModel,
-    private val controller: FunctionWaveletController,
 ) : BorderPane() {
     val title = "Wavelet Function"
 
@@ -33,7 +31,7 @@ class FunctionWaveletView(
         bottom = HBox(
             Button("Ok").apply {
                 setOnAction {
-                    controller.applyWavelet(viewModel)
+                    viewModel.commit()
                     (scene.window as Stage).close()
                 }
             }

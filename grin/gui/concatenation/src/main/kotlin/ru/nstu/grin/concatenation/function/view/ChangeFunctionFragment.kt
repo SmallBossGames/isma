@@ -13,13 +13,11 @@ import ru.isma.javafx.extensions.controls.PropertiesGrid
 import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
-import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
 import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.function.transform.*
 
 class ChangeFunctionFragment(
-    private val model: ChangeFunctionViewModel,
-    private val controller: ChangeFunctionController,
+    private val viewModel: ChangeFunctionViewModel,
 ) : BorderPane() {
     init {
         val types = FXCollections.observableArrayList(LineType.values().toList())
@@ -27,11 +25,11 @@ class ChangeFunctionFragment(
         center = TabPane(
             Tab("General",
                 propertiesGrid {
-                    addNode("Name", model.nameProperty)
-                    addNode("Color", model.functionColorProperty)
-                    addNode("Thickness", model.lineSizeProperty)
-                    addNode("Hide", model.isHideProperty)
-                    addNode("Line Type", types, model.lineTypeProperty) {
+                    addNode("Name", viewModel.nameProperty)
+                    addNode("Color", viewModel.functionColorProperty)
+                    addNode("Thickness", viewModel.lineSizeProperty)
+                    addNode("Hide", viewModel.isHideProperty)
+                    addNode("Line Type", types, viewModel.lineTypeProperty) {
                         createCell()
                     }
                 }.apply {
@@ -49,32 +47,32 @@ class ChangeFunctionFragment(
                     val addContextMenu = ContextMenu(
                         MenuItem(MirrorPointsTransformerViewModel.title).apply {
                             setOnAction {
-                                model.addModifier(::MirrorPointsTransformerViewModel)
+                                viewModel.addModifier(::MirrorPointsTransformerViewModel)
                             }
                         },
                         MenuItem(LogPointsTransformerViewModel.title).apply {
                             setOnAction {
-                                model.addModifier(::LogPointsTransformerViewModel)
+                                viewModel.addModifier(::LogPointsTransformerViewModel)
                             }
                         },
                         MenuItem(TranslateTransformerViewModel.title).apply {
                             setOnAction {
-                                model.addModifier(::TranslateTransformerViewModel)
+                                viewModel.addModifier(::TranslateTransformerViewModel)
                             }
                         },
                         MenuItem(WaveletTransformerViewModel.title).apply {
                             setOnAction {
-                                model.addModifier(::WaveletTransformerViewModel)
+                                viewModel.addModifier(::WaveletTransformerViewModel)
                             }
                         },
                         MenuItem(DerivativeTransformerViewModel.title).apply {
                             setOnAction {
-                                model.addModifier(::DerivativeTransformerViewModel)
+                                viewModel.addModifier(::DerivativeTransformerViewModel)
                             }
                         },
                         MenuItem(IntegratorTransformerViewModel.title).apply {
                             setOnAction {
-                                model.addModifier(::IntegratorTransformerViewModel)
+                                viewModel.addModifier(::IntegratorTransformerViewModel)
                             }
                         }
                     )
@@ -88,11 +86,11 @@ class ChangeFunctionFragment(
                             },
                             Button("Remove").apply {
                                 setOnAction {
-                                    selectedItem?.let { model.removeModifier(it) }
+                                    selectedItem?.let { viewModel.removeModifier(it) }
                                 }
                             },
                         ),
-                        ListView(model.modifiers).apply {
+                        ListView(viewModel.modifiers).apply {
                             setCellFactory {
                                 object : ListCell<IAsyncPointsTransformerViewModel>() {
                                     override fun updateItem(item: IAsyncPointsTransformerViewModel?, empty: Boolean) {
@@ -134,7 +132,7 @@ class ChangeFunctionFragment(
         bottom = HBox(
             Button("Save").apply {
                 setOnAction {
-                    controller.updateFunction(model)
+                    viewModel.commit()
                     (scene.window as Stage).close()
                 }
             }

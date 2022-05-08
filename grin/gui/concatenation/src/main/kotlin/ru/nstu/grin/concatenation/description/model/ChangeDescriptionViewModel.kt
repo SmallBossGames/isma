@@ -8,15 +8,17 @@ import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 
 class ChangeDescriptionViewModel(
     initData: IDescriptionModalInitData,
-    matrixTransformer: MatrixTransformer,
+    private val matrixTransformer: MatrixTransformer,
+    private val descriptionCanvasService: DescriptionCanvasService,
 ) {
     val description = (initData as? DescriptionModalForUpdate)?.description
 
     val cartesianSpaceProperty = SimpleObjectProperty<CartesianSpace>()
-    var cartesianSpace by cartesianSpaceProperty
+    var cartesianSpace: CartesianSpace by cartesianSpaceProperty
 
     val xPositionProperty = SimpleDoubleProperty()
     var xPosition by xPositionProperty
@@ -74,6 +76,47 @@ class ChangeDescriptionViewModel(
                 textSize = initData.description.font.size
                 font = initData.description.font.family
             }
+        }
+    }
+
+    fun commit() {
+        val space = cartesianSpace
+        val xAxis = space.xAxis
+        val yAxis = space.yAxis
+
+        val x = matrixTransformer.transformPixelToUnits(
+            xPosition,
+            xAxis.scaleProperties,
+            xAxis.direction
+        )
+
+        val y = matrixTransformer.transformPixelToUnits(
+            yPosition,
+            yAxis.scaleProperties,
+            yAxis.direction
+        )
+
+        val descriptionModel = DescriptionDto(
+            space = cartesianSpace,
+            textOffsetX = textOffsetX,
+            textOffsetY = textOffsetY,
+            pointerX = x,
+            pointerY = y,
+            text = text,
+            textSize = textSize,
+            color = color,
+            font = font
+        )
+
+        val description = description
+
+        if(description != null){
+            descriptionCanvasService.update(
+                description,
+                descriptionModel
+            )
+        } else {
+            descriptionCanvasService.add(descriptionModel)
         }
     }
 }

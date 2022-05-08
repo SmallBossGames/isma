@@ -2,9 +2,9 @@ package ru.nstu.grin.integration
 
 import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
-import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
+import org.koin.dsl.onClose
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
-import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
+import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentViewModel
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
 import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 import ru.nstu.grin.concatenation.axis.view.*
@@ -20,16 +20,13 @@ import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.canvas.view.*
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
-import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
-import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianController
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
-import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
-import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
+import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceViewModel
+import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianViewModel
 import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
 import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
 import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
-import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
@@ -201,39 +198,33 @@ val grinGuiModule = module {
     }
 
     scope<FunctionChangeModalScope> {
-        scopedOf(::ChangeFunctionController)
         scopedOf(::ChangeFunctionFragment)
         scopedOf(::ChangeFunctionViewModel)
     }
 
     scope<AxisChangeModalScope> {
-        scopedOf(::AxisChangeFragmentController)
         scopedOf(::AxisChangeFragment)
-        scopedOf(::AxisChangeFragmentModel)
+        scopedOf(::AxisChangeFragmentViewModel)
     }
 
     scope<FunctionCopyModalScope> {
-        scopedOf(::CopyFunctionController)
         scopedOf(::CopyFunctionFragment)
-        scopedOf(::CopyFunctionModel)
+        scopedOf(::CopyFunctionViewModel)
     }
 
     scope<DescriptionChangeModalScope> {
-        scopedOf(::ChangeDescriptionController)
         scopedOf(::ChangeDescriptionView)
         scopedOf(::ChangeDescriptionViewModel)
     }
 
     scope<CartesianCopyModalScope> {
-        scopedOf(::CopyCartesianController)
         scopedOf(::CopyCartesianFragment)
-        scopedOf(::CopyCartesianModel)
+        scopedOf(::CopyCartesianViewModel)
     }
 
     scope<CartesianChangeModalScope> {
-        scopedOf(::ChangeCartesianController)
         scopedOf(::ChangeCartesianFragment)
-        scopedOf(::ChangeCartesianSpaceModel)
+        scopedOf(::ChangeCartesianSpaceViewModel)
     }
 
     scope<AddFunctionModalScope> {
@@ -252,20 +243,17 @@ val grinGuiModule = module {
     }
 
     scope<SearchIntersectionsModalScope>{
-        scopedOf(::IntersectionFunctionView)
-        scopedOf(::IntersectionFunctionController)
-        scopedOf(::IntersectionFunctionViewModel)
+        scopedOf(::IntersectionFunctionView) onClose { it?.dispose() }
+        scopedOf(::IntersectionFunctionViewModel) onClose { it?.dispose() }
     }
 
     scope<FunctionIntegrationModalScope>{
         scopedOf(::FunctionIntegrationView)
-        scopedOf(::FunctionIntegrationController)
         scopedOf(::FunctionIntegrationViewModel)
     }
 
     scope<FunctionWaveletModalScope>{
         scopedOf(::FunctionWaveletView)
-        scopedOf(::FunctionWaveletController)
         scopedOf(::FunctionWaveletViewModel)
     }
 }

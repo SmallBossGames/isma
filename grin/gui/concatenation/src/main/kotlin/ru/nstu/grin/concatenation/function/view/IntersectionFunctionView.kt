@@ -10,15 +10,17 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
+import kotlinx.coroutines.*
+import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.function.controller.IntersectionFunctionController
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.IntersectionFunctionViewModel
 
 class IntersectionFunctionView(
     viewModel: IntersectionFunctionViewModel,
-    controller: IntersectionFunctionController,
 ) : BorderPane() {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
     val title = "Search Intersections"
 
     init {
@@ -51,13 +53,26 @@ class IntersectionFunctionView(
             Button("Ok").apply {
                 setOnAction {
                     if(viewModel.selectedFunctions.size == 2){
-                        controller.findIntersection(viewModel)
-                        (scene.window as Stage).close()
+                        coroutineScope.launch {
+                            withContext(Dispatchers.JavaFx){
+                                isDisable = true
+                            }
+
+                            viewModel.commit()
+
+                            withContext(Dispatchers.JavaFx){
+                                (scene.window as Stage).close()
+                            }
+                        }
                     }
                 }
             }
         ).apply {
             padding = Insets(10.0)
         }
+    }
+
+    fun dispose(){
+        coroutineScope.cancel()
     }
 }

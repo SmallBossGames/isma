@@ -8,9 +8,11 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
+import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 
-class AxisChangeFragmentModel(
-    val axis: ConcatenationAxis
+class AxisChangeFragmentViewModel(
+    private val service: AxisCanvasService,
+    private val axis: ConcatenationAxis
 ) {
     val nameProperty = SimpleStringProperty()
     var name: String by nameProperty
@@ -72,7 +74,11 @@ class AxisChangeFragmentModel(
         max = scaleProperties.maxValue
     }
 
-    fun createChangeSet() = UpdateAxisChangeSet(
+    fun commit() {
+        service.updateAxis(axis, createChangeSet())
+    }
+
+    private fun createChangeSet() = UpdateAxisChangeSet(
         name = name,
         direction = direction,
         styleProperties = AxisStyleProperties(
@@ -89,4 +95,6 @@ class AxisChangeFragmentModel(
             maxValue = max,
         )
     )
+
+
 }

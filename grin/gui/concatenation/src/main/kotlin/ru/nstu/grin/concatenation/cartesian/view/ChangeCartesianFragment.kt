@@ -7,19 +7,17 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
-import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
+import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceViewModel
 
 class ChangeCartesianFragment(
-    private val model: ChangeCartesianSpaceModel,
-    private val controller: ChangeCartesianController,
+    private val viewModel: ChangeCartesianSpaceViewModel,
 ) : BorderPane() {
 
     init {
         top = VBox(
             propertiesGrid {
-                addNode("Name", model.nameProperty)
-                addNode("Show Grid", model.isShowGridProperty)
+                addNode("Name", viewModel.nameProperty)
+                addNode("Show Grid", viewModel.isShowGridProperty)
             }.apply {
                 padding = Insets(10.0)
             }
@@ -28,7 +26,7 @@ class ChangeCartesianFragment(
         bottom = HBox(
             Button("Save").apply {
                 setOnAction {
-                    controller.updateCartesianSpace(model)
+                    viewModel.commit()
                     (scene.window as Stage).close()
                 }
             }

@@ -8,8 +8,12 @@ import javafx.collections.FXCollections
 import javafx.scene.paint.Color
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 
-class ChangeFunctionViewModel(val function: ConcatenationFunction) {
+class ChangeFunctionViewModel(
+    private val function: ConcatenationFunction,
+    private val functionCanvasService: FunctionCanvasService,
+) {
     val nameProperty = SimpleStringProperty()
     var name by nameProperty
 
@@ -27,14 +31,6 @@ class ChangeFunctionViewModel(val function: ConcatenationFunction) {
 
     val modifiers = FXCollections.observableArrayList<IAsyncPointsTransformerViewModel>()
 
-    fun addModifier(factory: () -> IAsyncPointsTransformerViewModel){
-        modifiers.add(factory())
-    }
-
-    fun removeModifier(item: IAsyncPointsTransformerViewModel){
-        modifiers.remove(item)
-    }
-
     init {
         name = function.name
         functionColor = function.functionColor
@@ -43,5 +39,27 @@ class ChangeFunctionViewModel(val function: ConcatenationFunction) {
         isHide = function.isHide
 
         modifiers.setAll(function.transformers.map { it.toViewModel() })
+    }
+
+    fun addModifier(factory: () -> IAsyncPointsTransformerViewModel){
+        modifiers.add(factory())
+    }
+
+    fun removeModifier(item: IAsyncPointsTransformerViewModel){
+        modifiers.remove(item)
+    }
+
+    fun commit() {
+        val updateFunctionData = UpdateFunctionData(
+            function = function,
+            name = name,
+            color = functionColor,
+            lineType = lineType,
+            lineSize = lineSize,
+            isHide = isHide,
+        )
+
+        functionCanvasService.updateFunction(updateFunctionData)
+        functionCanvasService.updateTransformer(function, modifiers.map { it.toModel() }.toTypedArray())
     }
 }

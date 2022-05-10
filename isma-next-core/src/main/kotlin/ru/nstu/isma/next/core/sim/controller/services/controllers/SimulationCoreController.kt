@@ -7,7 +7,7 @@ import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResul
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
-import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunnerProvider
+import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunner
 import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
 
 /**
@@ -15,7 +15,7 @@ import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
  * on 04.01.2015.
  */
 class SimulationCoreController(
-    private val simulationRunnerProvider: ISimulationRunnerProvider,
+    private val simulationRunnerProvider: ISimulationRunner,
     private val hsmCompiler: IHsmCompiler,
 ) : ISimulationCoreController {
     /**
@@ -37,7 +37,7 @@ class SimulationCoreController(
             parameters.stepChangeHandlers
         )
 
-        return@coroutineScope simulationRunnerProvider.create().run(context)
+        return@coroutineScope simulationRunnerProvider.run(context)
     }
 
     private suspend fun createOdeInitials(indexProvider: EquationIndexProvider, hsm: HSM): DoubleArray = coroutineScope {

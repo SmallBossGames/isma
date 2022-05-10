@@ -1,5 +1,7 @@
 package ru.isma.next.app.services.koin
 
+import org.koin.core.module.dsl.scopedOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import ru.isma.next.app.constants.APPLICATION_PREFERENCES_FILE
 import ru.isma.next.app.services.ModelErrorService
@@ -10,6 +12,7 @@ import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.*
 import ru.isma.next.editor.text.services.EditorPlatformService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
+import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
 import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.lisma.InputTranslator
@@ -19,7 +22,7 @@ import ru.nstu.isma.next.core.sim.controller.services.controllers.SimulationCore
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory
 import ru.nstu.isma.next.core.sim.controller.services.hsm.HsmCompiler
 import ru.nstu.isma.next.core.sim.controller.services.hsm.IHsmCompiler
-import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunnerProvider
+import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.runners.InFileSimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.runners.InMemorySimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.simulators.HybridSystemSimulator
@@ -40,17 +43,22 @@ val externalServicesModule = module {
 
 val simulationScopeModule = module {
     scope<SimulationScope> {
-
-        scoped<IIntegrationMethodProvider> { IntegrationMethodProvider(get(), get()) }
-        scoped<IDaeSystemSolverFactory> { DaeSystemStepSolverFactory(get(), get(), get(), get()) }
-        scoped<IHybridSystemSimulator> { HybridSystemSimulator(get(), get()) }
-        scoped<ISimulationRunnerProvider> { SimulationRunnerProvider(get(), get(), get()) }
-        scoped<ISimulationCoreController> { SimulationCoreController(get(), get()) }
-        scoped<IEventDetectorFactory> { EventDetectorFactory(get()) }
-        scoped { InFileSimulationRunner(get()) }
-        scoped { InMemorySimulationRunner(get()) }
-
         scoped<SimulationParametersModel> { get<SimulationParametersService>().snapshot() }
+
+        scopedOf(::IntegrationMethodProvider) bind IIntegrationMethodProvider::class
+        scopedOf(::DaeSystemStepSolverFactory) bind IDaeSystemSolverFactory::class
+        scopedOf(::HybridSystemSimulator) bind IHybridSystemSimulator::class
+        scopedOf(::SimulationCoreController) bind ISimulationCoreController::class
+        scopedOf(::EventDetectorFactory) bind IEventDetectorFactory::class
+
+        scoped<ISimulationRunner> {
+            val simulationParameters = get<SimulationParametersModel>()
+            when (simulationParameters.resultSavingParameters.savingTarget) {
+                SaveTarget.MEMORY -> InFileSimulationRunner(get())
+                SaveTarget.FILE -> InMemorySimulationRunner(get())
+            }
+        }
+
     }
 }
 

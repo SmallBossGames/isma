@@ -17,27 +17,18 @@ import java.util.List;
  * Date: 25.10.13
  * Time: 0:04
  */
-public class HSM implements Serializable {
+public final class HSM implements Serializable {
     public final static String INIT_STATE = "init";
 
-    protected HMVariableTable variables;
+    private final HMVariableTable variables = new HMVariableTable();
 
-    protected HMStateAutomata automata;
+    private final HMStateAutomata automata = new HMStateAutomata(this);
 
-    protected HMLinearSystem linearSystem;
+    private final HMLinearSystem linearSystem = new HMLinearSystem(this);
 
-    protected Double startTime = 0d;
-
-    protected Double endTime = 1d;
-
-    protected Double stepTime = 0.1;
-
-    protected List<String> out = new LinkedList<>();
+    private final List<String> out = new LinkedList<>();
 
     public HSM() {
-        variables = new HMVariableTable();
-        automata = new HMStateAutomata(this);
-        linearSystem = new HMLinearSystem(this);
 
         HMState init = new HMState(INIT_STATE);
         automata.setInit(init);
@@ -52,40 +43,8 @@ public class HSM implements Serializable {
         return variables.variables();
     }
 
-    public void setVariables(HMVariableTable variables) {
-        this.variables = variables;
-    }
-
     public HMStateAutomata getAutomata() {
         return automata;
-    }
-
-    public void setAutomata(HMStateAutomata automata) {
-        this.automata = automata;
-    }
-
-    public Double getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Double startTime) {
-        this.startTime = startTime;
-    }
-
-    public Double getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Double endTime) {
-        this.endTime = endTime;
-    }
-
-    public Double getStepTime() {
-        return stepTime;
-    }
-
-    public void setStepTime(Double stepTime) {
-        this.stepTime = stepTime;
     }
 
     public List<String> getOut() {
@@ -93,7 +52,8 @@ public class HSM implements Serializable {
     }
 
     public void setOut(List<String> out) {
-        this.out = out;
+        this.out.clear();
+        this.out.addAll(out);
     }
 
     public HMLinearSystem getLinearSystem() {

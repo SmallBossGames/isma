@@ -1,9 +1,7 @@
 package ru.isma.next.app.launcher
 
-import ru.isma.next.app.views.MainView
 import javafx.application.Application
 import javafx.scene.Scene
-import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -11,7 +9,7 @@ import ru.isma.next.app.models.preferences.DefaultFilesPreferencesModel
 import ru.isma.next.app.models.preferences.WindowPreferencesModel
 import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.ProjectFileService
-import tornadofx.FX
+import ru.isma.next.app.views.MainView
 
 class IsmaApplication : Application(), KoinComponent {
     lateinit var stage: Stage
@@ -30,11 +28,11 @@ class IsmaApplication : Application(), KoinComponent {
         val scene = Scene(mainView)
 
         stage.initWindow(scene, "ISMA 22")
-        stage.icons.add(Image("images/isma-2016-title.png"))
+        //stage.icons.add(Image("images/isma-2016-title.png"))
         stage.show()
 
         // Initialize GRIN Legacy
-        FX.registerApplication(this, stage)
+        // FX.registerApplication(this, stage)
     }
 
     override fun stop() {

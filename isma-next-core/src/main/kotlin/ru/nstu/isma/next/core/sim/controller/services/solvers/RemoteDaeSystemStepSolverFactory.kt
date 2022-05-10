@@ -1,5 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller.services.solvers
 
+//TODO: Removed because of problems with Java modules
+/*
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.intg.server.client.ComputeEngineClient
@@ -17,4 +19,4 @@ class RemoteDaeSystemStepSolverFactory {
 
         return RemoteDaeSystemStepSolver(method, client)
     }
-}
+}*/

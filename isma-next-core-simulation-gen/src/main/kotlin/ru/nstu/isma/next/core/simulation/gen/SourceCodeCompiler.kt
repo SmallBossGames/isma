@@ -14,7 +14,11 @@ class SourceCodeCompiler<T> {
     fun compile(packageName: String, className: String, sourceCode: String?): T {
         val compiler = ToolProvider.getSystemJavaCompiler()
         val manager = MemoryFileManager(compiler.getStandardFileManager(null, null, null))
-        val options = mutableListOf("-classpath", System.getProperty("java.class.path"))
+        val options = mutableListOf(
+            "-p", System.getProperty("jdk.module.path"),
+            "--add-modules=isma.isma.intg.api.main",
+            "--add-modules=isma.isma.next.core.simulation.gen.main",
+        )
         val files = arrayListOf(MemoryJavaFileObject(className, sourceCode))
         compiler.getTask(null, manager, null, options, null, files).call()
         val classLoader = manager.getClassLoader(null)

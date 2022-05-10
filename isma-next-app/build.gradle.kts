@@ -3,6 +3,7 @@ plugins {
     kotlin("plugin.serialization")
 
     id("org.openjfx.javafxplugin")
+    id("de.jjohannes.extra-java-module-info")
 
     application
 }
@@ -13,6 +14,7 @@ javafx {
 }
 
 application {
+    mainModule.set("isma.isma.next.app.main")
     mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
 
     applicationDefaultJvmArgs = listOf(
@@ -51,5 +53,9 @@ dependencies {
     implementation(project(":grin:integration"))
 
     api(project(":isma-intg-core"))
-    api(project(":isma-intg-server:isma-intg-server-client"))
+    //api(project(":isma-intg-server:isma-intg-server-client"))
+}
+
+extraJavaModuleInfo {
+    failOnMissingModuleInfo.set(false)
 }

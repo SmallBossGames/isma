@@ -15,7 +15,7 @@ dependencies {
     implementation(project(":isma-next-tools"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-core"))
-    implementation(project(":isma-intg-server:isma-intg-server-client"))
+    //implementation(project(":isma-intg-server:isma-intg-server-client"))
     implementation(project(":isma-intg-lib:isma-intg-lib-common"))
     implementation(project(":isma-intg-lib:isma-intg-lib-euler"))
 

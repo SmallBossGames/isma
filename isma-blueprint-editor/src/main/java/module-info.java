@@ -7,4 +7,5 @@ module isma.isma.blueprint.editor.main {
 
     exports ru.isma.next.editor.blueprint;
     exports ru.isma.next.editor.blueprint.services;
+    exports ru.isma.next.editor.blueprint.models;
 }

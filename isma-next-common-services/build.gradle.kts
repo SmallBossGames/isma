@@ -12,3 +12,15 @@ dependencies {
 
     implementation (libs.tornadofx.core)
 }
+
+val moduleName by extra("isma.isma.next.common.services.main")
+
+tasks {
+    compileJava {
+        inputs.property("moduleName", moduleName)
+        options.compilerArgs = listOf(
+            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
+        )
+    }
+    //check { dependsOn(integTestTask) }
+}

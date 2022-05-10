@@ -29,7 +29,6 @@ public final class HSM implements Serializable {
     private final List<String> out = new LinkedList<>();
 
     public HSM() {
-
         HMState init = new HMState(INIT_STATE);
         automata.setInit(init);
         automata.addState(init);
@@ -49,11 +48,6 @@ public final class HSM implements Serializable {
 
     public List<String> getOut() {
         return out;
-    }
-
-    public void setOut(List<String> out) {
-        this.out.clear();
-        this.out.addAll(out);
     }
 
     public HMLinearSystem getLinearSystem() {

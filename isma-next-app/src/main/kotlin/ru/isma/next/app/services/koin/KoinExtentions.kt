@@ -29,7 +29,6 @@ import ru.nstu.isma.next.core.sim.controller.services.simulators.HybridSystemSim
 import ru.nstu.isma.next.core.sim.controller.services.simulators.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.services.solvers.DefaultDaeSystemStepSolverFactory
 import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
-import ru.nstu.isma.next.core.sim.controller.services.solvers.RemoteDaeSystemStepSolverFactory
 import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 
 class SimulationScope
@@ -75,5 +74,5 @@ val appServicesModule = module {
 
 val daeSystemStepSolversModule = module {
     single { DefaultDaeSystemStepSolverFactory() }
-    single { RemoteDaeSystemStepSolverFactory() }
+    //single { RemoteDaeSystemStepSolverFactory() }
 }

@@ -62,7 +62,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private val tabs = TabPane(
-        Tab("Blueprint", ScrollPane(canvas)).apply {
+        Tab("Diagram", ScrollPane(canvas)).apply {
             isClosable = false
         }
     )

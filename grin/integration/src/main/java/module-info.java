@@ -7,4 +7,6 @@ module isma.grin.integration.main {
     requires tornadofx;
 
     exports ru.nstu.grin.integration;
+
+    opens ru.nstu.grin.integration;
 }

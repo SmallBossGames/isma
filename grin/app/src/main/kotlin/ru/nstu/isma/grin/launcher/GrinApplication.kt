@@ -2,6 +2,7 @@ package ru.nstu.isma.grin.launcher
 
 import javafx.application.Application
 import javafx.scene.Scene
+import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -32,6 +33,8 @@ class GrinApplication: Application(), KoinComponent {
     private fun Stage.initWindow(scene: Scene, title: String) {
         this.title = title
         this.scene = scene
+
+        icons.add(Image("/ru/nstu/grin/integration/isma-2016-title.png"))
 
         isMaximized = false
         height = 600.0

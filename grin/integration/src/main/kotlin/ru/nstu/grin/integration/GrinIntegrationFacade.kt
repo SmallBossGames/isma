@@ -1,6 +1,7 @@
 package ru.nstu.grin.integration
 
 import javafx.scene.Scene
+import javafx.scene.image.Image
 import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
@@ -29,7 +30,10 @@ class GrinIntegrationFacade: KoinComponent {
             val view = scope.get<ConcatenationView>{ parametersOf(initData) }
 
             scene = Scene(view)
-            title = "GRIN"
+            title = "GrIn"
+
+            icons.add(Image("/ru/nstu/grin/integration/isma-2016-title.png"))
+
             initModality(
                 Modality.WINDOW_MODAL
             )

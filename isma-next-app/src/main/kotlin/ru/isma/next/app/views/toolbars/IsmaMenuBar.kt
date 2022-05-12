@@ -28,7 +28,7 @@ class IsmaMenuBar(
                         projectController.createNew()
                     }
                 },
-                MenuItem("New blueprint").apply {
+                MenuItem("New Statechart").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+B")
                     onAction = EventHandler {
                         projectController.createNewBlueprint()

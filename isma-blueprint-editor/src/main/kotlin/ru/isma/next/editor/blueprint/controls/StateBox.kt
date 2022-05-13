@@ -28,8 +28,8 @@ class StateBox(
 ) : Group() {
     val isEditModeEnabledProperty = SimpleBooleanProperty(false)
     val isEditableProperty = SimpleBooleanProperty(true)
-    private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
     val nameProperty = SimpleStringProperty("")
+    private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
     private val textProperty = SimpleStringProperty("")
     private val squareWidthProperty = SimpleDoubleProperty(110.0)
     private val squareHeightProperty = SimpleDoubleProperty(65.0)

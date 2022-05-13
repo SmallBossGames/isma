@@ -142,17 +142,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         val main = mainStateBox.toBlueprintState()
         val init = initStateBox.toBlueprintState()
         val states = stateBoxes.map { it.toBlueprintState() }.toTypedArray()
-
-        val blueprintTransactions = transactions
-            .map {
-                BlueprintTransactionModel(
-                    startStateName = it.startStateBox.name,
-                    endStateName = it.endStateBox.name,
-                    predicate = it.transactionArrow.text,
-                    alias = it.transactionArrow.alias
-                )
-            }
-            .toTypedArray()
+        val blueprintTransactions = transactions.map { it.toBlueprintTransaction() }.toTypedArray()
 
         return BlueprintModel(main, init, states, blueprintTransactions)
     }
@@ -188,6 +178,15 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             this.layoutYProperty().value,
             this.name,
             this.text
+        )
+    }
+
+    private fun BlueprintEditorTransactionModel.toBlueprintTransaction() : BlueprintTransactionModel {
+        return  BlueprintTransactionModel(
+            startStateName = this.startStateBox.name,
+            endStateName = this.endStateBox.name,
+            predicate = this.transactionArrow.text,
+            alias = this.transactionArrow.alias
         )
     }
 
@@ -348,8 +347,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private fun StateBox.removeFromEditor() {
-        transactions
-            .toList()
+        transactions.toList()
             .filter { it.startStateBox == this || it.endStateBox == this }
             .forEach { removeTransaction(it) }
 
@@ -358,8 +356,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private fun StateTransactionArrow.removeFromEditor() {
-        transactions
-            .toList()
+        transactions.toList()
             .filter { it.transactionArrow == this }
             .forEach { removeTransaction(it) }
     }

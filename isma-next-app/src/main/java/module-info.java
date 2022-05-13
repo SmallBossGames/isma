@@ -24,5 +24,6 @@ module isma.isma.next.app.main {
     exports ru.isma.next.app.launcher;
 
     opens ru.isma.next.app.models.preferences to kotlinx.serialization.core;
+    opens ru.isma.next.app.models to javafx.base;
     opens ru.isma.next.app.launcher;
 }

@@ -2,6 +2,7 @@ package ru.isma.next.app.utilities
 
 import ru.isma.next.app.models.projects.CodeRegion
 import ru.isma.next.app.models.projects.LismaTextModel
+import ru.isma.next.editor.blueprint.models.BlueprintLoopTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 
 fun BlueprintModel.convertToLisma() : LismaTextModel {
@@ -44,6 +45,21 @@ fun BlueprintModel.convertToLisma() : LismaTextModel {
         linesCounter = endLineNumber
     }
 
+    this.loopTransactions.forEach {
+        val fragmentText = it.toLisma()
+        val fragmentLinesCount = fragmentText.lines().count()
+        val startLineNumber = linesCounter
+        val endLineNumber = linesCounter + fragmentLinesCount + 1
+
+        resultStringBuilder.appendLine(fragmentText).appendLine()
+
+        fragments.add(CodeRegion(it.stateBox.name, startLineNumber, endLineNumber))
+
+        linesCounter = endLineNumber
+
+        resultStringBuilder.appendLine()
+    }
+
     return LismaTextModel(resultStringBuilder.toString(), fragments.toList())
 }
 
@@ -64,6 +80,24 @@ private class StateBlockModel(val stateName: String, val transactionKey: String,
 
         return sb.toString()
     }
+}
+
+fun BlueprintLoopTransactionModel.toLisma(): String {
+    return StringBuilder().apply {
+        val pseudoStateName = "${stateBox.name}_pseudo_1"
+
+        appendLine("state $pseudoStateName (${predicate.trim()}) {")
+        appendLine(text)
+        appendLine("} from ${stateBox.name};")
+
+        appendLine()
+
+        appendLine("state ${stateBox.name} (${predicate.trim()}) {")
+        appendLine(stateBox.text)
+        appendLine("} from $pseudoStateName;")
+
+        appendLine()
+    }.toString()
 }
 
 private fun createTransactionKey(targetStateName: String, predicate: String) =

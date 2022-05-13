@@ -9,7 +9,8 @@ class BlueprintModel(
     val main: BlueprintStateModel,
     val init: BlueprintStateModel,
     val states: Array<BlueprintStateModel>,
-    val transactions: Array<BlueprintTransactionModel>
+    val transactions: Array<BlueprintTransactionModel>,
+    val loopTransactions: Array<BlueprintLoopTransactionModel> = emptyArray()
 ) {
     companion object {
         @JvmStatic
@@ -17,7 +18,8 @@ class BlueprintModel(
             BlueprintStateModel(10.0, 10.0, MAIN_STATE, ""),
             BlueprintStateModel(10.0, 100.0, INIT_STATE, ""),
             emptyArray(),
-            emptyArray()
+            emptyArray(),
+            emptyArray(),
         )
     }
 }

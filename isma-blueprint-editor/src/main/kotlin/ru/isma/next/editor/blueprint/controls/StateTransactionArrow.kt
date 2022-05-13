@@ -43,8 +43,6 @@ class StateTransactionArrow(
         layoutXProperty().bind((endXProperty.subtract(startXProperty)).divide( 2).add(startXProperty))
         layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(startYProperty))
 
-        //val popover = createEditPopOver()
-
         val predicateText = Label().apply {
             font = Font("Arial", 16.0)
             prefWidth = TextFieldLength

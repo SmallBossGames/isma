@@ -18,7 +18,10 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-class StateTransactionArrow : Group() {
+class StateTransactionArrow(
+    onClick: (source: StateTransactionArrow, event: MouseEvent) -> Unit,
+    onArrowClick: (source: StateTransactionArrow, event: MouseEvent) -> Unit,
+) : Group() {
     private val startXProperty = SimpleDoubleProperty(0.0)
     private val startYProperty = SimpleDoubleProperty(0.0)
     private val endXProperty = SimpleDoubleProperty(0.0)
@@ -26,10 +29,6 @@ class StateTransactionArrow : Group() {
 
     val aliasProperty = SimpleStringProperty("")
     val textProperty = SimpleStringProperty("")
-
-    private val mousePressedListeners = arrayListOf<(StateTransactionArrow, MouseEvent) -> Unit>()
-
-    private var onShowPopup: ((node: StateTransactionArrow, x: Double, y: Double) -> Unit)? = null
 
     fun startXProperty() = startXProperty
     fun startYProperty() = startYProperty
@@ -67,11 +66,7 @@ class StateTransactionArrow : Group() {
                 viewOrder = 6.0
             }
         ).apply {
-            setOnMouseClicked {
-                onShowPopup?.also { action ->
-                    action(this@StateTransactionArrow, it.sceneX, it.sceneY)
-                }
-            }
+            setOnMouseClicked { onArrowClick(this@StateTransactionArrow, it) }
         }
 
         children.addAll(arrowhead, predicateTextWrapped)
@@ -122,26 +117,8 @@ class StateTransactionArrow : Group() {
         textProperty.onChange {
             updatePredicateText()
         }
-    }
 
-    fun setShowPopup(action: (node: StateTransactionArrow, x: Double, y: Double) -> Unit) {
-        onShowPopup = action
-    }
-
-    fun addMousePressedListener(handler: (StateTransactionArrow, MouseEvent) -> Unit){
-        mousePressedListeners.add(handler)
-    }
-
-    fun removeMousePressedListener(handler: (StateTransactionArrow, MouseEvent) -> Unit){
-        mousePressedListeners.remove(handler)
-    }
-
-    private fun executeMousePressedListener(event: MouseEvent){
-        if(event.isPrimaryButtonDown){
-            for(i in mousePressedListeners.indices){
-                mousePressedListeners[i](this, event)
-            }
-        }
+        setOnMouseClicked { onClick(this@StateTransactionArrow, it) }
     }
 
     fun <T> ObservableValue<T>.onChange(op: () -> Unit){

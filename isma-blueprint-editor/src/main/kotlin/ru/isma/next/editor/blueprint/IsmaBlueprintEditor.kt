@@ -257,7 +257,20 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             return
         }
 
-        val transactionArrow = StateTransactionArrow().apply {
+        val transactionArrow = StateTransactionArrow(
+            onClick = { source, _ ->
+                if(isRemoveTransactionMode){
+                    source.removeFromEditor()
+                }
+            },
+            onArrowClick = { source, event ->
+                val converted = canvas.sceneToLocal(event.sceneX, event.sceneY)
+
+                val popover = createEditPopOver(source, converted.x, converted.y)
+
+                canvas.children.add(popover)
+            }
+        ).apply {
             startXProperty().bind(startStateBox.centerXProperty())
             startYProperty().bind(startStateBox.centerYProperty())
             endXProperty().bind(endStateBox.centerXProperty())
@@ -265,16 +278,6 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
             this.text = predicate
             this.alias = alias
-
-            initMouseRemoveTransactionEvents()
-
-            setShowPopup { node, x, y ->
-                val converted = canvas.sceneToLocal(x, y)
-
-                val popover = createEditPopOver(node, converted.x, converted.y)
-
-                canvas.children.add(popover)
-            }
         }
 
         canvas.children.add(transactionArrow)
@@ -383,15 +386,6 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     private fun StateBox.initMouseRemoveStateEvents() {
         addMousePressedListener { it, _ ->
             if(!isRemoveStateMode){
-                return@addMousePressedListener
-            }
-            it.removeFromEditor()
-        }
-    }
-
-    private fun StateTransactionArrow.initMouseRemoveTransactionEvents() {
-        addMousePressedListener { it, _ ->
-            if(!isRemoveTransactionMode){
                 return@addMousePressedListener
             }
             it.removeFromEditor()

@@ -18,9 +18,9 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-class StateTransactionArrow(
-    onClick: (source: StateTransactionArrow, event: MouseEvent) -> Unit,
-    onArrowClick: (source: StateTransactionArrow, event: MouseEvent) -> Unit,
+class TransactionArrow(
+    onClick: (source: TransactionArrow, event: MouseEvent) -> Unit,
+    onArrowClick: (source: TransactionArrow, event: MouseEvent) -> Unit,
 ) : Group() {
     val aliasProperty = SimpleStringProperty("")
     val textProperty = SimpleStringProperty("")
@@ -59,7 +59,7 @@ class StateTransactionArrow(
                 viewOrder = 6.0
             }
         ).apply {
-            setOnMouseClicked { onArrowClick(this@StateTransactionArrow, it) }
+            setOnMouseClicked { onArrowClick(this@TransactionArrow, it) }
         }
 
         children.addAll(arrowhead, predicateTextWrapped)
@@ -69,18 +69,18 @@ class StateTransactionArrow(
             viewOrder = 6.0
 
             fun updateGeometry() {
-                val x = this@StateTransactionArrow.endX - this@StateTransactionArrow.startX
-                val y = this@StateTransactionArrow.endY - this@StateTransactionArrow.startY
+                val x = this@TransactionArrow.endX - this@TransactionArrow.startX
+                val y = this@TransactionArrow.endY - this@TransactionArrow.startY
                 val angle = atan2(x, y) + PI / 2
                 val offsetX = 10.0 * sin(angle)
                 val offsetY = 10.0 * cos(angle)
                 val textOffsetX = 75.0 * sin(angle)
                 val textOffsetY = 50.0 * cos(angle)
 
-                startX = this@StateTransactionArrow.startX - this@StateTransactionArrow.layoutX + offsetX
-                startY = this@StateTransactionArrow.startY - this@StateTransactionArrow.layoutY + offsetY
-                endX = this@StateTransactionArrow.endX - this@StateTransactionArrow.layoutX + offsetX
-                endY = this@StateTransactionArrow.endY - this@StateTransactionArrow.layoutY + offsetY
+                startX = this@TransactionArrow.startX - this@TransactionArrow.layoutX + offsetX
+                startY = this@TransactionArrow.startY - this@TransactionArrow.layoutY + offsetY
+                endX = this@TransactionArrow.endX - this@TransactionArrow.layoutX + offsetX
+                endY = this@TransactionArrow.endY - this@TransactionArrow.layoutY + offsetY
 
                 arrowhead.translateX = offsetX
                 arrowhead.translateY = offsetY
@@ -90,10 +90,10 @@ class StateTransactionArrow(
                 predicateTextWrapped.translateY = textOffsetY
             }
 
-            this@StateTransactionArrow.startXProperty.onChange { updateGeometry() }
-            this@StateTransactionArrow.startYProperty.onChange { updateGeometry() }
-            this@StateTransactionArrow.endXProperty.onChange { updateGeometry() }
-            this@StateTransactionArrow.endYProperty.onChange { updateGeometry() }
+            this@TransactionArrow.startXProperty.onChange { updateGeometry() }
+            this@TransactionArrow.startYProperty.onChange { updateGeometry() }
+            this@TransactionArrow.endXProperty.onChange { updateGeometry() }
+            this@TransactionArrow.endYProperty.onChange { updateGeometry() }
         }
 
         fun updatePredicateText(){
@@ -111,11 +111,11 @@ class StateTransactionArrow(
             updatePredicateText()
         }
 
-        setOnMouseClicked { onClick(this@StateTransactionArrow, it) }
+        setOnMouseClicked { onClick(this@TransactionArrow, it) }
     }
 
     fun <T> ObservableValue<T>.onChange(op: () -> Unit){
-        this.addListener{ _, _, value ->
+        this.addListener{ _, _, _ ->
             op()
         }
     }

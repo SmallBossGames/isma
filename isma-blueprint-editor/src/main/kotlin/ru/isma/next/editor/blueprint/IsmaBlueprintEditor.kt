@@ -12,7 +12,7 @@ import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
 import ru.isma.next.editor.blueprint.controls.EditArrowPopOver
 import ru.isma.next.editor.blueprint.controls.StateBox
-import ru.isma.next.editor.blueprint.controls.StateTransactionArrow
+import ru.isma.next.editor.blueprint.controls.TransactionArrow
 import ru.isma.next.editor.blueprint.models.BlueprintEditorTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
@@ -215,17 +215,18 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         stateText: String = "",
     ) : StateBox {
         val stateBox = StateBox(
-            onClick = { source, _ ->
-                mouseLinkTransactionEventHandler(source)
-                mouseRemoveStateEventHandler(source)
-            },
+
             onPress = { source, event ->
                 mouseMovingEventPressHandler(source, event)
             },
             onRelease = { _, _ ->
                 mouseMovingEventReleaseHandler()
             },
-            onEditClick = { source ->
+            onClick = { source, _ ->
+                mouseLinkTransactionEventHandler(source)
+                mouseRemoveStateEventHandler(source)
+            },
+            onDoubleClick = { source, _ ->
                 openStateTextEditorTab(source)
             }
         ).apply {
@@ -251,7 +252,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
     private fun createMainStateBox() : StateBox {
         return StateBox(
-            onEditClick = { source ->
+            onDoubleClick = { source, _ ->
                 openStateTextEditorTab(source)
             },
             onPress = { source, event ->
@@ -318,7 +319,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             return
         }
 
-        val transactionArrow = StateTransactionArrow(
+        val transactionArrow = TransactionArrow(
             onClick = { source, _ ->
                 if(isRemoveTransactionMode){
                     source.removeFromEditor()
@@ -355,7 +356,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         canvas.children.remove(this)
     }
 
-    private fun StateTransactionArrow.removeFromEditor() {
+    private fun TransactionArrow.removeFromEditor() {
         transactions.toList()
             .filter { it.transactionArrow == this }
             .forEach { removeTransaction(it) }
@@ -433,7 +434,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         }
     }
 
-    private fun createEditPopOver(arrow: StateTransactionArrow, x: Double, y: Double) =
+    private fun createEditPopOver(arrow: TransactionArrow, x: Double, y: Double) =
         EditArrowPopOver(arrow, x, y).apply {
             setOnMouseExited {
                 canvas.children.remove(this)

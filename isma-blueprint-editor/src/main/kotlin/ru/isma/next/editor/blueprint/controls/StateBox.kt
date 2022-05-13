@@ -5,10 +5,8 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Group
-import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
@@ -17,6 +15,8 @@ import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
+import kotlinx.coroutines.*
+import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
 
@@ -24,7 +24,7 @@ class StateBox(
     onPress: (StateBox, MouseEvent) -> Unit = { _,_ -> },
     onRelease: (StateBox, MouseEvent) -> Unit = { _,_ -> },
     onClick: (StateBox, MouseEvent) -> Unit = { _,_ -> },
-    onEditClick: (StateBox) -> Unit = { _ -> }
+    onDoubleClick: (StateBox, MouseEvent) -> Unit = { _,_ -> },
 ) : Group() {
     val isEditModeEnabledProperty = SimpleBooleanProperty(false)
     val isEditableProperty = SimpleBooleanProperty(true)
@@ -89,25 +89,37 @@ class StateBox(
             children.add(nameTextArea)
         })
 
-        children.add(Button("Edit").apply {
-            padding = Insets(2.0, 5.0,2.0,5.0)
-
-            val isVisibleBinding = isEditModeEnabledProperty.not().and(isEditButtonVisibleProperty)
-
-            setOnAction { onEditClick(this@StateBox) }
-
-            visibleProperty().bind(isVisibleBinding)
-            managedProperty().bind(isVisibleBinding)
-        })
+        var singleClickAction: Job? = null
 
         addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            if (!isDragged && isEditable) {
-                isEditModeEnabled = true
-                nameTextArea.requestFocus()
-            }
-            onClick(this@StateBox, it)
-        }
+            when(it.clickCount){
+                1 -> {
+                    if(singleClickAction == null) {
+                        singleClickAction = coroutineScope.launch {
+                            delay(200)
 
+                            singleClickAction = null
+
+                            if (!isDragged && isEditable) {
+                                isEditModeEnabled = true
+                                nameTextArea.requestFocus()
+                            }
+
+                            onClick(this@StateBox, it)
+                        }
+                    }
+
+                }
+                2 -> {
+                    if(singleClickAction != null){
+                        singleClickAction?.cancel()
+                        singleClickAction = null
+
+                        onDoubleClick(this@StateBox, it)
+                    }
+                }
+            }
+        }
         addEventHandler(MouseEvent.MOUSE_PRESSED) {
             isDragged = false
             onPress(this@StateBox, it)
@@ -118,5 +130,9 @@ class StateBox(
         addEventHandler(MouseEvent.MOUSE_DRAGGED) {
             isDragged = true
         }
+    }
+
+    companion object {
+        private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     }
 }

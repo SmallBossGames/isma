@@ -16,4 +16,6 @@ javafx {
 dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.fxmisc.richtext.core)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.javafx)
 }

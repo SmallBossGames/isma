@@ -215,16 +215,23 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         stateName: String = "",
         stateText: String = "",
     ) : StateBox {
-        val stateBox = StateBox().apply {
+        val stateBox = StateBox(
+            onClick = { source, _ ->
+                mouseLinkTransactionEventHandler(source)
+                mouseRemoveStateEventHandler(source)
+            },
+            onPress = { source, event ->
+                mouseMovingEventPressHandler(source, event)
+            },
+            onRelease = { _, _ ->
+                mouseMovingEventReleaseHandler()
+            },
+            onEditClick = { source ->
+                openStateTextEditorTab(source)
+            }
+        ).apply {
             color = Color.CORAL
 
-            addEditActionListener {
-                openStateTextEditorTab(this)
-            }
-
-            initMouseMovingEvents()
-            initMouseRemoveStateEvents()
-            initMouseLinkTransactionEvents()
             initNameChangingEvent()
 
             layoutXProperty().value = positionX
@@ -234,13 +241,68 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
             nameChangingMonitor.tryRegister(name)
 
-            isEditableProperty().bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
+            isEditableProperty.bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
         }
 
         stateBoxes.add(stateBox)
         canvas.children.add(stateBox)
 
         return stateBox
+    }
+
+    private fun createMainStateBox() : StateBox {
+        return StateBox(
+            onEditClick = { source ->
+                openStateTextEditorTab(source)
+            },
+            onPress = { source, event ->
+                mouseMovingEventPressHandler(source, event)
+            },
+            onRelease = { _, _ ->
+                mouseMovingEventReleaseHandler()
+            }
+        ).apply {
+            color = Color.LIGHTGREEN
+            isEditable = false
+            squareHeight = 60.0
+            name = MAIN_STATE
+            layoutXProperty().value += 10
+            layoutXProperty().value += 10
+
+            nameChangingMonitor.tryRegister(name)
+        }
+    }
+
+    private fun createInitStateBox() : StateBox {
+        return StateBox(
+            onClick = { source, _ ->
+                mouseLinkTransactionEventHandler(source)
+            },
+            onPress = { source, event ->
+                mouseMovingEventPressHandler(source, event)
+            },
+            onRelease = { _, _ ->
+                mouseMovingEventReleaseHandler()
+            }
+        ).apply {
+            color = Color.LIGHTBLUE
+            isEditButtonVisible = false
+            isEditable = false
+            squareHeight = 60.0
+            name = INIT_STATE
+            layoutXProperty().value += 10
+            layoutYProperty().value += 100
+
+            nameChangingMonitor.tryRegister(name)
+        }
+    }
+
+    private fun Pane.addMainStateBox() {
+        children.add(mainStateBox)
+    }
+
+    private fun Pane.addInitStateBox() {
+        children.add(initStateBox)
     }
 
     private fun addStateBox() {
@@ -269,12 +331,12 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
                 val popover = createEditPopOver(source, converted.x, converted.y)
 
                 canvas.children.add(popover)
-            }
+            },
         ).apply {
-            startXProperty().bind(startStateBox.centerXProperty())
-            startYProperty().bind(startStateBox.centerYProperty())
-            endXProperty().bind(endStateBox.centerXProperty())
-            endYProperty().bind(endStateBox.centerYProperty())
+            startXProperty.bind(startStateBox.centerXProperty())
+            startYProperty.bind(startStateBox.centerYProperty())
+            endXProperty.bind(endStateBox.centerXProperty())
+            endYProperty.bind(endStateBox.centerYProperty())
 
             this.text = predicate
             this.alias = alias
@@ -283,13 +345,11 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         canvas.children.add(transactionArrow)
 
         transactions.add(BlueprintEditorTransactionModel(startStateBox, endStateBox, transactionArrow))
-
-
     }
 
     private fun StateBox.removeFromEditor() {
         transactions
-            .toTypedArray()
+            .toList()
             .filter { it.startStateBox == this || it.endStateBox == this }
             .forEach { removeTransaction(it) }
 
@@ -299,7 +359,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
     private fun StateTransactionArrow.removeFromEditor() {
         transactions
-            .toTypedArray()
+            .toList()
             .filter { it.transactionArrow == this }
             .forEach { removeTransaction(it) }
     }
@@ -308,48 +368,6 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         transactions.remove(transaction)
 
         canvas.children.remove(transaction.transactionArrow)
-    }
-
-    private fun createMainStateBox() : StateBox {
-        return StateBox().apply {
-            color = Color.LIGHTGREEN
-            isEditable = false
-            squareHeight = 60.0
-            name = MAIN_STATE
-            layoutXProperty().value += 10
-            layoutXProperty().value += 10
-
-            nameChangingMonitor.tryRegister(name)
-
-            addEditActionListener { openMainTextEditorTab() }
-
-            initMouseMovingEvents()
-        }
-    }
-
-    private fun createInitStateBox() : StateBox {
-        return StateBox().apply {
-            color = Color.LIGHTBLUE
-            isEditButtonVisible = false
-            isEditable = false
-            squareHeight = 60.0
-            name = INIT_STATE
-            layoutXProperty().value += 10
-            layoutYProperty().value += 100
-
-            nameChangingMonitor.tryRegister(name)
-
-            initMouseMovingEvents()
-            initMouseLinkTransactionEvents()
-        }
-    }
-
-    private fun Pane.addMainStateBox() {
-        children.add(mainStateBox)
-    }
-
-    private fun Pane.addInitStateBox() {
-        children.add(initStateBox)
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
@@ -370,63 +388,42 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         )
 
         tabs.tabs.add(Tab(state.name, editor).apply {
-            textProperty().bind(state.nameProperty())
+            textProperty().bind(state.nameProperty)
         })
     }
 
-    private fun openMainTextEditorTab() {
-        val editor = editorFactory.createTextEditor(
-            text = mainStateBox.text,
-            onTextChanged = { mainStateBox.text = it }
-        )
-
-        tabs.tabs.add(Tab("Main", editor))
-    }
-
-    private fun StateBox.initMouseRemoveStateEvents() {
-        addMousePressedListener { it, _ ->
-            if(!isRemoveStateMode){
-                return@addMousePressedListener
-            }
-            it.removeFromEditor()
+    private fun mouseRemoveStateEventHandler(source: StateBox) {
+        if(isRemoveStateMode){
+            source.removeFromEditor()
         }
     }
 
-    private fun StateBox.initMouseMovingEvents() {
-        addMousePressedListener { it, event ->
-            if(isRemoveStateMode || isAddTransactionMode){
-                return@addMousePressedListener
-            }
-
+    private fun mouseMovingEventPressHandler(source: StateBox, event: MouseEvent) {
+        if(!isRemoveStateMode && !isAddTransactionMode){
             xOffset = -event.x
             yOffset = -event.y
-            activeStateBox = it
-        }
-        addMouseReleasedListener { _, _ ->
-            activeStateBox = null
+            activeStateBox = source
         }
     }
 
-    private fun StateBox.initMouseLinkTransactionEvents() {
-        addMouseClickedListeners { it, _ ->
-            if (!isAddTransactionMode || isRemoveStateMode) {
-                return@addMouseClickedListeners
-            }
+    private fun mouseMovingEventReleaseHandler() {
+        activeStateBox = null
+    }
 
-            statesToLink[addTransactionStateCounter++] = it
+    private fun mouseLinkTransactionEventHandler(source: StateBox) {
+        if (isAddTransactionMode && !isRemoveStateMode) {
+            statesToLink[addTransactionStateCounter++] = source
 
             if (addTransactionStateCounter > 1) {
                 addTransactionArrow(statesToLink[0]!!, statesToLink[1]!!)
                 isAddTransactionMode = false
             }
-
-            return@addMouseClickedListeners
         }
     }
 
     private fun StateBox.initNameChangingEvent() {
         var previousName = ""
-        isEditModeEnabledProperty().addListener { _, _, value ->
+        isEditModeEnabledProperty.addListener { _, _, value ->
             if(value) {
                 previousName = name
             } else {

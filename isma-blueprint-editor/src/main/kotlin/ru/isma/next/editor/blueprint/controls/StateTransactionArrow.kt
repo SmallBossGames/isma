@@ -22,18 +22,13 @@ class StateTransactionArrow(
     onClick: (source: StateTransactionArrow, event: MouseEvent) -> Unit,
     onArrowClick: (source: StateTransactionArrow, event: MouseEvent) -> Unit,
 ) : Group() {
-    private val startXProperty = SimpleDoubleProperty(0.0)
-    private val startYProperty = SimpleDoubleProperty(0.0)
-    private val endXProperty = SimpleDoubleProperty(0.0)
-    private val endYProperty = SimpleDoubleProperty(0.0)
-
     val aliasProperty = SimpleStringProperty("")
     val textProperty = SimpleStringProperty("")
 
-    fun startXProperty() = startXProperty
-    fun startYProperty() = startYProperty
-    fun endXProperty() = endXProperty
-    fun endYProperty() = endYProperty
+    val startXProperty = SimpleDoubleProperty(0.0)
+    val startYProperty = SimpleDoubleProperty(0.0)
+    val endXProperty = SimpleDoubleProperty(0.0)
+    val endYProperty = SimpleDoubleProperty(0.0)
 
     val startX by startXProperty
     val startY by startYProperty

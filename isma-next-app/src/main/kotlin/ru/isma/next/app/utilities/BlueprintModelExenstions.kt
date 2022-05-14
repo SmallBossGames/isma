@@ -4,6 +4,7 @@ import ru.isma.next.app.models.projects.CodeRegion
 import ru.isma.next.app.models.projects.LismaTextModel
 import ru.isma.next.editor.blueprint.models.BlueprintLoopTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
+import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 
 fun BlueprintModel.convertToLisma() : LismaTextModel {
     val fragments = LinkedHashSet<CodeRegion>()
@@ -46,14 +47,14 @@ fun BlueprintModel.convertToLisma() : LismaTextModel {
     }
 
     this.loopTransactions.forEach {
-        val fragmentText = it.toLisma()
+        val fragmentText = it.toLisma(statesMap)
         val fragmentLinesCount = fragmentText.lines().count()
         val startLineNumber = linesCounter
         val endLineNumber = linesCounter + fragmentLinesCount + 1
 
         resultStringBuilder.appendLine(fragmentText).appendLine()
 
-        fragments.add(CodeRegion(it.stateBox.name, startLineNumber, endLineNumber))
+        fragments.add(CodeRegion(it.stateName, startLineNumber, endLineNumber))
 
         linesCounter = endLineNumber
 
@@ -82,19 +83,19 @@ private class StateBlockModel(val stateName: String, val transactionKey: String,
     }
 }
 
-fun BlueprintLoopTransactionModel.toLisma(): String {
+private fun BlueprintLoopTransactionModel.toLisma(states: Map<String, BlueprintStateModel>): String {
     return StringBuilder().apply {
-        val pseudoStateName = "${stateBox.name}_pseudo_1"
+        val pseudoStateName = "${stateName}_pseudo_1"
 
         appendLine("state $pseudoStateName (${predicate.trim()}) {")
         appendLine(text)
-        appendLine("} from ${stateBox.name};")
+        appendLine("} from ${stateName};")
 
         appendLine()
 
-        appendLine("state ${stateBox.name} (${predicate.trim()}) {")
-        appendLine(stateBox.text)
-        appendLine("} from $pseudoStateName;")
+        appendLine("state $stateName (${predicate.trim()}) {")
+        appendLine(states[stateName]!!.text)
+        appendLine("} from ${pseudoStateName};")
 
         appendLine()
     }.toString()

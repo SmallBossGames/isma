@@ -10,13 +10,8 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
-import ru.isma.next.editor.blueprint.controls.EditArrowPopOver
-import ru.isma.next.editor.blueprint.controls.StateBox
-import ru.isma.next.editor.blueprint.controls.TransactionArrow
-import ru.isma.next.editor.blueprint.models.BlueprintEditorTransactionModel
-import ru.isma.next.editor.blueprint.models.BlueprintModel
-import ru.isma.next.editor.blueprint.models.BlueprintStateModel
-import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
+import ru.isma.next.editor.blueprint.controls.*
+import ru.isma.next.editor.blueprint.models.*
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
@@ -46,6 +41,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     private var addTransactionStateCounter by addTransactionStateCounterProperty
 
     private val transactions = ArrayList<BlueprintEditorTransactionModel>()
+    private val loopTransactions = ArrayList<BlueprintEditorLoopTransactionModel>()
     private val stateBoxes = ArrayList<StateBox>()
     private val mainStateBox: StateBox = createMainStateBox()
     private val initStateBox: StateBox = createInitStateBox()
@@ -143,8 +139,9 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         val init = initStateBox.toBlueprintState()
         val states = stateBoxes.map { it.toBlueprintState() }.toTypedArray()
         val blueprintTransactions = transactions.map { it.toBlueprintTransaction() }.toTypedArray()
+        val blueprintLoopTransactions = loopTransactions.map { it.toBlueprintLoopTransaction() }.toTypedArray()
 
-        return BlueprintModel(main, init, states, blueprintTransactions)
+        return BlueprintModel(main, init, states, blueprintTransactions, blueprintLoopTransactions)
     }
 
     fun setBlueprintModel(model: BlueprintModel) {
@@ -170,6 +167,15 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
                 it.alias,
             )
         }
+
+        model.loopTransactions.forEach { loopTransaction ->
+            addLoopTransactionArrow(
+                stateBoxes[loopTransaction.stateName]!!,
+                loopTransaction.text,
+                loopTransaction.predicate,
+                loopTransaction.alias
+            )
+        }
     }
 
     private fun StateBox.toBlueprintState() : BlueprintStateModel {
@@ -187,6 +193,15 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             endStateName = this.endStateBox.name,
             predicate = this.transactionArrow.text,
             alias = this.transactionArrow.alias
+        )
+    }
+
+    private fun BlueprintEditorLoopTransactionModel.toBlueprintLoopTransaction() : BlueprintLoopTransactionModel {
+        return BlueprintLoopTransactionModel(
+            stateName = this.stateBox.name,
+            predicate = this.loopTransactionArrow.predicate,
+            alias = this.loopTransactionArrow.alias,
+            text = this.loopTransactionArrow.text,
         )
     }
 
@@ -215,7 +230,6 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         stateText: String = "",
     ) : StateBox {
         val stateBox = StateBox(
-
             onPress = { source, event ->
                 mouseMovingEventPressHandler(source, event)
             },
@@ -309,11 +323,50 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         instantiateStateBox(10.0, 200.0)
     }
 
+    private fun addLoopTransactionArrow(
+        stateBox: StateBox,
+        text: String = "",
+        predicate: String = "",
+        alias: String = "",
+    ){
+        if(loopTransactions.any { it.stateBox == stateBox }) {
+            return
+        }
+
+        val loopTransactionArrow = LoopTransactionArrow(
+            onClick = { source, _ ->
+                if(isRemoveTransactionMode){
+                    source.removeFromEditor()
+                }
+            },
+            onArrowClick = { source, event ->
+                val converted = canvas.sceneToLocal(event.sceneX, event.sceneY)
+
+                val popover = createEditPopOver(source, converted.x, converted.y)
+
+                canvas.children.add(popover)
+            },
+            onArrowDoubleClick = { source, _ ->
+                openStateTextEditorTab(source, stateBox)
+            },
+            text = text,
+            alias = alias,
+            predicate = predicate
+        ).apply {
+            layoutXProperty().bind(stateBox.centerXProperty())
+            layoutYProperty().bind(stateBox.centerYProperty())
+        }
+
+        canvas.children.add(loopTransactionArrow)
+
+        loopTransactions.add(BlueprintEditorLoopTransactionModel(stateBox, loopTransactionArrow))
+    }
+
     private fun addTransactionArrow(
         startStateBox: StateBox,
         endStateBox: StateBox,
         predicate: String = "",
-        alias: String = ""
+        alias: String = "",
     ) {
         if(transactions.any { it.startStateBox == startStateBox && it.endStateBox == endStateBox }) {
             return
@@ -362,10 +415,22 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             .forEach { removeTransaction(it) }
     }
 
+    private fun LoopTransactionArrow.removeFromEditor() {
+        loopTransactions.toList()
+            .filter { it.loopTransactionArrow == this }
+            .forEach { removeTransaction(it) }
+    }
+
     private fun removeTransaction(transaction: BlueprintEditorTransactionModel) {
         transactions.remove(transaction)
 
         canvas.children.remove(transaction.transactionArrow)
+    }
+
+    private fun removeTransaction(transaction: BlueprintEditorLoopTransactionModel) {
+        loopTransactions.remove(transaction)
+
+        canvas.children.remove(transaction.loopTransactionArrow)
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
@@ -387,6 +452,17 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
         tabs.tabs.add(Tab(state.name, editor).apply {
             textProperty().bind(state.nameProperty)
+        })
+    }
+
+    private fun openStateTextEditorTab(arrow: LoopTransactionArrow, stateBox: StateBox) {
+        val editor = editorFactory.createTextEditor(
+            text = arrow.text,
+            onTextChanged = { arrow.text = it }
+        )
+
+        tabs.tabs.add(Tab("${stateBox.name} (loop)", editor).apply {
+            textProperty().bind(stateBox.nameProperty.concat(" (loop)"))
         })
     }
 
@@ -412,10 +488,20 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         if (isAddTransactionMode && !isRemoveStateMode) {
             statesToLink[addTransactionStateCounter++] = source
 
-            if (addTransactionStateCounter > 1) {
-                addTransactionArrow(statesToLink[0]!!, statesToLink[1]!!)
-                isAddTransactionMode = false
+            if (addTransactionStateCounter < 2) {
+                return
             }
+
+            val state1 = statesToLink[0]!!
+            val state2 = statesToLink[1]!!
+
+            if(state1 === state2){
+                addLoopTransactionArrow(state1)
+            } else {
+                addTransactionArrow(state1, state2)
+            }
+
+            isAddTransactionMode = false
         }
     }
 
@@ -434,7 +520,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         }
     }
 
-    private fun createEditPopOver(arrow: TransactionArrow, x: Double, y: Double) =
+    private fun createEditPopOver(arrow: ITransactionArrowData, x: Double, y: Double) =
         EditArrowPopOver(arrow, x, y).apply {
             setOnMouseExited {
                 canvas.children.remove(this)

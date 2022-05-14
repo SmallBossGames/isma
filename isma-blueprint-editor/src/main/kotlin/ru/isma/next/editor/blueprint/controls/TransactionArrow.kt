@@ -18,12 +18,17 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
+interface ITransactionArrowData {
+    val aliasProperty: SimpleStringProperty
+    val predicateProperty: SimpleStringProperty
+}
+
 class TransactionArrow(
     onClick: (source: TransactionArrow, event: MouseEvent) -> Unit,
     onArrowClick: (source: TransactionArrow, event: MouseEvent) -> Unit,
-) : Group() {
-    val aliasProperty = SimpleStringProperty("")
-    val textProperty = SimpleStringProperty("")
+) : Group(), ITransactionArrowData {
+    override val aliasProperty = SimpleStringProperty("")
+    override val predicateProperty = SimpleStringProperty("")
 
     val startXProperty = SimpleDoubleProperty(0.0)
     val startYProperty = SimpleDoubleProperty(0.0)
@@ -36,7 +41,7 @@ class TransactionArrow(
     val endY by endYProperty
 
     var alias: String by aliasProperty
-    var text: String by textProperty
+    var text: String by predicateProperty
 
     init {
         viewOrder = 4.0
@@ -98,7 +103,7 @@ class TransactionArrow(
 
         fun updatePredicateText(){
             val alias = aliasProperty.value
-            val predicate = textProperty.value
+            val predicate = predicateProperty.value
 
             predicateText.text = if (alias != "") alias else predicate
         }
@@ -107,7 +112,7 @@ class TransactionArrow(
             updatePredicateText()
         }
 
-        textProperty.onChange {
+        predicateProperty.onChange {
             updatePredicateText()
         }
 

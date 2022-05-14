@@ -452,6 +452,10 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
         tabs.tabs.add(Tab(state.name, editor).apply {
             textProperty().bind(state.nameProperty)
+
+            setOnCloseRequest {
+                editorFactory.disposeInstance(editor)
+            }
         })
     }
 
@@ -463,6 +467,10 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
         tabs.tabs.add(Tab("${stateBox.name} (loop)", editor).apply {
             textProperty().bind(stateBox.nameProperty.concat(" (loop)"))
+
+            setOnCloseRequest {
+                editorFactory.disposeInstance(editor)
+            }
         })
     }
 

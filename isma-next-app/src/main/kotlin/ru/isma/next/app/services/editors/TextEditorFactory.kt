@@ -13,4 +13,8 @@ class TextEditorFactory: ITextEditorFactory, KoinComponent {
             textProperty().addListener { _, _, newText -> onTextChanged(newText) }
         }
     }
+
+    override fun disposeInstance(node: Node) {
+        (node as IsmaTextEditor).dispose()
+    }
 }

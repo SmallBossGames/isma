@@ -4,4 +4,6 @@ import javafx.scene.Node
 
 interface ITextEditorFactory {
     fun createTextEditor(text: String, onTextChanged: (String) -> Unit): Node
+
+    fun disposeInstance(node: Node)
 }

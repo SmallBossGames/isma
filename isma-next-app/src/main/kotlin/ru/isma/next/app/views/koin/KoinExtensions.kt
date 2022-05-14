@@ -5,6 +5,7 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.scopedOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 import ru.isma.next.app.models.projects.BlueprintProjectDataProvider
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.LismaProjectDataProvider
@@ -31,7 +32,7 @@ val lismaTextEditorModule = module {
 
     scope<LismaProjectModel> {
         scopedOf(::LismaProjectDataProvider)
-        scopedOf(::IsmaTextEditor)
+        scopedOf(::IsmaTextEditor) onClose { it?.dispose() }
         scoped<Node>(named<IsmaEditorQualifier>()) { get<IsmaTextEditor>() }
     }
 }
@@ -41,7 +42,7 @@ val blueprintEditorModule = module {
 
     scope<BlueprintProjectModel> {
         scopedOf<ITextEditorFactory>(::TextEditorFactory)
-        factoryOf(::IsmaTextEditor)
+        factoryOf(::IsmaTextEditor) onClose { it?.dispose() }
         scopedOf(::BlueprintProjectDataProvider)
         scopedOf(::IsmaBlueprintEditor)
         scoped<Node>(named<IsmaEditorQualifier>()) { get<IsmaBlueprintEditor>() }

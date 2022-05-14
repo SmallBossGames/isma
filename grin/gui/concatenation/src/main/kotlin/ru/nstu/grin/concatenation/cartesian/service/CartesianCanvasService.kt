@@ -27,13 +27,23 @@ class CartesianCanvasService(
 
         this.model.cartesianSpaces.add(newCartesian)
 
-        reportSpaceUpdate()
+        coroutineScope.launch {
+            model.reportCartesianSpacesListUpdate()
+            model.reportFunctionsListUpdate()
+            model.reportAxesListUpdate()
+            model.reportDescriptionsListUpdate()
+        }
     }
 
     fun deleteCartesianSpace(space: CartesianSpace) {
         model.cartesianSpaces.remove(space)
 
-        reportSpaceUpdate()
+        coroutineScope.launch {
+            model.reportCartesianSpacesListUpdate()
+            model.reportFunctionsListUpdate()
+            model.reportAxesListUpdate()
+            model.reportDescriptionsListUpdate()
+        }
     }
 
     fun updateCartesian(dataModel: UpdateCartesianDataModel) {
@@ -41,10 +51,6 @@ class CartesianCanvasService(
         cartesian.isShowGrid = dataModel.isShowGrid
         cartesian.name = dataModel.name
 
-        reportSpaceUpdate()
-    }
-
-    private fun reportSpaceUpdate() {
         coroutineScope.launch {
             model.reportCartesianSpacesListUpdate()
         }

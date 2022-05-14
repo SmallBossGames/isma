@@ -13,10 +13,14 @@ import javafx.scene.paint.Color
 class EditArrowPopOver(arrow: ITransactionArrowData, x: Double, y: Double): VBox(
     Label("Alias (optional)"),
     TextField().apply {
+        minWidth = 300.0
+
         textProperty().bindBidirectional(arrow.aliasProperty)
     },
     Label("Predicate"),
     TextField().apply {
+        minWidth = 300.0
+
         textProperty().bindBidirectional(arrow.predicateProperty)
     },
 ) {
@@ -24,7 +28,7 @@ class EditArrowPopOver(arrow: ITransactionArrowData, x: Double, y: Double): VBox
         translateXProperty().bind(widthProperty().divide(-2).add(x))
         translateY = y - 2.0
 
-        padding = Insets(5.0)
+        padding = Insets(10.0)
 
         background = Background(
             BackgroundFill(

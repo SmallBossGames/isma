@@ -32,7 +32,7 @@ class IsmaTextEditor(
         }
 
         fxCoroutineScope.launch {
-            textEditorService.copyEvent.collect{
+            textEditorService.pasteEvent.collect{
                 if (isFocused) paste()
             }
         }

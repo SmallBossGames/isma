@@ -58,8 +58,11 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
             FunctionModel(value.name, selectedColumns[i])
         }
 
+        val xAxisName = pickedItems.xAxisItem.name
+        val yAxisName = pickedItems.yAxisItems.joinToString(", ") { it.name }
+
         withContext(Dispatchers.JavaFx){
-            grinIntegrationController.openSimpleChart(functions)
+            grinIntegrationController.openSimpleChart(functions, xAxisName, yAxisName)
         }
     }
 
@@ -75,13 +78,11 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         }
     }
 
-    suspend fun exportToFileAsync(simulationResult: CompletedSimulationModel, file: File) = coroutineScope {
-        launch(Dispatchers.IO) {
-            file.bufferedWriter().use { writer ->
-                val header = buildHeader(simulationResult)
-                writer.write(header)
-                writePoints(simulationResult, writer)
-            }
+    suspend fun exportToFileAsync(simulationResult: CompletedSimulationModel, file: File) = withContext(Dispatchers.IO) {
+        file.bufferedWriter().use { writer ->
+            val header = buildHeader(simulationResult)
+            writer.write(header)
+            writePoints(simulationResult, writer)
         }
     }
 

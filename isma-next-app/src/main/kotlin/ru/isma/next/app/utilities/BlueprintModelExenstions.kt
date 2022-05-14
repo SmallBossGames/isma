@@ -6,6 +6,8 @@ import ru.isma.next.editor.blueprint.models.BlueprintLoopTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 
+private const val LISMA_TRUE = "1 > 0"
+
 fun BlueprintModel.convertToLisma() : LismaTextModel {
     val fragments = LinkedHashSet<CodeRegion>()
     val resultStringBuilder = StringBuilder()
@@ -20,7 +22,7 @@ fun BlueprintModel.convertToLisma() : LismaTextModel {
     resultStringBuilder.appendLine(mainTextFragment)
 
     this.transactions.forEach {
-        val key = createTransactionKey(it.endStateName, it.predicate)
+        val key = createTransactionKey(it.endStateName, it.predicate.ifBlank { LISMA_TRUE })
         val blockModel = stateBlockModels[key]
 
         if(blockModel == null) {
@@ -93,7 +95,7 @@ private fun BlueprintLoopTransactionModel.toLisma(states: Map<String, BlueprintS
 
         appendLine()
 
-        appendLine("state $stateName (${predicate.trim()}) {")
+        appendLine("state $stateName ($LISMA_TRUE) {")
         appendLine(states[stateName]!!.text)
         appendLine("} from ${pseudoStateName};")
 

@@ -44,14 +44,18 @@ class GrinIntegrationFacade: KoinComponent {
         }
     }
 
-    fun openSimpleChart(functions: Collection<FunctionModel>) {
+    fun openSimpleChart(
+        functions: Collection<FunctionModel>,
+        xAxisName: String = "X axis",
+        yAxisName: String = "Y axis",
+    ) {
         val xAxis = ConcatenationAxis(
-            name = "X axis",
+            name = xAxisName,
             direction = Direction.BOTTOM,
         )
 
         val yAxis = ConcatenationAxis(
-            name = "Y axis",
+            name = yAxisName,
             direction = Direction.LEFT,
         )
 

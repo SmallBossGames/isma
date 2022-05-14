@@ -67,7 +67,7 @@ dependencyResolutionManagement{
             library("kotlinx-coroutines-core","org.jetbrains.kotlinx","kotlinx-coroutines-core").versionRef("kotlinx-coroutines")
             library("kotlinx-coroutines-javafx","org.jetbrains.kotlinx","kotlinx-coroutines-javafx").versionRef("kotlinx-coroutines")
             library("kotlinx-serialization-json","org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-            library("antlr4-runtime","org.antlr:antlr4-runtime:4.9.3")
+            library("antlr4-runtime","org.antlr:antlr4-runtime:4.10.1")
             library("fxmisc-richtext-core","org.fxmisc.richtext:richtextfx:0.10.9")
         }
     }

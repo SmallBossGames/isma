@@ -375,8 +375,10 @@ statement
 // ------------------------------------------------------------------
 // 1.11 setter
 // ------------------------------------------------------------------
+    SET_KEYWORD : 'set';
+
     setter
-           :   'set' var_ident ASSIGN expression SEMI
+           :   SET_KEYWORD var_ident ASSIGN expression SEMI
    	;
 // ------------------------------------------------------------------
 // 1.12 Linear system

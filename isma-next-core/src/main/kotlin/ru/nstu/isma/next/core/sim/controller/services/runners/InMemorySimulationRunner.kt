@@ -12,8 +12,6 @@ import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 class InMemorySimulationRunner(
     private val hybridSystemSimulator: IHybridSystemSimulator
 ) : ISimulationRunner {
-    private val logger = LoggerFactory.getLogger(this.javaClass)
-
     override suspend fun run(context: SimulationParameters): HybridSystemIntegrationResult = coroutineScope {
         val resultMemoryStore = MemoryPointProvider()
 
@@ -21,11 +19,9 @@ class InMemorySimulationRunner(
             context.compilationResult,
             context.simulationInitials,
             stepChangeHandlers = context.stepChangeHandlers,
-            resultPointHandlers = arrayListOf(
-                {
-                    resultMemoryStore.accept(it)
-                }
-            )
+            resultPointHandlers = {
+                resultMemoryStore.accept(it)
+            }
         )
 
         val metricData: IntgMetricData = hybridSystemSimulator.runAsync(simulatorParameters)

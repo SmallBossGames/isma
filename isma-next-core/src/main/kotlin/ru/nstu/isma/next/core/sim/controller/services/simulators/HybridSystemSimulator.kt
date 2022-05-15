@@ -51,9 +51,7 @@ class HybridSystemSimulator(
                 rhs = stepSolver.calculateRhs(yForDe)
             }
 
-            parameters.resultPointHandlers.forEach {
-                it(IntgResultPoint(x, yForDe.copyOf(), rhs))
-            }
+            parameters.resultPointHandlers(IntgResultPoint(x, yForDe.copyOf(), rhs))
 
             val fromPoint = IntgPoint(step, yForDe, rhs)
             val toPoint = stepSolver.step(fromPoint)
@@ -68,16 +66,14 @@ class HybridSystemSimulator(
             yForDe = toPoint.y
             rhs = toPoint.rhs
             if (isLastStep) {
-                parameters.resultPointHandlers.forEach {
-                    it(IntgResultPoint(x, yForDe.copyOf(), rhs))
-                }
+                parameters.resultPointHandlers(IntgResultPoint(x, yForDe.copyOf(), rhs))
                 break
             } else if (x + step > end) { // Если нам нужно сделать последний шаг, то меняем значение
                 step = end - x
                 isLastStep = true
             }
             val finalX = x
-            parameters.stepChangeHandlers.forEach { it(finalX) }
+            parameters.stepChangeHandlers(finalX)
         }
         metricData.setEndTime(System.currentTimeMillis())
         return@coroutineScope metricData

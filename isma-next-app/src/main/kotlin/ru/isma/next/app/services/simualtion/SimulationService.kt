@@ -57,12 +57,13 @@ class SimulationService(
                 val context = IntegratorApiParameters(
                     hsm = hsm,
                     initials = initials,
-                    stepChangeHandlers = arrayListOf(
-                        {
+                    stepChangeHandlers = {
+                        launch {
                             val progress = normalizeProgress(initials.start, initials.end, it)
+
                             trackingTask.commitProgress(progress)
                         }
-                    )
+                    }
                 )
 
                 withContext(Dispatchers.JavaFx) {
@@ -97,7 +98,7 @@ class SimulationService(
     }
 
     fun stopSimulation(trackingTask: InProgressSimulationModel) {
-        currentSimulationJobs.getOrDefault(trackingTask, null)?.cancel()
+        currentSimulationJobs[trackingTask]?.cancel()
     }
 
     companion object {

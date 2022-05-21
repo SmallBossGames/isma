@@ -1,13 +1,12 @@
 package ru.nstu.isma.next.core.sim.controller.services.runners
 
 import kotlinx.coroutines.coroutineScope
-import org.slf4j.LoggerFactory
 import ru.nstu.isma.intg.api.IntgMetricData
 import ru.nstu.isma.intg.api.providers.MemoryPointProvider
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
-import ru.nstu.isma.next.core.sim.controller.services.simulators.IHybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
+import ru.nstu.isma.next.core.sim.controller.services.simulators.IHybridSystemSimulator
 
 class InMemorySimulationRunner(
     private val hybridSystemSimulator: IHybridSystemSimulator
@@ -19,9 +18,7 @@ class InMemorySimulationRunner(
             context.compilationResult,
             context.simulationInitials,
             stepChangeHandlers = context.stepChangeHandlers,
-            resultPointHandlers = {
-                resultMemoryStore.accept(it)
-            }
+            resultPointHandlers = resultMemoryStore::accept
         )
 
         val metricData: IntgMetricData = hybridSystemSimulator.runAsync(simulatorParameters)

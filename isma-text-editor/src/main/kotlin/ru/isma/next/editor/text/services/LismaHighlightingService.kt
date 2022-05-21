@@ -17,7 +17,7 @@ class LismaHighlightingService : IHighlightingService {
         tokens.forEach {
             when (it.type) {
                 LismaLexer.CONST_KEYWORD, LismaLexer.STATE_KEYWORD, LismaLexer.FOR_KEYWORD, LismaLexer.IF_KEYWORD,
-                LismaLexer.FROM_KEYWORD, LismaLexer.MACRO_KEYWORD, LismaLexer.SET_KEYWORD -> {
+                LismaLexer.ELSE_KEYWORD, LismaLexer.FROM_KEYWORD, LismaLexer.MACRO_KEYWORD, LismaLexer.SET_KEYWORD -> {
                     spansBuilder
                         .add(listOf("syntax-default"),  it.startIndex - lastKeyword)
                         .add(listOf("syntax-keyword"), it.stopIndex - it.startIndex + 1)

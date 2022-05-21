@@ -217,8 +217,10 @@ statement
         ;
 
     pseudo_state_else
-        :   'else' pseudo_state_body
+        :   ELSE_KEYWORD pseudo_state_body
         ;
+
+    ELSE_KEYWORD: 'else';
 
 // ------------------------------------------------------------------ 
 // 1.6 Function and math mapping

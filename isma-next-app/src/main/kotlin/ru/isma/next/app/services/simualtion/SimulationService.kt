@@ -58,11 +58,9 @@ class SimulationService(
                     hsm = hsm,
                     initials = initials,
                     stepChangeHandlers = {
-                        launch {
-                            val progress = normalizeProgress(initials.start, initials.end, it)
+                        val progress = normalizeProgress(initials.start, initials.end, it)
 
-                            trackingTask.commitProgress(progress)
-                        }
+                        trackingTask.commitProgress(progress)
                     }
                 )
 

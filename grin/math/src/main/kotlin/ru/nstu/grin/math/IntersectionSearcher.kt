@@ -54,9 +54,9 @@ object IntersectionSearcher {
 
 
                     val intersectionPointX =
-                        firstX[i] + leftCenterX * leftUpCross.absoluteValue / (leftDownCross - leftUpCross).absoluteValue
+                        firstX[i] + leftCenterX * (leftUpCross / (leftDownCross - leftUpCross)).absoluteValue
                     val intersectionPointY =
-                        firstY[i] + leftCenterY * leftUpCross.absoluteValue / (leftDownCross - leftUpCross).absoluteValue
+                        firstY[i] + leftCenterY * (leftUpCross / (leftDownCross - leftUpCross)).absoluteValue
 
                     resultIndices.add(Pair(intersectionPointX, intersectionPointY))
                 }

@@ -57,10 +57,12 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         }
     }
 
+    private val diagramTab = Tab("Diagram", ScrollPane(canvas)).apply {
+        isClosable = false
+    }
+
     private val tabs = TabPane(
-        Tab("Diagram", ScrollPane(canvas)).apply {
-            isClosable = false
-        }
+        diagramTab
     )
 
     init {
@@ -114,7 +116,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             },
 
             Button("Remove transition").apply {
-                onAction = EventHandler {
+                setOnAction {
                     if (isRemoveTransactionMode) {
                         resetEditorMode()
                     } else {
@@ -131,7 +133,11 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
                     }
                 }
             }
-        )
+        ).apply {
+            val visible = tabs.selectionModel.selectedItemProperty().isEqualTo(diagramTab)
+            visibleProperty().bind(visible)
+            managedProperty().bind(visible)
+        }
     }
 
     fun getBlueprintModel() : BlueprintModel {

@@ -34,9 +34,7 @@ class InFileSimulationRunner(
                     context.simulationInitials,
                     stepChangeHandlers = context.stepChangeHandlers,
                     resultPointHandlers = {
-                        launch {
-                            send(it)
-                        }
+                        send(it)
                     }
                 )
 

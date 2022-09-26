@@ -29,7 +29,7 @@ class IsmaToolBar(
             },
             Button().apply {
                 graphic = matIconAL("add_box")
-                tooltip = Tooltip("New blueprint")
+                tooltip = Tooltip("New statechart")
                 onAction = EventHandler { projectController.createNewBlueprint() }
             },
             Button().apply {

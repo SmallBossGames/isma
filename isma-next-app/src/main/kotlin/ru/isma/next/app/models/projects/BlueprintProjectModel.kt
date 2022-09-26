@@ -1,12 +1,24 @@
 package ru.isma.next.app.models.projects
 
 import javafx.beans.property.SimpleStringProperty
+import javafx.scene.Node
+import org.koin.core.component.KoinScopeComponent
+import org.koin.core.component.createScope
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
 import ru.isma.next.app.utilities.convertToLisma
+import ru.isma.next.app.views.koin.IsmaEditorQualifier
 import ru.isma.next.editor.blueprint.models.BlueprintModel
+import tornadofx.getValue
+import tornadofx.setValue
 import java.io.File
-import tornadofx.*
 
-class BlueprintProjectModel : IProjectModel {
+class BlueprintProjectModel : IProjectModel, KoinScopeComponent {
+    override val scope: Scope by lazy { createScope() }
+
+    private val dataProvider by inject<BlueprintProjectDataProvider>()
+
     private var blueprintValue: BlueprintModel = BlueprintModel.empty
 
     private val nameProperty = SimpleStringProperty("")
@@ -15,11 +27,17 @@ class BlueprintProjectModel : IProjectModel {
 
     override var file: File? = null
 
+    override val editor: Node by inject(named<IsmaEditorQualifier>())
+
+    init {
+        pushBlueprint()
+    }
+
     override fun nameProperty() = nameProperty
 
     override fun snapshot() = blueprint.convertToLisma()
 
-    var dataProvider: BlueprintProjectDataProvider? = null
+    override fun dispose() { closeScope() }
 
     var blueprint: BlueprintModel
         get() {
@@ -32,12 +50,10 @@ class BlueprintProjectModel : IProjectModel {
         }
 
     fun pushBlueprint() {
-        val provider = dataProvider ?: return
-        provider.blueprint = blueprintValue
+        dataProvider.blueprint = blueprintValue
     }
 
     fun fetchBlueprint() {
-        val provider = dataProvider ?: return
-        blueprintValue = provider.blueprint
+        blueprintValue = dataProvider.blueprint
     }
 }

@@ -5,6 +5,7 @@ import ru.nstu.grin.concatenation.file.options.controller.FileOptionsController
 import ru.nstu.grin.concatenation.file.options.model.CsvDetails
 import ru.nstu.grin.concatenation.file.options.model.ExcelDetails
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
+import ru.nstu.grin.concatenation.file.utilities.getFileType
 import ru.nstu.grin.concatenation.function.model.FileModel
 import ru.nstu.grin.concatenation.function.model.FileType
 import tornadofx.*
@@ -14,7 +15,7 @@ class FileOptionsView : Fragment() {
     private val controller: FileOptionsController by inject()
 
     init {
-        when (controller.getType()) {
+        when (model.file.getFileType()) {
             FileType.XLS, FileType.XLSX -> {
                 model.details = ExcelDetails()
             }
@@ -33,15 +34,7 @@ class FileOptionsView : Fragment() {
                         textfield().bind(details.sheetNameProperty)
                     }
                     field("Диапозон ячеек") {
-                        textfield(details.rangeProperty) {
-//                            validator {
-//                                if (it == null || !it.contains(":")) {
-//                                    error("Формат должен быть записан в следующем виде A0:B2")
-//                                } else {
-//                                    null
-//                                }
-//                            }
-                        }
+                        textfield(details.rangeProperty)
                     }
                 }
                 is CsvDetails -> {
@@ -53,7 +46,7 @@ class FileOptionsView : Fragment() {
             field("Вид файла") {
                 combobox(model.readerModeProperty, FileReaderMode.values().toList()) {
                     cellFormat {
-                        text = when (it) {
+                        text = when (it!!) {
                             FileReaderMode.ONE_TO_MANY -> "Один ко многим"
                             FileReaderMode.SEQUENCE -> "Функции подряд"
                         }
@@ -65,8 +58,8 @@ class FileOptionsView : Fragment() {
             action {
                 when (val details = model.details) {
                     is ExcelDetails -> {
-                        if (details.range == null || !details.range.contains(":")) {
-                            tornadofx.error("Формат должен быть записан в следующем виде A0:B2")
+                        if (!details.range.contains(":")) {
+                            error("Формат должен быть записан в следующем виде A0:B2")
                         } else {
                             controller.openPointsWindow()
                             close()

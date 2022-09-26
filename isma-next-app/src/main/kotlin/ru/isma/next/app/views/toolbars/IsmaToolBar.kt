@@ -11,13 +11,13 @@ import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import ru.isma.next.editor.text.services.contracts.ITextEditorService
+import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 
 class IsmaToolBar(
     private val projectController: ProjectService,
     private val projectFileService: ProjectFileService,
     private val lismaPdeService: LismaPdeService,
-    private val textEditorService: ITextEditorService,
+    private val textEditorService: IEditorPlatformService,
     private val simulationParametersService: SimulationParametersService,
 ): ToolBar() {
     init {
@@ -29,7 +29,7 @@ class IsmaToolBar(
             },
             Button().apply {
                 graphic = matIconAL("add_box")
-                tooltip = Tooltip("New blueprint")
+                tooltip = Tooltip("New statechart")
                 onAction = EventHandler { projectController.createNewBlueprint() }
             },
             Button().apply {

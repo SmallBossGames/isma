@@ -1,6 +1,15 @@
 package ru.isma.next.app.views.koin
 
+import javafx.scene.Node
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.scopedOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.dsl.onClose
+import ru.isma.next.app.models.projects.BlueprintProjectDataProvider
+import ru.isma.next.app.models.projects.BlueprintProjectModel
+import ru.isma.next.app.models.projects.LismaProjectDataProvider
+import ru.isma.next.app.models.projects.LismaProjectModel
 import ru.isma.next.app.services.editors.TextEditorFactory
 import ru.isma.next.app.views.MainView
 import ru.isma.next.app.views.settings.*
@@ -12,14 +21,32 @@ import ru.isma.next.editor.text.IsmaTextEditor
 import ru.isma.next.editor.text.services.LismaHighlightingService
 import ru.isma.next.editor.text.services.contracts.IHighlightingService
 
-val lismaTextEditorModule =  module {
-    factory { IsmaTextEditor(get(), get()) }
+class IsmaEditorQualifier
+
+val editorModule = module {
     single<IHighlightingService> { LismaHighlightingService() }
 }
 
+val lismaTextEditorModule = module {
+    includes(editorModule)
+
+    scope<LismaProjectModel> {
+        scopedOf(::LismaProjectDataProvider)
+        scopedOf(::IsmaTextEditor) onClose { it?.dispose() }
+        scoped<Node>(named<IsmaEditorQualifier>()) { get<IsmaTextEditor>() }
+    }
+}
+
 val blueprintEditorModule = module {
-    factory { IsmaBlueprintEditor(get()) }
-    single<ITextEditorFactory> { TextEditorFactory() }
+    includes(editorModule)
+
+    scope<BlueprintProjectModel> {
+        scopedOf<ITextEditorFactory>(::TextEditorFactory)
+        factoryOf(::IsmaTextEditor) onClose { it?.dispose() }
+        scopedOf(::BlueprintProjectDataProvider)
+        scopedOf(::IsmaBlueprintEditor)
+        scoped<Node>(named<IsmaEditorQualifier>()) { get<IsmaBlueprintEditor>() }
+    }
 }
 
 val toolbarsModule = module {

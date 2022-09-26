@@ -7,19 +7,17 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianController
-import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
+import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianViewModel
 
 class CopyCartesianFragment(
-    private val controller: CopyCartesianController,
-    private val model: CopyCartesianModel
+    private val viewModel: CopyCartesianViewModel
 ) : BorderPane() {
     init {
         top = VBox(
             propertiesGrid {
-                addNode("New Space Name", model.nameProperty)
-                addNode("X Axis Name", model.xAxisNameProperty)
-                addNode("Y Axis Name", model.yAxisNameProperty)
+                addNode("New Space Name", viewModel.nameProperty)
+                addNode("X Axis Name", viewModel.xAxisNameProperty)
+                addNode("Y Axis Name", viewModel.yAxisNameProperty)
             }.apply {
                 padding = Insets(10.0)
             },
@@ -28,7 +26,7 @@ class CopyCartesianFragment(
         bottom = HBox(
             Button("Copy").apply {
                 setOnAction {
-                    controller.copy(model)
+                    viewModel.copy()
                     (scene.window as Stage).close()
                 }
             }

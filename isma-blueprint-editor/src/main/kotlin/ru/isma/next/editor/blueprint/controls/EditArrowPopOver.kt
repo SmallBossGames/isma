@@ -10,21 +10,25 @@ import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 
-class EditArrowPopOver(arrow: StateTransactionArrow, x: Double, y: Double): VBox(
+class EditArrowPopOver(arrow: ITransactionArrowData, x: Double, y: Double): VBox(
     Label("Alias (optional)"),
     TextField().apply {
+        minWidth = 300.0
+
         textProperty().bindBidirectional(arrow.aliasProperty)
     },
     Label("Predicate"),
     TextField().apply {
-        textProperty().bindBidirectional(arrow.textProperty)
+        minWidth = 300.0
+
+        textProperty().bindBidirectional(arrow.predicateProperty)
     },
 ) {
     init {
         translateXProperty().bind(widthProperty().divide(-2).add(x))
         translateY = y - 2.0
 
-        padding = Insets(5.0)
+        padding = Insets(10.0)
 
         background = Background(
             BackgroundFill(

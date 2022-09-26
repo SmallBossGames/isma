@@ -3,46 +3,46 @@ package ru.nstu.grin.concatenation.canvas.handlers
 import javafx.event.EventHandler
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import ru.nstu.grin.common.model.Point
+import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.*
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.transform.TranslateTransformer
 
 class DraggedHandler(
     private val model: ConcatenationCanvasModel,
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val chainDrawer: ConcatenationChainDrawer,
-    private val concatenationViewModel: ConcatenationViewModel,
-    private val matrixTransformer: MatrixTransformerController,
+    private val editModeViewModel: EditModeViewModel,
+    private val matrixTransformer: MatrixTransformer,
+    private val functionCanvasService: FunctionCanvasService,
 ) : EventHandler<MouseEvent> {
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
     private val currentCanvasSettings: MutableMap<ConcatenationAxis, DraggedSettings> = mutableMapOf()
 
     override fun handle(event: MouseEvent) {
         var uiLayerDirty = false
 
-        val editMode = concatenationViewModel.currentEditMode
+        val editMode = editModeViewModel.currentEditMode
         val isOnAxis = isOnAxis(event)
 
         if ((editMode == EditMode.SCALE || editMode == EditMode.WINDOWED) && !isOnAxis) {
             if (event.isPrimaryButtonDown) {
-                if (!model.selectionSettings.isFirstPointSelected) {
-                    model.selectionSettings.firstPoint = Point(event.x, event.y)
-                    model.selectionSettings.isFirstPointSelected = true
+                if (!editModeViewModel.selectionSettings.isFirstPointSelected) {
+                    editModeViewModel.selectionSettings.firstPoint = Point(event.x, event.y)
+                    editModeViewModel.selectionSettings.isFirstPointSelected = true
                 } else {
-                    model.selectionSettings.secondPoint = Point(event.x, event.y)
-                    model.selectionSettings.isSecondPointSelected = true
+                    editModeViewModel.selectionSettings.secondPoint = Point(event.x, event.y)
+                    editModeViewModel.selectionSettings.isSecondPointSelected = true
                 }
             }
 
             if (!event.isPrimaryButtonDown) {
-                model.selectionSettings.isFirstPointSelected = false
-                model.selectionSettings.isSecondPointSelected = false
+                editModeViewModel.selectionSettings.isFirstPointSelected = false
+                editModeViewModel.selectionSettings.isSecondPointSelected = false
             }
 
             uiLayerDirty = true
@@ -61,131 +61,142 @@ class DraggedHandler(
         }
 
         if (editMode == EditMode.MOVE && event.button == MouseButton.PRIMARY) {
-            handleMoveMode(event)
+            val settings = editModeViewModel.moveSettings
 
-            uiLayerDirty = true
+            if(settings != null){
+                uiLayerDirty = handleMoveMode(event, settings)
+            }
         }
 
-        if (uiLayerDirty){
-            coroutineScope.launch {
-                chainDrawer.drawUiLayer()
-            }
+        if (uiLayerDirty) {
+            chainDrawer.drawUiLayer()
         }
     }
 
     private fun isOnAxis(event: MouseEvent): Boolean {
-        return model.cartesianSpaces
-            .map { listOf(it.xAxis, it.yAxis) }
-            .flatten()
-            .any { it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight) }
+        return model.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel) != null
     }
 
     private fun handleDragged(event: MouseEvent) {
-        model.pointToolTipSettings.isShow = false
-        model.pointToolTipSettings.pointsSettings.clear()
+        if(isOnAxis(event)){
+            return
+        }
 
-        val axises = model.cartesianSpaces.map {
-            listOf(it.xAxis, it.yAxis)
-        }.flatten()
-        val axis = axises.firstOrNull {
-            it.isLocated(event.x, event.y, canvasViewModel.canvasWidth, canvasViewModel.canvasHeight)
-        } ?: return
+        val axis = model.cartesianSpaces.findLocatedAxisOrNull(event.x, event.y, canvasViewModel) ?: return
 
         val draggedSettings = getDraggedSettings(axis)
 
         if (draggedSettings.lastX == -1.0) draggedSettings.lastX = event.x
         if (draggedSettings.lastY == -1.0) draggedSettings.lastY = event.y
 
+        val scaleProperties = axis.scaleProperties
 
-        if (axis.isXAxis) {
-            when {
-                event.x < draggedSettings.lastX -> {
-                    axis.settings.min -= DELTA
-                    axis.settings.max -= DELTA
-                }
-                event.x > draggedSettings.lastX -> {
-                    axis.settings.min += DELTA
-                    axis.settings.max += DELTA
-                }
-                else -> {
+        when(axis.direction) {
+            Direction.LEFT, Direction.RIGHT -> {
+                when {
+                    event.y < draggedSettings.lastY -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue - DELTA,
+                            maxValue = scaleProperties.maxValue - DELTA,
+                        )
+                    }
+                    event.y > draggedSettings.lastY -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue + DELTA,
+                            maxValue = scaleProperties.maxValue + DELTA,
+                        )
+                    }
+                    else -> throw IllegalStateException()
                 }
             }
-        } else {
-            when {
-                event.y < draggedSettings.lastY -> {
-                    axis.settings.min -= DELTA
-                    axis.settings.max -= DELTA
-                }
-                event.y > draggedSettings.lastY -> {
-                    axis.settings.min += DELTA
-                    axis.settings.max += DELTA
-                }
-                else -> {
+            Direction.TOP, Direction.BOTTOM -> {
+                when {
+                    event.x < draggedSettings.lastX -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue - DELTA,
+                            maxValue = scaleProperties.maxValue - DELTA,
+                        )
+                    }
+                    event.x > draggedSettings.lastX -> {
+                        axis.scaleProperties = axis.scaleProperties.copy(
+                            minValue = scaleProperties.minValue + DELTA,
+                            maxValue = scaleProperties.maxValue + DELTA,
+                        )
+                    }
+                    else -> throw IllegalStateException()
                 }
             }
         }
+
         draggedSettings.lastX = event.x
         draggedSettings.lastY = event.y
         currentCanvasSettings[axis] = draggedSettings
     }
 
     private fun handleEditMode(event: MouseEvent) {
-        val traceSettings = model.traceSettings ?: return
+        val traceSettings = editModeViewModel.traceSettings ?: return
         val x = matrixTransformer.transformPixelToUnits(
             event.x,
-            traceSettings.xAxis.settings,
+            traceSettings.xAxis.scaleProperties,
             traceSettings.xAxis.direction
         )
         val y = matrixTransformer.transformPixelToUnits(
             event.y,
-            traceSettings.yAxis.settings,
+            traceSettings.yAxis.scaleProperties,
             traceSettings.yAxis.direction
         )
         traceSettings.pressedPoint.x = x
         traceSettings.pressedPoint.y = y
     }
 
-    private fun handleMoveMode(event: MouseEvent) {
-        val moveSettings = model.moveSettings ?: return
-        when (moveSettings.type) {
-            MovedElementType.FUNCTION -> {
-                val xAxis = requireNotNull(moveSettings.xAxis) { "Function move event can't have null axises" }
-                val yAxis = requireNotNull(moveSettings.yAxis) { "Function move event can't have null axises" }
-                val xLeft = matrixTransformer.transformPixelToUnits(
-                    moveSettings.pressedX,
-                    xAxis.settings,
-                    xAxis.direction
+    private fun handleMoveMode(event: MouseEvent, moveSettings: IMoveSettings) : Boolean {
+        when(moveSettings){
+            is FunctionMoveSettings -> {
+                val startX = matrixTransformer.transformPixelToUnits(
+                    moveSettings.currentX,
+                    moveSettings.xAxis.scaleProperties,
+                    moveSettings.xAxis.direction
                 )
-                val yLeft = matrixTransformer.transformPixelToUnits(
-                    moveSettings.pressedY,
-                    yAxis.settings,
-                    yAxis.direction
+                val startY = matrixTransformer.transformPixelToUnits(
+                    moveSettings.currentY,
+                    moveSettings.yAxis.scaleProperties,
+                    moveSettings.yAxis.direction
                 )
-                val xRight = matrixTransformer.transformPixelToUnits(
+                val endX = matrixTransformer.transformPixelToUnits(
                     event.x,
-                    xAxis.settings,
-                    xAxis.direction
+                    moveSettings.xAxis.scaleProperties,
+                    moveSettings.xAxis.direction
                 )
-                val yRight = matrixTransformer.transformPixelToUnits(
+                val endY = matrixTransformer.transformPixelToUnits(
                     event.y,
-                    yAxis.settings,
-                    yAxis.direction
+                    moveSettings.yAxis.scaleProperties,
+                    moveSettings.yAxis.direction
                 )
-                val x = xLeft - xRight
-                val y = yLeft - yRight
-                println("Moved x=$x y=$y")
-                val function =
-                    model.cartesianSpaces.map { it.functions }.flatten().firstOrNull { it.id == moveSettings.id }
-                        ?: return
-                function.points.forEach {
-                    it.x -= x
-                    it.y -= y
+                val x = endX - startX
+                val y = endY - startY
+
+                moveSettings.apply {
+                    currentX = event.x
+                    currentY = event.y
                 }
+
+                functionCanvasService.addOrUpdateLastTransformer<TranslateTransformer>(moveSettings.function) { it ->
+                    it?.copy(
+                        translateX = it.translateX + x, translateY = it.translateY + y
+                    )?: TranslateTransformer(
+                        translateX = x, translateY = y
+                    )
+                }
+
+                return false
             }
-            MovedElementType.DESCRIPTION -> {
-                val description = model.descriptions.firstOrNull { it.id == moveSettings.id } ?: return
-                description.x = event.x
-                description.y = event.y
+            is DescriptionMoveSettings -> {
+                moveSettings.description.apply {
+                    textOffsetX = event.x
+                    textOffsetY = event.y
+                }
+
+                return true
             }
         }
     }

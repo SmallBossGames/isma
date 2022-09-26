@@ -8,7 +8,7 @@ import org.koin.core.component.get
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LocalizeFunctionModel
-import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
 import tornadofx.Controller
 
@@ -16,7 +16,7 @@ class LocalizeFunctionController : Controller() {
     private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
 
     private val concatenationCanvasModel: ConcatenationCanvasModel = mainGrinScope.get()
-    private val functionCanvasService: FunctionCanvasService = mainGrinScope.get()
+    private val functionCanvasService: FunctionOperationsService = mainGrinScope.get()
 
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     private val model: LocalizeFunctionModel by inject()
@@ -28,7 +28,7 @@ class LocalizeFunctionController : Controller() {
             }
         }
 
-        model.functions.setAll(concatenationCanvasModel.getAllFunctions())
+        model.functions.setAll(concatenationCanvasModel.functions)
     }
 
     fun localize(function: ConcatenationFunction) {

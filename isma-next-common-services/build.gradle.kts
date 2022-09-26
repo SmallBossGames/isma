@@ -10,5 +10,17 @@ dependencies {
     implementation(project(":isma-lisma"))
     implementation(project(":isma-next-core"))
 
-    implementation ("org.antlr:antlr4-runtime:4.9.3")
+    implementation (libs.tornadofx.core)
+}
+
+val moduleName by extra("isma.isma.next.common.services.main")
+
+tasks {
+    compileJava {
+        inputs.property("moduleName", moduleName)
+        options.compilerArgs = listOf(
+            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
+        )
+    }
+    //check { dependsOn(integTestTask) }
 }

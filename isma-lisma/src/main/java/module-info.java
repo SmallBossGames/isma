@@ -6,4 +6,6 @@ module isma.isma.lisma.main {
     exports ru.nstu.isma.lisma.analysis.gen;
     exports ru.nstu.isma.lisma.analysis.parser;
     exports ru.nstu.isma.lisma.service;
+    exports ru.nstu.isma.lisma.translator;
+    exports ru.nstu.isma.lisma;
 }

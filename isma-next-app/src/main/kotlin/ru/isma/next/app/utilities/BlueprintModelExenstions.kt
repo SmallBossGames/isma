@@ -2,7 +2,11 @@ package ru.isma.next.app.utilities
 
 import ru.isma.next.app.models.projects.CodeRegion
 import ru.isma.next.app.models.projects.LismaTextModel
+import ru.isma.next.editor.blueprint.models.BlueprintLoopTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
+import ru.isma.next.editor.blueprint.models.BlueprintStateModel
+
+private const val LISMA_TRUE = "1 > 0"
 
 fun BlueprintModel.convertToLisma() : LismaTextModel {
     val fragments = LinkedHashSet<CodeRegion>()
@@ -18,7 +22,7 @@ fun BlueprintModel.convertToLisma() : LismaTextModel {
     resultStringBuilder.appendLine(mainTextFragment)
 
     this.transactions.forEach {
-        val key = createTransactionKey(it.endStateName, it.predicate)
+        val key = createTransactionKey(it.endStateName, it.predicate.ifBlank { LISMA_TRUE })
         val blockModel = stateBlockModels[key]
 
         if(blockModel == null) {
@@ -44,6 +48,21 @@ fun BlueprintModel.convertToLisma() : LismaTextModel {
         linesCounter = endLineNumber
     }
 
+    this.loopTransactions.forEach {
+        val fragmentText = it.toLisma(statesMap)
+        val fragmentLinesCount = fragmentText.lines().count()
+        val startLineNumber = linesCounter
+        val endLineNumber = linesCounter + fragmentLinesCount + 1
+
+        resultStringBuilder.appendLine(fragmentText).appendLine()
+
+        fragments.add(CodeRegion(it.stateName, startLineNumber, endLineNumber))
+
+        linesCounter = endLineNumber
+
+        resultStringBuilder.appendLine()
+    }
+
     return LismaTextModel(resultStringBuilder.toString(), fragments.toList())
 }
 
@@ -64,6 +83,24 @@ private class StateBlockModel(val stateName: String, val transactionKey: String,
 
         return sb.toString()
     }
+}
+
+private fun BlueprintLoopTransactionModel.toLisma(states: Map<String, BlueprintStateModel>): String {
+    return StringBuilder().apply {
+        val pseudoStateName = "${stateName}_pseudo_1"
+
+        appendLine("state $pseudoStateName (${predicate.trim()}) {")
+        appendLine(text)
+        appendLine("} from ${stateName};")
+
+        appendLine()
+
+        appendLine("state $stateName ($LISMA_TRUE) {")
+        appendLine(states[stateName]!!.text)
+        appendLine("} from ${pseudoStateName};")
+
+        appendLine()
+    }.toString()
 }
 
 private fun createTransactionKey(targetStateName: String, predicate: String) =

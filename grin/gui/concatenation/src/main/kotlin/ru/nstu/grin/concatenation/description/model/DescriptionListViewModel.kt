@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
-import ru.nstu.grin.common.model.Description
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
 class DescriptionListViewModel(
@@ -20,7 +19,7 @@ class DescriptionListViewModel(
     init {
         coroutineScope.launch {
             merge(
-                flowOf(concatenationCanvasModel.getAllDescriptions()),
+                flowOf(concatenationCanvasModel.descriptions),
                 concatenationCanvasModel.descriptionsListUpdatedEvent
             ).collect{
                 descriptions.setAll(it)

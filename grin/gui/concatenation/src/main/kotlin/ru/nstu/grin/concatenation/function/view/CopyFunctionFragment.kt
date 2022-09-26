@@ -7,17 +7,15 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.function.controller.CopyFunctionController
-import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
+import ru.nstu.grin.concatenation.function.model.CopyFunctionViewModel
 
 class CopyFunctionFragment(
-    private val model: CopyFunctionModel,
-    private val controller: CopyFunctionController
+    private val viewModel: CopyFunctionViewModel,
 ): BorderPane() {
     init {
         top = VBox(
             propertiesGrid {
-                addNode("New Function Name", model.nameProperty)
+                addNode("New Function Name", viewModel.nameProperty)
             }.apply {
                 padding = Insets(10.0)
             },
@@ -26,7 +24,7 @@ class CopyFunctionFragment(
         bottom = HBox(
             Button("Copy").apply {
                 setOnAction {
-                    controller.copy(model)
+                    viewModel.commit()
                     (scene.window as Stage).close()
                 }
             }

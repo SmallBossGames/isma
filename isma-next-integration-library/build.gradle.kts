@@ -17,3 +17,16 @@ dependencies {
 
     implementation("org.slf4j:slf4j-api:1.7.36")
 }
+
+val moduleName by extra("isma.isma.next.integration.library.main")
+
+
+tasks {
+    compileJava {
+        inputs.property("moduleName", moduleName)
+        options.compilerArgs = listOf(
+            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
+        )
+    }
+    //check { dependsOn(integTestTask) }
+}

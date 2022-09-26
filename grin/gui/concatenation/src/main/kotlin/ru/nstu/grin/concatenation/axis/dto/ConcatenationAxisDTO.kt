@@ -7,7 +7,6 @@ import java.util.*
 data class ConcatenationAxisDTO(
     val id: UUID,
     val name: String,
-    val zeroPoint: Double,
     val backGroundColor: Color,
     val delimeterColor: Color,
     val textSize: Double,

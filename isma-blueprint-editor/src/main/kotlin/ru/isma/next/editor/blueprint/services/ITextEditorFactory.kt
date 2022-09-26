@@ -1,7 +1,9 @@
 package ru.isma.next.editor.blueprint.services
 
-import ru.isma.next.editor.text.IsmaTextEditor
+import javafx.scene.Node
 
 interface ITextEditorFactory {
-    fun createTextEditor(): IsmaTextEditor
+    fun createTextEditor(text: String, onTextChanged: (String) -> Unit): Node
+
+    fun disposeInstance(node: Node)
 }

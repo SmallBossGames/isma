@@ -5,6 +5,6 @@ import ru.nstu.isma.intg.api.models.IntgResultPoint
 data class HybridSystemSimulatorParameters(
     val hsmCompilationResult: HsmCompilationResult,
     val simulationInitials: SimulationInitials,
-    val resultPointHandlers: List<suspend (point: IntgResultPoint) -> Unit>,
-    val stepChangeHandlers: List<suspend (value: Double) -> Unit>,
+    val resultPointHandlers: suspend (point: IntgResultPoint) -> Unit,
+    val stepChangeHandlers: suspend (value: Double) -> Unit,
 )

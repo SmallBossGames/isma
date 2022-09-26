@@ -3,8 +3,8 @@ package ru.isma.next.app.viewmodels
 import ru.isma.next.services.simulation.abstractions.models.EventDetectionParametersModel
 import tornadofx.booleanProperty
 import tornadofx.doubleProperty
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 
 class EventDetectionParametersViewModel {
     val isEventDetectionInUseProperty = booleanProperty()

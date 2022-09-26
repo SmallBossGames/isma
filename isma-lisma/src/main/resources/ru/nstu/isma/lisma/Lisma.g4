@@ -217,8 +217,10 @@ statement
         ;
 
     pseudo_state_else
-        :   'else' pseudo_state_body
+        :   ELSE_KEYWORD pseudo_state_body
         ;
+
+    ELSE_KEYWORD: 'else';
 
 // ------------------------------------------------------------------ 
 // 1.6 Function and math mapping
@@ -375,8 +377,10 @@ statement
 // ------------------------------------------------------------------
 // 1.11 setter
 // ------------------------------------------------------------------
+    SET_KEYWORD : 'set';
+
     setter
-           :   'set' var_ident ASSIGN expression SEMI
+           :   SET_KEYWORD var_ident ASSIGN expression SEMI
    	;
 // ------------------------------------------------------------------
 // 1.12 Linear system

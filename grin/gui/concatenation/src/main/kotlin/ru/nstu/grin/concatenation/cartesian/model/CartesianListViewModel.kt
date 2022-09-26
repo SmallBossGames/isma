@@ -19,7 +19,7 @@ class CartesianListViewModel(
     init {
         coroutineScope.launch {
             merge(
-                flowOf(concatenationCanvasModel.getAllCartesianSpaces()),
+                flowOf(concatenationCanvasModel.cartesianSpaces),
                 concatenationCanvasModel.cartesianSpacesListUpdatedEvent
             ).collect {
                 cartesianSpaces.setAll(it)

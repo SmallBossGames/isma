@@ -1,29 +1,43 @@
 package ru.isma.next.editor.text
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.javafx.JavaFx
+import kotlinx.coroutines.launch
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
-import ru.isma.next.editor.text.services.LismaHighlightingService
+import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 import ru.isma.next.editor.text.services.contracts.IHighlightingService
-import ru.isma.next.editor.text.services.contracts.ITextEditorService
 
 class IsmaTextEditor(
-    private val textEditorService: ITextEditorService,
+    private val textEditorService: IEditorPlatformService,
     private val highlightingService: IHighlightingService,
 ) : CodeArea() {
-    private val cutEvent = {if (isFocused) cut()}
-    private val copyEvent = {if (isFocused) copy()}
-    private val pasteEvent = {if (isFocused) paste()}
+    private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
     init {
-        setStyle("-fx-font-family: consolas; -fx-font-size: 12pt;");
+        style = "-fx-font-family: consolas; -fx-font-size: 12pt;"
 
-        textEditorService.apply {
-            cutEventHandler.add(cutEvent)
-            copyEventHandler.add(copyEvent)
-            pasteEventHandler.add(pasteEvent)
+        fxCoroutineScope.launch {
+            textEditorService.cutEvent.collect{
+                if (isFocused) cut()
+            }
         }
 
-        textProperty().addListener{ observable, oldValue, newValue ->
+        fxCoroutineScope.launch {
+            textEditorService.copyEvent.collect{
+                if (isFocused) copy()
+            }
+        }
+
+        fxCoroutineScope.launch {
+            textEditorService.pasteEvent.collect{
+                if (isFocused) paste()
+            }
+        }
+
+        textProperty().addListener{ _, _, newValue ->
             if(paragraphGraphicFactory == null) {
                 paragraphGraphicFactory = LineNumberFactory.get(this)
             }
@@ -35,11 +49,8 @@ class IsmaTextEditor(
     }
 
     override fun dispose() {
-        textEditorService.apply {
-            cutEventHandler.remove(cutEvent)
-            copyEventHandler.remove(copyEvent)
-            pasteEventHandler.remove(pasteEvent)
-        }
+        fxCoroutineScope.cancel()
+
         super.dispose()
     }
 }

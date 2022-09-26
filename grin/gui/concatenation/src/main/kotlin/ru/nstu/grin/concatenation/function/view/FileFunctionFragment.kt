@@ -1,19 +1,15 @@
 package ru.nstu.grin.concatenation.function.view
 
-import javafx.scene.Parent
+import javafx.scene.control.Button
+import javafx.scene.layout.VBox
 import ru.nstu.grin.concatenation.function.controller.FileFragmentController
-import tornadofx.*
 
-class FileFunctionFragment : Fragment() {
-    private val controller: FileFragmentController by inject()
-
-    override val root: Parent = fieldset("Работа с файлом") {
-        field("Выберите файл") {
-            button("Файл") {
-                action {
-                    controller.chooseFile()
-                }
-            }
+class FileFunctionFragment(
+    private val controller: FileFragmentController
+) : VBox(
+    Button("Choose File").apply {
+        setOnAction {
+            controller.chooseFile()
         }
     }
-}
+)

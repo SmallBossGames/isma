@@ -1,20 +1,21 @@
 package ru.nstu.grin.concatenation.axis.converter
 
+import javafx.scene.text.Font
 import ru.nstu.grin.concatenation.axis.dto.ConcatenationAxisDTO
+import ru.nstu.grin.concatenation.axis.model.AxisStyleProperties
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 
 object ConcatenationAxisConverter {
-    fun merge(source: ConcatenationAxisDTO, order: Int): ConcatenationAxis {
+    fun merge(source: ConcatenationAxisDTO): ConcatenationAxis {
         return ConcatenationAxis(
-            id = source.id,
             name = source.name,
-            order = order,
             direction = source.direction,
-            backGroundColor = source.backGroundColor,
-            fontColor = source.delimeterColor,
-            distanceBetweenMarks = source.distanceBetweenMarks,
-            textSize = source.textSize,
-            font = source.font
+            styleProperties = AxisStyleProperties(
+                backgroundColor = source.backGroundColor,
+                marksDistance = source.distanceBetweenMarks,
+                marksFont = Font.font(source.font, source.textSize),
+                marksColor = source.delimeterColor,
+            )
         )
     }
 }

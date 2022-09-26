@@ -1,147 +1,86 @@
 package ru.nstu.grin.concatenation.axis.view
 
+import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.text.Font
-import ru.nstu.grin.concatenation.axis.controller.NumberFormatter
+import javafx.scene.text.TextAlignment
 import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import kotlin.math.absoluteValue
-import kotlin.math.max
-import kotlin.math.min
+import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
+import ru.nstu.grin.concatenation.axis.utilities.estimateTextSize
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 
 class HorizontalAxisDrawStrategy(
-    private val matrixTransformerController: MatrixTransformerController
+    private val matrixTransformer: MatrixTransformer,
+    private val pixelMarksArrayBuilder: HorizontalPixelMarksArrayBuilder,
+    private val valueMarksArrayBuilder: HorizontalValueMarksArrayBuilder,
 ) : AxisMarksDrawStrategy {
 
     override fun drawMarks(
         context: GraphicsContext,
         axis: ConcatenationAxis,
-        marksCoordinate: Double,
-        canvasWidth: Double,
-        canvasHeight: Double
+        marksCoordinate: Double
     ) {
-        context.font = Font.font(axis.font, axis.textSize)
+        context.save()
 
-        val zeroPixel = matrixTransformerController
-            .transformUnitsToPixel(0.0, axis.settings, axis.direction)
+        val scaleProperties = axis.scaleProperties
+        val styleProperties = axis.styleProperties
 
-        if (axis.settings.isOnlyIntegerPow) {
-            drawOnlyIntegerMark(context, axis, marksCoordinate, zeroPixel)
-        } else {
-            drawDoubleMarks(context, axis, marksCoordinate, zeroPixel)
+        context.stroke = styleProperties.marksColor
+        context.fill = styleProperties.marksColor
+        context.textAlign = TextAlignment.CENTER
+        context.textBaseline = VPos.CENTER
+        context.font = styleProperties.marksFont
+
+        val (_, labelHeight) = estimateTextSize(axis.name, context.font)
+
+        val marks = when(styleProperties.marksDistanceType){
+            MarksDistanceType.PIXEL -> pixelMarksArrayBuilder
+                .buildDoubleMarksArray(scaleProperties, styleProperties, axis.direction)
+            MarksDistanceType.VALUE -> valueMarksArrayBuilder
+                .buildDoubleMarksArray(scaleProperties, styleProperties, axis.direction)
         }
 
-        if (axis.settings.max > 0 && axis.settings.min < 0) {
-            val zeroText = if (axis.isLogarithmic()) {
-                NumberFormatter.formatLogarithmic(0.0, axis.settings.logarithmBase)
-            } else {
-                NumberFormatter.format(0.0)
+        val marksHeight = if (marks.isEmpty()) 0.0 else marks.maxOf { it.height }
+        val offset = marksHeight - (labelHeight + marksHeight) / 2
+
+        val marksY: Double
+        val labelY: Double
+
+        when(axis.direction){
+            Direction.TOP -> {
+                marksY = marksCoordinate + DISTANCE_TO_LABEL / 2 + marksHeight / 2 - offset
+                labelY = marksCoordinate - DISTANCE_TO_LABEL / 2 - labelHeight / 2 - offset
             }
-            context.strokeText(
-                zeroText,
-                zeroPixel,
-                marksCoordinate,
-                MAX_TEXT_WIDTH
-            )
+            Direction.BOTTOM -> {
+                marksY = marksCoordinate - DISTANCE_TO_LABEL / 2 - marksHeight / 2 + offset
+                labelY = marksCoordinate + DISTANCE_TO_LABEL / 2 + labelHeight / 2 + offset
+            }
+            else -> throw IllegalStateException()
         }
+
+        marks.forEach { context.fillText(it.text, it.coordinate, marksY) }
+        drawAxisLabel(context, axis, labelY)
+
+        context.restore()
     }
 
-    private fun drawDoubleMark(
+    private fun drawAxisLabel(
         context: GraphicsContext,
         axis: ConcatenationAxis,
-        marksCoordinate: Double,
-        value: Double,
-        pixel: Double
+        labelCoordinate: Double,
     ){
-        val text = if (axis.isLogarithmic()) {
-            NumberFormatter.formatLogarithmic(value, axis.settings.logarithmBase)
-        } else {
-            NumberFormatter.format(value)
-        }
+        context.save()
 
-        context.strokeText(
-            text,
-            pixel,
-            marksCoordinate,
-            MAX_TEXT_WIDTH
-        )
-    }
+        val (minPixel, maxPixel) = matrixTransformer.getMinMaxPixel(axis.direction)
 
-    private fun drawDoubleMarks(
-        context: GraphicsContext,
-        axis: ConcatenationAxis,
-        marksCoordinate: Double,
-        zeroPixel: Double
-    ) {
-        val (minPixel, maxPixel) = matrixTransformerController.getMinMaxPixel(axis.direction)
+        context.translate(minPixel + (maxPixel - minPixel) / 2, labelCoordinate)
+        context.rotate(0.0)
+        context.fillText(axis.name, 0.0, 0.0)
 
-        val maxDrawingPixel = maxPixel - TEXT_VERTICAL_BORDERS_OFFSET
-        val minDrawingPixel = minPixel + TEXT_VERTICAL_BORDERS_OFFSET
-
-        if(zeroPixel < maxDrawingPixel && zeroPixel > minDrawingPixel){
-            drawDoubleMark(context, axis, marksCoordinate, 0.0, zeroPixel)
-        }
-
-        var currentPixel = max(zeroPixel + axis.distanceBetweenMarks, minDrawingPixel)
-
-        while (currentPixel < maxDrawingPixel) {
-            val currentValue = matrixTransformerController
-                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
-
-            drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
-
-            currentPixel += axis.distanceBetweenMarks
-        }
-
-        currentPixel = min(zeroPixel - axis.distanceBetweenMarks, maxDrawingPixel)
-
-        while (currentPixel > minDrawingPixel) {
-            val currentValue = matrixTransformerController
-                .transformPixelToUnits(currentPixel, axis.settings, axis.direction)
-
-            drawDoubleMark(context, axis, marksCoordinate, currentValue, currentPixel)
-
-            currentPixel -= axis.distanceBetweenMarks
-        }
-    }
-
-    private fun drawOnlyIntegerMark(
-        context: GraphicsContext,
-        axis: ConcatenationAxis,
-        marksCoordinate: Double,
-        zeroPixel: Double
-    ) {
-        var currentX = axis.settings.min.toInt().toDouble()
-        val max = axis.settings.max
-        while (currentX < max) {
-            val stepX = matrixTransformerController
-                .transformUnitsToPixel(currentX, axis.settings, axis.direction)
-
-            if (axis.settings.max > 0 && axis.settings.min < 0) {
-                if ((stepX - zeroPixel).absoluteValue < axis.distanceBetweenMarks) {
-                    currentX += axis.settings.integerStep
-                    continue
-                }
-            }
-
-            val text = if (axis.isLogarithmic()) {
-                NumberFormatter.formatLogarithmic(currentX, axis.settings.logarithmBase)
-            } else {
-                NumberFormatter.format(currentX)
-            }
-
-            context.strokeText(
-                text,
-                stepX,
-                marksCoordinate,
-                MAX_TEXT_WIDTH
-            )
-            currentX += axis.settings.integerStep
-        }
+        context.restore()
     }
 
     private companion object {
-        const val MAX_TEXT_WIDTH = 30.0
-        const val TEXT_VERTICAL_BORDERS_OFFSET = 10.0
+        const val DISTANCE_TO_LABEL = 2.0
     }
 }

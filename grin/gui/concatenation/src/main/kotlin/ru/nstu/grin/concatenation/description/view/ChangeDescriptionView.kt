@@ -9,21 +9,18 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
 
 class ChangeDescriptionView(
-    private val controller: ChangeDescriptionController,
-    private val model: ChangeDescriptionViewModel
+    private val viewModel: ChangeDescriptionViewModel
 ) : BorderPane() {
-
     init {
         top = VBox(
             propertiesGrid {
-                addNode("Text", model.textProperty)
-                addNode("Font Size", model.textSizeProperty)
-                addNode("Font Color", model.colorProperty)
-                addNode("Font Family", observableArrayList(Font.getFamilies()), model.fontProperty)
+                addNode("Text", viewModel.textProperty)
+                addNode("Font Size", viewModel.textSizeProperty)
+                addNode("Font Color", viewModel.colorProperty)
+                addNode("Font Family", observableArrayList(Font.getFamilies()), viewModel.fontProperty)
             }.apply {
                 padding = Insets(10.0)
             }
@@ -32,7 +29,7 @@ class ChangeDescriptionView(
         bottom = HBox(
             Button("Save").apply {
                 setOnAction {
-                    controller.updateOrCreateDescription(model)
+                    viewModel.commit()
                     (scene.window as Stage).close()
                 }
             }

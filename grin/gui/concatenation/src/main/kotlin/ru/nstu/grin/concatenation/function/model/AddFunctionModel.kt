@@ -1,79 +1,68 @@
 package ru.nstu.grin.concatenation.function.model
 
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 import ru.nstu.grin.concatenation.axis.model.Direction
-import tornadofx.ViewModel
-import tornadofx.getValue
-import tornadofx.setValue
-import java.awt.Font
 
-class AddFunctionModel : ViewModel() {
-    var cartesianSpaceNameProperty = SimpleStringProperty(this, "cartesianSpaceName", "Пространство номер 1")
-    var cartesianSpaceName by cartesianSpaceNameProperty
+class AddFunctionModel {
+    var cartesianSpaceNameProperty = SimpleStringProperty("Space 1")
+    var cartesianSpaceName: String by cartesianSpaceNameProperty
 
-    var functionNameProperty = SimpleStringProperty(this, "functionName", "Функция номер 1")
+    var functionNameProperty = SimpleStringProperty("Function 1")
     var functionName: String by functionNameProperty
 
     var functionColorProperty = SimpleObjectProperty(Color.BLACK)
-    var functionColor by functionColorProperty
+    var functionColor: Color by functionColorProperty
 
-    var functionLineSizeProperty = SimpleStringProperty(this, "functionLineSize", "4.0")
+    var functionLineSizeProperty = SimpleDoubleProperty(4.0)
     var functionLineSize by functionLineSizeProperty
 
-    var functionLineTypeProperty = SimpleObjectProperty<LineType>(LineType.POLYNOM)
+    var functionLineTypeProperty = SimpleObjectProperty(LineType.POLYNOM)
     var functionLineType by functionLineTypeProperty
 
-    var xDirectionProperty = SimpleObjectProperty(Direction.BOTTOM)
-    var xDirection: Direction by xDirectionProperty
+    val xAxis = AxisViewModel(Direction.BOTTOM, "Axis 1")
 
-    var yDirectionProperty = SimpleObjectProperty(Direction.LEFT)
-    var yDirection: Direction by yDirectionProperty
-
-
-    var xAxisNameProperty = SimpleStringProperty(this, "xAxisName", "Ось 1")
-    var xAxisName by xAxisNameProperty
-
-    var xAxisColorProperty = SimpleObjectProperty(Color.LIGHTGREY)
-    var xAxisColor by xAxisColorProperty
-
-    var xDelimeterColorProperty = SimpleObjectProperty(Color.BLACK)
-    var xDelimiterColor by xDelimeterColorProperty
-
-    var xDistanceBetweenMarksProperty = SimpleStringProperty(this, "xDistanceBetweenMarks", "40.0")
-    var xDistanceBetweenMarks by xDistanceBetweenMarksProperty
-
-    var xFontProperty = SimpleStringProperty(Font.SANS_SERIF)
-    var xFont by xFontProperty
-
-    var xTextSizeProperty = SimpleStringProperty(this, "xTextSizeProperty", "10.0")
-    var xTextSize by xTextSizeProperty
-
-    var yAxisNameProperty = SimpleStringProperty(this, "yAxisName", "Ось 2")
-    var yAxisName by yAxisNameProperty
-
-    var yAxisColorProperty = SimpleObjectProperty(Color.LIGHTGREY)
-    var yAxisColor by yAxisColorProperty
-
-    var yDelimiterColorProperty = SimpleObjectProperty(Color.BLACK)
-    var yDelimeterColor by yDelimiterColorProperty
-
-    var yDistanceBetweenMarksProperty = SimpleStringProperty(this, "yDistanceBeetweenMarks", "40.0")
-    var yDistanceBetweenMarks by yDistanceBetweenMarksProperty
-
-    var yFontProperty = SimpleStringProperty(Font.SANS_SERIF)
-    var yFont by yFontProperty
-
-    var yTextSizeProperty = SimpleStringProperty(this, "yTextSizeProperty", "10.0")
-    var yTextSize by yTextSizeProperty
+    val yAxis = AxisViewModel(Direction.LEFT, "Axis 2")
 
     var stepProperty = SimpleIntegerProperty(this, "stepProperty", 1)
     var step by stepProperty
 
-    var inputWayProperty = SimpleObjectProperty<InputWay>(InputWay.FILE)
-    var inputWay by inputWayProperty
+    var inputWayProperty = SimpleObjectProperty(InputWay.FILE)
+    var inputWay: InputWay by inputWayProperty
+}
 
-    var details: FunctionDetails = FileFunctionModel()
+class AxisViewModel(
+    direction: Direction,
+    name: String,
+    color: Color = Color.LIGHTGREY,
+    delimeterColor: Color = Color.BLACK,
+    distanceBetweenMarks: Double = 40.0,
+    font: String = "Arial",
+    textSize: Double = 10.0
+) {
+    val directionProperty = SimpleObjectProperty(direction)
+    var direction: Direction by directionProperty
+
+    val nameProperty = SimpleStringProperty(name)
+    var name: String by nameProperty
+
+    val colorProperty = SimpleObjectProperty(color)
+    var color: Color by colorProperty
+
+    val delimiterColorProperty = SimpleObjectProperty(delimeterColor)
+    var delimeterColor: Color by delimiterColorProperty
+
+    val distanceBetweenMarksProperty = SimpleDoubleProperty(distanceBetweenMarks)
+    var distanceBetweenMarks by distanceBetweenMarksProperty
+
+    val fontProperty = SimpleStringProperty(font)
+    var font: String by fontProperty
+
+    val textSizeProperty = SimpleDoubleProperty(textSize)
+    var textSize: Double by textSizeProperty
 }

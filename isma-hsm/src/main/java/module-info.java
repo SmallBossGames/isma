@@ -11,9 +11,10 @@ module isma.isma.hsm.main {
     exports common;
 
     requires java.compiler;
-    requires isma.isma.next.tools.main;
+    requires kotlin.stdlib;
     requires org.jetbrains.annotations;
     requires org.apache.commons.lang3;
+    requires isma.isma.next.tools.main;
     requires org.slf4j;
 
 }

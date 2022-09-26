@@ -2,56 +2,51 @@ package ru.nstu.grin.integration
 
 import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
-import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
+import org.koin.dsl.onClose
 import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
-import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
+import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentViewModel
 import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
-import ru.nstu.grin.concatenation.axis.model.LogarithmicFragmentModel
 import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
 import ru.nstu.grin.concatenation.axis.view.*
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
 import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
 import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
-import ru.nstu.grin.concatenation.canvas.model.ConcatenationViewModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
 import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
 import ru.nstu.grin.concatenation.canvas.view.*
 import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
-import ru.nstu.grin.concatenation.cartesian.controller.ChangeCartesianController
-import ru.nstu.grin.concatenation.cartesian.controller.CopyCartesianController
 import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
-import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceModel
-import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianModel
+import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceViewModel
+import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianViewModel
 import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
 import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
 import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
 import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
-import ru.nstu.grin.concatenation.description.controller.ChangeDescriptionController
 import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
 import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
 import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
 import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
 import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
+import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
-import ru.nstu.grin.concatenation.function.controller.ChangeFunctionController
-import ru.nstu.grin.concatenation.function.controller.CopyFunctionController
-import ru.nstu.grin.concatenation.function.controller.FunctionListViewController
-import ru.nstu.grin.concatenation.function.model.ChangeFunctionModel
-import ru.nstu.grin.concatenation.function.model.CopyFunctionModel
-import ru.nstu.grin.concatenation.function.model.FunctionListViewModel
+import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
+import ru.nstu.grin.concatenation.function.controller.*
+import ru.nstu.grin.concatenation.function.model.*
 import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
-import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
 import tornadofx.Scope
+import tornadofx.find
 import tornadofx.setInScope
 
-val grinModule = module {
+val grinGuiModule = module {
     scope<MainGrinScope> {
         scoped { params ->
             // Access from the TornadoFx world. Should be removed later.
@@ -61,9 +56,8 @@ val grinModule = module {
 
             if(initData!=null){
                 get<ConcatenationCanvasController>().replaceAll(
-                    initData.cartesianSpaces,
-                    initData.arrows,
-                    initData.descriptions
+                    cartesianSpaces = initData.cartesianSpaces,
+                    normalizeSpaces = true,
                 )
             }
 
@@ -77,18 +71,24 @@ val grinModule = module {
         scopedOf(::ElementsView)
 
         scopedOf(::ConcatenationCanvas)
-        scopedOf(::ConcatenationViewModel)
-        scopedOf(::CanvasViewModel)
+        scopedOf(::EditModeViewModel)
+        scopedOf(::ConcatenationCanvasViewModel)
         scopedOf(::ConcatenationCanvasController)
         scopedOf(::ConcatenationCanvasModel)
 
         scopedOf(::ConcatenationChainDrawer)
         scopedOf(::AxisDrawElement)
         scopedOf(::VerticalAxisDrawStrategy)
+        scopedOf(::VerticalPixelMarksArrayBuilder)
+        scopedOf(::VerticalValueMarksArrayBuilder)
         scopedOf(::HorizontalAxisDrawStrategy)
-        scopedOf(::PointTooltipsDrawElement)
+        scopedOf(::HorizontalPixelMarksArrayBuilder)
+        scopedOf(::HorizontalValueMarksArrayBuilder)
         scopedOf(::ConcatenationFunctionDrawElement)
-        scopedOf(::MatrixTransformerController)
+        scopedOf(::SelectionDrawElement)
+        scopedOf(::DescriptionDrawElement)
+        scopedOf(::MatrixTransformer)
+        scopedOf(::CartesianCanvasContextMenuController)
 
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)
@@ -108,13 +108,18 @@ val grinModule = module {
 
         scopedOf(::ChartToolBar)
         scopedOf(::ModesToolBar)
+
         scopedOf(::MathToolBar)
+        scopedOf(::DerivativeFunctionController)
+
         scopedOf(::TransformToolBar)
+        scopedOf(::MirrorFunctionController)
 
         scopedOf(::CartesianCanvasService)
         scopedOf(::DescriptionCanvasService)
         scopedOf(::AxisCanvasService)
         scopedOf(::FunctionCanvasService)
+        scopedOf(::FunctionOperationsService)
 
         scopedOf(::ScalableScrollHandler)
         scopedOf(::DraggedHandler)
@@ -122,6 +127,8 @@ val grinModule = module {
         scopedOf(::ReleaseMouseHandler)
 
         scopedOf(::SpacesTransformationController)
+
+        scoped{ FileFragmentController(lazy { get() }, lazy {  get() }) }
 
         factory {
             FunctionChangeModalScope().apply {
@@ -159,47 +166,98 @@ val grinModule = module {
             }
         }
 
+        factory {
+            AddFunctionModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            SearchIntersectionsModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            FunctionIntegrationModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            FunctionWaveletModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
+
+        scoped { find<FileModel>(get<Scope>()) }
+        scoped { find<FileOptionsView>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {
-        scoped { ChangeFunctionController(get()) }
-        scoped { params -> ChangeFunctionFragment(get { params }, get()) }
-        scoped { params -> ChangeFunctionModel(params.get()) }
+        scopedOf(::ChangeFunctionFragment)
+        scopedOf(::ChangeFunctionViewModel)
     }
 
     scope<AxisChangeModalScope> {
-        scoped { params -> AxisChangeFragmentController(get(), get { params }, get { params }) }
-        scoped { params -> AxisChangeFragment(get { params }, get { params }, get { params }) }
-        scoped { params -> LogarithmicTypeFragment(get { params }) }
-        scoped { params -> AxisChangeFragmentModel(params.get()) }
-        scoped { params -> LogarithmicFragmentModel(params.get()) }
+        scopedOf(::AxisChangeFragment)
+        scopedOf(::AxisChangeFragmentViewModel)
     }
 
     scope<FunctionCopyModalScope> {
-        scoped { CopyFunctionController(get()) }
-        scoped { params -> CopyFunctionFragment(get { params }, get()) }
-        scoped { params -> CopyFunctionModel(params.get()) }
+        scopedOf(::CopyFunctionFragment)
+        scopedOf(::CopyFunctionViewModel)
     }
 
     scope<DescriptionChangeModalScope> {
-        scoped { ChangeDescriptionController(get()) }
-        scoped { params -> ChangeDescriptionView(get(), get{ params }) }
-        scoped { params -> ChangeDescriptionViewModel(params.getOrNull(), params.getOrNull()) }
+        scopedOf(::ChangeDescriptionView)
+        scopedOf(::ChangeDescriptionViewModel)
     }
 
     scope<CartesianCopyModalScope> {
-        scoped { CopyCartesianController(get()) }
-        scoped { params -> CopyCartesianFragment(get(), get { params }) }
-        scoped { params -> CopyCartesianModel(params.get()) }
+        scopedOf(::CopyCartesianFragment)
+        scopedOf(::CopyCartesianViewModel)
     }
 
     scope<CartesianChangeModalScope> {
-        scoped { ChangeCartesianController(get()) }
-        scoped { params -> ChangeCartesianFragment(get { params }, get()) }
-        scoped { params -> ChangeCartesianSpaceModel(params.get()) }
+        scopedOf(::ChangeCartesianFragment)
+        scopedOf(::ChangeCartesianSpaceViewModel)
     }
 
+    scope<AddFunctionModalScope> {
+        scopedOf(::AddFunctionModalView)
+        scopedOf(::AddFunctionController)
+        scopedOf(::AddFunctionModel)
+
+        scopedOf(::FileFunctionFragment)
+        scopedOf(::FileFunctionModel)
+
+        scopedOf(::AnalyticFunctionFragment)
+        scopedOf(::AnalyticFunctionModel)
+
+        scopedOf(::ManualFunctionFragment)
+        scopedOf(::ManualFunctionModel)
+    }
+
+    scope<SearchIntersectionsModalScope>{
+        scopedOf(::IntersectionFunctionView) onClose { it?.dispose() }
+        scopedOf(::IntersectionFunctionViewModel) onClose { it?.dispose() }
+    }
+
+    scope<FunctionIntegrationModalScope>{
+        scopedOf(::FunctionIntegrationView)
+        scopedOf(::FunctionIntegrationViewModel)
+    }
+
+    scope<FunctionWaveletModalScope>{
+        scopedOf(::FunctionWaveletView)
+        scopedOf(::FunctionWaveletViewModel)
+    }
+}
+
+val grinIntegrationModule = module {
     single { GrinIntegrationFacade() }
 }

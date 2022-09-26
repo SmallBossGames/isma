@@ -6,9 +6,9 @@ import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
 import tornadofx.*
 
-sealed class FunctionDetails : ViewModel()
+sealed interface FunctionDetails
 
-class AnalyticFunctionModel : FunctionDetails() {
+class AnalyticFunctionModel : FunctionDetails {
     var textFunctionProperty = SimpleStringProperty("x*x")
     var textFunction by textFunctionProperty
 
@@ -16,7 +16,7 @@ class AnalyticFunctionModel : FunctionDetails() {
     var delta: Double by deltaProperty
 }
 
-class ManualFunctionModel : FunctionDetails() {
+class ManualFunctionModel : FunctionDetails {
     var xPointsProperty = SimpleStringProperty(this, "xPoints", "")
     var xPoints: String by xPointsProperty
 
@@ -24,7 +24,7 @@ class ManualFunctionModel : FunctionDetails() {
     var yPoints: String by yPointsProperty
 }
 
-class FileFunctionModel : FunctionDetails() {
+class FileFunctionModel : FunctionDetails {
     var points: List<List<Point>>? = null
     var addFunctionsMode: AddFunctionsMode? = null
 }

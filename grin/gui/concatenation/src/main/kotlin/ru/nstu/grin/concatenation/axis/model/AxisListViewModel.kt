@@ -19,7 +19,7 @@ class AxisListViewModel(
     init {
         coroutineScope.launch {
             merge(
-                flowOf(concatenationCanvasModel.getAllAxes()),
+                flowOf(concatenationCanvasModel.axes),
                 concatenationCanvasModel.axesListUpdatedEvent
             ).collect {
                 axes.setAll(it)

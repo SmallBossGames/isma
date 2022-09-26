@@ -38,4 +38,19 @@ class CartesianChangeModalScope: KoinScopeComponent {
     override val scope: Scope by lazy { createScope(this) }
 }
 
+class AddFunctionModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+
+class SearchIntersectionsModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+class FunctionIntegrationModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+
+class FunctionWaveletModalScope: KoinScopeComponent {
+    override val scope: Scope by lazy { createScope(this) }
+}
+
 

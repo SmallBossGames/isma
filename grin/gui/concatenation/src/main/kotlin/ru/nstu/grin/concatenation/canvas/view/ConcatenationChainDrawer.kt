@@ -1,118 +1,91 @@
 package ru.nstu.grin.concatenation.canvas.view
 
-import javafx.scene.control.ContextMenu
-import javafx.scene.paint.Color
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import ru.nstu.grin.common.draw.elements.ArrowDrawElement
 import ru.nstu.grin.common.draw.elements.ClearDrawElement
-import ru.nstu.grin.common.draw.elements.DescriptionDrawElement
 import ru.nstu.grin.common.view.ChainDrawer
+import ru.nstu.grin.concatenation.axis.extensions.findFunctionsAreaInsets
 import ru.nstu.grin.concatenation.axis.view.AxisDrawElement
-import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
-import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformerController
-import ru.nstu.grin.concatenation.canvas.model.CanvasViewModel
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.function.view.ConcatenationFunctionDrawElement
 import ru.nstu.grin.concatenation.function.view.SpacesTransformationController
-import ru.nstu.grin.concatenation.koin.MainGrinScope
-import ru.nstu.grin.concatenation.points.view.PointTooltipsDrawElement
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class ConcatenationChainDrawer(
-    private val mainGrinScope: MainGrinScope,
-    private val canvasViewModel: CanvasViewModel,
+    private val canvasViewModel: ConcatenationCanvasViewModel,
     private val model: ConcatenationCanvasModel,
     private val functionDrawElement: ConcatenationFunctionDrawElement,
-    private val pointTooltipsDrawElement: PointTooltipsDrawElement,
-    private val controller: ConcatenationCanvasController,
+    private val selectionDrawElement: SelectionDrawElement,
     private val spacesTransformationController: SpacesTransformationController,
     private val axisDrawElement: AxisDrawElement,
-    private val matrixTransformerController: MatrixTransformerController,
+    private val descriptionDrawElement: DescriptionDrawElement,
 ) : ChainDrawer {
+    private val coroutinesScope = CoroutineScope(Dispatchers.Default)
 
-    private val contextMenu = ContextMenu()
-
-    private val drawingInProgress = AtomicBoolean(false)
-    private val transformationJob = AtomicReference<Job>(null)
+    private val drawingJob = AtomicReference<Job?>(null)
 
     override fun draw() {
-        val transformationJobLocal = transformationJob.getAndSet(
-            CoroutinesScope.launch {
-                spacesTransformationController.transformSpaces()
+        coroutinesScope.launch {
+            drawingJob.getAndSet(coroutineContext.job)?.cancel()
+
+            canvasViewModel.functionsArea = model.cartesianSpaces.findFunctionsAreaInsets()
+
+            spacesTransformationController.transformSpaces()
+
+            withContext(Dispatchers.JavaFx){
+                drawFunctionsLayerInternal()
+                drawUiLayerInternal()
             }
-        )
 
-        transformationJobLocal?.cancel()
-
-        if (drawingInProgress.compareAndSet(false, true)) {
-            CoroutinesScope.launch {
-                while (transformationJob.getAndSet(null)?.join() != null){
-                    drawFunctionsLayer()
-                    drawUiLayer()
-                }
-
-                drawingInProgress.set(false)
-            }
+            drawingJob.compareAndExchange(coroutineContext.job, null)
         }
     }
 
-    suspend fun drawFunctionsLayer() = withContext(Dispatchers.JavaFx) {
+    fun drawUiLayer() = coroutinesScope.launch(Dispatchers.JavaFx) {
+        drawUiLayerInternal()
+    }
+
+    private fun drawFunctionsLayerInternal() {
+
         canvasViewModel.functionsLayerContext.apply {
             val width = canvasViewModel.canvasWidth
             val height = canvasViewModel.canvasHeight
 
             ClearDrawElement.draw(this, width, height)
 
-            for (cartesianSpace in model.cartesianSpaces) {
+            /*for (cartesianSpace in model.cartesianSpaces) {
                 if (cartesianSpace.isShowGrid) {
                     GridDrawElement(
                         cartesianSpace.xAxis,
                         cartesianSpace.yAxis,
                         Color.valueOf("BBBBBB"),
-                        matrixTransformerController
+                        matrixTransformer
                     ).draw(this, width, height)
                     GridDrawElement(
                         cartesianSpace.xAxis,
                         cartesianSpace.yAxis,
                         Color.valueOf("EDEDED"),
-                        matrixTransformerController
+                        matrixTransformer
                     ).draw(this, width, height)
                 }
-            }
+            }*/
 
             functionDrawElement.draw(this, width, height)
             axisDrawElement.draw(this, width, height)
+            descriptionDrawElement.draw(this, width, height)
         }
     }
 
-
-    suspend fun drawUiLayer() = withContext(Dispatchers.JavaFx) {
+    private fun drawUiLayerInternal() {
         canvasViewModel.uiLayerContext.apply {
             val width = canvasViewModel.canvasWidth
             val height = canvasViewModel.canvasHeight
 
             ClearDrawElement.draw(this, width, height)
 
-            ArrowDrawElement(model.arrows, 1.0).draw(this, width, height)
-            DescriptionDrawElement(model.descriptions).draw(this, width, height)
-
-            pointTooltipsDrawElement.draw(this, width, height)
-
-            ContextMenuDrawElement(
-                contextMenu,
-                model,
-                controller,
-                this@ConcatenationChainDrawer,
-                mainGrinScope.primaryStage
-            ).draw(this, width, height)
-
-            SelectionDrawElement(model.selectionSettings).draw(this, width, height)
+            selectionDrawElement.draw(this, width, height)
         }
-    }
-
-    private companion object {
-        val CoroutinesScope = CoroutineScope(Dispatchers.Default)
     }
 }

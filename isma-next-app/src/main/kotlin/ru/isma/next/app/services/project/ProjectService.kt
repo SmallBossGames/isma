@@ -10,7 +10,7 @@ class ProjectService {
 
     var activeProject: IProjectModel? = null
 
-    fun createNewBlueprint(name: String = "New blueprint") {
+    fun createNewBlueprint(name: String = "New statechart") {
         BlueprintProjectModel().apply {
             this.name = name
             addBlueprint(this)
@@ -34,10 +34,15 @@ class ProjectService {
 
     fun close(project: IProjectModel){
         projects.remove(project)
+        project.dispose()
     }
 
     fun closeAll() {
+        val temp = projects.toTypedArray()
+
         projects.clear()
+
+        temp.forEach { it.dispose() }
     }
 
     fun getAllProjects() = projects.toTypedArray()

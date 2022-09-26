@@ -11,34 +11,45 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.Stage
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.nstu.grin.concatenation.axis.controller.AxisChangeFragmentController
-import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentModel
-import ru.nstu.grin.concatenation.axis.model.AxisMarkType
+import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentViewModel
+import ru.nstu.grin.concatenation.axis.model.AxisScalingType
+import ru.nstu.grin.concatenation.axis.model.Direction
+import ru.nstu.grin.concatenation.axis.model.MarksDistanceType
 
 class AxisChangeFragment(
-    private val model: AxisChangeFragmentModel,
-    private val controller: AxisChangeFragmentController,
-    private val logFragment: LogarithmicTypeFragment
+    private val viewModel: AxisChangeFragmentViewModel,
 ) : BorderPane() {
     init {
+        val distanceTypes = FXCollections.observableArrayList(MarksDistanceType.values().toList())
+        val scalingTypes = FXCollections.observableArrayList(AxisScalingType.values().toList())
+        val fontFamilies = FXCollections.observableArrayList(Font.getFamilies())
+        val availableDirections = when(viewModel.direction){
+            Direction.LEFT, Direction.RIGHT -> FXCollections.observableArrayList(Direction.LEFT, Direction.RIGHT)
+            Direction.TOP, Direction.BOTTOM -> FXCollections.observableArrayList(Direction.TOP, Direction.BOTTOM)
+        }
+
         top = VBox(
             propertiesGrid {
-                addNode("Distance between marks", model.distanceBetweenMarksProperty)
-                addNode("Font size", model.textSizeProperty)
-                addNode("Font", FXCollections.observableArrayList( Font.getFamilies()), model.fontProperty)
-                addNode("Font color", model.fontColorProperty)
-                addNode("Min", model.minProperty)
-                addNode("Max", model.maxProperty)
-                addNode("Axis Color", model.axisColorProperty)
-                addNode("Hide Axis", model.isHideProperty)
-                addNode("Scale Mode", FXCollections.observableArrayList(AxisMarkType.values().toList()), model.markTypeProperty){
-                    object : ListCell<AxisMarkType>() {
-                        override fun updateItem(item: AxisMarkType?, empty: Boolean) {
+                addNode("Name", viewModel.nameProperty)
+                addNode("Name", availableDirections, viewModel.directionProperty)
+                addNode("Distance between marks", viewModel.distanceBetweenMarksProperty)
+                addNode("Distance type", distanceTypes, viewModel.marksDistanceTypeProperty)
+                addNode("Border height", viewModel.borderHeightProperty)
+                addNode("Font size", viewModel.textSizeProperty)
+                addNode("Font", fontFamilies, viewModel.fontProperty)
+                addNode("Font color", viewModel.fontColorProperty)
+                addNode("Min", viewModel.minProperty)
+                addNode("Max", viewModel.maxProperty)
+                addNode("Axis Color", viewModel.axisColorProperty)
+                addNode("Hide Axis", viewModel.isHideProperty)
+                addNode("Scale Mode", scalingTypes, viewModel.markTypeProperty){
+                    object : ListCell<AxisScalingType>() {
+                        override fun updateItem(item: AxisScalingType?, empty: Boolean) {
                             super.updateItem(item, empty)
 
                             text = when (item) {
-                                AxisMarkType.LINEAR -> "Линейный"
-                                AxisMarkType.LOGARITHMIC -> "Логарифмический"
+                                AxisScalingType.LINEAR -> "Линейный"
+                                AxisScalingType.LOGARITHMIC -> "Логарифмический"
                                 else -> null
                             }
                         }
@@ -53,49 +64,12 @@ class AxisChangeFragment(
         bottom = HBox(
             Button("Save").apply {
                 setOnAction {
-                    controller.updateAxis()
+                    viewModel.commit()
                     (scene.window as Stage).close()
                 }
             }
         ).apply {
             padding = Insets(10.0)
         }
-
-        //TODO: disabled until log axis completely implemented
-        /*tabpane {
-            model.markTypeProperty.onChange {
-                when (model.axisMarkType!!) {
-                    AxisMarkType.LINEAR -> {
-                        hide()
-                    }
-                    AxisMarkType.LOGARITHMIC -> {
-                        show()
-                        (scene.window as Stage).apply {
-                            height = 600.0
-                        }
-                    }
-                }
-            }
-            when (model.axisMarkType!!) {
-                AxisMarkType.LINEAR -> {
-                    hide()
-                }
-                AxisMarkType.LOGARITHMIC -> {
-                    show()
-                }
-            }
-
-            tabs.addAll(
-                Tab(null, logFragment)
-            )
-
-            tabMaxHeight = 0.0
-            tabMinHeight = 0.0
-            stylesheet {
-                Stylesheet.tabHeaderArea {
-                    visibility = FXVisibility.HIDDEN
-                }
-            }
-        }*/
     }
 }

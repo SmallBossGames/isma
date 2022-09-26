@@ -12,7 +12,7 @@ dependencies {
     implementation 'com.fifesoft:rsyntaxtextarea:2.5.0'
     implementation 'de.jflex:maven-jflex-plugin:1.4.3'
     implementation 'org.java.net.substance:substance:6.0'
-    implementation 'org.antlr:antlr4-runtime:4.1'
+    implementation 'org.antlr:antlr4-runtime:4.10.1'
     implementation 'jgraph:jgraph:5.13.0.0'
     implementation 'jfree:jfreechart:1.0.13'
     implementation 'com.goebl:simplify:1.0.0'

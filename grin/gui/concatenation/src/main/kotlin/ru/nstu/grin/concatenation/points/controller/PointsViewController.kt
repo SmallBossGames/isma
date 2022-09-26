@@ -17,8 +17,7 @@ class PointsViewController : Controller() {
     private val fileModel: FileModel by inject()
 
     fun readPoints() {
-        model.pointsListProperty.clear()
-        model.pointsListProperty.addAll(readPoints(fileModel.file))
+        model.pointsListProperty.setAll(readPoints(fileModel.file))
     }
 
     private fun readPoints(file: File): List<List<String>> {

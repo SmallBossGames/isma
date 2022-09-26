@@ -7,7 +7,6 @@ group = "ru.nstu.isma.next"
 version = "1.0.0"
 
 val moduleName by extra("isma.isma.next.core.main")
-val koinVersion = "3.2.0-beta-1"
 
 dependencies {
     implementation(project(":isma-next-core-simulation-gen"))
@@ -16,7 +15,7 @@ dependencies {
     implementation(project(":isma-next-tools"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-core"))
-    implementation(project(":isma-intg-server:isma-intg-server-client"))
+    //implementation(project(":isma-intg-server:isma-intg-server-client"))
     implementation(project(":isma-intg-lib:isma-intg-lib-common"))
     implementation(project(":isma-intg-lib:isma-intg-lib-euler"))
 
@@ -25,10 +24,10 @@ dependencies {
     implementation ("org.apache.commons:commons-lang3:3.12.0")
     implementation ("org.apache.commons:commons-text:1.9")
     implementation ("org.slf4j:slf4j-api:1.7.36")
-    implementation ("com.google.guava:guava:31.0.1-jre")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation ("com.google.guava:guava:31.1-jre")
+    implementation(libs.kotlinx.coroutines.core)
 
-    implementation ("io.insert-koin:koin-core:$koinVersion")
+    implementation (libs.koin.core)
 
     testImplementation ("junit:junit:4.13.2")
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")
@@ -45,7 +44,9 @@ tasks {
     //check { dependsOn(integTestTask) }
 }
 
+val coroutinesCoreVersion = libs.kotlinx.coroutines.core.get().versionConstraint.requiredVersion
+
 extraJavaModuleInfo {
-    automaticModule("kotlinx-coroutines-core-jvm-1.6.0.jar", "kotlinx.coroutines.core.jvm")
+    automaticModule("kotlinx-coroutines-core-jvm-$coroutinesCoreVersion.jar", "kotlinx.coroutines.core.jvm")
     failOnMissingModuleInfo.set(false)
 }

@@ -3,39 +3,37 @@ plugins {
     kotlin("plugin.serialization")
 
     id("org.openjfx.javafxplugin")
+    id("de.jjohannes.extra-java-module-info")
 
     application
 }
 
 javafx {
-    version = "17"
+    version = "17.0.2"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 application {
-    mainClass.set("ru.isma.next.app.launcher.LauncherKt")
+    mainModule.set("isma.isma.next.app.main")
+    mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
 
-    /*applicationDefaultJvmArgs = listOf(
-        "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")*/
+    applicationDefaultJvmArgs = listOf(
+        //"--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        //"--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
+    )
 }
 
-val koinVersion = "3.2.0-beta-1"
-val kotlinReflectVersion = "1.6.0"
-val kotlinxCoroutinesVersion = "1.6.0"
-val kotlinxSerializationJsonVersion = "1.3.2"
-
 dependencies {
-    implementation ("no.tornado:tornadofx:1.7.20")
-    implementation ("org.antlr:antlr4-runtime:4.9.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-javafx:$kotlinxCoroutinesVersion")
-    implementation ("org.jetbrains.kotlin:kotlin-reflect:$kotlinReflectVersion")
-    implementation ("io.insert-koin:koin-core:$koinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJsonVersion")
-    implementation("org.kordamp.ikonli:ikonli-javafx:12.2.0")
-    implementation("org.kordamp.ikonli:ikonli-material2-pack:12.2.0")
-    implementation ("org.fxmisc.richtext:richtextfx:0.10.7")
+    implementation(libs.antlr4.runtime)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.javafx)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.koin.core)
+    implementation(libs.tornadofx.core)
+    implementation(libs.fxmisc.richtext.core)
+    implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
+    implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
     implementation("org.controlsfx:controlsfx:11.1.1")
 
     implementation(project(":isma-hsm"))
@@ -54,5 +52,9 @@ dependencies {
     implementation(project(":grin:integration"))
 
     api(project(":isma-intg-core"))
-    api(project(":isma-intg-server:isma-intg-server-client"))
+    //api(project(":isma-intg-server:isma-intg-server-client"))
+}
+
+extraJavaModuleInfo {
+    failOnMissingModuleInfo.set(false)
 }

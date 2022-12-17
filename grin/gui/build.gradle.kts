@@ -6,7 +6,7 @@ subprojects {
     apply(plugin = "org.openjfx.javafxplugin")
 
     javafx {
-        version = "17.0.2"
+        version = "19"
         modules = listOf("javafx.controls", "javafx.graphics")
     }
 

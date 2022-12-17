@@ -1,4 +1,4 @@
 dependencies {
     implementation(project(":isma-intg-api"))
-    implementation("com.google.guava:guava:30.1-jre")
+    implementation("com.google.guava:guava:31.1-jre")
 }

@@ -9,7 +9,7 @@ plugins {
 }
 
 javafx {
-    version = "17.0.2"
+    version = "19"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -34,7 +34,7 @@ dependencies {
     implementation(libs.fxmisc.richtext.core)
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
-    implementation("org.controlsfx:controlsfx:11.1.1")
+    implementation("org.controlsfx:controlsfx:11.1.2")
 
     implementation(project(":isma-hsm"))
     implementation(project(":isma-next-core-fdm"))

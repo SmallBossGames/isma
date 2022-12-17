@@ -22,8 +22,8 @@ dependencies {
     testImplementation (project(":isma-intg-lib:isma-intg-lib-common"))
 
     implementation ("org.apache.commons:commons-lang3:3.12.0")
-    implementation ("org.apache.commons:commons-text:1.9")
-    implementation ("org.slf4j:slf4j-api:1.7.36")
+    implementation ("org.apache.commons:commons-text:1.10.0")
+    implementation ("org.slf4j:slf4j-api:2.0.5")
     implementation ("com.google.guava:guava:31.1-jre")
     implementation(libs.kotlinx.coroutines.core)
 

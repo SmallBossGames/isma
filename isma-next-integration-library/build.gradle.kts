@@ -15,7 +15,7 @@ dependencies {
     implementation (project(":isma-intg-lib:isma-intg-lib-rkmerson"))
     implementation (project(":isma-intg-lib:isma-intg-lib-rkfehlberg"))
 
-    implementation("org.slf4j:slf4j-api:1.7.36")
+    implementation("org.slf4j:slf4j-api:2.0.5")
 }
 
 val moduleName by extra("isma.isma.next.integration.library.main")

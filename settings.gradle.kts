@@ -60,15 +60,15 @@ include("isma-javafx-extensions")
 dependencyResolutionManagement{
     versionCatalogs {
         create("libs") {
-            version("kotlinx-coroutines", "1.6.1")
-            library("koin-core", "io.insert-koin:koin-core:3.2.0")
+            version("kotlinx-coroutines", "1.6.4")
+            library("koin-core", "io.insert-koin:koin-core:3.3.0")
             library("tornadofx-core","no.tornado:tornadofx:1.7.20")
-            library("kotlin-reflect","org.jetbrains.kotlin:kotlin-reflect:1.6.20")
+            library("kotlin-reflect","org.jetbrains.kotlin:kotlin-reflect:1.7.22")
             library("kotlinx-coroutines-core","org.jetbrains.kotlinx","kotlinx-coroutines-core").versionRef("kotlinx-coroutines")
             library("kotlinx-coroutines-javafx","org.jetbrains.kotlinx","kotlinx-coroutines-javafx").versionRef("kotlinx-coroutines")
-            library("kotlinx-serialization-json","org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-            library("antlr4-runtime","org.antlr:antlr4-runtime:4.10.1")
-            library("fxmisc-richtext-core","org.fxmisc.richtext:richtextfx:0.10.9")
+            library("kotlinx-serialization-json","org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+            library("antlr4-runtime","org.antlr:antlr4-runtime:4.11.1")
+            library("fxmisc-richtext-core","org.fxmisc.richtext:richtextfx:0.11.0")
         }
     }
 }

@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.6.21" apply false
-    id("org.openjfx.javafxplugin") version "0.0.12" apply false
+    id("org.openjfx.javafxplugin") version "0.0.13" apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21" apply false
     id("de.jjohannes.extra-java-module-info") version "0.11" apply false
 }
@@ -23,13 +23,13 @@ subprojects {
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
 
-        targetCompatibility = "17"
+        targetCompatibility = "19"
     }
 
-    tasks.withType<KotlinCompile>{
-        targetCompatibility = "17"
+    tasks.withType<KotlinCompile> {
+        targetCompatibility = "19"
         kotlinOptions {
-            jvmTarget = "17"
+            jvmTarget = "18"
         }
     }
 }

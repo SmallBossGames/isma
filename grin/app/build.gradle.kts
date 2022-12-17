@@ -6,7 +6,7 @@ plugins {
 version = rootProject.version
 
 javafx {
-    version = "17.0.2"
+    version = "19"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -26,7 +26,7 @@ dependencies {
 
     implementation(project(":grin:integration"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 

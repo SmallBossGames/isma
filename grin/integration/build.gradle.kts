@@ -1,12 +1,14 @@
 plugins {
     id("org.openjfx.javafxplugin")
+    id("org.javamodularity.moduleplugin")
 }
+
+val moduleName by extra("isma.grin.integration.main")
 
 javafx {
     version = "19"
     modules = listOf("javafx.controls", "javafx.graphics")
 }
-
 
 dependencies {
     implementation(libs.tornadofx.core)

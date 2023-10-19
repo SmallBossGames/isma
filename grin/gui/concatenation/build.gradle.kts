@@ -1,6 +1,6 @@
 plugins {
     kotlin("plugin.serialization")
-    id("de.jjohannes.extra-java-module-info")
+    id("org.javamodularity.moduleplugin")
 }
 
 dependencies {
@@ -22,10 +22,4 @@ dependencies {
     api(project(":grin:gui:common"))
     implementation(project(":grin:math"))
     implementation(project(":isma-javafx-extensions"))
-}
-
-val coroutinesCoreVersion = libs.kotlinx.coroutines.core.get().versionConstraint.requiredVersion
-
-extraJavaModuleInfo {
-    failOnMissingModuleInfo.set(false)
 }

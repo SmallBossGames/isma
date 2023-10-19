@@ -1,10 +1,10 @@
 plugins {
     kotlin("jvm")
+    id("org.javamodularity.moduleplugin")
     id("org.openjfx.javafxplugin")
 }
 
-group = "ru.nstu.isma"
-version = "1.0.0"
+val moduleName by extra("isma.isma.text.editor.main")
 
 javafx {
     version = "17.0.2"

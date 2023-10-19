@@ -1,9 +1,11 @@
 plugins {
     kotlin("jvm")
     java
-
+    id("org.javamodularity.moduleplugin")
     id("org.openjfx.javafxplugin")
 }
+
+val moduleName by extra("isma.isma.javafx.extensions.main")
 
 javafx {
     version = "17.0.2"

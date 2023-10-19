@@ -1,9 +1,15 @@
 plugins {
     id("org.openjfx.javafxplugin")
+    id("org.javamodularity.moduleplugin")
+
     application
 }
 
-version = rootProject.version
+java {
+    modularity.inferModulePath.set(false)
+}
+
+val moduleName by extra("isma.grin.app.main")
 
 javafx {
     version = "19"
@@ -13,11 +19,6 @@ javafx {
 application {
     mainModule.set("isma.grin.app.main")
     mainClass.set("ru.nstu.isma.grin.launcher.LauncherKt")
-
-    applicationDefaultJvmArgs = listOf(
-        //"--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        //"--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
-    )
 }
 
 dependencies {

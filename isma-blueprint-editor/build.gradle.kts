@@ -2,11 +2,12 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
 
+    id("org.javamodularity.moduleplugin")
+
     id("org.openjfx.javafxplugin")
 }
 
-group = "ru.nstu.isma"
-version = "1.0.0"
+val moduleName by extra("isma.isma.blueprint.editor.main")
 
 javafx {
     version = "17.0.2"

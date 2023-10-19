@@ -33,7 +33,7 @@ class FunctionListViewController(
             }
 
             setOnCloseRequest {
-                functionCopyModalScope.closeScope()
+                functionCopyModalScope.scope.close()
             }
 
             show()
@@ -55,7 +55,7 @@ class FunctionListViewController(
             }
 
             setOnCloseRequest {
-                functionChangeModalScope.closeScope()
+                functionChangeModalScope.scope.close()
             }
 
             show()

@@ -50,7 +50,7 @@ fun <T> pickAxisVariables(
                     cellFactory { item ->
                         HBox(
                             CheckBox().apply {
-                                item.isSelected.bind(selectedProperty())
+                                item.isSelected.bindBidirectional(selectedProperty())
                             },
                             Label(item.value.name)
                         ).apply {

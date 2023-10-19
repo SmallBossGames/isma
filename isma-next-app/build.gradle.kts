@@ -3,13 +3,15 @@ plugins {
     kotlin("plugin.serialization")
 
     id("org.openjfx.javafxplugin")
-    id("de.jjohannes.extra-java-module-info")
+    id("org.javamodularity.moduleplugin")
 
     application
 }
 
+val moduleName by extra("isma.isma.next.app.main")
+
 javafx {
-    version = "19"
+    version = "21.0.1"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
@@ -53,8 +55,4 @@ dependencies {
 
     api(project(":isma-intg-core"))
     //api(project(":isma-intg-server:isma-intg-server-client"))
-}
-
-extraJavaModuleInfo {
-    failOnMissingModuleInfo.set(false)
 }

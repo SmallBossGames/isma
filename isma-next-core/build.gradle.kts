@@ -1,10 +1,7 @@
 plugins {
     kotlin("jvm")
-    id("de.jjohannes.extra-java-module-info")
+    id("org.javamodularity.moduleplugin")
 }
-
-group = "ru.nstu.isma.next"
-version = "1.0.0"
 
 val moduleName by extra("isma.isma.next.core.main")
 
@@ -32,21 +29,4 @@ dependencies {
     testImplementation ("junit:junit:4.13.2")
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")
     testImplementation ("com.github.jbellis:jamm:0.3.3")
-}
-
-tasks {
-    compileJava {
-        inputs.property("moduleName", moduleName)
-        options.compilerArgs = listOf(
-            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
-        )
-    }
-    //check { dependsOn(integTestTask) }
-}
-
-val coroutinesCoreVersion = libs.kotlinx.coroutines.core.get().versionConstraint.requiredVersion
-
-extraJavaModuleInfo {
-    automaticModule("kotlinx-coroutines-core-jvm-$coroutinesCoreVersion.jar", "kotlinx.coroutines.core.jvm")
-    failOnMissingModuleInfo.set(false)
 }

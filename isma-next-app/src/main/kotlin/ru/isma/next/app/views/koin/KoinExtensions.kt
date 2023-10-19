@@ -41,7 +41,7 @@ val blueprintEditorModule = module {
     includes(editorModule)
 
     scope<BlueprintProjectModel> {
-        scopedOf<ITextEditorFactory>(::TextEditorFactory)
+        scoped<ITextEditorFactory>{ TextEditorFactory { get() } }
         factoryOf(::IsmaTextEditor) onClose { it?.dispose() }
         scopedOf(::BlueprintProjectDataProvider)
         scopedOf(::IsmaBlueprintEditor)

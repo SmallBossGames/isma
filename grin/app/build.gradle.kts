@@ -1,23 +1,24 @@
 plugins {
     id("org.openjfx.javafxplugin")
+    id("org.javamodularity.moduleplugin")
+
     application
 }
 
-version = rootProject.version
+java {
+    modularity.inferModulePath.set(false)
+}
+
+val moduleName by extra("isma.grin.app.main")
 
 javafx {
-    version = "19"
+    version = "21.0.1"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 application {
     mainModule.set("isma.grin.app.main")
     mainClass.set("ru.nstu.isma.grin.launcher.LauncherKt")
-
-    applicationDefaultJvmArgs = listOf(
-        //"--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        //"--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED"
-    )
 }
 
 dependencies {
@@ -26,7 +27,7 @@ dependencies {
 
     implementation(project(":grin:integration"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 

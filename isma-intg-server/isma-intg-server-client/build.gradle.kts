@@ -1,5 +1,5 @@
 plugins {
-    id("de.jjohannes.extra-java-module-info")
+    id("org.javamodularity.moduleplugin")
 }
 
 dependencies {
@@ -13,13 +13,7 @@ dependencies {
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")
     testImplementation (project(":isma-intg-lib:isma-intg-lib-common"))
     testImplementation ("mpj:mpj:0.43")
-    testImplementation ("ch.qos.logback:logback-classic:1.4.5")
+    testImplementation ("ch.qos.logback:logback-classic:1.4.7")
     testImplementation ("com.github.jbellis:jamm:0.3.3")
     testImplementation (project(":isma-intg-demo-problems"))
-}
-
-extraJavaModuleInfo {
-    automaticModule("kryo-2.24.0.jar", "com.esotericsoftware.kryo")
-    automaticModule("kryonet-2.22.0-RC1.jar", "com.esotericsoftware.kryonet")
-    failOnMissingModuleInfo.set(false)
 }

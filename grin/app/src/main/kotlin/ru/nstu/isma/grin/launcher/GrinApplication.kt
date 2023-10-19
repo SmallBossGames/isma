@@ -27,7 +27,7 @@ class GrinApplication: Application(), KoinComponent {
     }
 
     override fun stop() {
-        scope.closeScope()
+        scope.scope.close()
     }
 
     private fun Stage.initWindow(scene: Scene, title: String) {

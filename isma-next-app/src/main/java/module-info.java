@@ -5,7 +5,7 @@ module isma.isma.next.app.main {
     requires tornadofx;
     requires koin.core.jvm;
     requires kotlinx.serialization.json;
-    requires kotlinx.coroutines.core.jvm;
+    requires kotlinx.coroutines.core;
     requires kotlinx.coroutines.javafx;
     requires isma.isma.blueprint.editor.main;
     requires isma.isma.text.editor.main;

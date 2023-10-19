@@ -48,7 +48,7 @@ class TransformToolBar(
                     initModality(Modality.WINDOW_MODAL)
 
                     setOnCloseRequest {
-                        functionChangeModalScope.closeScope()
+                        functionChangeModalScope.scope.close()
                     }
 
                     show()
@@ -72,7 +72,7 @@ class TransformToolBar(
                     initModality(Modality.WINDOW_MODAL)
 
                     setOnCloseRequest {
-                        descriptionChangeModalScope.closeScope()
+                        descriptionChangeModalScope.scope.close()
                     }
 
                     show()

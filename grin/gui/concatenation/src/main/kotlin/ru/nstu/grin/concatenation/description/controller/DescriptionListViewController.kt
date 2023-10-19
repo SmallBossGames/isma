@@ -39,7 +39,7 @@ class DescriptionListViewController(
             }
 
             setOnCloseRequest {
-                descriptionChangeModalScope.closeScope()
+                descriptionChangeModalScope.scope.close()
             }
 
             show()

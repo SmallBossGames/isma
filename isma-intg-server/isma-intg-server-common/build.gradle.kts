@@ -6,7 +6,7 @@ dependencies {
 
     implementation("com.google.guava:guava:31.1-jre")
     implementation("commons-io:commons-io:2.11.0")
-    implementation("ch.qos.logback:logback-classic:1.4.5")
+    implementation("ch.qos.logback:logback-classic:1.4.7")
     implementation("mpj:mpj:0.43")
     implementation("com.esotericsoftware:kryonet:2.22.0-RC1")
 }

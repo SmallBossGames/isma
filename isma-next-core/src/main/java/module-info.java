@@ -11,7 +11,7 @@ module isma.isma.next.core.main {
     requires isma.isma.hsm.main;
     requires isma.isma.intg.api.main;
     requires transitive isma.isma.next.core.simulation.gen.main;
-    requires kotlinx.coroutines.core.jvm;
+    requires kotlinx.coroutines.core;
     requires transitive isma.isma.intg.core.main;
     //requires transitive isma.isma.intg.server.isma.intg.server.client.main;
     requires org.apache.commons.text;

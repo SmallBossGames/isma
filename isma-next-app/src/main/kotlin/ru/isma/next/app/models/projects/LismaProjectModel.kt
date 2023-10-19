@@ -44,7 +44,7 @@ class LismaProjectModel: IProjectModel, KoinScopeComponent {
 
     override fun snapshot() = LismaTextModel(lismaText)
 
-    override fun dispose() { closeScope() }
+    override fun dispose() { scope.close() }
 
     fun pushText() {
         dataProvider.text = lismaTextValue

@@ -37,7 +37,7 @@ class BlueprintProjectModel : IProjectModel, KoinScopeComponent {
 
     override fun snapshot() = blueprint.convertToLisma()
 
-    override fun dispose() { closeScope() }
+    override fun dispose() { scope.close() }
 
     var blueprint: BlueprintModel
         get() {

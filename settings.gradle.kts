@@ -61,7 +61,7 @@ dependencyResolutionManagement{
     versionCatalogs {
         create("libs") {
             version("kotlinx-coroutines", "1.6.4")
-            library("koin-core", "io.insert-koin:koin-core:3.3.0")
+            library("koin-core", "io.insert-koin:koin-core:3.5.0")
             library("tornadofx-core","no.tornado:tornadofx:1.7.20")
             library("kotlin-reflect","org.jetbrains.kotlin:kotlin-reflect:1.7.22")
             library("kotlinx-coroutines-core","org.jetbrains.kotlinx","kotlinx-coroutines-core").versionRef("kotlinx-coroutines")

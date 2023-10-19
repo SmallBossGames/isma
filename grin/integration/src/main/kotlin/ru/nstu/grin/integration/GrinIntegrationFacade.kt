@@ -38,7 +38,7 @@ class GrinIntegrationFacade: KoinComponent {
                 Modality.WINDOW_MODAL
             )
             setOnCloseRequest {
-                scope.closeScope()
+                scope.scope.close()
             }
             show()
         }

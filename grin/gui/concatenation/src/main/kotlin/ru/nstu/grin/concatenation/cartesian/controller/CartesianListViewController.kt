@@ -32,7 +32,7 @@ class CartesianListViewController(
             }
 
             setOnCloseRequest {
-                cartesianCopyModalScope.closeScope()
+                cartesianCopyModalScope.scope.close()
             }
 
             show()
@@ -53,7 +53,7 @@ class CartesianListViewController(
             }
 
             setOnCloseRequest {
-                cartesianChangeModalScope.closeScope()
+                cartesianChangeModalScope.scope.close()
             }
 
             show()

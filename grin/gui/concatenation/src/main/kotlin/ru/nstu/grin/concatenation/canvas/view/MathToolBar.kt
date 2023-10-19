@@ -127,7 +127,7 @@ private fun openModal(
         }
 
         setOnCloseRequest {
-            searchIntersectionsScope.closeScope()
+            searchIntersectionsScope.scope.close()
         }
 
         show()

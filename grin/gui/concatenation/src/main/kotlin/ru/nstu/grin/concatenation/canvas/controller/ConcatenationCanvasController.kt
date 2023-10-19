@@ -66,7 +66,7 @@ class ConcatenationCanvasController(
             }
 
             setOnCloseRequest {
-                modalScope.closeScope()
+                modalScope.scope.close()
             }
 
             show()
@@ -126,7 +126,7 @@ class ConcatenationCanvasController(
             }
 
             setOnCloseRequest {
-                descriptionChangeModalScope.closeScope()
+                descriptionChangeModalScope.scope.close()
             }
 
             show()

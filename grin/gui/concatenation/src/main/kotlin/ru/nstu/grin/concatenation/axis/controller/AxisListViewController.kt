@@ -29,7 +29,7 @@ class AxisListViewController(
             }
 
             setOnCloseRequest {
-                scope.closeScope()
+                scope.scope.close()
             }
 
             show()

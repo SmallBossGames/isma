@@ -11,7 +11,7 @@ plugins {
 val moduleName by extra("isma.isma.next.app.main")
 
 javafx {
-    version = "19"
+    version = "21.0.1"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 

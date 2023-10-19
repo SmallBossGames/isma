@@ -7,7 +7,7 @@ plugins {
 val moduleName by extra("isma.isma.text.editor.main")
 
 javafx {
-    version = "17.0.2"
+    version = "21.0.1"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 

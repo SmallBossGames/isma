@@ -1,6 +1,6 @@
 module isma.isma.intg.api.main {
     requires kotlin.stdlib;
-    requires kotlinx.coroutines.core.jvm;
+    requires kotlinx.coroutines.core;
 
     exports ru.nstu.isma.intg.api.methods;
     exports ru.nstu.isma.intg.api.solvers;

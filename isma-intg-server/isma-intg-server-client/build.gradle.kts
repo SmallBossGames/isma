@@ -1,5 +1,5 @@
 plugins {
-    id("org.javamodularity.moduleplugin")
+    alias(libs.plugins.java.modules)
 }
 
 dependencies {

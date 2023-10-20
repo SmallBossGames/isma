@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     java
-    id("org.javamodularity.moduleplugin")
-    id("org.openjfx.javafxplugin")
+    alias(libs.plugins.java.modules)
+     alias(libs.plugins.javafx)
 }
 
 val moduleName by extra("isma.isma.javafx.extensions.main")
@@ -13,9 +13,7 @@ javafx {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-
-    implementation (libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.javafx)
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")

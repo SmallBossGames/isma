@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm")
-    id("org.javamodularity.moduleplugin")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
 }
 
 val moduleName by extra("isma.isma.next.core.main")

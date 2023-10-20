@@ -1,6 +1,6 @@
 plugins {
-    id("org.openjfx.javafxplugin")
-    id("org.javamodularity.moduleplugin")
+     alias(libs.plugins.javafx)
+    alias(libs.plugins.java.modules)
 }
 
 val moduleName by extra("isma.grin.integration.main")

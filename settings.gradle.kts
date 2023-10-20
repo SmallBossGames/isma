@@ -56,20 +56,3 @@ include("isma-next-services-simulation-abstractions")
 include("isma-next-core-fdm")
 include("isma-next-core-simulation-gen")
 include("isma-javafx-extensions")
-
-dependencyResolutionManagement{
-    versionCatalogs {
-        create("libs") {
-            version("kotlinx-coroutines", "1.7.3")
-            library("koin-core", "io.insert-koin:koin-core:3.5.0")
-            library("tornadofx-core","no.tornado:tornadofx:1.7.20")
-            library("kotlin-reflect","org.jetbrains.kotlin:kotlin-reflect:1.9.10")
-            library("kotlinx-coroutines-core","org.jetbrains.kotlinx","kotlinx-coroutines-core").versionRef("kotlinx-coroutines")
-            library("kotlinx-coroutines-javafx","org.jetbrains.kotlinx","kotlinx-coroutines-javafx").versionRef("kotlinx-coroutines")
-            library("kotlinx-serialization-json","org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-            library("antlr4-runtime","org.antlr:antlr4-runtime:4.11.1")
-            library("fxmisc-richtext-core","org.fxmisc.richtext:richtextfx:0.11.1")
-        }
-    }
-}
-

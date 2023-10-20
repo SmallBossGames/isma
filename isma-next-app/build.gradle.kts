@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 
-    id("org.openjfx.javafxplugin")
-    id("org.javamodularity.moduleplugin")
+     alias(libs.plugins.javafx)
+    alias(libs.plugins.java.modules)
 
     application
 }

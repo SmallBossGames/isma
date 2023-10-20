@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 
-    id("org.javamodularity.moduleplugin")
+    alias(libs.plugins.java.modules)
 
-    id("org.openjfx.javafxplugin")
+     alias(libs.plugins.javafx)
 }
 
 val moduleName by extra("isma.isma.blueprint.editor.main")

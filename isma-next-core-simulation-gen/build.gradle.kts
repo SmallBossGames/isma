@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 group = "ru.nstu.isma"
@@ -8,8 +8,6 @@ version = "1.0.0"
 val moduleName by extra("isma.isma.next.core.simulation.gen.main")
 
 dependencies {
-    implementation(kotlin("stdlib"))
-
     implementation ("com.google.guava:guava:31.1-jre")
     implementation ("org.apache.commons:commons-text:1.10.0")
     implementation ("org.slf4j:slf4j-api:2.0.5")

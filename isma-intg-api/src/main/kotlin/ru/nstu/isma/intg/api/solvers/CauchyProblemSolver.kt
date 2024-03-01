@@ -1,9 +1,8 @@
 package ru.nstu.isma.intg.api.solvers
 
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyProblem
-import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.intg.api.models.IntgResultPoint
-import ru.nstu.isma.intg.api.IntgMetricData
+import ru.nstu.isma.intg.api.models.IntgMetricData
 import java.util.function.Consumer
 
 /**

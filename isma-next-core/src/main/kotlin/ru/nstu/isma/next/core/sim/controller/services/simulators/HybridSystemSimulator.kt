@@ -2,7 +2,7 @@ package ru.nstu.isma.next.core.sim.controller.services.simulators
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
-import ru.nstu.isma.intg.api.IntgMetricData
+import ru.nstu.isma.intg.api.models.IntgMetricData
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation
 import ru.nstu.isma.intg.api.calcmodel.HybridSystemChangeSet
 import ru.nstu.isma.intg.api.methods.IntgPoint
@@ -35,7 +35,7 @@ class HybridSystemSimulator(
         eventDetector: IEventDetector?,
     ): IntgMetricData = coroutineScope {
         val metricData = IntgMetricData()
-        metricData.setStartTime(System.currentTimeMillis())
+        metricData.startTime = System.currentTimeMillis()
         var x = parameters.simulationInitials.start
         val end = parameters.simulationInitials.end
         var step = parameters.simulationInitials.step
@@ -75,7 +75,7 @@ class HybridSystemSimulator(
             val finalX = x
             parameters.stepChangeHandlers(finalX)
         }
-        metricData.setEndTime(System.currentTimeMillis())
+        metricData.endTime = System.currentTimeMillis()
         return@coroutineScope metricData
     }
 

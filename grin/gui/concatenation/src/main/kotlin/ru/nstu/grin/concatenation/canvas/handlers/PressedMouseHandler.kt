@@ -9,13 +9,13 @@ import ru.nstu.grin.concatenation.axis.extensions.findLocatedAxisOrNull
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
 import ru.nstu.grin.concatenation.canvas.model.*
-import ru.nstu.grin.concatenation.canvas.view.CartesianCanvasContextMenuController
+import ru.nstu.grin.concatenation.canvas.view.CartesianCanvasContextMenu
 import ru.nstu.grin.concatenation.canvas.view.ConcatenationChainDrawer
 import ru.nstu.grin.concatenation.cartesian.model.CartesianSpace
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 
 class PressedMouseHandler(
-    private val contextMenuDrawElement: CartesianCanvasContextMenuController,
+    private val contextMenuDrawElement: CartesianCanvasContextMenu,
     private val canvasModel: ConcatenationCanvasModel,
     private val canvasController: ConcatenationCanvasController,
     private val canvasViewModel: ConcatenationCanvasViewModel,

@@ -1,12 +1,9 @@
 package ru.nstu.isma.next.core.sim.controller.services.runners
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import ru.nstu.isma.intg.api.IntgMetricData
+import ru.nstu.isma.intg.api.models.IntgMetricData
 import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
 import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
@@ -27,24 +24,26 @@ class InFileSimulationRunner(
 
         var isFirst = true
 
-        tempFile.bufferedWriter().use { writer ->
-            channelFlow {
-                val simulatorParameters = HybridSystemSimulatorParameters(
-                    context.compilationResult,
-                    context.simulationInitials,
-                    stepChangeHandlers = context.stepChangeHandlers,
-                    resultPointHandlers = {
-                        send(it)
-                    }
-                )
+        withContext(Dispatchers.IO) {
+            tempFile.bufferedWriter().use { writer ->
+                channelFlow {
+                    val simulatorParameters = HybridSystemSimulatorParameters(
+                        context.compilationResult,
+                        context.simulationInitials,
+                        stepChangeHandlers = context.stepChangeHandlers,
+                        resultPointHandlers = {
+                            send(it)
+                        }
+                    )
 
-                result = hybridSystemSimulator.runAsync(simulatorParameters)
-            }.flowOn(Dispatchers.IO).collect {
-                if (isFirst) {
-                    writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(it))
-                    isFirst = false
+                    result = hybridSystemSimulator.runAsync(simulatorParameters)
+                }.flowOn(Dispatchers.Default).collect {
+                    if (isFirst) {
+                        writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(it))
+                        isFirst = false
+                    }
+                    writer.append(IntegrationResultPointFileHelpers.buildCsvString(it))
                 }
-                writer.append(IntegrationResultPointFileHelpers.buildCsvString(it))
             }
         }
 

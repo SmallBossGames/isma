@@ -1,7 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller.services.runners
 
 import kotlinx.coroutines.coroutineScope
-import ru.nstu.isma.intg.api.IntgMetricData
+import ru.nstu.isma.intg.api.models.IntgMetricData
 import ru.nstu.isma.intg.api.providers.MemoryPointProvider
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters

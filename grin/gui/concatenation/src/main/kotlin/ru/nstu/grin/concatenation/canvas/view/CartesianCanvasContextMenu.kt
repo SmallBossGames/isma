@@ -9,7 +9,7 @@ import ru.nstu.grin.concatenation.axis.model.ConcatenationAxis
 import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 
-class CartesianCanvasContextMenuController(
+class CartesianCanvasContextMenu(
     private val chainDrawer: ConcatenationChainDrawer,
     private val model: ConcatenationCanvasModel,
     private val controller: ConcatenationCanvasController,

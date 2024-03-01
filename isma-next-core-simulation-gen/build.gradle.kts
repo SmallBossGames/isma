@@ -8,7 +8,7 @@ version = "1.0.0"
 val moduleName by extra("isma.isma.next.core.simulation.gen.main")
 
 dependencies {
-    implementation ("com.google.guava:guava:31.1-jre")
+    implementation(libs.com.google.guava)
     implementation ("org.apache.commons:commons-text:1.10.0")
     implementation ("org.slf4j:slf4j-api:2.0.5")
 

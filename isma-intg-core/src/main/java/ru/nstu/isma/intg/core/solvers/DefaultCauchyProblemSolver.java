@@ -38,7 +38,7 @@ public class DefaultCauchyProblemSolver implements CauchyProblemSolver {
         while (x < end) {
             resultConsumer.accept(new IntgResultPoint(x, Arrays.copyOf(yForDe, yForDe.length), rhs));
 
-            IntgPoint toPoint = stepSolver.step(new IntgPoint(step, yForDe, rhs));
+            IntgPoint toPoint = stepSolver.step(new IntgPoint(step, yForDe, rhs, new double[0][], step));
             if (logger.isDebugEnabled()) {
                 logger.debug("Calculated step #{}. X: {}; Original step: {}, Used step: {}; Next step: {}",
                         stepIndex++, x, step, toPoint.getStep(), toPoint.getNextStep());

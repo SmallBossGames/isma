@@ -98,7 +98,7 @@ class DefaultDaeSystemStepSolver(
         if (stageCalculators.isNullOrEmpty()) {
             return emptyArray()
         }
-        
+
         val stageCount = stageCalculators.size
         val stages = Array(daeSystem.differentialVariableCount) { DoubleArray(stageCount) }
         for (stageIdx in 0 until stageCount) {
@@ -191,7 +191,7 @@ class DefaultDaeSystemStepSolver(
     }
 
     private fun isControllerEnabled(intgController: IntgController?): Boolean {
-        return intgController != null && intgController.isEnabled
+        return intgController != null && intgController.enabled
     }
 
     override fun dispose() {}

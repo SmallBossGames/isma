@@ -1,6 +1,6 @@
 plugins {
-    kotlin("plugin.serialization")
-    id("org.javamodularity.moduleplugin")
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.java.modules)
 }
 
 dependencies {

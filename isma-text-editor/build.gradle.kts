@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm")
-    id("org.javamodularity.moduleplugin")
-    id("org.openjfx.javafxplugin")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
+    alias(libs.plugins.javafx)
 }
 
 val moduleName by extra("isma.isma.text.editor.main")

@@ -1,6 +1,6 @@
 plugins {
-    id("org.openjfx.javafxplugin")
-    id("org.javamodularity.moduleplugin")
+     alias(libs.plugins.javafx)
+    alias(libs.plugins.java.modules)
 
     application
 }
@@ -22,7 +22,6 @@ application {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
     implementation(libs.koin.core)
 
     implementation(project(":grin:integration"))

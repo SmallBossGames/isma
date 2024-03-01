@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm")
-    id("org.javamodularity.moduleplugin")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
 }
 
 val moduleName by extra("isma.isma.next.core.main")
@@ -21,7 +21,7 @@ dependencies {
     implementation ("org.apache.commons:commons-lang3:3.12.0")
     implementation ("org.apache.commons:commons-text:1.10.0")
     implementation ("org.slf4j:slf4j-api:2.0.5")
-    implementation ("com.google.guava:guava:31.1-jre")
+    implementation(libs.com.google.guava)
     implementation(libs.kotlinx.coroutines.core)
 
     implementation (libs.koin.core)

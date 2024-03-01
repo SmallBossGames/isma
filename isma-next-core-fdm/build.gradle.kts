@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
 }
 
 val moduleName by extra("isma.isma.next.core.fdm.main")
@@ -8,8 +8,6 @@ group = "ru.nstu.isma"
 version = "1.0.0"
 
 dependencies {
-    implementation(kotlin("stdlib"))
-
     implementation(project(":isma-hsm"))
 }
 

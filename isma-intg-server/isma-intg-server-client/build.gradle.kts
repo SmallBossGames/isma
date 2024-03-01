@@ -1,12 +1,12 @@
 plugins {
-    id("org.javamodularity.moduleplugin")
+    alias(libs.plugins.java.modules)
 }
 
 dependencies {
     implementation (project(":isma-intg-server:isma-intg-server-api"))
     implementation (project(":isma-intg-api"))
 
-    implementation ("com.google.guava:guava:31.1-jre")
+    implementation(libs.com.google.guava)
     implementation ("com.esotericsoftware:kryonet:2.22.0-RC1")
 
     testImplementation ("junit:junit:4.13.2")

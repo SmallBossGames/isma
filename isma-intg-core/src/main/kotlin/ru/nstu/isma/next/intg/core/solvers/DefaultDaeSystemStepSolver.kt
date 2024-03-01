@@ -51,8 +51,11 @@ class DefaultDaeSystemStepSolver(
 
         var stages = stages(fromPoint)
         var accuracyNextStep: Double? = null
-        if (isControllerEnabled(intgMethod.accuracyController)) {
-            val accuracyResults = intgMethod.accuracyController.tune(fromPoint, stages, this)
+
+        val accuracyController = intgMethod.accuracyController
+
+        if (accuracyController != null && isControllerEnabled(accuracyController)) {
+            val accuracyResults = accuracyController.tune(fromPoint, stages, this)
             stages = accuracyResults.tunedStages
             accuracyNextStep = accuracyResults.tunedStep
             fromPoint.step = accuracyResults.tunedStep
@@ -64,8 +67,11 @@ class DefaultDaeSystemStepSolver(
         val nextRhs = calculateRhs(nextY)
         val toPoint = IntgPoint(fromPoint.step, nextY, nextRhs, stages, fromPoint.step)
         var stabilityNextStep: Double? = null
-        if (isControllerEnabled(intgMethod.stabilityController)) {
-            stabilityNextStep = intgMethod.stabilityController.predictNextStepSize(toPoint)
+
+        val stabilityController = intgMethod.stabilityController
+
+        if (stabilityController != null && isControllerEnabled(stabilityController)) {
+            stabilityNextStep = stabilityController.predictNextStepSize(toPoint)
         }
 
         // Выбираем следующий шаг по формуле h_new = max(h, min(h_acc, h_st)), где
@@ -87,15 +93,16 @@ class DefaultDaeSystemStepSolver(
     }
 
     override fun stages(fromPoint: IntgPoint): Array<DoubleArray> {
-        if (intgMethod.stageCalculators.isEmpty()) {
+        val stageCalculators = intgMethod.stageCalculators
+
+        if (stageCalculators.isNullOrEmpty()) {
             return emptyArray()
         }
-
-        val stageCalcs = intgMethod.stageCalculators
-        val stageCount = stageCalcs.size
+        
+        val stageCount = stageCalculators.size
         val stages = Array(daeSystem.differentialVariableCount) { DoubleArray(stageCount) }
         for (stageIdx in 0 until stageCount) {
-            val stageCalc = stageCalcs[stageIdx]
+            val stageCalc = stageCalculators[stageIdx]
             val yk = yk(stageCalc, fromPoint, stages)
 
             // Оптимизация для первой стадии.

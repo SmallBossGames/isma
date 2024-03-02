@@ -106,7 +106,7 @@ class DefaultDaeSystemStepSolver(
             val yk = yk(stageCalc, fromPoint, stages)
 
             // Оптимизация для первой стадии.
-            val fk: DoubleArray = if (stageIdx == 0 && Arrays.equals(yk, fromPoint.y)) {
+            val fk: DoubleArray = if (stageIdx == 0 && yk.contentEquals(fromPoint.y)) {
                 fromPoint.rhs[DaeSystem.RHS_DE_PART_IDX]
             } else {
                 calculateRhs(yk)[DaeSystem.RHS_DE_PART_IDX]

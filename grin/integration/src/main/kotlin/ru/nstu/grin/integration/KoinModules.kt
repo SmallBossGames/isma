@@ -88,7 +88,7 @@ val grinGuiModule = module {
         scopedOf(::SelectionDrawElement)
         scopedOf(::DescriptionDrawElement)
         scopedOf(::MatrixTransformer)
-        scopedOf(::CartesianCanvasContextMenuController)
+        scopedOf(::CartesianCanvasContextMenu)
 
         scopedOf(::FunctionListView)
         scopedOf(::FunctionListViewController)

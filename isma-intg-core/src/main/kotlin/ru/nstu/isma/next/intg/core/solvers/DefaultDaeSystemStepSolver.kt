@@ -98,7 +98,7 @@ class DefaultDaeSystemStepSolver(
         if (stageCalculators.isNullOrEmpty()) {
             return emptyArray()
         }
-        
+
         val stageCount = stageCalculators.size
         val stages = Array(daeSystem.differentialVariableCount) { DoubleArray(stageCount) }
         for (stageIdx in 0 until stageCount) {
@@ -106,7 +106,7 @@ class DefaultDaeSystemStepSolver(
             val yk = yk(stageCalc, fromPoint, stages)
 
             // Оптимизация для первой стадии.
-            val fk: DoubleArray = if (stageIdx == 0 && Arrays.equals(yk, fromPoint.y)) {
+            val fk: DoubleArray = if (stageIdx == 0 && yk.contentEquals(fromPoint.y)) {
                 fromPoint.rhs[DaeSystem.RHS_DE_PART_IDX]
             } else {
                 calculateRhs(yk)[DaeSystem.RHS_DE_PART_IDX]
@@ -191,7 +191,7 @@ class DefaultDaeSystemStepSolver(
     }
 
     private fun isControllerEnabled(intgController: IntgController?): Boolean {
-        return intgController != null && intgController.isEnabled
+        return intgController != null && intgController.enabled
     }
 
     override fun dispose() {}

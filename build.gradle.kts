@@ -1,3 +1,8 @@
+plugins {
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.java.modules) apply false
+}
+
 allprojects {
     group = "ru.nstu.isma"
     version = "1.0.0"

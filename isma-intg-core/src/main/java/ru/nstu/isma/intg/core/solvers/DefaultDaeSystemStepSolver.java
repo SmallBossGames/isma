@@ -205,7 +205,7 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
     }
 
     private boolean isControllerEnabled(IntgController intgController) {
-        return intgController != null && intgController.isEnabled();
+        return intgController != null && intgController.getEnabled();
     }
 
     @Override

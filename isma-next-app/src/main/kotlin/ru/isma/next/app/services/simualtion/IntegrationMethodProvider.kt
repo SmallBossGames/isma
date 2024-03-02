@@ -25,7 +25,7 @@ class IntegrationMethodProvider(
         val accuracyController = accuracyController
         if (accuracyController != null) {
             val accuracyInUse = parameters.isAccuracyInUse
-            accuracyController.isEnabled = accuracyInUse
+            accuracyController.enabled = accuracyInUse
             if (accuracyInUse){
                 accuracyController.accuracy = parameters.accuracy
             }
@@ -35,7 +35,7 @@ class IntegrationMethodProvider(
     private fun IntgMethod.initStabilityController(){
         val stabilityController = stabilityController
         if (stabilityController != null) {
-            stabilityController.isEnabled = parameters.isStableInUse
+            stabilityController.enabled = parameters.isStableInUse
         }
     }
 }

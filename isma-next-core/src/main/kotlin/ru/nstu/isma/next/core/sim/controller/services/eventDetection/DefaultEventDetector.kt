@@ -10,7 +10,9 @@ class DefaultEventDetector(
     gamma: Double,
     private val stepLowBound: Double
 ): IEventDetector {
-    private val eventDetectionIntegrationController = EventDetectionIntgController(gamma, true)
+    private val eventDetectionIntegrationController = EventDetectionIntgController(gamma).apply {
+        enabled = true
+    }
 
     // TODO: сделать правильно, чтобы первый шаг тоже оценивался.
     override fun predictNextStep(point: IntgPoint, guards: List<Guard>): Double {

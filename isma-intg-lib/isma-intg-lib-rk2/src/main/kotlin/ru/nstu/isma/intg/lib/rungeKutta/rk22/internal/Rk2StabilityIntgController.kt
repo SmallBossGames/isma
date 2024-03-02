@@ -3,7 +3,7 @@ package ru.nstu.isma.intg.lib.rungeKutta.rk22.internal
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.core.methods.BaseStabilityIntgController
-import ru.nstu.isma.intg.core.methods.utils.MathUtils
+import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
 import kotlin.math.abs
 
 /**
@@ -32,7 +32,7 @@ class Rk2StabilityIntgController : BaseStabilityIntgController() {
             }
         }
 
-        return 2.0 * MathUtils.max(deltaKs)
+        return 2.0 * deltaKs.maxOrThrow()
     }
 
     companion object {

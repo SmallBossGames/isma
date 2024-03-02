@@ -2,7 +2,7 @@ package ru.nstu.isma.intg.lib.rungeKutta.rungeKuttaFehlberg.internal
 
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.core.methods.BaseStabilityIntgController
-import ru.nstu.isma.intg.core.methods.utils.MathUtils
+import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
 import kotlin.math.abs
 
 class RkFehlbergStabilityIntgController : BaseStabilityIntgController() {
@@ -23,7 +23,7 @@ class RkFehlbergStabilityIntgController : BaseStabilityIntgController() {
                 deltaKs[i] = abs(32.0 * k3 - 48.0 * k2 + 16.0 * k1) / abs(k2 - k1)
             }
         }
-        return MathUtils.max(deltaKs) / 9
+        return deltaKs.maxOrThrow() / 9
     }
 
     companion object {

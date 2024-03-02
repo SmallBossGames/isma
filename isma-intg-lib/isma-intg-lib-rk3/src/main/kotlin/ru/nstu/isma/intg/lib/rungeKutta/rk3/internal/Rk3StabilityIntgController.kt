@@ -2,7 +2,7 @@ package ru.nstu.isma.intg.lib.rungeKutta.rk3.internal
 
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.core.methods.BaseStabilityIntgController
-import ru.nstu.isma.intg.core.methods.utils.MathUtils
+import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
 import kotlin.math.abs
 
 /**
@@ -32,7 +32,7 @@ class Rk3StabilityIntgController : BaseStabilityIntgController() {
             else deltaKs[i] = abs(k1 - 2.0 * k2 + k3) / abs(k2 - k1)
         }
 
-        val maxDeltaK = MathUtils.max(deltaKs)
+        val maxDeltaK = deltaKs.maxOrThrow()
         return 0.5 * maxDeltaK
     }
 

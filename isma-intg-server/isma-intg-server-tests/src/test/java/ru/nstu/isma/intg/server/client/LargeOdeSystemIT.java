@@ -50,7 +50,7 @@ public class LargeOdeSystemIT {
         double step = problem.getCauchyInitials().getStepSize();
         double[] yForDe = problem.getCauchyInitials().getY0();
         double[][] rhs = client.calculateRhs(yForDe);
-        IntgPoint initialPoint = new IntgPoint(step, yForDe, rhs);
+        IntgPoint initialPoint = new IntgPoint(step, yForDe, rhs, new double[0][], step);
 
         System.out.println(String.format(
                 "Equation count: %d", size));
@@ -105,7 +105,7 @@ public class LargeOdeSystemIT {
         double[] yForDe = problem.getCauchyInitials().getY0();
 
         double[][] rhs = client.calculateRhs(yForDe);
-        IntgPoint fromPoint = new IntgPoint(step, yForDe, rhs);
+        IntgPoint fromPoint = new IntgPoint(step, yForDe, rhs, new double[0][], step);
 
         return client.step(fromPoint);
     }

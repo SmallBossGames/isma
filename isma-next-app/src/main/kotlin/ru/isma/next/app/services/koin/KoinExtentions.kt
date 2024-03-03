@@ -27,7 +27,6 @@ import ru.nstu.isma.next.core.sim.controller.services.runners.InFileSimulationRu
 import ru.nstu.isma.next.core.sim.controller.services.runners.InMemorySimulationRunner
 import ru.nstu.isma.next.core.sim.controller.services.simulators.HybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.services.simulators.IHybridSystemSimulator
-import ru.nstu.isma.next.core.sim.controller.services.solvers.DefaultDaeSystemStepSolverFactory
 import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
 import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 
@@ -70,9 +69,4 @@ val appServicesModule = module {
     single<SimulationResultService> { SimulationResultService(get()) }
     single<SimulationService> { SimulationService(get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
-}
-
-val daeSystemStepSolversModule = module {
-    single { DefaultDaeSystemStepSolverFactory() }
-    //single { RemoteDaeSystemStepSolverFactory() }
 }

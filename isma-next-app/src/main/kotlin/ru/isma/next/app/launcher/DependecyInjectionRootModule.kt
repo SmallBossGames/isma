@@ -11,7 +11,6 @@ fun ismaKoinStart() = startKoin {
         simulationScopeModule,
         externalServicesModule,
         appServicesModule,
-        daeSystemStepSolversModule
     )
 
     modules(

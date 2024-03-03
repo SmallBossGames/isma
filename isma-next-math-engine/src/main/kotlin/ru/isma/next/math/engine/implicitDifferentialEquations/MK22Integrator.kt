@@ -10,9 +10,9 @@ import kotlin.math.*
 
 const val a = 0.29289321881
 const val p1 = 0.29289321881
-const val p2 = 0.5/ a
+const val p2 = 0.5 / a
 const val beta = 0.29289321881
-const val alpha = -2* a
+const val alpha = -2 * a
 
 class MK22Integrator (
     val accuracy: Double,

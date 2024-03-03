@@ -3,6 +3,7 @@ package ru.nstu.isma.intg.lib;
 import ru.nstu.isma.intg.api.methods.IntgMethod;
 import ru.nstu.isma.intg.lib.euler.EulerIntgMethod;
 import ru.nstu.isma.intg.lib.rungeKutta.rk22.Rk2IntgMethod;
+import ru.nstu.isma.intg.lib.rungeKutta.rk3.IntegrationMethodFactory;
 import ru.nstu.isma.intg.lib.rungeKutta.rk3.Rk3IntgMethod;
 import ru.nstu.isma.intg.lib.rungeKutta.rk31.Rk31IntgMethod;
 import ru.nstu.isma.intg.lib.rungeKutta.rkMerson.RkMersonIntgMethod;
@@ -49,16 +50,16 @@ public final class IntgMethodLibrary {
         return methodNames;
     }
 
-    static void registerIntgMethod(IntgMethod intgMethod, boolean system) {
+    static void registerIntgMethod(IntegrationMethodFactory intgMethod, boolean system) {
         String intgMethodName = intgMethod.getName();
         if (getIntgMethod(intgMethodName) != null) {
             throw new IllegalArgumentException("Integration method with name \"" + intgMethodName + "\" is already registered.");
         }
 
         if (system) {
-            SYSTEM_METHODS.put(intgMethodName, intgMethod);
+            SYSTEM_METHODS.put(intgMethodName, intgMethod.create());
         } else {
-            USER_METHODS.put(intgMethodName, intgMethod);
+            USER_METHODS.put(intgMethodName, intgMethod.create());
         }
     }
 

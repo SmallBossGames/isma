@@ -7,7 +7,6 @@ dependencies {
     implementation(project(":isma-intg-lib:isma-intg-lib-rk31"))
     implementation(project(":isma-intg-lib:isma-intg-lib-rkmerson"))
     implementation(project(":isma-intg-lib:isma-intg-lib-rkfehlberg"))
-    implementation("org.reflections:reflections:0.10.2")
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation(libs.com.google.guava)
 }

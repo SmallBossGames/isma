@@ -1,5 +1,5 @@
-import ru.nstu.isma.intg.api.methods.IntgMethod;
-import ru.nstu.isma.intg.lib.euler.EulerIntgMethod;
+import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory;
+import ru.nstu.isma.intg.lib.euler.IntegrationMethodFactory;
 
 module isma.isma.intg.lib.isma.intg.lib.euler.main {
     requires isma.isma.intg.api.main;
@@ -7,5 +7,5 @@ module isma.isma.intg.lib.isma.intg.lib.euler.main {
 
     exports ru.nstu.isma.intg.lib.euler;
 
-    provides IntgMethod with EulerIntgMethod;
+    provides IIntegrationMethodFactory with IntegrationMethodFactory;
 }

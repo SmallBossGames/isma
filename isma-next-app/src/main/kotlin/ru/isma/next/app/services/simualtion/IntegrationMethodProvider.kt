@@ -13,7 +13,8 @@ class IntegrationMethodProvider(
     private val parameters = simulationParameters.integrationMethodParameters
 
     private val method = library
-        .getIntegrationMethod(parameters.selectedMethod)!!
+        .getIntegrationMethod(parameters.selectedMethod)
+        .create()
         .apply {
             initAccuracyController()
             initStabilityController()

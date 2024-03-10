@@ -1,5 +1,6 @@
 package ru.nstu.isma.intg.lib;
 
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgMethod;
 import ru.nstu.isma.intg.lib.euler.EulerIntgMethod;
 import ru.nstu.isma.intg.lib.rungeKutta.rk22.Rk2IntgMethod;
@@ -15,14 +16,14 @@ import java.util.stream.Collectors;
 
 @Deprecated
 public final class IntgMethodLibrary {
-    private static final Map<String, IntgMethod> SYSTEM_METHODS = new HashMap<>();
-    private static final Map<String, IntgMethod> USER_METHODS = new HashMap<>();
+    private static final Map<String, IntegrationMethodRungeKutta> SYSTEM_METHODS = new HashMap<>();
+    private static final Map<String, IntegrationMethodRungeKutta> USER_METHODS = new HashMap<>();
 
     private IntgMethodLibrary() {
     }
 
-    public static IntgMethod getIntgMethod(String name) {
-        IntgMethod intgMethod = SYSTEM_METHODS.get(name);
+    public static IntegrationMethodRungeKutta getIntgMethod(String name) {
+        IntegrationMethodRungeKutta intgMethod = SYSTEM_METHODS.get(name);
         if (intgMethod == null) {
             intgMethod = USER_METHODS.get(name);
         }

@@ -22,9 +22,7 @@ class EulerIntgMethod : IntgMethod {
 class IntegrationMethodFactory : IIntegrationMethodFactory{
     override val name = "Euler"
 
-    override fun create() = EulerIntgMethod()
-
-    override fun createNg() = IntegrationMethodRungeKutta(
+    override fun create() = IntegrationMethodRungeKutta(
         nextY = { step, k, y, f -> y + step * f }
     )
 }

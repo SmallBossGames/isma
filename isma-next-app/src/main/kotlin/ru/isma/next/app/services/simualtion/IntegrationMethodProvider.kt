@@ -2,7 +2,6 @@ package ru.isma.next.app.services.simualtion
 
 import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta
-import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 
@@ -15,7 +14,7 @@ class IntegrationMethodProvider(
 
     override val method = library
         .getIntegrationMethod(parameters.selectedMethod)
-        .createNg()
+        .create()
         .apply {
             initAccuracyController()
             initStabilityController()

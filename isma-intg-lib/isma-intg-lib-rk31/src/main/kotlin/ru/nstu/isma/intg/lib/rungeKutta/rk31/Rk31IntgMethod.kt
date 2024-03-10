@@ -27,8 +27,7 @@ class Rk31IntgMethod : IntgMethod {
 class IntegrationMethodFactory : IIntegrationMethodFactory {
     override val name = "Runge-Kutta 3-1"
 
-    override fun create() = Rk31IntgMethod()
-    override fun createNg() = IntegrationMethodRungeKutta(
+    override fun create() = IntegrationMethodRungeKutta(
         accuracyController = Rk31AccuracyIntgController(),
         stageCalculators = arrayOf(
             Rk31Stage1Calculator(),

@@ -29,8 +29,7 @@ class Rk2IntgMethod : IntgMethod {
 class IntegrationMethodFactory : IIntegrationMethodFactory {
     override val name = "Runge-Kutta 2"
 
-    override fun create() = Rk2IntgMethod()
-    override fun createNg() = IntegrationMethodRungeKutta(
+    override fun create() = IntegrationMethodRungeKutta(
         accuracyController = Rk2AccuracyIntgController(),
         stabilityController = Rk2StabilityIntgController(),
         stageCalculators = arrayOf(

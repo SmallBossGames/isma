@@ -28,8 +28,7 @@ class RkMersonIntgMethod : IntgMethod {
 class IntegrationMethodFactory : IIntegrationMethodFactory {
     override val name = "Runge-Kutta-Merson"
 
-    override fun create() = RkMersonIntgMethod()
-    override fun createNg() = IntegrationMethodRungeKutta(
+    override fun create() = IntegrationMethodRungeKutta(
         accuracyController = RkMersonAccuracyIntgController(),
         stageCalculators = arrayOf(
         RkMersonStage1Calculator(),

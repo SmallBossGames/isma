@@ -26,8 +26,7 @@ class RkFehlbergIntgMethod : IntgMethod {
 class IntegrationMethodFactory : IIntegrationMethodFactory {
     override val name = "Runge-Kutta-Fehlberg"
 
-    override fun create() = RkFehlbergIntgMethod()
-    override fun createNg() = IntegrationMethodRungeKutta(
+    override fun create() = IntegrationMethodRungeKutta(
         accuracyController = RkFehlbergAccuracyIntgController(),
         stabilityController = RkFehlbergStabilityIntgController(),
         stageCalculators = arrayOf(

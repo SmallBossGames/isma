@@ -11,7 +11,7 @@ class DaeSystemStepSolverFactory(
 ): IDaeSystemSolverFactory {
     override fun create(hsmCompilationResult: HsmCompilationResult): DaeSystemStepSolver {
         return DefaultDaeSystemStepSolver(
-            integrationMethodProvider.createMethod(),
+            integrationMethodProvider.method,
             hsmCompilationResult.hybridSystem.daeSystem
         )
     }

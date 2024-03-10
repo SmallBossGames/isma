@@ -30,4 +30,13 @@ class IntegrationMethodFactory : IIntegrationMethodFactory {
     override val name = "Runge-Kutta 2"
 
     override fun create() = Rk2IntgMethod()
+    override fun createNg() = IntegrationMethodRungeKutta(
+        accuracyController = Rk2AccuracyIntgController(),
+        stabilityController = Rk2StabilityIntgController(),
+        stageCalculators = arrayOf(
+            Rk2Stage1Calculator(),
+            Rk2Stage2Calculator(),
+        ),
+        nextY = {step, k, y, f -> y + 0.5 * k[0] + 0.5 * k[1]}
+    )
 }

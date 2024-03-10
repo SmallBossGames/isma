@@ -2,6 +2,7 @@ package ru.nstu.isma.intg.api.solvers
 
 import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.api.methods.IntgPoint
 
@@ -12,7 +13,7 @@ import ru.nstu.isma.intg.api.methods.IntgPoint
  * @since 08.12.2014
  */
 interface DaeSystemStepSolver {
-    val intgMethod: IntgMethod
+    val intgMethod: IntegrationMethodRungeKutta
     fun apply(changeSet: DaeSystemChangeSet?)
     fun calculateRhs(yForDe: DoubleArray): Array<DoubleArray>
     fun step(fromPoint: IntgPoint): IntgPoint

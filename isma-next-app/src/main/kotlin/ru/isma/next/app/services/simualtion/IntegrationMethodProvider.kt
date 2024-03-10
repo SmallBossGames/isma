@@ -1,6 +1,7 @@
 package ru.isma.next.app.services.simualtion
 
 import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
@@ -12,17 +13,15 @@ class IntegrationMethodProvider(
 
     private val parameters = simulationParameters.integrationMethodParameters
 
-    private val method = library
+    override val method = library
         .getIntegrationMethod(parameters.selectedMethod)
-        .create()
+        .createNg()
         .apply {
             initAccuracyController()
             initStabilityController()
         }
 
-    override fun createMethod() = method
-
-    private fun IntgMethod.initAccuracyController(){
+    private fun IntegrationMethodRungeKutta.initAccuracyController(){
         val accuracyController = accuracyController
         if (accuracyController != null) {
             val accuracyInUse = parameters.isAccuracyInUse
@@ -33,7 +32,7 @@ class IntegrationMethodProvider(
         }
     }
 
-    private fun IntgMethod.initStabilityController(){
+    private fun IntegrationMethodRungeKutta.initStabilityController(){
         val stabilityController = stabilityController
         if (stabilityController != null) {
             stabilityController.enabled = parameters.isStableInUse

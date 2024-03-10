@@ -1,6 +1,7 @@
 package ru.nstu.isma.intg.lib.rungeKutta.rkMerson
 
 import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta
 import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.lib.rungeKutta.rkMerson.internal.*
 
@@ -28,4 +29,15 @@ class IntegrationMethodFactory : IIntegrationMethodFactory {
     override val name = "Runge-Kutta-Merson"
 
     override fun create() = RkMersonIntgMethod()
+    override fun createNg() = IntegrationMethodRungeKutta(
+        accuracyController = RkMersonAccuracyIntgController(),
+        stageCalculators = arrayOf(
+        RkMersonStage1Calculator(),
+        RkMersonStage2Calculator(),
+        RkMersonStage3Calculator(),
+        RkMersonStage4Calculator(),
+        RkMersonStage5Calculator(),
+    ),
+        nextY = {step, k, y, f -> (k[0] + 4.0 * k[3] + k[4]) / 6.0}
+    )
 }

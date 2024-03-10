@@ -4,4 +4,6 @@ interface IIntegrationMethodFactory {
     val name: String
 
     fun create(): IntgMethod
+
+    fun createNg(): IntegrationMethodRungeKutta
 }

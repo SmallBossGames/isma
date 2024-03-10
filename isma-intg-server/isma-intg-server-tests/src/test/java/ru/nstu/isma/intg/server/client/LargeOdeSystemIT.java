@@ -11,10 +11,9 @@ import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitialsLegacy;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyProblem;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
-import ru.nstu.isma.intg.lib.IntgMethodLibrary;
-import ru.nstu.isma.intg.lib.IntgMethodType;
 import ru.nstu.isma.intg.server.models.*;
 
 import java.util.Arrays;
@@ -23,6 +22,8 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(DataProviderRunner.class)
 public class LargeOdeSystemIT {
+    private IIntegrationMethodFactory rkmFactory = new ru.nstu.isma.intg.lib.rungeKutta.rkMerson.IntegrationMethodFactory();
+    private IIntegrationMethodFactory eulerFactory = new ru.nstu.isma.intg.lib.euler.IntegrationMethodFactory();
 
     MemoryMeter memoryMeter = new MemoryMeter();
     private final ComputeEngineClient client = new ComputeEngineClient();
@@ -42,7 +43,7 @@ public class LargeOdeSystemIT {
     public void calculateStructureSize() throws Exception {
         int size = 1000;
         CauchyProblem problem = createTestCauchyProblem(size);
-        IntgMethod method = IntgMethodLibrary.createMethod(IntgMethodType.RUNGE_KUTTA_MERSON);
+        IntegrationMethodRungeKutta method = rkmFactory.create();
 
         client.loadIntgMethod(method);
         client.loadDaeSystem(problem.getDaeSystem());
@@ -92,7 +93,7 @@ public class LargeOdeSystemIT {
     public void testOdeSystemSize(int size) throws Exception {
         CauchyProblem problem = createTestCauchyProblem(size);
 
-        IntgMethod method = IntgMethodLibrary.createMethod(IntgMethodType.EULER);
+        var method = eulerFactory.create();
         client.loadIntgMethod(method);
         client.loadDaeSystem(problem.getDaeSystem());
 

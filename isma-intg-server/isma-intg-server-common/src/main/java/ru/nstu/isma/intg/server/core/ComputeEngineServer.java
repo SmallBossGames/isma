@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.server.ClassDataProvider;
 import ru.nstu.isma.intg.server.ComputeEngine;
@@ -62,7 +62,7 @@ public class ComputeEngineServer implements ComputeEngine, Serializable {
     @Override
     public void loadIntgMethod(int clientId, LoadIntgMethodRequest request) {
         logger.debug("Got a request to load IntgMethod from client #{}.", clientId);
-        ClientRequest<IntgMethod> clientRequest = buildClientRequest(clientId, request, IntgMethod.class);
+        ClientRequest<IntegrationMethodRungeKutta> clientRequest = buildClientRequest(clientId, request, IntegrationMethodRungeKutta.class);
         serviceFacade.getMpiService().sendMessageToEveryone(new Message(MessageType.LOAD_INTG_METHOD, clientRequest));
     }
 

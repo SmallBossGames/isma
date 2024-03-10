@@ -2,7 +2,6 @@ package ru.nstu.isma.intg.server.models;
 
 import com.google.common.base.Preconditions;
 import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
 
 import java.io.IOException;
 

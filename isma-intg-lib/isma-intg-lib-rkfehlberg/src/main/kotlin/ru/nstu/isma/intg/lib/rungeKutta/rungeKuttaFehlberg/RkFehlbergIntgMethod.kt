@@ -2,7 +2,6 @@ package ru.nstu.isma.intg.lib.rungeKutta.rungeKuttaFehlberg
 
 import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory
 import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta
-import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.lib.rungeKutta.rungeKuttaFehlberg.internal.*
 
 class IntegrationMethodFactory : IIntegrationMethodFactory {

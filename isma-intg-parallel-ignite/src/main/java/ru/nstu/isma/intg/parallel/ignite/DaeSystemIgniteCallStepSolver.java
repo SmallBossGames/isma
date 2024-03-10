@@ -2,7 +2,7 @@ package ru.nstu.isma.intg.parallel.ignite;
 
 import org.apache.ignite.Ignite;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.api.methods.StageCalculator;
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver;
@@ -11,7 +11,7 @@ public class DaeSystemIgniteCallStepSolver extends DefaultDaeSystemStepSolver {
 
     private final Ignite ignite;
 
-    public DaeSystemIgniteCallStepSolver(IntgMethod intgMethod, DaeSystem daeSystem, Ignite ignite) {
+    public DaeSystemIgniteCallStepSolver(IntegrationMethodRungeKutta intgMethod, DaeSystem daeSystem, Ignite ignite) {
         super(intgMethod, daeSystem);
         this.ignite = ignite;
     }

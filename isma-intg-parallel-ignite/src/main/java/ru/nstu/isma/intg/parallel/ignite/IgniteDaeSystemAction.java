@@ -6,7 +6,7 @@ import org.apache.ignite.lang.IgniteCallable;
 import org.apache.ignite.lang.IgniteClosure;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.api.methods.StageCalculator;
 
@@ -77,14 +77,15 @@ abstract class IgniteDaeSystemAction {
         };
     }
 
-    static IgniteDaeSystemAction createNextYAction(Ignite ignite, DaeSystem daeSystem, IntgMethod intgMethod,
-                                                   IntgPoint fromPoint, double[][] stages) {
+    static IgniteDaeSystemAction createNextYAction(
+            Ignite ignite, DaeSystem daeSystem, IntegrationMethodRungeKutta intgMethod,
+            IntgPoint fromPoint, double[][] stages) {
         return new IgniteDaeSystemAction(ignite, daeSystem) {
             @Override
             public Double runFor(DifferentialEquation de) {
                 int deIdx = de.getIndex();
                 double[] deStages = stages.length == 0 ? new double[0] : stages[deIdx];
-                return intgMethod.nextY(
+                return intgMethod.getNextY().invoke(
                         fromPoint.getStep(),
                         deStages,
                         fromPoint.getY()[deIdx],

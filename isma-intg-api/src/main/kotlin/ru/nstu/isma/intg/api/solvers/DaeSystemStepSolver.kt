@@ -3,7 +3,6 @@ package ru.nstu.isma.intg.api.solvers
 import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet
 import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta
-import ru.nstu.isma.intg.api.methods.IntgMethod
 import ru.nstu.isma.intg.api.methods.IntgPoint
 
 /**

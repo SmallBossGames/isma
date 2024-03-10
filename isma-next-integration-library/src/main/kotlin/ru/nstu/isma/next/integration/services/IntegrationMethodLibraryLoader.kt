@@ -1,7 +1,6 @@
 package ru.nstu.isma.next.integration.services
 
 import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory
-import ru.nstu.isma.intg.api.methods.IntgMethod
 import java.util.*
 
 

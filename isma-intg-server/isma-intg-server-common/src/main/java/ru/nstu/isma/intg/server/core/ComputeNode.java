@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.core.solvers.parallel.ParallelDaeSystemStepSolver;
 import ru.nstu.isma.intg.server.ClassDataProvider;
@@ -25,7 +25,7 @@ public class ComputeNode {
     private final Logger logger = LoggerFactory.getLogger(ComputeNode.class);
     private final ServiceFacade serviceFacade;
 
-    private IntgMethod intgMethod;
+    private IntegrationMethodRungeKutta intgMethod;
     private DaeSystem daeSystem;
     private ParallelDaeSystemStepSolver stepSolver;
     private boolean recreateStepSolver = true;
@@ -65,8 +65,8 @@ public class ComputeNode {
         });
 
         serviceFacade.getMessageService().addMessageListener(MessageType.LOAD_INTG_METHOD, message -> {
-            ClientRequest<IntgMethod> clientRequest = (ClientRequest<IntgMethod>) message.getPayload();
-            intgMethod = deserialize(IntgMethod.class,
+            var clientRequest = (ClientRequest<IntegrationMethodRungeKutta>) message.getPayload();
+            intgMethod = deserialize(IntegrationMethodRungeKutta.class,
                     clientRequest.getRequest().getBinaryObject().getBytes(),
                     clientRequest.getSerializedClasses());
             Preconditions.checkNotNull(intgMethod, "intgMethod cannot be null");

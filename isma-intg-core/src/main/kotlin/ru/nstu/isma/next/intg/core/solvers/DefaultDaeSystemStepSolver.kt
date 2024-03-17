@@ -4,10 +4,7 @@ import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquationCalculator
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquationsCalculator
-import ru.nstu.isma.intg.api.methods.IntgController
-import ru.nstu.isma.intg.api.methods.IntgMethod
-import ru.nstu.isma.intg.api.methods.IntgPoint
-import ru.nstu.isma.intg.api.methods.StageCalculator
+import ru.nstu.isma.intg.api.methods.*
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import java.util.*
 
@@ -16,7 +13,7 @@ import java.util.*
  * @since 01.09.14
  */
 class DefaultDaeSystemStepSolver(
-    override val intgMethod: IntgMethod,
+    override val intgMethod: IntegrationMethodRungeKutta,
     daeSystem: DaeSystem
 ) : DaeSystemStepSolver {
     var daeSystem: DaeSystem = daeSystem

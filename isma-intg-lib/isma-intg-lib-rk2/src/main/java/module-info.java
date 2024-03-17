@@ -1,3 +1,6 @@
+import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory;
+import ru.nstu.isma.intg.lib.rungeKutta.rk22.IntegrationMethodFactory;
+
 module isma.isma.intg.lib.isma.intg.lib.rk2.main {
     requires isma.isma.intg.api.main;
     requires isma.isma.intg.core.main;
@@ -5,5 +8,5 @@ module isma.isma.intg.lib.isma.intg.lib.rk2.main {
 
     exports ru.nstu.isma.intg.lib.rungeKutta.rk22;
 
-    provides ru.nstu.isma.intg.api.methods.IntgMethod with ru.nstu.isma.intg.lib.rungeKutta.rk22.Rk2IntgMethod;
+    provides IIntegrationMethodFactory with IntegrationMethodFactory;
 }

@@ -15,7 +15,7 @@ import java.util.Arrays;
 @Deprecated
 public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
 
-    private final IntgMethod intgMethod;
+    private final IntegrationMethodRungeKutta intgMethod;
     private DaeSystem daeSystem;
 
     private long stepCalculationCount;
@@ -24,14 +24,14 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
     private DifferentialEquationsCalculator deCalculator;
     private AlgebraicEquationCalculator aeCalculator;
 
-    public DefaultDaeSystemStepSolver(IntgMethod intgMethod, DaeSystem daeSystem) {
+    public DefaultDaeSystemStepSolver(IntegrationMethodRungeKutta intgMethod, DaeSystem daeSystem) {
         this.intgMethod = intgMethod;
         commitDaeSystem(daeSystem);
     }
 
     @NotNull
     @Override
-    public IntgMethod getIntgMethod() {
+    public IntegrationMethodRungeKutta getIntgMethod() {
         return intgMethod;
     }
 
@@ -123,7 +123,7 @@ public class DefaultDaeSystemStepSolver implements DaeSystemStepSolver {
             if (stages.length > 0)
                 odeStages = stages[odeIdx];
 
-            nextY[odeIdx] = getIntgMethod().nextY(
+            nextY[odeIdx] = getIntgMethod().getNextY().invoke(
                     fromPoint.getStep(),
                     odeStages,
                     fromPoint.getY()[odeIdx],

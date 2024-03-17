@@ -4,20 +4,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyProblem;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.demo.problems.FourDimensionalCauchyProblem;
 import ru.nstu.isma.intg.demo.problems.ReactionDiffusionCauchyProblem;
 import ru.nstu.isma.intg.demo.problems.TwoDimensionalCauchyProblem;
-import ru.nstu.isma.intg.lib.IntgMethodLibrary;
-import ru.nstu.isma.intg.lib.IntgMethodType;
-import ru.nstu.isma.intg.lib.rungeKutta.rk22.Rk2IntgMethod;
-import ru.nstu.isma.intg.lib.rungeKutta.rk3.Rk3IntgMethod;
-import ru.nstu.isma.intg.lib.rungeKutta.rkMerson.RkMersonIntgMethod;
 
 import static org.junit.Assert.assertNotNull;
 
 public class ComputeEngineClientIT {
+	private final IIntegrationMethodFactory eulerFactory = new ru.nstu.isma.intg.lib.euler.IntegrationMethodFactory();
+	private final IIntegrationMethodFactory rk22Factory = new ru.nstu.isma.intg.lib.rungeKutta.rk22.IntegrationMethodFactory();
+	private final IIntegrationMethodFactory rk3Factory = new ru.nstu.isma.intg.lib.rungeKutta.rk3.IntegrationMethodFactory();
+	private final IIntegrationMethodFactory rkmFactory = new ru.nstu.isma.intg.lib.rungeKutta.rkMerson.IntegrationMethodFactory();
 
 	private final ComputeEngineClient client = new ComputeEngineClient();
 
@@ -34,7 +33,7 @@ public class ComputeEngineClientIT {
 
 	@Test
 	public void test2DCauchyProblemWithEulerMethod() throws Exception {
-		IntgMethod method = IntgMethodLibrary.createMethod(IntgMethodType.EULER);
+		var method = eulerFactory.create();
 		CauchyProblem problem = new TwoDimensionalCauchyProblem();
 
         client.loadIntgMethod(method);
@@ -45,7 +44,7 @@ public class ComputeEngineClientIT {
 
 	@Test
 	public void test2DCauchyProblemWithRungeKutta22Method() throws Exception {
-		Rk2IntgMethod method = new Rk2IntgMethod();
+		var method = rk22Factory.create();
 		method.getAccuracyController().setAccuracy(0.01);
 
 		CauchyProblem problem = new TwoDimensionalCauchyProblem();
@@ -69,7 +68,7 @@ public class ComputeEngineClientIT {
 
 	@Test
 	public void test2DCauchyProblemWithRungeKutta3Method() throws Exception {
-		Rk3IntgMethod method = new Rk3IntgMethod();
+		var method = rk3Factory.create();
 		method.getAccuracyController().setAccuracy(0.01);
 
 		CauchyProblem problem = new TwoDimensionalCauchyProblem();
@@ -93,7 +92,7 @@ public class ComputeEngineClientIT {
 
 	@Test
 	public void test2DCauchyProblemWithRkMersonMethod() throws Exception {
-		RkMersonIntgMethod method = new RkMersonIntgMethod();
+		var method = rkmFactory.create();
 		method.getAccuracyController().setAccuracy(0.01);
 
 		CauchyProblem problem = new TwoDimensionalCauchyProblem();
@@ -110,7 +109,7 @@ public class ComputeEngineClientIT {
 
 	@Test
 	public void test4DCauchyProblemWithEulerMethod() throws Exception {
-		IntgMethod method = IntgMethodLibrary.createMethod(IntgMethodType.EULER);
+		var method = eulerFactory.create();
 		CauchyProblem problem = new FourDimensionalCauchyProblem();
 
         client.loadDaeSystem(problem.getDaeSystem());
@@ -121,7 +120,7 @@ public class ComputeEngineClientIT {
 
 	@Test
 	public void testReactionDiffusionCauchyProblemWithEulerMethod() throws Exception {
-		IntgMethod method = IntgMethodLibrary.createMethod(IntgMethodType.EULER);
+		var method = eulerFactory.create();
 		CauchyProblem problem = new ReactionDiffusionCauchyProblem(2, 2);
 
         client.loadDaeSystem(problem.getDaeSystem());
@@ -137,7 +136,7 @@ public class ComputeEngineClientIT {
 		double[] yForDe = problem.getCauchyInitials().getY0();
 
         double[][] rhs = client.calculateRhs(yForDe);
-        IntgPoint fromPoint = new IntgPoint(step, yForDe, rhs);
+        IntgPoint fromPoint = new IntgPoint(step, yForDe, rhs, new double[0][], step);
 
 		return client.step(fromPoint);
 	}

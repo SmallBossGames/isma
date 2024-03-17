@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.api.methods.StageCalculator;
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver;
@@ -21,7 +21,7 @@ public class ParallelDaeSystemStepSolver extends DefaultDaeSystemStepSolver {
 
     private static final Logger logger = LoggerFactory.getLogger(ParallelDaeSystemStepSolver.class);
 
-    public ParallelDaeSystemStepSolver(IntgMethod method, DaeSystem odes) {
+    public ParallelDaeSystemStepSolver(IntegrationMethodRungeKutta method, DaeSystem odes) {
         super(method, prepareOdeSystem(odes));
     }
 
@@ -58,7 +58,7 @@ public class ParallelDaeSystemStepSolver extends DefaultDaeSystemStepSolver {
             public double getSendingValue(DifferentialEquation ode) {
                 int odeIdx = ode.getIndex();
                 double[] odeStages = stages.length == 0 ? new double[0] : stages[odeIdx];
-                return getIntgMethod().nextY(
+                return getIntgMethod().getNextY().invoke(
                         fromPoint.getStep(),
                         odeStages,
                         fromPoint.getY()[odeIdx],

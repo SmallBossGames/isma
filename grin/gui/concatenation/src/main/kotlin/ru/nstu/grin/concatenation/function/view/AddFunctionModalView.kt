@@ -32,7 +32,7 @@ class AddFunctionModalView(
                 addNode("Function Name", model.functionNameProperty)
                 addNode("Line Size", model.functionLineSizeProperty)
                 addNode("Line Color", model.functionColorProperty)
-                addNode("Show As", FXCollections.observableList(LineType.values().toList()), model.functionLineTypeProperty){
+                addNode("Show As", FXCollections.observableList(LineType.entries), model.functionLineTypeProperty){
                     object : ListCell<LineType>() {
                         override fun updateItem(item: LineType?, empty: Boolean) {
                             super.updateItem(item, empty)
@@ -57,7 +57,7 @@ class AddFunctionModalView(
 
         val inputView = VBox(
             propertiesGrid {
-                addNode("Input Type", FXCollections.observableList(InputWay.values().toList()), model.inputWayProperty) {
+                addNode("Input Type", FXCollections.observableList(InputWay.entries), model.inputWayProperty) {
                     object: ListCell<InputWay>() {
                         override fun updateItem(item: InputWay?, empty: Boolean) {
                             super.updateItem(item, empty)

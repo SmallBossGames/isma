@@ -5,5 +5,5 @@ module isma.isma.next.integration.library.main {
 
     exports ru.nstu.isma.next.integration.services;
 
-    uses ru.nstu.isma.intg.api.methods.IntgMethod;
+    uses ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory;
 }

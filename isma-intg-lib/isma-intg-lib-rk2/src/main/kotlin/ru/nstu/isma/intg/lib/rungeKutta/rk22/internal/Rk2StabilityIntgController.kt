@@ -18,12 +18,10 @@ class Rk2StabilityIntgController : BaseStabilityIntgController() {
     public override fun getMaxJacobiEigenValue(point: IntgPoint): Double {
         val varCount = point.stages.size
         val deltaKs = DoubleArray(varCount)
-        var k1: Double
-        var k2: Double
 
         for (i in 0 until varCount) {
-            k1 = point.stages[i][0]
-            k2 = point.stages[i][1]
+            val k1 = point.stages[i][0]
+            val k2 = point.stages[i][1]
 
             if (k2 == k1) {
                 deltaKs[i] = 0.0

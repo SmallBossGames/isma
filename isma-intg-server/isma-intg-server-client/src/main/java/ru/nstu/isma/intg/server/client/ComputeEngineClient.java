@@ -9,7 +9,7 @@ import com.esotericsoftware.kryonet.rmi.RemoteObject;
 import com.google.common.base.Preconditions;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.server.ComputeEngine;
 import ru.nstu.isma.intg.server.RemoteObjects;
@@ -108,7 +108,7 @@ public class ComputeEngineClient {
         }
     }
 
-    public void loadIntgMethod(IntgMethod intgMethod) throws ComputeEngineClientException {
+    public void loadIntgMethod(IntegrationMethodRungeKutta intgMethod) throws ComputeEngineClientException {
         Preconditions.checkNotNull(intgMethod, "intgMethod cannot be null");
         LoadIntgMethodRequest request = new LoadIntgMethodRequest(serialize(intgMethod));
         invokeComputeEngine(() -> computeEngine.loadIntgMethod(client.getID(), request));

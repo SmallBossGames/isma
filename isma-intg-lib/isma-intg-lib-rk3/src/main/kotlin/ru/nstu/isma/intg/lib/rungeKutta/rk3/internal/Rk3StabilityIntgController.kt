@@ -19,14 +19,10 @@ class Rk3StabilityIntgController : BaseStabilityIntgController() {
         val varCount = point.stages.size
         val deltaKs = DoubleArray(varCount)
 
-        var k1: Double
-        var k2: Double
-        var k3: Double
-
         for (i in 0 until varCount) {
-            k1 = point.stages[i][0]
-            k2 = point.stages[i][1]
-            k3 = point.stages[i][2]
+            val k1 = point.stages[i][0]
+            val k2 = point.stages[i][1]
+            val k3 = point.stages[i][2]
 
             if (k2 == k1) deltaKs[i] = 0.0 // TODO: проверить корректность, может поэтому залипает?
             else deltaKs[i] = abs(k1 - 2.0 * k2 + k3) / abs(k2 - k1)

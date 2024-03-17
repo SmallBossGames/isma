@@ -2,7 +2,7 @@ package ru.nstu.isma.intg.server.client;
 
 import com.google.common.base.Throwables;
 import ru.nstu.isma.intg.api.calcmodel.DaeSystemChangeSet;
-import ru.nstu.isma.intg.api.methods.IntgMethod;
+import ru.nstu.isma.intg.api.methods.IntegrationMethodRungeKutta;
 import ru.nstu.isma.intg.api.methods.IntgPoint;
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver;
 
@@ -13,15 +13,15 @@ import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver;
 public class RemoteDaeSystemStepSolver implements DaeSystemStepSolver {
 
     private final ComputeEngineClient computeEngineClient;
-    private final IntgMethod intgMethod;
+    private final IntegrationMethodRungeKutta intgMethod;
 
-    public RemoteDaeSystemStepSolver(IntgMethod intgMethod, ComputeEngineClient computeEngineClient) {
+    public RemoteDaeSystemStepSolver(IntegrationMethodRungeKutta intgMethod, ComputeEngineClient computeEngineClient) {
         this.computeEngineClient = computeEngineClient;
         this.intgMethod = intgMethod;
     }
 
     @Override
-    public IntgMethod getIntgMethod() {
+    public IntegrationMethodRungeKutta getIntgMethod() {
         return intgMethod;
     }
 

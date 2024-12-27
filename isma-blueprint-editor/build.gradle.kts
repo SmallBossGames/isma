@@ -10,7 +10,7 @@ plugins {
 val moduleName by extra("isma.isma.blueprint.editor.main")
 
 javafx {
-    version = "21.0.1"
+    version = "23.0.1"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 

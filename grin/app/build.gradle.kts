@@ -12,7 +12,7 @@ java {
 val moduleName by extra("isma.grin.app.main")
 
 javafx {
-    version = "21.0.1"
+    version = "23.0.1"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 

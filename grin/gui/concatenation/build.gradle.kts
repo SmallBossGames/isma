@@ -21,5 +21,5 @@ dependencies {
 
     api(project(":grin:gui:common"))
     implementation(project(":grin:math"))
-    implementation(project(":isma-javafx-extensions"))
+    implementation(project(":isma-ui:toolkit"))
 }

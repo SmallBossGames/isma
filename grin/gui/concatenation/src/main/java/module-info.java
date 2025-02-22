@@ -3,7 +3,7 @@ module isma.grin.gui.concatenation.main {
     requires kotlinx.coroutines.core;
     requires kotlinx.coroutines.javafx;
     requires kotlinx.serialization.json;
-    requires isma.isma.javafx.extensions.main;
+    requires isma.ui.toolkit;
     requires javafx.graphics;
     requires javafx.controls;
     requires transitive isma.grin.gui.common.main;

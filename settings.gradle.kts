@@ -1,13 +1,15 @@
 rootProject.name = "isma"
 //JAVA 11+ projects
-include("isma-next-app")
+include("isma-ui:app")
+include("isma-ui:text-editor")
+include("isma-ui:blueprint-editor")
+include("isma-ui:toolkit")
+
 
 include("isma-next-core")
 include("isma-next-tools")
 include("isma-next-integration-library")
 include("isma-next-common-services")
-include("isma-blueprint-editor")
-include("isma-text-editor")
 
 include("grin:gui")
 include("grin:analytic-fu")
@@ -56,4 +58,3 @@ include("isma-next-math-common")
 include("isma-next-services-simulation-abstractions")
 include("isma-next-core-fdm")
 include("isma-next-core-simulation-gen")
-include("isma-javafx-extensions")

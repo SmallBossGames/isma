@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
 }
 
 group = "ru.nstu.isma.next"
@@ -16,17 +17,4 @@ dependencies {
     implementation (project(":isma-intg-lib:isma-intg-lib-rkfehlberg"))
 
     implementation("org.slf4j:slf4j-api:2.0.5")
-}
-
-val moduleName by extra("isma.isma.next.integration.library.main")
-
-
-tasks {
-    compileJava {
-        inputs.property("moduleName", moduleName)
-        options.compilerArgs = listOf(
-            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
-        )
-    }
-    //check { dependsOn(integTestTask) }
 }

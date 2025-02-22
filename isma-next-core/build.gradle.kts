@@ -3,8 +3,6 @@ plugins {
     alias(libs.plugins.java.modules)
 }
 
-val moduleName by extra("isma.isma.next.core.main")
-
 dependencies {
     implementation(project(":isma-next-core-simulation-gen"))
     implementation(project(":isma-hsm"))

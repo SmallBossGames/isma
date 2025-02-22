@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.java.modules)
 }
 
 group = "ru.nstu.isma"
@@ -12,15 +13,4 @@ repositories {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
-}
-
-val moduleName by extra("isma.isma.next.services.simulation.abstractions.main")
-
-tasks {
-    compileJava {
-        inputs.property("moduleName", moduleName)
-        options.compilerArgs = listOf(
-            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
-        )
-    }
 }

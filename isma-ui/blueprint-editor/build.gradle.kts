@@ -4,10 +4,8 @@ plugins {
 
     alias(libs.plugins.java.modules)
 
-     alias(libs.plugins.javafx)
+    alias(libs.plugins.javafx)
 }
-
-val moduleName by extra("isma.isma.blueprint.editor.main")
 
 javafx {
     version = "23.0.1"

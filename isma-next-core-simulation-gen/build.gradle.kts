@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
 }
 
 group = "ru.nstu.isma"
 version = "1.0.0"
-
-val moduleName by extra("isma.isma.next.core.simulation.gen.main")
 
 dependencies {
     implementation(libs.com.google.guava)
@@ -15,14 +14,4 @@ dependencies {
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-next-tools"))
     implementation(project(":isma-hsm"))
-}
-
-tasks {
-    compileJava {
-        inputs.property("moduleName", moduleName)
-        options.compilerArgs = listOf(
-            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
-        )
-    }
-    //check { dependsOn(integTestTask) }
 }

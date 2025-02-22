@@ -17,7 +17,7 @@ include("grin:analytic-fu")
 include("grin:math")
 include("grin:gui:concatenation")
 include("grin:gui:common")
-include("grin:app")
+include("grin:gui:app")
 
 //Java 8 projects
 include("isma-hsm")

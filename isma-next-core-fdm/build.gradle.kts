@@ -1,22 +1,11 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
 }
-
-val moduleName by extra("isma.isma.next.core.fdm.main")
 
 group = "ru.nstu.isma"
 version = "1.0.0"
 
 dependencies {
     implementation(project(":isma-hsm"))
-}
-
-tasks {
-    compileJava {
-        inputs.property("moduleName", moduleName)
-        options.compilerArgs = listOf(
-            "--patch-module", "$moduleName=${sourceSets.main.get().output.asPath}"
-        )
-    }
-    //check { dependsOn(integTestTask) }
 }

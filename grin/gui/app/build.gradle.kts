@@ -1,23 +1,11 @@
 plugins {
-     alias(libs.plugins.javafx)
     alias(libs.plugins.java.modules)
 
     application
 }
 
-java {
-    modularity.inferModulePath.set(false)
-}
-
-val moduleName by extra("isma.grin.app.main")
-
-javafx {
-    version = "23.0.1"
-    modules = listOf("javafx.controls", "javafx.fxml")
-}
-
 application {
-    mainModule.set("isma.grin.app.main")
+    mainModule.set("isma.grin.gui.app")
     mainClass.set("ru.nstu.isma.grin.launcher.LauncherKt")
 }
 

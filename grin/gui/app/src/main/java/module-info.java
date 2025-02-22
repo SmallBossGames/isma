@@ -1,4 +1,4 @@
-module isma.grin.app.main {
+module isma.grin.gui.app {
     requires kotlin.stdlib;
     requires koin.core.jvm;
     requires isma.grin.gui.concatenation.main;

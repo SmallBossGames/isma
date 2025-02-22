@@ -3,5 +3,4 @@ dependencies {
     implementation("org.apache.ignite:ignite-core:2.15.0")
     implementation(project(":isma-intg-demo-problems"))
     implementation(project(":isma-intg-api"))
-    implementation(project(":isma-intg-lib:isma-intg-lib-common"))
 }

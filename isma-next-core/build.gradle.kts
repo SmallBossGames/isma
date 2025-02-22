@@ -12,11 +12,7 @@ dependencies {
     implementation(project(":isma-next-tools"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-core"))
-    //implementation(project(":isma-intg-server:isma-intg-server-client"))
-    implementation(project(":isma-intg-lib:isma-intg-lib-common"))
     implementation(project(":isma-intg-lib:isma-intg-lib-euler"))
-
-    testImplementation (project(":isma-intg-lib:isma-intg-lib-common"))
 
     implementation ("org.apache.commons:commons-lang3:3.12.0")
     implementation ("org.apache.commons:commons-text:1.10.0")

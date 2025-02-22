@@ -5,4 +5,4 @@ import ru.nstu.isma.core.hsm.HSM
 sealed interface LismaTranslationResult
 
 class SuccessTranslation(val hsm: HSM) : LismaTranslationResult
-object FailedTranslation : LismaTranslationResult
+data object FailedTranslation : LismaTranslationResult

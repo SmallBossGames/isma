@@ -3,9 +3,9 @@ module isma.ui.editor.text {
     requires isma.isma.lisma.main;
     requires org.fxmisc.richtext;
     requires org.antlr.antlr4.runtime;
-    requires javafx.base;
     requires kotlinx.coroutines.core;
     requires kotlinx.coroutines.javafx;
+    requires javafx.graphics;
 
     exports ru.isma.next.editor.text;
     exports ru.isma.next.editor.text.services;

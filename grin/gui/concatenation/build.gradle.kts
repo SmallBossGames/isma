@@ -4,8 +4,8 @@ plugins {
 }
 
 dependencies {
-    implementation("org.apache.poi:poi:5.2.2")
-    implementation("org.apache.poi:poi-ooxml:5.2.2")
+    implementation("org.apache.poi:poi:5.4.0")
+    implementation("org.apache.poi:poi-ooxml:5.4.0")
     implementation("de.sciss:jwave:1.0.3")
 
     implementation(libs.tornadofx.core)

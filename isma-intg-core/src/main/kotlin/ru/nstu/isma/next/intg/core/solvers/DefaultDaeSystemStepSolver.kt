@@ -92,7 +92,7 @@ class DefaultDaeSystemStepSolver(
     override fun stages(fromPoint: IntgPoint): Array<DoubleArray> {
         val stageCalculators = intgMethod.stageCalculators
 
-        if (stageCalculators.isNullOrEmpty()) {
+        if (stageCalculators.isEmpty()) {
             return emptyArray()
         }
 

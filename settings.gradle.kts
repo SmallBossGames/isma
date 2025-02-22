@@ -23,7 +23,6 @@ include("grin:gui:app")
 include("isma-hsm")
 include("isma-intg-api")
 include("isma-intg-core")
-include("isma-intg-core-solvers-parallel")
 include("isma-intg-demo-problems")
 include("isma-intg-lib:isma-intg-lib-euler")
 include("isma-intg-lib:isma-intg-lib-rk2")
@@ -32,9 +31,6 @@ include("isma-intg-lib:isma-intg-lib-rk31")
 include("isma-intg-lib:isma-intg-lib-rkmerson")
 include("isma-intg-lib:isma-intg-lib-rkfehlberg")
 include("isma-lisma")
-
-include("isma-intg-parallel-ignite")
-
 
 // Java 8 legacy
 //include "grin:gui:simple"
@@ -52,6 +48,8 @@ include("isma-intg-parallel-ignite")
 //include("isma-intg-server:isma-intg-server-api")
 //include("isma-intg-server:isma-intg-server-client")
 //include("isma-intg-server:isma-intg-server-tests")
+//include("isma-intg-core-solvers-parallel")
+//include("isma-intg-parallel-ignite")
 
 include("isma-next-math-engine")
 include("isma-next-math-common")

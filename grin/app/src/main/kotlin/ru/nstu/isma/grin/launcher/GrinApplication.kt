@@ -34,7 +34,7 @@ class GrinApplication: Application(), KoinComponent {
         this.title = title
         this.scene = scene
 
-        icons.add(Image("/ru/nstu/grin/integration/isma-2016-title.png"))
+        icons.add(Image("isma-2016-title.png"))
 
         isMaximized = false
         height = 600.0

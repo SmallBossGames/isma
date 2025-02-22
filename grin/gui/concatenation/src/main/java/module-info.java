@@ -39,4 +39,5 @@ module isma.grin.gui.concatenation.main {
     exports ru.nstu.grin.concatenation.file;
     exports ru.nstu.grin.concatenation.file.options.view;
     exports ru.nstu.grin.concatenation.function.service;
+    exports ru.nstu.grin.concatenation;
 }

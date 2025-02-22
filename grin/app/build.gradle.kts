@@ -24,7 +24,7 @@ application {
 dependencies {
     implementation(libs.koin.core)
 
-    implementation(project(":grin:integration"))
+    implementation(project(":grin:gui:concatenation"))
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

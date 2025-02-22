@@ -1,4 +1,4 @@
-package ru.nstu.grin.integration
+package ru.nstu.grin.concatenation
 
 import org.koin.core.module.dsl.scopedOf
 import org.koin.dsl.module
@@ -256,8 +256,4 @@ val grinGuiModule = module {
         scopedOf(::FunctionWaveletView)
         scopedOf(::FunctionWaveletViewModel)
     }
-}
-
-val grinIntegrationModule = module {
-    single { GrinIntegrationFacade() }
 }

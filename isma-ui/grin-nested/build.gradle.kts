@@ -1,13 +1,12 @@
 plugins {
-     alias(libs.plugins.javafx)
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.java.modules)
+    alias(libs.plugins.javafx)
 }
-
-val moduleName by extra("isma.grin.integration.main")
 
 javafx {
     version = "23.0.1"
-    modules = listOf("javafx.controls", "javafx.graphics")
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 dependencies {

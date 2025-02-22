@@ -49,9 +49,9 @@ dependencies {
     implementation(project(":isma-ui:blueprint-editor"))
     implementation(project(":isma-ui:text-editor"))
     implementation(project(":isma-ui:toolkit"))
+    implementation(project(":isma-ui:grin-nested"))
     implementation(project(":isma-next-services-simulation-abstractions"))
 
-    implementation(project(":grin:integration"))
 
     api(project(":isma-intg-core"))
     //api(project(":isma-intg-server:isma-intg-server-client"))

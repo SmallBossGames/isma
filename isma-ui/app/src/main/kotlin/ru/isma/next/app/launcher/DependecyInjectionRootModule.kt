@@ -3,8 +3,7 @@ package ru.isma.next.app.launcher
 import org.koin.core.context.GlobalContext.startKoin
 import ru.isma.next.app.services.koin.*
 import ru.isma.next.app.views.koin.*
-import ru.nstu.grin.integration.grinIntegrationModule
-import ru.nstu.grin.integration.grinGuiModule
+import ru.nstu.grin.integration.grinNestedModule
 
 fun ismaKoinStart() = startKoin {
     modules(
@@ -14,8 +13,7 @@ fun ismaKoinStart() = startKoin {
     )
 
     modules(
-        grinGuiModule,
-        grinIntegrationModule,
+        grinNestedModule,
     )
 
     modules(

@@ -4,6 +4,7 @@ include("isma-ui:app")
 include("isma-ui:text-editor")
 include("isma-ui:blueprint-editor")
 include("isma-ui:toolkit")
+include("isma-ui:grin-nested")
 
 
 include("isma-next-core")
@@ -16,7 +17,6 @@ include("grin:analytic-fu")
 include("grin:math")
 include("grin:gui:concatenation")
 include("grin:gui:common")
-include("grin:integration")
 include("grin:app")
 
 //Java 8 projects

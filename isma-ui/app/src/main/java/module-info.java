@@ -18,7 +18,7 @@ module isma.ui.app {
     requires isma.ui.editor.text;
     requires isma.ui.editor.blueprint;
     requires isma.ui.toolkit;
-    requires isma.grin.integration.main;
+    requires isma.ui.grin.nested;
     requires org.controlsfx.controls;
 
     exports ru.isma.next.app.launcher;

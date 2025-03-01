@@ -3,5 +3,5 @@ dependencies {
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-core"))
     implementation(libs.com.google.guava)
-    implementation(libs.slf4j.api)
+    implementation("org.slf4j:slf4j-api:2.0.5")
 }

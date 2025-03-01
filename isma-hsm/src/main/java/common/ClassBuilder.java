@@ -41,9 +41,7 @@ public abstract class ClassBuilder<T> {
             var classLoader = manager.getClassLoader(null);
             return (T) classLoader.loadClass(pack + name).getConstructor().newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
-            // todo errorlist
         }
     }
 }

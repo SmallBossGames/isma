@@ -2,7 +2,6 @@ package ru.nstu.isma.core.hsm.linear;
 
 import common.ClassBuilder;
 import common.JavaClassBuilder;
-import ru.nstu.isma.core.hsm.HSM;
 import common.IndexMapper;
 
 /**

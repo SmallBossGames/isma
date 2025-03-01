@@ -12,20 +12,11 @@ import ru.nstu.isma.intg.api.methods.IntgPoint
  * @since 08.12.2014
  */
 interface DaeSystemStepSolver {
-    val intgMethod: IntegrationMethodRungeKutta
     fun apply(changeSet: DaeSystemChangeSet?)
     fun calculateRhs(yForDe: DoubleArray): Array<DoubleArray>
     fun step(fromPoint: IntgPoint): IntgPoint
     fun stages(fromPoint: IntgPoint): Array<DoubleArray>
     fun dispose()
-}
-
-fun DaeSystemStepSolver.use(op: DaeSystemStepSolver.() -> Unit) {
-    try {
-        op()
-    } finally {
-        dispose()
-    }
 }
 
 suspend inline fun <T> DaeSystemStepSolver.useAsync(crossinline op: suspend DaeSystemStepSolver.() -> T) = coroutineScope {

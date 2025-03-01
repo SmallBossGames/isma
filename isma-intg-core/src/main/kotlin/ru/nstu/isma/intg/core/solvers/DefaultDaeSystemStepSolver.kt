@@ -12,15 +12,11 @@ import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
  * @since 01.09.14
  */
 class DefaultDaeSystemStepSolver(
-    override val intgMethod: IntegrationMethodRungeKutta,
-    daeSystem: DaeSystem
+    private val intgMethod: IntegrationMethodRungeKutta,
+    private var daeSystem: DaeSystem
 ) : DaeSystemStepSolver {
-    var daeSystem: DaeSystem = daeSystem
-        private set
-    var stepCalculationCount: Long = 0
-        private set
-    var rhsCalculationCount: Long = 0
-        private set
+    private var stepCalculationCount = 0L
+    private var rhsCalculationCount: Long = 0L
     private var deCalculator: DifferentialEquationsCalculator? = null
     private var aeCalculator: AlgebraicEquationCalculator? = null
 

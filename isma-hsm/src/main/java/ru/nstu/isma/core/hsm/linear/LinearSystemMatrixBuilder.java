@@ -10,15 +10,10 @@ import common.IndexMapper;
  * on 14.03.2015.
  */
 public class LinearSystemMatrixBuilder extends ClassBuilder<LinearSystemMatrix> {
-
+    private final IndexMapper modelContext;
     public LinearSystemMatrixBuilder(IndexMapper modelContext) {
-        super(modelContext);
+        this.modelContext = modelContext;
     }
-
-    public LinearSystemMatrixBuilder(HSM hsm) {
-        super(hsm);
-    }
-
 
     public LinearSystemMatrix build(String name, boolean printJava) {
         return super.build(name, "ru.nstu.isma.core.hsm.linear.", printJava);

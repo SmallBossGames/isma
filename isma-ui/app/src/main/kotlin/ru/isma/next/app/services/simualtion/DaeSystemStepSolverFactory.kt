@@ -4,7 +4,7 @@ import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
-import ru.nstu.isma.next.intg.core.solvers.DefaultDaeSystemStepSolver
+import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 
 class DaeSystemStepSolverFactory(
     private val integrationMethodProvider: IIntegrationMethodProvider,

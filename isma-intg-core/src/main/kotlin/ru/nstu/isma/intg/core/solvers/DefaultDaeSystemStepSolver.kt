@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.intg.core.solvers
+package ru.nstu.isma.intg.core.solvers
 
 import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquationCalculator
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem

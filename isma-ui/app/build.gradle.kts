@@ -26,6 +26,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.koin.core)
     implementation(libs.tornadofx.core)
+    implementation(libs.logback.classic)
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
     implementation("org.controlsfx:controlsfx:11.1.2")

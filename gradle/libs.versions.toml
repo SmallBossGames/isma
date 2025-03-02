@@ -1,7 +1,7 @@
 [versions]
 kotlinx-coroutines = "1.10.1"
-kotlin-plugin = "2.1.0"
-kotlinx-serialization-json = "1.7.3"
+kotlin-plugin = "2.1.10"
+kotlinx-serialization-json = "1.8.0"
 javafx-plugin = "0.1.0"
 
 [libraries]
@@ -16,6 +16,7 @@ tornadofx-core = { module = "no.tornado:tornadofx", version = "1.7.20" }
 com-google-guava = { module = "com.google.guava:guava", version = "33.0.0-jre" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version = "26.0.2" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.5" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.17" }
 junit = { module = "junit:junit", version = "4.13.2" }
 
 [plugins]

@@ -1,6 +1,6 @@
 package ru.isma.next.app.services.simualtion
 
-import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
+import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.DefaultEventDetector
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory
 

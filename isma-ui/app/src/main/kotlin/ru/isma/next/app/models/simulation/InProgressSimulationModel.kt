@@ -3,7 +3,6 @@ package ru.isma.next.app.models.simulation
 import javafx.beans.property.SimpleDoubleProperty
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
-import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import java.util.concurrent.atomic.AtomicReference
 
 class InProgressSimulationModel(

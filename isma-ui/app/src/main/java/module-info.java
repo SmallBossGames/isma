@@ -9,7 +9,6 @@ module isma.ui.app {
     requires kotlinx.coroutines.javafx;
     requires isma.isma.next.core.simulation.gen.main;
     requires isma.isma.intg.api.main;
-    requires isma.isma.next.services.simulation.abstractions.main;
     requires isma.isma.next.integration.library.main;
     requires isma.isma.next.core.main;
     requires isma.isma.lisma.main;

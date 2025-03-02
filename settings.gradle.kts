@@ -56,5 +56,4 @@ include("isma-intg-demo-problems")
 
 include("isma-next-math-engine")
 include("isma-next-math-common")
-include("isma-next-services-simulation-abstractions")
 include("isma-compiler:hsm-generator-jvm")

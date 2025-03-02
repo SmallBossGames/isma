@@ -7,8 +7,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.isma.next.app.constants.SIMULATION_PARAMETERS_FILE
 import ru.isma.next.app.viewmodels.*
-import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
-import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
+import ru.isma.next.app.models.simulation.SaveTarget
+import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 
 class SimulationParametersService(library: IntegrationMethodsLibrary) {

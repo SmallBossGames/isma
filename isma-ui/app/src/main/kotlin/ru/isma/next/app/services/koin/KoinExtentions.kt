@@ -12,8 +12,8 @@ import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.*
 import ru.isma.next.editor.text.services.EditorPlatformService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
-import ru.isma.next.services.simulation.abstractions.enumerables.SaveTarget
-import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
+import ru.isma.next.app.models.simulation.SaveTarget
+import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.lisma.InputTranslator
 import ru.nstu.isma.lisma.LismaTranslator

@@ -4,7 +4,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
-import ru.isma.next.services.simulation.abstractions.models.IntegrationMethodParametersModel
+import ru.isma.next.app.models.simulation.IntegrationMethodParametersModel
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 

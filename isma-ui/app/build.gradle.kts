@@ -40,7 +40,6 @@ dependencies {
     implementation(project(":isma-ui:text-editor"))
     implementation(project(":isma-ui:toolkit"))
     implementation(project(":isma-ui:grin-nested"))
-    implementation(project(":isma-next-services-simulation-abstractions"))
     implementation(project(":isma-solver:lib-utils"))
     implementation(project(":isma-solver:lib-meta"))
 

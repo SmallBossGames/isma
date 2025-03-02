@@ -7,9 +7,8 @@ dependencies {
     implementation(project(":isma-compiler:hsm-generator-jvm"))
     implementation(project(":isma-compiler:hsm-core"))
     implementation(project(":isma-compiler:lisma-translator-hsm"))
-    implementation(project(":isma-intg-api"))
-    implementation(project(":isma-intg-core"))
-    implementation(project(":isma-intg-lib:isma-intg-lib-euler"))
+    implementation(project(":isma-solver:api"))
+    implementation(project(":isma-solver:core"))
 
     implementation ("org.apache.commons:commons-lang3:3.12.0")
     implementation ("org.apache.commons:commons-text:1.10.0")

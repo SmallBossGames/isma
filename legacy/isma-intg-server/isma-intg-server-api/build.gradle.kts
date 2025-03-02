@@ -1,4 +1,4 @@
 dependencies {
-    implementation(project(":isma-intg-api"))
+    implementation(project(":isma-solver:api"))
     implementation(libs.com.google.guava)
 }

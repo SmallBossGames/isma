@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     implementation (project(":isma-intg-server:isma-intg-server-api"))
-    implementation (project(":isma-intg-api"))
+    implementation (project(":isma-solver:api"))
 
     implementation(libs.com.google.guava)
     implementation ("com.esotericsoftware:kryonet:2.22.0-RC1")

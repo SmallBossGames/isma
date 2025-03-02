@@ -35,15 +35,16 @@ dependencies {
     implementation(project(":isma-compiler:hsm-generator-jvm"))
     implementation(project(":isma-compiler:lisma-translator-hsm"))
     implementation(project(":isma-next-core"))
-    implementation(project(":isma-intg-api"))
+    implementation(project(":isma-solver:api"))
     implementation(project(":isma-ui:blueprint-editor"))
     implementation(project(":isma-ui:text-editor"))
     implementation(project(":isma-ui:toolkit"))
     implementation(project(":isma-ui:grin-nested"))
     implementation(project(":isma-next-services-simulation-abstractions"))
-    implementation(project(":isma-next-integration-library"))
+    implementation(project(":isma-solver:lib-utils"))
+    implementation(project(":isma-solver:lib-meta"))
 
 
-    api(project(":isma-intg-core"))
+    api(project(":isma-solver:core"))
     //api(project(":isma-intg-server:isma-intg-server-client"))
 }

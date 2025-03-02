@@ -1,3 +1,3 @@
 dependencies {
-    implementation(project(":isma-intg-api"))
+    implementation(project(":isma-solver:api"))
 }

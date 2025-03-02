@@ -6,9 +6,7 @@ include("isma-ui:blueprint-editor")
 include("isma-ui:toolkit")
 include("isma-ui:grin-nested")
 
-
 include("isma-next-core")
-include("isma-next-integration-library")
 
 include("grin:gui")
 include("grin:analytic-fu")
@@ -22,16 +20,20 @@ include("isma-compiler:hsm-fdm")
 include("isma-compiler:lisma-translator-hsm")
 include("isma-compiler:jvm-utils")
 
+include("isma-solver:api")
+include("isma-solver:core")
+include("isma-solver:lib-utils")
+include("isma-solver:lib-meta")
+include("isma-solver:lib:euler")
+include("isma-solver:lib:rk2")
+include("isma-solver:lib:rk3")
+include("isma-solver:lib:rk31")
+include("isma-solver:lib:rkmerson")
+include("isma-solver:lib:rkfehlberg")
+
 //Java 8 projects
-include("isma-intg-api")
-include("isma-intg-core")
 include("isma-intg-demo-problems")
-include("isma-intg-lib:isma-intg-lib-euler")
-include("isma-intg-lib:isma-intg-lib-rk2")
-include("isma-intg-lib:isma-intg-lib-rk3")
-include("isma-intg-lib:isma-intg-lib-rk31")
-include("isma-intg-lib:isma-intg-lib-rkmerson")
-include("isma-intg-lib:isma-intg-lib-rkfehlberg")
+
 
 // Java 8 legacy
 //include "grin:gui:simple"

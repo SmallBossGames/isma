@@ -6,8 +6,8 @@ dependencies {
     testImplementation(project(":isma-intg-lib:isma-intg-lib-rk3"))
     testImplementation(project(":isma-intg-lib:isma-intg-lib-rkmerson"))
 
-    implementation(project(":isma-intg-api"))
-    implementation(project(":isma-intg-core"))
+    implementation(project(":isma-solver:api"))
+    implementation(project(":isma-solver:core"))
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("com.tngtech.java:junit-dataprovider:1.13.1")

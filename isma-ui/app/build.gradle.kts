@@ -31,9 +31,9 @@ dependencies {
     implementation("org.controlsfx:controlsfx:11.1.2")
 
     implementation(project(":isma-compiler:hsm-core"))
-    implementation(project(":isma-next-core-fdm"))
-    implementation(project(":isma-compiler:hsm-jvm-generator"))
-    implementation(project(":isma-compiler:lisma-hsm-translator"))
+    implementation(project(":isma-compiler:hsm-fdm"))
+    implementation(project(":isma-compiler:hsm-generator-jvm"))
+    implementation(project(":isma-compiler:lisma-translator-hsm"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-ui:blueprint-editor"))

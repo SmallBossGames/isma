@@ -4,9 +4,9 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":isma-compiler:hsm-jvm-generator"))
+    implementation(project(":isma-compiler:hsm-generator-jvm"))
     implementation(project(":isma-compiler:hsm-core"))
-    implementation(project(":isma-compiler:lisma-hsm-translator"))
+    implementation(project(":isma-compiler:lisma-translator-hsm"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-core"))
     implementation(project(":isma-intg-lib:isma-intg-lib-euler"))

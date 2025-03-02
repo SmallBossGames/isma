@@ -18,7 +18,8 @@ include("grin:gui:common")
 include("grin:gui:app")
 
 include("isma-compiler:hsm-core")
-include("isma-compiler:lisma-hsm-translator")
+include("isma-compiler:hsm-fdm")
+include("isma-compiler:lisma-translator-hsm")
 include("isma-compiler:jvm-utils")
 
 //Java 8 projects
@@ -54,5 +55,4 @@ include("isma-intg-lib:isma-intg-lib-rkfehlberg")
 include("isma-next-math-engine")
 include("isma-next-math-common")
 include("isma-next-services-simulation-abstractions")
-include("isma-next-core-fdm")
-include("isma-compiler:hsm-jvm-generator")
+include("isma-compiler:hsm-generator-jvm")

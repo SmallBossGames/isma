@@ -10,7 +10,7 @@ javafx {
 }
 
 dependencies {
-    implementation(project(":isma-compiler:lisma-hsm-translator"))
+    implementation(project(":isma-compiler:lisma-translator-hsm"))
 
     implementation(libs.fxmisc.richtext.core)
     implementation(libs.antlr4.runtime)

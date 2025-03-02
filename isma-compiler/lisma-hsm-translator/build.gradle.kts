@@ -6,7 +6,7 @@ plugins {
 dependencies {
     implementation(libs.antlr4.runtime)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
 
-    implementation(project(":isma-hsm"))
+    implementation(project(":isma-compiler:hsm-core"))
 }

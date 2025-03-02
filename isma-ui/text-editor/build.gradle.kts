@@ -11,7 +11,7 @@ javafx {
 
 dependencies {
     implementation(project(":isma-next-common-services"))
-    implementation(project(":isma-lisma"))
+    implementation(project(":isma-compiler:lisma-hsm-translator"))
 
     implementation(libs.fxmisc.richtext.core)
     implementation(libs.antlr4.runtime)

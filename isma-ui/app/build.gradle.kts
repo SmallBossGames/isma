@@ -30,10 +30,10 @@ dependencies {
     implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
     implementation("org.controlsfx:controlsfx:11.1.2")
 
-    implementation(project(":isma-hsm"))
+    implementation(project(":isma-compiler:hsm-core"))
     implementation(project(":isma-next-core-fdm"))
-    implementation(project(":isma-next-core-simulation-gen"))
-    implementation(project(":isma-lisma"))
+    implementation(project(":isma-compiler:hsm-jvm-generator"))
+    implementation(project(":isma-compiler:lisma-hsm-translator"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-next-common-services"))

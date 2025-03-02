@@ -13,5 +13,5 @@ dependencies {
 
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-next-tools"))
-    implementation(project(":isma-hsm"))
+    implementation(project(":isma-compiler:hsm-core"))
 }

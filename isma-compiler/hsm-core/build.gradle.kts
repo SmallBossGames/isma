@@ -10,5 +10,5 @@ dependencies {
     implementation(libs.slf4j.api)
     implementation(libs.jetbrains.annotations)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
 }

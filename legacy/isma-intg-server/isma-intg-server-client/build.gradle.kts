@@ -9,7 +9,7 @@ dependencies {
     implementation(libs.com.google.guava)
     implementation ("com.esotericsoftware:kryonet:2.22.0-RC1")
 
-    testImplementation ("junit:junit:4.13.2")
+    testImplementation (libs.junit)
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")
     testImplementation ("mpj:mpj:0.43")
     testImplementation ("ch.qos.logback:logback-classic:1.4.7")

@@ -4,9 +4,9 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":isma-next-core-simulation-gen"))
-    implementation(project(":isma-hsm"))
-    implementation(project(":isma-lisma"))
+    implementation(project(":isma-compiler:hsm-jvm-generator"))
+    implementation(project(":isma-compiler:hsm-core"))
+    implementation(project(":isma-compiler:lisma-hsm-translator"))
     implementation(project(":isma-next-tools"))
     implementation(project(":isma-intg-api"))
     implementation(project(":isma-intg-core"))
@@ -20,7 +20,7 @@ dependencies {
 
     implementation (libs.koin.core)
 
-    testImplementation ("junit:junit:4.13.2")
+    testImplementation (libs.junit)
     testImplementation ("com.tngtech.java:junit-dataprovider:1.13.1")
     testImplementation ("com.github.jbellis:jamm:0.3.3")
 }

@@ -20,7 +20,7 @@ include("grin:gui:common")
 include("grin:gui:app")
 
 //Java 8 projects
-include("isma-hsm")
+include("isma-compiler:hsm-core")
 include("isma-intg-api")
 include("isma-intg-core")
 include("isma-intg-demo-problems")
@@ -30,7 +30,7 @@ include("isma-intg-lib:isma-intg-lib-rk3")
 include("isma-intg-lib:isma-intg-lib-rk31")
 include("isma-intg-lib:isma-intg-lib-rkmerson")
 include("isma-intg-lib:isma-intg-lib-rkfehlberg")
-include("isma-lisma")
+include("isma-compiler:lisma-hsm-translator")
 
 // Java 8 legacy
 //include "grin:gui:simple"
@@ -55,4 +55,4 @@ include("isma-next-math-engine")
 include("isma-next-math-common")
 include("isma-next-services-simulation-abstractions")
 include("isma-next-core-fdm")
-include("isma-next-core-simulation-gen")
+include("isma-compiler:hsm-jvm-generator")

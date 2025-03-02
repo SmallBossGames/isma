@@ -7,5 +7,5 @@ group = "ru.nstu.isma"
 version = "1.0.0"
 
 dependencies {
-    implementation(project(":isma-hsm"))
+    implementation(project(":isma-compiler:hsm-core"))
 }

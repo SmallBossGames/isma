@@ -12,6 +12,6 @@ dependencies {
     implementation ("org.slf4j:slf4j-api:2.0.5")
 
     implementation(project(":isma-intg-api"))
-    implementation(project(":isma-next-tools"))
+    implementation(project(":isma-compiler:jvm-utils"))
     implementation(project(":isma-compiler:hsm-core"))
 }

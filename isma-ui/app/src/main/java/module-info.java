@@ -13,7 +13,6 @@ module isma.ui.app {
     requires isma.isma.next.integration.library.main;
     requires isma.isma.next.core.main;
     requires isma.isma.lisma.main;
-    requires isma.isma.next.common.services.main;
     requires isma.isma.next.core.fdm.main;
     requires isma.ui.editor.text;
     requires isma.ui.editor.blueprint;

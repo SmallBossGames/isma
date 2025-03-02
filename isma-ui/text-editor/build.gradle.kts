@@ -10,7 +10,6 @@ javafx {
 }
 
 dependencies {
-    implementation(project(":isma-next-common-services"))
     implementation(project(":isma-compiler:lisma-hsm-translator"))
 
     implementation(libs.fxmisc.richtext.core)

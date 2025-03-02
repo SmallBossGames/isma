@@ -2,9 +2,6 @@ package ru.isma.next.app.services.project
 
 import ru.isma.next.app.services.ModelErrorService
 import ru.nstu.isma.core.hsm.models.IsmaErrorList
-import ru.isma.next.common.services.lisma.models.FailedTranslation
-import ru.isma.next.common.services.lisma.models.LismaTranslationResult
-import ru.isma.next.common.services.lisma.models.SuccessTranslation
 import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.models.projects.LismaTextModel
 import ru.nstu.isma.core.hsm.models.IsmaSemanticError
@@ -16,7 +13,7 @@ class LismaPdeService(
     private val translator: InputTranslator,
     private val modelService: ModelErrorService
 ) {
-    fun translateLisma(sourceSnapshot: LismaTextModel): LismaTranslationResult {
+    fun translateLisma(sourceSnapshot: LismaTextModel): LismaPdeTranslationResult {
         val errors = IsmaErrorList()
         val model = translator.translate(sourceSnapshot.fullText, errors)
 

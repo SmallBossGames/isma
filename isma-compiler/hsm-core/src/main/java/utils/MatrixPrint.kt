@@ -1,4 +1,4 @@
-package ru.nstu.isma.print
+package utils
 
 /**
  * Created by Bessonov Alex

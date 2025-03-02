@@ -36,7 +36,6 @@ dependencies {
     implementation(project(":isma-compiler:lisma-hsm-translator"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-intg-api"))
-    implementation(project(":isma-next-common-services"))
     implementation(project(":isma-ui:blueprint-editor"))
     implementation(project(":isma-ui:text-editor"))
     implementation(project(":isma-ui:toolkit"))

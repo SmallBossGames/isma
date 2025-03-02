@@ -1,7 +1,6 @@
 package ru.nstu.isma.lisma.parser
 
 import ru.nstu.isma.lisma.analysis.gen.LismaParser.Spatial_var_boundContext
-import ru.nstu.isma.lisma.parser.InternalConstUtil
 import java.util.*
 
 /**

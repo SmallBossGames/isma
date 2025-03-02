@@ -9,7 +9,7 @@ import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.services.koin.SimulationScope
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.common.services.lisma.models.SuccessTranslation
+import ru.isma.next.app.services.project.SuccessTranslation
 import ru.isma.next.services.simulation.abstractions.models.CauchyInitialsModel
 import ru.isma.next.services.simulation.abstractions.models.SimulationParametersModel
 import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials

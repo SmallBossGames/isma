@@ -1,11 +1,9 @@
 package ru.nstu.isma.next.core.simulation.gen
 
 import com.google.common.collect.HashBiMap
-import com.google.common.collect.ImmutableMap
+import common.IndexProvider
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
-import common.IndexProvider
-import org.apache.commons.text.StringSubstitutor
 
 /**
  * Генератор индексов для уравнений в расчетной модели.
@@ -20,33 +18,23 @@ class EquationIndexProvider(hsm: HSM) : IndexProvider {
 
     /** Возвращает строку вида y[index] для ДУ, соответствующую уравнению по указанному код из HSM.  */
     override fun getDifferentialArrayCode(code: String): String {
-        val template = "\${deArrayName}[\${deIndex}]"
-        val sub = StringSubstitutor(ImmutableMap.of(
-            "deArrayName", DE_ARRAY_NAME,
-            "deIndex", deIndices[code]
-        ))
-        return sub.replace(template)
+        return """
+            $DE_ARRAY_NAME[${deIndices[code]}]
+        """.trimIndent()
     }
 
     /** Возвращает строку вида а.getValue(index) для АУ, соответствующей уравнению по указанному код из HSM.  */
     override fun getAlgebraicArrayCode(code: String): String {
-        val template = "\${aeArrayName}.getValue(\${aeIndex})"
-        val sub = StringSubstitutor(ImmutableMap.of(
-            "aeArrayName", AE_RESULT_PROVIDER_NAME,
-            "aeIndex", aeIndices[code]
-        ))
-        return sub.replace(template)
+        return """
+            $AE_RESULT_PROVIDER_NAME.getValue(${aeIndices[code]})
+        """.trimIndent()
     }
 
     /** Возвращает строку вида rhs[rhsAeIndex][index] для АУ в ДУ, соответствующей уравнению по указанному коду из HSM.  */
     override fun getAlgebraicArrayCodeForDifferentialEquation(aeCode: String): String {
-        val template = "\${deRhsArrayName}[\${rhsAeIndex}][\${aeIndex}]"
-        val sub = StringSubstitutor(ImmutableMap.of(
-            "deRhsArrayName", DE_RHS_ARRAY_NAME,
-            "rhsAeIndex", DaeSystem.RHS_AE_PART_IDX,
-            "aeIndex", aeIndices[aeCode]
-        ))
-        return sub.replace(template)
+        return """
+            $DE_RHS_ARRAY_NAME[${DaeSystem.RHS_AE_PART_IDX}][${aeIndices[aeCode]}]
+        """.trimIndent()
     }
 
     /** Возвращает сгенерированный индекс ДУ для указанного кода из HSM.  */

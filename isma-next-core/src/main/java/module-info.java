@@ -13,7 +13,6 @@ module isma.isma.next.core.main {
     requires transitive isma.isma.next.core.simulation.gen.main;
     requires kotlinx.coroutines.core;
     requires transitive isma.isma.intg.core.main;
-    requires org.apache.commons.text;
     requires com.google.common;
     requires java.compiler;
     requires org.slf4j;

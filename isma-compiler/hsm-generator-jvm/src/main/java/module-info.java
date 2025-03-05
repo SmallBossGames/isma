@@ -8,5 +8,4 @@ module isma.isma.next.core.simulation.gen.main {
     requires isma.isma.next.tools.main;
     requires java.compiler;
     requires org.slf4j;
-    requires org.apache.commons.text;
 }

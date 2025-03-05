@@ -11,8 +11,7 @@ dependencies {
     implementation(project(":isma-solver:core"))
 
     implementation ("org.apache.commons:commons-lang3:3.12.0")
-    implementation ("org.apache.commons:commons-text:1.10.0")
-    implementation ("org.slf4j:slf4j-api:2.0.5")
+    implementation(libs.slf4j.api)
     implementation(libs.com.google.guava)
     implementation(libs.kotlinx.coroutines.core)
 

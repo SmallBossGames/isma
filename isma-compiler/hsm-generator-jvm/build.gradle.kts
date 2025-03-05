@@ -8,8 +8,7 @@ version = "1.0.0"
 
 dependencies {
     implementation(libs.com.google.guava)
-    implementation ("org.apache.commons:commons-text:1.10.0")
-    implementation ("org.slf4j:slf4j-api:2.0.5")
+    implementation(libs.slf4j.api)
 
     implementation(project(":isma-solver:api"))
     implementation(project(":isma-compiler:jvm-utils"))

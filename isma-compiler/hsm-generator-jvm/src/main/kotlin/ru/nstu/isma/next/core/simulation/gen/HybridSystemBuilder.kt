@@ -23,10 +23,10 @@ import java.util.*
  */
 class HybridSystemBuilder {
     /** Компоновщики состояний гибридной системы  */
-    private val stateBuilders: MutableMap<String?, StateBuilder>
+    private val stateBuilders: MutableMap<String?, StateBuilder> = HashMap()
 
     /** Компоновщики псевдосостояний гибридной системы (например, предикаты условных блоков)  */
-    private val pseudoStateBuilders: MutableMap<String?, StateBuilder>
+    private val pseudoStateBuilders: MutableMap<String?, StateBuilder> = HashMap()
 
     /**
      * Добавляет новое состояние.
@@ -78,10 +78,5 @@ class HybridSystemBuilder {
         val aes = initStateAes.toTypedArray()
         val daeSystem = DaeSystem(des, aes)
         return HybridSystem(daeSystem, states, pseudoStates)
-    }
-
-    init {
-        stateBuilders = HashMap()
-        pseudoStateBuilders = HashMap()
     }
 }

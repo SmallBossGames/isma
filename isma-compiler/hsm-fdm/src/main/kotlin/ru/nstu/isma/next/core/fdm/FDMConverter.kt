@@ -6,276 +6,322 @@ import ru.nstu.isma.core.hsm.`var`.pde.HMBoundaryCondition
 import ru.nstu.isma.core.hsm.`var`.pde.HMPartialDerivativeEquation
 import ru.nstu.isma.core.hsm.`var`.pde.HMSampledSpatialVariable
 import ru.nstu.isma.core.hsm.exp.*
+import ru.nstu.isma.core.hsm.service.PDEInitialValueCalculator
 import java.lang.StringBuilder
 import java.util.*
 import java.util.function.Consumer
 
 /**
- * Created by Bessonov Alex
- * Date: 12.12.13
- * Time: 1:53
- * преобразует модель с ДУЧП в модель с ОДУ
+ * Created by Bessonov Alex on 02.03.14.
  */
-@Deprecated("Use FDMNewConverter instead")
-class FDMConverter(model: HSM) {
-    private val model: HSM = model
-    private val variableTable: HMVariableTable = model.variableTable
-    private val apxVars: LinkedList<HMSampledSpatialVariable> = LinkedList<HMSampledSpatialVariable>()
-    private val notApx: HashSet<HMVariable> = HashSet<HMVariable>()
-    private val apxEq: HashSet<HMEquation> = HashSet<HMEquation>()
+class FDMConverter(private val model: HSM?) {
+    private val approximatedVariables: LinkedList<HMSampledSpatialVariable> = LinkedList<HMSampledSpatialVariable>()
+    private val approximatedEquations: LinkedList<HMEquation> = LinkedList<HMEquation>()
+    private val notApproximated: LinkedList<HMVariable> = LinkedList<HMVariable>()
     private var indexIterator: FDMIndexIterator? = null
-    fun convert(): HSM {
-        // подготавливаем контекст аппроксимации - информацию для построения сетки
-        prepare()
-
-        // совершаем полный обход всех индексов
-        indexIterator!!.start()
-        processGridNode()
-        do {
-            indexIterator!!.next()
-            processGridNode()
-        } while (!indexIterator!!.atEnd())
-
-        // убираем края и строим разностные аналоги для операторов ДУЧП
-        indexIterator!!.start()
-        completeGrid()
-        do {
-            indexIterator!!.next()
-            completeGrid()
-        } while (!indexIterator!!.atEnd())
-
-        // удаляем все старые аппроксимируемые переменные
-        for (v in apxVars) {
-            variableTable.remove(v.code)
+    private val vT: HMVariableTable
+        get() {
+            if (model == null) {
+                throw RuntimeException("Model not init!")
+            }
+            return model.variableTable
         }
-        // удаляем все старые аппроксимируемые уравнения
-        for (e in apxEq) {
-            variableTable.remove(e.code)
+
+    fun convert(): HSM? {
+        try {
+            healModelPhase()
+            preparePhase()
+            generateObjectPhase()
+            correctRightPartsPhase()
+            initialConditionPhase()
+            boundsPhase()
+            finishPhase()
+        } catch (e: Exception) {
+            println(e)
+            e.printStackTrace()
         }
         return model
     }
 
-    // аппроксимируемые переменные разбивают пространство на сетку, где каждому узлу соответствует набор уравнений
-    private fun processGridNode() {
-        // прописываем все аппроксимируемые переменные как константы
-        for (i in indexIterator!!.get()) {
-            variableTable.add(i.toConst())
-        }
-        // генерируем для каждого уравнения аналог для сетки
-        for (eq in apxEq) {
-            processEquation(eq)
+    private fun healModelPhase() {
+        for (k in vT.keySet()) {
+            val vv: HMVariable = vT.get(k)
+            if (vv is HMEquation) {
+                val eq: HMEquation = vv
+                if (eq.rightPart != null) {
+                    healModelEquation(eq.rightPart)
+                }
+            }
         }
     }
 
-    private fun processEquation(eq: HMEquation): HMEquation {
-        val newName = equationNameMapping(eq)
-        // если таблица уже содержит такое уравнение - не будем разбирать снова
-        if (variableTable.contain(newName)) {
-            return variableTable.get(newName) as HMEquation
+    private fun healModelEquation(expr: HMExpression) {
+        for (tt in expr.tokens) {
+            if (tt is EXPFunctionOperand) {
+                val f: EXPFunctionOperand = tt
+                f.args.stream().forEach { e: HMExpression -> healModelEquation(e) }
+            } else if (tt is EXPOperand) {
+                val o: EXPOperand = tt
+                if (o.variable != null && vT.contain(o.variable.code)) {
+                    o.variable = vT.get(o.variable.code)
+                }
+            }
         }
-        // создаем объект нового уравнения
-        var newEq: HMEquation? = null
-        // ОДУ и ДУЧП
-        if (eq is HMDerivativeEquation) {
-            newEq = HMDerivativeEquation(newName)
-            (newEq as HMDerivativeEquation?)!!.setInitial(eq.initial.value)
-            // алгебраические
-        } else if (eq is HMAlgebraicEquation) {
-            newEq = HMAlgebraicEquation(newName)
+    }
+
+    private fun preparePhase() {
+        val variableCodes: Set<String> = vT.keySet()
+
+        // запоминаем все апроксимируемые переменные и ДУЧП
+        for (varCode in variableCodes) {
+            val variable: HMVariable = vT.get(varCode)
+            if (variable is HMPartialDerivativeEquation) {
+                approximatedEquations.add(variable as HMEquation)
+            } else if (variable is HMSampledSpatialVariable) {
+                approximatedVariables.add(variable)
+            }
         }
-        if (newEq == null) {
-            throw RuntimeException("FDMConverter -> processEquation error!")
+
+        // выявляем пассивные апроксимируемые элементы
+        var isReady = false
+        while (!isReady) {
+            isReady = true
+            for (varCode in variableCodes) {
+                val equation: HMVariable = vT.get(varCode)
+                if (isNeedToAddIntoApproximateEq(equation)) {
+                    approximatedEquations.add(equation as HMEquation)
+                    isReady = false
+                }
+            }
         }
-        val rp = HMExpression()
+
+        // запоминаем все не апроксимируемые элементы
+        for (varCode in variableCodes) {
+            val `var`: HMVariable = vT.get(varCode)
+            if (!approximatedEquations.contains(`var`) && !approximatedVariables.contains(`var`)) notApproximated.add(`var`)
+        }
+
+        // создаем итератор
+        indexIterator = newIterator
+    }
+
+    fun generateObjectPhase() {
+        indexIterator!!.start()
+        doGenerateObjectPhase()
+        if (!indexIterator!!.atEnd()) do {
+            indexIterator!!.next()
+            doGenerateObjectPhase()
+        } while (!indexIterator!!.atEnd())
+    }
+
+    fun doGenerateObjectPhase() {
+        // прописываем все аппроксимируемые переменные как константы
+        for (i in indexIterator!!.get()) {
+            vT.add(i.toConst())
+        }
+        // генерируем для каждого уравнения аналог для сетки
+        for (equation in approximatedEquations) {
+            val newName = equationNameMapping(equation)
+            if (vT.contain(newName)) {
+                continue
+            }
+            // создаем объект нового уравнения
+            var newEq: HMEquation? = null
+            // ОДУ и ДУЧП
+            if (equation is HMDerivativeEquation) {
+                newEq = HMDerivativeEquation(newName)
+                (newEq as HMDerivativeEquation?)!!.initial = equation.initial
+                // алгебраические
+            } else if (equation is HMAlgebraicEquation) {
+                newEq = HMAlgebraicEquation(newName)
+            }
+            if (newEq == null) {
+                throw RuntimeException("FDMConverter -> processEquation error!")
+            }
+            newEq.rightPart = equation.rightPart
+            vT.add(newEq)
+        }
+    }
+
+    fun correctRightPartsPhase() {
+        indexIterator!!.start()
+        doCorrectRightPartsPhase()
+        if (!indexIterator!!.atEnd()) do {
+            indexIterator!!.next()
+            doCorrectRightPartsPhase()
+        } while (!indexIterator!!.atEnd())
+    }
+
+    fun doCorrectRightPartsPhase() {
+        for (eq in approximatedEquations) {
+            val appEq: HMEquation = getMappedVar(eq) as HMEquation
+            appEq.rightPart = correctRightParts(appEq.rightPart)
+            if (appEq is HMDerivativeEquation) {
+                val der: HMDerivativeEquation = appEq
+                val initial = HMConst(der.initial.code)
+                initial.rightPart = correctRightParts(der.initial.rightPart)
+                der.initial = initial
+            }
+        }
+    }
+
+    private fun correctRightParts(oldRP: HMExpression): HMExpression {
+        val newRP = HMExpression()
+        newRP.type = oldRP.type
         // пробегаем по правой части и меняем все аппроксимируемые переменные
-        for ((index, tt) in eq.rightPart.tokens.withIndex()) {
-            if (tt is EXPOperand && tt !is EXPPDEOperand) {
+        for ((index, tt) in oldRP.tokens.withIndex()) {
+            if (tt is EXPPDEOperand) {
+                val o: EXPPDEOperand = tt
+                val pde: HMPartialDerivativeEquation = vT.get(o.variable.code) as HMPartialDerivativeEquation
+                val av: HMSampledSpatialVariable = o.sampledFirstSpatialVar
+                val idx = indexIterator!!.getIndex(av.code)
+                addSubst(pde, av, idx, o, newRP)
+            } else if (tt is EXPFunctionOperand) {
+                val func = EXPFunctionOperand(tt.name)
+                for (exp in tt.args) {
+                    func.addArgExpression(correctRightParts(exp))
+                }
+                newRP.add(func)
+            } else if (tt is EXPOperand && tt !is EXPPDEOperand) {
                 val o: EXPOperand = tt
                 // TODO выражения могут хранить неправедбные объекты
                 val mappedVar: HMVariable = getMappedVar(o.variable)
                 if (mappedVar !== o.variable) {
-                    eq.rightPart.tokens[index] = EXPOperand(mappedVar)
+                    oldRP.tokens[index] = EXPOperand(mappedVar)
                 }
+                newRP.add(tt)
+            } else {
+                newRP.add(tt)
             }
-            rp.add(tt)
         }
-        newEq.rightPart = rp
-        variableTable.add(newEq)
-        return newEq
+        return newRP
     }
 
-    private fun completeGrid() {
-        for (eq in apxEq) {
-            val newEq: HMEquation = processEquation(eq)
-            val rp = HMExpression()
-
-            // пробегаем по правой части и меняем все аппроксимируемые переменные
-            for (tt in eq.rightPart.tokens) {
-                if (tt is EXPPDEOperand) {
-                    val o: EXPPDEOperand = tt
-
-//                    HMVariable mappedVar = getMappedVar(o.getVariable());
-//                    if (mappedVar != o.getVariable()) {
-//                        tt = new EXPOperand(mappedVar);
-//                    }
-                    // System.out.println(o.toString());
-                    var uc: HMUnnamedConst?
-                    val pde: HMPartialDerivativeEquation = variableTable.get(o.variable.code) as HMPartialDerivativeEquation
-                    val av: HMSampledSpatialVariable = o.sampledFirstSpatialVar
-                    val idx = indexIterator!!.getIndex(av.code)
-                    if (idx!!.isFirst) {
-                        pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> rp.add(t) })
-                    } else if (idx.isMax) {
-                        pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> rp.add(t) })
-                    } else {
-                        val eq_idx_plus_1: HMEquation = variableTable.get(equationNameMappingSpecIndex(pde, av, idx.index!! + 1)) as HMEquation
-                        val eq_idx_minus_1: HMEquation = variableTable.get(equationNameMappingSpecIndex(pde, av, idx.index!! - 1)) as HMEquation
-                        val eq_cur: HMEquation = variableTable.get(equationNameMapping(pde)) as HMEquation
-                        if (o.order == EXPPDEOperand.Order.ONE) {
-                            uc = HMUnnamedConst(o.sampledFirstSpatialVar.stepSize)
-                            rp.add(EXPOperand(eq_idx_plus_1))
-                            rp.add(EXPOperand(eq_idx_minus_1))
-                            rp.add(EXPOperator.sub())
-                            rp.add(EXPOperand(HMUnnamedConst(2.0)))
-                            rp.add(EXPOperand(uc))
-                            rp.add(EXPOperator.mult())
-                            rp.add(EXPOperator.div())
-                        } else if (o.order == EXPPDEOperand.Order.TWO) {
-                            uc = HMUnnamedConst(Math.pow(o.sampledFirstSpatialVar.stepSize, 2.0))
-                            rp.add(EXPOperand(eq_idx_minus_1))
-                            rp.add(EXPOperand(HMUnnamedConst(2.0)))
-                            rp.add(EXPOperand(eq_cur))
-                            rp.add(EXPOperator.mult())
-                            rp.add(EXPOperator.sub())
-                            rp.add(EXPOperand(eq_idx_plus_1))
-                            rp.add(EXPOperator.add())
-                            rp.add(EXPOperand(uc))
-                            rp.add(EXPOperator.div())
-                        }
-                    }
-                } else {
-                    rp.add(tt)
-                }
-            }
-            newEq.rightPart = rp
+    private fun addSubst(pde: HMPartialDerivativeEquation, av: HMSampledSpatialVariable, idx: FDMIndexedApxVar?, o: EXPPDEOperand,
+                         newRP: HMExpression) {
+        val eq_idx_plus_1: HMEquation = vT.get(equationNameMappingSpecIndex(pde, av, idx!!.index!! + 1)) as HMEquation
+        val eq_idx_minus_1: HMEquation = vT.get(equationNameMappingSpecIndex(pde, av, idx.index!! - 1)) as HMEquation
+        val eq_cur: HMEquation = vT.get(equationNameMapping(pde)) as HMEquation
+        val uc: HMUnnamedConst
+        if (idx.isMax && pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).derOrder > 0) {
+            pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
+        } else if (idx.isFirst && pde.getBound(HMBoundaryCondition.SideType.LEFT, av).derOrder > 0) {
+            pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
+        } else if (o.order == EXPPDEOperand.Order.ONE) {
+//            if (eq_idx_plus_1 == null || eq_idx_minus_1 == null || eq_cur == null) {
+//                throw new RuntimeException("FDM: all is bad");
+//            }
+            uc = HMUnnamedConst(o.sampledFirstSpatialVar.stepSize)
+            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_plus_1))
+            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_minus_1))
+            newRP.add(EXPOperator.sub())
+            newRP.add(EXPOperand(HMUnnamedConst(2.0)))
+            newRP.add(EXPOperand(uc))
+            newRP.add(EXPOperator.mult())
+            newRP.add(EXPOperator.div())
+        } else if (o.order == EXPPDEOperand.Order.TWO) {
+            uc = HMUnnamedConst(Math.pow(o.sampledFirstSpatialVar.stepSize, 2.0))
+            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_minus_1))
+            newRP.add(EXPOperand(HMUnnamedConst(2.0)))
+            newRP.add(EXPOperand(eq_cur))
+            newRP.add(EXPOperator.mult())
+            newRP.add(EXPOperator.sub())
+            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_plus_1))
+            newRP.add(EXPOperator.add())
+            newRP.add(EXPOperand(uc))
+            newRP.add(EXPOperator.div())
         }
     }
 
-    // Парсинг таблицы переменных и наполнение предварительных данных
-    fun prepare() {
+    fun initialConditionPhase() {}
+    fun boundsPhase() {}
+    fun finishPhase() {
+        // удаляем все старые аппроксимируемые переменные
+        for (v in approximatedVariables) {
+            vT.remove(v.code)
+        }
+        // удаляем все старые аппроксимируемые уравнения
+        for (e in approximatedEquations) {
+            vT.remove(e.code)
+        }
 
-        // запоминаем все апроксимируемые переменные и уравнения
-        for (s in variableTable.keySet()) {
-            val vv: HMVariable = variableTable.get(s)
-            if (vv is HMPartialDerivativeEquation) {
-                apxEq.add(vv as HMEquation)
-            } else if (vv is HMSampledSpatialVariable) {
-                apxVars.add(vv)
+        // высчитываем значения НУ для ОДУ
+        for (str in vT.keySet()) {
+            val v: HMVariable = vT.get(str)
+            if (v is HMDerivativeEquation) {
+                val der: HMDerivativeEquation = v
+                PDEInitialValueCalculator.calculate(der.initial)
             }
         }
-        var isReady = false
-        var eqNeedApx: Boolean
-        while (!isReady) {
-            // пробегаем все уравнения в которых есть другие аппроксимируемые уравнения или переменные
-            isReady = true
-            for (s in variableTable.keySet()) {
-                val `var`: HMVariable = variableTable.get(s)
-                if (`var` is HMEquation
-                        && `var` !is HMConst
-                        && !apxEq.contains(`var`)) {
-                    // проверяем правую часть на аппроксимируемые элементы
-                    eqNeedApx = false
-                    val right: HMExpression = `var`.rightPart
-                    for (t in right.tokens) {
-                        // проверяем только уравнения и только если ранее не было найдено (eqNeedApx)
-                        if (t is EXPOperand && !eqNeedApx) {
-                            val operVar: HMVariable = t.variable
-                            if (apxEq.contains(operVar) || apxVars.contains(operVar)) {
-                                isReady = false
-                                apxEq.add(`var`)
-                                eqNeedApx = true
-                            }
-                        }
+    }
+
+    // -------------------- ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ------------------
+    private fun isNeedToAddIntoApproximateEq(`var`: HMVariable): Boolean {
+        // проверяем уравенения (не константы) не содержащиеся в списке апроксимации
+        return when {
+            `var` is HMEquation && `var` !is HMConst && !approximatedEquations.contains(`var`) -> {
+                checkExpression(`var`.rightPart)
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
+    private fun checkExpression(right: HMExpression): Boolean {
+        var eqNeedApx = false
+        for (t in right.tokens) {
+            // если есть оператор ДУЧП - автоматом попадает в апроксимируемые
+            if (t is EXPPDEOperand) {
+                eqNeedApx = true
+                // проверяем фунции
+            } else if (t is EXPFunctionOperand && !eqNeedApx) {
+                for (expr in t.args) {
+                    if (checkExpression(expr)) {
+                        eqNeedApx = true
                     }
-                    if (!eqNeedApx) {
-                        notApx.add(`var`)
-                    }
-                } else {
-                    if (!apxVars.contains(`var`) && !apxEq.contains(`var`)) notApx.add(`var`)
+                }
+                // проверяем только уравнения и только если ранее не было найдено (eqNeedApx)
+            } else if (t is EXPOperand && !eqNeedApx) {
+                val operandVarisable: HMVariable = t.variable
+                if (approximatedEquations.contains(operandVarisable) || approximatedVariables.contains(operandVarisable)) {
+                    eqNeedApx = true
                 }
             }
         }
-        // подготовим итератор по индексам - полный перебор всех индексов
-        indexIterator = iterator
+        return eqNeedApx
     }
 
     // инициализировать итератор индексов
-    private val iterator: FDMIndexIterator
+    private val newIterator: FDMIndexIterator
         get() {
             val iterator = FDMIndexIterator()
-            for (av in apxVars) {
+            for (av in approximatedVariables) {
                 iterator.addIndex(FDMIndexedApxVar(av))
             }
             return iterator
         }
 
-    // TODO рефакторинг
-    private fun getMappedVar(v: HMVariable): HMVariable {
-        if (notApx.contains(v) || v is HMUnnamedConst) {
-            return v
-        } else if (v is HMSampledSpatialVariable) {
-            return variableTable.get(apxVarNameMapping(v))
-        } else if (v is HMEquation) {
-            val code = equationNameMapping(v)
-            return if (variableTable.contain(code)) {
-                variableTable.get(code)
-            } else {
-                processEquation(v)
-            }
-        }
-        throw RuntimeException("Cant find mapped variable: " + v.code)
-        //
-//        if (!context.containsApxVar(v.getCode())) {
-//            return v;
-//        }
-//        String newName = nameMapping(v);
-//        if (variables.contain(newName)) {
-//            return variables.get(newName);
-//        }
-//        if (v instanceof HMEquation) {
-//            processEquation((HMEquation) v);
-//        }
-//        throw new RuntimeException("Cant find mapped variable: " + newName);
-    }
-
-    // TODO apxLinkTable
     protected fun equationNameMapping(equation: HMVariable): String {
-        if (!apxEq.contains(equation)) {
+        if (!approximatedEquations.contains(equation)) {
             throw RuntimeException("FDM converter doesn't contain " + equation.code)
         }
-        val newName: StringBuilder = StringBuilder(equation.code)
+        val newName = StringBuilder(equation.code)
         newName.append(APX_PREFIX)
-        for (v in apxVars) {
+        for (v in approximatedVariables) {
             newName.append("_")
             newName.append(indexIterator!!.getIndex(v.code)!!.index)
-            //            if (isEqContains(equation, v)) {
-//                newName.append(indexes.get(v.getCode()).getIndex());
-//            } else if (!indexes.containsKey(v.getCode())) {
-//                newName.append("E");
-//            } else {
-//                newName.append("0");
-//            }
         }
         return newName.toString()
     }
 
     protected fun equationNameMappingSpecIndex(equation: HMVariable, av: HMSampledSpatialVariable, specValue: Int?): String {
-        if (!apxEq.contains(equation)) {
+        if (!approximatedEquations.contains(equation)) {
             throw RuntimeException("FDM converter doesn't contain " + equation.code)
         }
-        val newName: StringBuilder = StringBuilder(equation.code)
+        val newName = StringBuilder(equation.code)
         newName.append(APX_PREFIX)
-        for (v in apxVars) {
+        for (v in approximatedVariables) {
             newName.append("_")
             if (v.code == av.code) {
                 newName.append(specValue)
@@ -288,6 +334,22 @@ class FDMConverter(model: HSM) {
 
     private fun apxVarNameMapping(variable: HMSampledSpatialVariable): String? {
         return indexIterator!!.getIndex(variable.code)!!.constCode
+    }
+
+    // TODO рефакторинг
+    private fun getMappedVar(v: HMVariable): HMVariable {
+        return when {
+            notApproximated.contains(v) || v is HMUnnamedConst -> {
+                v
+            }
+            v is HMSampledSpatialVariable -> {
+                vT.get(apxVarNameMapping(v))
+            }
+            v is HMEquation -> {
+                vT.get(equationNameMapping(v))
+            }
+            else -> throw RuntimeException("Cant find mapped variable: " + v.code)
+        }
     }
 
 }

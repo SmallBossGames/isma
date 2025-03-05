@@ -12,7 +12,7 @@ import java.util.*
 class FDMIndexIterator {
     private val indexes = ArrayList<FDMIndexedApxVar>()
     private val nameMapping: MutableMap<String, FDMIndexedApxVar> = HashMap()
-    var readyToFight = false
+    private var readyToFight = false
     fun addIndex(v: FDMIndexedApxVar) {
         indexes.add(v)
         nameMapping[v.code] = v

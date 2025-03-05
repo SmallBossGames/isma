@@ -7,7 +7,7 @@ import ru.isma.next.app.models.projects.LismaTextModel
 import ru.nstu.isma.core.hsm.models.IsmaSemanticError
 import ru.nstu.isma.core.hsm.models.IsmaSyntaxError
 import ru.nstu.isma.lisma.InputTranslator
-import ru.nstu.isma.next.core.fdm.FDMNewConverter
+import ru.nstu.isma.next.core.fdm.FDMConverter
 
 class LismaPdeService(
     private val translator: InputTranslator,
@@ -34,7 +34,7 @@ class LismaPdeService(
 
         modelService.putErrorList(errorViewModels)
 
-        val processedModel = if (model.isPDE) model else FDMNewConverter(model).convert()
+        val processedModel = if (model.isPDE) model else FDMConverter(model).convert()
 
         if (processedModel != null && errors.isEmpty()) {
             return SuccessTranslation(processedModel)

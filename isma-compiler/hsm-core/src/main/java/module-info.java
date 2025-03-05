@@ -16,5 +16,4 @@ module isma.isma.hsm.main {
     requires org.apache.commons.lang3;
     requires isma.isma.next.tools.main;
     requires org.slf4j;
-
 }

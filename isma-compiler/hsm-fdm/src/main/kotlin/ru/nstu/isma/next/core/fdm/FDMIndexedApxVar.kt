@@ -11,7 +11,7 @@ import ru.nstu.isma.core.hsm.`var`.pde.HMSampledSpatialVariable
  */
 class FDMIndexedApxVar(v: HMSampledSpatialVariable) : HMSampledSpatialVariable() {
     var index: Int? = null
-        protected set
+        private set
 
     // связываем текущий объект с объектом HMApproximateVariable
     // все изменения в базовых полях индекса дожны отразиьться в предке

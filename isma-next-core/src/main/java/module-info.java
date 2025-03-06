@@ -10,7 +10,7 @@ module isma.isma.next.core.main {
     requires kotlin.stdlib;
     requires isma.isma.hsm.main;
     requires isma.isma.intg.api.main;
-    requires transitive isma.isma.next.core.simulation.gen.main;
+    requires transitive isma.compiler.hsm.jvm;
     requires kotlinx.coroutines.core;
     requires transitive isma.isma.intg.core.main;
     requires com.google.common;

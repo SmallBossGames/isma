@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.simulation.gen
+package ru.nstu.isma.compiler.hsm.jvm
 
 import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquation
 import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation

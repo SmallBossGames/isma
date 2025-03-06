@@ -33,7 +33,7 @@ dependencies {
 
     implementation(project(":isma-compiler:hsm-core"))
     implementation(project(":isma-compiler:hsm-fdm"))
-    implementation(project(":isma-compiler:hsm-generator-jvm"))
+    implementation(project(":isma-compiler:hsm-jvm"))
     implementation(project(":isma-compiler:lisma-translator-hsm"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-solver:api"))

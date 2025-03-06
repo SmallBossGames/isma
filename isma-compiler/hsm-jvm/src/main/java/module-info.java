@@ -1,5 +1,5 @@
-module isma.isma.next.core.simulation.gen.main {
-    exports ru.nstu.isma.next.core.simulation.gen;
+module isma.compiler.hsm.jvm {
+    exports ru.nstu.isma.compiler.hsm.jvm;
 
     requires kotlin.stdlib;
     requires com.google.common;

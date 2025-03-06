@@ -8,7 +8,7 @@ import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunner
-import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
+import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 
 /**
  * Created by Bessonov Alex

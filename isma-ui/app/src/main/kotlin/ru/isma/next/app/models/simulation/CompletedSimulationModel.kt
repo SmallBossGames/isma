@@ -2,7 +2,7 @@ package ru.isma.next.app.models.simulation
 
 import ru.nstu.isma.intg.api.models.IntgMetricData
 import ru.nstu.isma.intg.api.providers.IntegrationResultPointProvider
-import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
+import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 
 class CompletedSimulationModel(
     val id: Int,

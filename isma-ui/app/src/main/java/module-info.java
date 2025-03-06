@@ -7,7 +7,7 @@ module isma.ui.app {
     requires kotlinx.serialization.json;
     requires kotlinx.coroutines.core;
     requires kotlinx.coroutines.javafx;
-    requires isma.isma.next.core.simulation.gen.main;
+    requires isma.compiler.hsm.jvm;
     requires isma.isma.intg.api.main;
     requires isma.isma.next.integration.library.main;
     requires isma.isma.next.core.main;

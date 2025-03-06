@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.simulation.gen
+package ru.nstu.isma.compiler.hsm.jvm
 
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.generate.MemoryFileManager
@@ -17,7 +17,7 @@ class SourceCodeCompiler<T> {
         val options = mutableListOf(
             "-p", System.getProperty("jdk.module.path"),
             "--add-modules=isma.isma.intg.api.main",
-            "--add-modules=isma.isma.next.core.simulation.gen.main",
+            "--add-modules=isma.compiler.hsm.jvm",
         )
         val files = arrayListOf(MemoryJavaFileObject(className, sourceCode))
         compiler.getTask(null, manager, null, options, null, files).call()

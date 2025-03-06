@@ -19,6 +19,7 @@ include("isma-compiler:hsm-core")
 include("isma-compiler:hsm-fdm")
 include("isma-compiler:lisma-translator-hsm")
 include("isma-compiler:jvm-utils")
+include("isma-compiler:hsm-jvm")
 
 include("isma-solver:api")
 include("isma-solver:core")
@@ -56,4 +57,3 @@ include("isma-intg-demo-problems")
 
 include("isma-next-math-engine")
 include("isma-next-math-common")
-include("isma-compiler:hsm-generator-jvm")

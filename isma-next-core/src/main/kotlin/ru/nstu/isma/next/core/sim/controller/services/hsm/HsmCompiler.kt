@@ -4,9 +4,9 @@ import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.core.hsm.HSM
 import ru.nstu.isma.intg.api.calcmodel.HybridSystem
 import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
-import ru.nstu.isma.next.core.simulation.gen.AnalyzedHybridSystemClassBuilder
-import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
-import ru.nstu.isma.next.core.simulation.gen.SourceCodeCompiler
+import ru.nstu.isma.compiler.hsm.jvm.AnalyzedHybridSystemClassBuilder
+import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
+import ru.nstu.isma.compiler.hsm.jvm.SourceCodeCompiler
 
 class HsmCompiler : IHsmCompiler {
     override suspend fun compile(hsm: HSM): HsmCompilationResult = coroutineScope {

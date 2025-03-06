@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.simulation.gen
+package ru.nstu.isma.compiler.hsm.jvm
 
 import com.google.common.collect.HashBiMap
 import common.IndexProvider

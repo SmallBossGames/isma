@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.simulation.gen
+package ru.nstu.isma.compiler.hsm.jvm
 
 import common.HMExpressionBuilder
 import ru.nstu.isma.core.hsm.HSM

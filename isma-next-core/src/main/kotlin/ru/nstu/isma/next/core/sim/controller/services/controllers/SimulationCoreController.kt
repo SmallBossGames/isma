@@ -1,14 +1,13 @@
 package ru.nstu.isma.next.core.sim.controller.services.controllers
 
-import kotlinx.coroutines.coroutineScope
+import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.next.core.sim.controller.services.hsm.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
+import ru.nstu.isma.next.core.sim.controller.services.hsm.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.services.runners.ISimulationRunner
-import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 
 /**
  * Created by Bessonov Alex
@@ -21,7 +20,7 @@ class SimulationCoreController(
     /**
      * Моделирование
      */
-    override suspend fun simulateAsync(parameters: IntegratorApiParameters): HybridSystemIntegrationResult = coroutineScope {
+    override suspend fun simulateAsync(parameters: IntegratorApiParameters): HybridSystemIntegrationResult {
         val compilationResult = hsmCompiler.compile(parameters.hsm)
 
         val initials = SimulationInitials(
@@ -37,10 +36,10 @@ class SimulationCoreController(
             parameters.stepChangeHandlers
         )
 
-        return@coroutineScope simulationRunnerProvider.run(context)
+        return simulationRunnerProvider.run(context)
     }
 
-    private suspend fun createOdeInitials(indexProvider: EquationIndexProvider, hsm: HSM): DoubleArray = coroutineScope {
+    private fun createOdeInitials(indexProvider: EquationIndexProvider, hsm: HSM): DoubleArray {
         val odeInitials = DoubleArray(hsm.variableTable.odes.size)
 
         for (ode in hsm.variableTable.odes) {
@@ -48,6 +47,6 @@ class SimulationCoreController(
             odeInitials[idx] = ode.initialValue
         }
 
-        return@coroutineScope odeInitials
+        return odeInitials
     }
 }

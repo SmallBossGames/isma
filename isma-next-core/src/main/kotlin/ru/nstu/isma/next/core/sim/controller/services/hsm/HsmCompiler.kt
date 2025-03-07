@@ -1,15 +1,14 @@
 package ru.nstu.isma.next.core.sim.controller.services.hsm
 
-import kotlinx.coroutines.coroutineScope
-import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.intg.api.calcmodel.HybridSystem
-import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 import ru.nstu.isma.compiler.hsm.jvm.AnalyzedHybridSystemClassBuilder
 import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 import ru.nstu.isma.compiler.hsm.jvm.SourceCodeCompiler
+import ru.nstu.isma.core.hsm.HSM
+import ru.nstu.isma.intg.api.calcmodel.HybridSystem
+import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 
 class HsmCompiler : IHsmCompiler {
-    override suspend fun compile(hsm: HSM): HsmCompilationResult = coroutineScope {
+    override fun compile(hsm: HSM): HsmCompilationResult {
         val indexProvider = EquationIndexProvider(hsm)
         val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
         val hsSourceCode = hsClassBuilder.buildSourceCode()
@@ -18,7 +17,7 @@ class HsmCompiler : IHsmCompiler {
         )
         val modelClassLoader = hybridSystem.javaClass.classLoader!!
 
-        return@coroutineScope HsmCompilationResult(indexProvider, hybridSystem, modelClassLoader)
+        return HsmCompilationResult(indexProvider, hybridSystem, modelClassLoader)
     }
 
     companion object {

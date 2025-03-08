@@ -10,10 +10,8 @@ module isma.compiler.hsm.core {
     exports ru.nstu.isma.compiler.hsm.core.events;
     exports common;
 
-    requires java.compiler;
     requires kotlin.stdlib;
     requires org.jetbrains.annotations;
     requires org.apache.commons.lang3;
-    requires isma.isma.next.tools.main;
     requires org.slf4j;
 }

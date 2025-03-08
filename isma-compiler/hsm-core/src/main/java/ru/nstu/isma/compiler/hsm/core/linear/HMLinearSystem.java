@@ -1,25 +1,18 @@
 package ru.nstu.isma.compiler.hsm.core.linear;
 
-import common.Calculateable;
-import common.IndexMapper;
 import ru.nstu.isma.compiler.hsm.core.HSM;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Bessonov Alex
  * on 13.03.2015.
  */
-public class HMLinearSystem implements Calculateable, Serializable {
+public class HMLinearSystem implements Serializable {
     private final HSM hms;
     private final Map<String, HMLinearVar> vars = new HashMap<>();
     private List<HMLinearEquation> equations;
-    private IndexMapper indexMapper;
-    private LinearSystemMatrix matrix;
     private boolean readyForCalc = false;
 
     private Integer size;
@@ -52,7 +45,7 @@ public class HMLinearSystem implements Calculateable, Serializable {
 
     public HMLinearVar getLinearVariable(Integer index) {
         for (HMLinearVar v : vars.values()) {
-            if (v.getColumnIndex() == index)
+            if (Objects.equals(v.getColumnIndex(), index))
                 return v;
         }
         return null;
@@ -78,26 +71,4 @@ public class HMLinearSystem implements Calculateable, Serializable {
     public List<HMLinearEquation> getEquations() {
         return equations;
     }
-
-    public int getVarCalulationIndex(HMLinearVar v) {
-        return indexMapper.getIndexMap().get(v.getCode());
-    }
-
-    @Override
-    public void prepareForCalculation(IndexMapper indexMapper) {
-        this.indexMapper = indexMapper;
-        LinearSystemMatrixBuilder matrixBuilder = new LinearSystemMatrixBuilder(indexMapper);
-        matrix = matrixBuilder.build("DefaultLinearSystemMatrix", true);
-        readyForCalc = true;
-    }
-
-    @Override
-    public double[] calculate(double[] y) {
-        if (!readyForCalc)
-            throw new RuntimeException("Linear system is not ready");
-
-        LinearEquationsSolver solver = new LinearEquationsSolver(matrix.getA(y));
-        return solver.solve(matrix.getB(y));
-    }
-
 }

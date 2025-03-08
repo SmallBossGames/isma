@@ -1,5 +1,7 @@
 package ru.nstu.isma.intg.api.calcmodel
 
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DifferentialEquation
+
 class DifferentialEquationsCalculator(
     private val differentialEquations: Array<DifferentialEquation>,
 ) {

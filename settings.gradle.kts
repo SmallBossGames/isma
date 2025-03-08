@@ -19,6 +19,7 @@ include("isma-compiler:hsm-core")
 include("isma-compiler:hsm-fdm")
 include("isma-compiler:lisma-translator-hsm")
 include("isma-compiler:hsm-jvm")
+include("isma-compiler:hsm-jvm-calcmodel")
 
 include("isma-solver:api")
 include("isma-solver:core")

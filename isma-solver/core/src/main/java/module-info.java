@@ -5,7 +5,9 @@ module isma.isma.intg.core.main {
 
     requires org.apache.commons.lang3;
     requires org.slf4j;
-    requires isma.isma.intg.api.main;
     requires org.jetbrains.annotations;
     requires kotlin.stdlib;
+
+    requires isma.isma.intg.api.main;
+    requires isma.compiler.hsm.jvm.calcmodel;
 }

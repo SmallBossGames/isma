@@ -1,9 +1,8 @@
 package ru.nstu.isma.intg.core.methods
 
-import ru.nstu.isma.intg.api.calcmodel.DaeSystem
-import ru.nstu.isma.intg.api.calcmodel.EventFunction
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunction
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunctionGroup
 import ru.nstu.isma.intg.api.methods.IntgController
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
@@ -52,8 +51,8 @@ class EventDetectionIntgController(private val gamma: Double) : IntgController()
             }
         }
         val predictedStep = when (eventFunctionGroup.stepChoiceRule) {
-            StepChoiceRule.MAX -> steps.maxOrThrow()
-            StepChoiceRule.MIN -> steps.minOrThrow()
+            EventFunctionGroup.StepChoiceRule.MAX -> steps.maxOrThrow()
+            EventFunctionGroup.StepChoiceRule.MIN -> steps.minOrThrow()
             else -> steps[0] // TODO: для одного значения переделать
         }
         return if (predictedStep > 0) predictedStep else intgPoint.nextStep // TODO: отрефакторить, более не актуально

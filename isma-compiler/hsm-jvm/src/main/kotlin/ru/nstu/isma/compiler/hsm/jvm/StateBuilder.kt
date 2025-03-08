@@ -1,9 +1,9 @@
 package ru.nstu.isma.compiler.hsm.jvm
 
-import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquation
-import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation
-import ru.nstu.isma.intg.api.calcmodel.Guard
-import ru.nstu.isma.intg.api.calcmodel.HybridSystem
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.AlgebraicEquation
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DifferentialEquation
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.Guard
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystem
 import java.util.*
 import java.util.stream.Collectors
 

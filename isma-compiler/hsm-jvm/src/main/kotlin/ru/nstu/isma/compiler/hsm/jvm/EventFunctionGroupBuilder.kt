@@ -1,7 +1,7 @@
 package ru.nstu.isma.compiler.hsm.jvm
 
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
-import ru.nstu.isma.intg.api.calcmodel.*
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.*
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunctionGroup.StepChoiceRule
 import java.util.ArrayList
 
 /**
@@ -56,7 +56,10 @@ class EventFunctionGroupBuilder(private val stepChoiceRule: StepChoiceRule?, pri
     }
 
     fun toEventFunctionGroup(): EventFunctionGroup {
-        return EventFunctionGroup(stepChoiceRule, eventFunctions)
+        return EventFunctionGroup(
+            stepChoiceRule,
+            eventFunctions
+        )
     }
 
 }

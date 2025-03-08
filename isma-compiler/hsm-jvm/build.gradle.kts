@@ -10,6 +10,6 @@ dependencies {
     implementation(libs.com.google.guava)
     implementation(libs.slf4j.api)
 
-    implementation(project(":isma-solver:api"))
     implementation(project(":isma-compiler:hsm-core"))
+    implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
 }

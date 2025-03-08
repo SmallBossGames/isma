@@ -1,21 +1,16 @@
 package ru.nstu.isma.intg.api.calcmodel
 
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.AlgebraicEquation
+
 class AlgebraicEquationCalculator(
     private val algebraicEquations: Array<AlgebraicEquation>
 ) {
     fun apply(y: DoubleArray): DoubleArray {
         val rhsForDe = DoubleArray(algebraicEquations.size)
         for (i in algebraicEquations.indices) {
-            rhsForDe[i] = algebraicEquations[i].apply(y, Provider)
+            rhsForDe[i] = algebraicEquations[i].apply(y)
         }
         return rhsForDe
-    }
-
-    //TODO: Workaround, because we cannot remove this method
-    object Provider: IAlgebraicEquationResultProvider{
-        override fun getValue(index: Int): Double {
-            return 0.0;
-        }
     }
 }
 

@@ -1,6 +1,6 @@
 package ru.nstu.isma.intg.lib.rungeKutta.rk22.internal
 
-import ru.nstu.isma.intg.api.calcmodel.DaeSystem
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.core.methods.BaseStabilityIntgController
 import ru.nstu.isma.intg.core.methods.utils.maxOrThrow

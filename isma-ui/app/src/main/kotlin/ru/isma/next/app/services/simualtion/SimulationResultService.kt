@@ -12,7 +12,7 @@ import ru.isma.next.app.views.dialogs.pickAxisVariables
 import ru.nstu.grin.integration.FunctionModel
 import ru.nstu.grin.integration.GrinIntegrationFacade
 import ru.nstu.grin.integration.PointModel
-import ru.nstu.isma.intg.api.calcmodel.DaeSystem
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import java.io.File
 import java.io.Writer

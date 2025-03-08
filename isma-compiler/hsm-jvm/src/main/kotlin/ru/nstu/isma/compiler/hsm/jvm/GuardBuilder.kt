@@ -1,7 +1,10 @@
 package ru.nstu.isma.compiler.hsm.jvm
 
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
-import ru.nstu.isma.intg.api.calcmodel.*
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.AlgebraicEquation
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DifferentialEquation
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunctionGroup.StepChoiceRule
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.Guard
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystem
 
 /**
  * @author Maria Nasyrova

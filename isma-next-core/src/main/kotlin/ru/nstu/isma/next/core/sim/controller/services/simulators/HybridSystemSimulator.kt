@@ -3,8 +3,8 @@ package ru.nstu.isma.next.core.sim.controller.services.simulators
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import ru.nstu.isma.intg.api.models.IntgMetricData
-import ru.nstu.isma.intg.api.calcmodel.DifferentialEquation
-import ru.nstu.isma.intg.api.calcmodel.HybridSystemChangeSet
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DifferentialEquation
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystemChangeSet
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver

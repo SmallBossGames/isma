@@ -8,6 +8,7 @@ module isma.ui.app {
     requires kotlinx.coroutines.core;
     requires kotlinx.coroutines.javafx;
     requires isma.compiler.hsm.jvm;
+    requires isma.compiler.hsm.jvm.calcmodel;
     requires isma.isma.intg.api.main;
     requires isma.isma.next.integration.library.main;
     requires isma.isma.next.core.main;

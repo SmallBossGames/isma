@@ -16,4 +16,5 @@ module isma.isma.next.core.main {
     requires com.google.common;
     requires java.compiler;
     requires org.slf4j;
+    requires isma.compiler.hsm.jvm.calcmodel;
 }

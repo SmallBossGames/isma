@@ -1,6 +1,6 @@
 package ru.nstu.isma.intg.api.models
 
-import ru.nstu.isma.intg.api.calcmodel.DaeSystem
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
 
 /**
  * @author Maria

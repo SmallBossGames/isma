@@ -1,11 +1,11 @@
-package ru.nstu.isma.intg.api.calcmodel;
+package ru.nstu.isma.compiler.hsm.jvm.calcmodel;
 
 import java.io.Serializable;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
-public class AlgebraicEquation implements BiFunction<double[], IAlgebraicEquationResultProvider, Double>, Serializable {
+public class AlgebraicEquation implements Function<double[], Double>, Serializable {
 
-    public interface AeFunction extends BiFunction<double[], IAlgebraicEquationResultProvider, Double>, Serializable {
+    public interface AeFunction extends Function<double[], Double>, Serializable {
     }
 
     private final int index;
@@ -45,7 +45,7 @@ public class AlgebraicEquation implements BiFunction<double[], IAlgebraicEquatio
     }
 
     @Override
-    public Double apply(double[] y, IAlgebraicEquationResultProvider resultProvider) {
-        return function.apply(y, resultProvider);
+    public Double apply(double[] y) {
+        return function.apply(y);
     }
 }

@@ -11,8 +11,8 @@ import ru.nstu.isma.compiler.hsm.core.hybrid.HMState
 import ru.nstu.isma.compiler.hsm.core.hybrid.HMTransaction
 import ru.nstu.isma.compiler.hsm.core.`var`.HMAlgebraicEquation
 import ru.nstu.isma.compiler.hsm.core.`var`.HMDerivativeEquation
-import ru.nstu.isma.intg.api.calcmodel.*
-import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.*
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunctionGroup.StepChoiceRule
 
 /**
  * @author Maria Nasyrova
@@ -169,7 +169,7 @@ class AnalyzedHybridSystemClassBuilder(
             val expression = hmExpressionBuilder.buildExpression(it.rightPart, true)
             val index = (indexProvider.getAlgebraicEquationIndex(it.code)!!).toString()
 
-            """.add$aeClassName(new $aeClassName("$name", $index, (y, a) -> ($expression), "$expression"))"""
+            """.add$aeClassName(new $aeClassName("$name", $index, (y) -> ($expression), "$expression"))"""
         }
     }
 

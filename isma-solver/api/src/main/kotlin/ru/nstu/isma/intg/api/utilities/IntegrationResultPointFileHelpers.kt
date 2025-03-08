@@ -1,6 +1,6 @@
 package ru.nstu.isma.intg.api.utilities
 
-import ru.nstu.isma.intg.api.calcmodel.DaeSystem
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.models.ResultPointsFileMetadata
 

@@ -5,7 +5,6 @@ module isma.compiler.hsm.jvm {
     requires com.google.common;
     requires transitive isma.compiler.hsm.core;
     requires isma.isma.intg.api.main;
-    requires isma.isma.next.tools.main;
     requires java.compiler;
     requires org.slf4j;
 }

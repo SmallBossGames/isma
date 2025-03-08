@@ -1,18 +1,11 @@
-package ru.nstu.isma.generate
+package ru.nstu.isma.compiler.hsm.jvm.utils
 
-import javax.tools.StandardJavaFileManager
-import javax.tools.ForwardingJavaFileManager
-import javax.tools.JavaFileManager
-import java.security.SecureClassLoader
 import kotlin.Throws
-import java.lang.ClassNotFoundException
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import java.net.URI
 import javax.tools.JavaFileObject
-import javax.tools.FileObject
 import javax.tools.SimpleJavaFileObject
 
 /**

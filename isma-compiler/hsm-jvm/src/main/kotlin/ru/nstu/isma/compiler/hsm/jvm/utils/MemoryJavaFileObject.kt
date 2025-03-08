@@ -1,4 +1,4 @@
-package ru.nstu.isma.generate
+package ru.nstu.isma.compiler.hsm.jvm.utils
 
 import java.net.URI
 import javax.tools.JavaFileObject

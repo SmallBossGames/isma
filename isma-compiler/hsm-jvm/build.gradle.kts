@@ -11,6 +11,5 @@ dependencies {
     implementation(libs.slf4j.api)
 
     implementation(project(":isma-solver:api"))
-    implementation(project(":isma-compiler:jvm-utils"))
     implementation(project(":isma-compiler:hsm-core"))
 }

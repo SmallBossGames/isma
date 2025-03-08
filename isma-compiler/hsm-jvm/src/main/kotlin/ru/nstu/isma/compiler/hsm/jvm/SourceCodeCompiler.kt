@@ -1,8 +1,8 @@
 package ru.nstu.isma.compiler.hsm.jvm
 
 import org.slf4j.LoggerFactory
-import ru.nstu.isma.generate.MemoryFileManager
-import ru.nstu.isma.generate.MemoryJavaFileObject
+import ru.nstu.isma.compiler.hsm.jvm.utils.MemoryFileManager
+import ru.nstu.isma.compiler.hsm.jvm.utils.MemoryJavaFileObject
 import javax.tools.ToolProvider
 
 /**

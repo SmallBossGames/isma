@@ -3,7 +3,7 @@ module isma.compiler.hsm.jvm {
 
     requires kotlin.stdlib;
     requires com.google.common;
-    requires transitive isma.isma.hsm.main;
+    requires transitive isma.compiler.hsm.core;
     requires isma.isma.intg.api.main;
     requires isma.isma.next.tools.main;
     requires java.compiler;

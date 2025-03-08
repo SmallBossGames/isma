@@ -2,10 +2,10 @@ package ru.nstu.isma.lisma.analysis.parser.visitor;
 
 import ru.nstu.isma.lisma.analysis.gen.LismaBaseVisitor;
 import ru.nstu.isma.lisma.analysis.gen.LismaParser;
-import ru.nstu.isma.core.hsm.hybrid.HMState;
-import ru.nstu.isma.core.hsm.hybrid.HMStateAutomata;
-import ru.nstu.isma.core.hsm.var.HMVariableTable;
-import ru.nstu.isma.core.hsm.exp.HMExpression;
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMState;
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMStateAutomata;
+import ru.nstu.isma.compiler.hsm.core.var.HMVariableTable;
+import ru.nstu.isma.compiler.hsm.core.exp.HMExpression;
 import org.antlr.v4.runtime.misc.NotNull;
 import ru.nstu.isma.lisma.analysis.parser.ParserContext;
 

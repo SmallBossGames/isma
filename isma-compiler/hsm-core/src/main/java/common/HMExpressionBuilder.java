@@ -1,12 +1,12 @@
 package common;
 
-import ru.nstu.isma.core.hsm.exp.*;
-import ru.nstu.isma.core.hsm.linear.HMLinearVar;
-import ru.nstu.isma.core.hsm.service.Poliz2InfixConverter;
-import ru.nstu.isma.core.hsm.var.HMAlgebraicEquation;
-import ru.nstu.isma.core.hsm.var.HMConst;
-import ru.nstu.isma.core.hsm.var.HMDerivativeEquation;
-import ru.nstu.isma.core.hsm.var.HMVariable;
+import ru.nstu.isma.compiler.hsm.core.exp.*;
+import ru.nstu.isma.compiler.hsm.core.linear.HMLinearVar;
+import ru.nstu.isma.compiler.hsm.core.service.Poliz2InfixConverter;
+import ru.nstu.isma.compiler.hsm.core.var.HMAlgebraicEquation;
+import ru.nstu.isma.compiler.hsm.core.var.HMConst;
+import ru.nstu.isma.compiler.hsm.core.var.HMDerivativeEquation;
+import ru.nstu.isma.compiler.hsm.core.var.HMVariable;
 
 import java.util.LinkedList;
 import java.util.List;

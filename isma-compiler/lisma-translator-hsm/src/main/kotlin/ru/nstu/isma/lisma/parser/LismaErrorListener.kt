@@ -1,13 +1,13 @@
 package ru.nstu.isma.lisma.parser
 
-import ru.nstu.isma.core.hsm.models.IsmaError
+import ru.nstu.isma.compiler.hsm.core.models.IsmaError
 import org.antlr.v4.runtime.ANTLRErrorListener
 import org.antlr.v4.runtime.Parser
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.dfa.DFA
 import org.antlr.v4.runtime.atn.ATNConfigSet
-import ru.nstu.isma.core.hsm.models.IsmaSyntaxError
+import ru.nstu.isma.compiler.hsm.core.models.IsmaSyntaxError
 import java.util.*
 
 /**

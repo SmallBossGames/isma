@@ -1,11 +1,11 @@
 package ru.isma.next.app.services.project
 
 import ru.isma.next.app.services.ModelErrorService
-import ru.nstu.isma.core.hsm.models.IsmaErrorList
+import ru.nstu.isma.compiler.hsm.core.models.IsmaErrorList
 import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.models.projects.LismaTextModel
-import ru.nstu.isma.core.hsm.models.IsmaSemanticError
-import ru.nstu.isma.core.hsm.models.IsmaSyntaxError
+import ru.nstu.isma.compiler.hsm.core.models.IsmaSemanticError
+import ru.nstu.isma.compiler.hsm.core.models.IsmaSyntaxError
 import ru.nstu.isma.lisma.InputTranslator
 import ru.nstu.isma.next.core.fdm.FDMConverter
 

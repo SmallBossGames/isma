@@ -1,14 +1,14 @@
 package ru.nstu.isma.lisma.analysis.parser.visitor;
 
 import org.antlr.v4.runtime.misc.NotNull;
-import ru.nstu.isma.core.hsm.exp.EXPPDEOperand;
-import ru.nstu.isma.core.hsm.exp.HMExpression;
-import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
-import ru.nstu.isma.core.hsm.var.HMVariable;
-import ru.nstu.isma.core.hsm.var.HMVariableTable;
-import ru.nstu.isma.core.hsm.var.pde.HMBoundaryCondition;
-import ru.nstu.isma.core.hsm.var.pde.HMPartialDerivativeEquation;
-import ru.nstu.isma.core.hsm.var.pde.HMSpatialVariable;
+import ru.nstu.isma.compiler.hsm.core.exp.EXPPDEOperand;
+import ru.nstu.isma.compiler.hsm.core.exp.HMExpression;
+import ru.nstu.isma.compiler.hsm.core.models.IsmaSemanticError;
+import ru.nstu.isma.compiler.hsm.core.var.HMVariable;
+import ru.nstu.isma.compiler.hsm.core.var.HMVariableTable;
+import ru.nstu.isma.compiler.hsm.core.var.pde.HMBoundaryCondition;
+import ru.nstu.isma.compiler.hsm.core.var.pde.HMPartialDerivativeEquation;
+import ru.nstu.isma.compiler.hsm.core.var.pde.HMSpatialVariable;
 import ru.nstu.isma.lisma.analysis.gen.LismaBaseVisitor;
 import ru.nstu.isma.lisma.analysis.gen.LismaParser;
 import ru.nstu.isma.lisma.analysis.parser.ParserContext;

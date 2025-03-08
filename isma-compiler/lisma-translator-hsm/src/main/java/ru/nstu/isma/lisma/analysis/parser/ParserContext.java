@@ -1,9 +1,9 @@
 package ru.nstu.isma.lisma.analysis.parser;
 
-import ru.nstu.isma.core.hsm.exp.EXPParenthesis;
-import ru.nstu.isma.core.hsm.exp.HMExpression;
-import ru.nstu.isma.core.hsm.models.IsmaErrorList;
-import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
+import ru.nstu.isma.compiler.hsm.core.exp.EXPParenthesis;
+import ru.nstu.isma.compiler.hsm.core.exp.HMExpression;
+import ru.nstu.isma.compiler.hsm.core.models.IsmaErrorList;
+import ru.nstu.isma.compiler.hsm.core.models.IsmaSemanticError;
 
 import java.util.HashMap;
 import java.util.Map;

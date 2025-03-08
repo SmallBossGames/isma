@@ -1,12 +1,12 @@
 package ru.nstu.isma.next.core.fdm
 
-import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.core.hsm.`var`.*
-import ru.nstu.isma.core.hsm.`var`.pde.HMBoundaryCondition
-import ru.nstu.isma.core.hsm.`var`.pde.HMPartialDerivativeEquation
-import ru.nstu.isma.core.hsm.`var`.pde.HMSampledSpatialVariable
-import ru.nstu.isma.core.hsm.exp.*
-import ru.nstu.isma.core.hsm.service.PDEInitialValueCalculator
+import ru.nstu.isma.compiler.hsm.core.HSM
+import ru.nstu.isma.compiler.hsm.core.exp.*
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMBoundaryCondition
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMPartialDerivativeEquation
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMSampledSpatialVariable
+import ru.nstu.isma.compiler.hsm.core.service.PDEInitialValueCalculator
+import ru.nstu.isma.compiler.hsm.core.`var`.*
 import java.lang.StringBuilder
 import java.util.*
 import java.util.function.Consumer
@@ -198,7 +198,8 @@ class FDMConverter(private val model: HSM?) {
     }
 
     private fun addSubst(pde: HMPartialDerivativeEquation, av: HMSampledSpatialVariable, idx: FDMIndexedApxVar?, o: EXPPDEOperand,
-                         newRP: HMExpression) {
+                         newRP: HMExpression
+    ) {
         val eq_idx_plus_1: HMEquation = vT.get(equationNameMappingSpecIndex(pde, av, idx!!.index!! + 1)) as HMEquation
         val eq_idx_minus_1: HMEquation = vT.get(equationNameMappingSpecIndex(pde, av, idx.index!! - 1)) as HMEquation
         val eq_cur: HMEquation = vT.get(equationNameMapping(pde)) as HMEquation
@@ -212,8 +213,12 @@ class FDMConverter(private val model: HSM?) {
 //                throw new RuntimeException("FDM: all is bad");
 //            }
             uc = HMUnnamedConst(o.sampledFirstSpatialVar.stepSize)
-            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_plus_1))
-            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_minus_1))
+            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+                EXPOperand(eq_idx_plus_1)
+            )
+            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+                EXPOperand(eq_idx_minus_1)
+            )
             newRP.add(EXPOperator.sub())
             newRP.add(EXPOperand(HMUnnamedConst(2.0)))
             newRP.add(EXPOperand(uc))
@@ -221,12 +226,16 @@ class FDMConverter(private val model: HSM?) {
             newRP.add(EXPOperator.div())
         } else if (o.order == EXPPDEOperand.Order.TWO) {
             uc = HMUnnamedConst(Math.pow(o.sampledFirstSpatialVar.stepSize, 2.0))
-            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_minus_1))
+            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+                EXPOperand(eq_idx_minus_1)
+            )
             newRP.add(EXPOperand(HMUnnamedConst(2.0)))
             newRP.add(EXPOperand(eq_cur))
             newRP.add(EXPOperator.mult())
             newRP.add(EXPOperator.sub())
-            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(EXPOperand(eq_idx_plus_1))
+            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+                EXPOperand(eq_idx_plus_1)
+            )
             newRP.add(EXPOperator.add())
             newRP.add(EXPOperand(uc))
             newRP.add(EXPOperator.div())

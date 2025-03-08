@@ -1,6 +1,6 @@
 package ru.isma.next.app.services.project
 
-import ru.nstu.isma.core.hsm.HSM
+import ru.nstu.isma.compiler.hsm.core.HSM
 
 sealed interface LismaPdeTranslationResult
 

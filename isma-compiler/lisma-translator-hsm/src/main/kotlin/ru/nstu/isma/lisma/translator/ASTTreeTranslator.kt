@@ -1,12 +1,12 @@
 package ru.nstu.isma.lisma.translator
 
-import ru.nstu.isma.core.hsm.models.IsmaErrorList
+import ru.nstu.isma.compiler.hsm.core.models.IsmaErrorList
 import org.antlr.v4.runtime.tree.ParseTree
-import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.core.hsm.`var`.HMDerivativeEquation
-import ru.nstu.isma.core.hsm.`var`.HMEquation
-import ru.nstu.isma.core.hsm.`var`.pde.HMPartialDerivativeEquation
-import ru.nstu.isma.core.hsm.exp.EXPPDEOperand
+import ru.nstu.isma.compiler.hsm.core.HSM
+import ru.nstu.isma.compiler.hsm.core.`var`.HMDerivativeEquation
+import ru.nstu.isma.compiler.hsm.core.`var`.HMEquation
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMPartialDerivativeEquation
+import ru.nstu.isma.compiler.hsm.core.exp.EXPPDEOperand
 import ru.nstu.isma.lisma.analysis.parser.ParserContext
 import ru.nstu.isma.lisma.analysis.parser.visitor.*
 

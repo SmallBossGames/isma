@@ -1,17 +1,17 @@
 package ru.nstu.isma.lisma.analysis.parser.visitor;
 
 import org.antlr.v4.runtime.misc.NotNull;
-import ru.nstu.isma.core.hsm.HSM;
-import ru.nstu.isma.core.hsm.exp.EXPOperand;
-import ru.nstu.isma.core.hsm.exp.EXPPDEOperand;
-import ru.nstu.isma.core.hsm.exp.HMExpression;
-import ru.nstu.isma.core.hsm.hybrid.HMState;
-import ru.nstu.isma.core.hsm.hybrid.HMStateAutomata;
-import ru.nstu.isma.core.hsm.linear.HMLinearEquation;
-import ru.nstu.isma.core.hsm.linear.HMLinearVar;
-import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
-import ru.nstu.isma.core.hsm.var.*;
-import ru.nstu.isma.core.hsm.var.pde.HMPartialDerivativeEquation;
+import ru.nstu.isma.compiler.hsm.core.HSM;
+import ru.nstu.isma.compiler.hsm.core.exp.EXPOperand;
+import ru.nstu.isma.compiler.hsm.core.exp.EXPPDEOperand;
+import ru.nstu.isma.compiler.hsm.core.exp.HMExpression;
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMState;
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMStateAutomata;
+import ru.nstu.isma.compiler.hsm.core.linear.HMLinearEquation;
+import ru.nstu.isma.compiler.hsm.core.linear.HMLinearVar;
+import ru.nstu.isma.compiler.hsm.core.var.*;
+import ru.nstu.isma.compiler.hsm.core.models.IsmaSemanticError;
+import ru.nstu.isma.compiler.hsm.core.var.pde.HMPartialDerivativeEquation;
 import ru.nstu.isma.lisma.analysis.gen.LismaParser;
 import ru.nstu.isma.lisma.analysis.parser.ParserContext;
 

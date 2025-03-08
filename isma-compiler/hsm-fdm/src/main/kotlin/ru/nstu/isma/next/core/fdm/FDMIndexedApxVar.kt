@@ -1,7 +1,7 @@
 package ru.nstu.isma.next.core.fdm
 
-import ru.nstu.isma.core.hsm.`var`.HMConst
-import ru.nstu.isma.core.hsm.`var`.pde.HMSampledSpatialVariable
+import ru.nstu.isma.compiler.hsm.core.`var`.HMConst
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMSampledSpatialVariable
 
 /**
  * Created by Bessonov Alex

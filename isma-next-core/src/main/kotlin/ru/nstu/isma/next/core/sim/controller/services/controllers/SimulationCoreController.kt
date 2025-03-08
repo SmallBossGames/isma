@@ -1,7 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller.services.controllers
 
 import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
-import ru.nstu.isma.core.hsm.HSM
+import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials

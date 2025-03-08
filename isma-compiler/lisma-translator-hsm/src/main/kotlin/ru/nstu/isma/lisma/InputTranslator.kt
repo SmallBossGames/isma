@@ -1,7 +1,7 @@
 package ru.nstu.isma.lisma
 
-import ru.nstu.isma.core.hsm.models.IsmaErrorList
-import ru.nstu.isma.core.hsm.HSM
+import ru.nstu.isma.compiler.hsm.core.models.IsmaErrorList
+import ru.nstu.isma.compiler.hsm.core.HSM
 
 /**
  * Created by Bessonov Alex

@@ -1,7 +1,7 @@
 package common;
 
-import ru.nstu.isma.core.hsm.HSM;
-import ru.nstu.isma.core.hsm.var.pde.HMPartialDerivativeEquation;
+import ru.nstu.isma.compiler.hsm.core.HSM;
+import ru.nstu.isma.compiler.hsm.core.var.pde.HMPartialDerivativeEquation;
 
 import java.io.Serializable;
 import java.util.HashMap;

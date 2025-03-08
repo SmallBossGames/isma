@@ -1,10 +1,10 @@
 package common;
 
-import ru.nstu.isma.core.hsm.exp.HMExpression;
-import ru.nstu.isma.core.hsm.hybrid.HMPseudoState;
-import ru.nstu.isma.core.hsm.hybrid.HMState;
-import ru.nstu.isma.core.hsm.linear.HMLinearEquation;
-import ru.nstu.isma.core.hsm.linear.HMLinearSystem;
+import ru.nstu.isma.compiler.hsm.core.exp.HMExpression;
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMPseudoState;
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMState;
+import ru.nstu.isma.compiler.hsm.core.linear.HMLinearEquation;
+import ru.nstu.isma.compiler.hsm.core.linear.HMLinearSystem;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

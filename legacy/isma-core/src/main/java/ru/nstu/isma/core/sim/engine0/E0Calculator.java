@@ -6,7 +6,6 @@ import ru.nstu.isma.core.hsm.exp.EXPFunctionOperand;
 import ru.nstu.isma.core.hsm.exp.EXPOperand;
 import ru.nstu.isma.core.hsm.exp.EXPOperator;
 import ru.nstu.isma.core.hsm.exp.HMExpression;
-import ru.nstu.isma.core.hsm.var.*;
 
 import java.util.HashSet;
 import java.util.LinkedList;

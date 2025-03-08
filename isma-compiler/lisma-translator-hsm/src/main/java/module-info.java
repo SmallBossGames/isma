@@ -1,6 +1,6 @@
 module isma.isma.lisma.main {
     requires org.antlr.antlr4.runtime;
-    requires isma.isma.hsm.main;
+    requires isma.compiler.hsm.core;
     requires kotlin.stdlib;
 
     exports ru.nstu.isma.lisma.analysis.gen;

@@ -3,7 +3,7 @@ package ru.nstu.isma.next.core.sim.controller.services.hsm
 import ru.nstu.isma.compiler.hsm.jvm.AnalyzedHybridSystemClassBuilder
 import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 import ru.nstu.isma.compiler.hsm.jvm.SourceCodeCompiler
-import ru.nstu.isma.core.hsm.HSM
+import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.intg.api.calcmodel.HybridSystem
 import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 

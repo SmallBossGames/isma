@@ -1,14 +1,14 @@
 package ru.nstu.isma.next.core.fdm
 
-import ru.nstu.isma.core.hsm.`var`.HMConst
-import ru.nstu.isma.core.hsm.`var`.HMEquation
-import ru.nstu.isma.core.hsm.`var`.HMVariable
-import ru.nstu.isma.core.hsm.`var`.HMVariableTable
-import ru.nstu.isma.core.hsm.`var`.pde.HMPartialDerivativeEquation
-import ru.nstu.isma.core.hsm.`var`.pde.HMSampledSpatialVariable
-import ru.nstu.isma.core.hsm.`var`.pde.HMSpatialVariable
-import ru.nstu.isma.core.hsm.exp.EXPOperand
-import ru.nstu.isma.core.hsm.exp.HMExpression
+import ru.nstu.isma.compiler.hsm.core.`var`.HMConst
+import ru.nstu.isma.compiler.hsm.core.`var`.HMEquation
+import ru.nstu.isma.compiler.hsm.core.`var`.HMVariable
+import ru.nstu.isma.compiler.hsm.core.`var`.HMVariableTable
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMPartialDerivativeEquation
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMSampledSpatialVariable
+import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMSpatialVariable
+import ru.nstu.isma.compiler.hsm.core.exp.EXPOperand
+import ru.nstu.isma.compiler.hsm.core.exp.HMExpression
 import java.lang.StringBuilder
 import java.util.*
 

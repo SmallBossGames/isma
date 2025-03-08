@@ -1,13 +1,13 @@
 package ru.nstu.isma.lisma.analysis.parser.visitor;
 
 import org.antlr.v4.runtime.misc.NotNull;
-import ru.nstu.isma.core.hsm.models.IsmaErrorList;
-import ru.nstu.isma.core.hsm.models.IsmaSemanticError;
-import ru.nstu.isma.core.hsm.service.ConstValueCalculator;
-import ru.nstu.isma.core.hsm.var.HMConst;
-import ru.nstu.isma.core.hsm.var.HMDerivativeEquation;
-import ru.nstu.isma.core.hsm.var.HMVariableTable;
-import ru.nstu.isma.core.hsm.var.pde.HMPartialDerivativeEquation;
+import ru.nstu.isma.compiler.hsm.core.models.IsmaErrorList;
+import ru.nstu.isma.compiler.hsm.core.models.IsmaSemanticError;
+import ru.nstu.isma.compiler.hsm.core.service.ConstValueCalculator;
+import ru.nstu.isma.compiler.hsm.core.var.HMConst;
+import ru.nstu.isma.compiler.hsm.core.var.HMDerivativeEquation;
+import ru.nstu.isma.compiler.hsm.core.var.HMVariableTable;
+import ru.nstu.isma.compiler.hsm.core.var.pde.HMPartialDerivativeEquation;
 import ru.nstu.isma.lisma.analysis.gen.LismaParser;
 import ru.nstu.isma.lisma.analysis.parser.ParserContext;
 

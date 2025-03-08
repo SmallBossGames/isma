@@ -2,9 +2,9 @@ package ru.nstu.isma.lisma.analysis.parser.visitor;
 
 import ru.nstu.isma.lisma.analysis.gen.LismaBaseVisitor;
 import ru.nstu.isma.lisma.analysis.gen.LismaParser;
-import ru.nstu.isma.core.hsm.var.HMAlgebraicEquation;
-import ru.nstu.isma.core.hsm.var.HMDerivativeEquation;
-import ru.nstu.isma.core.hsm.var.HMEquation;
+import ru.nstu.isma.compiler.hsm.core.var.HMAlgebraicEquation;
+import ru.nstu.isma.compiler.hsm.core.var.HMDerivativeEquation;
+import ru.nstu.isma.compiler.hsm.core.var.HMEquation;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTree;
 import ru.nstu.isma.lisma.analysis.parser.ParserContext;

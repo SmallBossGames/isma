@@ -1,16 +1,16 @@
 package ru.nstu.isma.compiler.hsm.jvm
 
 import common.HMExpressionBuilder
-import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.core.hsm.events.HSMEventFunctionGroup
-import ru.nstu.isma.core.hsm.events.HSMEventFunctionGroupEvaluator
-import ru.nstu.isma.core.hsm.exp.EXPOperator
-import ru.nstu.isma.core.hsm.exp.HMExpression
-import ru.nstu.isma.core.hsm.hybrid.HMPseudoState
-import ru.nstu.isma.core.hsm.hybrid.HMState
-import ru.nstu.isma.core.hsm.hybrid.HMTransaction
-import ru.nstu.isma.core.hsm.`var`.HMAlgebraicEquation
-import ru.nstu.isma.core.hsm.`var`.HMDerivativeEquation
+import ru.nstu.isma.compiler.hsm.core.HSM
+import ru.nstu.isma.compiler.hsm.core.events.HSMEventFunctionGroup
+import ru.nstu.isma.compiler.hsm.core.events.HSMEventFunctionGroupEvaluator
+import ru.nstu.isma.compiler.hsm.core.exp.EXPOperator
+import ru.nstu.isma.compiler.hsm.core.exp.HMExpression
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMPseudoState
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMState
+import ru.nstu.isma.compiler.hsm.core.hybrid.HMTransaction
+import ru.nstu.isma.compiler.hsm.core.`var`.HMAlgebraicEquation
+import ru.nstu.isma.compiler.hsm.core.`var`.HMDerivativeEquation
 import ru.nstu.isma.intg.api.calcmodel.*
 import ru.nstu.isma.intg.api.calcmodel.EventFunctionGroup.StepChoiceRule
 

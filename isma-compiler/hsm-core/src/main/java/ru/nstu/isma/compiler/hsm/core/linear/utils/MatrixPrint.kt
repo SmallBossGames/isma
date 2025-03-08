@@ -1,4 +1,4 @@
-package utils
+package ru.nstu.isma.compiler.hsm.core.linear.utils
 
 /**
  * Created by Bessonov Alex

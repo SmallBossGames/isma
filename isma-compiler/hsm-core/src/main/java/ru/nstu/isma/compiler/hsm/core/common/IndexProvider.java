@@ -1,4 +1,4 @@
-package common;
+package ru.nstu.isma.compiler.hsm.core.common;
 
 /**
  * @author Maria Nasyrova

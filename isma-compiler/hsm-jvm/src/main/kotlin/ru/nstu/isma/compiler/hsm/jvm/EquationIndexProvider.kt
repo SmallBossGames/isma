@@ -1,7 +1,7 @@
 package ru.nstu.isma.compiler.hsm.jvm
 
 import com.google.common.collect.HashBiMap
-import common.IndexProvider
+import ru.nstu.isma.compiler.hsm.core.common.IndexProvider
 import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.intg.api.calcmodel.DaeSystem
 

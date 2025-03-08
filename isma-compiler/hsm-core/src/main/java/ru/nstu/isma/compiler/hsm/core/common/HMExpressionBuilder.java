@@ -1,4 +1,4 @@
-package common;
+package ru.nstu.isma.compiler.hsm.core.common;
 
 import ru.nstu.isma.compiler.hsm.core.exp.*;
 import ru.nstu.isma.compiler.hsm.core.linear.HMLinearVar;

@@ -1,6 +1,6 @@
 package ru.nstu.isma.compiler.hsm.jvm
 
-import common.HMExpressionBuilder
+import ru.nstu.isma.compiler.hsm.core.common.HMExpressionBuilder
 import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.compiler.hsm.core.events.HSMEventFunctionGroup
 import ru.nstu.isma.compiler.hsm.core.events.HSMEventFunctionGroupEvaluator
@@ -24,7 +24,8 @@ class AnalyzedHybridSystemClassBuilder(
     private val packageName: String,
     private val className: String
 ) {
-    private val hmExpressionBuilder = HMExpressionBuilder(indexProvider)
+    private val hmExpressionBuilder =
+        HMExpressionBuilder(indexProvider)
 
     fun buildSourceCode(): String {
         return renderClassTemplate(

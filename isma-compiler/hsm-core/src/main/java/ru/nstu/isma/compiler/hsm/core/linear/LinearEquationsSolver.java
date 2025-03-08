@@ -1,7 +1,7 @@
 package ru.nstu.isma.compiler.hsm.core.linear;
 
 
-import utils.MatrixPrint;
+import ru.nstu.isma.compiler.hsm.core.linear.utils.MatrixPrint;
 
 /**
  * Created by Дмитрий Достовалов

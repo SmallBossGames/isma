@@ -8,7 +8,7 @@ module isma.compiler.hsm.core {
     exports ru.nstu.isma.compiler.hsm.core.hybrid;
     exports ru.nstu.isma.compiler.hsm.core.linear;
     exports ru.nstu.isma.compiler.hsm.core.events;
-    exports common;
+    exports ru.nstu.isma.compiler.hsm.core.common;
 
     requires kotlin.stdlib;
     requires org.jetbrains.annotations;

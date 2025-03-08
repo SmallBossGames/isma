@@ -32,7 +32,6 @@ include("isma-solver:lib:rkmerson")
 include("isma-solver:lib:rkfehlberg")
 
 //Java 8 projects
-include("isma-intg-demo-problems")
 
 
 // Java 8 legacy
@@ -53,6 +52,7 @@ include("isma-intg-demo-problems")
 //include("isma-intg-server:isma-intg-server-tests")
 //include("isma-intg-core-solvers-parallel")
 //include("isma-intg-parallel-ignite")
+//include("isma-intg-demo-problems")
 
 include("isma-next-math-engine")
 include("isma-next-math-common")

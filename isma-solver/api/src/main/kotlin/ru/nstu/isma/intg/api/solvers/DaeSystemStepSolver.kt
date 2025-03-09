@@ -15,13 +15,4 @@ interface DaeSystemStepSolver {
     fun calculateRhs(yForDe: DoubleArray): Array<DoubleArray>
     fun step(fromPoint: IntgPoint): IntgPoint
     fun stages(fromPoint: IntgPoint): Array<DoubleArray>
-    fun dispose()
-}
-
-suspend inline fun <T> DaeSystemStepSolver.useAsync(crossinline op: suspend DaeSystemStepSolver.() -> T) = coroutineScope {
-    try {
-        return@coroutineScope op()
-    } finally {
-        dispose()
-    }
 }

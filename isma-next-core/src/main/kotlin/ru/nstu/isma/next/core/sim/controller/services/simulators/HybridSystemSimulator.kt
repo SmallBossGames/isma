@@ -8,7 +8,6 @@ import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystemChangeSet
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
-import ru.nstu.isma.intg.api.solvers.useAsync
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetector
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory
@@ -23,10 +22,9 @@ class HybridSystemSimulator(
     private val eventDetectorFactory: IEventDetectorFactory
 ) : IHybridSystemSimulator {
 
-    override suspend fun runAsync(parameters: HybridSystemSimulatorParameters) = coroutineScope {
-        daeSystemStepSolverFactory.create(parameters.hsmCompilationResult).useAsync {
-            return@useAsync runAsyncInternal(parameters, this, eventDetectorFactory.create())
-        }
+    override suspend fun runAsync(parameters: HybridSystemSimulatorParameters): IntgMetricData {
+        val solver = daeSystemStepSolverFactory.create(parameters.hsmCompilationResult)
+        return runAsyncInternal(parameters, solver, eventDetectorFactory.create())
     }
 
     private suspend fun runAsyncInternal(

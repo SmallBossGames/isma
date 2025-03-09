@@ -185,6 +185,4 @@ class DefaultDaeSystemStepSolver(
     private fun isControllerEnabled(intgController: IntgController?): Boolean {
         return intgController != null && intgController.enabled
     }
-
-    override fun dispose() {}
 }

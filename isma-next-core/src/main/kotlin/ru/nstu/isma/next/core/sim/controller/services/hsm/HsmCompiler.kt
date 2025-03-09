@@ -9,15 +9,13 @@ import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 
 class HsmCompiler : IHsmCompiler {
     override fun compile(hsm: HSM): HsmCompilationResult {
-        val indexProvider = EquationIndexProvider(hsm)
-        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
+        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
         val hsSourceCode = hsClassBuilder.buildSourceCode()
         val hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
             DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode
         )
-        val modelClassLoader = hybridSystem.javaClass.classLoader!!
 
-        return HsmCompilationResult(indexProvider, hybridSystem, modelClassLoader)
+        return HsmCompilationResult(hsClassBuilder.indexProvider, hybridSystem)
     }
 
     companion object {

@@ -20,12 +20,12 @@ import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunctionGroup.StepChoiceRule
  */
 class AnalyzedHybridSystemClassBuilder(
     private val hsm: HSM,
-    private val indexProvider: EquationIndexProvider,
     private val packageName: String,
     private val className: String
 ) {
-    private val hmExpressionBuilder =
-        HMExpressionBuilder(indexProvider)
+    val indexProvider = EquationIndexProvider(hsm)
+
+    private val hmExpressionBuilder = HMExpressionBuilder(indexProvider)
 
     fun buildSourceCode(): String {
         return renderClassTemplate(

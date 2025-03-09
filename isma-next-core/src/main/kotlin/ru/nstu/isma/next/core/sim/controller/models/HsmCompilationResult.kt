@@ -6,5 +6,4 @@ import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystem
 data class HsmCompilationResult(
     val indexProvider: EquationIndexProvider,
     val hybridSystem: HybridSystem,
-    val classLoader: ClassLoader,
 )

@@ -1,6 +1,5 @@
 package ru.nstu.isma.intg.api.solvers
 
-import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystemChangeSet
 import ru.nstu.isma.intg.api.methods.IntgPoint
 

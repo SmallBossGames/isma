@@ -6,5 +6,4 @@ plugins {
 dependencies {
     implementation(project(":isma-solver:api"))
     implementation(project(":isma-solver:core"))
-    implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
 }

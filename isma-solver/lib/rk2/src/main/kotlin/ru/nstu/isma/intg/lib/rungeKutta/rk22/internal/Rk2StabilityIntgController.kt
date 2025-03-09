@@ -1,6 +1,5 @@
 package ru.nstu.isma.intg.lib.rungeKutta.rk22.internal
 
-import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.core.methods.BaseStabilityIntgController
 import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
@@ -26,7 +25,7 @@ class Rk2StabilityIntgController : BaseStabilityIntgController() {
             if (k2 == k1) {
                 deltaKs[i] = 0.0
             } else {
-                deltaKs[i] = abs(point.rhs[DaeSystem.RHS_DE_PART_IDX][i] - k2) / abs(k2 - k1)
+                deltaKs[i] = abs(point.rhs[0][i] - k2) / abs(k2 - k1)
             }
         }
 

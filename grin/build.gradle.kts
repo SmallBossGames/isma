@@ -9,7 +9,7 @@ subprojects {
     version = rootProject.version
 
     dependencies {
-        testImplementation("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+        testImplementation(rootProject.libs.junit.jupiter.engine)
     }
 
     tasks.test {

@@ -14,7 +14,7 @@ dependencies {
 
     implementation(project(":grin:gui:concatenation"))
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 

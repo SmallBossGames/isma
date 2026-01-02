@@ -4,9 +4,9 @@ plugins {
 }
 
 dependencies {
-    implementation("org.apache.poi:poi:5.4.0")
-    implementation("org.apache.poi:poi-ooxml:5.4.0")
-    implementation("de.sciss:jwave:1.0.3")
+    implementation(libs.org.apache.poi)
+    implementation(libs.org.apache.poi.ooxml)
+    implementation(libs.de.sciss.jwave)
 
     implementation(libs.tornadofx.core)
     implementation(libs.kotlinx.coroutines.core)
@@ -16,8 +16,8 @@ dependencies {
 
     implementation(libs.koin.core)
 
-    testImplementation ("ru.kontur.kinfra.kfixture:kfixture:0.6.0")
-    testImplementation ("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation (libs.kfixture)
+    testImplementation (libs.mockito.kotlin)
 
     api(project(":grin:gui:common"))
     implementation(project(":grin:math"))

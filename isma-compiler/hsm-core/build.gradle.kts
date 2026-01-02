@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation(libs.org.apache.commons.lang)
     implementation(libs.slf4j.api)
     implementation(libs.jetbrains.annotations)
 

@@ -27,9 +27,9 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.tornadofx.core)
     implementation(libs.logback.classic)
-    implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
-    implementation("org.kordamp.ikonli:ikonli-material2-pack:12.3.1")
-    implementation("org.controlsfx:controlsfx:11.1.2")
+    implementation(libs.ikonli.javafx)
+    implementation(libs.ikonli.material2.pack)
+    implementation(libs.controlsfx)
 
     implementation(project(":isma-compiler:hsm-core"))
     implementation(project(":isma-compiler:hsm-fdm"))

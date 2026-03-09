@@ -1,7 +1,6 @@
 package ru.nstu.isma.next.core.sim.controller.services.simulators
 
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.isActive
+
 import ru.nstu.isma.intg.api.models.IntgMetricData
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DifferentialEquation
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystemChangeSet
@@ -22,16 +21,16 @@ class HybridSystemSimulator(
     private val eventDetectorFactory: IEventDetectorFactory
 ) : IHybridSystemSimulator {
 
-    override suspend fun runAsync(parameters: HybridSystemSimulatorParameters): IntgMetricData {
+    override fun runAsync(parameters: HybridSystemSimulatorParameters): IntgMetricData {
         val solver = daeSystemStepSolverFactory.create(parameters.hsmCompilationResult)
         return runAsyncInternal(parameters, solver, eventDetectorFactory.create())
     }
 
-    private suspend fun runAsyncInternal(
+    private fun runAsyncInternal(
         parameters: HybridSystemSimulatorParameters,
         stepSolver: DaeSystemStepSolver,
         eventDetector: IEventDetector?,
-    ): IntgMetricData = coroutineScope {
+    ): IntgMetricData {
         val metricData = IntgMetricData()
         metricData.startTime = System.currentTimeMillis()
         var x = parameters.simulationInitials.start
@@ -41,7 +40,7 @@ class HybridSystemSimulator(
         var changeSet: HybridSystemChangeSet
         var rhs = stepSolver.calculateRhs(yForDe)
         var isLastStep = false
-        while (x < end && isActive) {
+        while (x < end) {
             changeSet = parameters.hsmCompilationResult.hybridSystem.checkTransitions(yForDe, rhs)
             if (!changeSet.isEmpty) {
                 changeInitials(yForDe, changeSet)
@@ -74,7 +73,7 @@ class HybridSystemSimulator(
             parameters.stepChangeHandlers(finalX)
         }
         metricData.endTime = System.currentTimeMillis()
-        return@coroutineScope metricData
+        return metricData
     }
 
     private fun changeInitials(yForDe: DoubleArray, changeSet: HybridSystemChangeSet) {

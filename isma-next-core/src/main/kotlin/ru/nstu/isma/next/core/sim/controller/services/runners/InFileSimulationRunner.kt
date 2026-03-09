@@ -1,9 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller.services.runners
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flowOn
 import ru.nstu.isma.intg.api.models.IntgMetricData
+import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
 import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
@@ -11,46 +9,59 @@ import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParamet
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 import ru.nstu.isma.next.core.sim.controller.services.simulators.IHybridSystemSimulator
 import java.io.File
+import java.util.concurrent.LinkedBlockingQueue
+
+sealed class QueueItem {
+    data class Point(val point: IntgResultPoint) : QueueItem()
+    data object EndOfStream : QueueItem()
+}
 
 class InFileSimulationRunner(
     private val hybridSystemSimulator: IHybridSystemSimulator,
 ) : ISimulationRunner {
-    override suspend fun run(context: SimulationParameters): HybridSystemIntegrationResult = coroutineScope {
-        val tempFile = withContext(Dispatchers.IO) {
-            File.createTempFile("ismaSolverTempFile_", ".txt")
+    override fun run(context: SimulationParameters): HybridSystemIntegrationResult {
+        val tempFile = File.createTempFile("ismaSolverTempFile_", ".txt")
+
+        var result: IntgMetricData? = null
+        val pointQueue = LinkedBlockingQueue<QueueItem>()
+
+        val simulatorThread = Thread.ofVirtual().start {
+            val simulatorParameters = HybridSystemSimulatorParameters(
+                context.compilationResult,
+                context.simulationInitials,
+                stepChangeHandlers = context.stepChangeHandlers,
+                resultPointHandlers = { point ->
+                    pointQueue.put(QueueItem.Point(point))
+                }
+            )
+
+            result = hybridSystemSimulator.runAsync(simulatorParameters)
+            pointQueue.put(QueueItem.EndOfStream)
         }
 
-        var result = IntgMetricData()
-
-        var isFirst = true
-
-        withContext(Dispatchers.IO) {
+        val writerThread = Thread.ofVirtual().start {
             tempFile.bufferedWriter().use { writer ->
-                channelFlow {
-                    val simulatorParameters = HybridSystemSimulatorParameters(
-                        context.compilationResult,
-                        context.simulationInitials,
-                        stepChangeHandlers = context.stepChangeHandlers,
-                        resultPointHandlers = {
-                            send(it)
-                        }
-                    )
-
-                    result = hybridSystemSimulator.runAsync(simulatorParameters)
-                }.flowOn(Dispatchers.Default).collect {
+                var isFirst = true
+                while (true) {
+                    val item = pointQueue.take()
+                    if (item is QueueItem.EndOfStream) break
+                    val point = (item as QueueItem.Point).point
                     if (isFirst) {
-                        writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(it))
+                        writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(point))
                         isFirst = false
                     }
-                    writer.append(IntegrationResultPointFileHelpers.buildCsvString(it))
+                    writer.append(IntegrationResultPointFileHelpers.buildCsvString(point))
                 }
             }
         }
 
+        simulatorThread.join()
+        writerThread.join()
+
         val resultReader = AsyncFilePointProvider(tempFile)
 
-        return@coroutineScope HybridSystemIntegrationResult(
-            metricData = result,
+        return HybridSystemIntegrationResult(
+            metricData = result!!,
             resultPointProvider = resultReader,
             equationIndexProvider = context.compilationResult.indexProvider,
         )

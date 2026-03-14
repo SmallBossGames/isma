@@ -19,3 +19,7 @@ build/
 local.properties
 *.log
 .kotlin/
+.project
+.settings
+.classpath
+bin/

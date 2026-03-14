@@ -1,4 +1,5 @@
 rootProject.name = "isma"
+
 //JAVA 11+ projects
 include("isma-ui:app")
 include("isma-ui:text-editor")

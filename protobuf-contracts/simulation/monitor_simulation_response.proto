@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package ru.nstu.isma.contracts.simulation;
+
+option csharp_namespace = "Isma.Contracts.Simulation";
+option go_package = "github.com/isma/contracts/simulation";
+option java_package = "ru.nstu.isma.contracts.simulation";
+
+message MonitorSimulationResponse {
+  double start_time = 1;
+  double end_time = 2;
+  double current_time = 3;
+}

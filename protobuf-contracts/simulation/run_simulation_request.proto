@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package ru.nstu.isma.contracts.simulation;
+
+option csharp_namespace = "Isma.Contracts.Simulation";
+option go_package = "github.com/isma/contracts/simulation";
+option java_package = "ru.nstu.isma.contracts.simulation";
+
+message RunSimulationRequest {
+  double start_time = 1;
+  double end_time = 2;
+  double initial_step = 3;
+  string method_name = 4;
+  double accuracy = 5;
+  bool is_accuracy_in_use = 6;
+}

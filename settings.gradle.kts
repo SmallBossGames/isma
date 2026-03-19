@@ -58,3 +58,5 @@ include("isma-solver:lib:rkfehlberg")
 
 include("isma-next-math-engine")
 include("isma-next-math-common")
+
+include("isma-server:domain")

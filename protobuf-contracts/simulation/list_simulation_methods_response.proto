@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package ru.nstu.isma.contracts.simulation;
+
+import "simulation_method_item.proto";
+
+option csharp_namespace = "Isma.Contracts.Simulation";
+option go_package = "github.com/isma/contracts/simulation";
+option java_package = "ru.nstu.isma.contracts.simulation";
+
+message ListSimulationMethodsResponse {
+  repeated SimulationMethodItem methods = 1;
+}

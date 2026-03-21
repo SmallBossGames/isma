@@ -2,18 +2,18 @@ syntax = "proto3";
 
 package ru.nstu.isma.contracts.simulation;
 
-import "get_simulation_result_request.proto";
-import "get_simulation_result_response.proto";
-import "list_simulation_methods_request.proto";
-import "list_simulation_methods_response.proto";
-import "monitor_simulation_request.proto";
-import "monitor_simulation_response.proto";
-import "run_simulation_request.proto";
-import "run_simulation_response.proto";
+import "simulation/get_simulation_result_request.proto";
+import "simulation/get_simulation_result_response.proto";
+import "simulation/list_simulation_methods_request.proto";
+import "simulation/list_simulation_methods_response.proto";
+import "simulation/monitor_simulation_request.proto";
+import "simulation/monitor_simulation_response.proto";
+import "simulation/run_simulation_request.proto";
+import "simulation/run_simulation_response.proto";
 
 option csharp_namespace = "Isma.Contracts.Simulation";
 option go_package = "github.com/isma/contracts/simulation";
-option java_outer_classname = "SimulationServiceGrpc";
+option java_multiple_files = true;
 option java_package = "ru.nstu.isma.contracts.simulation";
 
 service SimulationService {

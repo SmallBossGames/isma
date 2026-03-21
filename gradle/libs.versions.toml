@@ -5,6 +5,9 @@ kotlinx-serialization-json = "1.10.0-RC"
 javafx-plugin = "0.1.0"
 org-apache-poi = "5.4.0"
 ikonli = "12.4.0"
+grpc = "1.80.0"
+netty = "4.1.115.Final"
+google-protobuf-plugin = "0.9.6"
 
 [libraries]
 antlr4-runtime = { module = "org.antlr:antlr4-runtime", version = "4.13.0" }
@@ -32,6 +35,18 @@ org-apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "org
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
 tornadofx-core = { module = "no.tornado:tornadofx", version = "1.7.20" }
 
+netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
+netty-transport = { module = "io.netty:netty-transport", version.ref = "netty" }
+
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version = "4.34.0" }
+
+grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
+grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
+grpc-core = { module = "io.grpc:grpc-core", version.ref = "grpc" }
+grpc-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
+grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
+
+
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.9.2"
 junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.11.4"
 
@@ -40,3 +55,4 @@ java-modules = { id = "org.javamodularity.moduleplugin", version = "2.0.0" }
 javafx = { id = "org.openjfx.javafxplugin", version.ref = "javafx-plugin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-plugin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-plugin" }
+google-protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf-plugin" }

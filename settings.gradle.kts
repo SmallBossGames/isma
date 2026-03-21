@@ -60,3 +60,5 @@ include("isma-next-math-engine")
 include("isma-next-math-common")
 
 include("isma-server:domain")
+include("isma-server:grpc")
+include("isma-server:app")

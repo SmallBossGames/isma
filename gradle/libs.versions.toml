@@ -46,6 +46,7 @@ grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
 grpc-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
 grpc-netty = { module = "io.grpc:grpc-netty", version.ref = "grpc" }
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
+grpc-services = { module = "io.grpc:grpc-services", version.ref = "grpc" }
 
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.9.2"
 junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.11.4"

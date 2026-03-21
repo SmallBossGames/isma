@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.grpc.protobuf)
     implementation(libs.protobuf.java)
     implementation(libs.grpc.java)
+    implementation(libs.grpc.services)
 
     implementation(libs.kotlin.reflect)
     implementation(libs.koin.core)

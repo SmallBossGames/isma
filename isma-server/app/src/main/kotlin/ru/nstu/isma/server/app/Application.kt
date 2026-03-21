@@ -1,6 +1,8 @@
 package ru.nstu.isma.server.app
 
 import io.grpc.netty.NettyServerBuilder
+import io.grpc.protobuf.services.ProtoReflectionService
+import io.grpc.protobuf.services.ProtoReflectionServiceV1
 import io.netty.channel.MultiThreadIoEventLoopGroup
 import io.netty.channel.epoll.EpollIoHandler
 import io.netty.channel.epoll.EpollServerDomainSocketChannel
@@ -36,6 +38,7 @@ fun main() {
         .bossEventLoopGroup(bossGroup)
         .workerEventLoopGroup(workerGroup)
         .addService(koin.grpcService)
+        .addService(ProtoReflectionServiceV1.newInstance())
         .build()
 
     println("Starting gRPC server on Unix socket: $socketPath")

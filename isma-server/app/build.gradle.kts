@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":isma-server:domain"))
     implementation(project(":isma-server:grpc"))
     implementation(project(":isma-server:infrastructure"))
+    implementation(project(":isma-solver:lib-meta"))
 
     implementation(libs.grpc.netty)
     implementation(libs.netty.transport)

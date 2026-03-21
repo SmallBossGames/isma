@@ -1,14 +1,23 @@
 package ru.nstu.isma.domain.handlers.listSimulationMethods
 
-class ListSimulationMethodsHandlerImpl : IListSimulationMethodsHandler {
+import ru.nstu.isma.domain.integration.IIntegrationMethodsStore
+
+class ListSimulationMethodsHandlerImpl(
+    private val integrationMethodsStore: IIntegrationMethodsStore
+) : IListSimulationMethodsHandler {
     override fun handle(): List<SimulationMethodItem> {
-        return listOf(
-            SimulationMethodItem("euler", "Euler"),
-            SimulationMethodItem("rk2", "Runge-Kutta 2nd order"),
-            SimulationMethodItem("rk3", "Runge-Kutta 3rd order"),
-            SimulationMethodItem("rk31", "Runge-Kutta 3(1)"),
-            SimulationMethodItem("rkmerson", "Merson's method"),
-            SimulationMethodItem("rkfehlberg", "Runge-Kutta-Fehlberg"),
-        )
+        return integrationMethodsStore.getMethodNames().map { name ->
+            SimulationMethodItem(name, formatTitle(name))
+        }
+    }
+
+    private fun formatTitle(name: String): String = when (name) {
+        "euler" -> "Euler"
+        "rk2" -> "Runge-Kutta 2nd order"
+        "rk3" -> "Runge-Kutta 3rd order"
+        "rk31" -> "Runge-Kutta 3(1)"
+        "rkmerson" -> "Merson's method"
+        "rkfehlberg" -> "Runge-Kutta-Fehlberg"
+        else -> name.replaceFirstChar { it.uppercase() }
     }
 }

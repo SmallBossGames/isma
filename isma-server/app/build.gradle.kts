@@ -13,6 +13,7 @@ application {
 dependencies {
     implementation(project(":isma-server:domain"))
     implementation(project(":isma-server:grpc"))
+    implementation(project(":isma-server:infrastructure"))
 
     implementation(libs.grpc.netty)
     implementation(libs.netty.transport)

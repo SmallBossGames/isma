@@ -14,5 +14,5 @@ val domainModule = module {
     single<IRunSimulationHandler> { RunSimulationHandlerImpl() }
     single<IGetSimulationResultHandler> { GetSimulationResultHandlerImpl() }
     single<IMonitorSimulationHandler> { MonitorSimulationHandlerImpl() }
-    single<IListSimulationMethodsHandler> { ListSimulationMethodsHandlerImpl() }
+    single<IListSimulationMethodsHandler> { ListSimulationMethodsHandlerImpl(get()) }
 }

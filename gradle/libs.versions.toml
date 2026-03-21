@@ -6,7 +6,7 @@ javafx-plugin = "0.1.0"
 org-apache-poi = "5.4.0"
 ikonli = "12.4.0"
 grpc = "1.80.0"
-netty = "4.1.130.Final"
+netty = "4.2.10.Final"
 google-protobuf-plugin = "0.9.6"
 
 [libraries]

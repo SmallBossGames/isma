@@ -17,6 +17,11 @@ dependencies {
     implementation(libs.grpc.netty)
     implementation(libs.netty.transport)
     implementation(libs.netty.transport.classes.epoll)
+    implementation(libs.netty.transport.native.epoll) {
+        artifact {
+            classifier = "linux-x86_64"
+        }
+    }
     implementation(libs.grpc.stub)
     implementation(libs.grpc.protobuf)
     implementation(libs.protobuf.java)

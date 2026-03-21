@@ -6,7 +6,7 @@ javafx-plugin = "0.1.0"
 org-apache-poi = "5.4.0"
 ikonli = "12.4.0"
 grpc = "1.80.0"
-netty = "4.1.115.Final"
+netty = "4.1.130.Final"
 google-protobuf-plugin = "0.9.6"
 
 [libraries]
@@ -37,6 +37,7 @@ tornadofx-core = { module = "no.tornado:tornadofx", version = "1.7.20" }
 
 netty-transport = { module = "io.netty:netty-transport", version.ref = "netty" }
 netty-transport-classes-epoll = { module = "io.netty:netty-transport-classes-epoll", version.ref = "netty" }
+netty-transport-native-epoll = { module = "io.netty:netty-transport-native-epoll", version.ref = "netty" }
 
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version = "4.34.0" }
 

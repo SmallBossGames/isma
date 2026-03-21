@@ -13,4 +13,7 @@ option java_package = "ru.nstu.isma.contracts.simulation";
 message MonitorSimulationRequest {
   // ID returned from RunSimulation
   int64 simulation_id = 1;
+  // Accuracy threshold in [0.0, 1.0] — report progress when time advances by
+  // this fraction of total simulation range. Last value always reported.
+  double accuracy = 2;
 }

@@ -72,7 +72,7 @@ class SimulationServiceGrpcImpl(
         responseObserver: StreamObserver<MonitorSimulationResponse>
     ) {
         try {
-            monitorSimulationHandler.handle(request.simulationId) { progress ->
+            monitorSimulationHandler.handle(request.simulationId, request.accuracy) { progress ->
                 responseObserver.onNext(
                     MonitorSimulationResponse.newBuilder()
                         .setStartTime(progress.startTime)

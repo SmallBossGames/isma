@@ -21,7 +21,7 @@ class SimulationServiceGrpcImpl(
         responseObserver: StreamObserver<RunSimulationResponse>
     ) {
         try {
-            if (request.lismaSourceCode.isEmpty()) {
+            if (request.lismaSourceCode.isBlank()) {
                 responseObserver.onError(
                     IllegalArgumentException("LISMA source code is required")
                 )

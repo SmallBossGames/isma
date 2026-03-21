@@ -5,17 +5,14 @@ import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 import ru.nstu.isma.domain.handlers.runSimulation.RunSimulationParameters
 import ru.nstu.isma.domain.simulation.ISimulationExecutor
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
-import ru.nstu.isma.domain.simulation.SimulationStatus
-import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
-import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
+import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
-import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
-import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
+import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetector
 import ru.nstu.isma.next.core.sim.controller.services.hsm.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.services.simulators.HybridSystemSimulator
 import ru.nstu.isma.next.core.sim.controller.services.solvers.IDaeSystemSolverFactory
@@ -23,7 +20,6 @@ import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.LinkedBlockingQueue
-import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetector
 
 class SimulationExecutorImpl(
     private val integrationMethodsLibrary: IntegrationMethodsLibrary,

@@ -2,7 +2,6 @@ package ru.nstu.isma.domain.handlers.runSimulation
 
 import ru.nstu.isma.domain.simulation.ISimulationExecutor
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
-import ru.nstu.isma.domain.simulation.SimulationSession
 
 class RunSimulationHandlerImpl(
     private val lismaTranslator: ILismaTranslator,
@@ -16,15 +15,10 @@ class RunSimulationHandlerImpl(
             throw IllegalArgumentException("LISMA translation failed: ${it.message}")
         }
 
-        val session = SimulationSession(
-            simulationId = 0L,
-            startTime = parameters.startTime,
-            endTime = parameters.endTime,
-        )
-        val simulationId = sessionStore.create(session)
+        val session = sessionStore.create(parameters.startTime, parameters.endTime)
 
-        simulationExecutor.execute(simulationId, parameters, hsm)
+        simulationExecutor.execute(session.simulationId, parameters, hsm)
 
-        return RunningSimulationResult(simulationId)
+        return RunningSimulationResult(session.simulationId)
     }
 }

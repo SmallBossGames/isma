@@ -1,7 +1,7 @@
 package ru.nstu.isma.domain.simulation
 
 interface ISimulationSessionStore {
-    fun create(session: SimulationSession): Long
+    fun create(startTime: Double, endTime: Double): SimulationSession
 
     fun get(id: Long): SimulationSession?
 

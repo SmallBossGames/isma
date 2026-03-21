@@ -15,7 +15,7 @@ class LismaTranslatorImpl(
             val errors = IsmaErrorList()
             val model = translator.translate(sourceCode, errors)
 
-            if (model == null || errors.isNotEmpty()) {
+            if (errors.isNotEmpty()) {
                 val errorMessages = errors.joinToString("; ") { it.toString() }
                 return Result.failure(IllegalArgumentException("Translation failed: $errorMessages"))
             }

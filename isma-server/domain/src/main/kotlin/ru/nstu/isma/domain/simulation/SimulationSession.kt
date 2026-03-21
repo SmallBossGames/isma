@@ -1,9 +1,7 @@
 package ru.nstu.isma.domain.simulation
 
-import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
-
 data class SimulationSession(
-    val simulationId: Long,
+    val simulationId: Long = 0L,
     val startTime: Double,
     val endTime: Double,
     val currentTime: Double = 0.0,

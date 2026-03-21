@@ -10,10 +10,15 @@ class SimulationSessionStore : ISimulationSessionStore {
     private val sessions = ConcurrentHashMap<Long, SimulationSession>()
     private val nextId = AtomicLong(1L)
 
-    override fun create(session: SimulationSession): Long {
+    override fun create(startTime: Double, endTime: Double): SimulationSession {
         val id = nextId.getAndIncrement()
+        val session = SimulationSession(
+            simulationId = id,
+            startTime = startTime,
+            endTime = endTime,
+        )
         sessions[id] = session
-        return id
+        return session
     }
 
     override fun get(id: Long): SimulationSession? = sessions[id]

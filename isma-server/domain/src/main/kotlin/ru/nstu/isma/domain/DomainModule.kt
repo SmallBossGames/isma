@@ -12,7 +12,7 @@ import ru.nstu.isma.domain.handlers.runSimulation.RunSimulationHandlerImpl
 
 val domainModule = module {
     single<IRunSimulationHandler> { RunSimulationHandlerImpl(get(), get(), get()) }
-    single<IGetSimulationResultHandler> { GetSimulationResultHandlerImpl() }
+    single<IGetSimulationResultHandler> { GetSimulationResultHandlerImpl(get()) }
     single<IMonitorSimulationHandler> { MonitorSimulationHandlerImpl(get()) }
     single<IListSimulationMethodsHandler> { ListSimulationMethodsHandlerImpl(get()) }
 }

@@ -15,7 +15,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.javafx)
 
     testImplementation(libs.junit.jupiter.api)
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testRuntimeOnly(libs.junit.jupiter.engine)
 }
 
 tasks.getByName<Test>("test") {

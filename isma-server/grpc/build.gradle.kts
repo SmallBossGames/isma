@@ -34,7 +34,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation("io.grpc:grpc-netty:1.80.0")
+    implementation(libs.grpc.netty.shaded)
     implementation(libs.grpc.stub)
     implementation(libs.grpc.protobuf)
     implementation(libs.protobuf.java)

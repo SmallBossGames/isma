@@ -35,17 +35,16 @@ org-apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "org
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
 tornadofx-core = { module = "no.tornado:tornadofx", version = "1.7.20" }
 
-netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
 netty-transport = { module = "io.netty:netty-transport", version.ref = "netty" }
+netty-transport-classes-epoll = { module = "io.netty:netty-transport-classes-epoll", version.ref = "netty" }
 
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version = "4.34.0" }
 
 grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
-grpc-core = { module = "io.grpc:grpc-core", version.ref = "grpc" }
 grpc-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
+grpc-netty = { module = "io.grpc:grpc-netty", version.ref = "grpc" }
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
-
 
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.9.2"
 junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.11.4"

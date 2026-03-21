@@ -14,8 +14,9 @@ dependencies {
     implementation(project(":isma-server:domain"))
     implementation(project(":isma-server:grpc"))
 
-    implementation("io.grpc:grpc-netty:1.80.0")
-    implementation("io.netty:netty-all:4.1.115.Final")
+    implementation(libs.grpc.netty)
+    implementation(libs.netty.transport)
+    implementation(libs.netty.transport.classes.epoll)
     implementation(libs.grpc.stub)
     implementation(libs.grpc.protobuf)
     implementation(libs.protobuf.java)
@@ -24,5 +25,5 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.koin.core)
     implementation(libs.slf4j.api)
-    runtimeOnly("ch.qos.logback:logback-classic:1.5.23")
+    runtimeOnly(libs.logback.classic)
 }

@@ -4,30 +4,26 @@ import io.grpc.netty.NettyServerBuilder
 import io.netty.channel.epoll.EpollEventLoopGroup
 import io.netty.channel.epoll.EpollServerDomainSocketChannel
 import io.netty.channel.unix.DomainSocketAddress
-import ru.nstu.isma.domain.handlers.getSimulationResult.GetSimulationResultHandlerImpl
-import ru.nstu.isma.domain.handlers.listSimulationMethods.ListSimulationMethodsHandlerImpl
-import ru.nstu.isma.domain.handlers.monitorSimulation.MonitorSimulationHandlerImpl
-import ru.nstu.isma.domain.handlers.runSimulation.RunSimulationHandlerImpl
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.context.startKoin
+import ru.nstu.isma.domain.domainModule
 import ru.nstu.isma.server.app.grpc.SimulationServiceGrpcImpl
 import java.io.File
 import java.util.UUID
 
 fun main() {
+    startKoin {
+        modules(domainModule, appModule)
+    }
+
+    val koin = object : KoinComponent {
+        val grpcService: SimulationServiceGrpcImpl by inject()
+    }
+
     val socketPath = "${System.getProperty("java.io.tmpdir")}/isma-${UUID.randomUUID()}.sock"
 
     File(socketPath).delete()
-
-    val runSimulationHandler = RunSimulationHandlerImpl()
-    val getSimulationResultHandler = GetSimulationResultHandlerImpl()
-    val monitorSimulationHandler = MonitorSimulationHandlerImpl()
-    val listSimulationMethodsHandler = ListSimulationMethodsHandlerImpl()
-
-    val grpcService = SimulationServiceGrpcImpl(
-        runSimulationHandler = runSimulationHandler,
-        getSimulationResultHandler = getSimulationResultHandler,
-        monitorSimulationHandler = monitorSimulationHandler,
-        listSimulationMethodsHandler = listSimulationMethodsHandler,
-    )
 
     val bossGroup = EpollEventLoopGroup(1)
     val workerGroup = EpollEventLoopGroup()
@@ -37,7 +33,7 @@ fun main() {
         .channelType(EpollServerDomainSocketChannel::class.java)
         .bossEventLoopGroup(bossGroup)
         .workerEventLoopGroup(workerGroup)
-        .addService(grpcService)
+        .addService(koin.grpcService)
         .build()
 
     println("Starting gRPC server on Unix socket: $socketPath")

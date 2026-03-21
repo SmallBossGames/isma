@@ -22,6 +22,7 @@ dependencies {
     implementation(libs.grpc.java)
 
     implementation(libs.kotlin.reflect)
+    implementation(libs.koin.core)
     implementation(libs.slf4j.api)
     runtimeOnly("ch.qos.logback:logback-classic:1.5.23")
 }

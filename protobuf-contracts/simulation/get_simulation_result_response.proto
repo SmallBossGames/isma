@@ -7,6 +7,10 @@ option go_package = "github.com/isma/contracts/simulation";
 option java_multiple_files = true;
 option java_package = "ru.nstu.isma.contracts.simulation";
 
+/* 
+ * Response containing serialized simulation results.
+ */
 message GetSimulationResultResponse {
+  // Serialized simulation results (format depends on server implementation)
   bytes result_data = 1;
 }

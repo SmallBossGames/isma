@@ -7,8 +7,14 @@ option go_package = "github.com/isma/contracts/simulation";
 option java_multiple_files = true;
 option java_package = "ru.nstu.isma.contracts.simulation";
 
+/* 
+ * Streaming response with current simulation progress.
+ */
 message MonitorSimulationResponse {
+  // Original start time of simulation
   double start_time = 1;
+  // Original end time of simulation
   double end_time = 2;
+  // Current simulation time (progress indicator)
   double current_time = 3;
 }

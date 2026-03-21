@@ -7,7 +7,12 @@ option go_package = "github.com/isma/contracts/simulation";
 option java_multiple_files = true;
 option java_package = "ru.nstu.isma.contracts.simulation";
 
+/* 
+ * Describes a single numerical integration method.
+ */
 message SimulationMethodItem {
+  // Internal method name (e.g., "Euler", "RK4", "RKF")
   string name = 1;
+  // Display name for UI
   string title = 2;
 }

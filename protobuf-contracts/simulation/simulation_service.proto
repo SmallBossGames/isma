@@ -16,9 +16,19 @@ option go_package = "github.com/isma/contracts/simulation";
 option java_multiple_files = true;
 option java_package = "ru.nstu.isma.contracts.simulation";
 
+/* 
+ * ISMA Simulation Service
+ *
+ * Provides RPCs for running numerical simulations, retrieving results,
+ * monitoring progress, and listing available integration methods.
+ */
 service SimulationService {
+  // Starts a simulation, returns simulation ID
   rpc RunSimulation(RunSimulationRequest) returns (RunSimulationResponse);
+  // Retrieves completed simulation results
   rpc GetSimulationResult(GetSimulationResultRequest) returns (GetSimulationResultResponse);
+  // Streams progress updates for a running simulation
   rpc MonitorSimulation(MonitorSimulationRequest) returns (stream MonitorSimulationResponse);
+  // Lists available integration methods
   rpc ListSimulationMethods(ListSimulationMethodsRequest) returns (ListSimulationMethodsResponse);
 }

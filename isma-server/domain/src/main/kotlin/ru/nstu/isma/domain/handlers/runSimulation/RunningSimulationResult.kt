@@ -1,5 +1,5 @@
 package ru.nstu.isma.domain.handlers.runSimulation
 
 data class RunningSimulationResult(
-    val simulationId: String,
+    val simulationId: Long,
 )

@@ -21,6 +21,13 @@ class SimulationServiceGrpcImpl(
         responseObserver: StreamObserver<RunSimulationResponse>
     ) {
         try {
+            if (request.lismaSourceCode.isEmpty()) {
+                responseObserver.onError(
+                    IllegalArgumentException("LISMA source code is required")
+                )
+                return
+            }
+
             val parameters = RunSimulationParameters(
                 startTime = request.startTime,
                 endTime = request.endTime,
@@ -28,6 +35,7 @@ class SimulationServiceGrpcImpl(
                 methodName = request.methodName,
                 accuracy = request.accuracy,
                 isAccuracyInUse = request.isAccuracyInUse,
+                lismaSourceCode = request.lismaSourceCode,
             )
             val result = runSimulationHandler.handle(parameters)
             responseObserver.onNext(

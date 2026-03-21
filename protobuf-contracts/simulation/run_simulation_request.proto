@@ -23,4 +23,6 @@ message RunSimulationRequest {
   double accuracy = 5;
   // Enable adaptive step size control
   bool is_accuracy_in_use = 6;
+  // LISMA source code for the model (required)
+  string lisma_source_code = 7;
 }

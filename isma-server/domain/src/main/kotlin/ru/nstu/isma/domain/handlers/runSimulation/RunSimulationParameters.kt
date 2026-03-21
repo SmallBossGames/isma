@@ -7,4 +7,5 @@ data class RunSimulationParameters(
     val methodName: String,
     val accuracy: Double,
     val isAccuracyInUse: Boolean,
+    val lismaSourceCode: String,
 )

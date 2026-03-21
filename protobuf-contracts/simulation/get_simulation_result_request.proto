@@ -12,5 +12,5 @@ option java_package = "ru.nstu.isma.contracts.simulation";
  */
 message GetSimulationResultRequest {
   // ID returned from RunSimulation
-  string simulation_id = 1;
+  int64 simulation_id = 1;
 }

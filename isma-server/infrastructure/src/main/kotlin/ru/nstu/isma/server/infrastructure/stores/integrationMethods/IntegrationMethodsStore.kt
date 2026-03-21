@@ -1,4 +1,4 @@
-package ru.nstu.isma.server.infrastructure.integration.methods
+package ru.nstu.isma.server.infrastructure.stores.integrationMethods
 
 import ru.nstu.isma.domain.integration.IIntegrationMethodsStore
 import ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory

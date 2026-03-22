@@ -44,6 +44,7 @@ class SimulationServerManager(
         
         while (lines.size < 4) {
             val line = reader.readLine() ?: break
+            if (line.startsWith("WARNING:") || line.startsWith("SLF4J:") || line.isBlank()) continue
             lines.add(line)
         }
 

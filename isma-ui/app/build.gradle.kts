@@ -11,14 +11,22 @@ plugins {
 application {
     mainModule.set("isma.ui.app.main")
     mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
+    applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=javafx.graphics",
+        "--enable-native-access=io.netty.common",
+    )
 }
 
 tasks.withType<JavaExec>().configureEach {
-    jvmArgs("-Disma.server.script=$rootDir/build/bundle/isma-server-app/bin/app")
+    jvmArgs(
+        "--enable-native-access=javafx.graphics",
+        "--enable-native-access=io.netty.common",
+        "-Disma.server.script=$rootDir/build/bundle/isma-server-app/bin/app"
+    )
 }
 
 javafx {
-    version = "23.0.1"
+    version = "25.0.2"
     modules = listOf("javafx.controls", "javafx.fxml")
 }
 

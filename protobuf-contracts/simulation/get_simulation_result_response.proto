@@ -8,9 +8,9 @@ option java_multiple_files = true;
 option java_package = "ru.nstu.isma.contracts.simulation";
 
 /* 
- * Response containing serialized simulation results.
+ * Response containing download URL for simulation results.
  */
 message GetSimulationResultResponse {
-  // Serialized simulation results (format depends on server implementation)
-  bytes result_data = 1;
+  // URL path for downloading the CSV file via HTTP
+  string download_url = 2;
 }

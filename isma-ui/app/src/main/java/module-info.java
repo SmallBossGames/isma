@@ -35,6 +35,8 @@ module isma.ui.app.main {
     requires isma.grin.gui.concatenation.main;
 
     requires io.grpc.netty;
+    requires io.netty.codec;
+    requires io.netty.codec.http2;
     requires io.netty.transport;
     requires io.netty.transport.classes.epoll;
     requires io.netty.transport.epoll.linux.x86_64;

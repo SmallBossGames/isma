@@ -8,12 +8,14 @@ import ru.isma.next.domain.models.SimulationProgress
 class SimulationServerFacade(
     private val serverManager: SimulationServerManager,
 ) {
-    private var client: GrpcSimulationClient? = null
+    private var grpcClient: GrpcSimulationClient? = null
+    private var httpClient: HttpSimulationClient? = null
 
     fun warmup() {
-        val socketPath = serverManager.start()
-        client = GrpcSimulationClient(socketPath)
-        client!!.blockingStub.listSimulationMethods(ListSimulationMethodsRequest.getDefaultInstance())
+        val socketPaths = serverManager.start()
+        grpcClient = GrpcSimulationClient(socketPaths.grpc)
+        httpClient = HttpSimulationClient(socketPaths.http)
+        grpcClient!!.blockingStub.listSimulationMethods(ListSimulationMethodsRequest.getDefaultInstance())
     }
 
     fun runSimulation(params: RunSimulationParams): Long {
@@ -36,7 +38,7 @@ class SimulationServerFacade(
             requestBuilder.setStabilityConfig(StabilityConfig.getDefaultInstance())
         }
 
-        return client!!.blockingStub.runSimulation(requestBuilder.build()).simulationId
+        return grpcClient!!.blockingStub.runSimulation(requestBuilder.build()).simulationId
     }
 
     fun monitorSimulation(simulationId: Long, accuracy: Double): Flow<SimulationProgress> = flow {
@@ -45,7 +47,7 @@ class SimulationServerFacade(
             .setAccuracy(accuracy)
             .build()
 
-        val iterator = client!!.blockingStub.monitorSimulation(request)
+        val iterator = grpcClient!!.blockingStub.monitorSimulation(request)
         while (iterator.hasNext()) {
             val response = iterator.next()
             emit(SimulationProgress(
@@ -60,11 +62,15 @@ class SimulationServerFacade(
         val request = GetSimulationResultRequest.newBuilder()
             .setSimulationId(simulationId)
             .build()
-        return client!!.blockingStub.getSimulationResult(request).resultData.toByteArray()
+        val downloadUrl = grpcClient!!.blockingStub.getSimulationResult(request).downloadUrl
+        if (downloadUrl.isNullOrBlank()) {
+            throw IllegalStateException("Download URL is empty")
+        }
+        return httpClient!!.download(downloadUrl)
     }
 
     fun shutdown() {
-        client?.shutdown()
+        grpcClient?.shutdown()
         serverManager.stop()
     }
 }

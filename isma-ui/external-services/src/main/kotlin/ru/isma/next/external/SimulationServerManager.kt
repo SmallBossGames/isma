@@ -6,6 +6,11 @@ import java.io.File
 class SimulationServerManager(
     private val scriptPath: String = resolveServerScriptPath(),
 ) {
+    data class SocketPaths(
+        val grpc: String,
+        val http: String,
+    )
+
     companion object {
         private const val ENV_VAR = "ISMA_SERVER_SCRIPT"
         private const val PROP_NAME = "isma.server.script"
@@ -21,11 +26,11 @@ class SimulationServerManager(
     }
     private val logger = LoggerFactory.getLogger(SimulationServerManager::class.java)
     private var process: Process? = null
-    private var socketPath: String? = null
+    private var socketPaths: SocketPaths? = null
     @Volatile private var running = false
 
-    fun start(): String {
-        if (running) return socketPath!!
+    fun start(): SocketPaths {
+        if (running) return socketPaths!!
 
         val file = File(scriptPath)
         require(file.exists()) { "isma-server script not found at: $scriptPath" }
@@ -35,19 +40,32 @@ class SimulationServerManager(
             .start()
 
         val reader = process!!.inputStream.bufferedReader()
-        val line = reader.readLine()
-            ?: throw IllegalStateException("isma-server started but produced no output")
-
-        if (!line.startsWith("Starting gRPC server on Unix socket:")) {
-            throw IllegalStateException("Unexpected server output: $line")
+        val lines = mutableListOf<String>()
+        
+        while (lines.size < 4) {
+            val line = reader.readLine() ?: break
+            lines.add(line)
         }
 
-        socketPath = line.substringAfter(": ").trim()
+        if (lines.isEmpty()) {
+            throw IllegalStateException("isma-server started but produced no output")
+        }
+
+        if (!lines[0].startsWith("Starting gRPC server on Unix socket:")) {
+            throw IllegalStateException("Unexpected server output: ${lines[0]}")
+        }
+
+        val grpcSocket = lines[0].substringAfter(": ").trim()
+        val httpSocket = lines.find { it.startsWith("HTTP_SOCKET=") }?.substringAfter("=")?.trim()
+            ?: throw IllegalStateException("HTTP socket not found in server output")
+
+        socketPaths = SocketPaths(grpc = grpcSocket, http = httpSocket)
         running = true
-        logger.info("isma-server started on socket: $socketPath")
+        logger.info("isma-server started on gRPC socket: ${socketPaths!!.grpc}")
+        logger.info("isma-server started on HTTP socket: ${socketPaths!!.http}")
 
         Runtime.getRuntime().addShutdownHook(Thread { stop() })
-        return socketPath!!
+        return socketPaths!!
     }
 
     fun stop() {
@@ -55,7 +73,7 @@ class SimulationServerManager(
         running = false
         process?.destroy()
         process = null
-        socketPath = null
+        socketPaths = null
         logger.info("isma-server stopped")
     }
 

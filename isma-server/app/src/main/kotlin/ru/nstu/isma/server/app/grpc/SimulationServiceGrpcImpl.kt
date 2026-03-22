@@ -1,6 +1,5 @@
 package ru.nstu.isma.server.app.grpc
 
-import com.google.protobuf.ByteString
 import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.stub.StreamObserver
@@ -11,6 +10,7 @@ import ru.nstu.isma.domain.handlers.listSimulationMethods.IListSimulationMethods
 import ru.nstu.isma.domain.handlers.monitorSimulation.IMonitorSimulationHandler
 import ru.nstu.isma.domain.handlers.runSimulation.IRunSimulationHandler
 import ru.nstu.isma.domain.handlers.runSimulation.RunSimulationParameters
+import ru.nstu.isma.server.app.globalHttpSocketPath
 
 class SimulationServiceGrpcImpl(
     private val runSimulationHandler: IRunSimulationHandler,
@@ -63,11 +63,11 @@ class SimulationServiceGrpcImpl(
         responseObserver: StreamObserver<GetSimulationResultResponse>
     ) {
         try {
-            val resultStream = getSimulationResultHandler.handle(request.simulationId)
-            val bytes = resultStream.readAllBytes()
+            getSimulationResultHandler.handle(request.simulationId).close()
+            val downloadUrl = "/simulation/${request.simulationId}/download"
             responseObserver.onNext(
                 GetSimulationResultResponse.newBuilder()
-                    .setResultData(ByteString.copyFrom(bytes))
+                    .setDownloadUrl(downloadUrl)
                     .build()
             )
             responseObserver.onCompleted()

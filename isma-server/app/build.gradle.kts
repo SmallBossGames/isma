@@ -24,6 +24,8 @@ dependencies {
             classifier = "linux-x86_64"
         }
     }
+    implementation(libs.netty.codec)
+    implementation(libs.netty.handler)
     implementation(libs.grpc.stub)
     implementation(libs.grpc.protobuf)
     implementation(libs.protobuf.java)

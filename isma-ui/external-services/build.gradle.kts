@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.netty.transport.native.epoll) {
         artifact { classifier = "linux-x86_64" }
     }
+    implementation(libs.netty.codec)
     implementation(libs.com.google.guava)
     implementation(libs.koin.core)
     implementation(libs.kotlinx.coroutines.core)

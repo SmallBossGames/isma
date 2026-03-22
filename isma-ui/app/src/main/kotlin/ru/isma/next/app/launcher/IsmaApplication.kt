@@ -11,6 +11,7 @@ import ru.isma.next.app.models.preferences.WindowPreferencesModel
 import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.views.MainView
+import ru.isma.next.external.SimulationServerFacade
 
 class IsmaApplication : Application(), KoinComponent {
     lateinit var stage: Stage
@@ -18,9 +19,11 @@ class IsmaApplication : Application(), KoinComponent {
     private val projectFileService: ProjectFileService by inject()
     private val preferencesProvider: PreferencesProvider by inject()
     private val mainView: MainView by inject()
+    private val serverFacade: SimulationServerFacade by inject()
 
     init {
         ismaKoinStart()
+        serverFacade.warmup()
     }
 
     override fun start(stage: Stage) {
@@ -39,6 +42,7 @@ class IsmaApplication : Application(), KoinComponent {
 
     override fun stop() {
         stage.tearDownWindow()
+        serverFacade.shutdown()
     }
 
     private fun Stage.initWindow(scene: Scene, title: String) {

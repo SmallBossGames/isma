@@ -1,7 +1,10 @@
 package ru.nstu.isma.server.app.grpc
 
 import com.google.protobuf.ByteString
+import io.grpc.Status
+import io.grpc.StatusException
 import io.grpc.stub.StreamObserver
+import org.slf4j.LoggerFactory
 import ru.nstu.isma.contracts.simulation.*
 import ru.nstu.isma.domain.handlers.getSimulationResult.IGetSimulationResultHandler
 import ru.nstu.isma.domain.handlers.listSimulationMethods.IListSimulationMethodsHandler
@@ -16,6 +19,8 @@ class SimulationServiceGrpcImpl(
     private val listSimulationMethodsHandler: IListSimulationMethodsHandler,
 ) : SimulationServiceGrpc.SimulationServiceImplBase() {
 
+    private val logger = LoggerFactory.getLogger(SimulationServiceGrpcImpl::class.java)
+
     override fun runSimulation(
         request: RunSimulationRequest,
         responseObserver: StreamObserver<RunSimulationResponse>
@@ -23,7 +28,7 @@ class SimulationServiceGrpcImpl(
         try {
             if (request.lismaSourceCode.isBlank()) {
                 responseObserver.onError(
-                    IllegalArgumentException("LISMA source code is required")
+                    Status.INVALID_ARGUMENT.withDescription("LISMA source code is required").asException()
                 )
                 return
             }
@@ -33,9 +38,12 @@ class SimulationServiceGrpcImpl(
                 endTime = request.endTime,
                 initialStep = request.initialStep,
                 methodName = request.methodName,
-                accuracy = request.accuracy,
-                isAccuracyInUse = request.isAccuracyInUse,
+                accuracy = if (request.hasAccuracyConfig()) request.accuracyConfig.accuracy else 0.0,
+                isAccuracyInUse = request.hasAccuracyConfig(),
+                isStabilityControlInUse = request.hasStabilityConfig(),
                 lismaSourceCode = request.lismaSourceCode,
+                eventDetectionGamma = if (request.hasEventDetection()) request.eventDetection.gamma else null,
+                eventDetectionLowBorder = if (request.hasEventDetection()) request.eventDetection.lowBorder else null,
             )
             val result = runSimulationHandler.handle(parameters)
             responseObserver.onNext(
@@ -45,7 +53,8 @@ class SimulationServiceGrpcImpl(
             )
             responseObserver.onCompleted()
         } catch (e: Exception) {
-            responseObserver.onError(e)
+            logger.error("runSimulation failed", e)
+            responseObserver.onError(toStatusException(e))
         }
     }
 
@@ -63,7 +72,8 @@ class SimulationServiceGrpcImpl(
             )
             responseObserver.onCompleted()
         } catch (e: Exception) {
-            responseObserver.onError(e)
+            logger.error("getSimulationResult failed for simulationId=${request.simulationId}", e)
+            responseObserver.onError(toStatusException(e))
         }
     }
 
@@ -83,7 +93,8 @@ class SimulationServiceGrpcImpl(
             }
             responseObserver.onCompleted()
         } catch (e: Exception) {
-            responseObserver.onError(e)
+            logger.error("monitorSimulation failed for simulationId=${request.simulationId}", e)
+            responseObserver.onError(toStatusException(e))
         }
     }
 
@@ -105,7 +116,16 @@ class SimulationServiceGrpcImpl(
             responseObserver.onNext(responseBuilder.build())
             responseObserver.onCompleted()
         } catch (e: Exception) {
-            responseObserver.onError(e)
+            logger.error("listSimulationMethods failed", e)
+            responseObserver.onError(toStatusException(e))
+        }
+    }
+
+    private fun toStatusException(e: Exception): StatusException {
+        return when (e) {
+            is IllegalArgumentException -> Status.NOT_FOUND.withDescription(e.message).asException()
+            is IllegalStateException -> Status.FAILED_PRECONDITION.withDescription(e.message).asException()
+            else -> Status.INTERNAL.withDescription(e.message).asException()
         }
     }
 }

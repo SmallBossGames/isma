@@ -12,6 +12,7 @@ import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
+import ru.nstu.isma.next.core.sim.controller.services.eventDetection.DefaultEventDetector
 import ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetector
 import ru.nstu.isma.next.core.sim.controller.services.hsm.IHsmCompiler
 import ru.nstu.isma.next.core.sim.controller.services.simulators.HybridSystemSimulator
@@ -53,6 +54,11 @@ class SimulationExecutorImpl(
             }
         }
 
+        val stabilityController = integrationMethod.stabilityController
+        if (stabilityController != null) {
+            stabilityController.enabled = parameters.isStabilityControlInUse
+        }
+
         val integrationMethodProvider = object : IIntegrationMethodProvider {
             override val method = integrationMethod
         }
@@ -67,7 +73,15 @@ class SimulationExecutorImpl(
         }
 
         val eventDetectorFactory = object : ru.nstu.isma.next.core.sim.controller.services.eventDetection.IEventDetectorFactory {
-            override fun create(): IEventDetector? = null
+            override fun create(): IEventDetector? {
+                val gamma = parameters.eventDetectionGamma
+                val lowBorder = parameters.eventDetectionLowBorder
+                return if (gamma != null && lowBorder != null) {
+                    DefaultEventDetector(gamma = gamma, stepLowBound = lowBorder)
+                } else {
+                    null
+                }
+            }
         }
 
         val simulator = HybridSystemSimulator(daeSystemSolverFactory, eventDetectorFactory)
@@ -107,12 +121,26 @@ class SimulationExecutorImpl(
         val writerThread = Thread.ofVirtual().start {
             tempFile.bufferedWriter().use { writer ->
                 var isFirst = true
+                val variableNames = mutableListOf<String>()
                 while (true) {
                     val item = pointQueue.take()
                     if (item is QueueItem.EndOfStream) break
                     val point = (item as QueueItem.Point).point
                     if (isFirst) {
                         writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(point))
+                        val indexProvider = compilationResult.indexProvider
+                        val deCount = indexProvider.getDifferentialEquationCount()
+                        val aeCount = indexProvider.getAlgebraicEquationCount()
+                        for (i in 0 until deCount) {
+                            variableNames.add(indexProvider.getDifferentialEquationCode(i) ?: "DE_$i")
+                        }
+                        for (i in 0 until aeCount) {
+                            variableNames.add(indexProvider.getAlgebraicEquationCode(i) ?: "AE_$i")
+                        }
+                        for (i in 0 until deCount) {
+                            variableNames.add("f$i")
+                        }
+                        writer.appendLine(variableNames.joinToString(","))
                         isFirst = false
                     }
                     writer.append(IntegrationResultPointFileHelpers.buildCsvString(point))

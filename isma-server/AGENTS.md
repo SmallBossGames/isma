@@ -56,6 +56,16 @@ infrastructure/
 | protobuf-java | Protocol buffers |
 | kotlin-reflect, koin-core | DI and reflection |
 
+## Proto Contracts
+
+gRPC stubs are generated from `../../protobuf-contracts/`. Key messages in `run_simulation_request.proto`:
+
+- `AccuracyConfig` (field 5) — enables adaptive step size control; presence of the message = enabled
+- `StabilityConfig` (field 6) — enables stability control for RK methods; presence = enabled
+- `EventDetectionConfig` (field 8) — enables event detection with gamma/low_border parameters
+
+Proto changes require rebuilding `isma-server:grpc`.
+
 ## Build
 
 ```bash

@@ -4,33 +4,30 @@ import javafx.collections.FXCollections
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import org.koin.core.component.KoinComponent
-import ru.isma.next.app.models.simulation.CauchyInitialsModel
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
-import ru.isma.next.app.services.koin.SimulationScope
-import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.app.services.project.SuccessTranslation
-import ru.nstu.isma.intg.api.calcmodel.cauchy.CauchyInitials
-import ru.nstu.isma.next.core.sim.controller.models.IntegratorApiParameters
-import ru.nstu.isma.next.core.sim.controller.services.controllers.ISimulationCoreController
+import ru.isma.next.external.CsvEquationIndexProvider
+import ru.isma.next.external.CsvIntegrationResultPointProvider
+import ru.isma.next.external.CsvMetadata
+import ru.isma.next.external.RunSimulationParams
+import ru.isma.next.external.SimulationServerFacade
+import ru.nstu.isma.intg.api.models.IntgMetricData
 
 class SimulationService(
     private val projectService: ProjectService,
-    private val lismaPdeService: LismaPdeService,
     private val simulationResult: SimulationResultService,
+    private val simulationParametersService: SimulationParametersService,
+    private val serverFacade: SimulationServerFacade,
 ) : KoinComponent {
     val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()!!
 
     private val currentSimulationJobs = mutableMapOf<InProgressSimulationModel, Job>()
-
     private var taskNumber = 1
 
     fun simulate() {
-        val simulationScope = getKoin().createScope<SimulationScope>()
-        val simulationController: ISimulationCoreController = simulationScope.get()
-        val simulationParameters: SimulationParametersModel = simulationScope.get()
+        val simulationParameters = simulationParametersService.snapshot()
         val project = projectService.activeProject ?: return
 
         val trackingTask = InProgressSimulationModel(
@@ -38,61 +35,51 @@ class SimulationService(
             project.name,
             simulationParameters
         )
-
         taskNumber++
 
-        val currentSimulationJob = SimulationScope.launch {
+        SimulationScope.launch {
             try {
-                val sourceCode = project.snapshot()
+                val sourceCode = project.snapshot().fullText
+                val params = simulationParameters.toRunSimulationParams(sourceCode)
 
-                val translationResult = lismaPdeService.translateLisma(sourceCode) as? SuccessTranslation
-                    ?: return@launch
+                val simulationId = serverFacade.runSimulation(params)
 
-                val initials = simulationParameters.cauchyInitials.toCauchyInitials()
-
-                val hsm = translationResult.hsm.apply {
-                    initTimeEquation(initials.start)
-                }
-
-                val context = IntegratorApiParameters(
-                    hsm = hsm,
-                    initials = initials,
-                    stepChangeHandlers = {
-                        val progress = normalizeProgress(initials.start, initials.end, it)
-
-                        trackingTask.commitProgress(progress)
-                    }
-                )
-
-                withContext(Dispatchers.JavaFx) {
+                SimulationScope.launch(Dispatchers.JavaFx) {
                     trackingTasks.add(trackingTask)
                 }
 
-                val result = simulationController.simulateAsync(context)
+                serverFacade.monitorSimulation(simulationId, 0.1).collect { progress ->
+                    val normalized = ((progress.currentTime - progress.startTime) / (progress.endTime - progress.startTime)).coerceIn(0.0, 1.0)
+                    withContext(Dispatchers.JavaFx) {
+                        trackingTask.commitProgress(normalized)
+                    }
+                }
+
+                val csvData = serverFacade.getSimulationResult(simulationId)
+                val csvMetadata = CsvMetadata(csvData)
+                val metricData = IntgMetricData()
 
                 val resultModel = CompletedSimulationModel(
                     trackingTask.id,
                     trackingTask.model,
-                    result.equationIndexProvider,
-                    result.metricData,
-                    result.resultPointProvider,
+                    CsvEquationIndexProvider(csvMetadata),
+                    metricData,
+                    CsvIntegrationResultPointProvider(csvData),
                     trackingTask.parameters
                 )
 
                 simulationResult.commitResult(resultModel)
+            } catch (e: Throwable)
+            {
+                throw e;
             }
             finally {
-                simulationScope.close()
-
                 currentSimulationJobs.remove(trackingTask)
-
                 SimulationScope.launch(Dispatchers.JavaFx) {
                     trackingTasks.remove(trackingTask)
                 }
             }
-        }
-
-        currentSimulationJobs[trackingTask] = currentSimulationJob
+        }.also { job -> currentSimulationJobs[trackingTask] = job }
     }
 
     fun stopSimulation(trackingTask: InProgressSimulationModel) {
@@ -101,11 +88,18 @@ class SimulationService(
 
     companion object {
         val SimulationScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
-        private fun normalizeProgress(start: Double, end: Double, current: Double): Double {
-            return ((current - start) / (end-start)).coerceIn(0.0, 1.0)
-        }
-
-        private fun CauchyInitialsModel.toCauchyInitials() = CauchyInitials(startTime, endTime, initialStep)
     }
 }
+
+private fun SimulationParametersModel.toRunSimulationParams(lismaSourceCode: String) = RunSimulationParams(
+    startTime = cauchyInitials.startTime,
+    endTime = cauchyInitials.endTime,
+    initialStep = cauchyInitials.initialStep,
+    methodName = integrationMethodParameters.selectedMethod,
+    accuracy = integrationMethodParameters.accuracy,
+    isAccuracyInUse = integrationMethodParameters.isAccuracyInUse,
+    isStabilityControlInUse = integrationMethodParameters.isStableInUse,
+    lismaSourceCode = lismaSourceCode,
+    eventDetectionGamma = if (eventDetectionParameters.isEventDetectionInUse) eventDetectionParameters.gamma else null,
+    eventDetectionLowBorder = if (eventDetectionParameters.isEventDetectionInUse) eventDetectionParameters.lowBorder else null,
+)

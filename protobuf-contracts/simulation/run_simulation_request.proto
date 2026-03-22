@@ -7,7 +7,34 @@ option go_package = "github.com/isma/contracts/simulation";
 option java_multiple_files = true;
 option java_package = "ru.nstu.isma.contracts.simulation";
 
-/* 
+/*
+ * Configuration for adaptive step size control.
+ * When this message is present in RunSimulationRequest, adaptive step control is enabled.
+ */
+message AccuracyConfig {
+  // Target accuracy for adaptive methods
+  double accuracy = 1;
+}
+
+/*
+ * Configuration for stability control during simulation.
+ * When this message is present in RunSimulationRequest, stability control is enabled.
+ */
+message StabilityConfig {
+}
+
+/*
+ * Configuration for event detection during simulation.
+ * When this message is present in RunSimulationRequest, event detection is enabled.
+ */
+message EventDetectionConfig {
+  // Gamma parameter for event detection (controls step size near events)
+  double gamma = 1;
+  // Low bound for step size when event detection is active
+  double low_border = 2;
+}
+
+/*
  * Request to start a new simulation.
  */
 message RunSimulationRequest {
@@ -19,10 +46,12 @@ message RunSimulationRequest {
   double initial_step = 3;
   // Integration method name (e.g., "Euler", "RK4")
   string method_name = 4;
-  // Target accuracy for adaptive methods
-  double accuracy = 5;
-  // Enable adaptive step size control
-  bool is_accuracy_in_use = 6;
+  // Accuracy configuration for adaptive step size control
+  AccuracyConfig accuracy_config = 5;
+  // Stability configuration for stability control
+  StabilityConfig stability_config = 6;
+  // Event detection configuration
+  EventDetectionConfig event_detection = 8;
   // LISMA source code for the model (required)
   string lisma_source_code = 7;
 }

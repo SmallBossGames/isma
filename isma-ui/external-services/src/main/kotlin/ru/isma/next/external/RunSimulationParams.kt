@@ -1,6 +1,6 @@
-package ru.nstu.isma.domain.handlers.runSimulation
+package ru.isma.next.external
 
-data class RunSimulationParameters(
+data class RunSimulationParams(
     val startTime: Double,
     val endTime: Double,
     val initialStep: Double,

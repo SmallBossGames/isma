@@ -12,7 +12,7 @@ import ru.isma.next.app.views.dialogs.pickAxisVariables
 import ru.nstu.grin.integration.FunctionModel
 import ru.nstu.grin.integration.GrinIntegrationFacade
 import ru.nstu.grin.integration.PointModel
-import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
+
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import java.io.File
 import java.io.Writer
@@ -103,12 +103,12 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         }
 
         // Алгебраические переменные
-        for (yForAe in rhs[DaeSystem.RHS_AE_PART_IDX]) {
+        for (yForAe in rhs[RHS_AE_PART_IDX]) {
             builder.append(yForAe).append(COMMA_AND_SPACE)
         }
 
         // Правая часть
-        for (f in rhs[DaeSystem.RHS_DE_PART_IDX]) {
+        for (f in rhs[RHS_DE_PART_IDX]) {
             builder.append(f).append(COMMA_AND_SPACE)
         }
 
@@ -121,23 +121,33 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
     private fun createColumnNamesArray(result: CompletedSimulationModel) : Array<String> {
         val equationIndexProvider = result.equationIndexProvider
         val deCount = equationIndexProvider.getDifferentialEquationCount()
-        val aeCount: Int = equationIndexProvider.getAlgebraicEquationCount()
-        val outputArray = Array(deCount*2 + aeCount) { "" }
+        val aeCount = equationIndexProvider.getAlgebraicEquationCount()
+        val rhsDeCount = deCount
+        val rhsAeCount = aeCount
+        val outputArray = Array(1 + deCount + rhsDeCount + rhsAeCount) { "" }
+
+        outputArray[0] = "TIME"
 
         for (i in 0 until deCount) {
-            outputArray[i] = equationIndexProvider.getDifferentialEquationCode(i) ?: ""
+            outputArray[1 + i] = equationIndexProvider.getDifferentialEquationCode(i) ?: "y$i"
         }
 
-        var offset = deCount
+        var offset = 1 + deCount
 
         for (i in 0 until aeCount) {
-            outputArray[i + offset] = equationIndexProvider.getAlgebraicEquationCode(i) ?: ""
+            outputArray[offset + i] = equationIndexProvider.getAlgebraicEquationCode(i) ?: "a$i"
         }
 
-        offset = aeCount + deCount
+        offset = 1 + deCount + aeCount
 
-        for (i in 0 until deCount) {
-            outputArray[i + offset] = "f${i}"
+        for (i in 0 until rhsDeCount) {
+            outputArray[offset + i] = "rhs_DE_$i"
+        }
+
+        offset = 1 + deCount + aeCount + rhsDeCount
+
+        for (i in 0 until rhsAeCount) {
+            outputArray[offset + i] = "rhs_AE_$i"
         }
 
         return outputArray
@@ -149,12 +159,19 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         yAxisColumns: IntArray,
     ) : List<List<PointModel>> {
          val tempResult = List(yAxisColumns.size) { mutableListOf<PointModel>() }
+         val eqIdx = result.equationIndexProvider
+         val deCount = eqIdx.getDifferentialEquationCount()
+         val aeCount = eqIdx.getAlgebraicEquationCount()
 
-         result.resultPointProvider.results.collect {
-             val row = it.yForDe + it.rhs[DaeSystem.RHS_AE_PART_IDX] + it.rhs[DaeSystem.RHS_DE_PART_IDX]
+         result.resultPointProvider.results.collect { point ->
+             val row = DoubleArray(1 + deCount + deCount + aeCount)
+             row[0] = point.x
+             point.yForDe.copyInto(row, 1)
+             point.rhs[RHS_DE_PART_IDX].copyInto(row, 1 + deCount)
+             point.rhs[RHS_AE_PART_IDX].copyInto(row, 1 + deCount + deCount)
 
-             yAxisColumns.forEachIndexed { index, item ->
-                 tempResult[index].add(PointModel(row[xAxisColumn], row[item]))
+             yAxisColumns.forEachIndexed { index, colIdx ->
+                 tempResult[index].add(PointModel(row[xAxisColumn], row[colIdx]))
              }
          }
 
@@ -163,6 +180,8 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
 
     companion object {
         private const val COMMA_AND_SPACE = ", "
+        private const val RHS_DE_PART_IDX = 0
+        private const val RHS_AE_PART_IDX = 1
 
         private val ResultServiceScope = CoroutineScope(Dispatchers.Default)
 

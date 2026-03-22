@@ -7,8 +7,7 @@ import ru.nstu.grin.integration.grinNestedModule
 
 fun ismaKoinStart() = startKoin {
     modules(
-        simulationScopeModule,
-        externalServicesModule,
+        simulationServerModule,
         appServicesModule,
     )
 

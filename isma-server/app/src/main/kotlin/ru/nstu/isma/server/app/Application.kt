@@ -16,7 +16,13 @@ import ru.nstu.isma.server.app.grpc.SimulationServiceGrpcImpl
 import java.io.File
 import java.util.UUID
 
-fun main() {
+fun main(args: Array<String>) {
+    val cliArgs = args.toList()
+    val socketPath = cliArgs.indexOf("--socket-path").let { idx ->
+        if (idx >= 0 && idx + 1 < args.size) args[idx + 1]
+        else "${System.getProperty("java.io.tmpdir")}/isma-${UUID.randomUUID()}.sock"
+    }
+
     startKoin {
         modules(domainModule, infrastructureModule, appModule)
     }
@@ -24,8 +30,6 @@ fun main() {
     val koin = object : KoinComponent {
         val grpcService: SimulationServiceGrpcImpl by inject()
     }
-
-    val socketPath = "${System.getProperty("java.io.tmpdir")}/isma-${UUID.randomUUID()}.sock"
 
     File(socketPath).delete()
 

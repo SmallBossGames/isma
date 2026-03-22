@@ -2,20 +2,24 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
 
-    alias(libs.plugins.javafx)
     alias(libs.plugins.java.modules)
+    alias(libs.plugins.javafx)
 
     application
+}
+
+application {
+    mainModule.set("isma.ui.app.main")
+    mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
+}
+
+tasks.withType<JavaExec>().configureEach {
+    jvmArgs("-Disma.server.script=$rootDir/build/bundle/isma-server-app/bin/app")
 }
 
 javafx {
     version = "23.0.1"
     modules = listOf("javafx.controls", "javafx.fxml")
-}
-
-application {
-    mainModule.set("isma.ui.app")
-    mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
 }
 
 dependencies {
@@ -30,11 +34,12 @@ dependencies {
     implementation(libs.ikonli.javafx)
     implementation(libs.ikonli.material2.pack)
     implementation(libs.controlsfx)
+    implementation(libs.fxmisc.richtext.core)
 
     implementation(project(":isma-compiler:hsm-core"))
-    implementation(project(":isma-compiler:hsm-fdm"))
     implementation(project(":isma-compiler:hsm-jvm"))
     implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
+    implementation(project(":isma-compiler:hsm-fdm"))
     implementation(project(":isma-compiler:lisma-translator-hsm"))
     implementation(project(":isma-next-core"))
     implementation(project(":isma-solver:api"))
@@ -45,7 +50,15 @@ dependencies {
     implementation(project(":isma-solver:lib-utils"))
     implementation(project(":isma-solver:lib-meta"))
 
-
     api(project(":isma-solver:core"))
-    //api(project(":isma-intg-server:isma-intg-server-client"))
+
+    implementation(project(":isma-ui:grpc"))
+    implementation(project(":isma-ui:external-services"))
+    implementation(project(":isma-ui:domain"))
+    implementation(libs.grpc.netty)
+    implementation(libs.netty.transport)
+    implementation(libs.netty.transport.classes.epoll)
+    implementation(libs.netty.transport.native.epoll) {
+        artifact { classifier = "linux-x86_64" }
+    }
 }

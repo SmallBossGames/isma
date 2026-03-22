@@ -61,6 +61,17 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `infrastructure/` - Infrastructure implementations
   - *See `isma-server/AGENTS.md` for details*
 
+### Out-of-Process Architecture (UI + Server)
+
+The UI launches the server as a separate JVM process communicating via gRPC over Unix Domain Sockets.
+
+- **isma-ui/external-services/** - gRPC client layer
+  - `GrpcSimulationClient` - Netty-based gRPC client with Unix socket transport
+  - `SimulationServerManager` - Manages server process lifecycle (start/stop)
+  - `SimulationServerFacade` - High-level facade for simulation operations
+- **Server launch** — `ISMA_SERVER_SCRIPT` env var (bundle) or `isma.server.script` sysprop (IDE/Gradle)
+- **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with both apps + `run-ui.sh` launcher
+
 ---
 
 ## Gradle Configuration
@@ -76,4 +87,9 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 ```bash
 ./gradlew build          # Build all modules
 ./gradlew :module:build  # Build specific module
+./.ci-cd/build-bundle.sh # Build application distribution bundle UI + server
 ```
+
+## Proto Contracts
+
+All protobuf definitions live in `protobuf-contracts/simulation/`. Proto changes require rebuilding both `isma-server:grpc` and `isma-ui:grpc` modules.

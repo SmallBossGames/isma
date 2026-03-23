@@ -34,6 +34,9 @@ module isma.ui.app.main {
     requires isma.grin.gui.common.main;
     requires isma.grin.gui.concatenation.main;
 
+    requires isma.ui.grpc;
+    requires isma.ui.domain;
+    requires isma.ui.external.services;
     requires io.grpc.netty;
     requires io.netty.codec;
     requires io.netty.codec.http2;

@@ -2,6 +2,7 @@ import com.google.protobuf.gradle.*
 
 plugins {
     alias(libs.plugins.google.protobuf)
+    alias(libs.plugins.java.modules)
 }
 
 group = "ru.isma.next.ui"
@@ -44,4 +45,5 @@ dependencies {
     implementation(libs.grpc.protobuf)
     implementation(libs.protobuf.java)
     implementation(libs.grpc.java)
+    implementation(libs.com.google.guava)
 }

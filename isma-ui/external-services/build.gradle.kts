@@ -1,4 +1,7 @@
-plugins { alias(libs.plugins.kotlin.jvm) }
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
+}
 
 group = "ru.isma.next.ui"
 version = "1.0.0-SNAPSHOT"

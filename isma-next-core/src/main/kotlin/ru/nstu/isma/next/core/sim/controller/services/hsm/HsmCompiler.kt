@@ -8,10 +8,14 @@ import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 
 class HsmCompiler : IHsmCompiler {
+    private val sourceCodeCompiler: SourceCodeCompiler<HybridSystem> by lazy {
+        SourceCodeCompiler()
+    }
+
     override fun compile(hsm: HSM): HsmCompilationResult {
         val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
         val hsSourceCode = hsClassBuilder.buildSourceCode()
-        val hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
+        val hybridSystem = sourceCodeCompiler.compile(
             DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode
         )
 

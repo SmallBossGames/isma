@@ -10,9 +10,13 @@ import javax.tools.ToolProvider
  * @since 06.10.2015
  */
 class SourceCodeCompiler<T> {
+    private val compiler: javax.tools.JavaCompiler by lazy {
+        ToolProvider.getSystemJavaCompiler()
+            ?: throw IllegalStateException("System JavaCompiler not available")
+    }
+
     @Suppress("UNCHECKED_CAST")
     fun compile(packageName: String, className: String, sourceCode: String?): T {
-        val compiler = ToolProvider.getSystemJavaCompiler()
         val manager = MemoryFileManager(compiler.getStandardFileManager(null, null, null))
         val options = mutableListOf(
             "-classpath", System.getProperty("java.class.path"),

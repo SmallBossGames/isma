@@ -2,24 +2,23 @@ package ru.nstu.isma.server.app
 
 import io.grpc.netty.NettyServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionServiceV1
+import io.ktor.server.cio.*
+import io.ktor.server.engine.*
+import io.ktor.server.routing.*
 import io.netty.channel.MultiThreadIoEventLoopGroup
 import io.netty.channel.epoll.EpollIoHandler
 import io.netty.channel.epoll.EpollServerDomainSocketChannel
 import io.netty.channel.unix.DomainSocketAddress
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.cio.*
-import io.ktor.server.routing.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import ru.nstu.isma.domain.domainModule
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
+import ru.nstu.isma.server.app.grpc.SimulationServiceGrpcImpl
 import ru.nstu.isma.server.app.http.simulationResultRoutes
 import ru.nstu.isma.server.infrastructure.infrastructureModule
-import ru.nstu.isma.server.app.grpc.SimulationServiceGrpcImpl
 import java.io.File
-import java.util.UUID
+import java.util.*
 
 var globalHttpSocketPath = ""
 

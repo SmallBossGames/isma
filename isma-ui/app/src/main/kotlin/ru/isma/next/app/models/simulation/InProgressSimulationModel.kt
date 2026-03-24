@@ -2,9 +2,6 @@ package ru.isma.next.app.models.simulation
 
 import javafx.application.Platform
 import javafx.beans.property.SimpleDoubleProperty
-import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
-import java.util.concurrent.atomic.AtomicReference
 
 class InProgressSimulationModel(
     val id: Int,

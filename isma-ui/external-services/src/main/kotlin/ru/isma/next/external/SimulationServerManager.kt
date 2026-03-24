@@ -78,6 +78,4 @@ class SimulationServerManager(
         socketPaths = null
         logger.info("isma-server stopped")
     }
-
-    fun isRunning(): Boolean = running
 }

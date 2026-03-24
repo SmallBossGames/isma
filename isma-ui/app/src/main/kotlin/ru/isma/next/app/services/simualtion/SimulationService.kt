@@ -72,7 +72,7 @@ class SimulationService(
                 simulationResult.commitResult(resultModel)
             } catch (e: Throwable)
             {
-                throw e;
+                throw e
             }
             finally {
                 currentSimulationJobs.remove(trackingTask)

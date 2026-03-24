@@ -2,18 +2,20 @@ package ru.nstu.isma.server.app
 
 import io.grpc.netty.NettyServerBuilder
 import io.grpc.protobuf.services.ProtoReflectionServiceV1
-import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.Channel
 import io.netty.channel.MultiThreadIoEventLoopGroup
 import io.netty.channel.epoll.EpollIoHandler
 import io.netty.channel.epoll.EpollServerDomainSocketChannel
 import io.netty.channel.unix.DomainSocketAddress
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.cio.*
+import io.ktor.server.routing.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import ru.nstu.isma.domain.domainModule
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
-import ru.nstu.isma.server.app.http.HttpServerPipelineInitializer
+import ru.nstu.isma.server.app.http.simulationResultRoutes
 import ru.nstu.isma.server.infrastructure.infrastructureModule
 import ru.nstu.isma.server.app.grpc.SimulationServiceGrpcImpl
 import java.io.File
@@ -58,13 +60,15 @@ fun main(args: Array<String>) {
         .addService(ProtoReflectionServiceV1.newInstance())
         .build()
 
-    val httpChannel: Channel = ServerBootstrap()
-        .group(bossGroup, workerGroup)
-        .channel(EpollServerDomainSocketChannel::class.java)
-        .childHandler(HttpServerPipelineInitializer(koin.sessionStore))
-        .bind(DomainSocketAddress(httpSocketPath))
-        .await()
-        .channel()
+    val httpServer = embeddedServer(CIO, configure = {
+        unixConnector(httpSocketPath) { }
+    }) {
+        routing {
+            simulationResultRoutes(koin.sessionStore)
+        }
+    }
+
+    httpServer.start(wait = false)
 
     println("Starting gRPC server on Unix socket: $socketPath")
     println("Starting HTTP server on Unix socket: $httpSocketPath")
@@ -76,7 +80,7 @@ fun main(args: Array<String>) {
     Runtime.getRuntime().addShutdownHook(
         Thread {
             grpcServer.shutdown()
-            httpChannel.close().sync()
+            httpServer.stop(1, 2, java.util.concurrent.TimeUnit.SECONDS)
             bossGroup.shutdownGracefully()
             workerGroup.shutdownGracefully()
             File(socketPath).delete()

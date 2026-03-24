@@ -36,4 +36,8 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.slf4j.api)
     runtimeOnly(libs.logback.classic)
+
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.cio)
+    implementation(libs.ktor.server.content.negotiation)
 }

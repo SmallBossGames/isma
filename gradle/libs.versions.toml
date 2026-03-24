@@ -7,6 +7,7 @@ javafx-libs = "25.0.2"
 org-apache-poi = "5.5.1"
 ikonli = "12.4.0"
 grpc = "1.80.0"
+ktor = "3.4.1"
 netty = "4.2.10.Final"
 google-protobuf-plugin = "0.9.6"
 ben-manes-versions = "0.53.0"
@@ -51,6 +52,10 @@ grpc-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
 grpc-netty = { module = "io.grpc:grpc-netty", version.ref = "grpc" }
 grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
 grpc-services = { module = "io.grpc:grpc-services", version.ref = "grpc" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.0" }
 
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.9.2"
 junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.11.4"

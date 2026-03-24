@@ -18,6 +18,7 @@ module isma.ui.external.services {
     requires com.google.common;
     requires koin.core.jvm;
     requires org.slf4j;
+    requires kotlinx.io.core;
 
     exports ru.isma.next.external;
 }

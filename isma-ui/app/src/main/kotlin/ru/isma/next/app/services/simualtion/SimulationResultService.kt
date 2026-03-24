@@ -1,5 +1,6 @@
 package ru.isma.next.app.services.simualtion
 
+import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.stage.FileChooser
 import javafx.stage.Window
@@ -25,15 +26,13 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
         FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
 
-    suspend fun commitResult(result: CompletedSimulationModel) =
-        withContext(Dispatchers.JavaFx) {
-            trackingTasksResults.add(result)
-        }
+    fun commitResult(result: CompletedSimulationModel) = Platform.runLater {
+        trackingTasksResults.add(result)
+    }
 
-    suspend fun removeResult(result: CompletedSimulationModel) =
-        withContext(Dispatchers.JavaFx) {
-            trackingTasksResults.remove(result)
-        }
+    fun removeResult(result: CompletedSimulationModel) = Platform.runLater {
+        trackingTasksResults.remove(result)
+    }
 
     fun showChart(simulationResult: CompletedSimulationModel) = ResultServiceScope.launch {
         val headers = createColumnNamesArray(simulationResult)

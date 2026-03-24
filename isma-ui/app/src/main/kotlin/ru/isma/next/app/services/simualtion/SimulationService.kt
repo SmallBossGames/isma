@@ -1,8 +1,10 @@
 package ru.isma.next.app.services.simualtion
 
+import javafx.application.Platform
 import javafx.collections.FXCollections
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import java.util.concurrent.Executors
 import org.koin.core.component.KoinComponent
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
@@ -44,15 +46,14 @@ class SimulationService(
 
                 val simulationId = serverFacade.runSimulation(params)
 
-                SimulationScope.launch(Dispatchers.JavaFx) {
+                Platform.runLater {
                     trackingTasks.add(trackingTask)
                 }
 
-                serverFacade.monitorSimulation(simulationId, 0.1).collect { progress ->
+                serverFacade.monitorSimulation(simulationId, 0.01).collect { progress ->
                     val normalized = ((progress.currentTime - progress.startTime) / (progress.endTime - progress.startTime)).coerceIn(0.0, 1.0)
-                    withContext(Dispatchers.JavaFx) {
-                        trackingTask.commitProgress(normalized)
-                    }
+
+                    trackingTask.commitProgress(normalized)
                 }
 
                 val csvData = serverFacade.getSimulationResult(simulationId)
@@ -87,7 +88,8 @@ class SimulationService(
     }
 
     companion object {
-        val SimulationScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        private val virtualThreadDispatcher = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
+        val SimulationScope = CoroutineScope(virtualThreadDispatcher + SupervisorJob())
     }
 }
 

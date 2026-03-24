@@ -9,7 +9,7 @@ class SimulationServerFacade(
     private val serverManager: SimulationServerManager,
 ) {
     private var grpcClient: GrpcSimulationClient? = null
-    private var httpClient: HttpSimulationClient? = null
+    private lateinit var httpClient: HttpSimulationClient
 
     fun warmup() {
         val socketPaths = serverManager.start()
@@ -58,7 +58,7 @@ class SimulationServerFacade(
         }
     }
 
-    fun getSimulationResult(simulationId: Long): ByteArray {
+    suspend fun getSimulationResult(simulationId: Long): ByteArray {
         val request = GetSimulationResultRequest.newBuilder()
             .setSimulationId(simulationId)
             .build()
@@ -66,11 +66,12 @@ class SimulationServerFacade(
         if (downloadUrl.isNullOrBlank()) {
             throw IllegalStateException("Download URL is empty")
         }
-        return httpClient!!.download(downloadUrl)
+        return httpClient.download(downloadUrl)
     }
 
     fun shutdown() {
         grpcClient?.shutdown()
+        httpClient.close()
         serverManager.stop()
     }
 }

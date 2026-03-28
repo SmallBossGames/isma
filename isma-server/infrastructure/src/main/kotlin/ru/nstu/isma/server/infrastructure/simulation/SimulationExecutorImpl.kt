@@ -8,7 +8,8 @@ import ru.nstu.isma.domain.simulation.ISimulationSessionStore
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
-import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
+import ru.nstu.isma.intg.api.utilities.BinaryResultWriter
+import java.io.DataOutputStream
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
@@ -97,7 +98,7 @@ class SimulationExecutorImpl(
             step = parameters.initialStep
         )
 
-        val tempFile = File.createTempFile("isma_simulation_$simulationId", ".csv")
+        val tempFile = File.createTempFile("isma_simulation_$simulationId", ".bin")
 
         var metricData: ru.nstu.isma.intg.api.models.IntgMetricData? = null
         val pointQueue = LinkedBlockingQueue<QueueItem>()
@@ -119,33 +120,37 @@ class SimulationExecutorImpl(
         }
 
         val writerThread = Thread.ofVirtual().start {
-            tempFile.bufferedWriter().use { writer ->
-                var isFirst = true
-                val variableNames = mutableListOf<String>()
-                while (true) {
-                    val item = pointQueue.take()
-                    if (item is QueueItem.EndOfStream) break
-                    val point = (item as QueueItem.Point).point
-                    if (isFirst) {
-                        writer.append(IntegrationResultPointFileHelpers.buildCsvHeader(point))
-                        val indexProvider = compilationResult.indexProvider
-                        val deCount = indexProvider.getDifferentialEquationCount()
-                        val aeCount = indexProvider.getAlgebraicEquationCount()
-                        for (i in 0 until deCount) {
-                            variableNames.add(indexProvider.getDifferentialEquationCode(i) ?: "DE_$i")
-                        }
-                        for (i in 0 until aeCount) {
-                            variableNames.add(indexProvider.getAlgebraicEquationCode(i) ?: "AE_$i")
-                        }
-                        for (i in 0 until deCount) {
-                            variableNames.add("f$i")
-                        }
-                        writer.appendLine(variableNames.joinToString(","))
-                        isFirst = false
-                    }
-                    writer.append(IntegrationResultPointFileHelpers.buildCsvString(point))
-                }
+            val indexProvider = compilationResult.indexProvider
+            val deCount = indexProvider.getDifferentialEquationCount()
+            val aeCount = indexProvider.getAlgebraicEquationCount()
+
+            val variableNames = mutableListOf<String>()
+            variableNames.add("TIME")
+            for (i in 0 until deCount) {
+                val code = indexProvider.getDifferentialEquationCode(i)
+                variableNames.add(if (code != null) "DE_$i-$code" else "DE_$i")
             }
+            for (i in 0 until aeCount) {
+                val code = indexProvider.getAlgebraicEquationCode(i)
+                variableNames.add(if (code != null) "AE_$i-$code" else "AE_$i")
+            }
+            for (i in 0 until deCount) {
+                variableNames.add("f$i")
+            }
+
+            val dos = DataOutputStream(tempFile.outputStream())
+            BinaryResultWriter.writeHeader(dos, variableNames)
+            dos.flush()
+
+            while (true) {
+                val item = pointQueue.take()
+                if (item is QueueItem.EndOfStream) break
+                val point = (item as QueueItem.Point).point
+                BinaryResultWriter.writePoint(dos, point)
+            }
+
+            dos.flush()
+            dos.close()
         }
 
         simulatorThread.join()

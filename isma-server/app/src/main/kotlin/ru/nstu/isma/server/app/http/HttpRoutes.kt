@@ -28,10 +28,10 @@ fun Routing.simulationResultRoutes(sessionStore: ISimulationSessionStore) {
             return@get
         }
 
-        call.response.headers.append(HttpHeaders.ContentType, "text/csv; charset=utf-8")
+        call.response.headers.append(HttpHeaders.ContentType, "application/octet-stream")
         call.response.headers.append(
             HttpHeaders.ContentDisposition,
-            "attachment; filename=\"simulation_$simulationId.csv\""
+            "attachment; filename=\"simulation_$simulationId.bin\""
         )
         call.respondFile(File(resultFilePath))
     }

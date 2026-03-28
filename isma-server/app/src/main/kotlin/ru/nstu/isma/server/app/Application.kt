@@ -20,8 +20,6 @@ import ru.nstu.isma.server.infrastructure.infrastructureModule
 import java.io.File
 import java.util.*
 
-var globalHttpSocketPath = ""
-
 fun main(args: Array<String>) {
     val cliArgs = args.toList()
     val socketPath = cliArgs.indexOf("--socket-path").let { idx ->
@@ -32,8 +30,6 @@ fun main(args: Array<String>) {
         if (idx >= 0 && idx + 1 < args.size) args[idx + 1]
         else "${System.getProperty("java.io.tmpdir")}/isma-http-${UUID.randomUUID()}.sock"
     }
-
-    globalHttpSocketPath = httpSocketPath
 
     startKoin {
         modules(domainModule, infrastructureModule, appModule)

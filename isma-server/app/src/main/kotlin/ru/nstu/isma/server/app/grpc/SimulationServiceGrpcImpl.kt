@@ -10,7 +10,6 @@ import ru.nstu.isma.domain.handlers.listSimulationMethods.IListSimulationMethods
 import ru.nstu.isma.domain.handlers.monitorSimulation.IMonitorSimulationHandler
 import ru.nstu.isma.domain.handlers.runSimulation.IRunSimulationHandler
 import ru.nstu.isma.domain.handlers.runSimulation.RunSimulationParameters
-import ru.nstu.isma.server.app.globalHttpSocketPath
 
 class SimulationServiceGrpcImpl(
     private val runSimulationHandler: IRunSimulationHandler,

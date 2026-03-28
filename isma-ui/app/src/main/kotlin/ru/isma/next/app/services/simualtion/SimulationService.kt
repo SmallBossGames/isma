@@ -11,11 +11,11 @@ import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.external.CsvEquationIndexProvider
-import ru.isma.next.external.CsvIntegrationResultPointProvider
-import ru.isma.next.external.CsvMetadata
+import ru.isma.next.external.CsvInputStreamPointProvider
 import ru.isma.next.external.RunSimulationParams
 import ru.isma.next.external.SimulationServerFacade
 import ru.nstu.isma.intg.api.models.IntgMetricData
+import ru.nstu.isma.intg.api.utilities.CsvParser
 
 class SimulationService(
     private val projectService: ProjectService,
@@ -56,16 +56,16 @@ class SimulationService(
                     trackingTask.commitProgress(normalized)
                 }
 
-                val csvData = serverFacade.getSimulationResult(simulationId)
-                val csvMetadata = CsvMetadata(csvData)
+                val inputStream = serverFacade.getSimulationResultAsInputStream(simulationId)
+                val parseResult = CsvParser.parseAll(inputStream)
                 val metricData = IntgMetricData()
 
                 val resultModel = CompletedSimulationModel(
                     trackingTask.id,
                     trackingTask.model,
-                    CsvEquationIndexProvider(csvMetadata),
+                    CsvEquationIndexProvider(parseResult.metadata),
                     metricData,
-                    CsvIntegrationResultPointProvider(csvData),
+                    CsvInputStreamPointProvider(parseResult.dataInputStream, parseResult.metadata),
                     trackingTask.parameters
                 )
 

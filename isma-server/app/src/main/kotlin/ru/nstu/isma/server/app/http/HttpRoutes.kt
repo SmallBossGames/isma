@@ -28,12 +28,11 @@ fun Routing.simulationResultRoutes(sessionStore: ISimulationSessionStore) {
             return@get
         }
 
-        val file = File(resultFilePath)
         call.response.headers.append(HttpHeaders.ContentType, "text/csv; charset=utf-8")
         call.response.headers.append(
             HttpHeaders.ContentDisposition,
             "attachment; filename=\"simulation_$simulationId.csv\""
         )
-        call.respondBytes(bytes = file.readBytes(), status = HttpStatusCode.OK) { }
+        call.respondFile(File(resultFilePath))
     }
 }

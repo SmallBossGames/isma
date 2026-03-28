@@ -4,6 +4,9 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.utils.io.jvm.javaio.toInputStream
+import java.io.InputStream
+
 class HttpSimulationClient(
     private val socketPath: String,
     private val timeoutSeconds: Long = 30,
@@ -14,10 +17,11 @@ class HttpSimulationClient(
         }
     }
 
-    suspend fun download(urlPath: String): ByteArray {
-        return client.get(urlPath) {
+    suspend fun downloadAsInputStream(urlPath: String): InputStream {
+        val response = client.get(urlPath) {
             unixSocket(socketPath)
-        }.readRawBytes()
+        }
+        return response.bodyAsChannel().toInputStream()
     }
 
     fun close() {

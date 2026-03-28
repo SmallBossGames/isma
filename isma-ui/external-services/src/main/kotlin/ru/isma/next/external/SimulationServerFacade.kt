@@ -68,7 +68,7 @@ class SimulationServerFacade(
         }
     }
 
-    suspend fun getSimulationResult(simulationId: Long): ByteArray {
+    suspend fun getSimulationResultAsInputStream(simulationId: Long): java.io.InputStream {
         val request = GetSimulationResultRequest.newBuilder()
             .setSimulationId(simulationId)
             .build()
@@ -76,7 +76,7 @@ class SimulationServerFacade(
         if (downloadUrl.isNullOrBlank()) {
             throw IllegalStateException("Download URL is empty")
         }
-        return httpClient.download(downloadUrl)
+        return httpClient.downloadAsInputStream(downloadUrl)
     }
 
     fun shutdown() {

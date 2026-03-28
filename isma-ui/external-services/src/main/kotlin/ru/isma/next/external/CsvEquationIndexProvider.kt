@@ -1,6 +1,7 @@
 package ru.isma.next.external
 
 import ru.isma.next.domain.models.IEquationIndexProvider
+import ru.nstu.isma.intg.api.utilities.CsvMetadata
 
 class CsvEquationIndexProvider(
     private val metadata: CsvMetadata,

@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import java.io.BufferedInputStream
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.EOFException
 import java.io.InputStream
@@ -16,30 +14,7 @@ data class BinaryMetadata(
     val columnNames: List<String>,
 )
 
-data class BinaryParseResult(
-    val metadata: BinaryMetadata,
-    val dataInputStream: InputStream,
-)
-
 object BinaryParser {
-    fun parseAll(inputStream: InputStream): BinaryParseResult {
-        val bufferedStream = BufferedInputStream(inputStream)
-        val dis = DataInputStream(bufferedStream)
-        val columnCount = dis.readShort().toInt() and 0xFFFF
-
-        val columnNames = (0 until columnCount).map {
-            val len = dis.readShort().toInt() and 0xFFFF
-            val bytes = ByteArray(len)
-            dis.readFully(bytes)
-            String(bytes, Charsets.UTF_8)
-        }
-
-        val buffer = ByteArrayOutputStream()
-        bufferedStream.use { it.copyTo(buffer) }
-
-        return BinaryParseResult(BinaryMetadata(columnNames), ByteArrayInputStream(buffer.toByteArray()))
-    }
-
     fun parsePoints(inputStream: InputStream, columnNames: List<String>): Flow<IntgResultPoint> = flow {
         val dis = DataInputStream(BufferedInputStream(inputStream))
 

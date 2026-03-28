@@ -15,6 +15,7 @@ import ru.nstu.grin.integration.GrinIntegrationFacade
 import ru.nstu.grin.integration.PointModel
 
 import ru.nstu.isma.intg.api.models.IntgResultPoint
+import ru.isma.next.external.BinaryFilePointProvider
 import java.io.File
 import java.io.Writer
 
@@ -86,7 +87,9 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
     }
 
     private suspend fun writePoints(result: CompletedSimulationModel, writer: Writer) = coroutineScope {
-        result.resultPointProvider.results.collect { value ->
+        val pointProvider = BinaryFilePointProvider(result.cachedFile, result.cachedColumnNames)
+
+        pointProvider.results.collect { value ->
             writer.appendLine(value.toCsvLine())
         }
     }
@@ -162,7 +165,9 @@ class SimulationResultService(private val grinIntegrationController: GrinIntegra
          val deCount = eqIdx.getDifferentialEquationCount()
          val aeCount = eqIdx.getAlgebraicEquationCount()
 
-         result.resultPointProvider.results.collect { point ->
+         val pointProvider = BinaryFilePointProvider(result.cachedFile, result.cachedColumnNames)
+
+         pointProvider.results.collect { point ->
              val row = DoubleArray(1 + deCount + deCount + aeCount)
              row[0] = point.x
              point.yForDe.copyInto(row, 1)

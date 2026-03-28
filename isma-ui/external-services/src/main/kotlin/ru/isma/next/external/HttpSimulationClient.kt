@@ -3,9 +3,9 @@ package ru.isma.next.external
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.utils.io.jvm.javaio.toInputStream
-import java.io.InputStream
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.utils.io.jvm.javaio.*
+import java.io.File
 
 class HttpSimulationClient(
     private val socketPath: String,
@@ -17,16 +17,19 @@ class HttpSimulationClient(
         }
     }
 
-    suspend fun downloadAsInputStream(urlPath: String): InputStream {
-        val response = client.get(urlPath) {
+    suspend fun downloadToFile(urlPath: String, targetFile: File) {
+        val input = client.get(urlPath) {
             unixSocket(socketPath)
+        }.bodyAsChannel().toInputStream()
+
+        input.use { inputStream ->
+            targetFile.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
         }
-        return response.bodyAsChannel().toInputStream()
     }
 
     fun close() {
         client.close()
     }
 }
-
-class HttpDownloadException(message: String) : RuntimeException(message)

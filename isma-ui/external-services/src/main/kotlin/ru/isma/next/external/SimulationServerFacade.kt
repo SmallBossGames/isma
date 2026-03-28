@@ -3,8 +3,10 @@ package ru.isma.next.external
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import ru.nstu.isma.contracts.simulation.*
 import ru.isma.next.domain.models.SimulationProgress
+import ru.nstu.isma.contracts.simulation.*
+import java.io.File
+import java.nio.file.Path
 
 class SimulationServerFacade(
     private val serverManager: SimulationServerManager,
@@ -68,7 +70,7 @@ class SimulationServerFacade(
         }
     }
 
-    suspend fun getSimulationResultAsInputStream(simulationId: Long): java.io.InputStream {
+    suspend fun downloadResultToCache(simulationId: Long): CachedSimulationResult {
         val request = GetSimulationResultRequest.newBuilder()
             .setSimulationId(simulationId)
             .build()
@@ -76,7 +78,23 @@ class SimulationServerFacade(
         if (downloadUrl.isNullOrBlank()) {
             throw IllegalStateException("Download URL is empty")
         }
-        return httpClient.downloadAsInputStream(downloadUrl)
+
+        val cacheDir = getCacheDirectory()
+        val cachedFile = File(cacheDir.toFile(), "simulation_$simulationId.bin")
+
+        httpClient.downloadToFile(downloadUrl, cachedFile)
+
+        val metadata = BinaryFilePointProvider.readMetadata(cachedFile)
+
+        return CachedSimulationResult(cachedFile, metadata.columnNames)
+    }
+
+    private fun getCacheDirectory(): Path {
+        val cacheDir = File(System.getProperty("java.io.tmpdir"), "isma-simulation-cache")
+        if (!cacheDir.exists()) {
+            cacheDir.mkdirs()
+        }
+        return cacheDir.toPath()
     }
 
     fun cancelSimulation(simulationId: Long) {
@@ -92,3 +110,8 @@ class SimulationServerFacade(
         serverManager.stop()
     }
 }
+
+data class CachedSimulationResult(
+    val file: File,
+    val columnNames: List<String>,
+)

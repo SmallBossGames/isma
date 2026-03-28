@@ -11,11 +11,11 @@ import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.external.BinaryEquationIndexProvider
-import ru.isma.next.external.BinaryInputStreamPointProvider
+import ru.isma.next.external.CachedSimulationResult
 import ru.isma.next.external.RunSimulationParams
 import ru.isma.next.external.SimulationServerFacade
 import ru.nstu.isma.intg.api.models.IntgMetricData
-import ru.nstu.isma.intg.api.utilities.BinaryParser
+import ru.nstu.isma.intg.api.utilities.BinaryMetadata
 
 class SimulationService(
     private val projectService: ProjectService,
@@ -58,17 +58,18 @@ class SimulationService(
                     trackingTask.commitProgress(normalized)
                 }
 
-                val inputStream = serverFacade.getSimulationResultAsInputStream(simulationId)
-                val parseResult = BinaryParser.parseAll(inputStream)
+                val cachedResult: CachedSimulationResult = serverFacade.downloadResultToCache(simulationId)
                 val metricData = IntgMetricData()
+                val metadata = BinaryMetadata(cachedResult.columnNames)
 
                 val resultModel = CompletedSimulationModel(
-                    trackingTask.id,
-                    trackingTask.model,
-                    BinaryEquationIndexProvider(parseResult.metadata),
-                    metricData,
-                    BinaryInputStreamPointProvider(parseResult.dataInputStream, parseResult.metadata.columnNames),
-                    trackingTask.parameters
+                    id = trackingTask.id,
+                    modelName = trackingTask.model,
+                    equationIndexProvider = BinaryEquationIndexProvider(metadata),
+                    metricData = metricData,
+                    parameters = trackingTask.parameters,
+                    cachedFile = cachedResult.file,
+                    cachedColumnNames = cachedResult.columnNames
                 )
 
                 simulationResult.commitResult(resultModel)

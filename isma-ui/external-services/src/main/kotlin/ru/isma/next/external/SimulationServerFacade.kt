@@ -79,6 +79,13 @@ class SimulationServerFacade(
         return httpClient.downloadAsInputStream(downloadUrl)
     }
 
+    fun cancelSimulation(simulationId: Long) {
+        val request = CancelSimulationRequest.newBuilder()
+            .setSimulationId(simulationId)
+            .build()
+        grpcClient.blockingStub.cancelSimulation(request)
+    }
+
     fun shutdown() {
         grpcClient.shutdown()
         httpClient.close()

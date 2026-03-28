@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package ru.nstu.isma.contracts.simulation;
 
+import "simulation/cancel_simulation_request.proto";
+import "simulation/cancel_simulation_response.proto";
 import "simulation/get_simulation_result_request.proto";
 import "simulation/get_simulation_result_response.proto";
 import "simulation/list_simulation_methods_request.proto";
@@ -31,4 +33,6 @@ service SimulationService {
   rpc MonitorSimulation(MonitorSimulationRequest) returns (stream MonitorSimulationResponse);
   // Lists available integration methods
   rpc ListSimulationMethods(ListSimulationMethodsRequest) returns (ListSimulationMethodsResponse);
+  // Cancels a running simulation
+  rpc CancelSimulation(CancelSimulationRequest) returns (CancelSimulationResponse);
 }

@@ -10,6 +10,8 @@ class InProgressSimulationModel(
 ) {
     private var actualProgress = 0.0
 
+    var simulationId: Long? = null
+
     val progressProperty = SimpleDoubleProperty(actualProgress)
 
     fun commitProgress(value: Double) {

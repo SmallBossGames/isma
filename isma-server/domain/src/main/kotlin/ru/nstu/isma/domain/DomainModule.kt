@@ -1,6 +1,8 @@
 package ru.nstu.isma.domain
 
 import org.koin.dsl.module
+import ru.nstu.isma.domain.handlers.cancelSimulation.CancelSimulationHandlerImpl
+import ru.nstu.isma.domain.handlers.cancelSimulation.ICancelSimulationHandler
 import ru.nstu.isma.domain.handlers.getSimulationResult.GetSimulationResultHandlerImpl
 import ru.nstu.isma.domain.handlers.getSimulationResult.IGetSimulationResultHandler
 import ru.nstu.isma.domain.handlers.listSimulationMethods.IListSimulationMethodsHandler
@@ -15,4 +17,5 @@ val domainModule = module {
     single<IGetSimulationResultHandler> { GetSimulationResultHandlerImpl(get()) }
     single<IMonitorSimulationHandler> { MonitorSimulationHandlerImpl(get()) }
     single<IListSimulationMethodsHandler> { ListSimulationMethodsHandlerImpl(get()) }
+    single<ICancelSimulationHandler> { CancelSimulationHandlerImpl(get()) }
 }

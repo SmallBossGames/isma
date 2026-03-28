@@ -5,6 +5,7 @@ import io.grpc.StatusException
 import io.grpc.stub.StreamObserver
 import org.slf4j.LoggerFactory
 import ru.nstu.isma.contracts.simulation.*
+import ru.nstu.isma.domain.handlers.cancelSimulation.ICancelSimulationHandler
 import ru.nstu.isma.domain.handlers.getSimulationResult.IGetSimulationResultHandler
 import ru.nstu.isma.domain.handlers.listSimulationMethods.IListSimulationMethodsHandler
 import ru.nstu.isma.domain.handlers.monitorSimulation.IMonitorSimulationHandler
@@ -16,6 +17,7 @@ class SimulationServiceGrpcImpl(
     private val getSimulationResultHandler: IGetSimulationResultHandler,
     private val monitorSimulationHandler: IMonitorSimulationHandler,
     private val listSimulationMethodsHandler: IListSimulationMethodsHandler,
+    private val cancelSimulationHandler: ICancelSimulationHandler,
 ) : SimulationServiceGrpc.SimulationServiceImplBase() {
 
     private val logger = LoggerFactory.getLogger(SimulationServiceGrpcImpl::class.java)
@@ -116,6 +118,20 @@ class SimulationServiceGrpcImpl(
             responseObserver.onCompleted()
         } catch (e: Exception) {
             logger.error("listSimulationMethods failed", e)
+            responseObserver.onError(toStatusException(e))
+        }
+    }
+
+    override fun cancelSimulation(
+        request: CancelSimulationRequest,
+        responseObserver: StreamObserver<CancelSimulationResponse>
+    ) {
+        try {
+            cancelSimulationHandler.handle(request.simulationId)
+            responseObserver.onNext(CancelSimulationResponse.getDefaultInstance())
+            responseObserver.onCompleted()
+        } catch (e: Exception) {
+            logger.error("cancelSimulation failed for simulationId=${request.simulationId}", e)
             responseObserver.onError(toStatusException(e))
         }
     }

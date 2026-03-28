@@ -5,6 +5,7 @@ import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 import ru.nstu.isma.domain.handlers.runSimulation.RunSimulationParameters
 import ru.nstu.isma.domain.simulation.ISimulationExecutor
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
+import ru.nstu.isma.domain.simulation.SimulationStatus
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
@@ -34,6 +35,11 @@ class SimulationExecutorImpl(
         executorService.submit {
             try {
                 runSimulation(simulationId, parameters, hsm)
+            } catch (e: InterruptedException) {
+                val session = sessionStore.get(simulationId)
+                if (session?.status != SimulationStatus.CANCELLED) {
+                    sessionStore.failSimulation(simulationId, e.message ?: "Simulation interrupted")
+                }
             } catch (e: Exception) {
                 sessionStore.failSimulation(simulationId, e.message ?: "Unknown error")
             }
@@ -104,19 +110,26 @@ class SimulationExecutorImpl(
         val pointQueue = LinkedBlockingQueue<QueueItem>()
 
         val simulatorThread = Thread.ofVirtual().start {
-            val simulatorParameters = HybridSystemSimulatorParameters(
-                compilationResult,
-                simulationInitials,
-                stepChangeHandlers = { currentTime ->
-                    sessionStore.updateProgress(simulationId, currentTime)
-                },
-                resultPointHandlers = { point ->
-                    pointQueue.put(QueueItem.Point(point))
-                }
-            )
+            try {
+                val simulatorParameters = HybridSystemSimulatorParameters(
+                    compilationResult,
+                    simulationInitials,
+                    stepChangeHandlers = { currentTime ->
+                        val session = sessionStore.get(simulationId)
+                        if (session?.status == SimulationStatus.CANCELLED) {
+                            throw InterruptedException("Simulation was cancelled")
+                        }
+                        sessionStore.updateProgress(simulationId, currentTime)
+                    },
+                    resultPointHandlers = { point ->
+                        pointQueue.put(QueueItem.Point(point))
+                    }
+                )
 
-            metricData = simulator.runAsync(simulatorParameters)
-            pointQueue.put(QueueItem.EndOfStream)
+                metricData = simulator.runAsync(simulatorParameters)
+            } finally {
+                pointQueue.put(QueueItem.EndOfStream)
+            }
         }
 
         val writerThread = Thread.ofVirtual().start {

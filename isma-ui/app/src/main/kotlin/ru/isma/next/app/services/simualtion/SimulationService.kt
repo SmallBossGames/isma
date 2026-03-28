@@ -46,6 +46,8 @@ class SimulationService(
 
                 val simulationId = serverFacade.runSimulation(params)
 
+                trackingTask.simulationId = simulationId
+
                 Platform.runLater {
                     trackingTasks.add(trackingTask)
                 }
@@ -83,7 +85,8 @@ class SimulationService(
         }.also { job -> currentSimulationJobs[trackingTask] = job }
     }
 
-    fun stopSimulation(trackingTask: InProgressSimulationModel) {
+    fun stopSimulation(trackingTask: InProgressSimulationModel) = SimulationScope.launch {
+        trackingTask.simulationId?.let { serverFacade.cancelSimulation(it) }
         currentSimulationJobs[trackingTask]?.cancel()
     }
 

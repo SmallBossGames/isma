@@ -61,6 +61,8 @@ include("isma-solver:lib:rkfehlberg")
 include("isma-next-math-engine")
 include("isma-next-math-common")
 
+include("isma-jvm-lib:exchange-format")
+
 include("isma-server:domain")
 include("isma-server:grpc")
 include("isma-server:infrastructure")

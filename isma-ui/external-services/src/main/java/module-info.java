@@ -4,6 +4,7 @@ module isma.ui.external.services {
     requires isma.ui.grpc;
     requires isma.ui.domain;
     requires isma.isma.intg.api.main;
+    requires isma.jvm.lib.exchange.format;
     requires io.grpc.netty;
     requires io.grpc.protobuf;
     requires io.grpc.stub;

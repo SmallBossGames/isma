@@ -1,5 +1,6 @@
 package ru.nstu.isma.server.infrastructure.simulation
 
+import ru.isma.next.exchange.format.writeAll
 import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 import ru.nstu.isma.domain.handlers.runSimulation.RunSimulationParameters
@@ -9,8 +10,6 @@ import ru.nstu.isma.domain.simulation.SimulationStatus
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
-import ru.nstu.isma.intg.api.utilities.BinaryResultWriter
-import java.io.DataOutputStream
 import ru.nstu.isma.intg.core.solvers.DefaultDaeSystemStepSolver
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationInitials
@@ -151,19 +150,16 @@ class SimulationExecutorImpl(
                 variableNames.add("f$i")
             }
 
-            val dos = DataOutputStream(tempFile.outputStream())
-            BinaryResultWriter.writeHeader(dos, variableNames)
-            dos.flush()
-
-            while (true) {
-                val item = pointQueue.take()
-                if (item is QueueItem.EndOfStream) break
-                val point = (item as QueueItem.Point).point
-                BinaryResultWriter.writePoint(dos, point)
+            val pointsSequence = sequence {
+                while (true) {
+                    val item = pointQueue.take()
+                    if (item is QueueItem.EndOfStream) break
+                    val point = (item as QueueItem.Point).point
+                    yield(convertToDoubleArray(point))
+                }
             }
 
-            dos.flush()
-            dos.close()
+            writeAll(tempFile, variableNames, pointsSequence)
         }
 
         simulatorThread.join()
@@ -181,6 +177,26 @@ class SimulationExecutorImpl(
         }
 
         return odeInitials
+    }
+
+    private fun convertToDoubleArray(point: IntgResultPoint): DoubleArray {
+        val deCount = point.yForDe.size
+        val aeCount = point.rhs[1].size
+        val fCount = point.rhs[0].size
+
+        val result = DoubleArray(1 + deCount + aeCount + fCount)
+        var idx = 0
+        result[idx++] = point.x
+        for (v in point.yForDe) {
+            result[idx++] = v
+        }
+        for (v in point.rhs[1]) {
+            result[idx++] = v
+        }
+        for (v in point.rhs[0]) {
+            result[idx++] = v
+        }
+        return result
     }
 
     private sealed class QueueItem {

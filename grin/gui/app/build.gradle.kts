@@ -13,7 +13,7 @@ dependencies {
     implementation(libs.koin.core)
 
     implementation(project(":grin:gui:concatenation"))
-    implementation(project(":isma-solver:api"))
+    implementation(project(":isma-jvm-lib:exchange-format"))
 
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

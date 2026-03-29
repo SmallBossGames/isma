@@ -7,6 +7,7 @@ version = "1.0.0-SNAPSHOT"
 
 dependencies {
     implementation(project(":isma-server:domain"))
+    implementation(project(":isma-jvm-lib:exchange-format"))
     implementation(project(":isma-solver:api"))
     implementation(project(":isma-solver:core"))
     implementation(project(":isma-solver:lib-utils"))

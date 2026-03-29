@@ -17,7 +17,7 @@ class GrinProcessLauncher() {
     private val logger = LoggerFactory.getLogger(GrinProcessLauncher::class.java)
     private var process: Process? = null
 
-    fun launch(resultFile: File, chartColumns: List<String>) {
+    fun launch(resultFile: File, xAxisColumn: String, chartColumns: List<String>) {
         val scriptPath = resolveGrinScriptPath()
             ?: run {
                 logger.error("Grin is not configured. Set $ENV_VAR environment variable or $PROP_NAME system property to enable chart display.")
@@ -33,10 +33,10 @@ class GrinProcessLauncher() {
         val args = mutableListOf<String>()
         args.add("--result-file")
         args.add(resultFile.absolutePath)
-        if (chartColumns.isNotEmpty()) {
-            args.add("--charts")
-            args.add(chartColumns.joinToString(","))
-        }
+        args.add("--x-axis")
+        args.add(xAxisColumn)
+        args.add("--charts")
+        args.add(chartColumns.joinToString(","))
 
         logger.info("Launching Grin with args: ${args.joinToString(" ")}")
 

@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":isma-solver:api"))
     implementation(project(":isma-compiler:hsm-jvm"))
     implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
+    implementation(project(":isma-jvm-lib:exchange-format"))
     implementation(libs.grpc.netty)
     implementation(libs.grpc.protobuf)
     implementation(libs.grpc.stub)

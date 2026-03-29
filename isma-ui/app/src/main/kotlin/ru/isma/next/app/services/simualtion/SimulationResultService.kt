@@ -45,17 +45,14 @@ class SimulationResultService(
             headerColumnPairs
         )
 
-        val pickedItems = withContext(Dispatchers.JavaFx){
+        val pickedItems = withContext(Dispatchers.JavaFx) {
             pickAxisVariables(pickerModel)
         } ?: return@launch
 
         val selectedColumnNames = pickedItems.yAxisItems.map { it.name }
         val xAxisName = pickedItems.xAxisItem.name
-        val allChartColumns = listOf(xAxisName) + selectedColumnNames
 
-        withContext(Dispatchers.JavaFx){
-            grinProcessLauncher.launch(simulationResult.cachedFile, allChartColumns)
-        }
+        grinProcessLauncher.launch(simulationResult.cachedFile, xAxisName, selectedColumnNames)
     }
 
     fun exportToFile(simulationResult: CompletedSimulationModel, ownerWindow: Window? = null){

@@ -7,7 +7,8 @@ fun main(args: Array<String>) {
 }
 
 data class GrinCommandLineConfig(
-    val resultFile: String,
+    val resultFile: String?,
+    val xAxis: String?,
     val charts: List<String>,
 ) {
     companion object {
@@ -17,7 +18,11 @@ data class GrinCommandLineConfig(
                 ?: args.indexOfFirst { !it.startsWith("-") }.takeIf { it >= 0 }
 
             val resultFile = resultFileIdx?.let { args[it] }
-                ?: throw IllegalArgumentException("Missing required argument: --result-file <path>")
+
+            val xAxisIdx = args.indexOf("--x-axis").takeIf { it >= 0 }?.let { it + 1 }
+                ?: args.indexOf("-x").takeIf { it >= 0 }?.let { it + 1 }
+
+            val xAxis = xAxisIdx?.let { args[it] }
 
             val chartsIdx = args.indexOf("--charts").takeIf { it >= 0 }?.let { it + 1 }
                 ?: args.indexOf("-c").takeIf { it >= 0 }?.let { it + 1 }
@@ -26,7 +31,13 @@ data class GrinCommandLineConfig(
                 args.getOrNull(idx)?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }
             } ?: emptyList()
 
-            return GrinCommandLineConfig(resultFile, charts)
+            if (resultFile != null) {
+                if (xAxis == null || charts.isEmpty()) {
+                    throw IllegalArgumentException("When --result-file is provided, both --x-axis and --charts are required")
+                }
+            }
+
+            return GrinCommandLineConfig(resultFile, xAxis, charts)
         }
     }
 }

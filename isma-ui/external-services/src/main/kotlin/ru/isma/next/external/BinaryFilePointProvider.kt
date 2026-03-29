@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.IntegrationResultPointProvider
 import ru.nstu.isma.intg.api.utilities.BinaryParser
+import ru.isma.next.exchange.format.readMetadata
 import java.io.BufferedInputStream
 import java.io.DataInputStream
 import java.io.File
@@ -31,21 +32,10 @@ class BinaryFilePointProvider(
 
     companion object {
         fun readMetadata(file: File): BinaryMetadataCache {
-            val dis = DataInputStream(BufferedInputStream(FileInputStream(file)))
-            val columnCount = dis.readShort().toInt() and 0xFFFF
-
-            val columnNames = (0 until columnCount).map {
-                val len = dis.readShort().toInt() and 0xFFFF
-                val bytes = ByteArray(len)
-                dis.readFully(bytes)
-                String(bytes, Charsets.UTF_8)
-            }
-
-            return BinaryMetadataCache(columnNames)
+            val metadata = ru.isma.next.exchange.format.readMetadata(file)
+            return BinaryMetadataCache(metadata.columnNames)
         }
     }
 }
 
-data class BinaryMetadataCache(
-    val columnNames: List<String>,
-)
+typealias BinaryMetadataCache = ru.isma.next.exchange.format.BinaryMetadata

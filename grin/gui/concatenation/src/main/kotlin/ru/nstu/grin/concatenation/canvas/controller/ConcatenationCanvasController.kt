@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.canvas.controller
 
+import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Modality
@@ -9,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.core.component.get
 import org.koin.core.parameter.parametersOf
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
@@ -31,18 +33,17 @@ class ConcatenationCanvasController(
     private val mainGrinScope: MainGrinScope,
     private val descriptionCanvasService: DescriptionCanvasService,
 ) {
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
-
     fun replaceAll(
         cartesianSpaces: List<CartesianSpace>,
         normalizeSpaces: Boolean = false
-    ){
+    ) {
         model.cartesianSpaces.clear()
         model.cartesianSpaces.addAll(cartesianSpaces)
 
-        coroutineScope.launch {
-            if(normalizeSpaces) normalizeSpaces()
-
+        runBlocking {
+            if (normalizeSpaces) {
+                normalizeSpaces()
+            }
             model.reportAxesListUpdate()
             model.reportCartesianSpacesListUpdate()
             model.reportDescriptionsListUpdate()

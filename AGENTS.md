@@ -82,6 +82,10 @@ The UI launches the server as a separate JVM process communicating via gRPC over
 - No duplicate `group`, `version`, or `repositories` declarations
 - `java.sourceCompatibility` and `java.targetCompatibility` must match
 
+## Java Modules
+
+All applications in this repository should use `module-info.java` for proper module system configuration.
+
 ## Build
 
 ```bash

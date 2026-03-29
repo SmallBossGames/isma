@@ -10,17 +10,18 @@ mkdir -p "$BUNDLE_DIR"
 
 cd "$PROJECT_ROOT"
 
-./gradlew :isma-ui:app:installDist :isma-server:app:installDist
+./gradlew :isma-ui:app:installDist :isma-server:app:installDist :grin:gui:app:installDist
 
 cp -r "$PROJECT_ROOT/isma-ui/app/build/install/app" "$BUNDLE_DIR/isma-ui-app"
 cp -r "$PROJECT_ROOT/isma-server/app/build/install/app" "$BUNDLE_DIR/isma-server-app"
+cp -r "$PROJECT_ROOT/grin/gui/app/build/install/app" "$BUNDLE_DIR/grin-app"
 
 cat > "$BUNDLE_DIR/run-ui.sh" << 'SCRIPT'
 #!/bin/bash
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
-exec env "ISMA_SERVER_SCRIPT=$SCRIPT_DIR/isma-server-app/bin/app" "$SCRIPT_DIR/isma-ui-app/bin/app"
+exec env "ISMA_SERVER_SCRIPT=$SCRIPT_DIR/isma-server-app/bin/app" "ISMA_GRIN_SCRIPT=$SCRIPT_DIR/grin-app/bin/app" "$SCRIPT_DIR/isma-ui-app/bin/app"
 SCRIPT
 chmod +x "$BUNDLE_DIR/run-ui.sh"
 

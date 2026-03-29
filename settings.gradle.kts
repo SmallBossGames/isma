@@ -8,7 +8,6 @@ include("isma-ui:domain")
 include("isma-ui:text-editor")
 include("isma-ui:blueprint-editor")
 include("isma-ui:toolkit")
-include("isma-ui:grin-nested")
 
 include("isma-next-core")
 

@@ -1,10 +1,9 @@
 package ru.isma.next.app.launcher
 
 import org.koin.core.context.GlobalContext.startKoin
+import org.koin.dsl.module
 import ru.isma.next.app.services.koin.*
 import ru.isma.next.app.views.koin.*
-import ru.nstu.grin.integration.grinNestedModule
-
 fun ismaKoinStart() = startKoin {
     modules(
         simulationServerModule,
@@ -12,7 +11,7 @@ fun ismaKoinStart() = startKoin {
     )
 
     modules(
-        grinNestedModule,
+        grinProcessLauncherModule,
     )
 
     modules(
@@ -23,4 +22,8 @@ fun ismaKoinStart() = startKoin {
         lismaTextEditorModule,
         blueprintEditorModule,
     )
+}
+
+val grinProcessLauncherModule = module {
+    single { GrinProcessLauncher() }
 }

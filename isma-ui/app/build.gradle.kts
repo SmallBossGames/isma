@@ -21,7 +21,8 @@ tasks.withType<JavaExec>().configureEach {
     jvmArgs(
         "--enable-native-access=javafx.graphics",
         "--enable-native-access=io.netty.common",
-        "-Disma.server.script=$rootDir/build/bundle/isma-server-app/bin/app"
+        "-Disma.server.script=$rootDir/build/bundle/isma-server-app/bin/app",
+        "-Disma.grin.script=$rootDir/build/bundle/grin-app/bin/app"
     )
 }
 
@@ -54,7 +55,6 @@ dependencies {
     implementation(project(":isma-ui:blueprint-editor"))
     implementation(project(":isma-ui:text-editor"))
     implementation(project(":isma-ui:toolkit"))
-    implementation(project(":isma-ui:grin-nested"))
     implementation(project(":isma-solver:lib-utils"))
     implementation(project(":isma-solver:lib-meta"))
 

@@ -30,9 +30,6 @@ module isma.ui.app.main {
     requires isma.ui.toolkit;
     requires isma.ui.editor.text;
     requires isma.ui.editor.blueprint;
-    requires isma.ui.grin.nested;
-    requires isma.grin.gui.common.main;
-    requires isma.grin.gui.concatenation.main;
 
     requires isma.ui.grpc;
     requires isma.ui.domain;

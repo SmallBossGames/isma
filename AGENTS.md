@@ -30,12 +30,14 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `lisma-translator-hsm/` - LISMA to HSM translator
 
 ### User Interface
-- **isma-ui/** - UI components
-  - `app/` - Main application
-  - `text-editor/` - Text editing
-  - `blueprint-editor/` - Blueprint editing
-  - `grin-nested/` - Nested graphical representation
-  - `toolkit/` - UI utilities
+- **isma-ui/** - JavaFX-based UI components (see `isma-ui/AGENTS.md` for details)
+  - `app/` - Main application entry point
+  - `domain/` - Domain models and business logic
+  - `external-services/` - gRPC client layer for server communication
+  - `grpc/` - Generated gRPC stubs
+  - `text-editor/` - Text editing component
+  - `blueprint-editor/` - Blueprint/visual editing component
+  - `toolkit/` - Shared UI utilities
 
 ### Next-Generation Core
 - **isma-next-core/** - Core functionality

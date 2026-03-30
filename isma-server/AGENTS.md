@@ -6,10 +6,10 @@ gRPC-based server for ISMA with Netty transport layer.
 
 | Module | Description |
 |--------|-------------|
-| **app/** | Main application entry point. Starts gRPC server with Netty transport, uses domain sockets for IPC |
-| **domain/** | Domain layer - shared business logic with Koin DI |
+| **app/** | Main application entry point. Starts gRPC server with Netty transport, uses domain sockets for IPC. Also includes Ktor HTTP server. |
+| **domain/** | Domain layer - shared business logic with Koin DI. Contains handlers for simulation operations. |
 | **grpc/** | gRPC code generation from protobuf. Proto files sourced from `../../protobuf-contracts` |
-| **infrastructure/** | Infrastructure layer - implements domain interfaces (e.g., integration methods via ServiceLoader) |
+| **infrastructure/** | Infrastructure layer - implements domain interfaces. Uses ServiceLoader for integration methods and includes compilers (HSM, FDM, JVM). |
 
 ## Architecture
 
@@ -18,7 +18,8 @@ app/
  └── ApplicationKt (main class)
       ├── Starts Koin DI (domainModule, infrastructureModule, appModule)
       ├── Creates gRPC server on Unix domain socket
-      └── Imports: ru.nstu.isma.server.domain, ru.nstu.isma.server.grpc
+      └── Creates Ktor HTTP server (CIO engine)
+       └── Imports: ru.nstu.isma.server.domain, ru.nstu.isma.server.grpc
 
 grpc/
  └── Generates gRPC stubs from proto files
@@ -50,11 +51,14 @@ infrastructure/
 | Dependency | Purpose |
 |------------|---------|
 | isma-solver:lib-meta | SPI interface for integration method factories |
+| isma-solver:api, isma-solver:core | Solver API and implementation |
+| isma-compiler:hsm-core, hsm-fdm, hsm-jvm | HSM compiler components |
 | grpc-netty | Netty-based gRPC server transport |
 | netty-transport + netty-transport-classes-epoll | Epoll event loop for Linux domain sockets |
 | grpc-stub, grpc-protobuf, grpc-java | gRPC API and generated code |
 | protobuf-java | Protocol buffers |
 | kotlin-reflect, koin-core | DI and reflection |
+| ktor-server-core, ktor-server-cio | Ktor HTTP server (for potential HTTP endpoints) |
 
 ## Proto Contracts
 

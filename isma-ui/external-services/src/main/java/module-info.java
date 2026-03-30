@@ -3,7 +3,6 @@ module isma.ui.external.services {
     requires kotlinx.coroutines.core;
     requires isma.ui.grpc;
     requires isma.ui.domain;
-    requires isma.isma.intg.api.main;
     requires isma.jvm.lib.exchange.format;
     requires io.grpc.netty;
     requires io.grpc.protobuf;
@@ -16,8 +15,6 @@ module isma.ui.external.services {
     requires io.netty.common;
     requires io.netty.buffer;
     requires io.netty.codec;
-    requires com.google.common;
-    requires koin.core.jvm;
     requires org.slf4j;
     requires kotlinx.io.core;
 

@@ -1,10 +1,10 @@
 package ru.isma.next.external
 
 import ru.isma.next.domain.models.IEquationIndexProvider
-import ru.nstu.isma.intg.api.utilities.BinaryMetadata
+import ru.isma.next.domain.models.SimulationMetadata
 
 class BinaryEquationIndexProvider(
-    metadata: BinaryMetadata,
+    metadata: SimulationMetadata,
 ) : IEquationIndexProvider {
     private val columnNames: List<String> = metadata.columnNames
 

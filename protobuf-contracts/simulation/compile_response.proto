@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package ru.nstu.isma.contracts.simulation;
+
+option csharp_namespace = "Isma.Contracts.Simulation";
+option go_package = "github.com/isma/contracts/simulation";
+option java_multiple_files = true;
+option java_package = "ru.nstu.isma.contracts.simulation";
+
+message CompileResponse {
+  string compiled_model_id = 1;
+  repeated CompilationError errors = 2;
+  repeated string warnings = 3;
+}
+
+message CompilationError {
+  int32 row = 1;
+  int32 column = 2;
+  string message = 3;
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package ru.nstu.isma.contracts.simulation;
+
+option csharp_namespace = "Isma.Contracts.Simulation";
+option go_package = "github.com/isma/contracts/simulation";
+option java_multiple_files = true;
+option java_package = "ru.nstu.isma.contracts.simulation";
+
+message DeleteCompiledModelRequest {
+  string compiled_model_id = 1;
+}
+
+message DeleteCompiledModelResponse {
+  bool success = 1;
+}

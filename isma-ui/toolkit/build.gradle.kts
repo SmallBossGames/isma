@@ -13,11 +13,4 @@ javafx {
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.javafx)
-
-    testImplementation(libs.junit.jupiter.api)
-    testRuntimeOnly(libs.junit.jupiter.engine)
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
 }

@@ -9,10 +9,9 @@ import ru.isma.next.app.constants.SIMULATION_PARAMETERS_FILE
 import ru.isma.next.app.viewmodels.*
 import ru.isma.next.app.models.simulation.SaveTarget
 import ru.isma.next.app.models.simulation.SimulationParametersModel
-import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 
-class SimulationParametersService(library: IntegrationMethodsLibrary) {
-    val integrationMethods = FXCollections.observableArrayList(library.getIntegrationMethodNames())
+class SimulationParametersService(methodNames: List<String>) {
+    val integrationMethods = FXCollections.observableArrayList(methodNames)
 
     val simplifyMethods = FXCollections.observableArrayList("Radial-Distance", "Douglas-Peucker")
 

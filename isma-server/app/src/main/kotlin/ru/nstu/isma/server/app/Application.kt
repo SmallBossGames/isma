@@ -14,6 +14,7 @@ import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import ru.nstu.isma.domain.domainModule
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
+import ru.nstu.isma.server.app.grpc.LismaCompilerServiceGrpcImpl
 import ru.nstu.isma.server.app.grpc.SimulationServiceGrpcImpl
 import ru.nstu.isma.server.app.http.simulationResultRoutes
 import ru.nstu.isma.server.infrastructure.infrastructureModule
@@ -37,6 +38,7 @@ fun main(args: Array<String>) {
 
     val koin = object : KoinComponent {
         val grpcService: SimulationServiceGrpcImpl by inject()
+        val compilerService: LismaCompilerServiceGrpcImpl by inject()
         val sessionStore: ISimulationSessionStore by inject()
     }
 
@@ -52,6 +54,7 @@ fun main(args: Array<String>) {
         .bossEventLoopGroup(bossGroup)
         .workerEventLoopGroup(workerGroup)
         .addService(koin.grpcService)
+        .addService(koin.compilerService)
         .addService(ProtoReflectionServiceV1.newInstance())
         .build()
 

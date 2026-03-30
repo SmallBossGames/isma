@@ -14,9 +14,6 @@ import ru.isma.next.editor.text.services.EditorPlatformService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 import ru.isma.next.external.SimulationServerFacade
 import ru.isma.next.external.SimulationServerManager
-import ru.nstu.isma.lisma.InputTranslator
-import ru.nstu.isma.lisma.LismaTranslator
-import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 
 val simulationServerModule = module {
     single { SimulationServerManager() }
@@ -24,15 +21,13 @@ val simulationServerModule = module {
 }
 
 val appServicesModule = module {
-    single { IntegrationMethodLibraryLoader.load() }
     single<IEditorPlatformService> { EditorPlatformService() }
-    single<InputTranslator> { LismaTranslator() }
     single<ProjectService> { ProjectService() }
     single<ProjectFileService> { ProjectFileService(get()) }
     single<ModelErrorService> { ModelErrorService() }
     single<LismaPdeService> { LismaPdeService(get(), get()) }
-    single<SimulationParametersService> { SimulationParametersService(get()) }
+    single<SimulationParametersService> { SimulationParametersService(get<SimulationServerFacade>().getSimulationMethods()) }
     single<SimulationResultService> { SimulationResultService(get()) }
-    single<SimulationService> { SimulationService(get(), get(), get(), get()) }
+    single<SimulationService> { SimulationService(get(), get(), get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
 }

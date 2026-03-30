@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package ru.nstu.isma.contracts.simulation;
+
+import "simulation/compile_request.proto";
+import "simulation/compile_response.proto";
+import "simulation/validate_request.proto";
+import "simulation/delete_compiled_model_request.proto";
+import "simulation/highlight_request.proto";
+import "simulation/highlight_response.proto";
+
+option csharp_namespace = "Isma.Contracts.Simulation";
+option go_package = "github.com/isma/contracts/simulation";
+option java_multiple_files = true;
+option java_package = "ru.nstu.isma.contracts.simulation";
+
+service LismaCompilerService {
+  rpc Compile(CompileRequest) returns (CompileResponse);
+  rpc Validate(ValidateRequest) returns (ValidateResponse);
+  rpc Delete(DeleteCompiledModelRequest) returns (DeleteCompiledModelResponse);
+  rpc Highlight(HighlightRequest) returns (HighlightResponse);
+}

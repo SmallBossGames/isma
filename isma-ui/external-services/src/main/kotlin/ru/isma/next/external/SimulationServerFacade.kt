@@ -13,16 +13,65 @@ class SimulationServerFacade(
 ) {
     private lateinit var grpcClient: GrpcSimulationClient
     private lateinit var httpClient: HttpSimulationClient
+    private lateinit var compilerClient: GrpcLismaCompilerClient
 
     fun warmup() {
         val socketPaths = serverManager.start()
         grpcClient = GrpcSimulationClient(socketPaths.grpc)
         httpClient = HttpSimulationClient(socketPaths.http)
-        runCatching {
-            grpcClient.blockingStub.listSimulationMethods(
-                ListSimulationMethodsRequest.getDefaultInstance()
+        compilerClient = GrpcLismaCompilerClient(socketPaths.grpc)
+    }
+
+    fun compileModel(lismaSourceCode: String): CompileResult {
+        val request = CompileRequest.newBuilder()
+            .setLismaSourceCode(lismaSourceCode)
+            .build()
+        val response = compilerClient.blockingStub.compile(request)
+        return CompileResult(
+            modelId = response.compiledModelId,
+            errors = response.errorsList.map { it.toDto() },
+            warnings = response.warningsList,
+        )
+    }
+
+    fun validateModel(lismaSourceCode: String): ValidationResult {
+        val request = ValidateRequest.newBuilder()
+            .setLismaSourceCode(lismaSourceCode)
+            .build()
+        val response = compilerClient.blockingStub.validate(request)
+        return ValidationResult(
+            errors = response.errorsList.map { it.toDto() },
+            warnings = response.warningsList,
+        )
+    }
+
+    private fun CompilationError.toDto() = CompilationErrorDto(
+        row = row,
+        column = column,
+        message = message,
+    )
+
+    fun highlightSource(lismaSourceCode: String): List<SyntaxTokenDto> {
+        val response = compilerClient.highlight(lismaSourceCode)
+        return response.tokensList.map { token ->
+            SyntaxTokenDto(
+                start = token.start,
+                length = token.length,
+                kind = when (token.kind) {
+                    ru.nstu.isma.contracts.simulation.TokenKind.KEYWORD -> SyntaxTokenKind.KEYWORD
+                    ru.nstu.isma.contracts.simulation.TokenKind.COMMENT -> SyntaxTokenKind.COMMENT
+                    ru.nstu.isma.contracts.simulation.TokenKind.NUMBER -> SyntaxTokenKind.NUMBER
+                    else -> SyntaxTokenKind.TEXT
+                },
             )
         }
+    }
+
+    fun deleteCompiledModel(modelId: String): Boolean {
+        val request = DeleteCompiledModelRequest.newBuilder()
+            .setCompiledModelId(modelId)
+            .build()
+        return compilerClient.blockingStub.delete(request).success
     }
 
     fun runSimulation(params: RunSimulationParams): Long {
@@ -31,7 +80,7 @@ class SimulationServerFacade(
             .setEndTime(params.endTime)
             .setInitialStep(params.initialStep)
             .setMethodName(params.methodName)
-            .setLismaSourceCode(params.lismaSourceCode)
+            .setCompiledModelId(params.compiledModelId)
             .apply {
                 if (params.isAccuracyInUse) {
                     setAccuracyConfig(
@@ -104,9 +153,17 @@ class SimulationServerFacade(
         grpcClient.blockingStub.cancelSimulation(request)
     }
 
+    fun getSimulationMethods(): List<String> {
+        val response = grpcClient.blockingStub.listSimulationMethods(
+            ListSimulationMethodsRequest.getDefaultInstance()
+        )
+        return response.methodsList.map { it.name }
+    }
+
     fun shutdown() {
         grpcClient.shutdown()
         httpClient.close()
+        compilerClient.shutdown()
         serverManager.stop()
     }
 }
@@ -114,4 +171,35 @@ class SimulationServerFacade(
 data class CachedSimulationResult(
     val file: File,
     val columnNames: List<String>,
+)
+
+data class CompileResult(
+    val modelId: String,
+    val errors: List<CompilationErrorDto>,
+    val warnings: List<String>,
+)
+
+data class ValidationResult(
+    val errors: List<CompilationErrorDto>,
+    val warnings: List<String>,
+)
+
+data class CompilationErrorDto(
+    val row: Int,
+    val column: Int,
+    val message: String,
+)
+
+enum class SyntaxTokenKind {
+    UNSPECIFIED,
+    KEYWORD,
+    COMMENT,
+    NUMBER,
+    TEXT,
+}
+
+data class SyntaxTokenDto(
+    val start: Int,
+    val length: Int,
+    val kind: SyntaxTokenKind,
 )

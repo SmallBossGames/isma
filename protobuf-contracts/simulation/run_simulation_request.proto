@@ -52,6 +52,6 @@ message RunSimulationRequest {
   StabilityConfig stability_config = 6;
   // Event detection configuration
   EventDetectionConfig event_detection = 8;
-  // LISMA source code for the model (required)
-  string lisma_source_code = 7;
+  // Compiled model ID (required) - obtained from LismaCompilerService.Compile
+  string compiled_model_id = 9;
 }

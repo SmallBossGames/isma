@@ -10,6 +10,7 @@ import ru.isma.next.app.models.projects.BlueprintProjectDataProvider
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.LismaProjectDataProvider
 import ru.isma.next.app.models.projects.LismaProjectModel
+import ru.isma.next.app.services.editors.SyntaxHighlighterService
 import ru.isma.next.app.services.editors.TextEditorFactory
 import ru.isma.next.app.views.MainView
 import ru.isma.next.app.views.settings.*
@@ -18,13 +19,15 @@ import ru.isma.next.app.views.toolbars.*
 import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.text.IsmaTextEditor
-import ru.isma.next.editor.text.services.LismaHighlightingService
+import ru.isma.next.editor.text.services.RemoteLismaHighlightingService
 import ru.isma.next.editor.text.services.contracts.IHighlightingService
+import ru.isma.next.editor.text.services.contracts.ISyntaxHighlighter
 
 class IsmaEditorQualifier
 
 val editorModule = module {
-    single<IHighlightingService> { LismaHighlightingService() }
+    single<ISyntaxHighlighter> { SyntaxHighlighterService(get()) }
+    single<IHighlightingService> { RemoteLismaHighlightingService(get()) }
 }
 
 val lismaTextEditorModule = module {

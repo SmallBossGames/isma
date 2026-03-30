@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package ru.nstu.isma.contracts.simulation;
+
+import "simulation/compile_response.proto";
+
+option csharp_namespace = "Isma.Contracts.Simulation";
+option go_package = "github.com/isma/contracts/simulation";
+option java_multiple_files = true;
+option java_package = "ru.nstu.isma.contracts.simulation";
+
+message ValidateRequest {
+  string lisma_source_code = 1;
+}
+
+message ValidateResponse {
+  repeated CompilationError errors = 1;
+  repeated string warnings = 2;
+}

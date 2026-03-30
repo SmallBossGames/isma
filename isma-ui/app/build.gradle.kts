@@ -32,7 +32,6 @@ javafx {
 }
 
 dependencies {
-    implementation(libs.antlr4.runtime)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.javafx)
     implementation(libs.kotlin.reflect)
@@ -45,20 +44,9 @@ dependencies {
     implementation(libs.controlsfx)
     implementation(libs.fxmisc.richtext.core)
 
-    implementation(project(":isma-compiler:hsm-core"))
-    implementation(project(":isma-compiler:hsm-jvm"))
-    implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
-    implementation(project(":isma-compiler:hsm-fdm"))
-    implementation(project(":isma-compiler:lisma-translator-hsm"))
-    implementation(project(":isma-next-core"))
-    implementation(project(":isma-solver:api"))
     implementation(project(":isma-ui:blueprint-editor"))
     implementation(project(":isma-ui:text-editor"))
     implementation(project(":isma-ui:toolkit"))
-    implementation(project(":isma-solver:lib-utils"))
-    implementation(project(":isma-solver:lib-meta"))
-
-    api(project(":isma-solver:core"))
 
     implementation(project(":isma-ui:grpc"))
     implementation(project(":isma-ui:external-services"))

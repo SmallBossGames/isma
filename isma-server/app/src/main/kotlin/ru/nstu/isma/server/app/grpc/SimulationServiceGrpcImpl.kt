@@ -27,9 +27,9 @@ class SimulationServiceGrpcImpl(
         responseObserver: StreamObserver<RunSimulationResponse>
     ) {
         try {
-            if (request.lismaSourceCode.isBlank()) {
+            if (request.compiledModelId.isBlank()) {
                 responseObserver.onError(
-                    Status.INVALID_ARGUMENT.withDescription("LISMA source code is required").asException()
+                    Status.INVALID_ARGUMENT.withDescription("Compiled model ID is required").asException()
                 )
                 return
             }
@@ -42,7 +42,7 @@ class SimulationServiceGrpcImpl(
                 accuracy = if (request.hasAccuracyConfig()) request.accuracyConfig.accuracy else 0.0,
                 isAccuracyInUse = request.hasAccuracyConfig(),
                 isStabilityControlInUse = request.hasStabilityConfig(),
-                lismaSourceCode = request.lismaSourceCode,
+                compiledModelId = request.compiledModelId,
                 eventDetectionGamma = if (request.hasEventDetection()) request.eventDetection.gamma else null,
                 eventDetectionLowBorder = if (request.hasEventDetection()) request.eventDetection.lowBorder else null,
             )

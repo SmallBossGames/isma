@@ -3,6 +3,7 @@ package ru.nstu.isma.server.infrastructure.translation
 import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.compiler.hsm.core.models.IsmaErrorList
 import ru.nstu.isma.domain.handlers.runSimulation.ILismaTranslator
+import ru.nstu.isma.domain.handlers.runSimulation.TranslationException
 import ru.nstu.isma.lisma.InputTranslator
 import ru.nstu.isma.next.core.fdm.FDMConverter
 
@@ -16,8 +17,7 @@ class LismaTranslatorImpl(
             val model = translator.translate(sourceCode, errors)
 
             if (errors.isNotEmpty()) {
-                val errorMessages = errors.joinToString("; ") { it.toString() }
-                return Result.failure(IllegalArgumentException("Translation failed: $errorMessages"))
+                return Result.failure(TranslationException(errors))
             }
 
             val processedModel = if (model.isPDE) {
@@ -31,5 +31,11 @@ class LismaTranslatorImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override fun validate(sourceCode: String): IsmaErrorList {
+        val errors = IsmaErrorList()
+        translator.translate(sourceCode, errors)
+        return errors
     }
 }

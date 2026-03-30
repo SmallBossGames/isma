@@ -14,18 +14,7 @@ module isma.ui.app.main {
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
     requires org.slf4j;
-    requires org.antlr.antlr4.runtime;
     requires org.kordamp.ikonli.javafx;
-
-    requires isma.compiler.hsm.core;
-    requires isma.compiler.hsm.jvm;
-    requires isma.compiler.hsm.jvm.calcmodel;
-    requires isma.isma.next.core.fdm.main;
-    requires isma.isma.lisma.main;
-    requires isma.isma.next.core.main;
-    requires isma.isma.intg.api.main;
-    requires isma.isma.intg.core.main;
-    requires isma.isma.next.integration.library.main;
 
     requires isma.ui.toolkit;
     requires isma.ui.editor.text;

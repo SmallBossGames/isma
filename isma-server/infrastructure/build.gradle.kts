@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
     implementation(project(":isma-next-core"))
 
+    implementation(libs.antlr4.runtime)
     implementation(libs.koin.core)
     implementation(libs.slf4j.api)
 }

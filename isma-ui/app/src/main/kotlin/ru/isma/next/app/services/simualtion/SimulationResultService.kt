@@ -11,8 +11,7 @@ import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.views.dialogs.NamedPickerItem
 import ru.isma.next.app.views.dialogs.NamedPickerModel
 import ru.isma.next.app.views.dialogs.pickAxisVariables
-
-import ru.nstu.isma.intg.api.models.IntgResultPoint
+import ru.isma.next.domain.models.SimulationPoint
 import ru.isma.next.external.BinaryFilePointProvider
 import java.io.File
 import java.io.Writer
@@ -83,7 +82,7 @@ class SimulationResultService(
         }
     }
 
-    private fun IntgResultPoint.toCsvLine() : String {
+    private fun SimulationPoint.toCsvLine() : String {
         val builder = StringBuilder()
 
         builder.append(x).append(COMMA_AND_SPACE)

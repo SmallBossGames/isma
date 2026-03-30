@@ -6,22 +6,26 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import java.util.concurrent.Executors
 import org.koin.core.component.KoinComponent
+import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
+import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.external.BinaryEquationIndexProvider
 import ru.isma.next.external.CachedSimulationResult
+import ru.isma.next.external.CompilationErrorDto
 import ru.isma.next.external.RunSimulationParams
 import ru.isma.next.external.SimulationServerFacade
-import ru.nstu.isma.intg.api.models.IntgMetricData
-import ru.nstu.isma.intg.api.utilities.BinaryMetadata
+import ru.isma.next.domain.models.MetricData
+import ru.isma.next.domain.models.SimulationMetadata
 
 class SimulationService(
     private val projectService: ProjectService,
     private val simulationResult: SimulationResultService,
     private val simulationParametersService: SimulationParametersService,
     private val serverFacade: SimulationServerFacade,
+    private val modelErrorService: ModelErrorService,
 ) : KoinComponent {
     val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()!!
 
@@ -42,7 +46,18 @@ class SimulationService(
         SimulationScope.launch {
             try {
                 val sourceCode = project.snapshot().fullText
-                val params = simulationParameters.toRunSimulationParams(sourceCode)
+                val compileResult = serverFacade.compileModel(sourceCode)
+
+                val errorViewModels = compileResult.errors.map { error: CompilationErrorDto ->
+                    ErrorViewModel(error.row, error.column, "LISMA", error.message)
+                }
+                modelErrorService.putErrorList(errorViewModels)
+
+                if (compileResult.errors.isNotEmpty()) {
+                    return@launch
+                }
+
+                val params = simulationParameters.toRunSimulationParams(compileResult.modelId)
 
                 val simulationId = serverFacade.runSimulation(params)
 
@@ -59,8 +74,8 @@ class SimulationService(
                 }
 
                 val cachedResult: CachedSimulationResult = serverFacade.downloadResultToCache(simulationId)
-                val metricData = IntgMetricData()
-                val metadata = BinaryMetadata(cachedResult.columnNames)
+                val metricData = MetricData()
+                val metadata = SimulationMetadata(cachedResult.columnNames)
 
                 val resultModel = CompletedSimulationModel(
                     id = trackingTask.id,
@@ -97,7 +112,7 @@ class SimulationService(
     }
 }
 
-private fun SimulationParametersModel.toRunSimulationParams(lismaSourceCode: String) = RunSimulationParams(
+private fun SimulationParametersModel.toRunSimulationParams(compiledModelId: String) = RunSimulationParams(
     startTime = cauchyInitials.startTime,
     endTime = cauchyInitials.endTime,
     initialStep = cauchyInitials.initialStep,
@@ -105,7 +120,7 @@ private fun SimulationParametersModel.toRunSimulationParams(lismaSourceCode: Str
     accuracy = integrationMethodParameters.accuracy,
     isAccuracyInUse = integrationMethodParameters.isAccuracyInUse,
     isStabilityControlInUse = integrationMethodParameters.isStableInUse,
-    lismaSourceCode = lismaSourceCode,
+    compiledModelId = compiledModelId,
     eventDetectionGamma = if (eventDetectionParameters.isEventDetectionInUse) eventDetectionParameters.gamma else null,
     eventDetectionLowBorder = if (eventDetectionParameters.isEventDetectionInUse) eventDetectionParameters.lowBorder else null,
 )

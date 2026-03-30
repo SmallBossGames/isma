@@ -9,16 +9,11 @@ version = "1.0.0-SNAPSHOT"
 dependencies {
     implementation(project(":isma-ui:grpc"))
     implementation(project(":isma-ui:domain"))
-    implementation(project(":isma-solver:api"))
-    implementation(project(":isma-compiler:hsm-jvm"))
-    implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
     implementation(project(":isma-jvm-lib:exchange-format"))
     implementation(libs.grpc.netty)
     implementation(libs.grpc.protobuf)
     implementation(libs.grpc.stub)
     implementation(libs.protobuf.java)
-    implementation(libs.com.google.guava)
-    implementation(libs.koin.core)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.slf4j.api)
 

@@ -8,7 +8,7 @@ data class RunSimulationParameters(
     val accuracy: Double,
     val isAccuracyInUse: Boolean,
     val isStabilityControlInUse: Boolean,
-    val lismaSourceCode: String,
+    val compiledModelId: String,
     val eventDetectionGamma: Double? = null,
     val eventDetectionLowBorder: Double? = null,
 )

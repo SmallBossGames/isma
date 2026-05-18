@@ -4,6 +4,16 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 ---
 
+## Working Order — Read Docs Before Code
+
+**Always read `docs/` before reading any source code.** When investigating or modifying a component:
+
+1. Check if `docs/<module>/` exists (e.g. `docs/isma-server/`)
+2. Read the documentation first — it provides context, architecture, and API contracts
+3. Only then read the source code files
+
+---
+
 ## Technology Stack
 
 - **Language:** Kotlin
@@ -62,6 +72,11 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `grpc/` - Generated gRPC stubs
   - `infrastructure/` - Infrastructure implementations
   - *See `isma-server/AGENTS.md` for details*
+
+### Documentation
+- **docs/isma-server/** - Server module documentation
+- **docs/dotnet-ui-migration/** - WPF to Avalonia migration documentation and guides
+- **docs/legacy/** - Legacy system documentation and historical context
 
 ### Out-of-Process Architecture (UI + Server)
 

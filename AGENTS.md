@@ -4,6 +4,15 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 ---
 
+## Technology Stack
+
+- **Language:** Kotlin
+- **JVM Runtime:** Java Virtual Machine
+- **Build System:** Gradle with Kotlin DSL (`build.gradle.kts`)
+- **IDE:** IntelliJ IDEA
+
+---
+
 ## Working Order — Read Docs Before Code
 
 **Always read `docs/` before reading any source code.** When investigating or modifying a component:
@@ -11,15 +20,6 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 1. Check if `docs/<module>/` exists (e.g. `docs/isma-server/`)
 2. Read the documentation first — it provides context, architecture, and API contracts
 3. Only then read the source code files
-
----
-
-## Technology Stack
-
-- **Language:** Kotlin
-- **JVM Runtime:** Java Virtual Machine
-- **Build System:** Gradle with Kotlin DSL (`build.gradle.kts`)
-- **IDE:** IntelliJ IDEA
 
 ---
 

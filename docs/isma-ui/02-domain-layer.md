@@ -17,6 +17,8 @@ domain/src/main/kotlin/ru/isma/next/domain/models/
 └── SimulationResultReader.kt
 ```
 
+Note: `CodeRegion` and `SaveTarget` are defined in the `app` module (`LismaTextModel.kt` and `SaveTarget.kt` respectively) and are referenced by domain models but not part of this module.
+
 ## Module Configuration
 
 **File:** `domain/build.gradle.kts`
@@ -150,3 +152,5 @@ The domain module has no DI registrations of its own — all domain models are c
 | `external-services` | `BinaryEquationIndexProvider` (implements `IEquationIndexProvider`) |
 | `external-services` | `BinaryFilePointProvider` (implements `SimulationResultReader`) |
 | `app` | `CompletedSimulationModel` — wraps `SimulationResultReader` + `IEquationIndexProvider` for UI |
+| `app` | `CodeRegion` — line number tracking for LISMA conversion error mapping |
+| `app` | `SaveTarget` — enum (`MEMORY` / `FILE`) for result storage destination |

@@ -13,16 +13,23 @@ app/src/main/kotlin/ru/isma/next/app/
 │   ├── ErrorViewModel.kt
 │   ├── preferences/              # PreferencesModel, WindowPreferencesModel
 │   ├── projects/                 # IProjectModel, LismaProjectModel, BlueprintProjectModel
+│   │   └── LismaTextModel.kt     # CodeRegion for error line tracking
 │   └── simulation/               # SimulationParametersModel, CompletedSimulationModel
+│       ├── SaveTarget.kt         # MEMORY / FILE enum
+│       ├── InProgressSimulationModel.kt
+│       └── CompletedSimulationModel.kt
 ├── services/
 │   ├── ModelErrorService.kt
 │   ├── editors/                  # SyntaxHighlighterService, TextEditorFactory
 │   ├── koin/                     # Koin DI module definitions (services)
 │   ├── preferences/              # PreferencesProvider
 │   ├── project/                  # ProjectService, ProjectFileService, LismaPdeService
-│   └── simulation/               # SimulationService, SimulationResultService
+│   │   └── LismaPdeTranslationResult.kt  # Success/Failed sealed interface
+│   └── simualtion/               # SimulationService, SimulationResultService, SimulationParametersService
 ├── viewmodels/                   # TornadoFX view models for settings
-├── utilities/                    # BlueprintModel extensions
+├── utilities/                    # BlueprintModelExenstions.kt (convertToLisma)
+├── extention/                    # ButtonExtensions.kt, FormsExtentions.kt
+├── constants/                    # FileExtentions.kt (file type constants)
 ├── views/
 │   ├── MainView.kt               # Main BorderPane layout
 │   ├── dialogs/                  # ItemsPickerDialog
@@ -253,7 +260,37 @@ CSV export uses `BinaryFilePointProvider` to stream points via coroutine flow, w
 
 **File:** `LismaPdeService.kt`
 
-Validates LISMA source code via `serverFacade.validateModel()` and populates `ModelErrorService` with `ErrorViewModel` entries. Returns `SuccessTranslation` or `FailedTranslation` sealed interface.
+Validates LISMA source code via `serverFacade.validateModel()` and populates `ModelErrorService` with `ErrorViewModel` entries. Returns a sealed interface:
+
+```kotlin
+sealed interface LismaPdeTranslationResult
+data object SuccessTranslation : LismaPdeTranslationResult
+data object FailedTranslation : LismaPdeTranslationResult
+```
+
+### SimulationParametersService
+
+**File:** `SimulationParametersService.kt`
+
+Manages simulation parameter view models and provides store/load persistence as JSON files:
+
+| Property | Type | Default |
+| --- | --- | --- |
+| `cauchyInitials` | `CauchyInitialsViewModel` | start=0.0, end=10.0, step=0.1 |
+| `integrationMethod` | `IntegrationMethodParametersViewModel` | accuracy=0.1, server=localhost, port=7890 |
+| `eventDetection` | `EventDetectionParametersViewModel` | gamma=0.8, lowBorder=0.001 |
+| `resultSaving` | `ResultSavingParametersViewModel` | target=MEMORY |
+| `resultProcessing` | `ResultProcessingParametersViewModel` | tolerance=20.0 |
+| `integrationMethods` | `ObservableList<String>` | From server |
+| `simplifyMethods` | `ObservableList<String>` | Radial-Distance, Douglas-Peucker |
+
+**Methods:**
+- `store()` — opens FileChooser, serializes snapshot to JSON
+- `load()` — opens FileChooser, deserializes JSON into view models
+- `snapshot()` — captures current view model state into `SimulationParametersModel`
+- `commit(model)` — applies `SimulationParametersModel` to all view models
+
+File extension filter: `*.params.json` (constant from `FileExtentions.kt`).
 
 ### PreferencesProvider
 
@@ -398,6 +435,39 @@ class ResultProcessingParametersViewModel : ViewModel() {
 
 ## Text Editor Module
 
+### EditorPlatformService
+
+**File:** `text-editor/src/main/kotlin/.../services/EditorPlatformService.kt`
+
+Coroutine-based service that propagates cut/copy/paste events via `MutableSharedFlow`. Used by `IsmaTextEditor` to respond to platform clipboard commands:
+
+```kotlin
+class EditorPlatformService : IEditorPlatformService {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
+    private val cutEventInternal = MutableSharedFlow<Unit>()
+    override val cutEvent = cutEventInternal.asSharedFlow()
+
+    private val copyEventInternal = MutableSharedFlow<Unit>()
+    override val copyEvent = copyEventInternal.asSharedFlow()
+
+    private val pasteEventInternal = MutableSharedFlow<Unit>()
+    override val pasteEvent = pasteEventInternal.asSharedFlow()
+
+    override fun cut() {
+        coroutineScope.launch { cutEventInternal.emit(Unit) }
+    }
+
+    override fun copy() {
+        coroutineScope.launch { copyEventInternal.emit(Unit) }
+    }
+
+    override fun paste() {
+        coroutineScope.launch { pasteEventInternal.emit(Unit) }
+    }
+}
+```
+
 ### IsmaTextEditor
 
 **File:** `text-editor/src/main/kotlin/.../IsmaTextEditor.kt`
@@ -479,6 +549,8 @@ fun setBlueprintModel(model: BlueprintModel)
 
 ### Service Module (`KoinExtentions.kt`)
 
+**File:** `app/src/main/kotlin/.../services/koin/KoinExtentions.kt`
+
 ```kotlin
 val simulationServerModule = module {
     single { SimulationServerManager() }
@@ -498,9 +570,45 @@ val appServicesModule = module {
 }
 ```
 
-### View Module (`KoinExtensions.kt`)
+### Launcher Module (`DependecyInjectionRootModule.kt`)
+
+**File:** `app/src/main/kotlin/.../launcher/DependecyInjectionRootModule.kt`
 
 ```kotlin
+fun ismaKoinStart() = startKoin {
+    modules(
+        simulationServerModule,
+        appServicesModule,
+    )
+
+    modules(
+        grinProcessLauncherModule,
+    )
+
+    modules(
+        toolbarsModule,
+        mainViewModule,
+        settingsPanelModule,
+        editorTabPaneModule,
+        lismaTextEditorModule,
+        blueprintEditorModule,
+    )
+}
+
+val grinProcessLauncherModule = module {
+    single { GrinProcessLauncher() }
+}
+```
+
+DI initialization order: service modules → Grin launcher → view modules. All registrations use `single()` (singleton) lifecycle.
+
+### View Module (`KoinExtensions.kt`)
+
+**File:** `app/src/main/kotlin/.../views/koin/KoinExtensions.kt`
+
+```kotlin
+class IsmaEditorQualifier
+
 val editorModule = module {
     single<ISyntaxHighlighter> { SyntaxHighlighterService(get()) }
     single<IHighlightingService> { RemoteLismaHighlightingService(get()) }
@@ -534,12 +642,26 @@ val toolbarsModule = module {
     factory { TasksPopOver(get(), get()) }
 }
 
+val editorTabPaneModule = module {
+    single { IsmaEditorTabPane(get()) }
+}
+
+val settingsPanelModule = module {
+    single { CauchyInitialsView(get()) }
+    single { EventDetectionView(get()) }
+    single { MethodSettingsView(get()) }
+    single { ResultProcessingView(get()) }
+    single { SettingsPanelView(get(), get(), get(), get()) }
+}
+
 val mainViewModule = module {
     single { MainView(get(), get(), get(), get(), get(), get()) }
 }
 ```
 
 All registrations use `single()` (singleton) except `TasksPopOver` which uses `factory()` (created each time). Editor components within project scopes use `scopedOf(::)` for per-project lifecycle.
+
+**Key distinction:** `lismaTextEditorModule` uses `scopedOf(::IsmaTextEditor)` (one instance per LISMA project scope), while `blueprintEditorModule` uses `factoryOf(::IsmaTextEditor)` (new instance each time) because blueprint projects need multiple text editor tabs (one per state/loop content editor).
 
 ## Error Handling
 

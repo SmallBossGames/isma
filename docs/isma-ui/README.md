@@ -15,6 +15,8 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | [External Services](03-external-services.md) | gRPC client, HTTP client, server lifecycle, facade |
 | [UI Components](04-ui-components.md) | App entry point, views, editors, toolbars, models |
 | [Build & Deployment](05-build-and-deployment.md) | Gradle config, modules, dependencies, startup |
+| [UX Reference](06-ux-reference.md) | Complete user experience specification: windows, menus, dialogs, transitions, features |
+| [Blueprint Editor UX](07-blueprint-editor-ux.md) | Detailed specification of the visual statechart editor: canvas, states, arrows, popover, toolbar, modes, LISMA conversion, Avalonia migration mapping |
 
 ## Key Files
 
@@ -22,13 +24,24 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | --- | --- |
 | `app/src/main/kotlin/.../launcher/IsmaApplication.kt` | JavaFX `Application` entry point |
 | `app/src/main/kotlin/.../launcher/DependecyInjectionRootModule.kt` | Koin DI root startup |
+| `app/src/main/kotlin/.../launcher/GrinProcessLauncher.kt` | Grin chart viewer process launcher |
+| `app/src/main/kotlin/.../services/koin/KoinExtentions.kt` | Service-layer DI modules |
+| `app/src/main/kotlin/.../views/koin/KoinExtensions.kt` | View-layer DI modules |
 | `app/src/main/kotlin/.../services/project/ProjectService.kt` | Project lifecycle management |
 | `app/src/main/kotlin/.../services/simualtion/SimulationService.kt` | Simulation orchestration |
+| `app/src/main/kotlin/.../services/simualtion/SimulationParametersService.kt` | Simulation parameter management |
+| `app/src/main/kotlin/.../models/projects/LismaTextModel.kt` | LISMA text model with CodeRegion tracking |
+| `app/src/main/kotlin/.../models/simulation/CompletedSimulationModel.kt` | Completed simulation result wrapper |
+| `app/src/main/kotlin/.../utilities/BlueprintModelExenstions.kt` | Blueprint-to-LISMA conversion |
 | `external-services/src/main/kotlin/.../SimulationServerFacade.kt` | Server communication facade |
 | `external-services/src/main/kotlin/.../SimulationServerManager.kt` | Server process lifecycle |
+| `external-services/src/main/kotlin/.../RunSimulationParams.kt` | Simulation parameter DTO |
 | `text-editor/src/main/kotlin/.../IsmaTextEditor.kt` | Rich text editor (fxmisc.richtext) |
+| `text-editor/src/main/kotlin/.../services/EditorPlatformService.kt` | Cut/copy/paste event propagation |
 | `blueprint-editor/src/main/kotlin/.../IsmaBlueprintEditor.kt` | Visual statechart editor |
 | `domain/src/main/kotlin/.../models/SimulationResult.kt` | Domain model for simulation results |
+| `toolkit/src/main/kotlin/.../controls/PropertiesGrid.kt` | Reusable property grid component |
+| `toolkit/src/main/kotlin/.../coroutines/flow/CollectionsExtensions.kt` | ObservableList/Set → Flow bridges |
 
 ## Building
 
@@ -53,6 +66,18 @@ When running via Gradle (`JavaExec`), these are auto-configured to `$rootDir/bui
 | `domain` | Pure Kotlin domain models | — | `ru.isma.next.domain.models` |
 | `external-services` | gRPC/HTTP clients, server manager | — | `ru.isma.next.external` |
 | `grpc` | Generated gRPC stubs | — | `ru.nstu.isma.contracts.simulation` |
-| `text-editor` | Rich text editing with syntax highlighting | `controls`, `fxml` | `ru.isma.next.editor.text` |
-| `blueprint-editor` | Visual statechart editor | `controls`, `fxml` | `ru.isma.next.editor.blueprint` |
+| `text-editor` | Rich text editing with syntax highlighting | `controls` | `ru.isma.next.editor.text` |
+| `blueprint-editor` | Visual statechart editor | `controls` | `ru.isma.next.editor.blueprint` |
 | `toolkit` | Shared JavaFX utilities | `controls` | `ru.isma.javafx.extensions` |
+
+## Documents by Audience
+
+| Document | Target Audience |
+| --- | --- |
+| [01-overview](01-overview.md) | Architects, contributors understanding module layout |
+| [02-domain-layer](02-domain-layer.md) | Backend developers working with simulation models |
+| [03-external-services](03-external-services.md) | Developers modifying server communication |
+| [04-ui-components](04-ui-components.md) | Developers modifying existing JavaFX UI |
+| [05-build-and-deployment](05-build-and-deployment.md) | DevOps, contributors setting up the build |
+| [06-ux-reference](06-ux-reference.md) | Anyone implementing a replacement UI with feature parity |
+| [07-blueprint-editor-ux](07-blueprint-editor-ux.md) | Migrator implementing the Avalonia statechart editor, or anyone needing deep canvas/interaction details |

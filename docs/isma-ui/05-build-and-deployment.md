@@ -103,18 +103,54 @@ No JavaFX modules. Depends on gRPC-Netty, Ktor CIO, and Netty Epoll for Unix Dom
 **File:** `grpc/build.gradle.kts`
 
 ```kotlin
+import com.google.protobuf.gradle.*
+
 plugins {
     alias(libs.plugins.google.protobuf)
     alias(libs.plugins.java.modules)
 }
 
+group = "ru.isma.next.ui"
+version = "1.0.0-SNAPSHOT"
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.protobuf.java.get().version}"
+    }
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:${libs.grpc.java.get().version}"
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet("main").forEach {
+            it.plugins { id("grpc") {} }
+        }
+    }
+}
+
+sourceSets {
+    main {
+        proto {
+            srcDir("../../protobuf-contracts")
+        }
+    }
+}
+
 dependencies {
-    implementation(project(":protobuf-contracts"))
     implementation(libs.grpc.netty)
+    implementation(libs.netty.transport)
+    implementation(libs.netty.transport.classes.epoll)
+    implementation(libs.netty.transport.native.epoll) {
+        artifact {
+            classifier = "linux-x86_64"
+        }
+    }
     implementation(libs.grpc.stub)
     implementation(libs.grpc.protobuf)
     implementation(libs.protobuf.java)
-    implementation(libs.guava)
+    implementation(libs.grpc.java)
+    implementation(libs.com.google.guava)
 }
 ```
 
@@ -178,7 +214,7 @@ JavaFX module with kotlinx-serialization for `BlueprintModel` JSON persistence.
 ```kotlin
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java)
+    java
     alias(libs.plugins.java.modules)
     alias(libs.plugins.javafx)
 }
@@ -190,10 +226,11 @@ javafx {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.javafx)
 }
 ```
 
-Provides shared JavaFX utilities: `PropertiesGrid`, `ComboBox` extension, `ListView` cell factory, coroutine flow extensions for JavaFX collections.
+Provides shared JavaFX utilities: `PropertiesGrid`, `ComboBox` extension, `ListView` cell factory, coroutine flow extensions for JavaFX collections (`addedAsFlow()`, `changeAsFlow()`).
 
 ## Java Module System
 
@@ -208,6 +245,10 @@ Each module declares a `module-info.java` with appropriate `exports`:
 | `text-editor` | `isma.ui.editor.text` | `ru.isma.next.editor.text`, `services`, `services.contracts` |
 | `blueprint-editor` | `isma.ui.editor.blueprint` | `ru.isma.next.editor.blueprint`, `services`, `models` |
 | `toolkit` | `isma.ui.toolkit` | `ru.isma.javafx.extensions.controls`, `coroutines.flow`, `helpers` |
+
+**Requires notes:**
+- `text-editor` requires `javafx.graphics` (not `javafx.controls`)
+- `external-services` requires `io.netty.transport.unix.common`, `io.netty.common`, `io.netty.buffer`, `io.netty.codec`
 
 ## Build Commands
 

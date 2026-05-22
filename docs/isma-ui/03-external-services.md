@@ -18,6 +18,8 @@ external-services/src/main/kotlin/ru/isma/next/external/
 └── SimulationServerManager.kt
 ```
 
+Module group: `ru.isma.next.ui`, version: `1.0.0-SNAPSHOT`.
+
 ## Module Configuration
 
 **File:** `external-services/build.gradle.kts`
@@ -166,6 +168,33 @@ data class SyntaxTokenDto(val start: Int, val length: Int, val kind: SyntaxToken
 
 Netty gRPC client using Linux Epoll for Unix Domain Socket transport.
 
+### RunSimulationParams
+
+**File:** `RunSimulationParams.kt`
+
+DTO passed to `serverFacade.runSimulation()`:
+
+```kotlin
+data class RunSimulationParams(
+    val startTime: Double,
+    val endTime: Double,
+    val initialStep: Double,
+    val methodName: String,
+    val accuracy: Double,
+    val isAccuracyInUse: Boolean,
+    val isStabilityControlInUse: Boolean,
+    val compiledModelId: String,
+    val eventDetectionGamma: Double? = null,
+    val eventDetectionLowBorder: Double? = null,
+)
+```
+
+Optional fields (`eventDetectionGamma`, `eventDetectionLowBorder`) are null when event detection is disabled.
+
+### GrpcSimulationClient
+
+**File:** `GrpcSimulationClient.kt`
+
 ```kotlin
 class GrpcSimulationClient(socketPath: String) {
     private val eventLoopGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
@@ -287,3 +316,4 @@ sequenceDiagram
 | HTTP socket not found in output | `IllegalStateException` — "HTTP socket not found in server output" |
 | Empty download URL | `IllegalStateException` — "Download URL is empty" |
 | gRPC failure | Propagated as gRPC `StatusException` from the blocking stub |
+| Missing Netty Epoll native library | `UnsatisfiedLinkError` at channel creation time (Linux-only dependency) |

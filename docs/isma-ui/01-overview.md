@@ -10,12 +10,14 @@ ISMA-UI is a multi-module JavaFX desktop application that provides editing, simu
 isma-ui/
 ├── app/                          # Main application entry point
 │   └── src/main/kotlin/ru/isma/next/app/
-│       ├── launcher/             # IsmaApplication, Koin DI root
+│       ├── launcher/             # IsmaApplication, Koin DI root, GrinProcessLauncher
 │       ├── models/               # UI models (projects, simulation, preferences)
 │       ├── services/             # Business logic services
 │       ├── viewmodels/           # TornadoFX view models
 │       ├── views/                # JavaFX UI components (MainView, toolbars, settings)
-│       └── utilities/            # Extension functions
+│       ├── utilities/            # BlueprintModel extensions (convertToLisma)
+│       ├── extention/            # Ikonli icon helpers, TornadoFX binding helpers
+│       └── constants/            # File extension constants, preferences paths
 ├── domain/                       # Pure Kotlin domain models (no UI deps)
 ├── external-services/            # gRPC clients, HTTP client, server manager
 ├── grpc/                         # Generated gRPC stubs
@@ -60,8 +62,8 @@ All services and UI components are instantiated through Koin. There are no const
 
 ```
 simulationServerModule → appServicesModule → grinProcessLauncherModule
-    → toolbarsModule → mainViewModule → settingsPanelModule
-    → editorTabPaneModule → lismaTextEditorModule → blueprintEditorModule
+    → editorModule → lismaTextEditorModule → blueprintEditorModule
+    → toolbarsModule → editorTabPaneModule → settingsPanelModule → mainViewModule
 ```
 
 Scoped DI is used for project-specific editors: each `LismaProjectModel` and `BlueprintProjectModel` gets its own Koin scope with scoped `IsmaTextEditor` instances that are cleaned up on `dispose()`.
@@ -131,11 +133,16 @@ class InProgressSimulationModel(
     val model: String,
     val parameters: SimulationParametersModel
 ) {
+    private var actualProgress = 0.0
+
     var simulationId: Long? = null
+
     val progressProperty = SimpleDoubleProperty(actualProgress)
 
     fun commitProgress(value: Double) {
-        Platform.runLater { progressProperty.set(value) }
+        Platform.runLater {
+            progressProperty.set(value)
+        }
     }
 }
 ```

@@ -29,6 +29,11 @@ This document provides a comprehensive, multi-step migration plan for porting th
 │  ├── FileStorage/    (File I/O, preferences)                   │
 │  └── ChartViewer/    (Grin process launcher)                   │
 ├─────────────────────────────────────────────────────────────────┤
+│  ISMA.App (UI-dependent services — Dialogs, File I/O with UI)  │
+│  ├── Services/               (ProjectFileService, SimulationResultService,    │
+│  │                           SimulationParametersService — all need FileDialog)│
+│  └── ViewModels/             (Empty)                                         │
+├─────────────────────────────────────────────────────────────────┤
 │  ISMA.Tests (xUnit + FluentAssertions + Moq)                    │
 │  ├── Domain/         (Model + conversion tests)                │
 │  └── ViewModels/     (ViewModel + service tests)               │
@@ -44,11 +49,12 @@ ISMA.Tests → ISMA.Domain, ISMA.ViewModels (mocking ISMA.Infrastructure)
 
 Dependency direction:
   App depends on ViewModels + Infrastructure
-  ViewModels depends on Domain (interfaces)
+  ViewModels depends on Domain (interfaces only)
   Infrastructure depends on Domain (interfaces + models)
   Tests depends on Domain + ViewModels (Infrastructure is mocked)
 
-No circular dependencies allowed.
+CRITICAL: ViewModels layer must NOT depend on Avalonia types.
+  Any service requiring FileDialog, Window, or other UI types MUST be in App layer.
 ```
 
 **Key architectural decisions:**
@@ -115,14 +121,17 @@ isma-ui-dotnet/
    │   │       └── StateBlockModel.cs            # Helper for state block generation
    │   ├── Results/                              # Sealed result types for domain operations
    │   │   └── LismaPdeTranslationResult.cs      # Sealed interface: SuccessTranslation / FailedTranslation
-   │   ├── Contracts/                            # Service interfaces (implemented in Infrastructure)
+   │   ├── Contracts/                            # Service interfaces (implemented in Infrastructure or App)
 │   │   ├── ISimulationServerFacade.cs        # compile, validate, highlight, run, monitor,
 │   │   │                                   #   download, cancel, getMethods, shutdown
 │   │   ├── IEquationIndexProvider.cs         # getDifferentialEquationCount, getAlgebraicEquationCount,
 │   │   │                                   #   getDifferentialEquationCode, getAlgebraicEquationCode
 │   │   ├── ISimulationResultReader.cs        # Results (IEnumerable<SimulationPoint>)
 │   │   ├── ISyntaxHighlighter.cs             # Highlight(source) → List<SyntaxTokenDto>
-│   │   └── ITextEditorFactory.cs             # CreateTextEditor(text, onTextChanged), DisposeInstance
+│   │   ├── ITextEditorFactory.cs             # CreateTextEditor(text, onTextChanged), DisposeInstance
+│   │   └── ISimulationResultService.cs       # CommitResult, RemoveResult, ShowChart, ExportToFile
+│   │                                   # NOTE: ISimulationResultService is implemented in App layer
+│   │                                   # because ShowChart requires FileDialog and GrinProcessLauncher
 │   └── ISMA.Domain.csproj
 ├── ISMA.Infrastructure/                      # gRPC, file I/O, external processes
 │   ├── Server/
@@ -158,12 +167,10 @@ isma-ui-dotnet/
 │   │   ├── SelectVariablesDialogViewModel.cs # XAxis, YAxis selection for chart viewer
 │   │   ├── EditArrowPopOverViewModel.cs      # Alias + Predicate for arrow editing
 │   │   └── InProgressSimulationViewModel.cs  # Id, ModelName, Progress, CanAbort
- │   ├── Models/                               # Presentation-specific models (NamedPickerItem, etc.)
-   │   │   └── NamedPickerItem.cs                # Generic item for axis picker dialog
-   │   ├── Services/                             # Presentation services (UI orchestration, no Avalonia deps)
+│   ├── Models/                               # Presentation-specific models (NamedPickerItem, etc.)
+    │   │   └── NamedPickerItem.cs                # Generic item for axis picker dialog
+    │   ├── Services/                             # Presentation services (UI orchestration, NO Avalonia deps)
 │   │   ├── SimulationService.cs              # Orchestrates: snapshot → compile → run → monitor → download
-│   │   ├── SimulationResultService.cs        # Manages completed results, CSV export, chart launch
-│   │   ├── SimulationParametersService.cs    # Parameter state management, store/load
 │   │   ├── ProjectService.cs                 # Project collection management
 │   │   ├── ModelErrorService.cs              # Error list management
 │   │   ├── LismaPdeService.cs                # LISMA validation → Success/Failure
@@ -201,7 +208,10 @@ isma-ui-dotnet/
 │   │   └── NumericCell.axaml                 # Custom DataGrid cell for row/position columns
 │   ├── Services/                             # UI-specific services (Avalonia dependencies)
 │   │   ├── EditorPlatformService.cs          # Cut/Copy/Paste event propagation
-│   │   └── TextEditorFactory.cs              # Creates/disposes AvalonEdit instances
+│   │   ├── TextEditorFactory.cs              # Creates/disposes AvalonEdit instances
+│   │   ├── ProjectFileService.cs             # Open/Save with FileDialog (UI-dependent)
+│   │   ├── SimulationResultService.cs        # ShowChart with FileDialog/Grin (UI-dependent)
+│   │   └── SimulationParametersService.cs    # Store/Load with FileDialog (UI-dependent)
 │   ├── ViewModels/                           # (Empty — all ViewModels in ISMA.ViewModels)
 │   ├── Converters/                           # (Empty — all converters in ISMA.ViewModels)
 │   ├── App.axaml                             # Fluent theme, resource dictionaries, styles
@@ -376,6 +386,7 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
    - `WindowPreferences` — `double X`, `double Y`, `double Width`, `double Height`, `bool IsMaximized`
    - `DefaultFilesPreferences` — `string[] LastOpenedProjectPath`
    - `Preferences` — `WindowPreferences WindowPreferences`, `DefaultFilesPreferences DefaultFilesPreferences`
+    - `ProjectType` — enum: `LismaText`, `Blueprint`, `Legacy` (used by ProjectFileService.Open)
 
 6. **DTOs** (for server communication)
    - `CompileResult` — `string ModelId`, `List<CompilationError> Errors`, `List<string> Warnings`
@@ -431,6 +442,8 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
   - [ ] Loop transitions (pseudo-state pattern)
   - [ ] Multiple transitions to same target with same predicate (merge behavior)
 - [ ] `LismaPdeTranslationResult` sealed interface with `SuccessTranslation` and `FailedTranslation` variants
+- [ ] `ISimulationResultService` interface defined in Domain.Contracts (implemented in App layer)
+- [ ] `IProjectFileService` interface defined in Domain.Contracts (implemented in App layer)
 - [ ] `dotnet build ISMA.Domain` produces zero errors and zero warnings
 - [ ] All DTOs pass JSON serialization round-trip test
 
@@ -535,35 +548,20 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ### Phase 3: Infrastructure Layer — File Storage & Preferences
 
-**Goal:** Implement file I/O for projects and preferences persistence.
+**Goal:** Implement file I/O for projects and preferences persistence. File I/O without UI (PreferencesProvider, raw file operations) goes here.
+UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 10 (App layer)**.
 
 #### Steps
 
-1. **ProjectFileService**
-   - `Open(ownerWindow) → List<string> filePaths` — FileDialog with filters:
-     - `All ISMA Files` (`.iscm2`, `.scisma`, `.im`)
-     - `LISMA Text` (`.iscm2`)
-     - `State Chart` (`.scisma`)
-     - `Legacy` (`.im`)
-   - `Open(paths) → List<ProjectType>` — dispatches by extension:
-     - `.iscm2` → LISMA text project
-     - `.scisma` → Blueprint project (JSON-encoded `BlueprintModel`)
-     - `.im` → Legacy text project (backward compatibility, TODO)
-   - `Save(project) → bool` — writes project content to file
-     - LISMA text → write `FullText` to file
-     - Blueprint → serialize `BlueprintModel` to JSON
-   - `SaveAs(project) → bool` — same as Save but with FileDialog
-   - `SaveAll(projects) → bool` — iterate all projects, save each
+1. **PreferencesProvider**
+    - Resolve settings file path from config (default: app data directory + `preferences.json`)
+    - `Load() → Preferences` — deserialize JSON
+    - `Save(preferences) → void` — serialize JSON
+    - `CommitWindow(WindowPreferences) → void` — update and persist
+    - `CommitFiles(DefaultFilesPreferences) → void` — update and persist
+    - Restore last opened file paths on startup
 
-2. **PreferencesProvider**
-   - Resolve settings file path from config (default: app data directory + `preferences.json`)
-   - `Load() → Preferences` — deserialize JSON
-   - `Save(preferences) → void` — serialize JSON
-   - `CommitWindow(WindowPreferences) → void` — update and persist
-   - `CommitFiles(DefaultFilesPreferences) → void` — update and persist
-   - Restore last opened file paths on startup
-
-3. **Default values registry** (shared constants, no UI dependencies)
+2. **Default values registry** (shared constants, no UI dependencies)
     - Cauchy: `StartTime=0.0`, `EndTime=10.0`, `InitialStep=0.1`
     - Integration: `Accuracy=0.1`, `Server="localhost"`, `Port=7890`
     - Event Detection: `Gamma=0.8`, `LowBorder=0.001`
@@ -626,32 +624,28 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
      - `BlueprintModel Blueprint` — getter/setter
 
 4. **SimulationService** (presentation service)
-   - `ObservableCollection<InProgressSimulationViewModel> TrackingTasks`
-   - `Simulate()` — orchestrates full simulation flow:
-     1. Snapshot parameters from `SimulationParametersService`
-     2. Get active project source text
-     3. Call `serverFacade.CompileModel(source)`
-     4. Map compilation errors to `ErrorInfo` and call `ModelErrorService.PutErrorList(errors)`
-     5. Call `serverFacade.RunSimulation(params)` → `simulationId`
-     6. Start monitoring: `serverFacade.MonitorSimulation(id)` → stream progress
-     7. For each progress update: normalize to 0.0–1.0, update `InProgressSimulationViewModel.Progress`
-     8. Call `serverFacade.DownloadResult(id)` → `CachedSimulationResult`
-     9. Create `CompletedSimulation` and call `SimulationResultService.CommitResult()`
-     10. Remove from `TrackingTasks`
-   - `StopSimulation(InProgressSimulationViewModel)` — call `serverFacade.CancelSimulation()`
-   - Uses `Task.Run` or `Channels` for background execution (no virtual threads in .NET)
+    - `ObservableCollection<InProgressSimulationViewModel> TrackingTasks`
+    - `Simulate()` — orchestrates full simulation flow:
+      1. Snapshot parameters from `SimulationParametersService` (in App layer)
+      2. Get active project source text
+      3. Call `serverFacade.CompileModel(source)`
+      4. Map compilation errors to `ErrorInfo` and call `ModelErrorService.PutErrorList(errors)`
+      5. Call `serverFacade.RunSimulation(params)` → `simulationId`
+      6. Start monitoring: `serverFacade.MonitorSimulation(id)` → stream progress
+      7. For each progress update: normalize to 0.0–1.0, update `InProgressSimulationViewModel.Progress`
+      8. Call `serverFacade.DownloadResult(id)` → `CachedSimulationResult`
+      9. Create `CompletedSimulation` and call `SimulationResultService.CommitResult()` (in App layer)
+      10. Remove from `TrackingTasks`
+    - `StopSimulation(InProgressSimulationViewModel)` — call `serverFacade.CancelSimulation()`
+    - Uses `Task.Run` or `Channels` for background execution (no virtual threads in .NET)
 
-5. **SimulationResultService** (presentation service)
-   - `ObservableCollection<CompletedSimulation> TrackingTasksResults`
-   - `CommitResult(CompletedSimulation)` — add to collection (thread-safe)
-   - `RemoveResult(CompletedSimulation)` — remove from collection
-   - `ShowChart(CompletedSimulation)` — open axis picker dialog, launch Grin with selected axes
-   - `ExportToFile(CompletedSimulation, filePath)` — async CSV export:
-     - Header: `x, [DE column names], [AE column names], f0, f1, ..., fN`
-     - Stream points from `BinaryFilePointProvider`
-     - Write to buffered `StreamWriter` on background thread
+**IMPORTANT: The following services are in `ISMA.App/Services` (NOT in ViewModels):**
+- `SimulationResultService` — requires `FileDialog` (ShowChart) and `GrinProcessLauncher` (ShowChart)
+- `SimulationParametersService` — requires `FileDialog` (Store/Load)
+- `ProjectFileService` — requires `FileDialog` (Open/Save/SaveAs)
+- These services are UI-dependent and cannot be in the ViewModels layer
 
-6. **SimulationParametersViewModel**
+5. **SimulationParametersViewModel**
     - `CauchyInitials` — `double StartTime`, `double EndTime`, `double Step`
     - `IntegrationMethod` — `string SelectedMethod`, `double Accuracy`, `bool IsAccuracyInUse`,
       `bool IsStableInUse`, `bool IsParallelInUse`, `string Server`, `int Port`
@@ -741,12 +735,79 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 - [ ] `NamedPickerItem<T>` generic model supports axis picker dialog
 - [ ] `LismaPdeTranslationResult` sealed interface used by LismaPdeService
 - [ ] `CompletedSimulationViewModel` exposes column names for axis picker
-- [ ] ViewModels have zero Avalonia dependencies
+- [ ] ViewModels have zero Avalonia dependencies (NO FileDialog, NO Window, NO GrinProcessLauncher)
 - [ ] `dotnet build ISMA.ViewModels` produces zero errors
+- [ ] `SimulationResultService` and `SimulationParametersService` are in App layer (not ViewModels)
 
 ---
 
-### Phase 5: Tests — Domain & ViewModels
+### Phase 5: App Layer — UI-Dependent Services
+
+**Goal:** Implement services that require Avalonia UI types (FileDialog, Window). These services depend on `ISMA.Domain` (interfaces) and `ISMA.Infrastructure` (implementations) but MUST NOT be in the ViewModels layer.
+
+#### Steps
+
+1. **ProjectFileService** (in `ISMA.App/Services`)
+    - Implements `IProjectFileService` (new interface in `ISMA.Domain/Contracts`)
+    - `Open(ownerWindow) → List<string> filePaths` — `FileDialog` with filters:
+      - `All ISMA Files` (`.iscm2`, `.scisma`, `.im`)
+      - `LISMA Text` (`.iscm2`)
+      - `State Chart` (`.scisma`)
+      - `Legacy` (`.im`)
+    - `Open(paths) → List<ProjectType>` — dispatches by extension:
+      - `.iscm2` → LISMA text project
+      - `.scisma` → Blueprint project (JSON-encoded `BlueprintModel`)
+      - `.im` → Legacy text project (backward compatibility, TODO)
+    - `Save(project) → bool` — writes project content to file
+      - LISMA text → write `FullText` to file
+      - Blueprint → serialize `BlueprintModel` to JSON
+    - `SaveAs(project) → bool` — same as Save but with `FileDialog`
+    - `SaveAll(projects) → bool` — iterate all projects, save each
+
+2. **SimulationResultService** (in `ISMA.App/Services`)
+    - Implements `ISimulationResultService` (in `ISMA.Domain/Contracts`)
+    - `ObservableCollection<CompletedSimulation> TrackingTasksResults`
+    - `CommitResult(CompletedSimulation)` — add to collection (thread-safe)
+    - `RemoveResult(CompletedSimulation)` — remove from collection
+    - `ShowChart(CompletedSimulation)` — opens `FileDialog` for axis picker, launches `GrinProcessLauncher` with selected axes
+    - `ExportToFile(CompletedSimulation, filePath)` — async CSV export:
+      - Header: `x, [DE column names], [AE column names], f0, f1, ..., fN`
+      - Stream points from `BinaryFilePointProvider`
+      - Write to buffered `StreamWriter` on background thread
+
+3. **SimulationParametersService** (in `ISMA.App/Services`)
+    - Default values (from Phase 3 constants registry):
+      - Cauchy: `StartTime=0.0`, `EndTime=10.0`, `InitialStep=0.1`
+      - Integration: `Accuracy=0.1`, `Server="localhost"`, `Port=7890`
+      - Event Detection: `Gamma=0.8`, `LowBorder=0.001`
+    - `Store(ownerWindow) → bool` — `FileDialog` → serialize `SimulationParameters` to JSON
+    - `Load(ownerWindow) → bool` — `FileDialog` → deserialize from JSON
+    - `Snapshot() → SimulationParameters` — capture all viewmodel state
+    - `Commit(model) → void` — apply model to all viewmodel state
+    - `IntegrationMethods` — populated from server (set after Phase 2)
+    - `SimplifyMethods` — hardcoded: `["Radial-Distance", "Douglas-Peucker"]`
+
+4. **IProjectFileService interface** (in `ISMA.Domain/Contracts`)
+    - `Open(ownerWindow) → List<string> filePaths`
+    - `Open(paths) → List<ProjectType>`
+    - `Save(project) → bool`
+    - `SaveAs(project) → bool`
+    - `SaveAll(projects) → bool`
+
+#### Acceptance Checklist
+
+- [ ] `ProjectFileService` uses `FileDialog` (Avalonia type) — no ViewModels layer dependency
+- [ ] `SimulationResultService` uses `FileDialog` and `GrinProcessLauncher` — no ViewModels layer dependency
+- [ ] `SimulationParametersService` uses `FileDialog` — no ViewModels layer dependency
+- [ ] All three services implement interfaces defined in `ISMA.Domain/Contracts`
+- [ ] `IProjectFileService` interface exists in Domain layer
+- [ ] `ISimulationResultService` interface exists in Domain layer
+- [ ] Services can be mocked for ViewModel tests
+- [ ] `dotnet build ISMA.App` produces zero errors
+
+---
+
+### Phase 6: Tests — Domain & ViewModels
 
 **Goal:** Write unit tests for all business logic. UI layer is not tested directly.
 
@@ -790,7 +851,7 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ---
 
-### Phase 6: UI — Application Shell, Menu, Toolbar, Settings, and Error List
+### Phase 7: UI — Application Shell, Menu, Toolbar, Settings, and Error List
 
 **Goal:** Build the main window layout, menu bar, toolbar, settings panel, error list, and process bar. These are the simplest UI components.
 
@@ -868,7 +929,7 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ---
 
-### Phase 7: UI — Project Tabs, Text Editor, and File Operations
+### Phase 8: UI — Project Tabs, Text Editor, and File Operations
 
 **Goal:** Implement tab-based project management, LISMA text editor with syntax highlighting, and file open/save.
 
@@ -937,7 +998,7 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ---
 
-### Phase 8: UI — Blueprint Editor (Complex Canvas)
+### Phase 9: UI — Blueprint Editor (Complex Canvas)
 
 **Goal:** Implement the visual statechart editor with canvas rendering, state boxes, transition arrows, loop arrows, edit popover, and all interaction modes. This is the most complex UI component.
 
@@ -951,23 +1012,23 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
     - Scroll support via `ScrollViewer` wrapper in AXAML
     - Coordinate clamping: `max(position, 0.0)` — negative coordinates forbidden
 
-2. **State Box Rendering** (in `OnRender`)
-   - Rounded rectangles: `DrawRoundedRectangle(fill, pen, rect, 20, 20)`
-   - Main state: `#90EE90` (LightGreen) fill, fixed position (20, 10)
-   - Init state: `#ADD8E6` (LightBlue) fill, fixed position (10, 100)
-   - User states: `#F08080` (Coral) fill, draggable
-   - Text label: `DrawText(font, point, name)` — Arial 16pt, centered
-   - Inline name editing: `TextBox` overlay on single-click (200ms `DispatcherTimer` delay)
-   - Double-click → open text editor tab via `ITextEditorFactory`
+2. **State Box Rendering** (in `Draw(DrawingContext)`)
+    - Rounded rectangles: `DrawRoundedRectangle(fill, pen, rect, 20, 20)`
+    - Main state: `#90EE90` (LightGreen) fill, fixed position (20, 10)
+    - Init state: `#ADD8E6` (LightBlue) fill, fixed position (10, 100)
+    - User states: `#F08080` (Coral) fill, draggable
+    - Text label: `DrawText(font, point, name)` — Arial 16pt, centered
+    - Inline name editing: `TextBox` overlay on single-click (200ms `DispatcherTimer` delay)
+    - Double-click → open text editor tab via `ITextEditorFactory`
 
-3. **Transition Arrow Rendering** (in `OnRender`)
-   - Straight line from source state center to target state center
-   - Offset endpoints: `offsetDistance = 10.0`, perpendicular to line
-   - Arrowhead: `DrawPolygon(polygonPoints)` — 14×14 isosceles triangle
-   - Label: `DrawText(font, labelPosition, displayedText)` — alias if present, else predicate
-   - Geometry updates when state positions change (re-render on position change)
+3. **Transition Arrow Rendering** (in `Draw(DrawingContext)`)
+    - Straight line from source state center to target state center
+    - Offset endpoints: `offsetDistance = 10.0`, perpendicular to line
+    - Arrowhead: `DrawPolygon(polygonPoints)` — 14×14 isosceles triangle
+    - Label: `DrawText(font, labelPosition, displayedText)` — alias if present, else predicate
+    - Geometry updates when state positions change (re-render on position change)
 
-4. **Loop Arrow Rendering** (in `OnRender`)
+4. **Loop Arrow Rendering** (in `Draw(DrawingContext)`)
    - Circle: `DrawEllipseGeometry(rect)` with radius 40
    - Arrowhead pointing back to state
    - Label to the right of circle (X offset 120, Y offset -10)
@@ -1048,7 +1109,7 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ---
 
-### Phase 9: UI — Tasks PopOver, Results, and Chart Viewer
+### Phase 10: UI — Tasks PopOver, Results, and Chart Viewer
 
 **Goal:** Implement the Tasks PopOver, simulation result management, axis picker dialog, CSV export, and chart viewer integration.
 
@@ -1111,7 +1172,7 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ---
 
-### Phase 10: Polish, Integration Testing, and Documentation
+### Phase 11: Polish, Integration Testing, and Documentation
 
 **Goal:** Final polish, cross-platform testing, and documentation.
 
@@ -1230,37 +1291,37 @@ All 31 features from the original application that must be implemented:
 
 | # | Feature | Phase | Complexity |
 |---|---------|-------|------------|
-| 1 | Multi-project editing (tabs) | 7 | Low |
-| 2 | LISMA text editing with syntax highlighting | 7 | Medium |
-| 3 | Remote syntax highlighting (server-driven) | 7 | Medium |
-| 4 | Visual statechart (blueprint) editing | 8 | High |
-| 5 | State creation, drag, rename | 8 | Medium |
-| 6 | Transition arrow creation and management | 8 | High |
-| 7 | Loop transition arrows | 8 | High |
-| 8 | Edit arrow PopOver (alias/predicate) | 8 | Medium |
-| 9 | Inline state name editing | 8 | Medium |
+| 1 | Multi-project editing (tabs) | 8 | Low |
+| 2 | LISMA text editing with syntax highlighting | 8 | Medium |
+| 3 | Remote syntax highlighting (server-driven) | 8 | Medium |
+| 4 | Visual statechart (blueprint) editing | 9 | High |
+| 5 | State creation, drag, rename | 9 | Medium |
+| 6 | Transition arrow creation and management | 9 | High |
+| 7 | Loop transition arrows | 9 | High |
+| 8 | Edit arrow PopOver (alias/predicate) | 9 | Medium |
+| 9 | Inline state name editing | 9 | Medium |
 | 10 | Blueprint-to-LISMA conversion | 1 (Domain) | High |
 | 11 | Model compilation (via gRPC) | 2 | Low |
-| 12 | Model validation (Verify) | 6 | Low |
+| 12 | Model validation (Verify) | 7 | Low |
 | 13 | Simulation execution (via gRPC) | 2 | Low |
-| 14 | Real-time progress monitoring | 9 | Medium |
-| 15 | Simulation cancellation | 9 | Low |
+| 14 | Real-time progress monitoring | 10 | Medium |
+| 15 | Simulation cancellation | 10 | Low |
 | 16 | Result download and caching | 2 | Low |
-| 17 | Error list display | 6 | Low |
-| 18 | Simulation parameters configuration | 6 | Low |
-| 19 | Parameter presets (store/load JSON) | 3 | Low |
-| 20 | Chart visualization (Grin process) | 9 | Low |
-| 21 | Variable axis selection dialog | 9 | Medium |
-| 22 | CSV export of results | 9 | Medium |
-| 23 | Window state persistence | 7 | Low |
-| 24 | Menu bar and toolbar commands | 6 | Low |
-| 25 | Keyboard shortcuts | 10 | Low |
-| 26 | Clipboard propagation (cut/copy/paste) | 7 | Low |
-| 27 | Tasks PopOver (in-progress + completed) | 9 | Medium |
-| 28 | State content editing (double-click → text tab) | 8 | Medium |
-| 29 | Name uniqueness enforcement | 8 | Low |
-| 30 | Parallel execution settings | 6 | Low |
-| 31 | Result simplification settings | 6 | Low |
+| 17 | Error list display | 7 | Low |
+| 18 | Simulation parameters configuration | 7 | Low |
+| 19 | Parameter presets (store/load JSON) | 5 (App) | Low |
+| 20 | Chart visualization (Grin process) | 10 | Low |
+| 21 | Variable axis selection dialog | 10 | Medium |
+| 22 | CSV export of results | 10 | Medium |
+| 23 | Window state persistence | 8 | Low |
+| 24 | Menu bar and toolbar commands | 7 | Low |
+| 25 | Keyboard shortcuts | 11 | Low |
+| 26 | Clipboard propagation (cut/copy/paste) | 8 | Low |
+| 27 | Tasks PopOver (in-progress + completed) | 10 | Medium |
+| 28 | State content editing (double-click → text tab) | 9 | Medium |
+| 29 | Name uniqueness enforcement | 9 | Low |
+| 30 | Parallel execution settings | 7 | Low |
+| 31 | Result simplification settings | 7 | Low |
 
 ---
 

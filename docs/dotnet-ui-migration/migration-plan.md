@@ -41,6 +41,14 @@ ISMA.App → ISMA.ViewModels → ISMA.Domain
 ISMA.App → ISMA.Infrastructure → ISMA.Domain
 ISMA.ViewModels → ISMA.Domain
 ISMA.Tests → ISMA.Domain, ISMA.ViewModels (mocking ISMA.Infrastructure)
+
+Dependency direction:
+  App depends on ViewModels + Infrastructure
+  ViewModels depends on Domain (interfaces)
+  Infrastructure depends on Domain (interfaces + models)
+  Tests depends on Domain + ViewModels (Infrastructure is mocked)
+
+No circular dependencies allowed.
 ```
 
 **Key architectural decisions:**
@@ -101,11 +109,13 @@ isma-ui-dotnet/
 │   │   │                                   #   compiledModelId, eventDetectionGamma, eventDetectionLowBorder
 │   │   └── SocketPaths.cs                    # grpc, http (Unix socket paths)
 │   ├── Conversion/
-│   │   └── BlueprintToLismaConverter.cs      # BlueprintModel → LismaTextModel (pure algorithm)
-│   │       ├── ConvertToLisma()              # Main flow: main text → transactions → loops
-│   │       ├── CreateTransactionKey()        # "{targetStateName} ({predicate})"
-│   │       └── StateBlockModel.cs            # Helper for state block generation
-│   ├── Contracts/                            # Service interfaces (implemented in Infrastructure)
+   │   │   └── BlueprintToLismaConverter.cs      # BlueprintModel → LismaTextModel (pure algorithm)
+   │   │       ├── ConvertToLisma()              # Main flow: main text → transactions → loops
+   │   │       ├── CreateTransactionKey()        # "{targetStateName} ({predicate})"
+   │   │       └── StateBlockModel.cs            # Helper for state block generation
+   │   ├── Results/                              # Sealed result types for domain operations
+   │   │   └── LismaPdeTranslationResult.cs      # Sealed interface: SuccessTranslation / FailedTranslation
+   │   ├── Contracts/                            # Service interfaces (implemented in Infrastructure)
 │   │   ├── ISimulationServerFacade.cs        # compile, validate, highlight, run, monitor,
 │   │   │                                   #   download, cancel, getMethods, shutdown
 │   │   ├── IEquationIndexProvider.cs         # getDifferentialEquationCount, getAlgebraicEquationCount,
@@ -139,22 +149,25 @@ isma-ui-dotnet/
 │   │   ├── SimulationServiceViewModel.cs     # Simulate(), StopSimulation(), TrackingTasks
 │   │   ├── SimulationResultViewModel.cs      # CommitResult(), ShowChart(), ExportToFile()
 │   │   ├── ErrorListViewModel.cs             # Errors collection, PutErrorList()
-│   │   ├── SettingsViewModels.cs             # CauchyInitialsVm, MethodSettingsVm,
-│   │   │                                   #   EventDetectionVm, ResultProcessingVm
+│   │   ├── CauchyInitialsViewModel.cs        # Bound to CauchyInitials properties
+   │   ├── MethodSettingsViewModel.cs        # Bound to IntegrationMethod properties + method list
+   │   ├── EventDetectionViewModel.cs        # Bound to EventDetection properties
+   │   └── ResultProcessingViewModel.cs      # Bound to ResultProcessing properties
 │   │   ├── BlueprintEditorViewModel.cs       # States, Transactions, Modes, Add/Remove operations
 │   │   ├── TasksPopOverViewModel.cs          # InProgress + Completed sections
 │   │   ├── SelectVariablesDialogViewModel.cs # XAxis, YAxis selection for chart viewer
 │   │   ├── EditArrowPopOverViewModel.cs      # Alias + Predicate for arrow editing
 │   │   └── InProgressSimulationViewModel.cs  # Id, ModelName, Progress, CanAbort
-│   ├── Services/                             # Presentation services (UI orchestration)
+ │   ├── Models/                               # Presentation-specific models (NamedPickerItem, etc.)
+   │   │   └── NamedPickerItem.cs                # Generic item for axis picker dialog
+   │   ├── Services/                             # Presentation services (UI orchestration, no Avalonia deps)
 │   │   ├── SimulationService.cs              # Orchestrates: snapshot → compile → run → monitor → download
 │   │   ├── SimulationResultService.cs        # Manages completed results, CSV export, chart launch
 │   │   ├── SimulationParametersService.cs    # Parameter state management, store/load
 │   │   ├── ProjectService.cs                 # Project collection management
 │   │   ├── ModelErrorService.cs              # Error list management
 │   │   ├── LismaPdeService.cs                # LISMA validation → Success/Failure
-│   │   ├── SyntaxHighlighterService.cs       # Delegates to server, maps token kinds
-│   │   └── TextEditorFactory.cs              # Creates/disposes AvalonEdit instances
+│   │   └── SyntaxHighlighterService.cs       # Delegates to server, maps token kinds
 │   ├── Converters/
 │   │   ├── DoubleConverter.cs                # string ↔ double (with normalization)
 │   │   ├── IntegerConverter.cs               # string ↔ int (with normalization)
@@ -180,13 +193,15 @@ isma-ui-dotnet/
 │   │       ├── MethodSettingsView.axaml      # Method, Accurate, Accuracy, Stable, Parallel,
 │   │       │                                 #   Server, Port
 │   │       ├── EventDetectionView.axaml      # In use, Gamma, Step limit, Low border
-│   │       └── ResultProcessingView.axaml    # Save result (MEMORY/FILE), Simplify, Tolerance
+  │   │       └── ResultProcessingView.axaml    # Save result (MEMORY/FILE), Simplify checkbox,
+   │   │                                         #   Simplify method (Radial-Distance/Douglas-Peucker), Tolerance
 │   ├── Controls/
 │   │   ├── BlueprintCanvasPanel.cs           # Custom Panel: OnRender for states/arrows
 │   │   ├── PropertiesGrid.axaml              # Reusable label+control grid
 │   │   └── NumericCell.axaml                 # Custom DataGrid cell for row/position columns
 │   ├── Services/                             # UI-specific services (Avalonia dependencies)
-│   │   └── EditorPlatformService.cs          # Cut/Copy/Paste event propagation
+│   │   ├── EditorPlatformService.cs          # Cut/Copy/Paste event propagation
+│   │   └── TextEditorFactory.cs              # Creates/disposes AvalonEdit instances
 │   ├── ViewModels/                           # (Empty — all ViewModels in ISMA.ViewModels)
 │   ├── Converters/                           # (Empty — all converters in ISMA.ViewModels)
 │   ├── App.axaml                             # Fluent theme, resource dictionaries, styles
@@ -255,12 +270,15 @@ Implementation: Create an `IUnixSocketHandler` abstraction in Infrastructure wit
 
 ## Exchange-Format Binary Reader
 
-The original uses `ru.isma.next.exchange.format` for binary simulation result reading. This library must be **ported/reimplemented in .NET**:
+The original uses `ru.isma.next.exchange.format` for binary simulation result reading. This library must be **ported/reimplemented in .NET** inside `ISMA.Infrastructure`:
 
 - `BinaryFilePointProvider` reads binary `.bin` files
 - Each record: `x` (double), `yForDe[]` (double[]), `rhs[][]` (double[][])
 - Metadata: column names, equation counts (DE_, AE_, f prefixes)
 - Stream as `IEnumerable<SimulationPoint>` for CSV export and chart display
+- Port the Java `readAllPointsSequence()` and metadata parsing logic
+- The `BinaryEquationIndexProvider` parses column prefixes to derive equation counts and codes
+- This is the most complex infrastructure component — treat it as a separate porting effort
 
 ---
 
@@ -316,8 +334,11 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 2. **Simulation Parameters Models**
    - `CauchyInitials` — `double StartTime`, `double EndTime`, `double InitialStep`
    - `IntegrationMethodParameters` — `string SelectedMethod`, `double Accuracy`,
-     `bool IsAccuracyInUse`, `bool IsStableAllowedInUse`, `bool IsStableInUse`,
-     `bool IsParallelInUse`, `string Server`, `int Port`
+      `bool IsAccuracyInUse`, `bool IsStableAllowedInUse`, `bool IsStableInUse`,
+      `bool IsParallelInUse`, `string Server`, `int Port`
+      - NOTE: `IsStableAllowedInUse` is an internal flag (set by infrastructure based on server capabilities).
+        `IsStableInUse` is the user-facing flag. Both are preserved from original for model fidelity.
+        Only `IsStableInUse` is exposed in the ViewModel UI.
    - `EventDetectionParameters` — `bool IsEventDetectionInUse`, `bool IsStepLimitInUse`,
      `double Gamma`, `double LowBorder`
    - `ResultSavingParameters` — `SaveTarget SavingTarget` (enum: `Memory`, `File`)
@@ -345,9 +366,11 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
    - `ErrorInfo` — `int Row`, `int Position`, `string FragmentName`, `string Message`
    - `InProgressSimulation` — `int Id`, `string ModelName`, `SimulationParameters Parameters`,
      `double Progress` (0.0–1.0)
-   - `CompletedSimulation` — `int Id`, `string ModelName`, `IEquationIndexProvider EquationIndexProvider`,
-     `MetricData MetricData`, `SimulationParameters Parameters`, `string CachedFile`,
-     `List<string> CachedColumnNames`
+   - `CompletedSimulation` — `int Id`, `string ModelName`, `IEquationIndexProvider? EquationIndexProvider`,
+      `MetricData MetricData`, `SimulationParameters Parameters`, `string CachedFile`,
+      `List<string> CachedColumnNames`
+      - NOTE: `IEquationIndexProvider` is a domain interface (dependency inversion). Infrastructure implements it.
+        Used for CSV export to map equation indices to column names. Nullable since not all results have it.
 
 5. **Preferences Models**
    - `WindowPreferences` — `double X`, `double Y`, `double Width`, `double Height`, `bool IsMaximized`
@@ -407,6 +430,7 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
   - [ ] Multiple states with regular transitions
   - [ ] Loop transitions (pseudo-state pattern)
   - [ ] Multiple transitions to same target with same predicate (merge behavior)
+- [ ] `LismaPdeTranslationResult` sealed interface with `SuccessTranslation` and `FailedTranslation` variants
 - [ ] `dotnet build ISMA.Domain` produces zero errors and zero warnings
 - [ ] All DTOs pass JSON serialization round-trip test
 
@@ -539,17 +563,12 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
    - `CommitFiles(DefaultFilesPreferences) → void` — update and persist
    - Restore last opened file paths on startup
 
-3. **SimulationParametersService** (presentation service in ViewModels layer)
-   - Default values:
-     - Cauchy: `StartTime=0.0`, `EndTime=10.0`, `InitialStep=0.1`
-     - Integration: `Accuracy=0.1`, `Server="localhost"`, `Port=7890`
-     - Event Detection: `Gamma=0.8`, `LowBorder=0.001`
-   - `Store(ownerWindow) → bool` — FileDialog → serialize `SimulationParameters` to JSON
-   - `Load(ownerWindow) → bool` — FileDialog → deserialize from JSON
-   - `Snapshot() → SimulationParameters` — capture all viewmodel state
-   - `Commit(model) → void` — apply model to all viewmodel state
-   - `IntegrationMethods` — populated from server (set after Phase 2)
-   - `SimplifyMethods` — hardcoded: `["Radial-Distance", "Douglas-Peucker"]`
+3. **Default values registry** (shared constants, no UI dependencies)
+    - Cauchy: `StartTime=0.0`, `EndTime=10.0`, `InitialStep=0.1`
+    - Integration: `Accuracy=0.1`, `Server="localhost"`, `Port=7890`
+    - Event Detection: `Gamma=0.8`, `LowBorder=0.001`
+    - Simplify methods: `["Radial-Distance", "Douglas-Peucker"]`
+    - File extension constants: `.iscm2`, `.scisma`, `.im`, `.params.json`, `preferences.json`
 
 #### Acceptance Checklist
 
@@ -633,25 +652,27 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
      - Write to buffered `StreamWriter` on background thread
 
 6. **SimulationParametersViewModel**
-   - `CauchyInitials` — `double StartTime`, `double EndTime`, `double Step`
-   - `IntegrationMethod` — `string SelectedMethod`, `double Accuracy`, `bool IsAccuracyInUse`,
-     `bool IsStableAllowedInUse`, `bool IsStableInUse`, `bool IsParallelInUse`, `string Server`, `int Port`
-   - `EventDetection` — `bool IsEventDetectionInUse`, `bool IsStepLimitInUse`, `double Gamma`, `double LowBorder`
-   - `ResultSaving` — `SaveTarget SavingTarget`
-   - `ResultProcessing` — `bool IsSimplifyInUse`, `string SelectedSimplifyMethod`, `double Tolerance`
-   - `ObservableCollection<string> IntegrationMethods`
-   - `Snapshot() → SimulationParameters` — capture all properties
-   - `Commit(SimulationParameters) → void` — apply all properties
+    - `CauchyInitials` — `double StartTime`, `double EndTime`, `double Step`
+    - `IntegrationMethod` — `string SelectedMethod`, `double Accuracy`, `bool IsAccuracyInUse`,
+      `bool IsStableInUse`, `bool IsParallelInUse`, `string Server`, `int Port`
+      - NOTE: `IsStableAllowedInUse` exists in the Domain model but is NOT exposed in the ViewModel UI.
+        It is an internal flag set based on server capabilities, not a user-configurable setting.
+    - `EventDetection` — `bool IsEventDetectionInUse`, `bool IsStepLimitInUse`, `double Gamma`, `double LowBorder`
+    - `ResultSaving` — `SaveTarget SavingTarget`
+    - `ResultProcessing` — `bool IsSimplifyInUse`, `string SelectedSimplifyMethod`, `double Tolerance`
+    - `ObservableCollection<string> IntegrationMethods`
+    - `Snapshot() → SimulationParameters` — capture all properties
+    - `Commit(SimulationParameters) → void` — apply all properties
 
 7. **ErrorListViewModel**
    - `ObservableCollection<ErrorInfo> Errors`
    - `PutErrorList(IEnumerable<ErrorInfo>)` — clear and add all
 
-8. **Settings ViewModels** (derive from SimulationParametersViewModel)
-   - `CauchyInitialsViewModel` — bound to `CauchyInitials` properties
-   - `MethodSettingsViewModel` — bound to `IntegrationMethod` properties + method list
-   - `EventDetectionViewModel` — bound to `EventDetection` properties
-   - `ResultProcessingViewModel` — bound to `ResultProcessing` properties
+8. **Settings ViewModels** (each in its own file, bound to SimulationParametersViewModel)
+    - `CauchyInitialsViewModel` — `StartTime`, `EndTime`, `Step` properties
+    - `MethodSettingsViewModel` — `SelectedMethod`, `Accuracy`, `IsAccuracyInUse`, `IsStableAllowedInUse`, `IsStableInUse`, `IsParallelInUse`, `Server`, `Port`, `IntegrationMethods`
+    - `EventDetectionViewModel` — `IsEventDetectionInUse`, `IsStepLimitInUse`, `Gamma`, `LowBorder`
+    - `ResultProcessingViewModel` — `IsSimplifyInUse`, `SelectedSimplifyMethod`, `Tolerance`
 
 9. **BlueprintEditorViewModel**
    - `ObservableCollection<BlueprintStateViewModel> States`
@@ -668,12 +689,13 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
    - `ResetEditorMode()` — clear all modes
 
 10. **BlueprintStateViewModel**
-    - `double CanvasPositionX`, `double CanvasPositionY`
-    - `string Name`
-    - `string Text`
-    - `bool IsEditable`
-    - `bool IsMain`, `bool IsInit`
-    - `Color FillColor` (LightGreen for Main, LightBlue for Init, Coral for user)
+     - `double CanvasPositionX`, `double CanvasPositionY`
+     - `string Name`
+     - `string Text`
+     - `bool IsEditable`
+     - `bool IsMain`, `bool IsInit`
+     - `string FillColorHex` (hex color string: "#90EE90" for Main, "#ADD8E6" for Init, "#F08080" for user)
+     - NOTE: Color stored as hex string to keep ViewModels UI-framework agnostic (Avalonia `Color` type is not available in ViewModels)
 
 11. **BlueprintTransactionViewModel**
     - `BlueprintStateViewModel StartState`, `BlueprintStateViewModel EndState`
@@ -712,9 +734,12 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 - [ ] `SimulationService.Simulate()` implements full flow with proper error handling
 - [ ] Progress updates propagate via `[ObservableProperty]` from background task
 - [ ] `SimulationParametersViewModel` has all 5 parameter sections
+- [ ] `IsStableAllowedInUse` exists in Domain model but NOT in ViewModel UI (internal flag only)
 - [ ] `ErrorListViewModel` supports clearing and repopulating
 - [ ] `BlueprintEditorViewModel` has all 4 editor modes
 - [ ] `SelectVariablesDialogViewModel` has axis selection logic
+- [ ] `NamedPickerItem<T>` generic model supports axis picker dialog
+- [ ] `LismaPdeTranslationResult` sealed interface used by LismaPdeService
 - [ ] `CompletedSimulationViewModel` exposes column names for axis picker
 - [ ] ViewModels have zero Avalonia dependencies
 - [ ] `dotnet build ISMA.ViewModels` produces zero errors
@@ -919,11 +944,12 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 #### Steps
 
 1. **BlueprintCanvasPanel** (custom `Panel`)
-   - Override `MeasureOverride` and `ArrangeOverride` for absolute positioning
-   - Render states and arrows via `OnRender` (direct drawing for performance)
-   - Handle pointer events: `PointerPressed`, `PointerMoved`, `PointerReleased`, `PointerDoubleClicked`
-   - Scroll support via `ScrollViewer` wrapper in AXAML
-   - Coordinate clamping: `max(position, 0.0)` — negative coordinates forbidden
+    - Override `MeasureOverride` and `ArrangeOverride` for absolute positioning
+    - Render states and arrows via `Draw(DrawingContext)` override (direct drawing for performance)
+    - Handle pointer events: `PointerPressed`, `PointerMoved`, `PointerReleased`
+    - Double-click detection: check `e.ClickCount > 1` in `PointerPressed` handler
+    - Scroll support via `ScrollViewer` wrapper in AXAML
+    - Coordinate clamping: `max(position, 0.0)` — negative coordinates forbidden
 
 2. **State Box Rendering** (in `OnRender`)
    - Rounded rectangles: `DrawRoundedRectangle(fill, pen, rect, 20, 20)`

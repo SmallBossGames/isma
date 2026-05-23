@@ -8,35 +8,33 @@ This document provides a comprehensive, multi-step migration plan for porting th
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  ISMA.App (Avalonia 12 UI)                                      │
-│  ├── Views/          (AXAML + InitializeComponent code-behind)  │
-│  ├── Controls/       (Reusable controls: PropertiesGrid, etc.)  │
-│  ├── Services/       (UI-specific services: TextEditorFactory)  │
-│  └── App.axaml / Program.cs                                    │
-├─────────────────────────────────────────────────────────────────┤
-│  ISMA.ViewModels (Presentation Layer — UI-framework agnostic)   │
-│  ├── ViewModels/             (All MVVM viewmodels)             │
-│  ├── Services/               (Presentation services)           │
-│  └── Converters/             (IValueConverter implementations) │
+│  ISMA.Tests (xUnit + FluentAssertions + Moq)                    │
+│  ├── Domain/         (Model + conversion tests)                │
+│  └── ViewModels/     (ViewModel + service tests)               │
 ├─────────────────────────────────────────────────────────────────┤
 │  ISMA.Domain (Domain Layer — pure, no dependencies)             │
 │  ├── Models/         (Pure POCOs + DTOs)                       │
 │  ├── Conversion/     (BlueprintToLismaConverter — pure algo)   │
-│  └── Contracts/      (Service interfaces for infrastructure)   │
+│  ├── Results/      (LismaPdeTranslationResult sealed interface)│
+│  └── Contracts/      (Service interfaces — Infrastructure + App)│
 ├─────────────────────────────────────────────────────────────────┤
 │  ISMA.Infrastructure (Infrastructure Layer)                     │
 │  ├── Server/         (gRPC/HTTP client, server mgmt)           │
-│  ├── FileStorage/    (File I/O, preferences)                   │
-│  └── ChartViewer/    (Grin process launcher)                   │
+│  ├── FileStorage/    (PreferencesProvider, raw file I/O)       │
+│  └── ChartViewer/    (GrinProcessLauncher)                     │
 ├─────────────────────────────────────────────────────────────────┤
-│  ISMA.App (UI-dependent services — Dialogs, File I/O with UI)  │
+│  ISMA.ViewModels (Presentation Layer — UI-framework agnostic)   │
+│  ├── ViewModels/             (All MVVM viewmodels)             │
+│  ├── Services/               (Presentation services — NO UI)   │
+│  ├── Models/               (NamedPickerItem, etc.)             │
+│  └── Converters/             (IValueConverter implementations) │
+├─────────────────────────────────────────────────────────────────┤
+│  ISMA.App (Avalonia 12 UI + UI-dependent services)             │
 │  ├── Services/               (ProjectFileService, SimulationResultService,    │
 │  │                           SimulationParametersService — all need FileDialog)│
-│  └── ViewModels/             (Empty)                                         │
-├─────────────────────────────────────────────────────────────────┤
-│  ISMA.Tests (xUnit + FluentAssertions + Moq)                    │
-│  ├── Domain/         (Model + conversion tests)                │
-│  └── ViewModels/     (ViewModel + service tests)               │
+│  ├── Controls/       (BlueprintCanvasPanel, PropertiesGrid, NumericCell)     │
+│  ├── Views/          (All AXAML views)                         │
+│  └── App.axaml / Program.cs                                    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -143,8 +141,7 @@ isma-ui-dotnet/
 │   │   ├── BinaryFilePointProvider.cs        # Read binary results → IEnumerable<SimulationPoint>
 │   │   └── BinaryEquationIndexProvider.cs    # Parse column prefixes (DE_, AE_, f)
 │   ├── FileStorage/
-│   │   ├── ProjectFileService.cs             # Open/save projects by extension
-│   │   └── PreferencesProvider.cs            # preferences.json persistence
+│   │   └── PreferencesProvider.cs            # preferences.json persistence (raw file I/O)
 │   ├── ChartViewer/
 │   │   └── GrinProcessLauncher.cs            # Launch external chart viewer process
 │   └── ISMA.Infrastructure.csproj
@@ -203,7 +200,7 @@ isma-ui-dotnet/
   │   │       └── ResultProcessingView.axaml    # Save result (MEMORY/FILE), Simplify checkbox,
    │   │                                         #   Simplify method (Radial-Distance/Douglas-Peucker), Tolerance
 │   ├── Controls/
-│   │   ├── BlueprintCanvasPanel.cs           # Custom Panel: OnRender for states/arrows
+│   │   ├── BlueprintCanvasPanel.cs           # Custom Panel: Draw(DrawingContext) for states/arrows
 │   │   ├── PropertiesGrid.axaml              # Reusable label+control grid
 │   │   └── NumericCell.axaml                 # Custom DataGrid cell for row/position columns
 │   ├── Services/                             # UI-specific services (Avalonia dependencies)
@@ -570,17 +567,13 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
 
 #### Acceptance Checklist
 
-- [ ] Opening `.iscm2` file reads and returns file path
-- [ ] Opening `.scisma` file reads and returns file path
-- [ ] Opening `.im` file reads and returns file path (legacy, backward compat)
-- [ ] Save writes correct format for LISMA text projects
-- [ ] Save writes correct JSON format for blueprint projects
+- [ ] PreferencesProvider loads and saves `preferences.json` correctly
 - [ ] Preferences persist across app restarts
 - [ ] Last opened files are restored on startup
 - [ ] Window geometry is saved and restored
-- [ ] Store Settings saves parameters to JSON
-- [ ] Load Settings restores parameters from JSON
-- [ ] Default values match original application exactly
+- [ ] Default values registry contains all original defaults
+- [ ] File extension constants match original application
+- [ ] `dotnet build ISMA.Infrastructure` produces zero errors
 
 ---
 
@@ -658,17 +651,17 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
     - `Snapshot() → SimulationParameters` — capture all properties
     - `Commit(SimulationParameters) → void` — apply all properties
 
-7. **ErrorListViewModel**
+6. **ErrorListViewModel**
    - `ObservableCollection<ErrorInfo> Errors`
    - `PutErrorList(IEnumerable<ErrorInfo>)` — clear and add all
 
-8. **Settings ViewModels** (each in its own file, bound to SimulationParametersViewModel)
+7. **Settings ViewModels** (each in its own file, bound to SimulationParametersViewModel)
     - `CauchyInitialsViewModel` — `StartTime`, `EndTime`, `Step` properties
     - `MethodSettingsViewModel` — `SelectedMethod`, `Accuracy`, `IsAccuracyInUse`, `IsStableAllowedInUse`, `IsStableInUse`, `IsParallelInUse`, `Server`, `Port`, `IntegrationMethods`
     - `EventDetectionViewModel` — `IsEventDetectionInUse`, `IsStepLimitInUse`, `Gamma`, `LowBorder`
     - `ResultProcessingViewModel` — `IsSimplifyInUse`, `SelectedSimplifyMethod`, `Tolerance`
 
-9. **BlueprintEditorViewModel**
+8. **BlueprintEditorViewModel**
    - `ObservableCollection<BlueprintStateViewModel> States`
    - `ObservableCollection<BlueprintTransactionViewModel> Transactions`
    - `ObservableCollection<BlueprintLoopTransactionViewModel> LoopTransactions`
@@ -682,7 +675,7 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
    - `SetBlueprintModel(BlueprintModel model) → void` — restore from model
    - `ResetEditorMode()` — clear all modes
 
-10. **BlueprintStateViewModel**
+9. **BlueprintStateViewModel**
      - `double CanvasPositionX`, `double CanvasPositionY`
      - `string Name`
      - `string Text`
@@ -691,30 +684,30 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
      - `string FillColorHex` (hex color string: "#90EE90" for Main, "#ADD8E6" for Init, "#F08080" for user)
      - NOTE: Color stored as hex string to keep ViewModels UI-framework agnostic (Avalonia `Color` type is not available in ViewModels)
 
-11. **BlueprintTransactionViewModel**
+10. **BlueprintTransactionViewModel**
     - `BlueprintStateViewModel StartState`, `BlueprintStateViewModel EndState`
     - `string Predicate`, `string Alias`
 
-12. **BlueprintLoopTransactionViewModel**
+11. **BlueprintLoopTransactionViewModel**
     - `BlueprintStateViewModel State`
     - `string Predicate`, `string Alias`, `string Text`
 
-13. **TasksPopOverViewModel**
+12. **TasksPopOverViewModel**
     - `ObservableCollection<InProgressSimulationViewModel> InProgress`
     - `ObservableCollection<CompletedSimulation> Completed`
     - Properties for UI binding
 
-14. **SelectVariablesDialogViewModel**
+13. **SelectVariablesDialogViewModel**
     - `ObservableCollection<string> AllColumns`
     - `string SelectedXAxis` (pre-select "TIME")
     - `ObservableCollection<NamedPickerItem> YAxisItems`
     - `ICommand SelectAllCommand`, `ICommand UnselectAllCommand`, `ICommand OkCommand`, `ICommand CloseCommand`
 
-15. **EditArrowPopOverViewModel**
+14. **EditArrowPopOverViewModel**
     - `string Alias`
     - `string Predicate`
 
-16. **InProgressSimulationViewModel**
+15. **InProgressSimulationViewModel**
     - `int Id`, `string ModelName`, `SimulationParameters Parameters`
     - `double Progress` (0.0–1.0, `[ObservableProperty]`)
     - `bool CanAbort`
@@ -738,6 +731,7 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
 - [ ] ViewModels have zero Avalonia dependencies (NO FileDialog, NO Window, NO GrinProcessLauncher)
 - [ ] `dotnet build ISMA.ViewModels` produces zero errors
 - [ ] `SimulationResultService` and `SimulationParametersService` are in App layer (not ViewModels)
+- [ ] `ISimulationResultService` and `IProjectFileService` interfaces exist in Domain.Contracts
 
 ---
 
@@ -1216,7 +1210,7 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
    - Simulation failures → error messages in tasks
 
 5. **Performance**
-   - Blueprint canvas rendering: test with 50+ states (OnRender should be efficient)
+   - Blueprint canvas rendering: test with 50+ states (`Draw(DrawingContext)` should be efficient)
    - Text editor: test with 1000+ line files
    - CSV export: verify non-blocking behavior
 
@@ -1337,7 +1331,7 @@ All 31 features from the original application that must be implemented:
 | HTTP client | Ktor CIO | System.Net.Http.HttpClient |
 | JSON serialization | kotlinx.serialization | System.Text.Json (source generation) |
 | Text editor | fxmisc.richtext (JavaFX) | ICSharpCode.AvalonEdit |
-| Canvas rendering | JavaFX `Pane` with child nodes | Custom `Panel` with `OnRender` |
+| Canvas rendering | JavaFX `Pane` with child nodes | Custom `Panel` with `Draw(DrawingContext)` |
 | Styling | JavaFX CSS | Avalonia XAML styles + pseudo-classes |
 | Property system | JavaFX `Simple*Property` | CommunityToolkit.Mvvm `[ObservableProperty]` |
 | Testing | (not specified) | xUnit + FluentAssertions + Moq |

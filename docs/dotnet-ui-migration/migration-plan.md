@@ -7,140 +7,260 @@ This document provides a comprehensive, multi-step migration plan for porting th
 ## Target Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  ISMA.App (Avalonia UI)                             │
-│  ├── Views/          (AXAML + ViewModel code-behind)│
-│  └── ViewModels/     (CommunityToolkit.Mvvm)        │
-├─────────────────────────────────────────────────────┤
-│  ISMA.ViewModels (Presentation Layer)               │
-│  └── ViewModels/     (UI-framework agnostic)        │
-├─────────────────────────────────────────────────────┤
-│  ISMA.Domain (Domain Layer)                          │
-│  ├── Models/         (Pure POCOs, no deps)          │
-│  └── Services/       (Business logic interfaces)    │
-├─────────────────────────────────────────────────────┤
-│  ISMA.Infrastructure (Infrastructure Layer)          │
-│  ├── Server/         (gRPC/HTTP client, server mgmt)│
-│  ├── FileStorage/    (File I/O, preferences)        │
-│  └── ChartViewer/    (Grin process launcher)        │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│  ISMA.App (Avalonia 12 UI)                                      │
+│  ├── Views/          (AXAML + InitializeComponent code-behind)  │
+│  ├── Controls/       (Reusable controls: PropertiesGrid, etc.)  │
+│  ├── Services/       (UI-specific services: TextEditorFactory)  │
+│  └── App.axaml / Program.cs                                    │
+├─────────────────────────────────────────────────────────────────┤
+│  ISMA.ViewModels (Presentation Layer — UI-framework agnostic)   │
+│  ├── ViewModels/             (All MVVM viewmodels)             │
+│  ├── Services/               (Presentation services)           │
+│  └── Converters/             (IValueConverter implementations) │
+├─────────────────────────────────────────────────────────────────┤
+│  ISMA.Domain (Domain Layer — pure, no dependencies)             │
+│  ├── Models/         (Pure POCOs + DTOs)                       │
+│  ├── Conversion/     (BlueprintToLismaConverter — pure algo)   │
+│  └── Contracts/      (Service interfaces for infrastructure)   │
+├─────────────────────────────────────────────────────────────────┤
+│  ISMA.Infrastructure (Infrastructure Layer)                     │
+│  ├── Server/         (gRPC/HTTP client, server mgmt)           │
+│  ├── FileStorage/    (File I/O, preferences)                   │
+│  └── ChartViewer/    (Grin process launcher)                   │
+├─────────────────────────────────────────────────────────────────┤
+│  ISMA.Tests (xUnit + FluentAssertions + Moq)                    │
+│  ├── Domain/         (Model + conversion tests)                │
+│  └── ViewModels/     (ViewModel + service tests)               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Dependency graph:**
+```
+ISMA.App → ISMA.ViewModels → ISMA.Domain
+ISMA.App → ISMA.Infrastructure → ISMA.Domain
+ISMA.ViewModels → ISMA.Domain
+ISMA.Tests → ISMA.Domain, ISMA.ViewModels (mocking ISMA.Infrastructure)
 ```
 
 **Key architectural decisions:**
 
-- **MVVM** with `CommunityToolkit.Mvvm` — no reactive UI frameworks
-- **Microsoft.Extensions.DependencyInjection** — standard .NET DI
-- **System.Text.Json** — JSON serialization
-- **Grpc.Net.Client** — cross-platform gRPC client (no platform-specific epoll needed)
+- **MVVM** with `CommunityToolkit.Mvvm` — `[ObservableProperty]`, `[RelayCommand]`, `[INotifyPropertyChanged]`
+- **Microsoft.Extensions.DependencyInjection** — standard .NET DI with `ServiceCollectionExtensions` pattern
+- **System.Text.Json** — JSON serialization with `[JsonSerializable]` source generation
+- **Grpc.Net.Client** — cross-platform gRPC client with UnixDomainSocket handler (no Linux-only epoll)
 - **Avalonia.Controls.DataGrid** — for error list table
 - **ICSharpCode.AvalonEdit** — for LISMA text editor (syntax highlighting, line numbers)
-- **Custom Panel** — for blueprint editor canvas rendering
-- **Tests** — xUnit + FluentAssertions for Domain and ViewModels
+- **Custom Panel** — for blueprint editor canvas rendering (OnRender override)
+- **ViewLocator pattern** — automatic View resolution from ViewModel type
+- **Avalonia 12 features**: `x:DataType` compiled bindings, `IsVisible` (not `Visibility`), `BoxShadow`, Container Queries, Control Themes
+- **Tests**: xUnit + FluentAssertions + Moq for Domain and ViewModels
 
 ## Project Structure
 
 ```
 isma-ui-dotnet/
-├── ISMA.Domain/                     # Pure domain models + interfaces
+├── ISMA.Domain/                              # Pure domain models + DTOs + interfaces
 │   ├── Models/
-│   │   ├── SimulationResult.cs
-│   │   ├── SimulationProgress.cs
-│   │   ├── SimulationPoint.cs
-│   │   ├── SimulationMetadata.cs
-│   │   ├── MetricData.cs
-│   │   ├── SimulationParameters.cs
-│   │   ├── ErrorViewModel.cs
-│   │   ├── BlueprintModel.cs
-│   │   ├── BlueprintStateModel.cs
-│   │   ├── BlueprintTransactionModel.cs
-│   │   ├── BlueprintLoopTransactionModel.cs
-│   │   ├── PreferencesModel.cs
-│   │   ├── WindowPreferencesModel.cs
-│   │   ├── DefaultFilesPreferencesModel.cs
-│   │   └── InProgressSimulation.cs
-│   ├── Services/
-│   │   ├── ISimulationServerFacade.cs
-│   │   ├── IProjectService.cs
-│   │   ├── ISimulationService.cs
-│   │   ├── ISimulationResultService.cs
-│   │   ├── ISimulationParametersService.cs
-│   │   ├── IModelErrorService.cs
-│   │   ├── ILismaPdeService.cs
-│   │   ├── IProjectFileService.cs
-│   │   ├── IPreferencesProvider.cs
-│   │   ├── ITextEditorFactory.cs
-│   │   └── IEquationIndexProvider.cs
+│   │   ├── SimulationPoint.cs                # x, yForDe (double[]), rhs (double[][])
+│   │   ├── SimulationProgress.cs             # startTime, endTime, currentTime
+│   │   ├── SimulationMetadata.cs             # columnNames (List<string>)
+│   │   ├── MetricData.cs                     # startTime, endTime, simulationTime
+│   │   ├── CauchyInitials.cs                 # startTime, endTime, initialStep
+│   │   ├── IntegrationMethodParameters.cs    # selectedMethod, accuracy, isAccuracyInUse,
+│   │   │                                   #   isStableAllowedInUse, isStableInUse,
+│   │   │                                   #   isParallelInUse, server, port
+│   │   ├── EventDetectionParameters.cs       # isEventDetectionInUse, isStepLimitInUse,
+│   │   │                                   #   gamma, lowBorder
+│   │   ├── ResultSavingParameters.cs         # savingTarget (SaveTarget enum)
+│   │   ├── ResultProcessingParameters.cs     # isSimplifyInUse, selectedSimplifyMethod, tolerance
+│   │   ├── SimulationParameters.cs           # composite: cauchyInitials, eventDetection,
+│   │   │                                   #   integrationMethod, resultSaving
+│   │   ├── LismaTextModel.cs                 # fullText, regions (List<CodeRegion>)
+│   │   ├── CodeRegion.cs                     # name, startLine, endLine + fragmentNameByIndex()
+│   │   ├── BlueprintModel.cs                 # main, init, states[], transactions[], loopTransactions[]
+│   │   ├── BlueprintStateModel.cs            # canvasPositionX, canvasPositionY, name, text
+│   │   ├── BlueprintTransactionModel.cs      # startStateName, endStateName, predicate, alias
+│   │   ├── BlueprintLoopTransactionModel.cs  # stateName, predicate, alias, text
+│   │   ├── ErrorInfo.cs                      # row, position, fragmentName, message
+│   │   ├── InProgressSimulation.cs           # id, modelName, parameters, progress (0.0–1.0)
+│   │   ├── CompletedSimulation.cs            # id, modelName, equationIndexProvider, metricData,
+│   │   │                                   #   parameters, cachedFile, cachedColumnNames
+│   │   ├── WindowPreferences.cs              # x, y, width, height, isMaximized
+│   │   ├── DefaultFilesPreferences.cs        # lastOpenedProjectPath (string[])
+│   │   └── Preferences.cs                    # windowPreferences, defaultFilesPreferences
+│   ├── Dtos/                                 # DTOs for server communication
+│   │   ├── CompileResult.cs                  # modelId, errors (List<CompilationError>), warnings
+│   │   ├── ValidationResult.cs               # errors, warnings
+│   │   ├── CompilationError.cs               # row, column, message
+│   │   ├── SyntaxTokenDto.cs                 # start, length, kind (SyntaxTokenKind enum)
+│   │   ├── SyntaxTokenKind.cs                # Unspecified, Keyword, Comment, Number, Text
+│   │   ├── CachedSimulationResult.cs         # file (FileInfo), columnNames
+│   │   ├── RunSimulationParams.cs            # startTime, endTime, initialStep, methodName,
+│   │   │                                   #   accuracy, isAccuracyInUse, isStabilityControlInUse,
+│   │   │                                   #   compiledModelId, eventDetectionGamma, eventDetectionLowBorder
+│   │   └── SocketPaths.cs                    # grpc, http (Unix socket paths)
+│   ├── Conversion/
+│   │   └── BlueprintToLismaConverter.cs      # BlueprintModel → LismaTextModel (pure algorithm)
+│   │       ├── ConvertToLisma()              # Main flow: main text → transactions → loops
+│   │       ├── CreateTransactionKey()        # "{targetStateName} ({predicate})"
+│   │       └── StateBlockModel.cs            # Helper for state block generation
+│   ├── Contracts/                            # Service interfaces (implemented in Infrastructure)
+│   │   ├── ISimulationServerFacade.cs        # compile, validate, highlight, run, monitor,
+│   │   │                                   #   download, cancel, getMethods, shutdown
+│   │   ├── IEquationIndexProvider.cs         # getDifferentialEquationCount, getAlgebraicEquationCount,
+│   │   │                                   #   getDifferentialEquationCode, getAlgebraicEquationCode
+│   │   ├── ISimulationResultReader.cs        # Results (IEnumerable<SimulationPoint>)
+│   │   ├── ISyntaxHighlighter.cs             # Highlight(source) → List<SyntaxTokenDto>
+│   │   └── ITextEditorFactory.cs             # CreateTextEditor(text, onTextChanged), DisposeInstance
 │   └── ISMA.Domain.csproj
-├── ISMA.Infrastructure/             # gRPC, file I/O, external processes
+├── ISMA.Infrastructure/                      # gRPC, file I/O, external processes
 │   ├── Server/
-│   │   ├── SimulationServerManager.cs
-│   │   ├── SimulationServerFacade.cs
-│   │   ├── GrpcSimulationClient.cs
-│   │   ├── GrpcLismaCompilerClient.cs
-│   │   ├── HttpSimulationClient.cs
-│   │   ├── BinaryFilePointProvider.cs
-│   │   └── BinaryEquationIndexProvider.cs
+│   │   ├── SimulationServerManager.cs        # Process lifecycle, socket path parsing
+│   │   ├── SimulationServerFacade.cs         # Orchestration: compile, validate, run, monitor...
+│   │   ├── GrpcSimulationClient.cs           # gRPC client for SimulationServiceGrpc
+│   │   ├── GrpcLismaCompilerClient.cs        # gRPC client for LismaCompilerServiceGrpc
+│   │   ├── HttpSimulationClient.cs           # HTTP client for binary result downloads
+│   │   ├── BinaryFilePointProvider.cs        # Read binary results → IEnumerable<SimulationPoint>
+│   │   └── BinaryEquationIndexProvider.cs    # Parse column prefixes (DE_, AE_, f)
 │   ├── FileStorage/
-│   │   ├── ProjectFileService.cs
-│   │   └── PreferencesProvider.cs
+│   │   ├── ProjectFileService.cs             # Open/save projects by extension
+│   │   └── PreferencesProvider.cs            # preferences.json persistence
 │   ├── ChartViewer/
-│   │   └── GrinProcessLauncher.cs
+│   │   └── GrinProcessLauncher.cs            # Launch external chart viewer process
 │   └── ISMA.Infrastructure.csproj
-├── ISMA.ViewModels/                  # Presentation layer
-│   ├── ProjectViewModel.cs
-│   ├── LismaProjectViewModel.cs
-│   ├── BlueprintProjectViewModel.cs
-│   ├── SimulationParametersViewModel.cs
-│   ├── SimulationServiceViewModel.cs
-│   ├── SimulationResultViewModel.cs
-│   ├── ErrorListViewModel.cs
-│   ├── SettingsViewModels.cs
-│   ├── MainWindowViewModel.cs
-│   └── ISMA.ViewModels.csproj
-├── ISMA.App/                        # Avalonia UI
-│   ├── Views/
-│   │   ├── MainWindow.axaml
-│   │   ├── SettingsPanelView.axaml
-│   │   ├── EditorTabPaneView.axaml
-│   │   ├── IsmaTextEditorView.axaml
-│   │   ├── BlueprintEditorView.axaml
-│   │   ├── TasksPopOverView.axaml
-│   │   ├── IsmaErrorListTableView.axaml
-│   │   ├── SimulationProcessBarView.axaml
-│   │   ├── SelectVariablesDialog.axaml
-│   │   ├── EditArrowPopOverView.axaml
-│   │   └── Settings/
-│   │       ├── CauchyInitialsView.axaml
-│   │       ├── MethodSettingsView.axaml
-│   │       ├── EventDetectionView.axaml
-│   │       └── ResultProcessingView.axaml
-│   ├── ViewModels/                  # Thin view-specific viewmodels
-│   ├── Converters/
-│   ├── Controls/
-│   │   ├── BlueprintCanvasPanel.cs      # Custom Panel for canvas
-│   │   ├── StateBoxControl.axaml          # State box visual
-│   │   ├── ArrowShape.cs                  # Arrow geometry helpers
-│   │   └── PropertiesGrid.axaml           # Reusable property grid
-│   ├── Services/
-│   │   ├── TextEditorFactory.cs
-│   │   └── EditorPlatformService.cs
-│   ├── App.axaml
-│   ├── App.xaml.cs
-│   ├── Program.cs
-│   └── ISMA.App.csproj
-├── ISMA.Tests/                      # Test project
-│   ├── Domain/
-│   │   ├── SimulationParametersTests.cs
-│   │   ├── BlueprintModelTests.cs
-│   │   ├── BlueprintToLismaConversionTests.cs
-│   │   └── PreferencesTests.cs
+├── ISMA.ViewModels/                          # Presentation layer (UI-framework agnostic)
 │   ├── ViewModels/
-│   │   ├── SimulationServiceViewModelTests.cs
-│   │   ├── ProjectViewModelTests.cs
-│   │   └── SimulationParametersViewModelTests.cs
+│   │   ├── MainWindowViewModel.cs            # Projects, ActiveProject, 14 commands
+│   │   ├── IProjectViewModel.cs              # Name, File, EditorContent, NameChanged, Dispose
+│   │   ├── LismaProjectViewModel.cs          # LISMA text content, data provider bridge
+│   │   ├── BlueprintProjectViewModel.cs      # Blueprint model, convertToLisma integration
+│   │   ├── SimulationParametersViewModel.cs  # 5 parameter sections with snapshot/commit
+│   │   ├── SimulationServiceViewModel.cs     # Simulate(), StopSimulation(), TrackingTasks
+│   │   ├── SimulationResultViewModel.cs      # CommitResult(), ShowChart(), ExportToFile()
+│   │   ├── ErrorListViewModel.cs             # Errors collection, PutErrorList()
+│   │   ├── SettingsViewModels.cs             # CauchyInitialsVm, MethodSettingsVm,
+│   │   │                                   #   EventDetectionVm, ResultProcessingVm
+│   │   ├── BlueprintEditorViewModel.cs       # States, Transactions, Modes, Add/Remove operations
+│   │   ├── TasksPopOverViewModel.cs          # InProgress + Completed sections
+│   │   ├── SelectVariablesDialogViewModel.cs # XAxis, YAxis selection for chart viewer
+│   │   ├── EditArrowPopOverViewModel.cs      # Alias + Predicate for arrow editing
+│   │   └── InProgressSimulationViewModel.cs  # Id, ModelName, Progress, CanAbort
+│   ├── Services/                             # Presentation services (UI orchestration)
+│   │   ├── SimulationService.cs              # Orchestrates: snapshot → compile → run → monitor → download
+│   │   ├── SimulationResultService.cs        # Manages completed results, CSV export, chart launch
+│   │   ├── SimulationParametersService.cs    # Parameter state management, store/load
+│   │   ├── ProjectService.cs                 # Project collection management
+│   │   ├── ModelErrorService.cs              # Error list management
+│   │   ├── LismaPdeService.cs                # LISMA validation → Success/Failure
+│   │   ├── SyntaxHighlighterService.cs       # Delegates to server, maps token kinds
+│   │   └── TextEditorFactory.cs              # Creates/disposes AvalonEdit instances
+│   ├── Converters/
+│   │   ├── DoubleConverter.cs                # string ↔ double (with normalization)
+│   │   ├── IntegerConverter.cs               # string ↔ int (with normalization)
+│   │   ├── ProgressToPercentConverter.cs     # 0.0–1.0 → percentage
+│   │   ├── BoolToVisibilityConverter.cs      # bool → IsVisible binding
+│   │   └── SaveTargetConverter.cs            # SaveTarget enum → display string
+│   └── ISMA.ViewModels.csproj
+├── ISMA.App/                                 # Avalonia 12 UI
+│   ├── Views/
+│   │   ├── MainWindow.axaml                  # Main window: MenuBar, ToolBar, TabControl,
+│   │   │                                   #   SettingsPanel, ErrorList, ProcessBar
+│   │   ├── SettingsPanelView.axaml           # 4-tab settings panel
+│   │   ├── EditorTabPaneView.axaml           # TabControl bound to Projects collection
+│   │   ├── IsmaTextEditorView.axaml          # AvalonEdit TextEditor with syntax highlighting
+│   │   ├── BlueprintEditorView.axaml         # Canvas panel + toolbar + edit popover
+│   │   ├── TasksPopOverView.axaml            # In-progress + Completed sections
+│   │   ├── IsmaErrorListTableView.axaml      # DataGrid for errors
+│   │   ├── SimulationProcessBarView.axaml    # Play button + Tasks button
+│   │   ├── SelectVariablesDialog.axaml       # X-axis ComboBox + Y-axis CheckBoxList
+│   │   ├── EditArrowPopOverView.axaml        # Alias + Predicate text fields
+│   │   └── Settings/
+│   │       ├── CauchyInitialsView.axaml      # Start, End, Step
+│   │       ├── MethodSettingsView.axaml      # Method, Accurate, Accuracy, Stable, Parallel,
+│   │       │                                 #   Server, Port
+│   │       ├── EventDetectionView.axaml      # In use, Gamma, Step limit, Low border
+│   │       └── ResultProcessingView.axaml    # Save result (MEMORY/FILE), Simplify, Tolerance
+│   ├── Controls/
+│   │   ├── BlueprintCanvasPanel.cs           # Custom Panel: OnRender for states/arrows
+│   │   ├── PropertiesGrid.axaml              # Reusable label+control grid
+│   │   └── NumericCell.axaml                 # Custom DataGrid cell for row/position columns
+│   ├── Services/                             # UI-specific services (Avalonia dependencies)
+│   │   └── EditorPlatformService.cs          # Cut/Copy/Paste event propagation
+│   ├── ViewModels/                           # (Empty — all ViewModels in ISMA.ViewModels)
+│   ├── Converters/                           # (Empty — all converters in ISMA.ViewModels)
+│   ├── App.axaml                             # Fluent theme, resource dictionaries, styles
+│   ├── App.xaml.cs                           # DI registration, application lifecycle
+│   ├── Program.cs                            # Avalonia entry point
+│   └── ISMA.App.csproj
+├── ISMA.Tests/                               # xUnit + FluentAssertions + Moq
+│   ├── Domain/
+│   │   ├── SimulationParametersTests.cs      # Serialization, defaults, snapshot/commit
+│   │   ├── BlueprintModelTests.cs            # Empty model defaults, state/transaction creation
+│   │   ├── BlueprintToLismaConversionTests.cs # All conversion scenarios
+│   │   ├── PreferencesTests.cs               # Load/save, window geometry
+│   │   ├── SimulationPointTests.cs           # Equals/GetHashCode for arrays
+│   │   └── CodeRegionTests.cs                # Line range tracking, fragmentNameByIndex
+│   ├── ViewModels/
+│   │   ├── SimulationServiceViewModelTests.cs # Mock server: compile errors, success, progress, cancel
+│   │   ├── ProjectViewModelTests.cs          # Create/close projects, name changes, file save
+│   │   ├── SimulationParametersViewModelTests.cs # Snapshot captures, commit applies
+│   │   ├── ErrorListViewModelTests.cs        # Clear and repopulate
+│   │   ├── MainWindowViewModelTests.cs       # Commands exist and invoke
+│   │   ├── BlueprintEditorViewModelTests.cs  # Add/remove states and transitions
+│   │   └── BlueprintToLismaConversionViewModelTests.cs # ViewModel uses converter correctly
 │   └── ISMA.Tests.csproj
+├── Directory.Build.props                     # Common properties: nullable, analyzers, LangVersion
+├── Directory.Packages.props                  # Centralized package versions
 └── isma-ui-dotnet.sln
 ```
+
+---
+
+## Avalonia 12 Specifics
+
+The following Avalonia 12 features and changes must be used throughout:
+
+| Feature | Usage |
+|---------|-------|
+| **`.axaml` extension** | All XAML files use `.axaml`, not `.xaml` |
+| **Compiled bindings** | `<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>` in .csproj; `x:DataType` on all root elements |
+| **`IsVisible` (bool)** | Replace WPF `Visibility` enum — `IsVisible="False"` = Collapsed |
+| **`BoxShadow`** | CSS-like syntax on `Border` — replaces `DropShadowEffect` |
+| **Pseudo-classes** | `:pointerover`, `:pressed`, `:focus`, `:disabled` — replace WPF `Triggers` |
+| **Style classes** | `Classes="h1 primary"` — replace WPF `Style x:Key` |
+| **Container Queries** | `ContainerQuery` markup extension for responsive layouts |
+| **Control Themes** | `<ControlTheme>` for custom controls — replace implicit styles |
+| **`$parent[]` binding** | `{Binding $parent[Grid].Property}` — replace `RelativeSource AncestorType` |
+| **`#name` binding** | `{Binding #myControl.Text}` — replace `ElementName` |
+| **`$self` binding** | `{Binding $self.Property}` — replace `RelativeSource Self` |
+| **`OnFormFactor`** | Static platform detection: `{OnFormFactor Desktop='250,*', Mobile='*'}` |
+| **`AvaloniaUI.DiagnosticsSupport`** | Developer tools (NOT deprecated `Avalonia.Diagnostics`) |
+
+---
+
+## Unix Socket Cross-Platform Support
+
+The original uses Linux-only Netty Epoll for Unix Domain Sockets. The .NET implementation must be cross-platform:
+
+| Platform | gRPC Unix Socket | HTTP Unix Socket |
+|----------|-----------------|------------------|
+| **Linux** | `UnixDomainSocketEndPoint` | `UnixDomainSocketEndPoint` |
+| **Windows** | Named pipe (`Microsoft.IO.NamedPipeChannel`) | Named pipe |
+| **macOS** | `UnixDomainSocketEndPoint` | `UnixDomainSocketEndPoint` |
+
+Implementation: Create an `IUnixSocketHandler` abstraction in Infrastructure with platform-specific implementations. Use `Grpc.Net.Client` with a custom `HttpHandler` that selects the appropriate transport.
+
+---
+
+## Exchange-Format Binary Reader
+
+The original uses `ru.isma.next.exchange.format` for binary simulation result reading. This library must be **ported/reimplemented in .NET**:
+
+- `BinaryFilePointProvider` reads binary `.bin` files
+- Each record: `x` (double), `yForDe[]` (double[]), `rhs[][]` (double[][])
+- Metadata: column names, equation counts (DE_, AE_, f prefixes)
+- Stream as `IEnumerable<SimulationPoint>` for CSV export and chart display
 
 ---
 
@@ -153,165 +273,239 @@ isma-ui-dotnet/
 #### Steps
 
 1. Create .NET 10 solution with 5 projects (Domain, Infrastructure, ViewModels, App, Tests)
-2. Configure `Directory.Build.props` for common properties (nullable, analyzers, LangVersion)
-3. Add NuGet packages to each project:
+2. Configure `Directory.Build.props` for common properties (nullable enabled, analyzers, LangVersion=12)
+3. Configure `Directory.Packages.props` for centralized package version management
+4. Add NuGet packages:
    - **Domain:** None (pure POCOs)
-   - **Infrastructure:** `Grpc.Net.Client`, `Google.Protobuf`, `Grpc.Tools`, `System.IO.Pipelines`, `Microsoft.Extensions.Logging.Abstractions`
+   - **Infrastructure:** `Grpc.Net.Client`, `Grpc.Net.Client.Web`, `Google.Protobuf`, `Grpc.Tools`, `Microsoft.Extensions.Logging.Abstractions`, `System.IO.Pipelines`
    - **ViewModels:** `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection.Abstractions`
-   - **App:** `Avalonia.Themes.Fluent`, `Avalonia.Controls.DataGrid`, `Avalonia.Desktop`, `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection`, `ICSharpCode.AvalonEdit`, `System.Text.Json`
-   - **Tests:** `xunit`, `FluentAssertions`, `Moq`, `Microsoft.NET.Test.Sdk`, `coverlet.collector`
-4. Configure protobuf generation from `protobuf-contracts/simulation/`
-5. Set up DI registration in `App.axaml.cs`
-6. Create minimal `MainWindow` with empty content to verify the app runs
+   - **App:** `Avalonia.Themes.Fluent`, `Avalonia.Controls.DataGrid`, `Avalonia.Desktop`, `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection`, `ICSharpCode.AvalonEdit`, `AvaloniaUI.DiagnosticsSupport`, `Avalonia.Fonts.Inter`
+   - **Tests:** `xunit`, `xunit.runner.visualstudio`, `FluentAssertions`, `Moq`, `Microsoft.NET.Test.Sdk`, `coverlet.collector`
+5. Configure `Grpc.Tools` protobuf generation from `protobuf-contracts/simulation/`
+6. Set up DI registration skeleton in `App.xaml.cs` using `ServiceCollectionExtensions` pattern
+7. Create minimal `MainWindow.axaml` with empty content to verify the app runs
+8. Create `ViewLocator` for automatic View resolution from ViewModel type
 
 #### Acceptance Checklist
 
-- [ ] Solution builds with `dotnet build` (no warnings as errors yet)
-- [ ] `dotnet run` launches an empty Avalonia window
-- [ ] All 5 projects compile
+- [ ] Solution builds with `dotnet build` (zero errors)
+- [ ] `dotnet run` launches an empty Avalonia 12 window
+- [ ] All 5 projects compile (zero errors)
 - [ ] gRPC stubs generate correctly from protobuf contracts
 - [ ] DI container resolves `MainWindowViewModel`
 - [ ] Tests project compiles (no tests yet)
 - [ ] `.axaml` files compile (XAML validation passes)
+- [ ] `ViewLocator` resolves `MainWindowViewModel` → `MainWindow.axaml`
+- [ ] `Directory.Packages.props` centralizes all package versions
 
 ---
 
-### Phase 1: Domain Layer — Models & Interfaces
+### Phase 1: Domain Layer — Models, DTOs, Interfaces & Conversion Algorithm
 
-**Goal:** Implement all domain models and service interfaces. No UI dependencies.
+**Goal:** Implement all domain models, DTOs, service interfaces, and the pure `convertToLisma()` algorithm. Zero external dependencies.
 
 #### Steps
 
-1. **Simulation Models**
-   - `SimulationPoint` — x, yForDe (double[]), rhs (double[][])
-   - `SimulationProgress` — startTime, endTime, currentTime
-   - `SimulationResult` — raw data container
-   - `SimulationMetadata` — columnNames list
-   - `MetricData` — startTime, endTime, derived simulationTime
+1. **Simulation Models** (pure POCOs with `[JsonSerializable]` support)
+   - `SimulationPoint` — `double X`, `double[] YForDe`, `double[][] Rhs`
+     - Override `Equals`/`GetHashCode` using `SequenceEqual` for arrays
+   - `SimulationProgress` — `double StartTime`, `double EndTime`, `double CurrentTime`
+   - `SimulationMetadata` — `List<string> ColumnNames`
+   - `MetricData` — `long StartTime`, `long EndTime`, derived `SimulationTime`
 
 2. **Simulation Parameters Models**
-   - `CauchyInitials` — startTime, endTime, initialStep
-   - `IntegrationMethodParameters` — selectedMethod, accuracy, isAccuracyInUse, isStableInUse, isParallelInUse, server, port
-   - `EventDetectionParameters` — isEventDetectionInUse, isStepLimitInUse, gamma, lowBorder
-   - `ResultSavingParameters` — savingTarget (enum: Memory, File)
-   - `ResultProcessingParameters` — isSimplifyInUse, selectedSimplifyMethod, tolerance
-   - `SimulationParameters` — composite of all above
+   - `CauchyInitials` — `double StartTime`, `double EndTime`, `double InitialStep`
+   - `IntegrationMethodParameters` — `string SelectedMethod`, `double Accuracy`,
+     `bool IsAccuracyInUse`, `bool IsStableAllowedInUse`, `bool IsStableInUse`,
+     `bool IsParallelInUse`, `string Server`, `int Port`
+   - `EventDetectionParameters` — `bool IsEventDetectionInUse`, `bool IsStepLimitInUse`,
+     `double Gamma`, `double LowBorder`
+   - `ResultSavingParameters` — `SaveTarget SavingTarget` (enum: `Memory`, `File`)
+   - `ResultProcessingParameters` — `bool IsSimplifyInUse`, `string SelectedSimplifyMethod`,
+     `double Tolerance`
+   - `SimulationParameters` — composite of all above (serializable)
 
 3. **Project Models**
-   - `LismaTextModel` — fullText, CodeRegion list (line ranges for error mapping)
-   - `BlueprintModel` — main, init, states[], transactions[], loopTransactions[]
-   - `BlueprintStateModel` — canvasPositionX, canvasPositionY, name, text
-   - `BlueprintTransactionModel` — startStateName, endStateName, predicate, alias
-   - `BlueprintLoopTransactionModel` — stateName, predicate, alias, text
+   - `LismaTextModel` — `string FullText`, `List<CodeRegion> Regions`
+     - Static `DefaultFragment` (CodeRegion with name "Main", lines 0–0)
+     - `FragmentNameByIndex(int index)` method
+   - `CodeRegion` — `string Name`, `int StartLine`, `int EndLine`
+   - `BlueprintModel` — `BlueprintStateModel Main`, `BlueprintStateModel Init`,
+     `BlueprintStateModel[] States`, `BlueprintTransactionModel[] Transactions`,
+     `BlueprintLoopTransactionModel[] LoopTransactions`
+     - Static `Empty` property matching original defaults (Main at 10,10; Init at 10,100)
+   - `BlueprintStateModel` — `double CanvasPositionX`, `double CanvasPositionY`,
+     `string Name`, `string Text`
+   - `BlueprintTransactionModel` — `string StartStateName`, `string EndStateName`,
+     `string Predicate`, `string Alias = ""`
+   - `BlueprintLoopTransactionModel` — `string StateName`, `string Predicate`,
+     `string Alias = ""`, `string Text`
 
 4. **UI Models**
-   - `ErrorViewModel` — row, position, fragmentName, message
-   - `InProgressSimulation` — id, modelName, parameters, progress (0.0–1.0)
-   - `CompletedSimulation` — id, modelName, cachedFile, columnNames, parameters, equationIndexProvider, metricData
+   - `ErrorInfo` — `int Row`, `int Position`, `string FragmentName`, `string Message`
+   - `InProgressSimulation` — `int Id`, `string ModelName`, `SimulationParameters Parameters`,
+     `double Progress` (0.0–1.0)
+   - `CompletedSimulation` — `int Id`, `string ModelName`, `IEquationIndexProvider EquationIndexProvider`,
+     `MetricData MetricData`, `SimulationParameters Parameters`, `string CachedFile`,
+     `List<string> CachedColumnNames`
 
 5. **Preferences Models**
-   - `WindowPreferences` — x, y, width, height, isMaximized
-   - `DefaultFilesPreferences` — lastOpenedProjectPath (string[])
-   - `PreferencesModel` — windowPreferences, defaultFilesPreferences
+   - `WindowPreferences` — `double X`, `double Y`, `double Width`, `double Height`, `bool IsMaximized`
+   - `DefaultFilesPreferences` — `string[] LastOpenedProjectPath`
+   - `Preferences` — `WindowPreferences WindowPreferences`, `DefaultFilesPreferences DefaultFilesPreferences`
 
-6. **Service Interfaces** (in `ISMA.Domain.Services`)
-   - `ISimulationServerFacade` — compile, validate, highlight, runSimulation, monitorSimulation, downloadResult, cancelSimulation, getSimulationMethods, shutdown
-   - `IProjectService` — createNew, createNewBlueprint, close, closeAll, projects collection, activeProject
-   - `ISimulationService` — simulate, stopSimulation, trackingTasks collection
-   - `ISimulationResultService` — commitResult, removeResult, showChart, exportToFile, trackingTasksResults collection
-   - `ISimulationParametersService` — store, load, snapshot, commit, integrationMethods, simplifyMethods
-   - `IModelErrorService` — errors collection, putErrorList
-   - `ILismaPdeService` — validate (returns Success/Failure)
-   - `IProjectFileService` — open, save, saveAs
-   - `IPreferencesProvider` — load, save, preferences property
-   - `ITextEditorFactory` — createTextEditor, disposeInstance
-   - `IEquationIndexProvider` — getDifferentialEquationCount, getAlgebraicEquationCount, getDifferentialEquationCode, getAlgebraicEquationCode
-   - `ISimulationResultReader` — results (IEnumerable<SimulationPoint>)
+6. **DTOs** (for server communication)
+   - `CompileResult` — `string ModelId`, `List<CompilationError> Errors`, `List<string> Warnings`
+   - `ValidationResult` — `List<CompilationError> Errors`, `List<string> Warnings`
+   - `CompilationError` — `int Row`, `int Column`, `string Message`
+   - `SyntaxTokenDto` — `int Start`, `int Length`, `SyntaxTokenKind Kind`
+   - `SyntaxTokenKind` — `Unspecified`, `Keyword`, `Comment`, `Number`, `Text`
+   - `CachedSimulationResult` — `string File`, `List<string> ColumnNames`
+   - `RunSimulationParams` — `double StartTime`, `double EndTime`, `double InitialStep`,
+     `string MethodName`, `double Accuracy`, `bool IsAccuracyInUse`,
+     `bool IsStabilityControlInUse`, `string CompiledModelId`,
+     `double? EventDetectionGamma`, `double? EventDetectionLowBorder`
+   - `SocketPaths` — `string Grpc`, `string Http`
+
+7. **Conversion Algorithm** (pure algorithm, no dependencies)
+   - `BlueprintToLismaConverter.ConvertToLisma(BlueprintModel)` → `LismaTextModel`
+   - **Algorithm:**
+     1. Start with main state text as base content
+     2. Process transactions: group by target state + predicate, create `state "key" { ... } from start1, start2, ...;` blocks
+     3. Process loop transactions: create pseudo-state pattern
+        - `state <name>_pseudo_1 (<predicate>) { ... } from <state>;`
+        - `state <name> (1 > 0) { ... } from <pseudo_1>;`
+     4. Track `CodeRegion` for each generated fragment (line numbers)
+     5. Return `LismaTextModel` with full text and regions list
+   - Helper: `CreateTransactionKey(targetState, predicate)` → `"{targetState} ({predicate})"`
+   - Helper: `StateBlockModel` — builds state block string with proper formatting
+
+8. **Service Interfaces** (in `Contracts/`, implemented in Infrastructure and ViewModels)
+   - `ISimulationServerFacade` — `CompileModel(source) → CompileResult`, `ValidateModel(source) → ValidationResult`,
+     `HighlightSource(source) → SyntaxTokenDto[]`, `RunSimulation(params) → long`,
+     `MonitorSimulation(id) → IAsyncEnumerable<SimulationProgress>`,
+     `DownloadResult(id) → CachedSimulationResult`, `CancelSimulation(id) → void`,
+     `GetSimulationMethods() → string[]`, `Shutdown() → void`
+   - `IEquationIndexProvider` — `GetDifferentialEquationCount()`, `GetAlgebraicEquationCount()`,
+     `GetDifferentialEquationCode(index)`, `GetAlgebraicEquationCode(index)`
+   - `ISimulationResultReader` — `Results` (IEnumerable<SimulationPoint>)
+   - `ISyntaxHighlighter` — `Highlight(source) → SyntaxTokenDto[]`
+   - `ITextEditorFactory` — `CreateTextEditor(text, onTextChanged)`, `DisposeInstance(editor)`
 
 #### Acceptance Checklist
 
-- [ ] All domain model classes compile with no dependencies on external libraries
-- [ ] All interfaces are defined and consistent with original Kotlin interfaces
-- [ ] `SimulationPoint` uses `double[]` and `double[][]` with proper `Equals`/`GetHashCode`
-- [ ] `BlueprintModel` has an `Empty` static property matching original defaults
-- [ ] `SaveTarget` enum has Memory and File values
-- [ ] `SimulationParameters` is serializable with `System.Text.Json`
-- [ ] CodeRegion class tracks startLine and endLine
-- [ ] `dotnet build ISMA.Domain` produces zero errors
-- [ ] Domain models pass JSON serialization round-trip test
+- [ ] All domain model classes compile with zero dependencies on external libraries
+- [ ] All DTOs compile (no dependencies)
+- [ ] `SimulationPoint.Equals`/`GetHashCode` work correctly for arrays
+- [ ] `BlueprintModel.Empty` matches original defaults exactly (Main at 10,10; Init at 10,100)
+- [ ] `SaveTarget` enum has `Memory` and `File` values
+- [ ] `SimulationParameters` serializes and deserializes correctly with `System.Text.Json`
+- [ ] `CodeRegion.FragmentNameByIndex()` works correctly
+- [ ] `BlueprintToLismaConverter.ConvertToLisma()` produces correct LISMA text for:
+  - [ ] Empty blueprint (Main + init only)
+  - [ ] Single state with content
+  - [ ] Multiple states with regular transitions
+  - [ ] Loop transitions (pseudo-state pattern)
+  - [ ] Multiple transitions to same target with same predicate (merge behavior)
+- [ ] `dotnet build ISMA.Domain` produces zero errors and zero warnings
+- [ ] All DTOs pass JSON serialization round-trip test
 
 ---
 
 ### Phase 2: Infrastructure Layer — Server Communication
 
-**Goal:** Implement gRPC client, HTTP client, server lifecycle management, and binary result reading.
+**Goal:** Implement gRPC client, HTTP client, server lifecycle management, and binary result reading. All interfaces from Domain.Contracts are implemented.
 
 #### Steps
 
 1. **SimulationServerManager**
    - Resolve script path from `ISMA_SERVER_SCRIPT` env var or `isma.server.script` config key
-   - Launch server as child process
-   - Parse stdout for gRPC socket path and HTTP socket path
-   - Register shutdown hook to stop server
-   - Return `SocketPaths` tuple (grpc, http)
+   - Launch server as child process via `ProcessBuilder`
+   - Parse stdout: skip `WARNING:`, `SLF4J:`, blank, log-prefixed lines
+   - Extract gRPC socket path from first non-skipped line
+   - Extract HTTP socket path from line containing `HTTP_SOCKET=`
+   - Return `SocketPaths(grpc, http)`
+   - Register shutdown hook to stop server on process exit
+   - Cross-platform: use `ProcessStartInfo` with proper argument escaping
 
-2. **GrpcSimulationClient**
-   - Use `Grpc.Net.Client` with custom `HttpHandler` for Unix Domain Socket
-   - Implement `RunSimulation`, `MonitorSimulation` (server streaming), `DownloadResult`, `CancelSimulation`, `GetSimulationMethods`
-   - Cross-platform Unix socket support (no Linux-only epoll dependency)
+2. **Unix Socket Handler** (cross-platform abstraction)
+   - `IUnixSocketHandler` interface
+   - `LinuxUnixSocketHandler` — uses `UnixDomainSocketEndPoint`
+   - `WindowsNamedPipeHandler` — uses named pipes
+   - `MacUnixSocketHandler` — uses `UnixDomainSocketEndPoint`
+   - Factory selects handler based on `RuntimeInformation.IsOSPlatform()`
 
-3. **GrpcLismaCompilerClient**
-   - `CompileModel` — returns modelId + errors + warnings
-   - `ValidateModel` — returns errors + warnings
-   - `HighlightSource` — returns list of SyntaxToken (start, length, kind)
-   - `DeleteCompiledModel`
+3. **GrpcSimulationClient**
+   - Use `Grpc.Net.Client` with custom `HttpHandler` wrapping the Unix socket handler
+   - `RunSimulation(params) → long` — blocking call
+   - `MonitorSimulation(id) → IAsyncEnumerable<SimulationProgress>` — server streaming
+   - `DownloadResult(id) → string downloadUrl` — returns URL for HTTP download
+   - `CancelSimulation(id) → void` — blocking call
+   - `GetSimulationMethods() → string[]` — blocking call
 
-4. **HttpSimulationClient**
-   - Download result file from server-provided URL to temp directory
-   - Create cache directory `<temp>/isma-simulation-cache/`
+4. **GrpcLismaCompilerClient**
+   - `CompileModel(source) → CompileResult` — modelId + errors + warnings
+   - `ValidateModel(source) → ValidationResult` — errors + warnings
+   - `HighlightSource(source) → SyntaxTokenDto[]` — token positions and kinds
+   - `DeleteCompiledModel(modelId) → void`
 
-5. **SimulationServerFacade**
-   - Orchestrate all three clients
-   - `warmup()` — start server, create clients
-   - `shutdown()` — dispose all
-   - `compileModel(source)` → `CompileResult`
-   - `validateModel(source)` → `ValidationResult`
-   - `runSimulation(params)` → `long simulationId`
-   - `monitorSimulation(id)` → `IAsyncEnumerable<SimulationProgress>`
-   - `downloadResultToCache(id)` → `CachedSimulationResult`
-   - `cancelSimulation(id)`
-   - `getSimulationMethods()` → `string[]`
+5. **HttpSimulationClient**
+   - `DownloadResultToFile(downloadUrl, destinationPath) → FileInfo`
+   - Create cache directory `<temp>/isma-simulation-cache/` if not exists
+   - Use `HttpClient` with proper timeout
 
-6. **BinaryFilePointProvider**
-   - Read binary result files using exchange-format library (port from Java)
-   - Stream points as `IEnumerable<SimulationPoint>`
-   - Parse metadata (column names, equation counts)
+6. **SimulationServerFacade** (implements `ISimulationServerFacade`)
+   - `Warmup()` — start server, create all clients
+   - `Shutdown()` — dispose all clients and stop server
+   - `CompileModel(source) → CompileResult`
+   - `ValidateModel(source) → ValidationResult`
+   - `HighlightSource(source) → SyntaxTokenDto[]`
+   - `RunSimulation(params) → long`
+   - `MonitorSimulation(id) → IAsyncEnumerable<SimulationProgress>`
+   - `DownloadResult(id) → CachedSimulationResult` — gets URL from gRPC, downloads via HTTP
+   - `CancelSimulation(id) → void`
+   - `GetSimulationMethods() → string[]`
 
-7. **BinaryEquationIndexProvider**
-   - Parse column name prefixes (DE_, AE_, f) to derive equation info
-   - Implement `IEquationIndexProvider`
+7. **BinaryFilePointProvider** (implements `ISimulationResultReader`)
+   - Read binary result files using ported exchange-format library
+   - Each record: `x` (double), `yForDe[]` (double[]), `rhs[][]` (double[][])
+   - Stream as `IEnumerable<SimulationPoint>`
+   - Parse metadata: column names, equation counts
+   - Static `ReadMetadata(file) → SimulationMetadata`
 
-8. **GrinProcessLauncher**
-   - Resolve script from `ISMA_GRIN_SCRIPT` or config
-   - Launch with args: `--result-file`, `--x-axis`, `--charts`
+8. **BinaryEquationIndexProvider** (implements `IEquationIndexProvider`)
+   - Parse column name prefixes: `DE_` (differential), `AE_` (algebraic), `f` (forcing)
+   - `GetDifferentialEquationCount()` — count DE_ columns
+   - `GetAlgebraicEquationCount()` — count AE_ columns
+   - `GetDifferentialEquationCode(index)` — return column name for DE at index
+   - `GetAlgebraicEquationCode(index)` — return column name for AE at index
+
+9. **GrinProcessLauncher**
+   - Resolve script from `ISMA_GRIN_SCRIPT` env var or `isma.grin.script` config key
+   - `Launch(resultFile, xAxisColumn, chartColumns)` — starts Grin via `ProcessBuilder`
+   - Arguments: `--result-file <path>`, `--x-axis <name>`, `--charts <names>`
+   - Register shutdown hook to destroy process
 
 #### Acceptance Checklist
 
 - [ ] `SimulationServerManager` starts and stops the server process correctly
-- [ ] gRPC client connects via Unix Domain Socket
-- [ ] `warmup()` successfully initializes all clients
-- [ ] `compileModel()` returns CompileResult with modelId and errors
-- [ ] `validateModel()` returns ValidationResult
-- [ ] `highlightSource()` returns token list with correct positions and kinds
-- [ ] `runSimulation()` returns a simulation ID
-- [ ] `monitorSimulation()` streams progress updates
-- [ ] `downloadResultToCache()` saves binary file to cache directory
-- [ ] `cancelSimulation()` stops a running simulation
-- [ ] `getSimulationMethods()` returns available method names
-- [ ] `BinaryFilePointProvider` reads binary files and yields SimulationPoints
-- [ ] `BinaryEquationIndexProvider` correctly parses column prefixes
-- [ ] `GrinProcessLauncher` launches the chart viewer process
+- [ ] Socket path parsing handles all output formats (WARNING, SLF4J, blank lines)
+- [ ] gRPC client connects via Unix Domain Socket (Linux) or named pipes (Windows)
+- [ ] `Warmup()` successfully initializes all clients
+- [ ] `Shutdown()` cleanly disposes all clients and stops server
+- [ ] `CompileModel()` returns `CompileResult` with modelId and errors
+- [ ] `ValidateModel()` returns `ValidationResult`
+- [ ] `HighlightSource()` returns token list with correct positions and kinds
+- [ ] `RunSimulation()` returns a simulation ID
+- [ ] `MonitorSimulation()` streams progress updates as `IAsyncEnumerable`
+- [ ] `DownloadResult()` saves binary file to cache directory
+- [ ] `CancelSimulation()` stops a running simulation
+- [ ] `GetSimulationMethods()` returns available method names
+- [ ] `BinaryFilePointProvider` reads binary files and yields `SimulationPoint`s
+- [ ] `BinaryEquationIndexProvider` correctly parses DE_, AE_, f column prefixes
+- [ ] `GrinProcessLauncher` launches the chart viewer process with correct arguments
 - [ ] Shutdown hook terminates server on process exit
+- [ ] Cross-platform: Unix socket handler works on Linux (primary)
 
 ---
 
@@ -322,123 +516,214 @@ isma-ui-dotnet/
 #### Steps
 
 1. **ProjectFileService**
-   - Open: File picker → read file → determine type by extension (`.iscm2` → LISMA, `.scisma` → Blueprint, `.im` → legacy text)
-   - Save: Write project content to file (LISMA text or JSON for blueprint)
-   - Save As: Same as Save but with new file picker
-   - Save All: Iterate all projects, save each
+   - `Open(ownerWindow) → List<string> filePaths` — FileDialog with filters:
+     - `All ISMA Files` (`.iscm2`, `.scisma`, `.im`)
+     - `LISMA Text` (`.iscm2`)
+     - `State Chart` (`.scisma`)
+     - `Legacy` (`.im`)
+   - `Open(paths) → List<ProjectType>` — dispatches by extension:
+     - `.iscm2` → LISMA text project
+     - `.scisma` → Blueprint project (JSON-encoded `BlueprintModel`)
+     - `.im` → Legacy text project (backward compatibility, TODO)
+   - `Save(project) → bool` — writes project content to file
+     - LISMA text → write `FullText` to file
+     - Blueprint → serialize `BlueprintModel` to JSON
+   - `SaveAs(project) → bool` — same as Save but with FileDialog
+   - `SaveAll(projects) → bool` — iterate all projects, save each
 
 2. **PreferencesProvider**
-   - Load `preferences.json` from app data directory
-   - Save `WindowPreferences` and `DefaultFilesPreferences`
+   - Resolve settings file path from config (default: app data directory + `preferences.json`)
+   - `Load() → Preferences` — deserialize JSON
+   - `Save(preferences) → void` — serialize JSON
+   - `CommitWindow(WindowPreferences) → void` — update and persist
+   - `CommitFiles(DefaultFilesPreferences) → void` — update and persist
    - Restore last opened file paths on startup
 
-3. **SimulationParametersService**
-   - Manage default values (Cauchy: 0.0/10.0/0.1, Integration: accuracy 0.1, etc.)
-   - `store()` → File picker → serialize to JSON
-   - `load()` → File picker → deserialize from JSON
-   - `snapshot()` → create `SimulationParameters` model
-   - `commit(model)` → apply model to internal state
-   - `integrationMethods` and `simplifyMethods` from server
+3. **SimulationParametersService** (presentation service in ViewModels layer)
+   - Default values:
+     - Cauchy: `StartTime=0.0`, `EndTime=10.0`, `InitialStep=0.1`
+     - Integration: `Accuracy=0.1`, `Server="localhost"`, `Port=7890`
+     - Event Detection: `Gamma=0.8`, `LowBorder=0.001`
+   - `Store(ownerWindow) → bool` — FileDialog → serialize `SimulationParameters` to JSON
+   - `Load(ownerWindow) → bool` — FileDialog → deserialize from JSON
+   - `Snapshot() → SimulationParameters` — capture all viewmodel state
+   - `Commit(model) → void` — apply model to all viewmodel state
+   - `IntegrationMethods` — populated from server (set after Phase 2)
+   - `SimplifyMethods` — hardcoded: `["Radial-Distance", "Douglas-Peucker"]`
 
 #### Acceptance Checklist
 
-- [ ] Opening `.iscm2` file creates a text project
-- [ ] Opening `.scisma` file creates a blueprint project
-- [ ] Opening `.im` file creates a legacy text project
-- [ ] Saving a project writes correct format
+- [ ] Opening `.iscm2` file reads and returns file path
+- [ ] Opening `.scisma` file reads and returns file path
+- [ ] Opening `.im` file reads and returns file path (legacy, backward compat)
+- [ ] Save writes correct format for LISMA text projects
+- [ ] Save writes correct JSON format for blueprint projects
 - [ ] Preferences persist across app restarts
 - [ ] Last opened files are restored on startup
 - [ ] Window geometry is saved and restored
 - [ ] Store Settings saves parameters to JSON
 - [ ] Load Settings restores parameters from JSON
-- [ ] Default values match original application
+- [ ] Default values match original application exactly
 
 ---
 
-### Phase 4: ViewModels — Core Presentation Layer
+### Phase 4: ViewModels — Presentation Layer
 
-**Goal:** Implement all ViewModels using CommunityToolkit.Mvvm. These are UI-framework agnostic and fully testable.
+**Goal:** Implement all ViewModels and presentation services using CommunityToolkit.Mvvm. These are UI-framework agnostic and fully testable.
 
 #### Steps
 
 1. **MainWindowViewModel**
-   - `Projects` observable collection of `IProjectViewModel`
-   - `ActiveProject` property
-   - `ShowSettings` property (bind to settings panel visibility)
-   - Commands: `NewTextCommand`, `NewBlueprintCommand`, `OpenCommand`, `SaveCommand`, `SaveAllCommand`, `CloseCommand`, `CloseAllCommand`, `ExitCommand`, `CutCommand`, `CopyCommand`, `PasteCommand`, `VerifyCommand`, `RunCommand`, `StoreSettingsCommand`, `LoadSettingsCommand`
+   - `ObservableCollection<IProjectViewModel> Projects`
+   - `IProjectViewModel? ActiveProject`
+   - `bool ShowSettings` (binds to settings panel visibility)
+   - Commands (via `[RelayCommand]`):
+     - `NewText()` — delegates to `ProjectService.CreateNew("New project")`
+     - `NewBlueprint()` — delegates to `ProjectService.CreateNewBlueprint("New statechart")`
+     - `Open()` — delegates to `ProjectFileService.Open()`
+     - `Save()` — delegates to `ProjectFileService.Save(ActiveProject)`
+     - `SaveAll()` — delegates to `ProjectFileService.SaveAll(Projects)`
+     - `Close()` — delegates to `ProjectService.Close(ActiveProject)`
+     - `CloseAll()` — delegates to `ProjectService.CloseAll()`
+     - `Exit()` — closes application
+     - `Cut()` — delegates to `EditorPlatformService.Cut()`
+     - `Copy()` — delegates to `EditorPlatformService.Copy()`
+     - `Paste()` — delegates to `EditorPlatformService.Paste()`
+     - `Verify()` — delegates to `LismaPdeService.Validate(ActiveProject)`
+     - `Run()` — delegates to `SimulationService.Simulate()`
+     - `StoreSettings()` — delegates to `SimulationParametersService.Store()`
+     - `LoadSettings()` — delegates to `SimulationParametersService.Load()`
 
-2. **ProjectViewModel** (base interface + implementations)
-   - `IProjectViewModel` — Name, File, EditorContent (object), NameChanged event, Dispose
-   - `LismaProjectViewModel` — LISMA text content, data provider integration
-   - `BlueprintProjectViewModel` — Blueprint model, convertToLisma integration
+2. **ProjectViewModel** (interface + implementations)
+   - `IProjectViewModel` — `string Name`, `string? FilePath`, `object EditorContent`,
+     `event Action? NameChanged`, `void Dispose()`
+   - `LismaProjectViewModel` — wraps `LismaTextModel`, integrates with data provider
+   - `BlueprintProjectViewModel` — wraps `BlueprintModel`, integrates with `convertToLisma()`
 
-3. **SimulationServiceViewModel**
-   - `TrackingTasks` observable collection of `InProgressSimulationViewModel`
+3. **Data Provider Bridges** (per-project scoped)
+   - `LismaProjectDataProvider` — bridge between `LismaProjectViewModel` and text editor
+     - `string Text` — getter reads from editor, setter writes to editor
+   - `BlueprintProjectDataProvider` — bridge between `BlueprintProjectViewModel` and blueprint editor
+     - `BlueprintModel Blueprint` — getter/setter
+
+4. **SimulationService** (presentation service)
+   - `ObservableCollection<InProgressSimulationViewModel> TrackingTasks`
    - `Simulate()` — orchestrates full simulation flow:
-     1. Snapshot parameters from `SimulationParametersViewModel`
-     2. Get active project source
-     3. Call `serverFacade.compileModel()`
-     4. Report errors to `ModelErrorService`
-     5. Call `serverFacade.runSimulation()`
-     6. Monitor progress → update `InProgressSimulationViewModel.progress`
-     7. Download result → create `CompletedSimulationViewModel`
-     8. Commit to `SimulationResultService`
-   - `StopSimulation()` — cancel running simulation
+     1. Snapshot parameters from `SimulationParametersService`
+     2. Get active project source text
+     3. Call `serverFacade.CompileModel(source)`
+     4. Map compilation errors to `ErrorInfo` and call `ModelErrorService.PutErrorList(errors)`
+     5. Call `serverFacade.RunSimulation(params)` → `simulationId`
+     6. Start monitoring: `serverFacade.MonitorSimulation(id)` → stream progress
+     7. For each progress update: normalize to 0.0–1.0, update `InProgressSimulationViewModel.Progress`
+     8. Call `serverFacade.DownloadResult(id)` → `CachedSimulationResult`
+     9. Create `CompletedSimulation` and call `SimulationResultService.CommitResult()`
+     10. Remove from `TrackingTasks`
+   - `StopSimulation(InProgressSimulationViewModel)` — call `serverFacade.CancelSimulation()`
+   - Uses `Task.Run` or `Channels` for background execution (no virtual threads in .NET)
 
-4. **SimulationResultViewModel**
-   - `TrackingTasksResults` observable collection
-   - `CommitResult()` — add completed simulation
-   - `RemoveResult()` — remove from collection
-   - `ShowChart()` — open axis picker, launch Grin
-   - `ExportToFile()` — async CSV export
+5. **SimulationResultService** (presentation service)
+   - `ObservableCollection<CompletedSimulation> TrackingTasksResults`
+   - `CommitResult(CompletedSimulation)` — add to collection (thread-safe)
+   - `RemoveResult(CompletedSimulation)` — remove from collection
+   - `ShowChart(CompletedSimulation)` — open axis picker dialog, launch Grin with selected axes
+   - `ExportToFile(CompletedSimulation, filePath)` — async CSV export:
+     - Header: `x, [DE column names], [AE column names], f0, f1, ..., fN`
+     - Stream points from `BinaryFilePointProvider`
+     - Write to buffered `StreamWriter` on background thread
 
-5. **SimulationParametersViewModel**
-   - `CauchyInitials` — StartTime, EndTime, Step (double, INPC)
-   - `IntegrationMethod` — SelectedMethod, Accuracy, IsAccuracyInUse, IsStableInUse, IsParallelInUse, Server, Port
-   - `EventDetection` — IsEventDetectionInUse, IsStepLimitInUse, Gamma, LowBorder
-   - `ResultSaving` — SavingTarget (enum)
-   - `ResultProcessing` — IsSimplifyInUse, SelectedSimplifyMethod, Tolerance
-   - `IntegrationMethods` — observable collection of strings
-   - Snapshot/commit pattern
+6. **SimulationParametersViewModel**
+   - `CauchyInitials` — `double StartTime`, `double EndTime`, `double Step`
+   - `IntegrationMethod` — `string SelectedMethod`, `double Accuracy`, `bool IsAccuracyInUse`,
+     `bool IsStableAllowedInUse`, `bool IsStableInUse`, `bool IsParallelInUse`, `string Server`, `int Port`
+   - `EventDetection` — `bool IsEventDetectionInUse`, `bool IsStepLimitInUse`, `double Gamma`, `double LowBorder`
+   - `ResultSaving` — `SaveTarget SavingTarget`
+   - `ResultProcessing` — `bool IsSimplifyInUse`, `string SelectedSimplifyMethod`, `double Tolerance`
+   - `ObservableCollection<string> IntegrationMethods`
+   - `Snapshot() → SimulationParameters` — capture all properties
+   - `Commit(SimulationParameters) → void` — apply all properties
 
-6. **ErrorListViewModel**
-   - `Errors` observable collection of `ErrorViewModel`
-   - `PutErrorList()` — replace collection
+7. **ErrorListViewModel**
+   - `ObservableCollection<ErrorInfo> Errors`
+   - `PutErrorList(IEnumerable<ErrorInfo>)` — clear and add all
 
-7. **Settings ViewModels** (derived from SimulationParametersViewModel)
-   - `CauchyInitialsViewModel` — bound to CauchyInitials properties
-   - `MethodSettingsViewModel` — bound to IntegrationMethod properties + method list
-   - `EventDetectionViewModel` — bound to EventDetection properties
-   - `ResultProcessingViewModel` — bound to ResultProcessing properties
+8. **Settings ViewModels** (derive from SimulationParametersViewModel)
+   - `CauchyInitialsViewModel` — bound to `CauchyInitials` properties
+   - `MethodSettingsViewModel` — bound to `IntegrationMethod` properties + method list
+   - `EventDetectionViewModel` — bound to `EventDetection` properties
+   - `ResultProcessingViewModel` — bound to `ResultProcessing` properties
 
-8. **InProgressSimulationViewModel**
-   - `Id`, `ModelName`, `Parameters`
-   - `Progress` (0.0–1.0, INPC)
-   - `CanAbort` property
+9. **BlueprintEditorViewModel**
+   - `ObservableCollection<BlueprintStateViewModel> States`
+   - `ObservableCollection<BlueprintTransactionViewModel> Transactions`
+   - `ObservableCollection<BlueprintLoopTransactionViewModel> LoopTransactions`
+   - `BlueprintEditorMode CurrentMode` (enum: Default, AddTransition, RemoveState, RemoveTransition)
+   - `AddState(double x, double y)` — create state at position
+   - `AddTransition(BlueprintStateViewModel source, BlueprintStateViewModel target)` — create arrow
+   - `RemoveState(BlueprintStateViewModel state)` — remove state and all associated arrows
+   - `RemoveTransition(BlueprintTransactionViewModel arrow)` — remove arrow
+   - `RemoveLoop(BlueprintLoopTransactionViewModel arrow)` — remove loop arrow
+   - `GetBlueprintModel() → BlueprintModel` — serialize canvas to model
+   - `SetBlueprintModel(BlueprintModel model) → void` — restore from model
+   - `ResetEditorMode()` — clear all modes
 
-9. **CompletedSimulationViewModel**
-   - `Id`, `ModelName`, `Parameters`, `CachedFile`, `ColumnNames`, `MetricData`
-   - `EquationIndexProvider` for column name access
+10. **BlueprintStateViewModel**
+    - `double CanvasPositionX`, `double CanvasPositionY`
+    - `string Name`
+    - `string Text`
+    - `bool IsEditable`
+    - `bool IsMain`, `bool IsInit`
+    - `Color FillColor` (LightGreen for Main, LightBlue for Init, Coral for user)
+
+11. **BlueprintTransactionViewModel**
+    - `BlueprintStateViewModel StartState`, `BlueprintStateViewModel EndState`
+    - `string Predicate`, `string Alias`
+
+12. **BlueprintLoopTransactionViewModel**
+    - `BlueprintStateViewModel State`
+    - `string Predicate`, `string Alias`, `string Text`
+
+13. **TasksPopOverViewModel**
+    - `ObservableCollection<InProgressSimulationViewModel> InProgress`
+    - `ObservableCollection<CompletedSimulation> Completed`
+    - Properties for UI binding
+
+14. **SelectVariablesDialogViewModel**
+    - `ObservableCollection<string> AllColumns`
+    - `string SelectedXAxis` (pre-select "TIME")
+    - `ObservableCollection<NamedPickerItem> YAxisItems`
+    - `ICommand SelectAllCommand`, `ICommand UnselectAllCommand`, `ICommand OkCommand`, `ICommand CloseCommand`
+
+15. **EditArrowPopOverViewModel**
+    - `string Alias`
+    - `string Predicate`
+
+16. **InProgressSimulationViewModel**
+    - `int Id`, `string ModelName`, `SimulationParameters Parameters`
+    - `double Progress` (0.0–1.0, `[ObservableProperty]`)
+    - `bool CanAbort`
 
 #### Acceptance Checklist
 
 - [ ] All ViewModels inherit from `ObservableObject` (CommunityToolkit.Mvvm)
-- [ ] All collections use `ObservableCollection<T>` or `ObservableCollection`
-- [ ] All commands use `[RelayCommand]` or `ICommand`
-- [ ] `MainWindowViewModel` has all 14 menu/toolbar commands
-- [ ] `SimulationServiceViewModel.Simulate()` implements full flow
-- [ ] Progress updates propagate via INPC from background task
+- [ ] All properties use `[ObservableProperty]` or `[NotifyPropertyChangedFor]`
+- [ ] All commands use `[RelayCommand]`
+- [ ] `MainWindowViewModel` has all 15 commands (NewText, NewBlueprint, Open, Save, SaveAll, Close, CloseAll, Exit, Cut, Copy, Paste, Verify, Run, StoreSettings, LoadSettings)
+- [ ] `SimulationService.Simulate()` implements full flow with proper error handling
+- [ ] Progress updates propagate via `[ObservableProperty]` from background task
 - [ ] `SimulationParametersViewModel` has all 5 parameter sections
 - [ ] `ErrorListViewModel` supports clearing and repopulating
+- [ ] `BlueprintEditorViewModel` has all 4 editor modes
+- [ ] `SelectVariablesDialogViewModel` has axis selection logic
 - [ ] `CompletedSimulationViewModel` exposes column names for axis picker
-- [ ] ViewModels have no Avalonia dependencies
+- [ ] ViewModels have zero Avalonia dependencies
 - [ ] `dotnet build ISMA.ViewModels` produces zero errors
 
 ---
 
 ### Phase 5: Tests — Domain & ViewModels
 
-**Goal:** Write unit tests for all business logic. UI layer is not tested directly (it's a thin presentation layer).
+**Goal:** Write unit tests for all business logic. UI layer is not tested directly.
 
 #### Steps
 
@@ -450,10 +735,10 @@ isma-ui-dotnet/
      - Single state with content
      - Multiple states with regular transitions
      - Loop transitions (pseudo-state pattern)
-     - Multiple transitions to same target (merge behavior)
+     - Multiple transitions to same target with same predicate (merge behavior)
    - `PreferencesTests` — load/save preferences, window geometry persistence
    - `SimulationPointTests` — Equals/GetHashCode for arrays
-   - `CodeRegionTests` — line range tracking
+   - `CodeRegionTests` — line range tracking, `FragmentNameByIndex()`
 
 2. **ViewModel Tests** (`ISMA.Tests.ViewModels`)
    - `SimulationServiceViewModelTests` — simulate flow (mock server facade):
@@ -465,6 +750,8 @@ isma-ui-dotnet/
    - `SimulationParametersViewModelTests` — snapshot captures current values, commit applies values
    - `ErrorListViewModelTests` — errors are cleared and repopulated
    - `MainWindowViewModelTests` — commands exist and can be invoked
+   - `BlueprintEditorViewModelTests` — add/remove states and transitions
+   - `BlueprintToLismaConversionViewModelTests` — ViewModel uses converter correctly
 
 #### Acceptance Checklist
 
@@ -478,62 +765,81 @@ isma-ui-dotnet/
 
 ---
 
-### Phase 6: UI — Application Shell, Menu, Toolbar, and Simple Views
+### Phase 6: UI — Application Shell, Menu, Toolbar, Settings, and Error List
 
-**Goal:** Build the main window layout, menu bar, toolbar, settings panel, and error list. These are the simplest UI components.
+**Goal:** Build the main window layout, menu bar, toolbar, settings panel, error list, and process bar. These are the simplest UI components.
 
 #### Steps
 
-1. **App.axaml** — Global styling, Fluent theme, resource dictionaries
-2. **MainWindow.axaml** — BorderPane layout:
-   - Top: MenuBar + ToolBar
-   - Center: ContentControl for EditorTabPane
-   - Right: ContentControl for SettingsPanel (bind IsVisible)
-   - Bottom: ErrorList + SimulationProcessBar
+1. **App.axaml**
+   - Fluent theme: `<FluentTheme />`
+   - Resource dictionaries merged from `Converters/`, `Controls/`, `Styles/`
+   - Global styles: fonts, colors, pseudo-class hover effects
+   - `x:CompileBindings="True"` on Application root
 
-3. **Menu Bar** (`IsmaMenuBarView`)
+2. **MainWindow.axaml**
+   - BorderPane layout:
+     - Top: `MenuBar` + `ToolBar`
+     - Center: `ContentControl` bound to `EditorTabPaneView`
+     - Right: `ContentControl` bound to `SettingsPanelView` (IsVisible bound to `ShowSettings`)
+     - Bottom: `ErrorList` (collapsible drawer) + `SimulationProcessBar`
+   - Minimum size: `MinWidth="500" MinHeight="600"`
+   - Title: `"ISMA"`
+   - `x:DataType="vm:MainWindowViewModel"`
+
+3. **MenuBar** (`IsmaMenuBarView`)
    - File menu: New Text (Ctrl+N), New Statechart (Ctrl+B), Open (Ctrl+O), Save (Ctrl+S), Save As, Save All, Close, Close All, Exit (Ctrl+W)
    - Edit menu: Cut (Ctrl+X), Copy (Ctrl+C), Paste (Ctrl+V)
    - Simulation menu: Verify (Ctrl+F4), Run (Ctrl+F5), Store Settings, Load Settings
-   - All commands bound to `MainWindowViewModel`
+   - All commands bound to `MainWindowViewModel` via compiled bindings
+   - Accelerators: `InputBindings` for keyboard shortcuts
 
-4. **Tool Bar** (`IsmaToolBarView`)
-   - Icon buttons with Material Design icons (use Avalonia icon pack or inline SVG)
+4. **ToolBar** (`IsmaToolBarView`)
+   - Icon buttons: New model, New statechart, Open model, Save current, Save all, Cut, Copy, Paste, Verify, Store Settings, Load Settings
+   - Material Design icons (use `Avalonia.MaterialDesign` or inline SVG)
    - Same commands as menu bar
    - Separators between logical groups
 
-5. **Settings Panel** (`SettingsPanelView` + sub-views)
-   - TabControl with 4 tabs: Initials, Integration, Event Detection, Result Processing
+5. **Settings Panel** (`SettingsPanelView`)
+   - `TabControl` with 4 tabs: Initials, Integration, Event Detection, Result Processing
    - Each tab uses `PropertiesGrid` for label+control rows
-   - Bind to `SimulationParametersViewModel`
+   - Bind to `SimulationParametersViewModel` via compiled bindings
+   - Width: 240px per tab content
 
 6. **PropertiesGrid** (custom reusable control)
    - Grid layout: label on left, control on right
-   - Support for Double, Integer, String, Boolean, Enum, ComboBox
-   - Two-way binding support
+   - Support for: `Double`, `Integer`, `String`, `Boolean`, `Enum`, `ComboBox`
+   - Two-way binding support via compiled bindings
+   - Conditional visibility: fields disabled when parent checkbox is unchecked
 
 7. **Error List** (`IsmaErrorListTableView`)
    - `DataGrid` bound to `ErrorListViewModel.Errors`
    - Columns: Row (5%), Position (5%), Fragment (10%), Message (80%)
+   - Custom `NumericCell` for Row and Position columns (formatted as integers)
    - Auto-resize columns
 
 8. **Simulation Process Bar** (`SimulationProcessBarView`)
-   - Play button (RunCommand) + Tasks button (toggle TasksPopOver)
+   - `StackPanel` (horizontal) with:
+     - Play button (RunCommand) — Material Design `play_arrow` icon
+     - Tasks button — opens `TasksPopOverView` as a `Popup`
+   - Located at bottom of window
 
 #### Acceptance Checklist
 
 - [ ] MainWindow displays with all regions (top, center, right, bottom)
 - [ ] Menu bar shows all items with correct shortcuts
 - [ ] Toolbar shows all buttons with icons
-- [ ] Commands execute ViewModel methods (no code-behind logic)
+- [ ] Commands execute ViewModel methods (zero business logic in code-behind)
 - [ ] Settings panel shows all 4 sections with correct controls
 - [ ] PropertiesGrid renders label+control rows correctly
 - [ ] Error list DataGrid displays errors with correct column widths
 - [ ] Process bar shows play button and tasks button
-- [ ] Settings panel visibility toggles correctly
+- [ ] Settings panel visibility toggles correctly via `ShowSettings` binding
 - [ ] Window minimum size is 500×600
 - [ ] Window title is "ISMA"
-- [ ] No business logic in any code-behind file
+- [ ] No business logic in any code-behind file (only `InitializeComponent()`)
+- [ ] All bindings use compiled bindings (`x:DataType`)
+- [ ] Pseudo-classes used for hover/pressed states on buttons
 
 ---
 
@@ -544,48 +850,53 @@ isma-ui-dotnet/
 #### Steps
 
 1. **Editor Tab Pane** (`EditorTabPaneView`)
-   - `TabControl` bound to `MainWindowViewModel.Projects`
-   - Each tab shows project name and editor content
+   - `TabControl` bound to `MainWindowViewModel.Projects` via `ItemsSource`
+   - `DataTemplate` for `IProjectViewModel` → shows `EditorContent`
    - Tab close → `CloseCommand` for that project
    - Tab selection → sets `ActiveProject`
+   - Tab title bound to project `Name`
+   - Unsaved indicator: asterisk in tab title when project has unsaved changes
 
 2. **LISMA Text Editor** (`IsmaTextEditorView`)
-   - Use `ICSharpCode.AvalonEdit` TextEditor control
-   - Monospace font (Consolas/Courier New)
-   - Line numbers enabled
+   - Use `ICSharpCode.AvalonEdit` `TextEditor` control
+   - Monospace font: `FontFamily="Consolas"` or `Courier New`
+   - `FontOptions = { FontRenderingEmSize = 12 }`
+   - `ShowLineNumbers = true`
    - Syntax highlighting via `TextEditor.SyntaxHighlighting`
-   - Syntax highlighting definition for LISMA:
+   - LISMA syntax highlighting definition:
      - Keywords → orange, bold
      - Comments → gray, italic
      - Numbers → blue
-   - Syntax computed server-side via `highlightSource()` gRPC call
-   - Apply highlighting spans on text change with debouncing
-   - Cut/Copy/Paste via `EditorPlatformService`
+   - Syntax computed server-side via `HighlightSource()` gRPC call
+   - Apply highlighting spans on text change with debouncing (100ms)
+   - Cut/Copy/Paste via `EditorPlatformService` integration
 
-3. **EditorPlatformService**
-   - Expose events for Cut/Copy/Paste
+3. **EditorPlatformService** (UI-specific service)
+   - Expose `Action? CutRequested`, `CopyRequested`, `PasteRequested` events
    - Propagate clipboard commands from menu/toolbar to focused editor
+   - AvalonEdit has built-in cut/copy/paste — wire events to `TextEditor.Cut()`, `Copy()`, `Paste()`
 
-4. **TextEditorFactory**
+4. **TextEditorFactory** (in App.Services)
    - Create `TextEditor` instances for blueprint state text editing
    - Dispose instances on tab close
-   - Wire up text change callbacks
+   - Wire up text change callbacks via `TextEditor.TextArea.TextChanged` event
 
 5. **File Operations**
-   - Open dialog with filters: `.iscm2`, `.scisma`, `.im`, all files
-   - Save dialog with type-specific filter
-   - Save All iterates all projects
-   - Unsaved project indicator in tab title
+   - Open dialog: `FileDialog` with filters (`.iscm2`, `.scisma`, `.im`)
+   - Save dialog: `FileDialog` with type-specific filter
+   - Save All: iterate all projects, save each
+   - Unsaved changes: track `bool IsDirty` in project viewmodel, show asterisk in tab title
 
 6. **Window State Persistence**
-   - Save window geometry on closing
-   - Restore on startup
+   - Save window geometry on `Closing` event
+   - Restore on startup from `PreferencesProvider`
    - Save last opened file paths
 
 #### Acceptance Checklist
 
 - [ ] Multiple tabs can be opened simultaneously
 - [ ] Tab titles show project names (filename if saved, "New project" otherwise)
+- [ ] Unsaved changes indicated with asterisk in tab title
 - [ ] Closing a tab disposes the project
 - [ ] AvalonEdit renders LISMA source code correctly
 - [ ] Line numbers display on left margin
@@ -596,7 +907,6 @@ isma-ui-dotnet/
 - [ ] Cut/Copy/Paste work via menu, toolbar, and keyboard
 - [ ] Open dialog filters files correctly by extension
 - [ ] Save writes correct format for each project type
-- [ ] Unsaved changes are indicated (e.g., asterisk in tab title)
 - [ ] Window geometry persists across restarts
 - [ ] Last opened files restore on startup
 
@@ -604,111 +914,111 @@ isma-ui-dotnet/
 
 ### Phase 8: UI — Blueprint Editor (Complex Canvas)
 
-**Goal:** Implement the visual statechart editor with canvas rendering, state boxes, transition arrows, and all interaction modes. This is the most complex UI component.
+**Goal:** Implement the visual statechart editor with canvas rendering, state boxes, transition arrows, loop arrows, edit popover, and all interaction modes. This is the most complex UI component.
 
 #### Steps
 
 1. **BlueprintCanvasPanel** (custom `Panel`)
    - Override `MeasureOverride` and `ArrangeOverride` for absolute positioning
    - Render states and arrows via `OnRender` (direct drawing for performance)
-   - Handle pointer events for drag, click, and double-click
-   - Scroll support via `ScrollViewer` wrapper
+   - Handle pointer events: `PointerPressed`, `PointerMoved`, `PointerReleased`, `PointerDoubleClicked`
+   - Scroll support via `ScrollViewer` wrapper in AXAML
+   - Coordinate clamping: `max(position, 0.0)` — negative coordinates forbidden
 
-2. **State Box Rendering**
-   - Rounded rectangles (CornerRadius = 20)
-   - Main state: LightGreen fill, fixed position (20, 10)
-   - Init state: LightBlue fill, fixed position (10, 100)
-   - User states: Coral fill, draggable
-   - Text label (Arial 16pt) centered in box
-   - Inline name editing: TextBox overlay on single-click (200ms delay to distinguish from drag)
-   - Double-click → open text editor tab
+2. **State Box Rendering** (in `OnRender`)
+   - Rounded rectangles: `DrawRoundedRectangle(fill, pen, rect, 20, 20)`
+   - Main state: `#90EE90` (LightGreen) fill, fixed position (20, 10)
+   - Init state: `#ADD8E6` (LightBlue) fill, fixed position (10, 100)
+   - User states: `#F08080` (Coral) fill, draggable
+   - Text label: `DrawText(font, point, name)` — Arial 16pt, centered
+   - Inline name editing: `TextBox` overlay on single-click (200ms `DispatcherTimer` delay)
+   - Double-click → open text editor tab via `ITextEditorFactory`
 
-3. **Transition Arrow Rendering**
+3. **Transition Arrow Rendering** (in `OnRender`)
    - Straight line from source state center to target state center
-   - Offset endpoints to avoid overlapping state borders (offset = 10px)
-   - Arrowhead polygon (14×14 isosceles triangle)
-   - Label (alias or predicate) offset perpendicular from line midpoint
-   - Geometry updates when state positions change
+   - Offset endpoints: `offsetDistance = 10.0`, perpendicular to line
+   - Arrowhead: `DrawPolygon(polygonPoints)` — 14×14 isosceles triangle
+   - Label: `DrawText(font, labelPosition, displayedText)` — alias if present, else predicate
+   - Geometry updates when state positions change (re-render on position change)
 
-4. **Loop Arrow Rendering**
-   - Circle (radius 40) above the state
-   - Arrowhead pointing back to the state
-   - Label to the right of the circle
-   - Double-click arrowhead → open text editor tab with "{stateName} (loop)"
+4. **Loop Arrow Rendering** (in `OnRender`)
+   - Circle: `DrawEllipseGeometry(rect)` with radius 40
+   - Arrowhead pointing back to state
+   - Label to the right of circle (X offset 120, Y offset -10)
+   - Double-click arrowhead → open text editor tab with `"{stateName} (loop)"`
 
 5. **Edit Arrow PopOver** (`EditArrowPopOverView`)
-   - Floating panel with DropShadow effect
-   - Two text fields: Alias (optional) and Predicate
-   - Bidirectional binding to arrow properties
-   - Auto-dismiss on mouse exit
+   - `Border` with `BoxShadow` effect (radius 20, color `#D3D3D3`)
+   - `CornerRadius="5"`, `Padding="10"`, `MinWidth="300"`
+   - `StackPanel` with two `TextBox` fields: Alias (optional) and Predicate
+   - Bidirectional binding to `EditArrowPopOverViewModel`
+   - Auto-dismiss on `PointerExited` event
 
 6. **Interaction Modes** (managed by `BlueprintEditorViewModel`)
+   - `BlueprintEditorMode` enum: `Default`, `AddTransition`, `RemoveState`, `RemoveTransition`
    - Default mode: drag states, click to edit names, double-click for text
-   - Add transition mode: click source, click target (or same state for loop)
-   - Remove state mode: click state to delete
+   - Add transition mode: click source state, click target state (same state = loop)
+   - Remove state mode: click state to delete (Main/Init can be clicked but no removal handler)
    - Remove transition mode: click arrow to delete
    - Mutually exclusive modes via toggle buttons
 
 7. **Blueprint Editor Toolbar**
-   - Bottom toolbar with 4 buttons: New State, New Transition, Remove State, Remove Transition
-   - Toggle buttons with mode-specific text
+   - Bottom `StackPanel` (horizontal) with 4 buttons:
+     - New State — creates state at (10, 200)
+     - New Transition / Stop adding transaction — toggle button
+     - Remove state / Stop remove state — toggle button
+     - Remove transition / Stop remove transition — toggle button
+   - Separator between "add" group and "remove" group
 
-8. **State Box Control**
-   - Visual representation of a state (rendered in canvas)
-   - Hit testing for pointer events
-   - Name editing state machine (label ↔ TextBox)
+8. **NameChangingMonitor** (in ViewModels layer)
+   - `HashSet<string> ExistedNames`
+   - `int NextNameCounter = 1`
+   - `TryRegister(name) → bool` — returns false if duplicate
+   - `TryUnregister(name) → bool` — removes from registry
+   - `CreateNextDefaultName() → string` — returns `"New state N"`
+   - Name edit rollback: save `previousName`, restore on duplicate
 
-9. **NameChangingMonitor** (in Domain or ViewModel layer)
-   - Track registered state names
-   - Prevent duplicate names
-   - Auto-increment default name counter ("New state N")
-   - Rollback on duplicate during name edit
+9. **Blueprint-to-LISMA Integration**
+   - `BlueprintProjectViewModel.Snapshot()` calls `BlueprintToLismaConverter.ConvertToLisma(BlueprintModel)`
+   - Returns `LismaTextModel` with full text and `CodeRegion` list
+   - Used by simulation service for compilation
 
-10. **Blueprint Editor ViewModel**
-    - `States` collection
-    - `Transactions` collection
-    - `LoopTransactions` collection
-    - `CurrentMode` property
-    - `AddState()`, `AddTransition(source, target)`, `RemoveState()`, `RemoveTransition()`
-    - `GetBlueprintModel()` — serialize canvas to model
-    - `SetBlueprintModel(model)` — restore from model
-
-11. **Blueprint-to-LISMA Conversion** (in Domain layer)
-    - Main state text → base content
-    - Regular transitions → `state "key" { ... } from start1, start2, ...;`
-    - Loop transitions → pseudo-state pattern
-    - Merge transitions to same target with same predicate
-    - Track CodeRegions for error mapping
+10. **State Content Editing**
+    - Double-click state → `ITextEditorFactory.CreateTextEditor(state.Text, onTextChanged)`
+    - New tab named after state, content bound to state text
+    - Tab close → `ITextEditorFactory.DisposeInstance(editor)`
+    - Double-click loop arrowhead → tab named `"{stateName} (loop)"`
 
 #### Acceptance Checklist
 
 - [ ] Canvas renders Main (green) and Init (blue) states at correct positions
-- [ ] User states render as Coral rounded rectangles
-- [ ] States are draggable with mouse
+- [ ] User states render as Coral rounded rectangles (CornerRadius=20)
+- [ ] States are draggable with mouse (PointerPressed → PointerMoved → PointerReleased)
 - [ ] Dragging updates arrow positions in real-time
-- [ ] Arrow geometry connects state centers correctly
+- [ ] Arrow geometry connects state centers correctly (offset 10px perpendicular)
 - [ ] Arrowhead rotates to match line angle
-- [ ] Loop arrows render as circles with arrowheads
-- [ ] New State button creates a state at (10, 200)
+- [ ] Loop arrows render as circles (radius 40) with arrowheads
+- [ ] New State button creates a state at (10, 200) with auto-generated name
 - [ ] New Transition mode: click two states → arrow created
 - [ ] New Transition mode: click same state twice → loop arrow created
 - [ ] Remove State mode: click state → state and arrows deleted
 - [ ] Remove Transition mode: click arrow → arrow deleted
-- [ ] Modes are mutually exclusive (toggle buttons)
-- [ ] Inline name editing works (single-click, 200ms delay)
-- [ ] Duplicate names are prevented
+- [ ] Modes are mutually exclusive (toggle buttons call ResetEditorMode)
+- [ ] Inline name editing works (single-click, 200ms DispatcherTimer delay)
+- [ ] Duplicate names are prevented (NameChangingMonitor)
 - [ ] Duplicate names rollback to previous name
 - [ ] Double-click state → text editor tab opens
 - [ ] Double-click loop arrowhead → text editor tab with "(loop)" suffix
 - [ ] Edit Arrow PopOver opens on arrow click
 - [ ] PopOver fields bind bidirectionally to arrow properties
-- [ ] PopOver dismisses on mouse exit
+- [ ] PopOver dismisses on PointerExited
 - [ ] `GetBlueprintModel()` serializes canvas correctly
 - [ ] `SetBlueprintModel()` restores canvas from model
 - [ ] Blueprint-to-LISMA produces correct output for all scenarios
-- [ ] Main/Init states can be removed in remove mode (replicating original behavior)
 - [ ] Canvas scrolls when content exceeds viewport
 - [ ] No state can be placed at negative coordinates
+- [ ] Duplication prevention: no duplicate transitions between same states
+- [ ] Duplication prevention: only one loop arrow per state
 
 ---
 
@@ -719,34 +1029,39 @@ isma-ui-dotnet/
 #### Steps
 
 1. **Tasks PopOver** (`TasksPopOverView`)
-   - Two sections: "In Progress" and "Completed"
-   - In-progress items: task label, progress bar, abort button
-   - Completed items: task label, Show button, Export button, Remove button, Details chevron
-   - Details chevron → nested PopOver with simulation metadata
+   - `Popup` anchored to Tasks button
+   - Two sections: "In progress" and "Completed"
+   - In-progress items: task label (`TextBlock`), progress bar (`ProgressBar`), abort button
+   - Completed items: task label, Show button, Export button, Remove button, Details chevron (`TextBlock` with "⋯")
+   - Details chevron → nested `Popup` with simulation metadata
 
-2. **Select Variables Dialog** (`SelectVariablesDialog`)
-   - X-axis ComboBox (pre-select TIME)
-   - Y-axis ListView with checkboxes (multi-select)
-   - Select All / Unselect All buttons
-   - Ok / Close buttons
+2. **Select Variables Dialog** (`SelectVariablesDialog.axaml`)
+   - `Window` or `ContentDialog` with:
+     - X-axis: `ComboBox` bound to `AllColumns`, `SelectedXAxis` pre-selected to "TIME"
+     - Y-axis: `ListBox` with `CheckBox` for each column (multi-select)
+     - Select All / Unselect All buttons
+     - Ok / Close buttons
+   - Bound to `SelectVariablesDialogViewModel`
+   - Ok command returns selected axes
 
-3. **Simulation Result Service**
+3. **Simulation Result Service** (presentation service)
    - `CommitResult()` — add to completed list
    - `RemoveResult()` — remove from list
-   - `ShowChart(result)` — open axis picker, launch Grin with selected axes
+   - `ShowChart(result)` — open axis picker dialog, launch Grin with selected axes
    - `ExportToFile(result, filePath)` — async CSV export:
      - Header: `x, [DE columns], [AE columns], f0, f1, ...`
      - Stream points from `BinaryFilePointProvider`
-     - Write to buffered writer
+     - Write to buffered `StreamWriter` on background thread
 
 4. **Grin Process Launcher Integration**
-   - Launch Grin with binary file path, X-axis, and Y-axis arguments
-   - Resolve script from config
+   - `GrinProcessLauncher.Launch(resultFile, xAxisColumn, chartColumns)`
+   - Resolve script from config (same as Phase 2)
 
 5. **CSV Export**
-   - File picker for output path (filter `*.csv`)
-   - Background task for non-blocking export
+   - `FileDialog` for output path (filter `*.csv`)
+   - Background task: `Task.Run(() => ExportToFileAsync(...))`
    - Use `BinaryFilePointProvider` to stream points
+   - Non-blocking: UI remains responsive during export
 
 #### Acceptance Checklist
 
@@ -761,7 +1076,7 @@ isma-ui-dotnet/
 - [ ] Select All / Unselect All work correctly
 - [ ] Ok launches Grin chart viewer
 - [ ] Export button opens file picker
-- [ ] CSV export writes correct format
+- [ ] CSV export writes correct format (header + data rows)
 - [ ] CSV export runs asynchronously (non-blocking)
 - [ ] Details PopOver shows simulation metadata
 - [ ] Remove button removes entry from completed list
@@ -777,33 +1092,50 @@ isma-ui-dotnet/
 #### Steps
 
 1. **Styling & Theming**
-   - Consistent color palette matching original (Main=LightGreen, Init=LightBlue, User=Coral)
+   - Consistent color palette matching original:
+     - Main state: `#90EE90` (LightGreen)
+     - Init state: `#ADD8E6` (LightBlue)
+     - User states: `#F08080` (Coral)
+     - Arrow lines: `#000000` (Black)
+     - PopOver background: `#FFFFFF` (White)
+     - PopOver shadow: `#D3D3D3` (LightGray)
    - Fluent theme integration
-   - Custom accent colors if needed
+   - Custom accent colors in `App.axaml` if needed
+   - Pseudo-class styles for hover/pressed/disabled states
 
 2. **Keyboard Shortcuts**
-   - Verify all shortcuts work (Ctrl+N, Ctrl+B, Ctrl+O, Ctrl+S, Ctrl+W, Ctrl+X, Ctrl+C, Ctrl+V, Ctrl+F4, Ctrl+F5)
-   - Cross-platform: Cmd on macOS
+   - Verify all shortcuts work:
+     - `Ctrl+N` / New text
+     - `Ctrl+B` / New Statechart
+     - `Ctrl+O` / Open
+     - `Ctrl+S` / Save
+     - `Ctrl+W` / Exit
+     - `Ctrl+X` / Cut
+     - `Ctrl+C` / Copy
+     - `Ctrl+V` / Paste
+     - `Ctrl+F4` / Verify
+     - `Ctrl+F5` / Run
+   - Cross-platform: `Cmd` on macOS (Avalonia handles this automatically via `InputBindings`)
 
 3. **Window Management**
-   - Minimum size enforcement (500×600)
-   - State persistence (position, size, maximized)
-   - Multiple monitor support
+   - Minimum size enforcement (`MinWidth="500" MinHeight="600"`)
+   - State persistence (position, size, maximized) via `PreferencesProvider`
+   - Multiple monitor support (Avalonia handles this automatically)
 
 4. **Error Handling**
-   - Server not found → user-friendly error dialog
+   - Server not found → user-friendly error dialog (Avalonia `MessageBox`)
    - gRPC errors → displayed in error list
    - File I/O errors → error dialogs
    - Simulation failures → error messages in tasks
 
 5. **Performance**
-   - Blueprint canvas rendering performance (test with 50+ states)
-   - Text editor responsiveness with large files
-   - CSV export progress feedback
+   - Blueprint canvas rendering: test with 50+ states (OnRender should be efficient)
+   - Text editor: test with 1000+ line files
+   - CSV export: verify non-blocking behavior
 
 6. **Cross-Platform Testing**
    - Linux (primary development platform)
-   - Windows (gRPC Unix socket support)
+   - Windows (gRPC Unix socket / named pipe support)
    - macOS (Unix socket support)
 
 7. **Documentation**
@@ -817,7 +1149,7 @@ isma-ui-dotnet/
 - [ ] All keyboard shortcuts work correctly
 - [ ] Window respects minimum size
 - [ ] Window state persists across restarts
-- [ ] Server connection errors are handled gracefully
+- [ ] Server connection errors are handled gracefully (error dialog)
 - [ ] Compilation errors display in error list
 - [ ] Blueprint canvas handles 50+ states without lag
 - [ ] Text editor handles 1000+ line files smoothly
@@ -825,7 +1157,7 @@ isma-ui-dotnet/
 - [ ] App runs on Linux
 - [ ] App runs on Windows
 - [ ] App runs on macOS
-- [ ] All tests pass
+- [ ] All tests pass (`dotnet test` 100% green)
 - [ ] Documentation is complete
 
 ---
@@ -834,40 +1166,45 @@ isma-ui-dotnet/
 
 | Original (Java/Kotlin) | Replacement (.NET/C#) | Notes |
 |------------------------|----------------------|-------|
-| JavaFX Application | Avalonia `Application` | Entry point, lifecycle |
-| JavaFX Stage/Scene | Avalonia `Window` | Main window |
-| JavaFX BorderPane | Avalonia `BorderPane` or `Grid` | Layout |
-| JavaFX TabPane | Avalonia `TabControl` | Tab management |
-| JavaFX TableView | Avalonia `DataGrid` (NuGet) | Error list table |
-| JavaFX CodeArea (fxmisc.richtext) | AvalonEdit `TextEditor` | LISMA text editing |
-| JavaFX Pane (canvas) | Avalonia `Panel` (custom) | Blueprint canvas |
-| JavaFX Rectangle | Avalonia `Rectangle` + `CornerRadius` | State boxes |
-| JavaFX Line | Avalonia `Path` with `LineGeometry` | Arrow shafts |
-| JavaFX Polygon | Avalonia `Path` with `PathGeometry` | Arrowheads |
-| JavaFX Circle | Avalonia `Ellipse` | Loop arrows |
-| JavaFX VBox/HBox | Avalonia `StackPanel` | PopOver layout |
-| JavaFX ToolBar | Avalonia `StackPanel` (horizontal) | Bottom toolbar |
-| JavaFX PopOver | Avalonia `Popup` or custom overlay | Edit popover, tasks |
-| JavaFX DropShadow | Avalonia `BoxShadow` on `Border` | PopOver shadow |
+| JavaFX `Application` | Avalonia `Application` | Entry point, lifecycle |
+| JavaFX `Stage`/`Scene` | Avalonia `Window` | Main window |
+| JavaFX `BorderPane` | Avalonia `BorderPane` | Layout |
+| JavaFX `TabPane` | Avalonia `TabControl` | Tab management |
+| JavaFX `TableView` | Avalonia `DataGrid` (NuGet) | Error list table |
+| JavaFX `CodeArea` (fxmisc.richtext) | AvalonEdit `TextEditor` | LISMA text editing |
+| JavaFX `Pane` (canvas) | Avalonia `Panel` (custom) | Blueprint canvas |
+| JavaFX `Rectangle` | Avalonia `Rectangle` + `CornerRadius` | State boxes |
+| JavaFX `Line` | Avalonia `Path` with `LineGeometry` | Arrow shafts |
+| JavaFX `Polygon` | Avalonia `Path` with `PathGeometry` | Arrowheads |
+| JavaFX `Circle` | Avalonia `Ellipse` | Loop arrows |
+| JavaFX `VBox`/`HBox` | Avalonia `StackPanel` | PopOver layout |
+| JavaFX `ToolBar` | Avalonia `StackPanel` (horizontal) | Bottom toolbar |
+| JavaFX `PopOver` (ControlsFX) | Avalonia `Popup` | Edit popover, tasks |
+| JavaFX `DropShadow` | Avalonia `BoxShadow` on `Border` | PopOver shadow |
 | Koin DI | Microsoft.Extensions.DependencyInjection | Dependency injection |
-| TornadoFX ViewModel | CommunityToolkit.Mvvm `ObservableObject` | MVVM base class |
-| JavaFX Properties | CommunityToolkit.Mvvm `[ObservableProperty]` | Property change notification |
+| TornadoFX `ViewModel` | CommunityToolkit.Mvvm `ObservableObject` | MVVM base class |
+| JavaFX `Simple*Property` | CommunityToolkit.Mvvm `[ObservableProperty]` | Property change notification |
 | Kotlin Coroutines | C# `async`/`await` + `Task` | Concurrency |
-| Kotlin Flow | C# `IAsyncEnumerable` / `ObservableCollection` | Reactive collections |
+| Kotlin `Flow` | C# `IAsyncEnumerable` / `ObservableCollection` | Reactive collections |
 | gRPC-Java (Netty Epoll) | Grpc.Net.Client (cross-platform) | gRPC client |
-| Ktor CIO HTTP | `HttpClient` (built-in) | HTTP client |
+| Ktor CIO HTTP | `System.Net.Http.HttpClient` | HTTP client |
 | kotlinx.serialization | System.Text.Json | JSON serialization |
-| JavaFX ObservableList | `ObservableCollection<T>` | Reactive collections |
-| JavaFX FileChooser | Avalonia `FileDialog` | File dialogs |
-| JavaFX Preferences | File-based JSON storage | Preferences persistence |
+| JavaFX `ObservableList` | `ObservableCollection<T>` | Reactive collections |
+| JavaFX `FileChooser` | Avalonia `FileDialog` | File dialogs |
+| JavaFX `Preferences` | File-based JSON storage | Preferences persistence |
+| TornadoFX `drawer` | Avalonia `TabControl` or `StackPanel` | Settings panel |
+| Ikonli (Material Design) | Avalonia.MaterialDesign or inline SVG | Icons |
+| fxmisc.richtext | ICSharpCode.AvalonEdit | Rich text editing |
 
----## Business Features Inventory
+---
 
-All features from the original application that must be implemented:
+## Business Features Inventory
+
+All 31 features from the original application that must be implemented:
 
 | # | Feature | Phase | Complexity |
 |---|---------|-------|------------|
-| 1 | Multi-project editing (tabs) | 6 | Low |
+| 1 | Multi-project editing (tabs) | 7 | Low |
 | 2 | LISMA text editing with syntax highlighting | 7 | Medium |
 | 3 | Remote syntax highlighting (server-driven) | 7 | Medium |
 | 4 | Visual statechart (blueprint) editing | 8 | High |
@@ -876,7 +1213,7 @@ All features from the original application that must be implemented:
 | 7 | Loop transition arrows | 8 | High |
 | 8 | Edit arrow PopOver (alias/predicate) | 8 | Medium |
 | 9 | Inline state name editing | 8 | Medium |
-| 10 | Blueprint-to-LISMA conversion | 5 (ViewModels) | High |
+| 10 | Blueprint-to-LISMA conversion | 1 (Domain) | High |
 | 11 | Model compilation (via gRPC) | 2 | Low |
 | 12 | Model validation (Verify) | 6 | Low |
 | 13 | Simulation execution (via gRPC) | 2 | Low |
@@ -894,7 +1231,27 @@ All features from the original application that must be implemented:
 | 25 | Keyboard shortcuts | 10 | Low |
 | 26 | Clipboard propagation (cut/copy/paste) | 7 | Low |
 | 27 | Tasks PopOver (in-progress + completed) | 9 | Medium |
-| 28 | State content editing (double-click → text tab) | 7/8 | Medium |
+| 28 | State content editing (double-click → text tab) | 8 | Medium |
 | 29 | Name uniqueness enforcement | 8 | Low |
 | 30 | Parallel execution settings | 6 | Low |
 | 31 | Result simplification settings | 6 | Low |
+
+---
+
+## Key Differences from Original Architecture
+
+| Aspect | Original (Java/Kotlin) | New (.NET/C#) |
+|--------|----------------------|---------------|
+| DI framework | Koin (scoped, module-based) | Microsoft.Extensions.DependencyInjection |
+| MVVM framework | TornadoFX (JavaFX-first) | CommunityToolkit.Mvvm (framework-agnostic) |
+| Reactive collections | JavaFX `ObservableList` + Kotlin `Flow` | `ObservableCollection<T>` + C# events |
+| Concurrency | Kotlin coroutines + virtual threads | C# `async`/`await` + `Task.Run` |
+| Server communication | gRPC-Java (Linux epoll only) | Grpc.Net.Client (cross-platform) |
+| HTTP client | Ktor CIO | System.Net.Http.HttpClient |
+| JSON serialization | kotlinx.serialization | System.Text.Json (source generation) |
+| Text editor | fxmisc.richtext (JavaFX) | ICSharpCode.AvalonEdit |
+| Canvas rendering | JavaFX `Pane` with child nodes | Custom `Panel` with `OnRender` |
+| Styling | JavaFX CSS | Avalonia XAML styles + pseudo-classes |
+| Property system | JavaFX `Simple*Property` | CommunityToolkit.Mvvm `[ObservableProperty]` |
+| Testing | (not specified) | xUnit + FluentAssertions + Moq |
+| Build system | Gradle | MSBuild + NuGet |

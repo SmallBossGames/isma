@@ -217,86 +217,190 @@ When a blueprint project is compiled/simulated, the visual statechart is automat
 
 ## Right Sidebar: Settings Panel
 
-A collapsible sidebar panel on the right side of the main window. Contains 4 configurable sections for simulation parameters. Each section uses a property grid layout (label on left, control on right).
+**Location:** Right side of the main window, occupies the full height of the content area (below the toolbars).
+
+**Visibility:** Always visible as part of the main window layout. The panel is a TornadoFX `drawer` with `multiselect = true`, meaning all sections are expanded and visible simultaneously — there is no collapsible section behavior.
+
+**Implementation:** `SettingsPanelView.kt` wraps four sub-views inside a `drawer` container, each with a fixed width of 240px and rendered as a `ScrollPane`. The panel uses a property grid layout (label on the left, control on the right) provided by `ru.isma.javafx.extensions.controls.propertiesGrid`.
+
+**Data flow:** The panel reads from and writes to the singleton `SimulationParametersService`, which holds five TornadoFX `ViewModel` instances. When the user clicks "Run" (▶ Play or `Ctrl+F5`), the service's `snapshot()` method captures the current view model state into a serializable `SimulationParametersModel`, which is then converted to `RunSimulationParams` and sent to the server via gRPC. The panel values are **not** live-bound to the simulation — they are only read at the moment of execution.
+
+---
 
 ### 1. Initials (Cauchy Initials)
 
-Controls the time range and step size for the simulation.
+**Purpose:** Defines the time domain for the numerical integration. These parameters specify the interval over which the differential equations are solved.
 
-| Label | Control | Type | Default |
-|-------|---------|------|---------|
-| **Start** | Number field | Double | 0.0 |
-| **End** | Number field | Double | 10.0 |
-| **Step** | Number field | Double | 0.1 |
+**View:** `CauchyInitialsView` → **ViewModel:** `CauchyInitialsViewModel`
 
-**Meaning:**
-- **Start:** Initial time value (t₀) for the simulation
-- **End:** Final time value (t₁) for the simulation
-- **Step:** Initial integration step size
+| Label | Control | Type | Default | Property |
+|-------|---------|------|---------|----------|
+| **Start** | Number field | Double | 0.0 | `startTimeProperty` |
+| **End** | Number field | Double | 10.0 | `endTimeProperty` |
+| **Step** | Number field | Double | 0.1 | `stepProperty` |
+
+**When values are consumed:** Only when "Run" is clicked. The values are captured via `snapshot()` → `CauchyInitialsModel(startTime, endTime, initialStep)` → `RunSimulationParams`.
+
+**Parameter details:**
+- **Start (t₀):** The initial time value. The integration begins from this point. Must be less than or equal to End.
+- **End (t₁):** The final time value. The integration runs until this time is reached. Must be greater than or equal to Start.
+- **Step (h₀):** The initial integration step size. This is a *hint* to the integration method — adaptive methods (like RK Fehlberg) will adjust step size dynamically based on error estimates, while fixed-step methods use this value directly.
+
+**Typical use cases:**
+- **Short transient analysis:** Start=0, End=5, Step=0.01 — for observing rapid changes near t=0
+- **Steady-state analysis:** Start=100, End=200, Step=0.5 — for observing system behavior after transients have settled
+- **Quick verification:** Start=0, End=1, Step=1.0 — for fast check of model correctness before running full simulation
+
+---
 
 ### 2. Integration
 
-Controls the numerical integration method and its parameters.
+**Purpose:** Configures the numerical integration algorithm and its control parameters. This section determines *how* the differential equations are solved.
 
-| Label | Control | Type | Default | Disabled when |
-|-------|---------|------|---------|---------------|
-| **Method** | ComboBox | String (from server) | First method in list | — |
-| **Accurate** | Checkbox | Boolean | false | — |
-| **Accuracy** | Number field | Double | 0.1 | "Accurate" unchecked |
-| **Stable** | Checkbox | Boolean | false | — |
-| **Parallel** | Checkbox | Boolean | false | — |
-| **Server** | Text field | String | "localhost" | "Parallel" unchecked |
-| **Port** | Number field | Integer | 7890 | "Parallel" unchecked |
+**View:** `MethodSettingsView` → **ViewModel:** `IntegrationMethodParametersViewModel`
 
-**Method list:** Populated dynamically from the server at startup (e.g., Euler, RK2, RK3, RK31, RK Fehlberg, RK Merson).
+| Label | Control | Type | Default | Disabled when | Bound to |
+|-------|---------|------|---------|---------------|----------|
+| **Method** | ComboBox | String (from server) | First method in list | — | `selectedMethodProperty` |
+| **Accurate** | Checkbox | Boolean | false | — | `isAccuracyInUseProperty` |
+| **Accuracy** | Number field | Double | 0.1 | "Accurate" unchecked | `accuracyProperty` |
+| **Stable** | Checkbox | Boolean | false | — | `isStableInUseProperty` |
+| **Parallel** | Checkbox | Boolean | false | — | `isParallelInUseProperty` |
+| **Server** | Text field | String | "localhost" | "Parallel" unchecked | `serverProperty` |
+| **Port** | Number field | Integer | 7890 | "Parallel" unchecked | `portProperty` |
 
-**Meaning:**
-- **Method:** Which numerical integration algorithm to use
-- **Accurate:** Whether to use adaptive accuracy control
-- **Accuracy:** The tolerance value for adaptive integration (only used when Accurate is checked)
-- **Stable:** Whether to use stability control during integration
-- **Parallel:** Whether to run the simulation on a remote server cluster
-- **Server / Port:** Target for parallel execution (only relevant when Parallel is checked)
+**Method list population:** The ComboBox items come from `SimulationParametersService.integrationMethods`, which is an `ObservableList<String>` populated from the server's available integration methods at startup (e.g., Euler, RK2, RK3, RK31, RK Fehlberg, RK Merson). The list is set once during Koin DI initialization: `single { SimulationParametersService(get<SimulationServerFacade>().getSimulationMethods()) }`.
+
+**Conditional behavior:**
+- **Accuracy field:** Disabled via `disableProperty().bind(isAccuracyInUseProperty.not())` — the user cannot edit the accuracy value while adaptive accuracy is turned off. The value is still sent to the server but ignored.
+- **Server / Port fields:** Disabled via `disableProperty().bind(isParallelInUseProperty.not())` — these are only relevant for parallel execution.
+
+**When values are consumed:** At simulation start, via `snapshot()` → `IntegrationMethodParametersModel` → `RunSimulationParams`. All fields are transmitted to the server.
+
+**Parameter details:**
+- **Method:** The numerical integration algorithm. Different methods offer different trade-offs between speed and accuracy:
+  - **Euler:** First-order, fastest but least accurate. Suitable for simple models where speed matters more than precision.
+  - **RK2:** Second-order Runge-Kutta. Moderate accuracy and speed.
+  - **RK3 / RK31:** Third-order Runge-Kutta variants. Better accuracy for smooth solutions.
+  - **RK Fehlberg:** Adaptive step-size method (RKF45). Automatically adjusts step size to maintain accuracy. Best for stiff or complex systems.
+  - **RK Merson:** Another adaptive method with error estimation.
+- **Accurate (isAccuracyInUse):** Enables adaptive step-size control. When checked, the integration method adjusts its step size dynamically to keep the error below the Accuracy threshold. Only meaningful for adaptive methods (RK Fehlberg, RK Merson).
+- **Accuracy:** The tolerance for adaptive integration. Smaller values (e.g., 0.001) produce more accurate but slower results. Larger values (e.g., 0.1) are faster but less precise.
+- **Stable (isStableInUse):** Enables stability control during integration. This adds checks to prevent numerical instability (e.g., oscillations or divergence) that can occur with certain methods or step sizes.
+- **Parallel (isParallelInUse):** When checked, the simulation runs on a remote server cluster instead of the local server. This is relevant for large-scale simulations that benefit from distributed computing.
+- **Server / Port:** Network address for the parallel execution target. Used only when Parallel is enabled.
+
+**Typical use cases:**
+- **Quick prototype:** Euler method, Accurate unchecked — for fast iteration during model development
+- **Production accuracy:** RK Fehlberg, Accurate checked, Accuracy=0.001, Stable checked — for high-precision results
+- **Distributed computation:** Parallel checked, Server="compute-node-1", Port=7890 — for running on a cluster
+
+---
 
 ### 3. Event Detection
 
-Controls whether the simulation detects zero-crossing events.
+**Purpose:** Configures zero-crossing detection during integration. Event detection allows the simulator to pinpoint exact times when state variables or user-defined functions cross zero (change sign), which is critical for hybrid systems with discrete state transitions.
 
-| Label | Control | Type | Default | Disabled when |
-|-------|---------|------|---------|---------------|
-| **In use** | Checkbox | Boolean | false | — |
-| **Gamma** | Number field | Double | 0.8 | "In use" unchecked |
-| **Step limit** | Checkbox | Boolean | false | — |
-| **Low border** | Number field | Double | 0.001 | "Step limit" unchecked |
+**View:** `EventDetectionView` → **ViewModel:** `EventDetectionParametersViewModel`
 
-**Meaning:**
-- **In use:** Enable event detection (zero-crossing detection)
-- **Gamma:** Event detection sensitivity parameter (0 < γ ≤ 1)
-- **Step limit:** Enable step size limiting during event detection
-- **Low border:** Minimum step size lower bound during event detection
+| Label | Control | Type | Default | Disabled when | Bound to |
+|-------|---------|------|---------|---------------|----------|
+| **In use** | Checkbox | Boolean | false | — | `isEventDetectionInUseProperty` |
+| **Gamma** | Number field | Double | 0.8 | "In use" unchecked | `gammaProperty` |
+| **Step limit** | Checkbox | Boolean | false | — | `isStepLimitInUseProperty` |
+| **Low border** | Number field | Double | 0.001 | "Step limit" unchecked | `lowBorderProperty` |
+
+**Conditional behavior:**
+- **Gamma field:** Disabled when "In use" is unchecked. The gamma value is sent to the server only when event detection is enabled.
+- **Low border field:** Disabled when "Step limit" is unchecked. The lower bound is only applied when step limiting is active.
+
+**When values are consumed:** At simulation start. In `RunSimulationParams`, gamma is sent as `eventDetectionGamma = if (isEventDetectionInUse) gamma else null`, and lowBorder as `eventDetectionLowBorder = if (isEventDetectionInUse) lowBorder else null`. The server uses `null` values to skip event detection entirely.
+
+**Parameter details:**
+- **In use (isEventDetectionInUse):** Enables zero-crossing event detection. Without this, the integrator only records values at discrete time steps and may miss the exact moment a variable crosses zero. With this enabled, the integrator searches for the precise crossing time between steps.
+- **Gamma (γ):** Event detection sensitivity. A value between 0 and 1 that controls how close a variable must be to zero for an event to be detected. Lower values (e.g., 0.1) require the variable to be closer to zero, reducing false positives but potentially missing near-zero crossings. Higher values (e.g., 0.9) are more sensitive but may trigger on noise.
+- **Step limit (isStepLimitInUse):** When enabled, constrains the integrator's step size during event detection searches. This prevents the integrator from taking excessively small steps when searching for a zero-crossing, which can happen in stiff systems.
+- **Low border:** The minimum step size allowed during event detection. Prevents the integrator from reducing step size below this threshold, which could cause infinite loops in cases where the zero-crossing cannot be precisely located.
+
+**Typical use cases:**
+- **No events needed:** In use unchecked — for pure ODE systems with no discrete transitions
+- **Hybrid system simulation:** In use checked, Gamma=0.8, Step limit checked, Low border=0.001 — for systems with state transitions triggered by continuous variable thresholds (e.g., a valve opening when pressure exceeds a limit)
+- **High-precision events:** In use checked, Gamma=0.3, Step limit checked, Low border=0.0001 — for systems where event timing accuracy is critical
+
+---
 
 ### 4. Result Saving
 
-Controls where simulation results are stored after completion.
+**Purpose:** Determines where and how simulation results are stored after completion.
 
-| Label | Control | Type | Default |
-|-------|---------|------|---------|
-| **Save result** | ComboBox | Enum (MEMORY / FILE) | MEMORY |
+**View:** `ResultProcessingView` (note: this view is named "Result processing" but currently only contains the "Save result" control) → **ViewModel:** `ResultSavingParametersViewModel`
 
-**Options:**
-- **MEMORY:** Results kept in memory only (available for chart display, not persisted to disk)
-- **FILE:** Results written to a binary cache file on disk (available for chart display, CSV export, and later sessions)
+| Label | Control | Type | Default | Bound to |
+|-------|---------|------|---------|----------|
+| **Save result** | ComboBox | Enum: `MEMORY` / `FILE` | `MEMORY` | `savingTargetProperty` |
+
+**When values are consumed:** At simulation completion. The `SaveTarget` enum is captured via `snapshot()` → `ResultSavingParametersModel` and stored in `CompletedSimulationModel`. The server respects this setting when deciding whether to write a binary cache file.
+
+**Parameter details:**
+- **MEMORY:** Results are kept in memory only. Available for immediate chart display in the Tasks PopOver, but not persisted to disk. Suitable for quick exploratory runs where results will not be reused.
+- **FILE:** Results are written to a binary cache file on disk (`.bin` format). The file is available for:
+  - Chart display via the Grin chart viewer
+  - CSV export via the Tasks PopOver
+  - Later sessions (results persist across application restarts)
+
+**Typical use cases:**
+- **Exploratory modeling:** MEMORY — for rapid iterations where results are viewed once and discarded
+- **Production runs:** FILE — for results that need to be shared, exported, or revisited later
+
+---
 
 ### 5. Result Processing
 
-Controls post-processing simplification of simulation results.
+**Purpose:** Configures post-processing simplification of simulation results. This applies a line-simplification algorithm to reduce the number of data points in the result, which produces smoother chart rendering and smaller file sizes.
 
-| Label | Control | Type | Default |
-|-------|---------|------|---------|
-| **Simplify** | ComboBox | String (Radial-Distance / Douglas-Peucker) | Radial-Distance |
-| **Tolerance** | Number field | Double | 20.0 |
+**View:** `ResultProcessingView` → **ViewModel:** `ResultProcessingParametersViewModel`
 
-**Meaning:** Applies a line-simplification algorithm to reduce the number of data points in the result for smoother chart rendering.
+| Label | Control | Type | Default | Bound to |
+|-------|---------|------|---------|----------|
+| **Simplify** | ComboBox | String: "Radial-Distance" / "Douglas-Peucker" | First in list | `selectedSimplifyMethodProperty` |
+| **Tolerance** | Number field | Double | 20.0 | `toleranceProperty` |
+
+**When values are consumed:** Result processing parameters are **not** sent to the server and are **not** included in `Store Settings` / `Load Settings` persistence. They are application-local settings that affect only the client-side chart rendering and CSV export. The `snapshot()` method in `SimulationParametersService` does not include `resultProcessing` in its output.
+
+**Parameter details:**
+- **Simplify (selectedSimplifyMethod):** The line-simplification algorithm to apply:
+  - **Radial-Distance:** A simpler algorithm that removes points based on radial distance thresholds. Faster but may distort sharp features.
+  - **Douglas-Peucker:** A more sophisticated algorithm that preserves the overall shape of the curve while removing fewer essential points. Better for curves with sharp turns or peaks.
+- **Tolerance:** The maximum allowed deviation between the original and simplified curve. Lower values (e.g., 1.0) produce more faithful approximations with more points. Higher values (e.g., 50.0) produce smoother but less detailed curves.
+
+**Typical use cases:**
+- **No simplification:** (Not currently exposed as a dropdown option in the UI — the view only shows the Save result control; the Simplify/Tolerance controls are commented out in the source code, see `ResultProcessingView.kt:23-52`)
+- **Smooth charts for presentation:** Douglas-Peucker, Tolerance=50.0 — for reducing data points in publication-quality charts
+- **Balanced rendering:** Radial-Distance, Tolerance=20.0 — for good visual quality with moderate point reduction
+
+> **Note:** The Simplify and Tolerance controls are currently commented out in `ResultProcessingView.kt` (lines 23-52). The view only renders the "Save result" ComboBox. The commented-out code shows the intended full implementation with a form layout using TornadoFX `fieldset`, `checkbox`, `combobox`, and `numberTextField`.
+
+---
+
+### Data Flow Summary
+
+```
+User edits settings → ViewModel properties (TornadoFX bind)
+       ↓
+SimulationParametersService holds all 5 ViewModels as singletons
+       ↓
+On "Run" click → snapshot() captures all ViewModels → SimulationParametersModel
+       ↓
+toRunSimulationParams() converts to RunSimulationParams (gRPC message)
+       ↓
+ServerFacade.runSimulation(params) sends to server via gRPC
+```
+
+**Parameters sent to server:** Cauchy initials (start, end, step), integration method (name, accuracy, flags), event detection (gamma, low border — only when enabled).
+
+**Parameters NOT sent to server:** `isStableAllowedInUse` (metadata only), `isParallelInUse` / `server` / `port` (client-side connection config), `savingTarget` (client-side storage preference), result processing settings (client-side rendering only).
+
+**Parameters NOT persisted in Store/Load:** Result processing settings (`isSimplifyInUse`, `selectedSimplifyMethod`, `tolerance`). All other settings sections are included in the JSON serialization.
 
 ---
 

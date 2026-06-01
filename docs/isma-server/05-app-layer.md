@@ -61,8 +61,11 @@ fun main(args: Array<String>) {
     httpServer.start(wait = false)
 
     // 8. Print socket paths to stdout
+    println("Starting gRPC server on Unix socket: $socketPath")
+    println("Starting HTTP server on Unix socket: $httpSocketPath")
     println("GRPC_SOCKET=$socketPath")
     println("HTTP_SOCKET=$httpSocketPath")
+    println("Servers started. Shutting down with Ctrl+C...")
 
     // 9. Register shutdown hook
     Runtime.getRuntime().addShutdownHook(Thread { ... })
@@ -142,12 +145,20 @@ val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())  // H
 | `listSimulationMethodsHandler` | `IListSimulationMethodsHandler` | `domainModule` |
 | `cancelSimulationHandler` | `ICancelSimulationHandler` | `domainModule` |
 
-**Request flow:** Each RPC method:
-1. Validates required fields (blank check)
-2. Calls domain handler
+**Request flow:** Each RPC method follows the same pattern:
+1. Validates required fields (blank check for `compiledModelId`, `lismaSourceCode`, `sourceCode`)
+2. Calls domain handler with transformed request data
 3. Maps domain types to protobuf response builders
 4. Calls `responseObserver.onNext()` + `responseObserver.onCompleted()`
 5. Catches exceptions and converts via `toStatusException()`
+6. Logs errors via `logger.error()` before propagating
+
+**Validation behavior:**
+- `runSimulation`: Returns `INVALID_ARGUMENT` if `compiledModelId` is blank
+- `compile`: Returns `INVALID_ARGUMENT` if `lismaSourceCode` is blank
+- `validate`: Returns `INVALID_ARGUMENT` if `lismaSourceCode` is blank
+- `delete`: Returns `INVALID_ARGUMENT` if `compiledModelId` is blank
+- `highlight`: Returns empty response (no error) if `sourceCode` is blank
 
 ### LismaCompilerServiceGrpcImpl
 
@@ -310,3 +321,4 @@ Configuration in `logback.xml`:
 - All output to stdout
 - Pattern: `%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n`
 - Third-party frameworks logged at INFO level
+- gRPC service methods log errors via `logger.error()` with exception stack traces before propagating to gRPC clients

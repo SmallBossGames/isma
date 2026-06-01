@@ -69,6 +69,9 @@ No JavaFX modules. Pure Kotlin module with only kotlinx-coroutines-core.
 **File:** `external-services/build.gradle.kts`
 
 ```kotlin
+group = "ru.isma.next.ui"
+version = "1.0.0-SNAPSHOT"
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.java.modules)
@@ -230,7 +233,19 @@ dependencies {
 }
 ```
 
-Provides shared JavaFX utilities: `PropertiesGrid`, `ComboBox` extension, `ListView` cell factory, coroutine flow extensions for JavaFX collections (`addedAsFlow()`, `changeAsFlow()`).
+Provides shared JavaFX utilities: `PropertiesGrid` (reusable property grid component), `ComboBox` extension (custom cell factory), `ListView` cell factory, `CollectionsExtensions` (coroutine flow extensions for JavaFX collections: `addedAsFlow()`, `changeAsFlow()`), and `Properties` helper.
+
+**Source structure:**
+```
+toolkit/src/main/kotlin/ru/isma/javafx/extensions/
+├── controls/
+│   ├── PropertiesGrid.kt       # Reusable property grid (label + control layout)
+│   └── ComboBox.kt             # Custom ComboBox extensions
+├── coroutines/flow/
+│   └── CollectionsExtensions.kt  # ObservableList/Set → Flow bridges
+└── helpers/
+    └── Properties.kt           # Property utility helpers
+```
 
 ## Java Module System
 
@@ -249,6 +264,11 @@ Each module declares a `module-info.java` with appropriate `exports`:
 **Requires notes:**
 - `text-editor` requires `javafx.graphics` (not `javafx.controls`)
 - `external-services` requires `io.netty.transport.unix.common`, `io.netty.common`, `io.netty.buffer`, `io.netty.codec`
+
+**Opens declarations (app module):**
+The `app` module uses `opens` (not `exports`) for packages that need reflection access:
+- `opens ru.isma.next.app.models.preferences to kotlinx.serialization` — required for JSON serialization of `WindowPreferencesModel` and `DefaultFilesPreferencesModel`
+- `opens ru.isma.next.app.models to javafx.base` — required for JavaFX property binding reflection
 
 ## Build Commands
 

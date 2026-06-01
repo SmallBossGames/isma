@@ -243,11 +243,13 @@ translationResult.fold(
 
 | ANTLR token type | SyntaxKind |
 |-----------------|------------|
-| CONST_KEYWORD, STATE_KEYWORD, FOR_KEYWORD, IF_KEYWORD, ELSE_KEYWORD, FROM_KEYWORD, MACRO_KEYWORD, SET_KEYWORD | KEYWORD |
-| COMMENT, SL_COMMENT | COMMENT |
-| FloatingPointLiteral, DecimalLiteral | NUMBER |
+| CONST_KEYWORD, STATE_KEYWORD, FOR_KEYWORD, IF_KEYWORD, ELSE_KEYWORD, FROM_KEYWORD, MACRO_KEYWORD, SET_KEYWORD | `KEYWORD` |
+| COMMENT, SL_COMMENT | `COMMENT` |
+| FloatingPointLiteral, DecimalLiteral | `NUMBER` |
 
-All other token types are silently filtered out.
+All other token types are silently filtered out. The `SyntaxKind` enum also includes `TEXT` (never produced by this handler — reserved for future use).
+
+**Implementation file:** `infrastructure/src/main/kotlin/.../HighlightLismaHandlerImpl.kt` — uses `LismaLexer` from the LISMA compiler module.
 
 ---
 

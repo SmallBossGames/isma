@@ -177,8 +177,11 @@ sequenceDiagram
     Note over Infra: async simulation run (ExecutorService thread)
 
     Client->>Server: MonitorSimulationRequest
-    Server->>Infra: query session state
-    Infra-->>Server: SimulationSession
+    Server->>Domain: handle(simulationId, accuracy, callback)
+    Domain->>Infra: poll session state (100ms interval)
+    Infra-->>Domain: SimulationSession
+    Domain->>Domain: compare currentTime vs threshold
+    Domain->>Server: callback(SimulationProgress)
     Server-->>Client: MonitorSimulationResponse (progress)
 
     Client->>Server: CancelSimulationRequest

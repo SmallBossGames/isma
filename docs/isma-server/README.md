@@ -54,14 +54,20 @@ curl -o result.bin \
 
 | Path | Purpose |
 |------|---------|
-| `app/src/main/kotlin/.../Application.kt` | Server entry point |
-| `app/src/main/kotlin/.../grpc/SimulationServiceGrpcImpl.kt` | gRPC simulation service |
-| `app/src/main/kotlin/.../grpc/LismaCompilerServiceGrpcImpl.kt` | gRPC compiler service |
-| `app/src/main/kotlin/.../http/HttpRoutes.kt` | Ktor HTTP routes |
-| `domain/.../handlers/runSimulation/RunSimulationHandlerImpl.kt` | Simulation start logic |
-| `infrastructure/.../simulation/SimulationExecutorImpl.kt` | Simulation execution engine |
-| `infrastructure/.../translation/LismaTranslatorImpl.kt` | LISMA → HSM translation |
-| `domain/src/main/kotlin/.../DomainModule.kt` | DI configuration (handlers) |
-| `infrastructure/.../InfrastructureModule.kt` | DI configuration (infrastructure) |
-| `grpc/build.gradle.kts` | Protobuf code generation |
-| `app/build.gradle.kts` | Application build configuration |
+| `isma-server/app/src/main/kotlin/.../Application.kt` | Server entry point, CLI parsing, server lifecycle |
+| `isma-server/app/src/main/kotlin/.../AppModule.kt` | Koin DI module (gRPC service bindings) |
+| `isma-server/app/src/main/kotlin/.../grpc/SimulationServiceGrpcImpl.kt` | gRPC SimulationService: 5 RPC methods |
+| `isma-server/app/src/main/kotlin/.../grpc/LismaCompilerServiceGrpcImpl.kt` | gRPC LismaCompilerService: 4 RPC methods |
+| `isma-server/app/src/main/kotlin/.../http/HttpRoutes.kt` | Ktor HTTP routes (`GET /simulation/{id}/download`) |
+| `isma-server/domain/src/main/kotlin/.../handlers/runSimulation/RunSimulationHandlerImpl.kt` | Simulation start logic |
+| `isma-server/domain/src/main/kotlin/.../handlers/runSimulation/RunSimulationParameters.kt` | Simulation parameters data class |
+| `isma-server/domain/src/main/kotlin/.../handlers/monitorSimulation/MonitorSimulationHandlerImpl.kt` | Polling progress updates |
+| `isma-server/domain/src/main/kotlin/.../handlers/compileLisma/CompileLismaHandlerImpl.kt` | LISMA → HSM compilation |
+| `isma-server/domain/src/main/kotlin/.../handlers/validateLisma/ValidateLismaHandlerImpl.kt` | LISMA validation |
+| `isma-server/domain/src/main/kotlin/.../DomainModule.kt` | DI configuration (handler interfaces → implementations) |
+| `isma-server/infrastructure/src/main/kotlin/.../SimulationExecutorImpl.kt` | Simulation execution engine (virtual threads, result writing) |
+| `isma-server/infrastructure/src/main/kotlin/.../LismaTranslatorImpl.kt` | LISMA → HSM translation with FDM support |
+| `isma-server/infrastructure/src/main/kotlin/.../HighlightLismaHandlerImpl.kt` | ANTLR4-based syntax highlighting |
+| `isma-server/infrastructure/src/main/kotlin/.../InfrastructureModule.kt` | DI configuration (stores, executors, translators) |
+| `isma-server/grpc/build.gradle.kts` | Protobuf/gRPC code generation config |
+| `isma-server/app/build.gradle.kts` | Application build config (main class, dependencies) |

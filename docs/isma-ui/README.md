@@ -17,6 +17,7 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | [Build & Deployment](05-build-and-deployment.md) | Gradle config, modules, dependencies, startup |
 | [UX Reference](06-ux-reference.md) | Complete user experience specification: windows, menus, dialogs, transitions, features |
 | [Blueprint Editor UX](07-blueprint-editor-ux.md) | Detailed specification of the visual statechart editor: canvas, states, arrows, popover, toolbar, modes, LISMA conversion, Avalonia migration mapping |
+| [Use Cases](use-cases/README.md) | End-to-end user flows: startup, editing, simulation, results, multi-project workflows |
 
 ## Key Files
 
@@ -32,7 +33,13 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | `app/src/main/kotlin/.../services/simualtion/SimulationParametersService.kt` | Simulation parameter management |
 | `app/src/main/kotlin/.../models/projects/LismaTextModel.kt` | LISMA text model with CodeRegion tracking |
 | `app/src/main/kotlin/.../models/simulation/CompletedSimulationModel.kt` | Completed simulation result wrapper |
-| `app/src/main/kotlin/.../utilities/BlueprintModelExenstions.kt` | Blueprint-to-LISMA conversion |
+| `app/src/main/kotlin/.../utilities/BlueprintModelExtensions.kt` | Blueprint-to-LISMA conversion |
+| `app/src/main/kotlin/.../services/ModelErrorService.kt` | Compilation/validation error tracking |
+| `app/src/main/kotlin/.../services/editors/SyntaxHighlighterService.kt` | Syntax highlighting service |
+| `app/src/main/kotlin/.../services/editors/TextEditorFactory.kt` | Text editor factory |
+| `app/src/main/kotlin/.../services/preferences/PreferencesProvider.kt` | Window and file preferences persistence |
+| `app/src/main/kotlin/.../views/layout/Drawer.kt` | Collapsible drawer panel |
+| `app/src/main/kotlin/.../views/dialogs/ItemsPickerDialog.kt` | Variable/axis selection dialog |
 | `external-services/src/main/kotlin/.../SimulationServerFacade.kt` | Server communication facade |
 | `external-services/src/main/kotlin/.../SimulationServerManager.kt` | Server process lifecycle |
 | `external-services/src/main/kotlin/.../RunSimulationParams.kt` | Simulation parameter DTO |
@@ -81,3 +88,4 @@ When running via Gradle (`JavaExec`), these are auto-configured to `$rootDir/bui
 | [05-build-and-deployment](05-build-and-deployment.md) | DevOps, contributors setting up the build |
 | [06-ux-reference](06-ux-reference.md) | Anyone implementing a replacement UI with feature parity |
 | [07-blueprint-editor-ux](07-blueprint-editor-ux.md) | Migrator implementing the Avalonia statechart editor, or anyone needing deep canvas/interaction details |
+| [Use Cases](use-cases/README.md) | Product owners, testers, and new contributors understanding end-to-end user workflows |

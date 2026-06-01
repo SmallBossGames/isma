@@ -314,15 +314,22 @@ val pointsSequence = sequence {
 writeAll(tempFile, variableNames, pointsSequence)
 ```
 
-**Point queue:** `LinkedBlockingQueue<QueueItem>` — unbounded blocking queue for thread synchronization.
+**Point queue:** `LinkedBlockingQueue<QueueItem>` — unbounded blocking queue for thread synchronization between simulator and writer threads.
 
 **QueueItem sealed class:**
+
 ```kotlin
 private sealed class QueueItem {
     data class Point(val point: IntgResultPoint) : QueueItem()
     data object EndOfStream : QueueItem()
 }
 ```
+
+**Variable naming in output file:** Variable names are derived from `EquationIndexProvider`:
+- `TIME` — simulation time
+- `DE_i-{code}` — differential equation `i` with optional equation code
+- `AE_i-{code}` — algebraic equation `i` with optional equation code
+- `f_i` — right-hand side function value for differential equation `i`
 
 **9. Result File Format**
 

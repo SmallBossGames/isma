@@ -68,6 +68,24 @@ CRITICAL: ViewModels layer must NOT depend on Avalonia types.
 - **Avalonia 12 features**: `x:DataType` compiled bindings, `IsVisible` (not `Visibility`), `BoxShadow`, Container Queries, Control Themes
 - **Tests**: xUnit + FluentAssertions + Moq for Domain and ViewModels
 
+## Source Documentation
+
+This migration plan is derived from the original Java/JavaFX ISMA-UI documentation. Always refer to these sources for implementation details:
+
+| Source Document | Content | Maps To |
+|----------------|---------|---------|
+| [01-overview.md](../isma-ui/01-overview.md) | Architecture, module structure, dependency graph, DI wiring | Target architecture, Phase 0 |
+| [02-domain-layer.md](../isma-ui/02-domain-layer.md) | Domain models, interfaces, result streaming | Phase 1 (Domain Layer) |
+| [03-external-services.md](../isma-ui/03-external-services.md) | gRPC client, HTTP client, server lifecycle, facade | Phase 2 (Infrastructure Layer) |
+| [04-ui-components.md](../isma-ui/04-ui-components.md) | App entry point, views, editors, toolbars, models | Phases 4–10 (ViewModels + UI) |
+| [05-build-and-deployment.md](../isma-ui/05-build-and-deployment.md) | Gradle config, modules, dependencies, startup | Phase 0 (project setup) |
+| [06-ux-reference.md](../isma-ui/06-ux-reference.md) | Complete UX specification: windows, menus, dialogs, transitions, features | Phases 7–11 (all UI) |
+| [07-blueprint-editor-ux.md](../isma-ui/07-blueprint-editor-ux.md) | Detailed blueprint editor: canvas, states, arrows, popover, toolbar, modes, LISMA conversion, Avalonia migration mapping | Phase 9 (Blueprint Editor) |
+
+**Critical reference for blueprint editor**: `07-blueprint-editor-ux.md` section 19 (Avalonia Migration Mapping) provides the component, interaction, and rendering strategy mapping from JavaFX to Avalonia.
+
+**Critical reference for UX**: `06-ux-reference.md` section "Feature Matrix" (31 features) maps directly to the feature inventory table in this plan.
+
 ## Project Structure
 
 ```
@@ -156,7 +174,7 @@ isma-ui-dotnet/
 │   │   ├── SimulationResultViewModel.cs      # CommitResult(), ShowChart(), ExportToFile()
 │   │   ├── ErrorListViewModel.cs             # Errors collection, PutErrorList()
 │   │   ├── CauchyInitialsViewModel.cs        # Bound to CauchyInitials properties
-   │   ├── MethodSettingsViewModel.cs        # Bound to IntegrationMethod properties + method list
+   │   ├── IntegrationMethodViewModel.cs     # Bound to IntegrationMethod properties + method list
    │   ├── EventDetectionViewModel.cs        # Bound to EventDetection properties
    │   └── ResultProcessingViewModel.cs      # Bound to ResultProcessing properties
 │   │   ├── BlueprintEditorViewModel.cs       # States, Transactions, Modes, Add/Remove operations
@@ -198,7 +216,8 @@ isma-ui-dotnet/
 │   │       │                                 #   Server, Port
 │   │       ├── EventDetectionView.axaml      # In use, Gamma, Step limit, Low border
   │   │       └── ResultProcessingView.axaml    # Save result (MEMORY/FILE), Simplify checkbox,
-   │   │                                         #   Simplify method (Radial-Distance/Douglas-Peucker), Tolerance
+    │   │                                         #   Simplify method (Radial-Distance/Douglas-Peucker), Tolerance
+    │   │                                         # NOTE: In original, Simplify/Tolerance controls are commented out (06-ux-reference.md:377-381)
 │   ├── Controls/
 │   │   ├── BlueprintCanvasPanel.cs           # Custom Panel: Draw(DrawingContext) for states/arrows
 │   │   ├── PropertiesGrid.axaml              # Reusable label+control grid
@@ -289,11 +308,143 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ---
 
+## Build Configuration
+
+### Directory.Build.props
+
+```xml
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>13</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS8618;CS8604</WarningsNotAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.0" PrivateAssets="all" />
+  </ItemGroup>
+</Project>
+```
+
+### Directory.Packages.props
+
+```xml
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Avalonia" Version="12.0.0" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.0.0" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.0.0" />
+    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.0.0" />
+    <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="12.0.0" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+    <PackageVersion Include="Grpc.Net.Client" Version="2.63.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.63.0" />
+    <PackageVersion Include="Google.Protobuf" Version="3.27.0" />
+    <PackageVersion Include="ICSharpCode.AvalonEdit" Version="6.3.0.90" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageVersion Include="System.IO.Pipelines" Version="10.0.0" />
+    <PackageVersion Include="xunit" Version="2.9.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="Moq" Version="4.20.70" />
+  </ItemGroup>
+</Project>
+```
+
+### .editorconfig (root)
+
+```ini
+root = true
+
+[*.cs]
+dotnet_sort_system_header_first = true
+dotnet_separate_import_directive_groups = false
+indent_style = space
+indent_size = 4
+end_of_line = \r\n
+insert_final_newline = true
+
+# CommunityToolkit.Mvvm conventions
+[mvvm*ViewModel.cs]
+dotnet_naming_rule.public_properties_have_correct_naming.convention = PublicProperty
+dotnet_naming_public_properties_have_correct_naming.style = pascal_case_style
+dotnet_naming_public_properties_have_correct_naming.style.capitalization = camel_case
+
+# Nullable context
+[*.cs]
+csharp_using_directive_placement = outside_namespace:csharp_file
+csharp_prefer_static_local_function = true:suggestion
+csharp_style_expression_bodied_methods = false:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+```
+
+### gRPC Code Generation
+
+The `Grpc.Tools` package generates C# stubs from protobuf definitions. Configuration in `ISMA.Infrastructure.csproj`:
+
+```xml
+<ItemGroup>
+  <Protobuf Include="..\..\protobuf-contracts\simulation\*.proto" GrpcServices="Client" Link="proto\%(Filename)%(Extension)" />
+</ItemGroup>
+<ItemGroup>
+  <Protobuf Include="..\..\protobuf-contracts\simulation\*.proto" GrpcServices="Server" Link="proto\%(Filename)%(Extension)" Condition="'$(Configuration)' == 'Debug'" />
+</ItemGroup>
+```
+
+Generated files appear in `obj/Debug/net10.0/` and are automatically included in the compilation.
+
+---
+
 ## Migration Phases
 
 ### Phase 0: Foundation & Project Setup
 
 **Goal:** Create the solution structure, configure build, DI, and verify the project compiles.
+
+#### Phase Dependencies
+
+| Phase | Prerequisites | Depends On |
+|-------|--------------|------------|
+| 0 | None | — |
+| 1 | Phase 0 | Phase 0 |
+| 2 | Phase 1 | Phase 0 (protobuf), Phase 1 (interfaces) |
+| 3 | Phase 2 | Phase 2 (server must be running for method list) |
+| 4 | Phase 1 | Phase 1 (interfaces + models), Phase 2 (server facade interface) |
+| 5 | Phase 4 | Phase 2 (infrastructure), Phase 4 (interfaces) |
+| 6 | Phase 1, 4 | Phase 1 (domain), Phase 4 (viewmodels) |
+| 7 | Phase 4, 5 | Phase 4 (viewmodels), Phase 5 (services) |
+| 8 | Phase 7 | Phase 7 (shell), Phase 5 (ProjectFileService) |
+| 9 | Phase 8 | Phase 8 (text editor integration), Phase 1 (converter) |
+| 10 | Phase 7, 9 | Phase 7 (shell), Phase 9 (blueprint editor), Phase 2 (GrinProcessLauncher) |
+| 11 | All phases | All |
+
+#### Cross-Reference: Phases → Features → Source Docs
+
+| Feature | Phase | Source Doc Reference |
+|---------|-------|---------------------|
+| Solution structure, build config, DI skeleton | 0 | 01-overview.md (module structure) |
+| Domain models, DTOs, interfaces | 1 | 02-domain-layer.md |
+| Blueprint-to-LISMA converter | 1 | 07-blueprint-editor-ux.md §11 |
+| gRPC/HTTP clients, server lifecycle | 2 | 03-external-services.md |
+| Binary result reader (exchange-format port) | 2 | 02-domain-layer.md (SimulationPoint) |
+| Preferences provider, default values | 3 | 04-ui-components.md (PreferencesProvider) |
+| All ViewModels (MVVM) | 4 | 04-ui-components.md (ViewModels), 06-ux-reference.md |
+| UI-dependent services (FileDialog) | 5 | 04-ui-components.md (ProjectFileService, etc.) |
+| Unit tests (Domain + ViewModels) | 6 | All domain/ViewModel docs |
+| Main window, menu, toolbar, settings, error list | 7 | 06-ux-reference.md (Application Shell, Menu Bar, Toolbars, Settings Panel) |
+| Project tabs, text editor, file operations | 8 | 04-ui-components.md (Text Editor), 06-ux-reference.md (File Operations) |
+| Blueprint editor (canvas, states, arrows, modes) | 9 | 07-blueprint-editor-ux.md (all sections), 06-ux-reference.md (Blueprint Editor) |
+| Tasks PopOver, results, chart viewer, CSV export | 10 | 06-ux-reference.md (Tasks PopOver, Results Visualization) |
+| Polish, cross-platform testing | 11 | 06-ux-reference.md (Keyboard Shortcuts, Feature Matrix) |
 
 #### Steps
 
@@ -307,9 +458,62 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
    - **App:** `Avalonia.Themes.Fluent`, `Avalonia.Controls.DataGrid`, `Avalonia.Desktop`, `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection`, `ICSharpCode.AvalonEdit`, `AvaloniaUI.DiagnosticsSupport`, `Avalonia.Fonts.Inter`
    - **Tests:** `xunit`, `xunit.runner.visualstudio`, `FluentAssertions`, `Moq`, `Microsoft.NET.Test.Sdk`, `coverlet.collector`
 5. Configure `Grpc.Tools` protobuf generation from `protobuf-contracts/simulation/`
-6. Set up DI registration skeleton in `App.xaml.cs` using `ServiceCollectionExtensions` pattern
+   - Add `<Protobuf Include="..\..\protobuf-contracts\simulation\*.proto" GrpcServices="Client" />` to `ISMA.Infrastructure.csproj`
+   - Set `<ProtobufFiles>$(IntermediateOutputPath)$(MSBuildProjectName).grpc.cs</ProtobufFiles>` for output path
+   - Verify generated stubs in `obj/Debug/net10.0/` after build
+6. Set up DI registration skeleton in `App.xaml.cs` using `ServiceCollectionExtensions` pattern:
+   ```csharp
+   public partial class App : Application
+   {
+       public override void OnFrameworkInitialization()
+       {
+           var services = new ServiceCollection();
+           ConfigureInfrastructure(services);
+           ConfigureViewModels(services);
+           ConfigureAppServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+           ConfigureServices(services);
+
+           // NOTE: The above is a placeholder. See Phase 4-5 for actual registrations.
+           // For Phase 0, just register MainWindowViewModel to verify DI works.
+           services.AddSingleton<MainWindowViewModel>();
+
+           Provider = services.BuildServiceProvider();
+           base.OnFrameworkInitialization();
+       }
+   }
+   ```
+   - Create `ServiceCollectionExtensions.cs` in each layer for modular registration
+   - Phase 0: register only `MainWindowViewModel`
+   - Phase 4: register all ViewModels and presentation services
+   - Phase 5: register UI-dependent services
 7. Create minimal `MainWindow.axaml` with empty content to verify the app runs
-8. Create `ViewLocator` for automatic View resolution from ViewModel type
+8. Create `ViewLocator` for automatic View resolution from ViewModel type:
+   ```csharp
+   public class ViewLocator : IDataTemplate
+   {
+       public Control? Build(object? param)
+       {
+           if (param is null) return null;
+           var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
+           var assembly = param.GetType().Assembly;
+           return assembly.GetType(name)?.CreateInstance() as Control;
+       }
+
+       public Control? Create() => Build(null);
+   }
+   ```
+   - Register in `App.axaml`: `<DataTemplate DataType="{x:Type vm:MainWindowViewModel}"><views:MainWindow /></DataTemplate>`
+   - Or use `ViewLocator` as default data template for `ContentControl`
 
 #### Acceptance Checklist
 
@@ -596,13 +800,13 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
      - `Close()` — delegates to `ProjectService.Close(ActiveProject)`
      - `CloseAll()` — delegates to `ProjectService.CloseAll()`
      - `Exit()` — closes application
-     - `Cut()` — delegates to `EditorPlatformService.Cut()`
-     - `Copy()` — delegates to `EditorPlatformService.Copy()`
-     - `Paste()` — delegates to `EditorPlatformService.Paste()`
-     - `Verify()` — delegates to `LismaPdeService.Validate(ActiveProject)`
-     - `Run()` — delegates to `SimulationService.Simulate()`
-     - `StoreSettings()` — delegates to `SimulationParametersService.Store()`
-     - `LoadSettings()` — delegates to `SimulationParametersService.Load()`
+   - `Cut()` — delegates to `EditorPlatformService.Cut()`
+    - `Copy()` — delegates to `EditorPlatformService.Copy()`
+    - `Paste()` — delegates to `EditorPlatformService.Paste()`
+    - `Verify()` — delegates to `LismaPdeService.Validate(ActiveProject)`
+    - `Run()` — delegates to `SimulationService.Simulate()`
+    - `StoreSettings()` — delegates to `IProjectFileService.StoreSettings()`
+    - `LoadSettings()` — delegates to `IProjectFileService.LoadSettings()`
 
 2. **ProjectViewModel** (interface + implementations)
    - `IProjectViewModel` — `string Name`, `string? FilePath`, `object EditorContent`,
@@ -619,7 +823,7 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
 4. **SimulationService** (presentation service)
     - `ObservableCollection<InProgressSimulationViewModel> TrackingTasks`
     - `Simulate()` — orchestrates full simulation flow:
-      1. Snapshot parameters from `SimulationParametersService` (in App layer)
+      1. Snapshot parameters from `ISimulationParametersService` (interface — App layer implements in Phase 5)
       2. Get active project source text
       3. Call `serverFacade.CompileModel(source)`
       4. Map compilation errors to `ErrorInfo` and call `ModelErrorService.PutErrorList(errors)`
@@ -627,16 +831,22 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
       6. Start monitoring: `serverFacade.MonitorSimulation(id)` → stream progress
       7. For each progress update: normalize to 0.0–1.0, update `InProgressSimulationViewModel.Progress`
       8. Call `serverFacade.DownloadResult(id)` → `CachedSimulationResult`
-      9. Create `CompletedSimulation` and call `SimulationResultService.CommitResult()` (in App layer)
+      9. Create `CompletedSimulation` and call `ISimulationResultService.CommitResult()` (interface — App layer implements in Phase 5)
       10. Remove from `TrackingTasks`
     - `StopSimulation(InProgressSimulationViewModel)` — call `serverFacade.CancelSimulation()`
     - Uses `Task.Run` or `Channels` for background execution (no virtual threads in .NET)
 
 **IMPORTANT: The following services are in `ISMA.App/Services` (NOT in ViewModels):**
-- `SimulationResultService` — requires `FileDialog` (ShowChart) and `GrinProcessLauncher` (ShowChart)
-- `SimulationParametersService` — requires `FileDialog` (Store/Load)
-- `ProjectFileService` — requires `FileDialog` (Open/Save/SaveAs)
+- `SimulationResultService` — requires `FileDialog` (ShowChart) and `GrinProcessLauncher` (ShowChart) — implements `ISimulationResultService`
+- `SimulationParametersService` — requires `FileDialog` (Store/Load) — implements `ISimulationParametersService`
+- `ProjectFileService` — requires `FileDialog` (Open/Save/SaveAs) — implements `IProjectFileService`
 - These services are UI-dependent and cannot be in the ViewModels layer
+- **ViewModels depend on interfaces only** — `ISimulationResultService`, `ISimulationParametersService`, `IProjectFileService` are defined in `ISMA.Domain/Contracts`
+
+**IMPORTANT: Interface definitions required in `ISMA.Domain/Contracts`:**
+- `ISimulationResultService` — `CommitResult(CompletedSimulation)`, `RemoveResult(CompletedSimulation)`, `ShowChart(CompletedSimulation)`, `ExportToFile(CompletedSimulation, filePath)`
+- `ISimulationParametersService` — `Snapshot() → SimulationParameters`, `Commit(SimulationParameters)`, `IntegrationMethods (ObservableCollection<string>)`, `SimplifyMethods (ObservableCollection<string>)`
+- `IProjectFileService` — `Open(ownerWindow) → List<string>`, `Save(project) → bool`, `SaveAs(project) → bool`, `SaveAll(projects) → bool`, `StoreSettings(ownerWindow) → bool`, `LoadSettings(ownerWindow) → bool`
 
 5. **SimulationParametersViewModel**
     - `CauchyInitials` — `double StartTime`, `double EndTime`, `double Step`
@@ -657,7 +867,7 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
 
 7. **Settings ViewModels** (each in its own file, bound to SimulationParametersViewModel)
     - `CauchyInitialsViewModel` — `StartTime`, `EndTime`, `Step` properties
-    - `MethodSettingsViewModel` — `SelectedMethod`, `Accuracy`, `IsAccuracyInUse`, `IsStableAllowedInUse`, `IsStableInUse`, `IsParallelInUse`, `Server`, `Port`, `IntegrationMethods`
+    - `IntegrationMethodViewModel` — `SelectedMethod`, `Accuracy`, `IsAccuracyInUse`, `IsStableInUse`, `IsParallelInUse`, `Server`, `Port`, `IntegrationMethods`
     - `EventDetectionViewModel` — `IsEventDetectionInUse`, `IsStepLimitInUse`, `Gamma`, `LowBorder`
     - `ResultProcessingViewModel` — `IsSimplifyInUse`, `SelectedSimplifyMethod`, `Tolerance`
 
@@ -692,25 +902,55 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
     - `BlueprintStateViewModel State`
     - `string Predicate`, `string Alias`, `string Text`
 
-12. **TasksPopOverViewModel**
+ 12. **SimulationResultViewModel**
+    - `ObservableCollection<CompletedSimulation> CompletedResults`
+    - `CommitResult(CompletedSimulation)` — thread-safe add to collection
+    - `RemoveResult(CompletedSimulation)` — remove from collection
+    - `ShowChart(CompletedSimulation)` — opens SelectVariablesDialog, then calls `GrinProcessLauncher`
+    - `ExportToFile(CompletedSimulation, filePath)` — async CSV export via `BinaryFilePointProvider`
+    - NOTE: This ViewModel is in ISMA.ViewModels layer but delegates ShowChart/ExportToFile to `ISimulationResultService` in App layer
+
+ 13. **InProgressSimulationViewModel**
+    - `int Id` — auto-incrementing task counter
+    - `string ModelName` — name of the model being simulated
+    - `SimulationParameters Parameters` — snapshot of simulation parameters at start
+    - `double Progress` (0.0–1.0, `[ObservableProperty]`) — updated from background task
+    - `bool CanAbort` — true while simulation is running
+    - `AbortCommand` — `[RelayCommand]` that calls `SimulationService.StopSimulation(this)`
+
+ 16. **TasksPopOverViewModel**
     - `ObservableCollection<InProgressSimulationViewModel> InProgress`
     - `ObservableCollection<CompletedSimulation> Completed`
     - Properties for UI binding
 
-13. **SelectVariablesDialogViewModel**
+ 17. **SelectVariablesDialogViewModel**
     - `ObservableCollection<string> AllColumns`
     - `string SelectedXAxis` (pre-select "TIME")
     - `ObservableCollection<NamedPickerItem> YAxisItems`
     - `ICommand SelectAllCommand`, `ICommand UnselectAllCommand`, `ICommand OkCommand`, `ICommand CloseCommand`
 
-14. **EditArrowPopOverViewModel**
+ 18. **EditArrowPopOverViewModel**
     - `string Alias`
     - `string Predicate`
 
-15. **InProgressSimulationViewModel**
-    - `int Id`, `string ModelName`, `SimulationParameters Parameters`
-    - `double Progress` (0.0–1.0, `[ObservableProperty]`)
-    - `bool CanAbort`
+ 19. **InProgressSimulationViewModel**
+    - `int Id` — auto-incrementing task counter
+    - `string ModelName` — name of the model being simulated
+    - `SimulationParameters Parameters` — snapshot of simulation parameters at start
+    - `double Progress` (0.0–1.0, `[ObservableProperty]`) — updated from background task
+    - `bool CanAbort` — true while simulation is running
+    - `AbortCommand` — `[RelayCommand]` that calls `SimulationService.StopSimulation(this)`
+
+20. **CompletedSimulationViewModel**
+    - `int Id` — simulation task ID
+    - `string ModelName` — name of the model
+    - `SimulationParameters Parameters` — parameters used for this simulation
+    - `MetricData MetricData` — timing information (startTime, endTime, simulationTime)
+    - `List<string> ColumnNames` — for axis picker dialog
+    - `string CachedFilePath` — path to cached binary result file
+    - `ShowChartCommand` — opens SelectVariablesDialog
+    - `ExportToFileCommand` — opens file picker for CSV export
+    - `RemoveCommand` — removes from completed list
 
 #### Acceptance Checklist
 
@@ -718,7 +958,7 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
 - [ ] All properties use `[ObservableProperty]` or `[NotifyPropertyChangedFor]`
 - [ ] All commands use `[RelayCommand]`
 - [ ] `MainWindowViewModel` has all 15 commands (NewText, NewBlueprint, Open, Save, SaveAll, Close, CloseAll, Exit, Cut, Copy, Paste, Verify, Run, StoreSettings, LoadSettings)
-- [ ] `SimulationService.Simulate()` implements full flow with proper error handling
+- [ ] `SimulationService.Simulate()` implements full flow with proper error handling using interfaces
 - [ ] Progress updates propagate via `[ObservableProperty]` from background task
 - [ ] `SimulationParametersViewModel` has all 5 parameter sections
 - [ ] `IsStableAllowedInUse` exists in Domain model but NOT in ViewModel UI (internal flag only)
@@ -728,10 +968,11 @@ UI-dependent file operations (ProjectFileService with FileDialog) go in **Phase 
 - [ ] `NamedPickerItem<T>` generic model supports axis picker dialog
 - [ ] `LismaPdeTranslationResult` sealed interface used by LismaPdeService
 - [ ] `CompletedSimulationViewModel` exposes column names for axis picker
+- [ ] `SimulationResultViewModel` delegates UI operations to `ISimulationResultService` (App layer)
+- [ ] `InProgressSimulationViewModel` has `AbortCommand` with `[RelayCommand]`
 - [ ] ViewModels have zero Avalonia dependencies (NO FileDialog, NO Window, NO GrinProcessLauncher)
 - [ ] `dotnet build ISMA.ViewModels` produces zero errors
-- [ ] `SimulationResultService` and `SimulationParametersService` are in App layer (not ViewModels)
-- [ ] `ISimulationResultService` and `IProjectFileService` interfaces exist in Domain.Contracts
+- [ ] `ISimulationResultService`, `ISimulationParametersService`, `IProjectFileService` interfaces exist in Domain.Contracts
 
 ---
 
@@ -1303,7 +1544,7 @@ All 31 features from the original application that must be implemented:
 | 16 | Result download and caching | 2 | Low |
 | 17 | Error list display | 7 | Low |
 | 18 | Simulation parameters configuration | 7 | Low |
-| 19 | Parameter presets (store/load JSON) | 5 (App) | Low |
+| 19 | Parameter presets (store/load JSON) | 5 | Low |
 | 20 | Chart visualization (Grin process) | 10 | Low |
 | 21 | Variable axis selection dialog | 10 | Medium |
 | 22 | CSV export of results | 10 | Medium |

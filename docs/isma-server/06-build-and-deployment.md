@@ -250,18 +250,30 @@ flowchart LR
 ## Build Commands
 
 ```bash
-# Build entire isma-server module
+# Build entire isma-server module (all 4 submodules)
 ./gradlew :isma-server:build
 
 # Build just the application (includes all dependencies)
 ./gradlew :isma-server:app:build
 
-# Generate gRPC stubs only
+# Generate gRPC stubs only (after proto changes)
 ./gradlew :isma-server:grpc:generateProto
+
+# Build with tests
+./gradlew :isma-server:test
 
 # Build distribution bundle (UI + server together)
 ./.ci-cd/build-bundle.sh
 ```
+
+### Common Issues
+
+| Problem | Solution |
+|---------|----------|
+| Proto files not found | Run `./gradlew :isma-server:grpc:generateProto` after pulling proto changes |
+| Missing Epoll native library | Server requires Linux x86_64; Epoll classifier `linux-x86_64` must be available |
+| Socket file already exists | Server auto-deletes stale sockets at startup; manually `rm /tmp/isma-*.sock` if needed |
+| ServiceLoader finds no integration methods | Ensure `isma-solver:lib:euler`, `lib:rk2`, etc. are in the classpath and have `META-INF/services/ru.nstu.isma.intg.api.methods.IIntegrationMethodFactory` entries |
 
 ---
 

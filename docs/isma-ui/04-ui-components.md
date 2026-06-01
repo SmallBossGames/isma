@@ -27,9 +27,9 @@ app/src/main/kotlin/ru/isma/next/app/
 │   │   └── LismaPdeTranslationResult.kt  # Success/Failed sealed interface
 │   └── simualtion/               # SimulationService, SimulationResultService, SimulationParametersService
 ├── viewmodels/                   # TornadoFX view models for settings
-├── utilities/                    # BlueprintModelExenstions.kt (convertToLisma)
-├── extention/                    # ButtonExtensions.kt, FormsExtentions.kt
-├── constants/                    # FileExtentions.kt (file type constants)
+├── utilities/                    # BlueprintModelExtensions.kt (convertToLisma)
+├── extentions/                   # ButtonExtensions.kt, FormsExtensions.kt
+└── constants/                    # FileExtensions.kt (file type constants)
 ├── views/
 │   ├── MainView.kt               # Main BorderPane layout
 │   ├── dialogs/                  # ItemsPickerDialog
@@ -167,7 +167,13 @@ class BlueprintProjectModel : IProjectModel, KoinScopeComponent {
 }
 ```
 
-`snapshot()` converts the visual blueprint model to LISMA text via `BlueprintModelExenstions.kt`, which handles main text, state blocks, and loop transactions.
+`snapshot()` converts the visual blueprint model to LISMA text via `BlueprintModelExtensions.kt`, which handles main text, state blocks, and loop transactions.
+
+### Additional Project Models
+
+**File:** `LismaProjectDataProvider.kt` / `BlueprintProjectDataProvider.kt`
+
+Data providers that act as the shared model between the project model and the editor. `LismaProjectDataProvider` holds the LISMA text string and notifies observers on changes. `BlueprintProjectDataProvider` holds the `BlueprintModel` and similarly provides change notification.
 
 ## Services
 
@@ -267,6 +273,24 @@ sealed interface LismaPdeTranslationResult
 data object SuccessTranslation : LismaPdeTranslationResult
 data object FailedTranslation : LismaPdeTranslationResult
 ```
+
+### SyntaxHighlighterService
+
+**File:** `editors/SyntaxHighlighterService.kt`
+
+Provides syntax highlighting for the text editor. Delegates to `RemoteLismaHighlightingService` which calls `serverFacade.highlightSource()` to get token positions and kinds from the server.
+
+### TextEditorFactory
+
+**File:** `editors/TextEditorFactory.kt`
+
+Factory for creating and disposing `IsmaTextEditor` instances. Used by the blueprint editor to create text editor tabs for state/loop content editing. Implements `ITextEditorFactory` interface from the blueprint-editor module.
+
+### ModelErrorService
+
+**File:** `ModelErrorService.kt`
+
+Tracks compilation and validation errors in an `ObservableList<ErrorViewModel>`. Populated by `LismaPdeService` (validation) and `SimulationService` (compilation errors). Consumed by `IsmaErrorListTable` for display.
 
 ### SimulationParametersService
 
@@ -467,6 +491,45 @@ class EditorPlatformService : IEditorPlatformService {
     }
 }
 ```
+
+### IEditorPlatformService (Contract)
+
+**File:** `text-editor/src/main/kotlin/.../services/contracts/IEditorPlatformService.kt`
+
+Interface defining the contract for editor platform services:
+
+```kotlin
+interface IEditorPlatformService {
+    val cutEvent: Flow<Unit>
+    val copyEvent: Flow<Unit>
+    val pasteEvent: Flow<Unit>
+    fun cut()
+    fun copy()
+    fun paste()
+}
+```
+
+### IHighlightingService (Contract)
+
+**File:** `text-editor/src/main/kotlin/.../services/contracts/IHighlightingService.kt`
+
+Interface defining the contract for syntax highlighting services:
+
+```kotlin
+interface IHighlightingService {
+    fun createHighlightingStyleSpans(text: String): StyleSpans<Collection<String>>
+}
+```
+
+### RemoteLismaHighlightingService
+
+**File:** `text-editor/src/main/kotlin/.../services/RemoteLismaHighlightingService.kt`
+
+Implementation of `IHighlightingService` that delegates to `SimulationServerFacade.highlightSource()`. Converts `SyntaxTokenDto[]` from the server into `StyleSpans<Collection<String>>` with CSS class mappings:
+- `SyntaxTokenKind.KEYWORD` → `syntax-keyword`
+- `SyntaxTokenKind.COMMENT` → `syntax-comment`
+- `SyntaxTokenKind.NUMBER` → `syntax-decimal`
+- `SyntaxTokenKind.UNSPECIFIED` → `syntax-default`
 
 ### IsmaTextEditor
 

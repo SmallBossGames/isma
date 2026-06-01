@@ -16,7 +16,7 @@ isma-ui/
 │       ├── viewmodels/           # TornadoFX view models
 │       ├── views/                # JavaFX UI components (MainView, toolbars, settings)
 │       ├── utilities/            # BlueprintModel extensions (convertToLisma)
-│       ├── extention/            # Ikonli icon helpers, TornadoFX binding helpers
+│       ├── extentions/           # Ikonli icon helpers, TornadoFX binding helpers
 │       └── constants/            # File extension constants, preferences paths
 ├── domain/                       # Pure Kotlin domain models (no UI deps)
 ├── external-services/            # gRPC clients, HTTP client, server manager

@@ -85,7 +85,7 @@ Returns the download URL for a completed simulation's result file.
 
 **Note:** The download URL is served by the embedded Ktor HTTP server on a separate Unix socket.
 
-**Implementation:** `SimulationServiceGrpcImpl.getSimulationResult()` → validates session status is `COMPLETED` → returns file path.
+**Implementation:** `SimulationServiceGrpcImpl.getSimulationResult()` → opens `InputStream` via handler (used only for validation, immediately closed) → returns download URL string `/simulation/{simulationId}/download`. The actual binary file download is served by the Ktor HTTP server on a separate Unix socket.
 
 ---
 
@@ -108,9 +108,11 @@ Streams progress updates for a running simulation.
 | `end_time` | `double` | Simulation end time |
 | `current_time` | `double` | Current simulation time (advances toward end_time) |
 
-**Polling behavior:** The server-side handler polls the session store every 100ms. Reports are sent when:
-1. The simulation reaches a time delta of at least `accuracy * timeRange`, or
+**Polling behavior:** The server-side handler polls the session store every 100ms on the gRPC thread. Reports are sent when:
+1. The simulation reaches a time delta of at least `accuracy * timeRange` since the last report, or
 2. The simulation finishes (any terminal status: COMPLETED, FAILED, CANCELLED)
+
+**Accuracy parameter:** Controls report granularity. With `accuracy = 0.0`, only the final status is reported. With `accuracy = 0.1` and a 10-second simulation, reports are sent approximately every 1 second of simulated time.
 
 **Implementation:** `SimulationServiceGrpcImpl.monitorSimulation()` → `IMonitorSimulationHandler.handle()` → polling loop with callback.
 
@@ -289,7 +291,9 @@ Performs lexical analysis on LISMA source code, returning syntax tokens for IDE 
 | `KEYWORD` | LISMA keywords (const, state, for, if, else, from, macro, set) |
 | `COMMENT` | Single-line and block comments |
 | `NUMBER` | Floating-point and decimal literals |
-| `TEXT` | All other identifiers and symbols |
+| `TEXT` | Reserved — never produced by the handler |
+
+Note: `TEXT` is defined in the proto but the handler silently filters all non-keyword/non-comment/non-number tokens.
 
 **Implementation:** Uses ANTLR4 `LismaLexer` to tokenize source code. Only keywords, comments, and numbers are returned (other token types are filtered out).
 

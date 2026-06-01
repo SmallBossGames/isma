@@ -393,10 +393,10 @@ The `Grpc.Tools` package generates C# stubs from protobuf definitions. Configura
 
 ```xml
 <ItemGroup>
-  <Protobuf Include="..\..\protobuf-contracts\simulation\*.proto" GrpcServices="Client" Link="proto\%(Filename)%(Extension)" />
+  <Protobuf Include="..\..\protobuf-contracts\v1\simulation_service\*.proto" GrpcServices="Client" Link="proto\%(Filename)%(Extension)" />
 </ItemGroup>
 <ItemGroup>
-  <Protobuf Include="..\..\protobuf-contracts\simulation\*.proto" GrpcServices="Server" Link="proto\%(Filename)%(Extension)" Condition="'$(Configuration)' == 'Debug'" />
+  <Protobuf Include="..\..\protobuf-contracts\v1\simulation_service\*.proto" GrpcServices="Server" Link="proto\%(Filename)%(Extension)" Condition="'$(Configuration)' == 'Debug'" />
 </ItemGroup>
 ```
 
@@ -457,8 +457,8 @@ Generated files appear in `obj/Debug/net10.0/` and are automatically included in
    - **ViewModels:** `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection.Abstractions`
    - **App:** `Avalonia.Themes.Fluent`, `Avalonia.Controls.DataGrid`, `Avalonia.Desktop`, `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection`, `ICSharpCode.AvalonEdit`, `AvaloniaUI.DiagnosticsSupport`, `Avalonia.Fonts.Inter`
    - **Tests:** `xunit`, `xunit.runner.visualstudio`, `FluentAssertions`, `Moq`, `Microsoft.NET.Test.Sdk`, `coverlet.collector`
-5. Configure `Grpc.Tools` protobuf generation from `protobuf-contracts/simulation/`
-   - Add `<Protobuf Include="..\..\protobuf-contracts\simulation\*.proto" GrpcServices="Client" />` to `ISMA.Infrastructure.csproj`
+5. Configure `Grpc.Tools` protobuf generation from `protobuf-contracts/v1/`
+    - Add `<Protobuf Include="..\..\protobuf-contracts\v1\simulation_service\*.proto" GrpcServices="Client" />` to `ISMA.Infrastructure.csproj`
    - Set `<ProtobufFiles>$(IntermediateOutputPath)$(MSBuildProjectName).grpc.cs</ProtobufFiles>` for output path
    - Verify generated stubs in `obj/Debug/net10.0/` after build
 6. Set up DI registration skeleton in `App.xaml.cs` using `ServiceCollectionExtensions` pattern:

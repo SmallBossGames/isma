@@ -45,7 +45,7 @@ sourceSets {
 }
 ```
 
-**Code generation:** Protobuf files from `protobuf-contracts/simulation/` are compiled into Java gRPC stubs. The generated classes include:
+**Code generation:** Protobuf files from `protobuf-contracts/v1/` are compiled into Java gRPC stubs. The generated classes include:
 - Service interfaces (`SimulationServiceGrpc`, `LismaCompilerServiceGrpc`)
 - Message classes (`RunSimulationRequest`, `CompileResponse`, etc.)
 - Builder classes for all messages

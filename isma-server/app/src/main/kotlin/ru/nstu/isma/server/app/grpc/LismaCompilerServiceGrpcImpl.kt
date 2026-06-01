@@ -4,10 +4,11 @@ import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.stub.StreamObserver
 import org.slf4j.LoggerFactory
-import ru.nstu.isma.contracts.simulation.*
+import ru.nstu.isma.contracts.v1.compiler_service.*
 import ru.nstu.isma.domain.handlers.compileLisma.ICompileLismaHandler
 import ru.nstu.isma.domain.handlers.deleteCompiledModel.IDeleteCompiledModelHandler
 import ru.nstu.isma.domain.handlers.highlightLisma.IHighlightLismaHandler
+import ru.nstu.isma.domain.handlers.highlightLisma.SyntaxKind
 import ru.nstu.isma.domain.handlers.validateLisma.IValidateLismaHandler
 
 class LismaCompilerServiceGrpcImpl(
@@ -128,10 +129,10 @@ class LismaCompilerServiceGrpcImpl(
                     .setStart(token.start)
                     .setLength(token.length)
                     .setKind(when (token.kind) {
-                        ru.nstu.isma.domain.handlers.highlightLisma.SyntaxKind.KEYWORD -> TokenKind.KEYWORD
-                        ru.nstu.isma.domain.handlers.highlightLisma.SyntaxKind.COMMENT -> TokenKind.COMMENT
-                        ru.nstu.isma.domain.handlers.highlightLisma.SyntaxKind.NUMBER -> TokenKind.NUMBER
-                        ru.nstu.isma.domain.handlers.highlightLisma.SyntaxKind.TEXT -> TokenKind.TEXT
+                        SyntaxKind.KEYWORD -> TokenKind.TOKEN_KIND_KEYWORD
+                        SyntaxKind.COMMENT -> TokenKind.TOKEN_KIND_COMMENT
+                        SyntaxKind.NUMBER -> TokenKind.TOKEN_KIND_NUMBER
+                        SyntaxKind.TEXT -> TokenKind.TOKEN_KIND_TEXT
                     })
                     .build()
             }

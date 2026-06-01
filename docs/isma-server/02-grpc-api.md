@@ -2,7 +2,7 @@
 
 ## Overview
 
-The server exposes two gRPC services defined in `protobuf-contracts/simulation/`:
+The server exposes two gRPC services defined in `protobuf-contracts/v1/`:
 
 | Service | Purpose |
 |---------|---------|

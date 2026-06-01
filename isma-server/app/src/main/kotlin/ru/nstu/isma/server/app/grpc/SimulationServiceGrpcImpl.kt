@@ -4,7 +4,7 @@ import io.grpc.Status
 import io.grpc.StatusException
 import io.grpc.stub.StreamObserver
 import org.slf4j.LoggerFactory
-import ru.nstu.isma.contracts.simulation.*
+import ru.nstu.isma.contracts.v1.simulation_service.*
 import ru.nstu.isma.domain.handlers.cancelSimulation.ICancelSimulationHandler
 import ru.nstu.isma.domain.handlers.getSimulationResult.IGetSimulationResultHandler
 import ru.nstu.isma.domain.handlers.listSimulationMethods.IListSimulationMethodsHandler

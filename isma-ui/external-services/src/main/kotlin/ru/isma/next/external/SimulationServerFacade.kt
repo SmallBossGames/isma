@@ -4,7 +4,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import ru.isma.next.domain.models.SimulationProgress
-import ru.nstu.isma.contracts.simulation.*
+import ru.nstu.isma.contracts.v1.compiler_service.*
+import ru.nstu.isma.contracts.v1.simulation_service.*
 import java.io.File
 import java.nio.file.Path
 
@@ -58,9 +59,9 @@ class SimulationServerFacade(
                 start = token.start,
                 length = token.length,
                 kind = when (token.kind) {
-                    ru.nstu.isma.contracts.simulation.TokenKind.KEYWORD -> SyntaxTokenKind.KEYWORD
-                    ru.nstu.isma.contracts.simulation.TokenKind.COMMENT -> SyntaxTokenKind.COMMENT
-                    ru.nstu.isma.contracts.simulation.TokenKind.NUMBER -> SyntaxTokenKind.NUMBER
+                    TokenKind.TOKEN_KIND_KEYWORD -> SyntaxTokenKind.KEYWORD
+                    TokenKind.TOKEN_KIND_COMMENT -> SyntaxTokenKind.COMMENT
+                    TokenKind.TOKEN_KIND_NUMBER -> SyntaxTokenKind.NUMBER
                     else -> SyntaxTokenKind.TEXT
                 },
             )

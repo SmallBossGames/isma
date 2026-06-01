@@ -6,7 +6,7 @@ import io.netty.channel.MultiThreadIoEventLoopGroup
 import io.netty.channel.epoll.EpollDomainSocketChannel
 import io.netty.channel.epoll.EpollIoHandler
 import io.netty.channel.unix.DomainSocketAddress
-import ru.nstu.isma.contracts.simulation.SimulationServiceGrpc
+import ru.nstu.isma.contracts.v1.simulation_service.SimulationServiceGrpc
 
 class GrpcSimulationClient(socketPath: String) {
     private val eventLoopGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())

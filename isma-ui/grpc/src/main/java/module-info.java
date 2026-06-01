@@ -8,5 +8,6 @@ module isma.ui.grpc {
     requires com.google.protobuf;
     requires com.google.common;
 
-    exports ru.nstu.isma.contracts.simulation;
+    exports ru.nstu.isma.contracts.v1.compiler_service;
+    exports ru.nstu.isma.contracts.v1.simulation_service;
 }

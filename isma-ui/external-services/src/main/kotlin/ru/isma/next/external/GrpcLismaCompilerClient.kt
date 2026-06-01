@@ -6,9 +6,9 @@ import io.netty.channel.MultiThreadIoEventLoopGroup
 import io.netty.channel.epoll.EpollDomainSocketChannel
 import io.netty.channel.epoll.EpollIoHandler
 import io.netty.channel.unix.DomainSocketAddress
-import ru.nstu.isma.contracts.simulation.HighlightRequest
-import ru.nstu.isma.contracts.simulation.HighlightResponse
-import ru.nstu.isma.contracts.simulation.LismaCompilerServiceGrpc
+import ru.nstu.isma.contracts.v1.compiler_service.HighlightRequest
+import ru.nstu.isma.contracts.v1.compiler_service.HighlightResponse
+import ru.nstu.isma.contracts.v1.compiler_service.LismaCompilerServiceGrpc
 
 class GrpcLismaCompilerClient(socketPath: String) {
     private val eventLoopGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())

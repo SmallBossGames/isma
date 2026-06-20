@@ -17,6 +17,7 @@ import ru.isma.next.app.views.settings.*
 import ru.isma.next.app.views.tabpane.IsmaEditorTabPane
 import ru.isma.next.app.views.toolbars.*
 import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
+import ru.isma.next.editor.blueprint.IsmaBlueprintViewModel
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.text.IsmaTextEditor
 import ru.isma.next.editor.text.services.RemoteLismaHighlightingService
@@ -45,6 +46,7 @@ val blueprintEditorModule = module {
 
     scope<BlueprintProjectModel> {
         scoped<ITextEditorFactory>{ TextEditorFactory { get() } }
+        factoryOf(::IsmaBlueprintViewModel)
         factoryOf(::IsmaTextEditor) onClose { it?.dispose() }
         scopedOf(::BlueprintProjectDataProvider)
         scopedOf(::IsmaBlueprintEditor)

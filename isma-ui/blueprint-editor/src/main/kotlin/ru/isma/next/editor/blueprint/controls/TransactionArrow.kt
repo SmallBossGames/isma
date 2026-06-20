@@ -17,6 +17,7 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import ru.isma.next.editor.blueprint.constants.*
 
 interface ITransactionArrowData {
     val aliasProperty: SimpleStringProperty
@@ -49,18 +50,18 @@ class TransactionArrow(
         layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(startYProperty))
 
         val predicateText = Label().apply {
-            font = Font("Arial", 16.0)
-            prefWidth = TextFieldLength
-            translateY = -10.0
-            translateX = -TextFieldLength / 2.0
+            font = Font("Arial", ARROW_LABEL_FONT_SIZE)
+            prefWidth = ARROW_LABEL_FIELD_WIDTH
+            translateY = LOOP_LABEL_Y_OFFSET
+            translateX = -ARROW_LABEL_FIELD_WIDTH / 2.0
             alignment = Pos.CENTER
         }
 
         val predicateTextWrapped = Group(predicateText)
 
         val arrowhead = Group(
-            Polygon(7.0, -7.0, -7.0, 0.0, 7.0, 7.0).apply {
-                strokeWidth = 3.0
+            Polygon(ARROWHEAD_WIDTH, -ARROWHEAD_WIDTH, -ARROWHEAD_WIDTH, 0.0, ARROWHEAD_WIDTH, ARROWHEAD_WIDTH).apply {
+                strokeWidth = ARROWHEAD_STROKE
                 viewOrder = 6.0
             }
         ).apply {
@@ -70,17 +71,17 @@ class TransactionArrow(
         children.addAll(arrowhead, predicateTextWrapped)
 
         line {
-            strokeWidth = 3.0
+            strokeWidth = ARROW_LINE_STROKE
             viewOrder = 6.0
 
             fun updateGeometry() {
                 val x = this@TransactionArrow.endX - this@TransactionArrow.startX
                 val y = this@TransactionArrow.endY - this@TransactionArrow.startY
                 val angle = atan2(x, y) + PI / 2
-                val offsetX = 10.0 * sin(angle)
-                val offsetY = 10.0 * cos(angle)
-                val textOffsetX = 75.0 * sin(angle)
-                val textOffsetY = 50.0 * cos(angle)
+                val offsetX = ARROW_LINE_OFFSET * sin(angle)
+                val offsetY = ARROW_LINE_OFFSET * cos(angle)
+                val textOffsetX = ARROW_TEXT_X_OFFSET * sin(angle)
+                val textOffsetY = ARROW_TEXT_Y_OFFSET * cos(angle)
 
                 startX = this@TransactionArrow.startX - this@TransactionArrow.layoutX + offsetX
                 startY = this@TransactionArrow.startY - this@TransactionArrow.layoutY + offsetY
@@ -126,8 +127,6 @@ class TransactionArrow(
     }
 
     companion object {
-        private const val TextFieldLength = 120.0
-
         inline fun Group.line(crossinline op: Line.() -> Unit){
             this.children.add(
                 Line().apply(op)

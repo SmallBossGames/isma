@@ -8,8 +8,7 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
-import ru.isma.next.editor.blueprint.constants.INIT_STATE
-import ru.isma.next.editor.blueprint.constants.MAIN_STATE
+import ru.isma.next.editor.blueprint.constants.*
 import ru.isma.next.editor.blueprint.controls.*
 import ru.isma.next.editor.blueprint.models.*
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
@@ -284,10 +283,10 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         ).apply {
             color = Color.LIGHTGREEN
             isEditable = false
-            squareHeight = 60.0
+            squareHeight = FIXED_STATE_HEIGHT
             name = MAIN_STATE
-            layoutXProperty().value += 10
-            layoutXProperty().value += 10
+            layoutXProperty().value += STATE_INSET
+            layoutXProperty().value += STATE_INSET
 
             nameChangingMonitor.tryRegister(name)
         }
@@ -308,9 +307,9 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             color = Color.LIGHTBLUE
             isEditButtonVisible = false
             isEditable = false
-            squareHeight = 60.0
+            squareHeight = FIXED_STATE_HEIGHT
             name = INIT_STATE
-            layoutXProperty().value += 10
+            layoutXProperty().value += STATE_INSET
             layoutYProperty().value += 100
 
             nameChangingMonitor.tryRegister(name)

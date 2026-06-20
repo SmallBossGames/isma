@@ -2,6 +2,7 @@ package ru.isma.next.editor.blueprint.controls
 
 import javafx.geometry.Insets
 import javafx.scene.control.Label
+import ru.isma.next.editor.blueprint.constants.*
 import javafx.scene.control.TextField
 import javafx.scene.effect.DropShadow
 import javafx.scene.layout.Background
@@ -13,13 +14,13 @@ import javafx.scene.paint.Color
 class EditArrowPopOver(arrow: ITransactionArrowData, x: Double, y: Double): VBox(
     Label("Alias (optional)"),
     TextField().apply {
-        minWidth = 300.0
+        minWidth = POPOVER_MIN_WIDTH
 
         textProperty().bindBidirectional(arrow.aliasProperty)
     },
     Label("Predicate"),
     TextField().apply {
-        minWidth = 300.0
+        minWidth = POPOVER_MIN_WIDTH
 
         textProperty().bindBidirectional(arrow.predicateProperty)
     },
@@ -28,16 +29,16 @@ class EditArrowPopOver(arrow: ITransactionArrowData, x: Double, y: Double): VBox
         translateXProperty().bind(widthProperty().divide(-2).add(x))
         translateY = y - 2.0
 
-        padding = Insets(10.0)
+        padding = Insets(POPOVER_PADDING)
 
         background = Background(
             BackgroundFill(
                 Color.WHITE,
-                CornerRadii(5.0),
+                CornerRadii(POPOVER_CORNER_RADIUS),
                 Insets(0.0)
             )
         )
 
-        effect = DropShadow(20.0, Color.LIGHTGRAY)
+        effect = DropShadow(POPOVER_SHADOW_RADIUS, Color.LIGHTGRAY)
     }
 }

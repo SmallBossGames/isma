@@ -11,6 +11,7 @@ import javafx.scene.shape.Polygon
 import javafx.scene.text.Font
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import ru.isma.next.editor.blueprint.constants.*
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
 
@@ -33,27 +34,27 @@ class LoopTransactionArrow(
         viewOrder = 4.0
 
         children.addAll(
-            Circle(40.0, Color.TRANSPARENT).apply {
+            Circle(LOOP_CIRCLE_RADIUS, Color.TRANSPARENT).apply {
                 fill = Color.TRANSPARENT
                 stroke = Color.BLACK
-                strokeWidth = 3.0
+                strokeWidth = ARROW_LINE_STROKE
 
-                centerX = 60.0
+                centerX = LOOP_CIRCLE_CENTER_X
             },
             Group(
-                Polygon(0.0, -7.0, 7.0, 0.0, -7.0, 0.0).apply {
-                    strokeWidth = 3.0
+                Polygon(0.0, -ARROWHEAD_WIDTH, ARROWHEAD_WIDTH, 0.0, -ARROWHEAD_WIDTH, 0.0).apply {
+                    strokeWidth = ARROWHEAD_STROKE
                     viewOrder = 6.0
                 }
             ).apply {
-                layoutX = 100.0
+                layoutX = LOOP_ARROWHEAD_X
 
                 addEventHandler(MouseEvent.MOUSE_CLICKED){ handleMouseClick(it) }
             },
             Label().apply {
-                font = Font("Arial", 16.0)
-                translateY = -10.0
-                translateX = 120.0
+                font = Font("Arial", ARROW_LABEL_FONT_SIZE)
+                translateY = LOOP_LABEL_Y_OFFSET
+                translateX = LOOP_LABEL_X
                 alignment = Pos.CENTER
 
                 fun updatePredicateText(){

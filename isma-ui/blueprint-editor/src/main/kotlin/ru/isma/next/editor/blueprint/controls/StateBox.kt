@@ -17,6 +17,7 @@ import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import ru.isma.next.editor.blueprint.constants.*
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
 
@@ -31,8 +32,8 @@ class StateBox(
     val nameProperty = SimpleStringProperty("")
     private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
     private val textProperty = SimpleStringProperty("")
-    private val squareWidthProperty = SimpleDoubleProperty(110.0)
-    private val squareHeightProperty = SimpleDoubleProperty(65.0)
+    private val squareWidthProperty = SimpleDoubleProperty(DEFAULT_STATE_WIDTH)
+    private val squareHeightProperty = SimpleDoubleProperty(DEFAULT_STATE_HEIGHT)
     private val colorProperty = SimpleObjectProperty<Paint>(Color.WHITE)
 
     private var isEditModeEnabled by isEditModeEnabledProperty
@@ -55,8 +56,8 @@ class StateBox(
             widthProperty().bind(squareWidthProperty)
             fillProperty().bind(colorProperty)
             viewOrder = 3.0
-            arcWidth = 20.0
-            arcHeight = 20.0
+            arcWidth = CORNER_RADIUS
+            arcHeight = CORNER_RADIUS
         })
 
         val nameTextArea = TextArea().apply {
@@ -73,7 +74,7 @@ class StateBox(
         }
 
         val boxLabel = Label().apply {
-            font = Font("Arial", 16.0)
+            font = Font("Arial", STATE_NAME_FONT_SIZE)
             textProperty().bind(nameProperty)
             visibleProperty().bind(!isEditModeEnabledProperty)
             managedProperty().bind(!isEditModeEnabledProperty)
@@ -82,8 +83,8 @@ class StateBox(
         children.add(HBox().apply {
             prefHeightProperty().bind(squareHeightProperty.subtract(20.0))
             prefWidthProperty().bind(squareWidthProperty.subtract(20.0))
-            translateX += 10.0
-            translateY += 10.0
+            translateX += STATE_INSET
+            translateY += STATE_INSET
             alignment = Pos.CENTER
             children.add(boxLabel)
             children.add(nameTextArea)

@@ -9,7 +9,7 @@ plugins {
 
 javafx {
     version = "25.0.2"
-    modules = listOf("javafx.controls", "javafx.fxml")
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
 dependencies {

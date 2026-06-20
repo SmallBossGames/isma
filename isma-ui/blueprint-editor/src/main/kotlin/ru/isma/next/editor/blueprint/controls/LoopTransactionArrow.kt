@@ -9,9 +9,9 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Polygon
 import javafx.scene.text.Font
-import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.editor.blueprint.constants.*
+import ru.isma.next.editor.blueprint.controls.CoroutineScopeProvider
+import ru.isma.next.editor.blueprint.utilities.ClickDisambiguator
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
 
@@ -33,6 +33,12 @@ class LoopTransactionArrow(
     init {
         viewOrder = 4.0
 
+        val clickDisambiguator = ClickDisambiguator(
+            coroutineScope = CoroutineScopeProvider.scope,
+            singleClick = { onArrowClick(this@LoopTransactionArrow, it) },
+            doubleClick = { onArrowDoubleClick(this@LoopTransactionArrow, it) }
+        )
+
         children.addAll(
             Circle(LOOP_CIRCLE_RADIUS, Color.TRANSPARENT).apply {
                 fill = Color.TRANSPARENT
@@ -49,7 +55,7 @@ class LoopTransactionArrow(
             ).apply {
                 layoutX = LOOP_ARROWHEAD_X
 
-                addEventHandler(MouseEvent.MOUSE_CLICKED){ handleMouseClick(it) }
+                addEventHandler(MouseEvent.MOUSE_CLICKED){ clickDisambiguator.onClick(it) }
             },
             Label().apply {
                 font = Font("Arial", ARROW_LABEL_FONT_SIZE)
@@ -74,36 +80,5 @@ class LoopTransactionArrow(
         setOnMouseClicked {
             onClick(this@LoopTransactionArrow, it)
         }
-    }
-
-    private var singleClickAction: Job? = null
-
-    private fun handleMouseClick(event: MouseEvent){
-        when(event.clickCount){
-            1 -> {
-                if(singleClickAction == null) {
-                    singleClickAction = coroutineScope.launch {
-                        delay(200)
-
-                        singleClickAction = null
-
-                        onArrowClick(this@LoopTransactionArrow, event)
-                    }
-                }
-
-            }
-            2 -> {
-                if(singleClickAction != null){
-                    singleClickAction?.cancel()
-                    singleClickAction = null
-
-                    onArrowDoubleClick(this@LoopTransactionArrow, event)
-                }
-            }
-        }
-    }
-
-    companion object {
-        private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
     }
 }

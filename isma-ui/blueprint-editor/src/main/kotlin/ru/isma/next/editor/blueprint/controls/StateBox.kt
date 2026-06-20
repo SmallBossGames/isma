@@ -15,9 +15,9 @@ import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
-import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.editor.blueprint.constants.*
+import ru.isma.next.editor.blueprint.controls.CoroutineScopeProvider
+import ru.isma.next.editor.blueprint.utilities.ClickDisambiguator
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
 
@@ -37,7 +37,6 @@ class StateBox(
     private val colorProperty = SimpleObjectProperty<Paint>(Color.WHITE)
 
     private var isEditModeEnabled by isEditModeEnabledProperty
-    private var isDragged = false
 
     var isEditable by isEditableProperty
     var isEditButtonVisible by isEditButtonVisibleProperty
@@ -90,50 +89,30 @@ class StateBox(
             children.add(nameTextArea)
         })
 
-        var singleClickAction: Job? = null
-
-        addEventHandler(MouseEvent.MOUSE_CLICKED) {
-            when(it.clickCount){
-                1 -> {
-                    if(singleClickAction == null) {
-                        singleClickAction = coroutineScope.launch {
-                            delay(200)
-
-                            singleClickAction = null
-
-                            if (!isDragged && isEditable) {
-                                isEditModeEnabled = true
-                                nameTextArea.requestFocus()
-                            }
-
-                            onClick(this@StateBox, it)
-                        }
-                    }
-
+        val clickDisambiguator = ClickDisambiguator(
+            coroutineScope = CoroutineScopeProvider.scope,
+            singleClick = {
+                if (isEditable) {
+                    isEditModeEnabled = true
+                    nameTextArea.requestFocus()
                 }
-                2 -> {
-                    if(singleClickAction != null){
-                        singleClickAction?.cancel()
-                        singleClickAction = null
+                onClick(this@StateBox, it)
+            },
+            doubleClick = { onDoubleClick(this@StateBox, it) }
+        )
 
-                        onDoubleClick(this@StateBox, it)
-                    }
-                }
-            }
-        }
         addEventHandler(MouseEvent.MOUSE_PRESSED) {
-            isDragged = false
+            clickDisambiguator.onKeyPress()
             onPress(this@StateBox, it)
         }
         addEventHandler(MouseEvent.MOUSE_RELEASED) {
             onRelease(this@StateBox, it)
         }
         addEventHandler(MouseEvent.MOUSE_DRAGGED) {
-            isDragged = true
+            clickDisambiguator.onDragged()
         }
-    }
-
-    companion object {
-        private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
+        addEventHandler(MouseEvent.MOUSE_CLICKED) {
+            clickDisambiguator.onClick(it)
+        }
     }
 }

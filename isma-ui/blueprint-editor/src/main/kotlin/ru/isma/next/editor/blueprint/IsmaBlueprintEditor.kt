@@ -1,7 +1,6 @@
 package ru.isma.next.editor.blueprint
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.scene.control.*
 import javafx.scene.input.MouseEvent
@@ -19,29 +18,15 @@ import kotlin.math.max
 class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): BorderPane() {
     private val nameChangingMonitor = NameChangingMonitor("New state")
 
-    private val isRemoveStateModeProperty = SimpleBooleanProperty(false)
-    private val isRemoveTransactionModeProperty = SimpleBooleanProperty(false)
-    private val isAddTransactionModeProperty = SimpleBooleanProperty(false)
-    private val addTransactionStateCounterProperty = SimpleIntegerProperty(0)
+    private val editorModeProperty = SimpleObjectProperty<EditorMode>(EditorMode.Idle)
+    private var editorMode by editorModeProperty
 
     private var activeStateBox: StateBox? = null
-    private var statesToLink = arrayOf<StateBox?>(null, null)
 
     private var xOffset = 0.0
     private var yOffset = 0.0
 
-    private fun isRemoveStateModeProperty() = isRemoveStateModeProperty
-    private fun isRemoveTransactionModeProperty() = isRemoveTransactionModeProperty
-    private fun isAddTransactionModeProperty() = isAddTransactionModeProperty
-
-    private var isRemoveStateMode by isRemoveStateModeProperty
-    private var isRemoveTransactionMode by isRemoveTransactionModeProperty
-    private var isAddTransactionMode by isAddTransactionModeProperty
-    private var addTransactionStateCounter by addTransactionStateCounterProperty
-
-    private val transactions = ArrayList<BlueprintEditorTransactionModel>()
-    private val loopTransactions = ArrayList<BlueprintEditorLoopTransactionModel>()
-    private val stateBoxes = ArrayList<StateBox>()
+    private val canvasViewModel = CanvasViewModel()
     private val mainStateBox: StateBox = createMainStateBox()
     private val initStateBox: StateBox = createInitStateBox()
 
@@ -50,7 +35,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         addInitStateBox()
 
         addEventHandler(MouseEvent.MOUSE_DRAGGED) {
-            if(it.isPrimaryButtonDown && activeStateBox != null && !isRemoveStateMode) {
+            if(it.isPrimaryButtonDown && activeStateBox != null && editorMode !is EditorMode.RemoveState) {
                 moveStateBox(activeStateBox!!, it.x + xOffset, it.y + yOffset)
             }
         }
@@ -75,62 +60,62 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             },
             Button("New transition").apply {
                 onAction = EventHandler {
-                    if(isAddTransactionMode) {
+                    if(editorMode is EditorMode.AddTransition) {
                         resetEditorMode()
                     } else {
                         resetEditorMode()
-                        isAddTransactionMode = true
-                        addTransactionStateCounter = 0
+                        editorMode = EditorMode.AddTransition(mutableListOf())
                     }
                 }
 
-                isAddTransactionModeProperty().addListener { _, _, value ->
-                    text = if(value) {
-                        "Stop adding transaction"
-                    } else {
-                        "New transition"
+                val updateText = {
+                    text = when(editorMode) {
+                        is EditorMode.AddTransition -> "Stop adding transaction"
+                        else -> "New transition"
                     }
                 }
+                updateText()
+                editorModeProperty.addListener { _, _, _ -> updateText() }
             },
             Separator(),
             Button("Remove state").apply {
                 onAction = EventHandler {
-                    if (isRemoveStateMode) {
+                    if (editorMode is EditorMode.RemoveState) {
                         resetEditorMode()
                     } else {
                         resetEditorMode()
-                        isRemoveStateMode = true
+                        editorMode = EditorMode.RemoveState
                     }
                 }
 
-                text = "Remove state"
-
-                isRemoveStateModeProperty().addListener { _, _, value ->
-                    text = if(value){
-                        "Stop remove state"
-                    } else {
-                        "Remove state"
+                val updateText = {
+                    text = when(editorMode) {
+                        is EditorMode.RemoveState -> "Stop remove state"
+                        else -> "Remove state"
                     }
                 }
+                updateText()
+                editorModeProperty.addListener { _, _, _ -> updateText() }
             },
 
             Button("Remove transition").apply {
-                setOnAction {
-                    if (isRemoveTransactionMode) {
+                onAction = EventHandler {
+                    if (editorMode is EditorMode.RemoveTransition) {
                         resetEditorMode()
                     } else {
                         resetEditorMode()
-                        isRemoveTransactionMode = true
+                        editorMode = EditorMode.RemoveTransition
                     }
                 }
 
-                isRemoveTransactionModeProperty().addListener { _, _, value ->
-                    text = if(value){
-                        "Stop remove transition"
-                    } else {
-                        "Remove transition"
+                val updateText = {
+                    text = when(editorMode) {
+                        is EditorMode.RemoveTransition -> "Stop remove transition"
+                        else -> "Remove transition"
                     }
                 }
+                updateText()
+                editorModeProperty.addListener { _, _, _ -> updateText() }
             }
         ).apply {
             val visible = tabs.selectionModel.selectedItemProperty().isEqualTo(diagramTab)
@@ -142,20 +127,20 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     fun getBlueprintModel() : BlueprintModel {
         val main = mainStateBox.toBlueprintState()
         val init = initStateBox.toBlueprintState()
-        val states = stateBoxes.map { it.toBlueprintState() }.toTypedArray()
-        val blueprintTransactions = transactions.map { it.toBlueprintTransaction() }.toTypedArray()
-        val blueprintLoopTransactions = loopTransactions.map { it.toBlueprintLoopTransaction() }.toTypedArray()
+        val states = canvasViewModel.states.map { it.toBlueprintState() }.toTypedArray()
+        val blueprintTransactions = canvasViewModel.transactions.map { it.toBlueprintTransaction() }.toTypedArray()
+        val blueprintLoopTransactions = canvasViewModel.loopTransactions.map { it.toBlueprintLoopTransaction() }.toTypedArray()
 
         return BlueprintModel(main, init, states, blueprintTransactions, blueprintLoopTransactions)
     }
 
     fun setBlueprintModel(model: BlueprintModel) {
-        stateBoxes.toTypedArray().forEach { it.removeFromEditor() }
+        canvasViewModel.states.toList().forEach { it.removeFromEditor() }
 
         mainStateBox.applyBlueprintState(model.main)
         initStateBox.applyBlueprintState(model.init)
 
-        val stateBoxes = model.states.associateByTo(
+        val stateMap = model.states.associateByTo(
             mutableMapOf(
                 initStateBox.name to initStateBox,
                 mainStateBox.name to mainStateBox
@@ -164,10 +149,12 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             {instantiateStateBoxFromBlueprintState(it)}
         )
 
+        stateMap.values.forEach { canvasViewModel.addState(it) }
+
         model.transactions.forEach {
             addTransactionArrow(
-                stateBoxes[it.startStateName]!!,
-                stateBoxes[it.endStateName]!!,
+                stateMap[it.startStateName]!!,
+                stateMap[it.endStateName]!!,
                 it.predicate,
                 it.alias,
             )
@@ -175,7 +162,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
         model.loopTransactions.forEach { loopTransaction ->
             addLoopTransactionArrow(
-                stateBoxes[loopTransaction.stateName]!!,
+                stateMap[loopTransaction.stateName]!!,
                 loopTransaction.text,
                 loopTransaction.predicate,
                 loopTransaction.alias
@@ -192,21 +179,21 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         )
     }
 
-    private fun BlueprintEditorTransactionModel.toBlueprintTransaction() : BlueprintTransactionModel {
+    private fun CanvasViewModel.EditorTransaction.toBlueprintTransaction() : BlueprintTransactionModel {
         return  BlueprintTransactionModel(
-            startStateName = this.startStateBox.name,
-            endStateName = this.endStateBox.name,
-            predicate = this.transactionArrow.text,
-            alias = this.transactionArrow.alias
+            startStateName = this.startBox.name,
+            endStateName = this.endBox.name,
+            predicate = this.arrow.text,
+            alias = this.arrow.alias
         )
     }
 
-    private fun BlueprintEditorLoopTransactionModel.toBlueprintLoopTransaction() : BlueprintLoopTransactionModel {
+    private fun CanvasViewModel.EditorLoopTransaction.toBlueprintLoopTransaction() : BlueprintLoopTransactionModel {
         return BlueprintLoopTransactionModel(
             stateName = this.stateBox.name,
-            predicate = this.loopTransactionArrow.predicate,
-            alias = this.loopTransactionArrow.alias,
-            text = this.loopTransactionArrow.text,
+            predicate = this.arrow.predicate,
+            alias = this.arrow.alias,
+            text = this.arrow.text,
         )
     }
 
@@ -260,10 +247,10 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
             nameChangingMonitor.tryRegister(name)
 
-            isEditableProperty.bind((isRemoveStateModeProperty).or(isAddTransactionModeProperty).not())
+            isEditableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })
         }
 
-        stateBoxes.add(stateBox)
+        canvasViewModel.addState(stateBox)
         canvas.children.add(stateBox)
 
         return stateBox
@@ -334,13 +321,13 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         predicate: String = "",
         alias: String = "",
     ){
-        if(loopTransactions.any { it.stateBox == stateBox }) {
+        if(canvasViewModel.loopTransactions.any { it.stateBox == stateBox }) {
             return
         }
 
         val loopTransactionArrow = LoopTransactionArrow(
             onClick = { source, _ ->
-                if(isRemoveTransactionMode){
+                if(editorMode is EditorMode.RemoveTransition){
                     source.removeFromEditor()
                 }
             },
@@ -364,7 +351,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
         canvas.children.add(loopTransactionArrow)
 
-        loopTransactions.add(BlueprintEditorLoopTransactionModel(stateBox, loopTransactionArrow))
+        canvasViewModel.addLoopTransaction(CanvasViewModel.EditorLoopTransaction(stateBox, loopTransactionArrow))
     }
 
     private fun addTransactionArrow(
@@ -373,13 +360,13 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
         predicate: String = "",
         alias: String = "",
     ) {
-        if(transactions.any { it.startStateBox == startStateBox && it.endStateBox == endStateBox }) {
+        if(canvasViewModel.transactions.any { it.startBox == startStateBox && it.endBox == endStateBox }) {
             return
         }
 
         val transactionArrow = TransactionArrow(
             onClick = { source, _ ->
-                if(isRemoveTransactionMode){
+                if(editorMode is EditorMode.RemoveTransition){
                     source.removeFromEditor()
                 }
             },
@@ -402,40 +389,22 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
 
         canvas.children.add(transactionArrow)
 
-        transactions.add(BlueprintEditorTransactionModel(startStateBox, endStateBox, transactionArrow))
+        canvasViewModel.addTransaction(CanvasViewModel.EditorTransaction(startStateBox, endStateBox, transactionArrow))
     }
 
     private fun StateBox.removeFromEditor() {
-        transactions.toList()
-            .filter { it.startStateBox == this || it.endStateBox == this }
-            .forEach { removeTransaction(it) }
-
-        stateBoxes.remove(this)
+        canvasViewModel.removeState(this)
         canvas.children.remove(this)
     }
 
     private fun TransactionArrow.removeFromEditor() {
-        transactions.toList()
-            .filter { it.transactionArrow == this }
-            .forEach { removeTransaction(it) }
+        canvasViewModel.removeTransaction(this)
+        canvas.children.remove(this)
     }
 
     private fun LoopTransactionArrow.removeFromEditor() {
-        loopTransactions.toList()
-            .filter { it.loopTransactionArrow == this }
-            .forEach { removeTransaction(it) }
-    }
-
-    private fun removeTransaction(transaction: BlueprintEditorTransactionModel) {
-        transactions.remove(transaction)
-
-        canvas.children.remove(transaction.transactionArrow)
-    }
-
-    private fun removeTransaction(transaction: BlueprintEditorLoopTransactionModel) {
-        loopTransactions.remove(transaction)
-
-        canvas.children.remove(transaction.loopTransactionArrow)
+        canvasViewModel.removeLoopTransaction(this)
+        canvas.children.remove(this)
     }
 
     private fun moveStateBox(stateBox: StateBox, positionX: Double, positionY: Double) {
@@ -444,9 +413,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private fun resetEditorMode() {
-        isRemoveStateMode = false
-        isRemoveTransactionMode = false
-        isAddTransactionMode = false
+        editorMode = EditorMode.Idle
     }
 
     private fun openStateTextEditorTab(state: StateBox) {
@@ -480,13 +447,13 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private fun mouseRemoveStateEventHandler(source: StateBox) {
-        if(isRemoveStateMode){
+        if(editorMode is EditorMode.RemoveState){
             source.removeFromEditor()
         }
     }
 
     private fun mouseMovingEventPressHandler(source: StateBox, event: MouseEvent) {
-        if(!isRemoveStateMode && !isAddTransactionMode){
+        if(editorMode is EditorMode.Idle){
             xOffset = -event.x
             yOffset = -event.y
             activeStateBox = source
@@ -498,15 +465,16 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
     }
 
     private fun mouseLinkTransactionEventHandler(source: StateBox) {
-        if (isAddTransactionMode && !isRemoveStateMode) {
-            statesToLink[addTransactionStateCounter++] = source
+        if (editorMode is EditorMode.AddTransition) {
+            (editorMode as EditorMode.AddTransition).selectedStates.add(source)
 
-            if (addTransactionStateCounter < 2) {
+            if ((editorMode as EditorMode.AddTransition).selectedStates.size < 2) {
                 return
             }
 
-            val state1 = statesToLink[0]!!
-            val state2 = statesToLink[1]!!
+            val states = (editorMode as EditorMode.AddTransition).selectedStates
+            val state1 = states[0]!!
+            val state2 = states[1]!!
 
             if(state1 === state2){
                 addLoopTransactionArrow(state1)
@@ -514,7 +482,7 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
                 addTransactionArrow(state1, state2)
             }
 
-            isAddTransactionMode = false
+            editorMode = EditorMode.Idle
         }
     }
 
@@ -540,4 +508,3 @@ class IsmaBlueprintEditor(private val editorFactory: ITextEditorFactory): Border
             }
         }
 }
-

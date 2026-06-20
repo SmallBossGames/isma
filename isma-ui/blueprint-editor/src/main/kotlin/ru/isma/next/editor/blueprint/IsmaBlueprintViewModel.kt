@@ -195,7 +195,7 @@ class IsmaBlueprintViewModel(
             { instantiateStateBoxFromBlueprintState(it) }
         )
 
-        stateMap.values.forEach { canvasViewModel.addState(it) }
+        stateMap.values.filter { it !== mainStateBox && it !== initStateBox }.forEach { canvasViewModel.addState(it) }
 
         model.transactions.forEach {
             addTransactionArrow(

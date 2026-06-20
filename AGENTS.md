@@ -111,6 +111,19 @@ All applications in this repository should use `module-info.java` for proper mod
 ./.ci-cd/build-bundle.sh # Build application distribution bundle UI + server
 ```
 
+## Architecture Rules
+
+### Separate Domain Models from gRPC Contracts
+
+**Never use gRPC-generated protobuf types in business logic.** Each module must have its own domain models that are mapped from/to gRPC contracts at the boundary.
+
+- **Server `domain/`** — pure business logic, domain entities, and handlers. No gRPC stubs.
+- **Server `infrastructure/`** — maps gRPC types to domain types (and vice versa) when crossing the gRPC boundary.
+- **UI `external-services/`** — maps gRPC protobuf types to UI domain models. No protobuf types leak into `app/`, `domain/`, or UI components.
+- **UI `domain/`** — pure domain models and interfaces. No gRPC types, no JavaFX types.
+
+This ensures that protocol changes only affect the mapping layer, not the business logic. It also keeps domain models free from protobuf annotations, code generation artifacts, and wire-format concerns.
+
 ## Proto Contracts
 
 All protobuf definitions live in `protobuf-contracts/simulation/`. Proto changes require rebuilding both `isma-server:grpc` and `isma-ui:grpc` modules.

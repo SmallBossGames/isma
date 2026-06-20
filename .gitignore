@@ -24,3 +24,6 @@ local.properties
 .settings
 .classpath
 bin/
+
+docs/**/todo
+docs/**/in-progress

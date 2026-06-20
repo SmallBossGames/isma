@@ -11,13 +11,10 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.shape.Line
 import javafx.scene.shape.Polygon
 import javafx.scene.text.Font
+import ru.isma.next.editor.blueprint.constants.*
+import ru.isma.next.editor.blueprint.utilities.calculateArrowGeometry
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import ru.isma.next.editor.blueprint.constants.*
 
 interface ITransactionArrowData {
     val aliasProperty: SimpleStringProperty
@@ -75,25 +72,29 @@ class TransactionArrow(
             viewOrder = 6.0
 
             fun updateGeometry() {
-                val x = this@TransactionArrow.endX - this@TransactionArrow.startX
-                val y = this@TransactionArrow.endY - this@TransactionArrow.startY
-                val angle = atan2(x, y) + PI / 2
-                val offsetX = ARROW_LINE_OFFSET * sin(angle)
-                val offsetY = ARROW_LINE_OFFSET * cos(angle)
-                val textOffsetX = ARROW_TEXT_X_OFFSET * sin(angle)
-                val textOffsetY = ARROW_TEXT_Y_OFFSET * cos(angle)
+                val geometry = calculateArrowGeometry(
+                    startX = this@TransactionArrow.startX,
+                    startY = this@TransactionArrow.startY,
+                    endX = this@TransactionArrow.endX,
+                    endY = this@TransactionArrow.endY,
+                    layoutX = this@TransactionArrow.layoutX,
+                    layoutY = this@TransactionArrow.layoutY,
+                    lineOffset = ARROW_LINE_OFFSET,
+                    textXOffset = ARROW_TEXT_X_OFFSET,
+                    textYOffset = ARROW_TEXT_Y_OFFSET
+                )
 
-                startX = this@TransactionArrow.startX - this@TransactionArrow.layoutX + offsetX
-                startY = this@TransactionArrow.startY - this@TransactionArrow.layoutY + offsetY
-                endX = this@TransactionArrow.endX - this@TransactionArrow.layoutX + offsetX
-                endY = this@TransactionArrow.endY - this@TransactionArrow.layoutY + offsetY
+                startX = geometry.lineStartX
+                startY = geometry.lineStartY
+                endX = geometry.lineEndX
+                endY = geometry.lineEndY
 
-                arrowhead.translateX = offsetX
-                arrowhead.translateY = offsetY
-                arrowhead.rotate = -angle / PI * 180.0
+                arrowhead.translateX = geometry.arrowheadTranslateX
+                arrowhead.translateY = geometry.arrowheadTranslateY
+                arrowhead.rotate = geometry.arrowheadRotation
 
-                predicateTextWrapped.translateX = textOffsetX
-                predicateTextWrapped.translateY = textOffsetY
+                predicateTextWrapped.translateX = geometry.labelTextTranslateX
+                predicateTextWrapped.translateY = geometry.labelTextTranslateY
             }
 
             this@TransactionArrow.startXProperty.onChange { updateGeometry() }

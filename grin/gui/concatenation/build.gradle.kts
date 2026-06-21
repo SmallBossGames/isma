@@ -8,7 +8,6 @@ dependencies {
     implementation(libs.org.apache.poi.ooxml)
     implementation(libs.de.sciss.jwave)
 
-    implementation(libs.tornadofx.core)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.javafx)
 

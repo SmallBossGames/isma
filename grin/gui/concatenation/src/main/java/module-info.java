@@ -8,7 +8,6 @@ module isma.grin.gui.concatenation.main {
     requires javafx.controls;
     requires transitive isma.grin.gui.common.main;
     requires isma.grin.math.main;
-    requires tornadofx;
     requires koin.core.jvm;
     requires org.apache.poi.poi;
     requires org.apache.poi.ooxml;

@@ -7,7 +7,8 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
-import tornadofx.*
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 
 class PointsModel {
     val pointsListProperty: SimpleListProperty<List<String>> = SimpleListProperty(FXCollections.observableArrayList())

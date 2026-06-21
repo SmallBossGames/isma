@@ -56,4 +56,14 @@ dependencies {
     implementation(libs.netty.transport.native.epoll) {
         artifact { classifier = "linux-x86_64" }
     }
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":isma-ui:toolkit"))
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

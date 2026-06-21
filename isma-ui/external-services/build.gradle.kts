@@ -26,4 +26,21 @@ dependencies {
     implementation(libs.netty.transport.native.epoll) {
         artifact { classifier = "linux-x86_64" }
     }
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+}
+
+tasks.test {
+    useJUnitPlatform()
+    jvmArgs(
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+        "--add-opens=java.base/java.util=ALL-UNNAMED",
+        "--add-opens=java.base/java.io=ALL-UNNAMED",
+        "--add-opens=java.base/sun.security.x509=ALL-UNNAMED",
+        "--add-opens=java.base/java.security=ALL-UNNAMED"
+    )
 }

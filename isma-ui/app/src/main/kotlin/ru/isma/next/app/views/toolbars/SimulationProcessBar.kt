@@ -7,8 +7,8 @@ import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
 import org.controlsfx.control.PopOver
 import org.koin.core.component.KoinComponent
-import ru.isma.next.app.extentions.matIconMZ
-import ru.isma.next.app.services.simualtion.SimulationService
+import ru.isma.next.app.extensions.matIconMZ
+import ru.isma.next.app.services.simulation.SimulationService
 
 class SimulationProcessBar(
     private val simulationService: SimulationService,

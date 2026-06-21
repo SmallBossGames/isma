@@ -4,7 +4,7 @@ import javafx.collections.FXCollections
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Pane
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.isma.next.app.services.simualtion.SimulationParametersService
+import ru.isma.next.app.services.simulation.SimulationParametersService
 import ru.isma.next.app.models.simulation.SaveTarget
 
 class ResultProcessingView(

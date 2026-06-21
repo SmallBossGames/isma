@@ -7,10 +7,10 @@ import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.app.services.simualtion.SimulationParametersService
-import ru.isma.next.app.services.simualtion.SimulationResultService
-import ru.isma.next.app.services.simualtion.SimulationService
-import ru.isma.next.app.services.simualtion.SimulationTaskService
+import ru.isma.next.app.services.simulation.SimulationParametersService
+import ru.isma.next.app.services.simulation.SimulationResultService
+import ru.isma.next.app.services.simulation.SimulationService
+import ru.isma.next.app.services.simulation.SimulationTaskService
 import ru.isma.next.editor.text.services.EditorPlatformService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 import ru.isma.next.external.SimulationServerFacade

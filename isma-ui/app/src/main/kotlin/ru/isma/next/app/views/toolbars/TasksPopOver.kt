@@ -16,12 +16,12 @@ import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
 import org.controlsfx.control.PopOver
 import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
-import ru.isma.next.app.extentions.matIconAL
+import ru.isma.next.app.extensions.matIconAL
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.models.simulation.SimulationTaskStatus
-import ru.isma.next.app.services.simualtion.SimulationResultService
-import ru.isma.next.app.services.simualtion.SimulationTaskService
+import ru.isma.next.app.services.simulation.SimulationResultService
+import ru.isma.next.app.services.simulation.SimulationTaskService
 
 class TasksPopOver(
     private val simulationTaskService: SimulationTaskService,

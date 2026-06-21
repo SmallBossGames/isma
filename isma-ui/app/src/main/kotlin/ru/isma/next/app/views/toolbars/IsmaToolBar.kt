@@ -5,12 +5,12 @@ import javafx.scene.control.Button
 import javafx.scene.control.Separator
 import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
-import ru.isma.next.app.extentions.matIconAL
-import ru.isma.next.app.extentions.matIconMZ
+import ru.isma.next.app.extensions.matIconAL
+import ru.isma.next.app.extensions.matIconMZ
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.app.services.simualtion.SimulationParametersService
+import ru.isma.next.app.services.simulation.SimulationParametersService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 
 class IsmaToolBar(

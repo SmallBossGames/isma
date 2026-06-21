@@ -1,4 +1,4 @@
-package ru.isma.next.app.services.simualtion
+package ru.isma.next.app.services.simulation
 
 import javafx.application.Platform
 import javafx.collections.FXCollections

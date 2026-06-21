@@ -1,4 +1,4 @@
-package ru.isma.next.app.extentions
+package ru.isma.next.app.extensions
 
 import org.kordamp.ikonli.javafx.FontIcon
 

@@ -8,8 +8,8 @@ import javafx.scene.control.SeparatorMenuItem
 import javafx.scene.input.KeyCombination
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.app.services.simualtion.SimulationParametersService
-import ru.isma.next.app.services.simualtion.SimulationService
+import ru.isma.next.app.services.simulation.SimulationParametersService
+import ru.isma.next.app.services.simulation.SimulationService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 
 class IsmaMenuBar(

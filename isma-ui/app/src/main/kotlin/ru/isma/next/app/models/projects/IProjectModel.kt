@@ -2,6 +2,7 @@ package ru.isma.next.app.models.projects
 
 import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Node
+import ru.isma.next.editor.blueprint.models.LismaTextModel
 import java.io.File
 
 interface IProjectModel {

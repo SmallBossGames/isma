@@ -7,9 +7,9 @@ import org.koin.core.component.createScope
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
-import ru.isma.next.app.utilities.convertToLisma
 import ru.isma.next.app.di.IsmaEditorQualifier
 import ru.isma.next.editor.blueprint.models.BlueprintModel
+import ru.isma.next.editor.blueprint.models.LismaTextModel
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 import java.io.File
@@ -35,7 +35,7 @@ class BlueprintProjectModel : IProjectModel, KoinScopeComponent {
 
     override fun nameProperty() = nameProperty
 
-    override fun snapshot() = blueprint.convertToLisma()
+    override fun snapshot() = blueprint.toLismaText()
 
     override fun dispose() { scope.close() }
 

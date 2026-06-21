@@ -138,7 +138,7 @@ class SimulationTaskService(
     }
 }
 
-private fun SimulationParametersModel.toRunSimulationParams(compiledModelId: String) = RunSimulationParams(
+fun SimulationParametersModel.toRunSimulationParams(compiledModelId: String) = RunSimulationParams(
     startTime = cauchyInitials.startTime,
     endTime = cauchyInitials.endTime,
     initialStep = cauchyInitials.initialStep,

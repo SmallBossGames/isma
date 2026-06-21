@@ -18,6 +18,7 @@ import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.isma.next.app.extentions.matIconAL
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.InProgressSimulationModel
+import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.services.simualtion.SimulationResultService
 import ru.isma.next.app.services.simualtion.SimulationService
 
@@ -52,7 +53,7 @@ class TasksPopOver(
         }
     }
 
-    private val inProgressItemMap = mutableMapOf<InProgressSimulationModel, HBox>()
+    private val inProgressItemMap = mutableMapOf<SimulationTask, HBox>()
 
     private val completedItemMap = mutableMapOf<CompletedSimulationModel, HBox>()
 
@@ -74,7 +75,7 @@ class TasksPopOver(
 
     private fun bindInProgressTasksList() {
         coroutineScope.launch {
-            simulationService.trackingTasks.changeAsFlow()
+            SimulationTask.ALL.changeAsFlow()
                 .cancellable()
                 .collect {
                     while (it.next()) {
@@ -166,17 +167,17 @@ class TasksPopOver(
         }
     }
 
-    private fun createInProgressTasksListItem(trackingTask: InProgressSimulationModel): HBox {
+    private fun createInProgressTasksListItem(task: SimulationTask): HBox {
         return HBox(
-            Label("Task #${trackingTask.id}"),
+            Label("Task #${task.id}"),
             ProgressBar().apply {
-                progressProperty().bind(trackingTask.progressProperty)
+                progressProperty().bind(task.progress)
             },
             Button().apply {
                 graphic = matIconAL("close")
                 tooltip = Tooltip("Abort")
                 onAction = EventHandler {
-                    simulationService.stopSimulation(trackingTask)
+                    simulationService.stopSimulation(task)
                 }
             }
         ).apply {

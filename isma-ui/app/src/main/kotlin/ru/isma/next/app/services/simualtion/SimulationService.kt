@@ -1,126 +1,36 @@
 package ru.isma.next.app.services.simualtion
 
-import javafx.application.Platform
 import javafx.collections.FXCollections
-import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
-import java.util.concurrent.Executors
-import org.koin.core.component.KoinComponent
-import ru.isma.next.app.models.ErrorViewModel
-import ru.isma.next.app.models.simulation.CompletedSimulationModel
-import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
-import ru.isma.next.app.services.ModelErrorService
+import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.external.BinaryEquationIndexProvider
-import ru.isma.next.external.CachedSimulationResult
-import ru.isma.next.external.CompilationErrorDto
 import ru.isma.next.external.RunSimulationParams
-import ru.isma.next.external.SimulationServerFacade
-import ru.isma.next.domain.models.MetricData
-import ru.isma.next.domain.models.SimulationMetadata
+import org.koin.core.component.KoinComponent
 
 class SimulationService(
     private val projectService: ProjectService,
-    private val simulationResult: SimulationResultService,
+    private val simulationTaskService: SimulationTaskService,
     private val simulationParametersService: SimulationParametersService,
-    private val serverFacade: SimulationServerFacade,
-    private val modelErrorService: ModelErrorService,
 ) : KoinComponent {
-    val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()!!
-
-    private val currentSimulationJobs = mutableMapOf<InProgressSimulationModel, Job>()
-    private var taskNumber = 1
 
     fun simulate() {
         val simulationParameters = simulationParametersService.snapshot()
         val project = projectService.activeProject ?: return
 
-        val trackingTask = InProgressSimulationModel(
-            taskNumber,
-            project.name,
-            simulationParameters
+        val runParams = simulationParameters.toRunSimulationParams("")
+
+        simulationTaskService.submit(
+            modelName = project.name,
+            params = runParams,
+            simulationParameters = simulationParameters,
         )
-        taskNumber++
-
-        SimulationScope.launch {
-            try {
-                val sourceCode = project.snapshot().fullText
-                val compileResult = serverFacade.compileModel(sourceCode)
-
-                val errorViewModels = compileResult.errors.map { error: CompilationErrorDto ->
-                    ErrorViewModel(error.row, error.column, "LISMA", error.message)
-                }
-                modelErrorService.putErrorList(errorViewModels)
-
-                if (compileResult.errors.isNotEmpty()) {
-                    return@launch
-                }
-
-                val params = simulationParameters.toRunSimulationParams(compileResult.modelId)
-
-                val simulationId = serverFacade.runSimulation(params)
-
-                trackingTask.simulationId = simulationId
-
-                Platform.runLater {
-                    trackingTasks.add(trackingTask)
-                }
-
-                serverFacade.monitorSimulation(simulationId, 0.01).collect { progress ->
-                    val normalized = ((progress.currentTime - progress.startTime) / (progress.endTime - progress.startTime)).coerceIn(0.0, 1.0)
-
-                    trackingTask.commitProgress(normalized)
-                }
-
-                val cachedResult: CachedSimulationResult = serverFacade.downloadResultToCache(simulationId)
-                val metricData = MetricData()
-                val metadata = SimulationMetadata(cachedResult.columnNames)
-
-                val resultModel = CompletedSimulationModel(
-                    id = trackingTask.id,
-                    modelName = trackingTask.model,
-                    equationIndexProvider = BinaryEquationIndexProvider(metadata),
-                    metricData = metricData,
-                    parameters = trackingTask.parameters,
-                    cachedFile = cachedResult.file,
-                    cachedColumnNames = cachedResult.columnNames
-                )
-
-                simulationResult.commitResult(resultModel)
-            } catch (e: Throwable)
-            {
-                throw e
-            }
-            finally {
-                currentSimulationJobs.remove(trackingTask)
-                SimulationScope.launch(Dispatchers.JavaFx) {
-                    trackingTasks.remove(trackingTask)
-                }
-            }
-        }.also { job -> currentSimulationJobs[trackingTask] = job }
     }
 
-    fun stopSimulation(trackingTask: InProgressSimulationModel) = SimulationScope.launch {
-        trackingTask.simulationId?.let { serverFacade.cancelSimulation(it) }
-        currentSimulationJobs[trackingTask]?.cancel()
+    fun stopSimulation(task: SimulationTask) {
+        simulationTaskService.cancelTask(task)
     }
 
     companion object {
-        private val virtualThreadDispatcher = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
-        val SimulationScope = CoroutineScope(virtualThreadDispatcher + SupervisorJob())
+        val SimulationScope = SimulationTaskService.SimulationScope
     }
 }
-
-private fun SimulationParametersModel.toRunSimulationParams(compiledModelId: String) = RunSimulationParams(
-    startTime = cauchyInitials.startTime,
-    endTime = cauchyInitials.endTime,
-    initialStep = cauchyInitials.initialStep,
-    methodName = integrationMethodParameters.selectedMethod,
-    accuracy = integrationMethodParameters.accuracy,
-    isAccuracyInUse = integrationMethodParameters.isAccuracyInUse,
-    isStabilityControlInUse = integrationMethodParameters.isStableInUse,
-    compiledModelId = compiledModelId,
-    eventDetectionGamma = if (eventDetectionParameters.isEventDetectionInUse) eventDetectionParameters.gamma else null,
-    eventDetectionLowBorder = if (eventDetectionParameters.isEventDetectionInUse) eventDetectionParameters.lowBorder else null,
-)

@@ -8,7 +8,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import ru.isma.next.app.utilities.convertToLisma
-import ru.isma.next.app.views.koin.IsmaEditorQualifier
+import ru.isma.next.app.di.IsmaEditorQualifier
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue

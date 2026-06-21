@@ -4,6 +4,13 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import ru.isma.next.domain.models.SimulationProgress
+import ru.isma.next.external.dtos.CachedSimulationResult
+import ru.isma.next.external.dtos.CompileResult
+import ru.isma.next.external.dtos.CompilationErrorDto
+import ru.isma.next.external.dtos.RunSimulationParams
+import ru.isma.next.external.dtos.SyntaxTokenDto
+import ru.isma.next.external.dtos.SyntaxTokenKind
+import ru.isma.next.external.dtos.ValidationResult
 import ru.nstu.isma.contracts.v1.compiler_service.*
 import ru.nstu.isma.contracts.v1.simulation_service.*
 import java.io.File
@@ -168,39 +175,3 @@ class SimulationServerFacade(
         serverManager.stop()
     }
 }
-
-data class CachedSimulationResult(
-    val file: File,
-    val columnNames: List<String>,
-)
-
-data class CompileResult(
-    val modelId: String,
-    val errors: List<CompilationErrorDto>,
-    val warnings: List<String>,
-)
-
-data class ValidationResult(
-    val errors: List<CompilationErrorDto>,
-    val warnings: List<String>,
-)
-
-data class CompilationErrorDto(
-    val row: Int,
-    val column: Int,
-    val message: String,
-)
-
-enum class SyntaxTokenKind {
-    UNSPECIFIED,
-    KEYWORD,
-    COMMENT,
-    NUMBER,
-    TEXT,
-}
-
-data class SyntaxTokenDto(
-    val start: Int,
-    val length: Int,
-    val kind: SyntaxTokenKind,
-)

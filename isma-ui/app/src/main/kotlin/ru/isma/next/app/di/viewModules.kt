@@ -1,4 +1,4 @@
-package ru.isma.next.app.views.koin
+package ru.isma.next.app.di
 
 import javafx.scene.Node
 import org.koin.core.module.dsl.factoryOf

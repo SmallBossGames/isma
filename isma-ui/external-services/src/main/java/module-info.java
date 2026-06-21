@@ -19,4 +19,5 @@ module isma.ui.external.services {
     requires kotlinx.io.core;
 
     exports ru.isma.next.external;
+    exports ru.isma.next.external.dtos;
 }

@@ -1,4 +1,4 @@
-package ru.isma.next.app.services.koin
+package ru.isma.next.app.di
 
 import org.koin.dsl.module
 import ru.isma.next.app.constants.APPLICATION_PREFERENCES_FILE

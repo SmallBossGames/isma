@@ -1,4 +1,4 @@
-package ru.isma.next.external
+package ru.isma.next.external.dtos
 
 data class RunSimulationParams(
     val startTime: Double,

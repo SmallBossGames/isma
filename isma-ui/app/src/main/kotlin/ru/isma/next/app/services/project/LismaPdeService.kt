@@ -3,8 +3,8 @@ package ru.isma.next.app.services.project
 import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.models.projects.LismaTextModel
-import ru.isma.next.external.CompilationErrorDto
 import ru.isma.next.external.SimulationServerFacade
+import ru.isma.next.external.dtos.CompilationErrorDto
 
 class LismaPdeService(
     private val serverFacade: SimulationServerFacade,

@@ -13,11 +13,11 @@ import ru.isma.next.app.models.simulation.SimulationTaskStatus
 import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.external.BinaryEquationIndexProvider
-import ru.isma.next.external.CachedSimulationResult
-import ru.isma.next.external.CompileResult
-import ru.isma.next.external.CompilationErrorDto
-import ru.isma.next.external.RunSimulationParams
 import ru.isma.next.external.SimulationServerFacade
+import ru.isma.next.external.dtos.CachedSimulationResult
+import ru.isma.next.external.dtos.CompileResult
+import ru.isma.next.external.dtos.CompilationErrorDto
+import ru.isma.next.external.dtos.RunSimulationParams
 import ru.isma.next.domain.models.MetricData
 import ru.isma.next.domain.models.SimulationMetadata
 import java.util.concurrent.Executors

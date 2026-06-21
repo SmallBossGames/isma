@@ -23,7 +23,6 @@ import java.util.concurrent.Executors
 
 class SimulationTaskService(
     private val serverFacade: SimulationServerFacade,
-    private val simulationResultService: SimulationResultService,
     private val modelErrorService: ModelErrorService,
     private val projectService: ProjectService,
 ) : KoinComponent {
@@ -112,7 +111,6 @@ class SimulationTaskService(
                     task.result = resultModel
                     task.setStatus(SimulationTaskStatus.COMPLETED)
                     task.setProgress(1.0)
-                    simulationResultService.commitResult(resultModel)
                 }
             } catch (e: Throwable) {
                 Platform.runLater {

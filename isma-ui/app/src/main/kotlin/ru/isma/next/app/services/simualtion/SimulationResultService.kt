@@ -8,6 +8,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.next.app.launcher.GrinProcessLauncher
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
+import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.views.dialogs.NamedPickerItem
 import ru.isma.next.app.views.dialogs.NamedPickerModel
 import ru.isma.next.app.views.dialogs.pickAxisVariables
@@ -18,24 +19,21 @@ import java.io.Writer
 
 class SimulationResultService(
     private val grinProcessLauncher: GrinProcessLauncher,
+    private val simulationTaskService: SimulationTaskService,
 ) {
-
-    val trackingTasksResults = FXCollections.observableArrayList<CompletedSimulationModel>()!!
 
     private val fileFilers = arrayOf(
         FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
 
-    fun commitResult(result: CompletedSimulationModel) = Platform.runLater {
-        trackingTasksResults.add(result)
+    fun removeResult(task: SimulationTask) = Platform.runLater {
+        SimulationTask.ALL.remove(task)
+        task.result = null
     }
 
-    fun removeResult(result: CompletedSimulationModel) = Platform.runLater {
-        trackingTasksResults.remove(result)
-    }
-
-    fun showChart(simulationResult: CompletedSimulationModel) = ResultServiceScope.launch {
-        val headerColumnPairs = simulationResult.cachedColumnNames.mapIndexed { i, header ->
+    fun showChart(task: SimulationTask) = ResultServiceScope.launch {
+        val result = task.result ?: return@launch
+        val headerColumnPairs = result.cachedColumnNames.mapIndexed { i, header ->
             NamedPickerItem(header, i)
         }
 
@@ -51,10 +49,11 @@ class SimulationResultService(
         val selectedColumnNames = pickedItems.yAxisItems.map { it.name }
         val xAxisName = pickedItems.xAxisItem.name
 
-        grinProcessLauncher.launch(simulationResult.cachedFile, xAxisName, selectedColumnNames)
+        grinProcessLauncher.launch(result.cachedFile, xAxisName, selectedColumnNames)
     }
 
-    fun exportToFile(simulationResult: CompletedSimulationModel, ownerWindow: Window? = null){
+    fun exportToFile(task: SimulationTask, ownerWindow: Window? = null){
+        val result = task.result ?: return
         val file = FileChooser().run {
             title = "Export Results"
             extensionFilters.addAll(fileFilers)
@@ -62,7 +61,7 @@ class SimulationResultService(
         } ?: return
 
         ResultServiceScope.launch {
-            exportToFileAsync(simulationResult, file)
+            exportToFileAsync(result, file)
         }
     }
 

@@ -10,6 +10,7 @@ import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.app.services.simualtion.SimulationParametersService
 import ru.isma.next.app.services.simualtion.SimulationResultService
 import ru.isma.next.app.services.simualtion.SimulationService
+import ru.isma.next.app.services.simualtion.SimulationTaskService
 import ru.isma.next.editor.text.services.EditorPlatformService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 import ru.isma.next.external.SimulationServerFacade
@@ -27,7 +28,8 @@ val appServicesModule = module {
     single<ModelErrorService> { ModelErrorService() }
     single<LismaPdeService> { LismaPdeService(get(), get()) }
     single<SimulationParametersService> { SimulationParametersService(get<SimulationServerFacade>().getSimulationMethods()) }
-    single<SimulationResultService> { SimulationResultService(get()) }
+    single<SimulationTaskService> { SimulationTaskService(get(), get(), get()) }
+    single<SimulationResultService> { SimulationResultService(get(), get()) }
     single<SimulationService> { SimulationService(get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
 }

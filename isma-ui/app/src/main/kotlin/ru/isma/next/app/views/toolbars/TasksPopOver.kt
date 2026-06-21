@@ -55,7 +55,7 @@ class TasksPopOver(
 
     private val inProgressItemMap = mutableMapOf<SimulationTask, HBox>()
 
-    private val completedItemMap = mutableMapOf<CompletedSimulationModel, HBox>()
+    private val completedItemMap = mutableMapOf<SimulationTask, HBox>()
 
     init {
         contentNode = VBox(
@@ -103,24 +103,22 @@ class TasksPopOver(
 
     private fun bindCompletedSimulationModel() {
         coroutineScope.launch {
-            simulationResultService.trackingTasksResults.changeAsFlow()
+            SimulationTask.ALL.changeAsFlow()
                 .cancellable()
                 .collect {
                     while (it.next()) {
                         if (it.wasAdded()) {
                             it.addedSubList.forEach { instance ->
-                                val item = createCompletedTasksListItem(instance)
-
-                                completedItemMap[instance] = item
-
-                                completedTasksContainer.children.add(item)
+                                if (instance.statusValue == ru.isma.next.app.models.simulation.SimulationTaskStatus.COMPLETED) {
+                                    val item = createCompletedTasksListItem(instance)
+                                    completedItemMap[instance] = item
+                                    completedTasksContainer.children.add(item)
+                                }
                             }
                         } else if (it.wasRemoved()) {
                             it.removed.forEach { instance ->
                                 val item = completedItemMap[instance]
-
                                 completedItemMap.remove(instance)
-
                                 completedTasksContainer.children.remove(item)
                             }
                         }
@@ -133,23 +131,24 @@ class TasksPopOver(
         coroutineScope.cancel()
     }
 
-    private fun createCompletedTasksListItem(trackingTask: CompletedSimulationModel): HBox {
+    private fun createCompletedTasksListItem(task: SimulationTask): HBox {
+        val result = task.result ?: return HBox()
         return HBox(
-            Label("Task #${trackingTask.id}"),
+            Label("Task #${task.id}"),
             Button("Show").apply {
                 onAction = EventHandler {
-                    simulationResultService.showChart(trackingTask)
+                    simulationResultService.showChart(task)
                 }
             },
             Button("Export").apply {
                 onAction = EventHandler {
-                    simulationResultService.exportToFile(trackingTask)
+                    simulationResultService.exportToFile(task)
                 }
             },
             Button("Remove").apply {
                 onAction = EventHandler {
                     PopOverScope.launch {
-                        simulationResultService.removeResult(trackingTask)
+                        simulationResultService.removeResult(task)
                     }
                 }
             },
@@ -157,7 +156,7 @@ class TasksPopOver(
                 tooltip = Tooltip("Details")
                 graphic = matIconAL("chevron_right")
                 onAction = EventHandler {
-                    detailsTextProperty.value = trackingTask.toMultilineDetails()
+                    detailsTextProperty.value = result.toMultilineDetails()
                     detailsPopover.show(this)
                 }
             }

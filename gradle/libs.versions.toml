@@ -1,20 +1,20 @@
 [versions]
-kotlinx-coroutines = "1.10.2"
-kotlin-plugin = "2.3.20"
-kotlinx-serialization-json = "1.10.0"
+kotlinx-coroutines = "1.11.0"
+kotlin-plugin = "2.4.0"
+kotlinx-serialization-json = "1.11.0"
 javafx-plugin = "0.1.0"
-javafx-libs = "25.0.2"
+javafx-libs = "27-ea+21"
 org-apache-poi = "5.5.1"
 ikonli = "12.4.0"
-grpc = "1.80.0"
-ktor = "3.4.1"
-netty = "4.2.10.Final"
-google-protobuf-plugin = "0.9.6"
-ben-manes-versions = "0.53.0"
+grpc = "1.82.0"
+ktor = "3.5.0"
+netty = "4.2.15.Final"
+google-protobuf-plugin = "0.10.0"
+ben-manes-versions = "0.54.0"
 
 [libraries]
 antlr4-runtime = { module = "org.antlr:antlr4-runtime", version = "4.13.2" }
-com-google-guava = { module = "com.google.guava:guava", version = "33.5.0-jre" }
+com-google-guava = { module = "com.google.guava:guava", version = "33.6.0-jre" }
 controlsfx = "org.controlsfx:controlsfx:11.2.3"
 de-sciss-jwave = { module = "de.sciss:jwave", version = "1.0.3" }
 fxmisc-richtext-core = { module = "org.fxmisc.richtext:richtextfx", version = "0.11.7" }
@@ -25,12 +25,12 @@ jetbrains-annotations = { module = "org.jetbrains:annotations", version = "26.1.
 junit = { module = "junit:junit", version = "4.13.2" }
 junit-dataprovider = "com.tngtech.java:junit-dataprovider:1.13.1"
 kfixture = "ru.kontur.kinfra.kfixture:kfixture:0.6.0"
-koin-core = { module = "io.insert-koin:koin-core", version = "4.2.0" }
+koin-core = { module = "io.insert-koin:koin-core", version = "4.2.2" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin-plugin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-javafx = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-javafx", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.32" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.34" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "6.3.0" }
 org-apache-commons-lang = "org.apache.commons:commons-lang3:3.20.0"
 org-apache-poi = { module = "org.apache.poi:poi", version.ref = "org-apache-poi" }
@@ -44,7 +44,7 @@ netty-transport-native-epoll = { module = "io.netty:netty-transport-native-epoll
 netty-codec = { module = "io.netty:netty-codec", version.ref = "netty" }
 netty-handler = { module = "io.netty:netty-handler", version.ref = "netty" }
 
-protobuf-java = { module = "com.google.protobuf:protobuf-java", version = "4.34.1" }
+protobuf-java = { module = "com.google.protobuf:protobuf-java", version = "4.35.1" }
 
 grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
@@ -60,11 +60,11 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.0" }
 
-junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:5.9.2"
-junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:5.11.4"
+junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:6.1.0"
+junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:6.1.0"
 
 [plugins]
-java-modules = { id = "org.javamodularity.moduleplugin", version = "2.0.0" }
+java-modules = { id = "org.javamodularity.moduleplugin", version = "2.0.1" }
 javafx = { id = "org.openjfx.javafxplugin", version.ref = "javafx-plugin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-plugin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-plugin" }

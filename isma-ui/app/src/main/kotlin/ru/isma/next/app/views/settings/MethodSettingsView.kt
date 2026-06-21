@@ -1,15 +1,17 @@
 package ru.isma.next.app.views.settings
 
 import javafx.scene.control.ScrollPane
+import javafx.scene.layout.Pane
 import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import tornadofx.View
 
 class MethodSettingsView(
     private val parametersService: SimulationParametersService
-): View("Integration") {
-    override val root =
-        ScrollPane(
+) : Pane() {
+    val title: String = "Integration"
+
+    init {
+        content = ScrollPane(
             propertiesGrid {
                 addNode(
                     "Method",
@@ -30,4 +32,5 @@ class MethodSettingsView(
                 }
             }
         )
+    }
 }

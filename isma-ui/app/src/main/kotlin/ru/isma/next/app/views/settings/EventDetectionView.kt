@@ -1,15 +1,17 @@
 package ru.isma.next.app.views.settings
 
 import javafx.scene.control.ScrollPane
+import javafx.scene.layout.Pane
 import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.isma.next.app.services.simualtion.SimulationParametersService
-import tornadofx.View
 
 class EventDetectionView(
     private val parametersService: SimulationParametersService
-) : View("Event detection") {
-    override val root =
-        ScrollPane(
+) : Pane() {
+    val title: String = "Event detection"
+
+    init {
+        content = ScrollPane(
             propertiesGrid {
                 addNode("In use", parametersService.eventDetection.isEventDetectionInUseProperty)
                 addNode("Gamma", parametersService.eventDetection.gammaProperty).apply {
@@ -21,4 +23,5 @@ class EventDetectionView(
                 }
             }
         )
+    }
 }

@@ -12,11 +12,15 @@ This document provides a detailed specification of the Blueprint (Statechart) Ed
 
 ```
 blueprint-editor/src/main/kotlin/ru/isma/next/editor/blueprint/
-├── IsmaBlueprintEditor.kt          # Main editor component
-├── NameChangingMonitor.kt          # Unique name enforcement
+├── IsmaBlueprintEditor.kt          # UI only (113 lines)
+├── IsmaBlueprintViewModel.kt       # All logic (421 lines)
+├── EditorMode.kt                   # Sealed class for editor modes (12 lines)
+├── NameChangingMonitor.kt          # Unique name enforcement (33 lines)
 ├── utilities/
+│   ├── ClickDisambiguator.kt       # 200ms single/double click disambiguation
 │   └── JavaFxExtensions.kt         # JavaFX utility extensions
 ├── constants/
+│   ├── BlueprintEditorConstants.kt # All magic numbers (35 lines)
 │   └── StateNames.kt               # MAIN_STATE, INIT_STATE constants
 ├── services/
 │   └── ITextEditorFactory.kt       # SPI for text editor creation
@@ -25,40 +29,44 @@ blueprint-editor/src/main/kotlin/ru/isma/next/editor/blueprint/
 │   ├── BlueprintStateModel.kt      # State data model
 │   ├── BlueprintTransactionModel.kt # Inter-state transition model
 │   ├── BlueprintLoopTransactionModel.kt # Loop transition model
-│   ├── BlueprintEditorTransactionModel.kt # Runtime transaction model
-│   └── BlueprintEditorLoopTransactionModel.kt # Runtime loop model
-└── controls/
-    ├── StateBox.kt                 # Draggable state box control
-    ├── TransactionArrow.kt         # Inter-state transition arrow
-    ├── LoopTransactionArrow.kt     # Self-loop arrow
-    └── EditArrowPopOver.kt         # Floating edit popover
+│   └── CanvasViewModel.kt          # Observable lists + EditorTransaction/EditorLoopTransaction
+├── controls/
+│   ├── StateBox.kt                 # Draggable state box control
+│   ├── TransactionArrow.kt         # Inter-state transition arrow
+│   ├── LoopTransactionArrow.kt     # Self-loop arrow
+│   ├── EditArrowPopOver.kt         # Floating edit popover
+│   └── CoroutineScopeProvider.kt   # Shared CoroutineScope(Dispatchers.JavaFx)
+└── utilities/
+    └── ArrowGeometry.kt            # Arrow geometry calculations
 ```
+
+The Blueprint Editor follows an MVVM pattern: `IsmaBlueprintEditor` is the View (UI only), `IsmaBlueprintViewModel` is the ViewModel (all logic), and `BlueprintModel` / `CanvasViewModel` are the Models.
 
 The Blueprint Editor is a **visual finite-state machine editor**. Users create states as draggable boxes on an infinite canvas, draw transitions between them, and define transition predicates (conditions). The visual statechart is compiled into LISMA text at build time via `convertToLisma()`.
 
-### 1.1 Container Hierarchy
+### 1.2 Container Hierarchy
 
 ```
-IsmaBlueprintEditor (BorderPane)
+IsmaBlueprintEditor (BorderPane) — View
 ├── center: TabPane
 │   └── Tab "Diagram" (non-closable)
 │       └── ScrollPane
 │           └── Pane (canvas)
-│               ├── mainStateBox (fixed)
-│               ├── initStateBox (fixed)
-│               ├── userStateBox[] (draggable)
-│               ├── transactionArrow[] (auto-geometry)
-│               ├── loopTransactionArrow[] (auto-geometry)
+│               ├── mainStateBox (fixed, from ViewModel)
+│               ├── initStateBox (fixed, from ViewModel)
+│               ├── userStateBox[] (from CanvasViewModel.states)
+│               ├── transactionArrow[] (from CanvasViewModel.transactions)
+│               ├── loopTransactionArrow[] (from CanvasViewModel.loopTransactions)
 │               └── EditArrowPopOver (floating, transient)
 └── bottom: ToolBar
-    ├── "New state" button
-    ├── "New transition" / "Stop adding transaction" toggle button
+    ├── "New state" button → viewModel.addState()
+    ├── "New transition" / "Stop adding transaction" → viewModel.toggleAddTransition()
     ├── Separator
-    ├── "Remove state" / "Stop remove state" toggle button
-    └── "Remove transition" / "Stop remove transition" toggle button
+    ├── "Remove state" / "Stop remove state" → viewModel.toggleRemoveState()
+    └── "Remove transition" / "Stop remove transition" → viewModel.toggleRemoveTransition()
 ```
 
-The toolbar is bound to the Diagram tab's visibility: `visibleProperty().bind(selectedItemProperty().isEqualTo(diagramTab))`. When the Diagram tab is not active, the toolbar is invisible and unmanaged.
+The toolbar is bound to the Diagram tab's visibility: `visibleProperty().bind(visible)` and `managedProperty().bind(visible)`. When the Diagram tab is not active, the toolbar is invisible and unmanaged.
 
 ---
 
@@ -394,49 +402,38 @@ The toolbar appears at the **bottom** of the `BorderPane`. It contains 4 buttons
 
 | Action | Effect |
 |--------|--------|
-| Click | 1. Reset all editor modes |
-| | 2. Create a new `StateBox` at position (10, 200) |
+| Click | 1. `viewModel.resetMode()` |
+| | 2. `viewModel.addState()` — creates new `StateBox` at (10, 200) |
 | | 3. Auto-generate name via `NameChangingMonitor.createNextDefaultName()` |
 | | 4. Register name with monitor |
-| | 5. Add to canvas |
+| | 5. Add to `CanvasViewModel.states` |
 
 **New state properties**:
 - Color: `CORAL`
 - Name: `"New state N"` where N is the next available integer
 - Position: layoutX=10, layoutY=200
-- Editable: yes (bound dynamically)
+- Editable: yes (bound to `editorModeProperty.map { it.isNotEditingMode() }`)
 - Edit button visible: yes
 - Initial text: `""`
 
 #### "New transition" / "Stop adding transaction"
 
-Toggle button. Text changes based on mode:
+Toggle button. Text changes based on `EditorMode`:
 
 | Mode | Text |
 |------|------|
-| Off | "New transition" |
-| On | "Stop adding transaction" |
+| `EditorMode.Idle` | "New transition" |
+| `EditorMode.AddTransition` | "Stop adding transaction" |
 
 **When turned ON**:
-1. Reset all editor modes first
-2. Set `isAddTransactionMode = true`
-3. Reset `addTransactionStateCounter = 0`
-
-**When turned OFF**:
-1. Reset all editor modes first
+1. `viewModel.toggleAddTransition()` → `resetMode()` then `editorMode = EditorMode.AddTransition(mutableListOf())`
+2. First click on a state → adds to `selectedStates` list
+3. Second click on a state → if same state → `addLoopArrow()`, else → `addTransactionArrow()`
+4. Mode auto-resets to `Idle` after creating the transition
 
 **During add-transaction mode**:
-1. Click a state box → records it as `statesToLink[0]`, increments counter to 1
-2. Click a second state box → records as `statesToLink[1]`, increments counter to 2
-3. Counter reaches 2:
-   - If both states are the **same** → create a `LoopTransactionArrow` (self-loop)
-   - If the states are **different** → create a `TransactionArrow` (inter-state)
-4. Reset `isAddTransactionMode = false` after each pair
-
-**Important**: During add-transaction mode:
-- User states become non-editable (`isEditable` bound to `!(isRemoveStateMode OR isAddTransactionMode)`)
-- Clicking states triggers `mouseLinkTransactionEventHandler` (not name editing)
-- The mode is automatically turned off after creating a transition
+- User states become non-editable (`isEditable` bound to `editorMode.isNotEditingMode()`)
+- Clicking states triggers `recordTransitionSource()` (not name editing)
 
 #### "Remove state" / "Stop remove state"
 
@@ -444,26 +441,22 @@ Toggle button.
 
 | Mode | Text |
 |------|------|
-| Off | "Remove state" |
-| On | "Stop remove state" |
+| `EditorMode.Idle` | "Remove state" |
+| `EditorMode.RemoveState` | "Stop remove state" |
 
-**When turned ON**:
-1. Reset all editor modes first
-2. Set `isRemoveStateMode = true`
+**When turned ON**: `viewModel.toggleRemoveState()` → sets `editorMode = EditorMode.RemoveState`
 
-**When turned OFF**:
-1. Reset all editor modes
+**When turned OFF**: `viewModel.resetMode()` → sets `editorMode = EditorMode.Idle`
 
 **During remove-state mode**:
-- Clicking any state box (Main, Init, or User) triggers `mouseRemoveStateEventHandler`
-- The state is removed along with all associated transitions and loop arrows
-- Main and Init states **can be clicked** during remove mode but they are NOT actually deletable (no code path removes them) — they just have no removal handler. Actually, reviewing the code: `mouseRemoveStateEventHandler` calls `source.removeFromEditor()` unconditionally when in remove mode. Since `removeFromEditor()` removes the state from `stateBoxes` and `canvas.children`, and removes associated transactions — **clicking Main or Init in remove mode will delete them from the canvas**. This is a potential bug in the original but should be replicated for feature parity.
+- Clicking any state box triggers `onClick` handler in `IsmaBlueprintViewModel`
+- `removeState(box)` checks `box.name == MAIN_STATE || box.name == INIT_STATE` → returns early (Main/Init protected)
+- Otherwise: `canvasViewModel.removeState(box)` removes state + all associated transactions/loops
 
-**`removeFromEditor()` on a StateBox**:
-1. Find all transactions where this state is start or end
-2. Remove each transaction (arrow + tracking entry)
-3. Remove this state from `stateBoxes` list
-4. Remove this state from `canvas.children`
+**`CanvasViewModel.removeState(box)`**:
+1. Removes box from `_states`
+2. Removes all transactions where `startBox == box || endBox == box`
+3. Removes all loop transactions where `stateBox == box`
 
 #### "Remove transition" / "Stop remove transition"
 
@@ -471,35 +464,27 @@ Toggle button.
 
 | Mode | Text |
 |------|------|
-| Off | "Remove transition" |
-| On | "Stop remove transition" |
+| `EditorMode.Idle` | "Remove transition" |
+| `EditorMode.RemoveTransition` | "Stop remove transition" |
 
-**When ON**: clicking the body of any arrow (inter-state or loop) removes it.
+**When ON**: clicking the body of any arrow (inter-state or loop) removes it via `canvasViewModel.removeTransaction()` or `canvasViewModel.removeLoopTransaction()`.
 
 **When ON**: clicking an arrowhead does **not** open the PopOver — the arrow body click handler fires first.
 
 ### 7.3 Mode Reset
 
-`resetEditorMode()` clears all three mode flags simultaneously:
-
-```kotlin
-isRemoveStateMode = false
-isRemoveTransactionMode = false
-isAddTransactionMode = false
-```
-
-Every toolbar button action calls `resetEditorMode()` before setting or toggling its own mode.
+`viewModel.resetMode()` sets `editorMode = EditorMode.Idle`. Every toolbar button action calls `resetMode()` before setting or toggling its own mode.
 
 ---
 
 ## 8. Interaction Modes Summary
 
-| Mode | Active States | Arrow Body Click | Arrowhead Click | State Box Single-Click | State Box Drag |
-|------|--------------|------------------|-----------------|----------------------|----------------|
-| **Default** | None | No effect | Open PopOver | Inline name edit | Yes |
-| **Add Transition** | `isAddTransactionMode` | No effect | Open PopOver | Record as source/target | No |
-| **Remove State** | `isRemoveStateMode` | No effect | Open PopOver | Remove state + arrows | No |
-| **Remove Transition** | `isRemoveTransactionMode` | Remove arrow | Open PopOver | Inline name edit | Yes |
+| Mode | `EditorMode` type | Arrow Body Click | Arrowhead Click | State Box Single-Click | State Box Drag |
+|------|-------------------|------------------|-----------------|----------------------|----------------|
+| **Default** | `EditorMode.Idle` | No effect | Open PopOver | Inline name edit | Yes |
+| **Add Transition** | `EditorMode.AddTransition` | No effect | Open PopOver | Record as source/target | No |
+| **Remove State** | `EditorMode.RemoveState` | No effect | Open PopOver | Remove state + arrows (protects Main/Init) | No |
+| **Remove Transition** | `EditorMode.RemoveTransition` | Remove arrow | Open PopOver | Inline name edit | Yes |
 
 ---
 
@@ -561,16 +546,20 @@ BlueprintModel(
 
 ### 9.3 Editor-Only Data Classes (runtime, not serializable)
 
-```
-BlueprintEditorTransactionModel
-├── startStateBox: StateBox          // Direct reference to canvas node
-├── endStateBox: StateBox
-└── transactionArrow: TransactionArrow
+These are now inner data classes of `CanvasViewModel` (in `models/CanvasViewModel.kt`):
 
-BlueprintEditorLoopTransactionModel
-├── stateBox: StateBox
-└── loopTransactionArrow: LoopTransactionArrow
 ```
+CanvasViewModel.EditorTransaction
+├── startBox: StateBox          // Direct reference to canvas node
+├── endBox: StateBox
+└── arrow: TransactionArrow
+
+CanvasViewModel.EditorLoopTransaction
+├── stateBox: StateBox
+└── arrow: LoopTransactionArrow
+```
+
+The old separate files `BlueprintEditorTransactionModel.kt` and `BlueprintEditorLoopTransactionModel.kt` no longer exist.
 
 ### 9.4 Data Flow: Save (Canvas → Model → JSON)
 
@@ -598,14 +587,17 @@ BlueprintEditorLoopTransactionModel
 
 ### 10.1 Purpose
 
-Ensures all state names are unique within the blueprint. Tracks registered names and auto-increments default name counters.
+Ensures all state names are unique within the blueprint. Tracks registered names and auto-increments default name counters. Takes `itemDefaultName` as constructor parameter.
 
 ### 10.2 Algorithm
 
+**File:** `NameChangingMonitor.kt` (33 lines)
+
 ```
+itemDefaultName: String          // e.g. "New state"
+defaultNameRegex: Regex          // "^New state (\\d+)$"
 existedNames: HashSet<String>
 nextNameCounter: Int = 1
-defaultNameRegex: "^New state (\\d+)$"
 ```
 
 **`tryRegister(name)`:**
@@ -618,13 +610,13 @@ defaultNameRegex: "^New state (\\d+)$"
 2. Otherwise → return `false`
 
 **`createNextDefaultName()`:**
-1. Return `"New state $nextNameCounter"`
+1. Return `"$itemDefaultName $nextNameCounter"`
 
 ### 10.3 Name Edit Rollback
 
-When a user edits a state name via inline editing:
-1. The current name is saved as `previousName` before edit begins
-2. On focus loss, `tryRegister(newName)` is called
+When a user edits a state name via inline editing (bound to `isEditModeEnabledProperty` in `IsmaBlueprintViewModel.initNameChangingEvent()`):
+1. The current name is saved as `previousName` when `isEditModeEnabled` becomes `true`
+2. On focus loss (`isEditModeEnabled` becomes `false`), `tryRegister(newName)` is called
 3. If registration fails (duplicate), `name = previousName` restores the old name
 4. If registration succeeds, `tryUnregister(previousName)` updates the registry
 
@@ -677,6 +669,39 @@ Each section is followed by a blank line.
 ### 11.5 Line Number Tracking
 
 For each generated fragment, start and end line numbers are tracked and returned in `CodeRegion` objects, used for error highlighting in the text editor.
+
+### 11.6 Constants
+
+**File:** `BlueprintEditorConstants.kt` (35 lines)
+
+All magic numbers are centralized:
+
+| Constant | Value | Used For |
+|----------|-------|----------|
+| `DEFAULT_STATE_WIDTH` | 110.0 | User state box width |
+| `DEFAULT_STATE_HEIGHT` | 65.0 | User state box height |
+| `FIXED_STATE_HEIGHT` | 60.0 | Main/Init state box height |
+| `CORNER_RADIUS` | 20.0 | State box corner rounding |
+| `STATE_NAME_FONT_SIZE` | 16.0 | State name text font |
+| `STATE_INSET` | 10.0 | Main/Init x-position offset |
+| `ARROW_LINE_OFFSET` | 10.0 | Line perpendicular offset from state center |
+| `ARROW_TEXT_X_OFFSET` | 75.0 | Arrow text X offset |
+| `ARROW_TEXT_Y_OFFSET` | 50.0 | Arrow text Y offset |
+| `ARROW_LINE_STROKE` | 3.0 | Arrow line stroke width |
+| `ARROWHEAD_STROKE` | 3.0 | Arrowhead stroke width |
+| `ARROWHEAD_WIDTH` | 7.0 | Arrowhead polygon half-width |
+| `ARROW_LABEL_FONT_SIZE` | 16.0 | Arrow label text font |
+| `ARROW_LABEL_FIELD_WIDTH` | 120.0 | Arrow label text field width |
+| `LOOP_CIRCLE_RADIUS` | 40.0 | Loop arrow circle radius |
+| `LOOP_CIRCLE_CENTER_X` | 60.0 | Loop circle center X |
+| `LOOP_ARROWHEAD_X` | 100.0 | Loop arrowhead position |
+| `LOOP_LABEL_X` | 120.0 | Loop label X position |
+| `LOOP_LABEL_Y_OFFSET` | -10.0 | Loop label Y offset |
+| `CLICK_DELAY_MS` | 200L | Single/double click disambiguation delay |
+| `POPOVER_MIN_WIDTH` | 300.0 | Edit PopOver minimum width |
+| `POPOVER_PADDING` | 10.0 | Edit PopOver padding |
+| `POPOVER_CORNER_RADIUS` | 5.0 | Edit PopOver corner radius |
+| `POPOVER_SHADOW_RADIUS` | 20.0 | Edit PopOver shadow radius |
 
 ---
 
@@ -811,7 +836,6 @@ The main TabPane can contain tabs from both LISMA text projects and Blueprint pr
 | **No auto-routing** | Arrows are straight lines from center to center, may pass through other states |
 | **No zoom/pan** | Scrolling only; no magnification |
 | **No undo/redo** | All edits are permanent once committed |
-| **Main/Init can be removed** | In remove-state mode, clicking Main or Init will delete them (potential bug) |
 | **No arrow label editing** | Only via PopOver; no inline editing on canvas |
 | **No color customization** | All colors are hardcoded (LIGHTGREEN, LIGHTBLUE, CORAL, WHITE, BLACK) |
 | **No keyboard shortcuts** | The blueprint editor itself has no keyboard shortcuts; all navigation is mouse-driven |
@@ -840,29 +864,31 @@ The main TabPane can contain tabs from both LISMA text projects and Blueprint pr
 
 ## 18. Dimensions Reference
 
+All constants are defined in `BlueprintEditorConstants.kt`.
+
 | Element | Width | Height | Notes |
 |---------|-------|--------|-------|
-| User state box | 110 | 65 | Fixed |
-| Main/Init state box | 110 | 60 | Override |
-| State box corner radius | 20 (arc) | 20 (arc) | Rounded corners |
-| State name font size | 16 | — | Arial |
-| Arrow label font size | 16 | — | Arial |
-| Arrow line stroke width | 3 | — | |
-| Arrowhead stroke width | 3 | — | |
-| Loop circle radius | 40 | 40 | Transparent fill |
-| Loop circle center offset | 60 | — | X position in local coords |
-| Arrowhead polygon width | 14 | 7 | Polygon(7,-7 / -7,0 / 7,7) |
-| Loop arrowhead X pos | 100 | — | Local X offset |
-| Loop label X pos | 120 | — | Local X offset |
-| PopOver min width | 300 | — | |
-| PopOver padding | 10 | — | All sides |
-| PopOver corner radius | 5 | — | |
-| PopOver shadow radius | 20 | — | |
-| Line perpendicular offset | 10 | — | From state center |
-| Arrow text X offset | 75 | — | Perpendicular |
-| Arrow text Y offset | 50 | — | Perpendicular |
-| Loop label Y offset | -10 | — | From center line |
-| Name label inset | 10, 10 | — | From state box edge |
+| User state box | 110 | 65 | `DEFAULT_STATE_WIDTH` / `DEFAULT_STATE_HEIGHT` |
+| Main/Init state box | 110 | 60 | `DEFAULT_STATE_WIDTH` / `FIXED_STATE_HEIGHT` |
+| State box corner radius | 20 (arc) | 20 (arc) | `CORNER_RADIUS` |
+| State name font size | 16 | — | `STATE_NAME_FONT_SIZE` |
+| Arrow label font size | 16 | — | `ARROW_LABEL_FONT_SIZE` |
+| Arrow line stroke width | 3 | — | `ARROW_LINE_STROKE` |
+| Arrowhead stroke width | 3 | — | `ARROWHEAD_STROKE` |
+| Loop circle radius | 40 | 40 | `LOOP_CIRCLE_RADIUS` |
+| Loop circle center offset | 60 | — | `LOOP_CIRCLE_CENTER_X` |
+| Arrowhead polygon width | 14 | 7 | `ARROWHEAD_WIDTH` = 7 |
+| Loop arrowhead X pos | 100 | — | `LOOP_ARROWHEAD_X` |
+| Loop label X pos | 120 | — | `LOOP_LABEL_X` |
+| PopOver min width | 300 | — | `POPOVER_MIN_WIDTH` |
+| PopOver padding | 10 | — | `POPOVER_PADDING` |
+| PopOver corner radius | 5 | — | `POPOVER_CORNER_RADIUS` |
+| PopOver shadow radius | 20 | — | `POPOVER_SHADOW_RADIUS` |
+| Line perpendicular offset | 10 | — | `ARROW_LINE_OFFSET` |
+| Arrow text X offset | 75 | — | `ARROW_TEXT_X_OFFSET` |
+| Arrow text Y offset | 50 | — | `ARROW_TEXT_Y_OFFSET` |
+| Loop label Y offset | -10 | — | `LOOP_LABEL_Y_OFFSET` |
+| Name label inset | 10, 10 | — | `STATE_INSET` |
 | HBox size | stateWidth - 20 | stateHeight - 20 | Centered inside rectangle |
 
 ---

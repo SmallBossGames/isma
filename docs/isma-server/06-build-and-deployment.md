@@ -43,6 +43,14 @@ sourceSets {
         }
     }
 }
+
+dependencies {
+    implementation(libs.grpc.netty.shaded)
+    implementation(libs.grpc.stub)
+    implementation(libs.grpc.protobuf)
+    implementation(libs.protobuf.java)
+    implementation(libs.grpc.java)
+}
 ```
 
 **Code generation:** Protobuf files from `protobuf-contracts/v1/` are compiled into Java gRPC stubs. The generated classes include:

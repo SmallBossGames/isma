@@ -29,9 +29,11 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | `app/src/main/kotlin/.../services/koin/KoinExtentions.kt` | Service-layer DI modules |
 | `app/src/main/kotlin/.../views/koin/KoinExtensions.kt` | View-layer DI modules |
 | `app/src/main/kotlin/.../services/project/ProjectService.kt` | Project lifecycle management |
-| `app/src/main/kotlin/.../services/simualtion/SimulationService.kt` | Simulation orchestration |
+| `app/src/main/kotlin/.../services/simualtion/SimulationService.kt` | Thin coordinator (delegates to SimulationTaskService) |
+| `app/src/main/kotlin/.../services/simualtion/SimulationTaskService.kt` | Full simulation lifecycle (compile, run, monitor, download) |
 | `app/src/main/kotlin/.../services/simualtion/SimulationParametersService.kt` | Simulation parameter management |
 | `app/src/main/kotlin/.../models/projects/LismaTextModel.kt` | LISMA text model with CodeRegion tracking |
+| `app/src/main/kotlin/.../models/simulation/SimulationTask.kt` | Running/completed/failed simulation task tracking |
 | `app/src/main/kotlin/.../models/simulation/CompletedSimulationModel.kt` | Completed simulation result wrapper |
 | `app/src/main/kotlin/.../utilities/BlueprintModelExtensions.kt` | Blueprint-to-LISMA conversion |
 | `app/src/main/kotlin/.../services/ModelErrorService.kt` | Compilation/validation error tracking |
@@ -45,7 +47,10 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | `external-services/src/main/kotlin/.../RunSimulationParams.kt` | Simulation parameter DTO |
 | `text-editor/src/main/kotlin/.../IsmaTextEditor.kt` | Rich text editor (fxmisc.richtext) |
 | `text-editor/src/main/kotlin/.../services/EditorPlatformService.kt` | Cut/copy/paste event propagation |
-| `blueprint-editor/src/main/kotlin/.../IsmaBlueprintEditor.kt` | Visual statechart editor |
+| `blueprint-editor/src/main/kotlin/.../IsmaBlueprintEditor.kt` | Visual statechart editor (UI only) |
+| `blueprint-editor/src/main/kotlin/.../IsmaBlueprintViewModel.kt` | Blueprint editor logic (MVVM ViewModel) |
+| `blueprint-editor/src/main/kotlin/.../EditorMode.kt` | Sealed class for editor modes |
+| `blueprint-editor/src/main/kotlin/.../constants/BlueprintEditorConstants.kt` | All magic numbers |
 | `domain/src/main/kotlin/.../models/SimulationResult.kt` | Domain model for simulation results |
 | `toolkit/src/main/kotlin/.../controls/PropertiesGrid.kt` | Reusable property grid component |
 | `toolkit/src/main/kotlin/.../coroutines/flow/CollectionsExtensions.kt` | ObservableList/Set → Flow bridges |

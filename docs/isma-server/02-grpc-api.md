@@ -55,7 +55,7 @@ Starts a numerical simulation asynchronously. Returns immediately with a `simula
 | Field | Type | Description |
 |-------|------|-------------|
 | `gamma` | `double` | Event detection sensitivity parameter |
-| `low_border` | `double` | Minimum step size for event detection |
+| `low_border` | `double` | Minimum step size for event detection (Java getter: `lowBorder`) |
 
 **Response:** `RunSimulationResponse`
 
@@ -318,5 +318,9 @@ if (request.lismaSourceCode.isBlank()) {
     responseObserver.onError(
         Status.INVALID_ARGUMENT.withDescription("LISMA source code is required").asException()
     )
+    return
 }
+```
+
+**Note:** `low_border` is the proto field name; the Java getter is `lowBorder`.
 ```

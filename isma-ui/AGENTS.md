@@ -5,7 +5,7 @@ User interface module for the ISMA application, built with Kotlin and JavaFX.
 ## Technology Stack
 
 - **Language:** Kotlin
-- **UI Framework:** JavaFX (via TornadoFX)
+- **UI Framework:** JavaFX (plain, no TornadoFX)
 - **Build System:** Gradle with Kotlin DSL
 
 ## Modules
@@ -44,7 +44,7 @@ Text editing component for mathematical expressions.
 ### blueprint-editor/
 Blueprint/visual editing component.
 
-- Uses JavaFX with FXML
+- Uses JavaFX (100% Kotlin, no FXML)
 
 ### toolkit/
 Shared UI utilities and components.

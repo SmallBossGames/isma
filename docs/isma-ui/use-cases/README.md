@@ -36,7 +36,8 @@ All use cases assume the following architecture:
 | `ProjectService` | UC-002, UC-003, UC-004, UC-009 | Manages the observable set of open projects |
 | `ProjectFileService` | UC-004 | FileChooser-based open/save operations |
 | `SimulationServerFacade` | UC-005, UC-006, UC-008, UC-010 | Orchestrates gRPC + HTTP communication with server |
-| `SimulationService` | UC-006, UC-010 | Simulation lifecycle orchestration |
+| `SimulationService` | UC-006, UC-010 | Thin coordinator — delegates to SimulationTaskService |
+| `SimulationTaskService` | UC-006, UC-010 | Full simulation lifecycle (compile, run, monitor, download) |
 | `SimulationParametersService` | UC-008 | Parameter view models and persistence |
 | `SimulationResultService` | UC-006, UC-007 | Completed result management and export |
 | `ModelErrorService` | UC-005, UC-006 | Error list tracking and display |

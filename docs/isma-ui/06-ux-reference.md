@@ -169,18 +169,17 @@ A drag-and-drop visual canvas for building state machines:
 
 | Button | Action |
 |--------|--------|
-| **New state** | Enter "Add state" mode — click on canvas to place a new state |
-| **New transition** | Enter "Add transition" mode — click source state, then click target state |
-| **Remove state** | Enter "Remove state" mode — click a state to delete it (and all its arrows) |
-| **Remove transition** | Enter "Remove transition" mode — click an arrow to delete it |
+| **New state** | Immediately creates a new state at position (10, 200) with an auto-generated name |
+| **New transition** → **Stop adding transaction** | Toggles add-transition mode — click source state, then click target state |
+| **Remove state** → **Stop remove state** | Toggles remove-state mode — click a state to delete it (and all its arrows) |
+| **Remove transition** → **Stop remove transition** | Toggles remove-transition mode — click an arrow to delete it |
 
 **Interaction modes (mutually exclusive):**
 
 1. **Default (drag) mode:** Drag states to reposition them on the canvas
-2. **Add state mode:** Click any position on the canvas to place a new state
-3. **Add transition mode:** Click a source state, then click a target state. If the same state is clicked twice, a loop (self-transition) is created.
-4. **Remove state mode:** Click any state to delete it along with all associated arrows
-5. **Remove transition mode:** Click any transition arrow to delete it
+2. **Add transition mode:** Click a source state, then click a target state. If the same state is clicked twice, a loop (self-transition) is created. Mode auto-resets after creating the transition.
+3. **Remove state mode:** Click any user state to delete it along with all associated arrows. Main and Init states are protected — clicking them has no effect.
+4. **Remove transition mode:** Click any transition arrow to delete it
 
 **State box details:**
 - **Shape:** Rounded rectangle (arc radius 20px), width 110px, height 65px
@@ -219,11 +218,11 @@ When a blueprint project is compiled/simulated, the visual statechart is automat
 
 **Location:** Right side of the main window, occupies the full height of the content area (below the toolbars).
 
-**Visibility:** Always visible as part of the main window layout. The panel is a TornadoFX `drawer` with `multiselect = true`, meaning all sections are expanded and visible simultaneously — there is no collapsible section behavior.
+**Visibility:** Always visible as part of the main window layout. The panel is a `PropertiesAccordion` (from toolkit) with all sections expanded and visible simultaneously.
 
-**Implementation:** `SettingsPanelView.kt` wraps four sub-views inside a `drawer` container, each with a fixed width of 240px and rendered as a `ScrollPane`. The panel uses a property grid layout (label on the left, control on the right) provided by `ru.isma.javafx.extensions.controls.propertiesGrid`.
+**Implementation:** `SettingsPanelView.kt` extends `PropertiesAccordion` and adds four sub-views, each wrapped in a `VBox` with `prefWidth = 240.0` and `styleClass = "settings-box"`. Each sub-view contains a `ScrollPane` with a `propertiesGrid` layout (label on the left, control on the right) provided by `ru.isma.javafx.extensions.controls.propertiesGrid`.
 
-**Data flow:** The panel reads from and writes to the singleton `SimulationParametersService`, which holds five TornadoFX `ViewModel` instances. When the user clicks "Run" (▶ Play or `Ctrl+F5`), the service's `snapshot()` method captures the current view model state into a serializable `SimulationParametersModel`, which is then converted to `RunSimulationParams` and sent to the server via gRPC. The panel values are **not** live-bound to the simulation — they are only read at the moment of execution.
+**Data flow:** The panel reads from and writes to the singleton `SimulationParametersService`, which holds five JavaFX property-based view model instances (no TornadoFX dependency). When the user clicks "Run" (▶ Play or `Ctrl+F5`), the service's `snapshot()` method captures the current view model state into a serializable `SimulationParametersModel`, which is then converted to `RunSimulationParams` and sent to the server via gRPC. The panel values are **not** live-bound to the simulation — they are only read at the moment of execution.
 
 ---
 
@@ -356,36 +355,24 @@ When a blueprint project is compiled/simulated, the visual statechart is automat
 
 ### 5. Result Processing
 
-**Purpose:** Configures post-processing simplification of simulation results. This applies a line-simplification algorithm to reduce the number of data points in the result, which produces smoother chart rendering and smaller file sizes.
+**Purpose:** Configures how simulation results are saved after completion. The "Simplify" and "Tolerance" controls are defined in the view model but not yet exposed in the UI.
 
 **View:** `ResultProcessingView` → **ViewModel:** `ResultProcessingParametersViewModel`
 
 | Label | Control | Type | Default | Bound to |
 |-------|---------|------|---------|----------|
-| **Simplify** | ComboBox | String: "Radial-Distance" / "Douglas-Peucker" | First in list | `selectedSimplifyMethodProperty` |
-| **Tolerance** | Number field | Double | 20.0 | `toleranceProperty` |
+| **Save result** | ComboBox | Enum: `MEMORY` / `FILE` | `MEMORY` | `savingTargetProperty` |
 
-**When values are consumed:** Result processing parameters are **not** sent to the server and are **not** included in `Store Settings` / `Load Settings` persistence. They are application-local settings that affect only the client-side chart rendering and CSV export. The `snapshot()` method in `SimulationParametersService` does not include `resultProcessing` in its output.
+**Note:** The `ResultProcessingParametersViewModel` also has `isSimplifyInUse`, `selectedSimplifyMethod`, and `tolerance` properties, but these are not yet rendered in `ResultProcessingView`. The view only shows the "Save result" ComboBox.
 
-**Parameter details:**
-- **Simplify (selectedSimplifyMethod):** The line-simplification algorithm to apply:
-  - **Radial-Distance:** A simpler algorithm that removes points based on radial distance thresholds. Faster but may distort sharp features.
-  - **Douglas-Peucker:** A more sophisticated algorithm that preserves the overall shape of the curve while removing fewer essential points. Better for curves with sharp turns or peaks.
-- **Tolerance:** The maximum allowed deviation between the original and simplified curve. Lower values (e.g., 1.0) produce more faithful approximations with more points. Higher values (e.g., 50.0) produce smoother but less detailed curves.
-
-**Typical use cases:**
-- **No simplification:** (Not currently exposed as a dropdown option in the UI — the view only shows the Save result control; the Simplify/Tolerance controls are commented out in the source code, see `ResultProcessingView.kt:23-52`)
-- **Smooth charts for presentation:** Douglas-Peucker, Tolerance=50.0 — for reducing data points in publication-quality charts
-- **Balanced rendering:** Radial-Distance, Tolerance=20.0 — for good visual quality with moderate point reduction
-
-> **Note:** The Simplify and Tolerance controls are currently commented out in `ResultProcessingView.kt` (lines 23-52). The view only renders the "Save result" ComboBox. The commented-out code shows the intended full implementation with a form layout using TornadoFX `fieldset`, `checkbox`, `combobox`, and `numberTextField`.
+**When values are consumed:** At simulation completion. The `SaveTarget` enum is captured via `snapshot()` → `ResultSavingParametersModel` and stored in `CompletedSimulationModel`. The server respects this setting when deciding whether to write a binary cache file.
 
 ---
 
 ### Data Flow Summary
 
 ```
-User edits settings → ViewModel properties (TornadoFX bind)
+User edits settings → ViewModel properties (JavaFX Simple*Property)
        ↓
 SimulationParametersService holds all 5 ViewModels as singletons
        ↓
@@ -448,18 +435,16 @@ A floating panel that opens from the "Tasks" button. Shows running and completed
 │ ┌─────────────────────────────────────┐ │
 │ │ Task #1  [████████░░] [✕ Abort]    │ │
 │ └─────────────────────────────────────┘ │
-│ ┌─────────────────────────────────────┐ │
-│ │ Task #2  [██████░░░░] [✕ Abort]    │ │
-│ └─────────────────────────────────────┘ │
 ├─────────────────────────────────────────┤
 │ Completed                               │
 │ ┌─────────────────────────────────────┐ │
 │ │ Task #1  [Show] [Export] [Remove]   │ │
 │ │            [⋯ Details]             │ │
 │ └─────────────────────────────────────┘ │
+├─────────────────────────────────────────┤
+│ Failed                                  │
 │ ┌─────────────────────────────────────┐ │
-│ │ Task #2  [Show] [Export] [Remove]   │ │
-│ │            [⋯ Details]             │ │
+│ │ Task #1  [Error message] [Remove]  │ │
 │ └─────────────────────────────────────┘ │
 └─────────────────────────────────────────┘
 ```
@@ -481,6 +466,15 @@ One row per completed simulation. Each row contains:
 - **Export button:** Opens file picker to export results as CSV
 - **Remove button:** Removes this entry from the list (does not delete the cached file)
 - **Details button:** Chevron icon (⋯) — opens a nested PopOver with simulation metadata
+
+### Failed Section
+
+One row per failed or cancelled simulation. Each row contains:
+- **Task label:** "Task #N"
+- **Error message:** Red text showing the error description (e.g., "Compilation failed: ...", "Monitor error: ...", "Download error: ...")
+- **Remove button:** Removes this entry from the list
+
+Tasks appear here when compilation fails, monitoring throws an exception, or result download fails. They also appear here when a running task is cancelled via the Abort button.
 
 ### Details PopOver (nested)
 
@@ -564,7 +558,8 @@ Opens when the user clicks "Show" on a completed simulation. Used to select whic
 sequenceDiagram
     participant User
     participant UI as Main Window
-    participant SimSvc as Simulation<br/>Service
+    participant SimSvc as Simulation<br/>Service (thin)
+    participant TaskSvc as SimulationTask<br/>Service (lifecycle)
     participant Server as ISMA Server
     participant Errors as Error List
     participant Tasks as Tasks PopOver
@@ -578,32 +573,34 @@ sequenceDiagram
 
     SimSvc->>SimSvc: Snapshot parameters
     SimSvc->>SimSvc: Get active project source
+    SimSvc->>TaskSvc: submit(modelName, params, simParams)
 
-    SimSvc->>Server: compileModel(source)
-    Server-->>SimSvc: CompileResult
+    TaskSvc->>Server: compileModel(source)
+    Server-->>TaskSvc: CompileResult
 
     alt Compilation errors
-        SimSvc->>Errors: Display errors in table
-        SimSvc-->>UI: Stop (no simulation)
+        TaskSvc->>Errors: Display errors in table
+        TaskSvc->>Tasks: Add "Failed" row with error message
+        TaskSvc-->>SimSvc: Task (FAILED)
     else Compilation succeeds
-        SimSvc->>Server: runSimulation(params)
-        Server-->>SimSvc: simulationId
+        TaskSvc->>Server: runSimulation(params)
+        Server-->>TaskSvc: simulationId
 
-        SimSvc->>Tasks: Add "In progress" row
-        SimSvc->>Server: monitorSimulation(id)
+        TaskSvc->>Tasks: Add "In progress" row
+        TaskSvc->>Server: monitorSimulation(id)
 
         loop Progress updates
-            Server-->>SimSvc: SimulationProgress
-            SimSvc->>Tasks: Update progress bar
+            Server-->>TaskSvc: SimulationProgress
+            TaskSvc->>Tasks: Update progress bar
         end
 
-        SimSvc->>Server: downloadResultToCache(id)
-        Server-->>SimSvc: CachedSimulationResult(file)
+        TaskSvc->>Server: downloadResultToCache(id)
+        Server-->>TaskSvc: CachedSimulationResult(file)
 
-        SimSvc->>Result: commitResult(model)
+        TaskSvc->>Result: Task (COMPLETED, result populated)
         Result->>Tasks: Move to "Completed"
 
-        SimSvc->>Tasks: Remove "In progress" row
+        TaskSvc->>Tasks: Remove "In progress" row (task status changed)
     end
 
     User->>Tasks: Click "Show" on completed task

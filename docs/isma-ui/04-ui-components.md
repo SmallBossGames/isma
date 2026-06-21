@@ -16,7 +16,7 @@ app/src/main/kotlin/ru/isma/next/app/
 │   │   └── LismaTextModel.kt     # CodeRegion for error line tracking
 │   └── simulation/               # SimulationParametersModel, CompletedSimulationModel
 │       ├── SaveTarget.kt         # MEMORY / FILE enum
-│       ├── InProgressSimulationModel.kt
+│       ├── SimulationTask.kt     # Task model with status/progress/error/result
 │       └── CompletedSimulationModel.kt
 ├── services/
 │   ├── ModelErrorService.kt
@@ -26,7 +26,7 @@ app/src/main/kotlin/ru/isma/next/app/
 │   ├── project/                  # ProjectService, ProjectFileService, LismaPdeService
 │   │   └── LismaPdeTranslationResult.kt  # Success/Failed sealed interface
 │   └── simualtion/               # SimulationService, SimulationResultService, SimulationParametersService
-├── viewmodels/                   # TornadoFX view models for settings
+├── viewmodels/                   # Plain JavaFX property-based view models for settings
 ├── utilities/                    # BlueprintModelExtensions.kt (convertToLisma)
 ├── extentions/                   # ButtonExtensions.kt, FormsExtensions.kt
 └── constants/                    # FileExtensions.kt (file type constants)
@@ -63,7 +63,7 @@ application {
 }
 ```
 
-JavaFX modules: `javafx.controls`, `javafx.fxml`. Key dependencies: Koin, TornadoFX, ControlsFX, fxmisc.richtext, Ikonli (Material2 icons), gRPC-Netty with Linux Epoll.
+JavaFX modules: `javafx.controls`, `javafx.fxml`. Key dependencies: Koin, ControlsFX, fxmisc.richtext, Ikonli (Material2 icons), gRPC-Netty with Linux Epoll, Kotlinx Coroutines (JavaFX + serialization).
 
 ## Application Entry Point
 
@@ -208,59 +208,64 @@ FileChooser-based open/save operations. Supports three file types:
 
 Save operations write `project.lismaText` or `Json.encodeToString(project.blueprint)` to file.
 
-### SimulationService
+### SimulationService (thin coordinator)
 
 **File:** `SimulationService.kt`
 
-Orchestrates the full simulation lifecycle:
+A 36-line thin wrapper that delegates to `SimulationTaskService`. It snapshots parameters, resolves the active project, and calls `SimulationTaskService.submit()`.
 
 ```kotlin
 class SimulationService(
     private val projectService: ProjectService,
-    private val simulationResult: SimulationResultService,
+    private val simulationTaskService: SimulationTaskService,
     private val simulationParametersService: SimulationParametersService,
-    private val serverFacade: SimulationServerFacade,
-    private val modelErrorService: ModelErrorService,
 ) : KoinComponent {
-    val trackingTasks = FXCollections.observableArrayList<InProgressSimulationModel>()!!
-
     fun simulate() { ... }
-    fun stopSimulation(trackingTask: InProgressSimulationModel) { ... }
-
-    companion object {
-        private val virtualThreadDispatcher = Executors.newVirtualThreadPerTaskExecutor()
-            .asCoroutineDispatcher()
-        val SimulationScope = CoroutineScope(virtualThreadDispatcher + SupervisorJob())
-    }
+    fun stopSimulation(task: SimulationTask) { simulationTaskService.cancelTask(task) }
+    companion object { val SimulationScope = SimulationTaskService.SimulationScope }
 }
 ```
 
-**Flow:**
+### SimulationTaskService (full lifecycle)
 
-1. Snapshot simulation parameters and project source
-2. Compile model via `serverFacade.compileModel()`
-3. Report compilation errors to `ModelErrorService` → `IsmaErrorListTable`
-4. Run simulation via `serverFacade.runSimulation()`
-5. Monitor progress via `serverFacade.monitorSimulation()` → flow → `trackingTask.commitProgress()`
-6. Download result via `serverFacade.downloadResultToCache()`
-7. Create `CompletedSimulationModel` and commit to `SimulationResultService`
+**File:** `SimulationTaskService.kt`
 
-Uses a virtual-thread-backed coroutine dispatcher with `SupervisorJob` for simulation concurrency. UI updates are marshalled via `Platform.runLater`.
+The complete simulation pipeline (151 lines). Owns `val tasks: ObservableList<SimulationTask> = SimulationTask.ALL` and manages the 4-phase lifecycle:
+
+| Phase | Method | Description |
+|-------|--------|-------------|
+| Compile | `serverFacade.compileModel(sourceCode)` | Populates `ModelErrorService` with errors; fails fast if errors exist |
+| Run | `serverFacade.runSimulation(runParams)` | Starts simulation, adds task to `tasks` list |
+| Monitor | `serverFacade.monitorSimulation(simulationId, 0.01)` | Collects `Flow<SimulationProgress>`, normalizes to 0.0–1.0, calls `task.setProgress()` |
+| Download | `serverFacade.downloadResultToCache(simulationId)` | Creates `CompletedSimulationModel`, sets `task.result` and `task.setStatus(COMPLETED)` |
+
+Uses `SimulationScope` — a global `CoroutineScope` backed by `Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()` with `SupervisorJob()`. Each job is tracked in `currentJobs: MutableMap<SimulationTask, Job>`.
+
+```kotlin
+class SimulationTaskService(
+    private val serverFacade: SimulationServerFacade,
+    private val modelErrorService: ModelErrorService,
+    private val projectService: ProjectService,
+) : KoinComponent {
+    val tasks: ObservableList<SimulationTask> = SimulationTask.ALL
+    fun submit(modelName: String, params: RunSimulationParams, simulationParameters: SimulationParametersModel): SimulationTask
+    fun cancelTask(task: SimulationTask)
+}
+```
 
 ### SimulationResultService
 
 **File:** `SimulationResultService.kt`
 
-Manages completed simulation results:
+Manages completed simulation results. Constructor takes `SimulationTaskService` (for task removal from `SimulationTask.ALL`) and `GrinProcessLauncher`.
 
 | Method | Description |
 | --- | --- |
-| `commitResult(result)` | Adds to `trackingTasksResults` observable list |
-| `removeResult(result)` | Removes from list |
-| `showChart(result)` | Opens Grin chart viewer with axis picker dialog |
-| `exportToFile(result, file)` | Exports to CSV asynchronously |
+| `removeResult(task)` | Removes task from `SimulationTask.ALL`, clears `task.result` |
+| `showChart(task)` | Opens Grin chart viewer with axis picker dialog |
+| `exportToFile(task, file)` | Exports to CSV asynchronously |
 
-CSV export uses `BinaryFilePointProvider` to stream points via coroutine flow, writing to a buffered `Writer` on `Dispatchers.IO`.
+CSV export uses `BinaryFilePointProvider` to stream points via coroutine flow, writing to a buffered `Writer` on `Dispatchers.IO`. Uses `ResultServiceScope` (`CoroutineScope(Dispatchers.Default)`).
 
 ### LismaPdeService
 
@@ -301,12 +306,12 @@ Manages simulation parameter view models and provides store/load persistence as 
 | Property | Type | Default |
 | --- | --- | --- |
 | `cauchyInitials` | `CauchyInitialsViewModel` | start=0.0, end=10.0, step=0.1 |
-| `integrationMethod` | `IntegrationMethodParametersViewModel` | accuracy=0.1, server=localhost, port=7890 |
+| `integrationMethod` | `IntegrationMethodParametersViewModel` | accuracy=0.1, server="localhost", port=7890, selectedMethod=first from list |
 | `eventDetection` | `EventDetectionParametersViewModel` | gamma=0.8, lowBorder=0.001 |
 | `resultSaving` | `ResultSavingParametersViewModel` | target=MEMORY |
-| `resultProcessing` | `ResultProcessingParametersViewModel` | tolerance=20.0 |
+| `resultProcessing` | `ResultProcessingParametersViewModel` | tolerance=20.0, selectedSimplifyMethod="Radial-Distance" |
 | `integrationMethods` | `ObservableList<String>` | From server |
-| `simplifyMethods` | `ObservableList<String>` | Radial-Distance, Douglas-Peucker |
+| `simplifyMethods` | `ObservableList<String>` | "Radial-Distance", "Douglas-Peucker" |
 
 **Methods:**
 - `store()` — opens FileChooser, serializes snapshot to JSON
@@ -350,13 +355,21 @@ class PreferencesProvider(private val settingsFilePath: String) {
 │ │  (center)          │  │ (right)                 │ │
 │ │                    │  │                         │ │
 │ ├────────────────────┤  └─────────────────────────┘ │
-│ │ Drawer:            │                              │
-│ │ ErrorListTable     │                              │
+│ │ ErrorListDrawer    │                              │
+│ │ (collapsible)      │                              │
 │ ├────────────────────┤                              │
 │ │ SimulationProcessBar│                             │
 │ └────────────────────┘                              │
 └──────────────────────────────────────────────────────┘
 ```
+
+The left drawer (`Drawer`) is commented out. The error list is now a dedicated `ErrorListDrawer` in the bottom area (above the simulation process bar).
+
+### ErrorListDrawer
+
+**File:** `ErrorListDrawer.kt`
+
+A `TitledPane("Error list", ismaErrorListTable)` that wraps `IsmaErrorListTable` in a collapsible panel. `isCollapsible = true`, `isExpanded = false` by default. Used in the bottom area of `MainView`.
 
 ### IsmaEditorTabPane
 
@@ -385,77 +398,149 @@ init {
 | `IsmaToolBar` | `IsmaToolBar.kt` | Same commands as buttons: New model, New statechart, Open, Save, Save all, Cut, Copy, Paste, Verify, Store/Load Settings |
 | `SimulationProcessBar` | `SimulationProcessBar.kt` | Play button (triggers `simulate()`) + Tasks button (opens `TasksPopOver`) |
 | `IsmaErrorListTable` | `IsmaErrorListTable.kt` | `TableView<ErrorViewModel>` with Row/Position/Fragment/Message columns |
-| `TasksPopOver` | `TasksPopOver.kt` | `PopOver` bound to `SimulationService.trackingTasks` + `SimulationResultService.trackingTasksResults` |
+| `TasksPopOver` | `TasksPopOver.kt` | `PopOver` with 3 sections (In progress, Completed, Failed) bound to `SimulationTaskService.tasks` via `changeAsFlow()` |
 
 ### Settings Panel
 
 **File:** `SettingsPanelView.kt`
 
-TornadoFX `drawer` with 4 sub-views:
+Extends `PropertiesAccordion` (from toolkit) with 4 sub-views wrapped in `VBox` with `styleClass = "settings-box"` and `prefWidth = 240.0`:
 
 | View | Model | Purpose |
 | --- | --- | --- |
 | `CauchyInitialsView` | `CauchyInitialsViewModel` | Start time, end time, initial step |
-| `MethodSettingsView` | `IntegrationMethodParametersViewModel` | Integration method, accuracy, stability control |
-| `EventDetectionView` | `EventDetectionParametersViewModel` | Event detection, step limit, gamma, low border |
-| `ResultProcessingView` | `ResultProcessingParametersViewModel` | Simplification, tolerance |
+| `MethodSettingsView` | `IntegrationMethodParametersViewModel` | Method, accuracy, stability, parallel, server/port |
+| `EventDetectionView` | `EventDetectionParametersViewModel` | Event detection, gamma, step limit, low border |
+| `ResultProcessingView` | `ResultSavingParametersViewModel` | Save target (MEMORY/FILE only — Simplify/Tolerance not yet in UI) |
+
+`MethodSettingsView` includes `Accurate` checkbox (with `Accuracy` field disabled unless enabled), `Stable` checkbox, `Parallel` checkbox (with `Server` and `Port` fields disabled unless enabled).
 
 ## ViewModels
 
-All view models use TornadoFX `bind` helpers for property binding to UI controls.
+All view models use plain JavaFX `Simple*Property` classes with Kotlin property delegation (`getValue`/`setValue` from toolkit). No TornadoFX `bind` helpers.
 
 ### CauchyInitialsViewModel
 
 ```kotlin
-class CauchyInitialsViewModel : ViewModel() {
-    val startTime = bindDouble(0.0)
-    val endTime = bindDouble(1.0)
-    val step = bindDouble(0.01)
+class CauchyInitialsViewModel {
+    private val startTimeProperty = SimpleDoubleProperty()
+    private val endTimeProperty = SimpleDoubleProperty()
+    private val stepProperty = SimpleDoubleProperty()
+
+    var startTime by startTimeProperty
+    var endTime by endTimeProperty
+    var step by stepProperty
+
+    fun commit(model: CauchyInitialsModel) { ... }
+    fun snapshot() = CauchyInitialsModel(startTime, endTime, step)
 }
 ```
+
+Defaults set at `SimulationParametersService` init: `startTime=0.0`, `endTime=10.0`, `step=0.1`.
 
 ### IntegrationMethodParametersViewModel
 
 ```kotlin
-class IntegrationMethodParametersViewModel(val methods: List<String>) : ViewModel() {
-    val selectedMethod = bind("method")
-    val accuracy = bindDouble(0.001)
-    val isAccuracyInUse = bind(true)
-    val isStableInUse = bind(true)
-    val isParallelInUse = bind(false)
-    val server = bind("")
-    val port = bind(0)
+class IntegrationMethodParametersViewModel {
+    val selectedMethodProperty = SimpleStringProperty()
+    var selectedMethod: String by selectedMethodProperty
+
+    val accuracyProperty = SimpleDoubleProperty()
+    var accuracy by accuracyProperty
+
+    val isAccuracyInUseProperty = SimpleBooleanProperty()
+    var isAccuracyInUse by isAccuracyInUseProperty
+
+    val isStableAllowedProperty = SimpleBooleanProperty()
+    var isStableAllowedInUse by isStableAllowedProperty
+
+    val isStableInUseProperty = SimpleBooleanProperty()
+    var isStableInUse by isStableInUseProperty
+
+    val isParallelInUseProperty = SimpleBooleanProperty()
+    var isParallelInUse by isParallelInUseProperty
+
+    val serverProperty = SimpleStringProperty()
+    var server: String by serverProperty
+
+    val portProperty = SimpleIntegerProperty()
+    var port by portProperty
+
+    fun commit(model: IntegrationMethodParametersModel) { ... }
+    fun snapshot() = IntegrationMethodParametersModel(...)
 }
 ```
+
+Defaults set at `SimulationParametersService` init: `accuracy=0.1`, `server="localhost"`, `port=7890`. `selectedMethod` is set to the first item from `integrationMethods` list.
 
 ### EventDetectionParametersViewModel
 
 ```kotlin
-class EventDetectionParametersViewModel : ViewModel() {
-    val isEventDetectionInUse = bind(false)
-    val isStepLimitInUse = bind(false)
-    val gamma = bindDouble(0.001)
-    val lowBorder = bindDouble(0.0)
+class EventDetectionParametersViewModel {
+    val isEventDetectionInUseProperty = SimpleBooleanProperty()
+    var isEventDetectionInUse by isEventDetectionInUseProperty
+
+    val isStepLimitInUseProperty = SimpleBooleanProperty()
+    var isStepLimitInUse by isStepLimitInUseProperty
+
+    val gammaProperty = SimpleDoubleProperty()
+    var gamma by gammaProperty
+
+    val lowBorderProperty = SimpleDoubleProperty()
+    var lowBorder by lowBorderProperty
+
+    fun commit(model: EventDetectionParametersModel) { ... }
+    fun snapshot() = EventDetectionParametersModel(...)
 }
 ```
+
+Defaults set at `SimulationParametersService` init: `gamma=0.8`, `lowBorder=0.001`.
 
 ### ResultSavingParametersViewModel
 
 ```kotlin
-class ResultSavingParametersViewModel : ViewModel() {
-    val savingTarget = bind(SaveTarget.FILE)
+class ResultSavingParametersViewModel {
+    val savingTargetProperty = SimpleObjectProperty(SaveTarget.MEMORY)
+    var savingTarget: SaveTarget by savingTargetProperty
+
+    fun commit(model: ResultSavingParametersModel) { ... }
+    fun snapshot() = ResultSavingParametersModel(savingTarget)
 }
 ```
 
 ### ResultProcessingParametersViewModel
 
 ```kotlin
-class ResultProcessingParametersViewModel : ViewModel() {
-    val isSimplifyInUse = bind(false)
-    val selectedSimplifyMethod = bind("")
-    val tolerance = bindDouble(0.001)
+class ResultProcessingParametersViewModel {
+    val isSimplifyInUseProperty = SimpleBooleanProperty()
+    var isSimplifyInUse by isSimplifyInUseProperty
+
+    val selectedSimplifyMethodProperty = SimpleStringProperty()
+    var selectedSimplifyMethod: String by selectedSimplifyMethodProperty
+
+    val toleranceProperty = SimpleDoubleProperty()
+    var tolerance by toleranceProperty
 }
 ```
+
+Defaults set at `SimulationParametersService` init: `tolerance=20.0`, `selectedSimplifyMethod` set to first item from `simplifyMethods` list ("Radial-Distance").
+
+### SimulationParametersService defaults
+
+| Property | Default Value |
+| --- | --- |
+| `cauchyInitials.startTime` | `0.0` |
+| `cauchyInitials.endTime` | `10.0` |
+| `cauchyInitials.step` | `0.1` |
+| `integrationMethod.accuracy` | `0.1` |
+| `integrationMethod.server` | `"localhost"` |
+| `integrationMethod.port` | `7890` |
+| `resultSaving.savingTarget` | `SaveTarget.MEMORY` |
+| `resultProcessing.tolerance` | `20.0` |
+| `eventDetection.gamma` | `0.8` |
+| `eventDetection.lowBorder` | `0.001` |
+| `integrationMethods` | From server (first selected) |
+| `simplifyMethods` | `"Radial-Distance"`, `"Douglas-Peucker"` |
 
 ## Text Editor Module
 
@@ -577,36 +662,63 @@ CSS classes applied: `syntax-keyword`, `syntax-comment`, `syntax-decimal`, `synt
 
 ## Blueprint Editor Module
 
-### IsmaBlueprintEditor
+### IsmaBlueprintEditor (UI only)
 
-**File:** `blueprint-editor/src/main/kotlin/.../IsmaBlueprintEditor.kt`
+**File:** `blueprint-editor/src/main/kotlin/.../IsmaBlueprintEditor.kt` (113 lines)
 
-Visual statechart editor with a canvas `Pane` containing `StateBox` nodes and `TransactionArrow` / `LoopTransactionArrow` connections.
-
-**Editor modes:**
-- **Add state** — toolbar button creates new `StateBox`
-- **Add transition** — click two states in sequence to create `TransactionArrow`; clicking same state twice creates `LoopTransactionArrow`
-- **Remove state** — click a state to delete it (removes associated arrows)
-- **Remove transition** — click an arrow to delete it
-
-**State boxes:**
-- `mainStateBox` — green, fixed position, non-editable
-- `initStateBox` — blue, fixed position, non-editable
-- Additional states — coral-colored, draggable, editable name via double-click
-
-**Interaction:**
-- Double-click a state or loop arrow → opens a text editor tab via `ITextEditorFactory`
-- Single-click an arrow → opens `EditArrowPopOver` for editing predicate and alias
-- Drag states → updates `layoutX`/`layoutY` bindings on connected arrows
-
-**Serialization:**
+Pure UI component — a `BorderPane` that creates the canvas, toolbar, and delegates all logic to `IsmaBlueprintViewModel`. 100% Kotlin, no FXML files.
 
 ```kotlin
-fun getBlueprintModel(): BlueprintModel
-fun setBlueprintModel(model: BlueprintModel)
+class IsmaBlueprintEditor(editorFactory: ITextEditorFactory) : BorderPane() {
+    private val canvas = Pane()
+    private val viewModel = IsmaBlueprintViewModel(editorFactory, canvas)
+    // toolbar buttons → viewModel methods
+    // canvas events → viewModel methods
+    fun getBlueprintModel() = viewModel.toBlueprintModel()
+    fun setBlueprintModel(model: BlueprintModel) { viewModel.fromBlueprintModel(model) }
+}
 ```
 
-`BlueprintModel` is `@Serializable` and stores `main`, `init`, `states`, `transactions`, `loopTransactions`.
+### IsmaBlueprintViewModel (all logic)
+
+**File:** `blueprint-editor/src/main/kotlin/.../IsmaBlueprintViewModel.kt` (421 lines)
+
+Contains all editor logic: state management, arrow creation/removal, canvas operations, serialization, and name monitoring.
+
+| Method | Description |
+|--------|-------------|
+| `resetMode()` | Sets `editorMode = EditorMode.Idle` |
+| `toggleAddTransition()` | Sets mode to `AddTransition`, resets counter |
+| `toggleRemoveState()` | Sets mode to `RemoveState` |
+| `toggleRemoveTransition()` | Sets mode to `RemoveTransition` |
+| `addState(x, y, text)` | Creates new `StateBox`, registers name |
+| `removeState(box)` | Removes state + associated arrows (protects Main/Init) |
+| `recordTransitionSource(box)` | Records first/second click for transition creation |
+| `addTransactionArrow(start, end, pred, alias)` | Creates `TransactionArrow` with geometry bindings |
+| `addLoopArrow(box, text, pred, alias)` | Creates `LoopTransactionArrow` with geometry bindings |
+| `toBlueprintModel()` | Serializes canvas to `BlueprintModel` |
+| `fromBlueprintModel(model)` | Rebuilds canvas from serialized model |
+| `openStateTextEditor(state)` | Creates text editor tab for state content |
+| `openLoopTextEditor(arrow, state)` | Creates text editor tab for loop content |
+| `onStatePress/release/drag` | Drag interaction handlers |
+
+### CanvasViewModel
+
+**File:** `blueprint-editor/src/main/kotlin/.../models/CanvasViewModel.kt` (61 lines)
+
+Holds observable lists of canvas elements:
+
+```kotlin
+class CanvasViewModel {
+    val states: ObservableList<StateBox>
+    val transactions: ObservableList<EditorTransaction>
+    val loopTransactions: ObservableList<EditorLoopTransaction>
+}
+```
+
+Inner data classes replace the old `BlueprintEditorTransactionModel` / `BlueprintEditorLoopTransactionModel`:
+- `EditorTransaction(startBox, endBox, arrow: TransactionArrow)`
+- `EditorLoopTransaction(stateBox, arrow: LoopTransactionArrow)`
 
 ## DI Configuration
 
@@ -627,11 +739,17 @@ val appServicesModule = module {
     single<ModelErrorService> { ModelErrorService() }
     single<LismaPdeService> { LismaPdeService(get(), get()) }
     single<SimulationParametersService> { SimulationParametersService(get<SimulationServerFacade>().getSimulationMethods()) }
-    single<SimulationResultService> { SimulationResultService(get()) }
-    single<SimulationService> { SimulationService(get(), get(), get(), get(), get()) }
+    single<SimulationTaskService> { SimulationTaskService(get(), get(), get()) }
+    single<SimulationResultService> { SimulationResultService(get(), get()) }
+    single<SimulationService> { SimulationService(get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
 }
 ```
+
+**Changes from previous version:**
+- `SimulationTaskService` added (takes `serverFacade`, `modelErrorService`, `projectService`)
+- `SimulationResultService` now takes 2 params (`grinProcessLauncher`, `simulationTaskService`)
+- `SimulationService` now takes 3 params (`projectService`, `simulationTaskService`, `simulationParametersService`) — no longer depends on `SimulationResultService`, `serverFacade`, or `ModelErrorService` directly
 
 ### Launcher Module (`DependecyInjectionRootModule.kt`)
 
@@ -689,7 +807,7 @@ val lismaTextEditorModule = module {
 val blueprintEditorModule = module {
     includes(editorModule)
     scope<BlueprintProjectModel> {
-        scoped<ITextEditorFactory> { TextEditorFactory { get() } }
+        scoped<ITextEditorFactory>{ TextEditorFactory { get() } }
         factoryOf(::IsmaTextEditor) onClose { it?.dispose() }
         scopedOf(::BlueprintProjectDataProvider)
         scopedOf(::IsmaBlueprintEditor)
@@ -698,10 +816,11 @@ val blueprintEditorModule = module {
 }
 
 val toolbarsModule = module {
-    single { IsmaMenuBar(get(), get(), get(), get(), get()) }
-    single { IsmaToolBar(get(), get(), get(), get(), get()) }
+    single { IsmaMenuBar(get(),get(),get(),get(),get()) }
+    single { IsmaToolBar(get(),get(),get(),get(),get()) }
     single { SimulationProcessBar(get(), get()) }
     single { IsmaErrorListTable(get()) }
+    single { ErrorListDrawer(get()) }
     factory { TasksPopOver(get(), get()) }
 }
 
@@ -714,7 +833,7 @@ val settingsPanelModule = module {
     single { EventDetectionView(get()) }
     single { MethodSettingsView(get()) }
     single { ResultProcessingView(get()) }
-    single { SettingsPanelView(get(), get(), get(), get()) }
+    single { SettingsPanelView(get(),get(),get(),get()) }
 }
 
 val mainViewModule = module {
@@ -726,11 +845,16 @@ All registrations use `single()` (singleton) except `TasksPopOver` which uses `f
 
 **Key distinction:** `lismaTextEditorModule` uses `scopedOf(::IsmaTextEditor)` (one instance per LISMA project scope), while `blueprintEditorModule` uses `factoryOf(::IsmaTextEditor)` (new instance each time) because blueprint projects need multiple text editor tabs (one per state/loop content editor).
 
+**New in `toolbarsModule`:** `ErrorListDrawer` is now registered as a singleton, injected into `MainView`.
+
 ## Error Handling
 
 | Scenario | Behavior |
 | --- | --- |
 | Compilation errors | `CompilationErrorDto[]` → `ErrorViewModel[]` → `ModelErrorService.errors` → `IsmaErrorListTable` |
+| Simulation compile failure | `task.setStatus(FAILED)`, `task.setError("Compilation failed: ...")` |
+| Simulation run failure | `task.setStatus(FAILED)`, `task.setError("Monitor error: ...")` |
+| Simulation download failure | `task.setStatus(FAILED)`, `task.setError("Download error: ...")` |
+| No active project | `task.setStatus(FAILED)`, `task.setError("No active project")` |
 | Server process not found | `IllegalStateException` — "isma-server script not found at: $scriptPath" |
 | Missing env/property | `IllegalStateException` — "Neither environment variable ... nor system property ... is set" |
-| Simulation failure | Exception re-thrown from `SimulationService.simulate()`, caught by caller |

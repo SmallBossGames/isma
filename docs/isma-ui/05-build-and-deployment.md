@@ -298,17 +298,15 @@ All dependency versions are centralized in `gradle/libs.versions.toml` with alia
 ```toml
 [versions]
 javafx = "25.0.2"
-koin = "3.x.x"
-tornadofx = "1.7.x"
+koin = "4.x.x"
 grpc = "1.x.x"
 
 [libraries]
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-tornadofx-core = { module = "com.github.jamesmortensen.kotlin-tornadofx:tornadofx", version.ref = "tornadofx" }
 grpc-netty = { module = "io.grpc:grpc-netty", version.ref = "grpc" }
 ```
 
-The `app` module imports `libs.tornadofx.core` and `libs.koin.core` for DI and UI framework support.
+The `app` module imports `libs.koin.core` for DI and `libs.kotlinx.coroutines.*` for coroutine-based concurrency. No TornadoFX dependency.
 
 ## Running
 

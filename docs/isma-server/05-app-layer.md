@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
     val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
     val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
 
-    // 6. Create and start gRPC server
+    // 6. Create gRPC server (build only — start happens after HTTP server)
     val grpcServer = NettyServerBuilder
         .forAddress(DomainSocketAddress(socketPath))
         .channelType(EpollServerDomainSocketChannel::class.java)
@@ -48,7 +48,6 @@ fun main(args: Array<String>) {
         .addService(koin.compilerService)
         .addService(ProtoReflectionServiceV1.newInstance())
         .build()
-    grpcServer.start()
 
     // 7. Create and start Ktor HTTP server
     val httpServer = embeddedServer(CIO, configure = {
@@ -60,9 +59,10 @@ fun main(args: Array<String>) {
     }
     httpServer.start(wait = false)
 
-    // 8. Print socket paths to stdout
+    // 8. Print socket paths to stdout, then start gRPC server
     println("Starting gRPC server on Unix socket: $socketPath")
     println("Starting HTTP server on Unix socket: $httpSocketPath")
+    grpcServer.start()
     println("GRPC_SOCKET=$socketPath")
     println("HTTP_SOCKET=$httpSocketPath")
     println("Servers started. Shutting down with Ctrl+C...")

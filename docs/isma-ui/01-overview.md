@@ -13,10 +13,10 @@ isma-ui/
 │       ├── launcher/             # IsmaApplication, Koin DI root, GrinProcessLauncher
 │       ├── models/               # UI models (projects, simulation, preferences)
 │       ├── services/             # Business logic services
-│       ├── viewmodels/           # TornadoFX view models
+│       ├── viewmodels/           # Plain JavaFX property-based view models for settings
 │       ├── views/                # JavaFX UI components (MainView, toolbars, settings)
 │       ├── utilities/            # BlueprintModel extensions (convertToLisma)
-│       ├── extentions/           # Ikonli icon helpers, TornadoFX binding helpers
+│       ├── extentions/           # Ikonli icon helpers, button extensions
 │       └── constants/            # File extension constants, preferences paths
 ├── domain/                       # Pure Kotlin domain models (no UI deps)
 ├── external-services/            # gRPC clients, HTTP client, server manager
@@ -72,6 +72,8 @@ Scoped DI is used for project-specific editors: each `LismaProjectModel` and `Bl
 
 JavaFX's single-threaded UI model is respected through `Dispatchers.JavaFx` coroutine context. Long-running operations (simulation monitoring, CSV export) run on `Dispatchers.IO` or a virtual-thread-backed dispatcher, with results marshalled back to the JavaFX thread via `Platform.runLater` or `withContext(Dispatchers.JavaFx)`.
 
+Simulation execution uses a global `CoroutineScope` backed by `Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()` with `SupervisorJob()`. Each simulation runs as an independent coroutine in this scope (`SimulationTaskService.SimulationScope`), allowing concurrent simulation runs without cancellation propagation.
+
 ### Observable Collections
 
 UI state is managed through JavaFX `ObservableList` and `ObservableSet` collections, bridged to coroutine `Flow` via `addedAsFlow()` and `changeAsFlow()` extensions from the toolkit module.
@@ -123,26 +125,59 @@ Two implementations exist:
 
 Both implement `KoinScopeComponent` for per-project DI scoping.
 
-### InProgressSimulationModel
+### SimulationTask
 
-Tracks running simulations with JavaFX `SimpleDoubleProperty` progress binding. Progress updates flow from `SimulationService.SimulationScope` → `Platform.runLater` → `progressProperty` → bound UI (e.g. `SimulationProcessBar`).
+Tracks running, completed, failed, and cancelled simulations. Replaced the old `InProgressSimulationModel`.
 
 ```kotlin
-class InProgressSimulationModel(
-    val id: Int,
-    val model: String,
-    val parameters: SimulationParametersModel
+enum class SimulationTaskStatus { RUNNING, COMPLETED, FAILED, CANCELLED }
+
+class SimulationTask(
+    val id: Long,
+    val modelName: String,
+    val parameters: SimulationParametersModel,
+    initialStatus: SimulationTaskStatus = SimulationTaskStatus.RUNNING,
 ) {
-    private var actualProgress = 0.0
+    val status: ObjectProperty<SimulationTaskStatus>
+    val progress: DoubleProperty
+    val error: ObjectProperty<String?>
+    var result: CompletedSimulationModel? = null
 
-    var simulationId: Long? = null
-
-    val progressProperty = SimpleDoubleProperty(actualProgress)
-
-    fun commitProgress(value: Double) {
-        Platform.runLater {
-            progressProperty.set(value)
-        }
+    companion object {
+        val ALL = FXCollections.observableArrayList<SimulationTask>()
     }
 }
 ```
+
+- `status` — tracks lifecycle state (RUNNING → COMPLETED/FAILED/CANCELLED)
+- `progress` — normalized 0.0–1.0, updated by `SimulationTaskService` via `Platform.runLater`
+- `error` — set on failure, displayed in `TasksPopOver`
+- `result` — populated when status becomes COMPLETED
+- `ALL` — global observable list, shared across `SimulationTaskService`, `TasksPopOver`, and `SimulationResultService`
+
+### SimulationService (thin wrapper)
+
+The `SimulationService` class is now a 36-line thin coordinator that delegates to `SimulationTaskService`. It snapshots parameters, resolves the active project, and calls `SimulationTaskService.submit()`.
+
+```kotlin
+class SimulationService(
+    private val projectService: ProjectService,
+    private val simulationTaskService: SimulationTaskService,
+    private val simulationParametersService: SimulationParametersService,
+) : KoinComponent {
+    fun simulate() { ... }
+    fun stopSimulation(task: SimulationTask) { simulationTaskService.cancelTask(task) }
+    companion object { val SimulationScope = SimulationTaskService.SimulationScope }
+}
+```
+
+### SimulationTaskService (full lifecycle)
+
+The complete simulation pipeline moved to `SimulationTaskService` (151 lines). It owns the `tasks` list and manages the 4-phase lifecycle:
+
+1. **Compile** — `serverFacade.compileModel(sourceCode)`, populates `ModelErrorService`
+2. **Run** — `serverFacade.runSimulation(runParams)`, adds task to `tasks` list
+3. **Monitor** — `serverFacade.monitorSimulation(id)` flow → `task.setProgress(normalized)`
+4. **Download** — `serverFacade.downloadResultToCache(id)` → creates `CompletedSimulationModel` → sets `task.result` and `task.setStatus(COMPLETED)`
+
+All UI updates go through `Platform.runLater`. The coroutine scope uses Java 21 virtual threads (`Executors.newVirtualThreadPerTaskExecutor()`).

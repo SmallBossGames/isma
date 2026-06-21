@@ -12,7 +12,7 @@ import tornadofx.*
 
 class FileOptionsView : Fragment() {
     private val model = FileModel()
-    private val controller: FileOptionsController by inject()
+    private val controller = FileOptionsController()
 
     init {
         when (model.file.getFileType()) {

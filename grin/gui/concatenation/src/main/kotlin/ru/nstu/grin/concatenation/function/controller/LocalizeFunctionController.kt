@@ -4,26 +4,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.JavaFx
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
 import ru.nstu.grin.concatenation.function.model.LocalizeFunctionData
 import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
-import ru.nstu.grin.concatenation.koin.MainGrinScopeWrapper
-import tornadofx.Controller
+import ru.nstu.grin.concatenation.koin.MainGrinScope
 
-class LocalizeFunctionController : Controller() {
-    private val mainGrinScope = find<MainGrinScopeWrapper>().koinScope
-
-    private val concatenationCanvasModel: ConcatenationCanvasModel = mainGrinScope.get()
-    private val functionCanvasService: FunctionOperationsService = mainGrinScope.get()
+class LocalizeFunctionController(
+    private val model: LocalizeFunctionData,
+) : KoinComponent {
+    private val mainGrinScope: MainGrinScope = get()
+    private val koinScope = mainGrinScope.scope
+    private val concatenationCanvasModel: ConcatenationCanvasModel = koinScope.get()
+    private val functionCanvasService: FunctionOperationsService = koinScope.get()
 
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
-    private val model = LocalizeFunctionData()
 
     init {
         coroutineScope.launch {
-            concatenationCanvasModel.functionsListUpdatedEvent.collect{
+            concatenationCanvasModel.functionsListUpdatedEvent.collect {
                 model.functions.setAll(it)
             }
         }

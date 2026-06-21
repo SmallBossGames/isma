@@ -42,16 +42,11 @@ import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
 import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
 import ru.nstu.grin.concatenation.function.view.*
 import ru.nstu.grin.concatenation.koin.*
-import tornadofx.Scope
-import tornadofx.find
-import tornadofx.setInScope
+
 
 val grinGuiModule = module {
     scope<MainGrinScope> {
         scoped { params ->
-            // Access from the TornadoFx world. Should be removed later.
-            setInScope(MainGrinScopeWrapper(get()), get())
-
             val initData = params.getOrNull<InitCanvasData>()
 
             if(initData!=null){
@@ -190,11 +185,6 @@ val grinGuiModule = module {
             }
         }
 
-        // Access to the TornadoFX world. Should be removed later.
-        scoped { Scope() }
-
-
-        scoped { find<FileOptionsView>(get<Scope>()) }
     }
 
     scope<FunctionChangeModalScope> {

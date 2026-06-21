@@ -10,8 +10,8 @@ import org.koin.core.scope.Scope
 import ru.isma.next.app.utilities.convertToLisma
 import ru.isma.next.app.views.koin.IsmaEditorQualifier
 import ru.isma.next.editor.blueprint.models.BlueprintModel
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 import java.io.File
 
 class BlueprintProjectModel : IProjectModel, KoinScopeComponent {

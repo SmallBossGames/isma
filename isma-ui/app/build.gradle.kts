@@ -37,7 +37,6 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.koin.core)
-    implementation(libs.tornadofx.core)
     implementation(libs.logback.classic)
     implementation(libs.ikonli.javafx)
     implementation(libs.ikonli.material2.pack)

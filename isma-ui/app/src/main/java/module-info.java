@@ -10,7 +10,6 @@ module isma.ui.app.main {
     requires kotlinx.serialization.json;
 
     requires koin.core.jvm;
-    requires tornadofx;
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
     requires org.slf4j;

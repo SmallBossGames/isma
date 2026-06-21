@@ -9,12 +9,12 @@ import ru.isma.next.app.extensions.matIconAL
 import ru.isma.next.app.extensions.matIconMZ
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
-import ru.isma.next.app.services.project.ProjectService
+import ru.isma.next.app.services.project.IProjectService
 import ru.isma.next.app.services.simulation.SimulationParametersService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 
 class IsmaToolBar(
-    private val projectController: ProjectService,
+    private val projectController: IProjectService,
     private val projectFileService: ProjectFileService,
     private val lismaPdeService: LismaPdeService,
     private val textEditorService: IEditorPlatformService,

@@ -11,7 +11,7 @@ class SyntaxHighlighterService(
 ) : ISyntaxHighlighter {
 
     override fun highlight(sourceCode: String): List<SyntaxToken> {
-        return serverFacade.highlightSource(sourceCode).map { dto ->
+        return serverFacade.getHighlighting(sourceCode).map { dto ->
             SyntaxToken(
                 start = dto.start,
                 length = dto.length,

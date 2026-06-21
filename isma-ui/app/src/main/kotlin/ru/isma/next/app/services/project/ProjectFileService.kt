@@ -10,9 +10,10 @@ import ru.isma.next.app.constants.TEXT_ISMA_PROJECT_FILE
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
+import ru.isma.next.app.services.project.IProjectService
 import java.io.File
 
-class ProjectFileService(private val projectController: ProjectService) {
+class ProjectFileService(private val projectController: IProjectService) {
     fun listAllFilesPaths(): List<String> {
         return projectController.getAllProjects().mapNotNull { it.file?.path }
     }
@@ -59,7 +60,7 @@ class ProjectFileService(private val projectController: ProjectService) {
                     this.name = file.name
                     this.file = file
                     this.lismaText = file.readText()
-                    projectController.addText(this)
+                    (projectController as ProjectService).addText(this)
                 }
             }
             STATE_CHART_ISMA_PROJECT_FILE.contains(file.extension) -> {
@@ -67,7 +68,7 @@ class ProjectFileService(private val projectController: ProjectService) {
                     this.name = file.name
                     this.file = file
                     this.blueprint = Json.decodeFromString(file.readText())
-                    projectController.addBlueprint(this)
+                    (projectController as ProjectService).addBlueprint(this)
                 }
             }
         }

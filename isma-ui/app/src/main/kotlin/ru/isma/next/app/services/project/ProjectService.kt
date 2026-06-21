@@ -5,39 +5,39 @@ import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
 
-class ProjectService {
-    val projects = FXCollections.observableSet<IProjectModel>()
+class ProjectService : IProjectService {
+    override val projects = FXCollections.observableSet<IProjectModel>()
 
-    var activeProject: IProjectModel? = null
+    override var activeProject: IProjectModel? = null
 
-    fun createNewBlueprint(name: String = "New statechart") {
+    override fun createNewBlueprint(name: String) {
         BlueprintProjectModel().apply {
             this.name = name
             addBlueprint(this)
         }
     }
 
-    fun createNew(name: String = "New project"){
+    override fun createNew(name: String){
         LismaProjectModel().apply {
             this.name = name
             addText(this)
         }
     }
 
-    fun addText(project: LismaProjectModel){
+    override fun addText(project: LismaProjectModel){
         projects.add(project)
     }
 
-    fun addBlueprint(project: BlueprintProjectModel){
+    override fun addBlueprint(project: BlueprintProjectModel){
         projects.add(project)
     }
 
-    fun close(project: IProjectModel){
+    override fun close(project: IProjectModel){
         projects.remove(project)
         project.dispose()
     }
 
-    fun closeAll() {
+    override fun closeAll() {
         val temp = projects.toTypedArray()
 
         projects.clear()
@@ -45,5 +45,5 @@ class ProjectService {
         temp.forEach { it.dispose() }
     }
 
-    fun getAllProjects() = projects.toTypedArray()
+    override fun getAllProjects() = projects.toTypedArray()
 }

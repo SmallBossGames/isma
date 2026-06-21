@@ -11,6 +11,7 @@ import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.models.simulation.SimulationTaskStatus
 import ru.isma.next.app.services.ModelErrorService
+import ru.isma.next.app.services.project.IProjectService
 import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.external.BinaryEquationIndexProvider
 import ru.isma.next.external.SimulationServerFacade
@@ -25,16 +26,16 @@ import java.util.concurrent.Executors
 class SimulationTaskService(
     private val serverFacade: SimulationServerFacade,
     private val modelErrorService: ModelErrorService,
-    private val projectService: ProjectService,
+    private val projectService: IProjectService,
     private val uiThreadExecutor: UiThreadExecutor,
-) : KoinComponent {
+) : ISimulationTaskService, KoinComponent {
 
-    val tasks: ObservableList<SimulationTask> = SimulationTask.ALL
+    override val tasks: ObservableList<SimulationTask> = SimulationTask.ALL
 
     private val currentJobs = mutableMapOf<SimulationTask, Job>()
     private var nextId = 1L
 
-    fun submit(
+    override fun submit(
         modelName: String,
         params: RunSimulationParams,
         simulationParameters: SimulationParametersModel,
@@ -127,7 +128,7 @@ class SimulationTaskService(
         return task
     }
 
-    fun cancelTask(task: SimulationTask) {
+    override fun cancelTask(task: SimulationTask) {
         task.id.let { serverFacade.cancelSimulation(it) }
         currentJobs.values.find { it == task }?.cancel()
     }

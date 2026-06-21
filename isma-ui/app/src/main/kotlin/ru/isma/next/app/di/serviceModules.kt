@@ -8,7 +8,10 @@ import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
+import ru.isma.next.app.services.project.IProjectService
 import ru.isma.next.app.services.project.ProjectService
+import ru.isma.next.app.services.simulation.ISimulationService
+import ru.isma.next.app.services.simulation.ISimulationTaskService
 import ru.isma.next.app.services.simulation.SimulationParametersService
 import ru.isma.next.app.services.simulation.SimulationResultService
 import ru.isma.next.app.services.simulation.SimulationService
@@ -26,13 +29,13 @@ val simulationServerModule = module {
 val appServicesModule = module {
     single<UiThreadExecutor> { JavaFxUiThreadExecutor() }
     single<IEditorPlatformService> { EditorPlatformService() }
-    single<ProjectService> { ProjectService() }
+    single<IProjectService> { ProjectService() }
     single<ProjectFileService> { ProjectFileService(get()) }
     single<ModelErrorService> { ModelErrorService() }
     single<LismaPdeService> { LismaPdeService(get(), get()) }
     single<SimulationParametersService> { SimulationParametersService(get<SimulationServerFacade>().getSimulationMethods()) }
-    single<SimulationTaskService> { SimulationTaskService(get(), get(), get(), get()) }
+    single<ISimulationTaskService> { SimulationTaskService(get(), get(), get(), get()) }
     single<SimulationResultService> { SimulationResultService(get(), get(), get()) }
-    single<SimulationService> { SimulationService(get(), get(), get()) }
+    single<ISimulationService> { SimulationService(get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
 }

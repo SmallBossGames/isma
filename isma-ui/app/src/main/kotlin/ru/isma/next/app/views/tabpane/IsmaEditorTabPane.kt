@@ -12,11 +12,11 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import ru.isma.javafx.extensions.coroutines.flow.addedAsFlow
 import ru.isma.next.app.models.projects.IProjectModel
-import ru.isma.next.app.services.project.ProjectService
+import ru.isma.next.app.services.project.IProjectService
 
 
 class IsmaEditorTabPane(
-    private val projectController: ProjectService,
+    private val projectController: IProjectService,
 ): TabPane(), KoinComponent {
     private val coroutinesScope = CoroutineScope(Dispatchers.JavaFx)
 

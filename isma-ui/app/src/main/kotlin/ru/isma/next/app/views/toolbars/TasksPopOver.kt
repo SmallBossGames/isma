@@ -21,10 +21,10 @@ import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.models.simulation.SimulationTaskStatus
 import ru.isma.next.app.services.simulation.SimulationResultService
-import ru.isma.next.app.services.simulation.SimulationTaskService
+import ru.isma.next.app.services.simulation.ISimulationTaskService
 
 class TasksPopOver(
-    private val simulationTaskService: SimulationTaskService,
+    private val simulationTaskService: ISimulationTaskService,
     private val simulationResultService: SimulationResultService,
 ): PopOver() {
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)

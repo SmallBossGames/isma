@@ -19,7 +19,7 @@ import java.io.Writer
 
 class SimulationResultService(
     private val grinProcessLauncher: GrinProcessLauncher,
-    private val simulationTaskService: SimulationTaskService,
+    private val simulationTaskService: ISimulationTaskService,
     private val uiThreadExecutor: UiThreadExecutor,
 ) {
 

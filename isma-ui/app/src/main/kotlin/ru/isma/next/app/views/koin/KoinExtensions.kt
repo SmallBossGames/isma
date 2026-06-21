@@ -15,6 +15,7 @@ import ru.isma.next.app.services.editors.TextEditorFactory
 import ru.isma.next.app.views.MainView
 import ru.isma.next.app.views.settings.*
 import ru.isma.next.app.views.tabpane.IsmaEditorTabPane
+import ru.isma.next.app.views.layout.ErrorListDrawer
 import ru.isma.next.app.views.toolbars.*
 import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
@@ -57,6 +58,7 @@ val toolbarsModule = module {
     single { IsmaToolBar(get(),get(),get(),get(),get()) }
     single { SimulationProcessBar(get(), get()) }
     single { IsmaErrorListTable(get()) }
+    single { ErrorListDrawer(get()) }
     factory { TasksPopOver(get(), get()) }
 }
 

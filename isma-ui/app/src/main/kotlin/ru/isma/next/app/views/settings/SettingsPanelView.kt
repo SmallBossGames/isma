@@ -1,33 +1,32 @@
 package ru.isma.next.app.views.settings
 
-import tornadofx.View
-import tornadofx.drawer
+import javafx.scene.layout.VBox
+import ru.isma.javafx.extensions.controls.PropertiesAccordion
+import ru.isma.javafx.extensions.controls.propertiesGrid
 
 class SettingsPanelView(
     private val cauchyInitialsView: CauchyInitialsView,
     private val methodSettingsView: MethodSettingsView,
     private val eventDetectionView: EventDetectionView,
     private val resultProcessingView: ResultProcessingView,
-) : View() {
-    override val root = drawer {
-        multiselect = true
-        val itemsWidth = 240.0
+) : PropertiesAccordion() {
+    init {
+        addItem(cauchyInitialsView.title, settingsBox(cauchyInitialsView))
+        addItem(methodSettingsView.title, settingsBox(methodSettingsView))
+        addItem(eventDetectionView.title, settingsBox(eventDetectionView))
+        addItem(resultProcessingView.title, settingsBox(resultProcessingView))
 
-        item(cauchyInitialsView.title) {
-            prefWidth = itemsWidth
-            add(cauchyInitialsView)
-        }
-        item(methodSettingsView.title) {
-            prefWidth = itemsWidth
-            add(methodSettingsView)
-        }
-        item(eventDetectionView.title) {
-            prefWidth = itemsWidth
-            add(eventDetectionView)
-        }
-        item(resultProcessingView.title) {
-            prefWidth = itemsWidth
-            add(resultProcessingView)
+        // Expand all by default
+        accordion.openPanes.clear()
+        accordion.openPanes.addAll(
+            accordions.map { it.second.lookup(".titled-pane") as javafx.scene.control.TitledPane }
+        )
+    }
+
+    private fun settingsBox(view: javafx.scene.Node): VBox {
+        return VBox(view).apply {
+            prefWidth = 240.0
+            styleClass.add("settings-box")
         }
     }
 }

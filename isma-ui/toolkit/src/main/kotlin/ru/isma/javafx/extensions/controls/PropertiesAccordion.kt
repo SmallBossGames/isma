@@ -1,20 +1,18 @@
 package ru.isma.javafx.extensions.controls
 
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.geometry.Insets
-import javafx.scene.control.Accordion
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TitledPane
 import javafx.scene.layout.VBox
 
-class PropertiesAccordion : ScrollPane() {
-    private val accordions = FXCollections.observableArrayList<Pair<StringProperty, VBox>>()
-    private val accordion = Accordion()
+open class PropertiesAccordion : ScrollPane() {
+    private val titledPanes = FXCollections.observableArrayList<Pair<String, TitledPane>>()
 
     init {
-        content = accordion
+        content = VBox().apply {
+            styleClass.add("properties-accordion-content")
+        }
         isFitToWidth = true
         hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
         padding = Insets(8.0)
@@ -25,16 +23,18 @@ class PropertiesAccordion : ScrollPane() {
         val titledPane = TitledPane(title, content).apply {
             isCollapsible = true
             styleClass.add("properties-titled-pane")
+            isExpanded = true
         }
-        accordion.openPanes.add(titledPane)
-        accordions.add(SimpleStringProperty(title) to content)
+        (this.content as VBox).children.add(titledPane)
+        titledPanes.add(title to titledPane)
     }
 
     fun removeItem(title: String) {
-        val index = accordions.indexOfFirst { it.first.value == title }
+        val index = titledPanes.indexOfFirst { it.first == title }
         if (index >= 0) {
-            accordion.openPanes.removeAt(index)
-            accordions.removeAt(index)
+            val pane = titledPanes[index].second
+            (this.content as VBox).children.remove(pane)
+            titledPanes.removeAt(index)
         }
     }
 

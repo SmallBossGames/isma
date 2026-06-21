@@ -14,12 +14,6 @@ class SettingsPanelView(
         addItem(methodSettingsView.title, settingsBox(methodSettingsView))
         addItem(eventDetectionView.title, settingsBox(eventDetectionView))
         addItem(resultProcessingView.title, settingsBox(resultProcessingView))
-
-        // Expand all by default
-        accordion.openPanes.clear()
-        accordion.openPanes.addAll(
-            accordions.map { it.second.lookup(".titled-pane") as javafx.scene.control.TitledPane }
-        )
     }
 
     private fun settingsBox(view: javafx.scene.Node): VBox {

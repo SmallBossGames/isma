@@ -1,22 +1,22 @@
 package ru.isma.next.app.viewmodels
 
 import ru.isma.next.app.models.simulation.EventDetectionParametersModel
-import tornadofx.booleanProperty
-import tornadofx.doubleProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleDoubleProperty
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 
 class EventDetectionParametersViewModel {
-    val isEventDetectionInUseProperty = booleanProperty()
+    val isEventDetectionInUseProperty = SimpleBooleanProperty()
     var isEventDetectionInUse by isEventDetectionInUseProperty
 
-    val isStepLimitInUseProperty = booleanProperty()
+    val isStepLimitInUseProperty = SimpleBooleanProperty()
     var isStepLimitInUse by isStepLimitInUseProperty
 
-    val gammaProperty = doubleProperty()
+    val gammaProperty = SimpleDoubleProperty()
     var gamma by gammaProperty
 
-    val lowBorderProperty = doubleProperty()
+    val lowBorderProperty = SimpleDoubleProperty()
     var lowBorder by lowBorderProperty
 
     fun commit(model: EventDetectionParametersModel){

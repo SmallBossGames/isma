@@ -1,9 +1,9 @@
 package ru.isma.next.app.services.simulation
 
-import javafx.application.Platform
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
 import org.koin.core.component.KoinComponent
+import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import javafx.collections.ObservableList
@@ -26,6 +26,7 @@ class SimulationTaskService(
     private val serverFacade: SimulationServerFacade,
     private val modelErrorService: ModelErrorService,
     private val projectService: ProjectService,
+    private val uiThreadExecutor: UiThreadExecutor,
 ) : KoinComponent {
 
     val tasks: ObservableList<SimulationTask> = SimulationTask.ALL
@@ -46,7 +47,7 @@ class SimulationTaskService(
             // Phase 1: Compile
             try {
                 val sourceCode = projectService.activeProject?.snapshot()?.fullText ?: run {
-                    Platform.runLater {
+                    uiThreadExecutor.executeOnUi {
                         task.setStatus(SimulationTaskStatus.FAILED)
                         task.setError("No active project")
                     }
@@ -60,14 +61,14 @@ class SimulationTaskService(
                 modelErrorService.putErrorList(errorViewModels)
 
                 if (compileResult!!.errors.isNotEmpty()) {
-                    Platform.runLater {
+                    uiThreadExecutor.executeOnUi {
                         task.setStatus(SimulationTaskStatus.FAILED)
                         task.setError("Compilation failed: ${compileResult.errors.joinToString("; ")}")
                     }
                     return@launch
                 }
             } catch (e: Throwable) {
-                Platform.runLater {
+                uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
                     task.setError("Compilation error: ${e.message}")
                 }
@@ -78,16 +79,16 @@ class SimulationTaskService(
             val runParams = simulationParameters.toRunSimulationParams(compileResult!!.modelId)
             val simulationId = serverFacade.runSimulation(runParams)
 
-            Platform.runLater { tasks.add(task) }
+            uiThreadExecutor.executeOnUi { tasks.add(task) }
 
             // Phase 3: Monitor
             try {
                 serverFacade.monitorSimulation(simulationId, 0.01).collect { progress ->
                     val normalized = ((progress.currentTime - progress.startTime) / (progress.endTime - progress.startTime)).coerceIn(0.0, 1.0)
-                    Platform.runLater { task.setProgress(normalized) }
+                    uiThreadExecutor.executeOnUi { task.setProgress(normalized) }
                 }
             } catch (e: Throwable) {
-                Platform.runLater {
+                uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
                     task.setError("Monitor error: ${e.message}")
                 }
@@ -108,13 +109,13 @@ class SimulationTaskService(
                     cachedFile = cachedResult.file,
                     cachedColumnNames = cachedResult.columnNames,
                 )
-                Platform.runLater {
+                uiThreadExecutor.executeOnUi {
                     task.result = resultModel
                     task.setStatus(SimulationTaskStatus.COMPLETED)
                     task.setProgress(1.0)
                 }
             } catch (e: Throwable) {
-                Platform.runLater {
+                uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
                     task.setError("Download error: ${e.message}")
                 }

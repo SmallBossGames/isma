@@ -1,11 +1,11 @@
 package ru.isma.next.app.services.simulation
 
-import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.stage.FileChooser
 import javafx.stage.Window
 import kotlinx.coroutines.*
 import kotlinx.coroutines.javafx.JavaFx
+import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.launcher.GrinProcessLauncher
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.SimulationTask
@@ -20,13 +20,14 @@ import java.io.Writer
 class SimulationResultService(
     private val grinProcessLauncher: GrinProcessLauncher,
     private val simulationTaskService: SimulationTaskService,
+    private val uiThreadExecutor: UiThreadExecutor,
 ) {
 
     private val fileFilers = arrayOf(
         FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
 
-    fun removeResult(task: SimulationTask) = Platform.runLater {
+    fun removeResult(task: SimulationTask) = uiThreadExecutor.executeOnUi {
         SimulationTask.ALL.remove(task)
         task.result = null
     }

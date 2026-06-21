@@ -1,6 +1,8 @@
 package ru.isma.next.app.di
 
 import org.koin.dsl.module
+import ru.isma.javafx.extensions.coroutines.JavaFxUiThreadExecutor
+import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.constants.APPLICATION_PREFERENCES_FILE
 import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.preferences.PreferencesProvider
@@ -22,14 +24,15 @@ val simulationServerModule = module {
 }
 
 val appServicesModule = module {
+    single<UiThreadExecutor> { JavaFxUiThreadExecutor() }
     single<IEditorPlatformService> { EditorPlatformService() }
     single<ProjectService> { ProjectService() }
     single<ProjectFileService> { ProjectFileService(get()) }
     single<ModelErrorService> { ModelErrorService() }
     single<LismaPdeService> { LismaPdeService(get(), get()) }
     single<SimulationParametersService> { SimulationParametersService(get<SimulationServerFacade>().getSimulationMethods()) }
-    single<SimulationTaskService> { SimulationTaskService(get(), get(), get()) }
-    single<SimulationResultService> { SimulationResultService(get(), get()) }
+    single<SimulationTaskService> { SimulationTaskService(get(), get(), get(), get()) }
+    single<SimulationResultService> { SimulationResultService(get(), get(), get()) }
     single<SimulationService> { SimulationService(get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
 }

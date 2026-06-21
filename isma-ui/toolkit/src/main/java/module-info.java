@@ -4,6 +4,7 @@ module isma.ui.toolkit {
     requires kotlinx.coroutines.core;
 
     exports ru.isma.javafx.extensions.controls;
+    exports ru.isma.javafx.extensions.coroutines;
     exports ru.isma.javafx.extensions.coroutines.flow;
     exports ru.isma.javafx.extensions.helpers;
 }

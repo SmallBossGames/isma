@@ -123,7 +123,7 @@ val grinGuiModule = module {
 
         scopedOf(::SpacesTransformationController)
 
-        scoped{ FileFragmentController(lazy { get() }, lazy {  get() }) }
+        scoped { FileFragmentController(lazy { get() }, get()) }
 
         factory {
             FunctionChangeModalScope().apply {

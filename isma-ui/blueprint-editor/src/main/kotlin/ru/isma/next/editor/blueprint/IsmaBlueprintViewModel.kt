@@ -206,6 +206,8 @@ class IsmaBlueprintViewModel(
 
         mainStateBox.applyBlueprintState(model.main)
         initStateBox.applyBlueprintState(model.init)
+        viewAdapter.addNodeToCanvas(canvasPane, mainStateBox)
+        viewAdapter.addNodeToCanvas(canvasPane, initStateBox)
 
         val stateMap = model.states.associateByTo(
             mutableMapOf(

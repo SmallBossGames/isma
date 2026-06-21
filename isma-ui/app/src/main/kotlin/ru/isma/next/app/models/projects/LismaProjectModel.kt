@@ -8,8 +8,8 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import ru.isma.next.app.views.koin.IsmaEditorQualifier
-import tornadofx.getValue
-import tornadofx.setValue
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 import java.io.File
 
 class LismaProjectModel: IProjectModel, KoinScopeComponent {

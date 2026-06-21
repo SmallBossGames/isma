@@ -13,14 +13,18 @@ class IsmaBlueprintEditor(
 ) : BorderPane() {
 
     private val canvas = Pane()
-    private val viewModel = IsmaBlueprintViewModel(editorFactory, canvas)
-
     private val diagramTab = Tab("Diagram", javafx.scene.control.ScrollPane(canvas)).apply {
         isClosable = false
     }
     private val tabs = TabPane(diagramTab)
+    private val viewModel = IsmaBlueprintViewModel(editorFactory, canvas)
 
     init {
+        viewModel.onStateDoubleClick = { state ->
+            val tab = viewModel.openStateTextEditor(state)
+            tabs.tabs.add(tab)
+        }
+
         canvas.children.add(viewModel.getMainStateBox())
         canvas.children.add(viewModel.getInitStateBox())
 
@@ -100,8 +104,8 @@ class IsmaBlueprintEditor(
     fun getBlueprintModel() = viewModel.toBlueprintModel()
 
     fun setBlueprintModel(model: ru.isma.next.editor.blueprint.models.BlueprintModel) {
-        viewModel.fromBlueprintModel(model)
         canvas.children.clear()
+        viewModel.fromBlueprintModel(model)
         canvas.children.add(viewModel.getMainStateBox())
         canvas.children.add(viewModel.getInitStateBox())
         viewModel.getAllStates().forEach { canvas.children.add(it) }

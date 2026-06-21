@@ -15,7 +15,8 @@ import kotlin.math.max
 
 class IsmaBlueprintViewModel(
     private val editorFactory: ITextEditorFactory,
-    private val canvasPane: Pane? = null
+    private val canvasPane: Pane? = null,
+    var onStateDoubleClick: (StateBox) -> Unit = {}
 ) {
     val editorModeProperty = SimpleObjectProperty<EditorMode>(EditorMode.Idle)
     var editorMode: EditorMode
@@ -302,9 +303,7 @@ class IsmaBlueprintViewModel(
                     removeState(source)
                 }
             },
-            onDoubleClick = { _, _ ->
-                // View handles text editor - no-op in ViewModel
-            }
+            onDoubleClick = { source, _ -> onStateDoubleClick(source) }
         ).apply {
             color = Color.CORAL
 
@@ -325,9 +324,7 @@ class IsmaBlueprintViewModel(
 
     private fun createMainStateBox(): StateBox {
         return StateBox(
-            onDoubleClick = { source, _ ->
-                // View handles text editor - no-op in ViewModel
-            },
+            onDoubleClick = { source, _ -> onStateDoubleClick(source) },
             onPress = { source, event ->
                 onStatePress(source, event)
             },

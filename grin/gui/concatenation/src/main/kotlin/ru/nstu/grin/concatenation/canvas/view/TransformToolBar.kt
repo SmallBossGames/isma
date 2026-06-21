@@ -21,8 +21,6 @@ import ru.nstu.grin.concatenation.function.view.LocalizeFunctionFragment
 import ru.nstu.grin.concatenation.koin.DescriptionChangeModalScope
 import ru.nstu.grin.concatenation.koin.FunctionChangeModalScope
 import ru.nstu.grin.concatenation.koin.MainGrinScope
-import tornadofx.find
-
 class TransformToolBar(
     private val mainGrinScope: MainGrinScope,
     private val canvasViewModel: ConcatenationCanvasViewModel,
@@ -116,7 +114,7 @@ class TransformToolBar(
             val function = canvasViewModel.selectedFunctions.firstOrNull()
 
             if (function == null) {
-                find<LocalizeFunctionFragment>().openModal()
+                LocalizeFunctionFragment.openModal(mainGrinScope.scope, mainGrinScope.primaryStage)
             } else {
                 functionOperationsService.localizeFunction(function)
             }

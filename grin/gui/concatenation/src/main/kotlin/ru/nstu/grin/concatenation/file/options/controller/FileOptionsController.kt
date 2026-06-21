@@ -1,7 +1,12 @@
 package ru.nstu.grin.concatenation.file.options.controller
 
-class FileOptionsController {
+import org.koin.core.scope.Scope
+import ru.nstu.grin.concatenation.points.view.PointsView
+
+class FileOptionsController(
+    private val koinScope: Scope,
+) {
     fun openPointsWindow() {
-        // TODO: will be updated in Task 7 to use PointsView.openModal(koinScope)
+        PointsView.openModal(koinScope)
     }
 }

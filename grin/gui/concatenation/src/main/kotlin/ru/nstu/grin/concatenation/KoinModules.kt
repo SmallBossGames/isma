@@ -35,6 +35,7 @@ import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
 import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
 import ru.nstu.grin.concatenation.description.view.DescriptionListView
 import ru.nstu.grin.concatenation.file.CanvasProjectLoader
+import ru.nstu.grin.concatenation.file.options.controller.FileOptionsController
 import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.controller.*
 import ru.nstu.grin.concatenation.function.model.*
@@ -122,6 +123,8 @@ val grinGuiModule = module {
         scopedOf(::ReleaseMouseHandler)
 
         scopedOf(::SpacesTransformationController)
+        scopedOf(::FileOptionsController)
+        scopedOf(::FileOptionsView)
 
         scoped { FileFragmentController(lazy { get() }, get()) }
 
@@ -233,8 +236,8 @@ val grinGuiModule = module {
     }
 
     scope<SearchIntersectionsModalScope>{
-        scopedOf(::IntersectionFunctionView) onClose { it?.dispose() }
-        scopedOf(::IntersectionFunctionViewModel) onClose { it?.dispose() }
+        scopedOf(::IntersectionFunctionView)
+        scopedOf(::IntersectionFunctionViewModel)
     }
 
     scope<FunctionIntegrationModalScope>{

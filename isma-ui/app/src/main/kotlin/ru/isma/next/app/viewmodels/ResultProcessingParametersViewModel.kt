@@ -35,7 +35,4 @@ class ResultProcessingParametersViewModel : BaseViewModel() {
     }
     var tolerance by toleranceProperty
 
-    fun isSimplifyInUseProperty() = isSimplifyInUseProperty
-    fun selectedSimplifyMethodProperty() = selectedSimplifyMethodProperty
-    fun toleranceProperty() = toleranceProperty
 }

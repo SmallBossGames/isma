@@ -10,50 +10,47 @@ import ru.isma.next.external.dtos.ValidationResult
 
 class SimulationServerFacade(
     private val serverManager: SimulationServerManager,
+    private val compilationClient: CompilationClient? = null,
+    private val simulationClient: SimulationClient? = null,
+    private val downloadClient: DownloadClient? = null,
 ) {
-    private lateinit var compilationClient: CompilationClient
-    private lateinit var simulationClient: SimulationClient
-    private lateinit var downloadClient: DownloadClient
+    private val _compilationClient = compilationClient ?: CompilationClient(GrpcLismaCompilerClient(""))
+    private val _simulationClient = simulationClient ?: SimulationClient(GrpcSimulationClient(""))
+    private val _downloadClient = downloadClient ?: DownloadClient(GrpcSimulationClient(""), HttpSimulationClient(""))
 
     fun warmup() {
         val socketPaths = serverManager.start()
-        val grpcClient = GrpcSimulationClient(socketPaths.grpc)
-        val httpClient = HttpSimulationClient(socketPaths.http)
-        val compilerClient = GrpcLismaCompilerClient(socketPaths.grpc)
-        compilationClient = CompilationClient(compilerClient)
-        simulationClient = SimulationClient(grpcClient)
-        downloadClient = DownloadClient(grpcClient, httpClient)
+        _compilationClient.compile("") // force initialization
     }
 
     fun compileModel(lismaSourceCode: String): CompileResult =
-        compilationClient.compile(lismaSourceCode)
+        _compilationClient.compile(lismaSourceCode)
 
     fun validateModel(lismaSourceCode: String): ValidationResult =
-        compilationClient.validate(lismaSourceCode)
+        _compilationClient.validate(lismaSourceCode)
 
     fun getHighlighting(lismaSourceCode: String): List<SyntaxTokenDto> =
-        compilationClient.highlight(lismaSourceCode)
+        _compilationClient.highlight(lismaSourceCode)
 
     fun deleteCompiledModel(modelId: String): Boolean =
-        compilationClient.deleteModel(modelId)
+        _compilationClient.deleteModel(modelId)
 
     fun runSimulation(params: RunSimulationParams): Long =
-        simulationClient.run(params)
+        _simulationClient.run(params)
 
     fun monitorSimulation(simulationId: Long, accuracy: Double): Flow<SimulationProgress> =
-        simulationClient.monitor(simulationId, accuracy)
+        _simulationClient.monitor(simulationId, accuracy)
 
     suspend fun downloadResultToCache(simulationId: Long): CachedSimulationResult =
-        downloadClient.downloadResultToCache(simulationId)
+        _downloadClient.downloadResultToCache(simulationId)
 
     fun cancelSimulation(simulationId: Long) =
-        simulationClient.cancel(simulationId)
+        _simulationClient.cancel(simulationId)
 
     fun getSimulationMethods(): List<String> =
-        simulationClient.listMethods()
+        _simulationClient.listMethods()
 
     fun shutdown() {
-        simulationClient // shutdown happens via client disposal
         serverManager.stop()
     }
 }

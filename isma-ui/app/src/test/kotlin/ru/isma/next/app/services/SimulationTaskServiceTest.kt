@@ -1,11 +1,11 @@
 package ru.isma.next.app.services
 
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import ru.isma.javafx.extensions.coroutines.TestUiThreadExecutor
@@ -52,11 +52,11 @@ class SimulationTaskServiceTest {
             modelId = modelId, errors = emptyList(), warnings = emptyList()
         )
         every { serverFacade.runSimulation(any<RunSimulationParams>()) } returns 42L
-        every { serverFacade.monitorSimulation(42L, 0.01) } returns flow(
-            ru.isma.next.domain.models.SimulationProgress(0.0, 10.0, 5.0),
-            ru.isma.next.domain.models.SimulationProgress(0.0, 10.0, 10.0)
-        )
-        every { serverFacade.downloadResultToCache(42L) } returns mockk {
+        every { serverFacade.monitorSimulation(42L, 0.01) } returns kotlinx.coroutines.flow.flow {
+            emit(ru.isma.next.domain.models.SimulationProgress(0.0, 10.0, 5.0))
+            emit(ru.isma.next.domain.models.SimulationProgress(0.0, 10.0, 10.0))
+        }
+        coEvery { serverFacade.downloadResultToCache(42L) } returns mockk {
             every { file } returns java.io.File("/tmp/test.bin")
             every { columnNames } returns listOf("x", "y")
         }
@@ -66,11 +66,6 @@ class SimulationTaskServiceTest {
     fun setUp() {
         every { modelErrorService.putErrorList(any()) } returns Unit
         service = SimulationTaskService(serverFacade, modelErrorService, projectService, uiThreadExecutor)
-    }
-
-    @AfterEach
-    fun tearDown() {
-        SimulationTaskService.SimulationScope.cancel()
     }
 
     @Test

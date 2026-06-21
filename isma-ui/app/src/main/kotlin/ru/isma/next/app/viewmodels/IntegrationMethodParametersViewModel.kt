@@ -77,15 +77,6 @@ class IntegrationMethodParametersViewModel : BaseViewModel() {
     }
     var port by portProperty
 
-    fun selectedMethodProperty() = selectedMethodProperty
-    fun accuracyProperty() = accuracyProperty
-    fun isAccuracyInUseProperty() = isAccuracyInUseProperty
-    fun isStableAllowedProperty() = isStableAllowedProperty
-    fun isStableInUseProperty() = isStableInUseProperty
-    fun isParallelInUseProperty() = isParallelInUseProperty
-    fun serverProperty() = serverProperty
-    fun portProperty() = portProperty
-
     fun commit(model: IntegrationMethodParametersModel){
         selectedMethod = model.selectedMethod
         accuracy = model.accuracy

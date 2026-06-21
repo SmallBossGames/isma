@@ -43,11 +43,6 @@ class EventDetectionParametersViewModel : BaseViewModel() {
     }
     var lowBorder by lowBorderProperty
 
-    fun isEventDetectionInUseProperty() = isEventDetectionInUseProperty
-    fun isStepLimitInUseProperty() = isStepLimitInUseProperty
-    fun gammaProperty() = gammaProperty
-    fun lowBorderProperty() = lowBorderProperty
-
     fun commit(model: EventDetectionParametersModel){
         isEventDetectionInUse = model.isEventDetectionInUse
         isStepLimitInUse = model.isStepLimitInUse

@@ -6,6 +6,7 @@ import kotlinx.coroutines.javafx.JavaFx
 import org.koin.core.component.KoinComponent
 import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
+import javafx.collections.ObservableList
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.models.simulation.SimulationTaskStatus
@@ -27,7 +28,7 @@ class SimulationTaskService(
     private val projectService: ProjectService,
 ) : KoinComponent {
 
-    val tasks = SimulationTask.ALL
+    val tasks: ObservableList<SimulationTask> = SimulationTask.ALL
 
     private val currentJobs = mutableMapOf<SimulationTask, Job>()
     private var nextId = 1L

@@ -1,6 +1,7 @@
 package ru.isma.next.app.views.toolbars
 
 import javafx.beans.property.SimpleStringProperty
+import javafx.beans.value.ChangeListener
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -17,24 +18,30 @@ import org.controlsfx.control.PopOver
 import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.isma.next.app.extentions.matIconAL
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
-import ru.isma.next.app.models.simulation.InProgressSimulationModel
 import ru.isma.next.app.models.simulation.SimulationTask
+import ru.isma.next.app.models.simulation.SimulationTaskStatus
 import ru.isma.next.app.services.simualtion.SimulationResultService
-import ru.isma.next.app.services.simualtion.SimulationService
+import ru.isma.next.app.services.simualtion.SimulationTaskService
 
 class TasksPopOver(
+    private val simulationTaskService: SimulationTaskService,
     private val simulationResultService: SimulationResultService,
-    private val simulationService: SimulationService,
 ): PopOver() {
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
-    private val inProgressTasksContainer = VBox()
+    private val inProgressContainer = VBox()
         .apply {
             spacing = 5.0
             padding = Insets(2.0)
         }
 
-    private val completedTasksContainer = VBox()
+    private val completedContainer = VBox()
+        .apply {
+            spacing = 5.0
+            padding = Insets(2.0)
+        }
+
+    private val failedContainer = VBox()
         .apply {
             spacing = 5.0
             padding = Insets(2.0)
@@ -53,47 +60,44 @@ class TasksPopOver(
         }
     }
 
-    private val inProgressItemMap = mutableMapOf<SimulationTask, HBox>()
-
-    private val completedItemMap = mutableMapOf<SimulationTask, HBox>()
+    private val itemMap = mutableMapOf<SimulationTask, HBox>()
 
     init {
         contentNode = VBox(
             Label("In progress"),
-            inProgressTasksContainer,
+            inProgressContainer,
             Separator(),
             Label("Completed"),
-            completedTasksContainer
+            completedContainer,
+            Separator(),
+            Label("Failed"),
+            failedContainer
         ).apply {
             spacing = 5.0
             padding = Insets(10.0)
         }
 
-        bindInProgressTasksList()
-        bindCompletedSimulationModel()
+        bindTasksList()
     }
 
-    private fun bindInProgressTasksList() {
+    private fun bindTasksList() {
         coroutineScope.launch {
-            SimulationTask.ALL.changeAsFlow()
+            simulationTaskService.tasks.changeAsFlow()
                 .cancellable()
                 .collect {
                     while (it.next()) {
                         if (it.wasAdded()) {
-                            it.addedSubList.forEach { instance ->
-                                val item = createInProgressTasksListItem(instance)
-
-                                inProgressItemMap[instance] = item
-
-                                inProgressTasksContainer.children.add(item)
+                            it.addedSubList.forEach { task ->
+                                val node = renderTask(task)
+                                itemMap[task] = node
+                                addToContainer(task, node)
+                                observeStatusChanges(task, node)
                             }
                         } else if (it.wasRemoved()) {
-                            it.removed.forEach { instance ->
-                                val item = inProgressItemMap[instance]
-
-                                inProgressItemMap.remove(instance)
-
-                                inProgressTasksContainer.children.remove(item)
+                            it.removed.forEach { task ->
+                                val node = itemMap[task]
+                                itemMap.remove(task)
+                                removeFromContainer(task, node)
                             }
                         }
                     }
@@ -101,37 +105,61 @@ class TasksPopOver(
         }
     }
 
-    private fun bindCompletedSimulationModel() {
-        coroutineScope.launch {
-            SimulationTask.ALL.changeAsFlow()
-                .cancellable()
-                .collect {
-                    while (it.next()) {
-                        if (it.wasAdded()) {
-                            it.addedSubList.forEach { instance ->
-                                if (instance.statusValue == ru.isma.next.app.models.simulation.SimulationTaskStatus.COMPLETED) {
-                                    val item = createCompletedTasksListItem(instance)
-                                    completedItemMap[instance] = item
-                                    completedTasksContainer.children.add(item)
-                                }
-                            }
-                        } else if (it.wasRemoved()) {
-                            it.removed.forEach { instance ->
-                                val item = completedItemMap[instance]
-                                completedItemMap.remove(instance)
-                                completedTasksContainer.children.remove(item)
-                            }
-                        }
-                    }
-                }
+    private fun renderTask(task: SimulationTask): HBox {
+        return when (task.statusValue) {
+            SimulationTaskStatus.RUNNING -> createInProgressItem(task)
+            SimulationTaskStatus.COMPLETED -> createCompletedItem(task)
+            SimulationTaskStatus.FAILED, SimulationTaskStatus.CANCELLED -> createFailedItem(task)
         }
+    }
+
+    private fun observeStatusChanges(task: SimulationTask, node: HBox) {
+        task.status.addListener { _, _, newStatus ->
+            removeFromContainer(task, node)
+            val newNode = renderTask(task)
+            itemMap[task] = newNode
+            addToContainer(task, newNode)
+        }
+    }
+
+    private fun addToContainer(task: SimulationTask, node: HBox) {
+        when (task.statusValue) {
+            SimulationTaskStatus.RUNNING -> inProgressContainer.children.add(node)
+            SimulationTaskStatus.COMPLETED -> completedContainer.children.add(node)
+            SimulationTaskStatus.FAILED, SimulationTaskStatus.CANCELLED -> failedContainer.children.add(node)
+        }
+    }
+
+    private fun removeFromContainer(task: SimulationTask, node: HBox?) {
+        inProgressContainer.children.remove(node)
+        completedContainer.children.remove(node)
+        failedContainer.children.remove(node)
     }
 
     fun dispose() {
         coroutineScope.cancel()
     }
 
-    private fun createCompletedTasksListItem(task: SimulationTask): HBox {
+    private fun createInProgressItem(task: SimulationTask): HBox {
+        return HBox(
+            Label("Task #${task.id}"),
+            ProgressBar().apply {
+                progressProperty().bind(task.progress)
+            },
+            Button().apply {
+                graphic = matIconAL("close")
+                tooltip = Tooltip("Abort")
+                onAction = EventHandler {
+                    simulationTaskService.cancelTask(task)
+                }
+            }
+        ).apply {
+            alignment = Pos.CENTER_LEFT
+            spacing = 5.0
+        }
+    }
+
+    private fun createCompletedItem(task: SimulationTask): HBox {
         val result = task.result ?: return HBox()
         return HBox(
             Label("Task #${task.id}"),
@@ -166,17 +194,17 @@ class TasksPopOver(
         }
     }
 
-    private fun createInProgressTasksListItem(task: SimulationTask): HBox {
+    private fun createFailedItem(task: SimulationTask): HBox {
         return HBox(
             Label("Task #${task.id}"),
-            ProgressBar().apply {
-                progressProperty().bind(task.progress)
+            Label(task.errorValue ?: "Unknown error").apply {
+                style = "-fx-text-fill: red;"
             },
-            Button().apply {
-                graphic = matIconAL("close")
-                tooltip = Tooltip("Abort")
+            Button("Remove").apply {
                 onAction = EventHandler {
-                    simulationService.stopSimulation(task)
+                    PopOverScope.launch {
+                        simulationResultService.removeResult(task)
+                    }
                 }
             }
         ).apply {

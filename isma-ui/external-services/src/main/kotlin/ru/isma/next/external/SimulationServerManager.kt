@@ -27,6 +27,7 @@ class SimulationServerManager(
     private val logger = LoggerFactory.getLogger(SimulationServerManager::class.java)
     private var process: Process? = null
     private var socketPaths: SocketPaths? = null
+    private var shutdownHook: Thread? = null
     @Volatile private var running = false
 
     fun start(): SocketPaths {
@@ -66,13 +67,16 @@ class SimulationServerManager(
         logger.info("isma-server started on gRPC socket: ${socketPaths!!.grpc}")
         logger.info("isma-server started on HTTP socket: ${socketPaths!!.http}")
 
-        Runtime.getRuntime().addShutdownHook(Thread { stop() })
+        shutdownHook = Thread { stop() }
+        Runtime.getRuntime().addShutdownHook(shutdownHook!!)
         return socketPaths!!
     }
 
     fun stop() {
         if (!running) return
         running = false
+        shutdownHook?.let { Runtime.getRuntime().removeShutdownHook(it) }
+        shutdownHook = null
         process?.destroy()
         process = null
         socketPaths = null

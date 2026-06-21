@@ -22,6 +22,8 @@ import java.io.File
 class SimulationServerFacadeTest {
 
     private val serverManager = mockk<SimulationServerManager>()
+    private val grpcClient = mockk<GrpcSimulationClient>()
+    private val compilerClient = mockk<GrpcLismaCompilerClient>()
     private val compilationClient = mockk<CompilationClient>()
     private val simulationClient = mockk<SimulationClient>()
     private val downloadClient = mockk<DownloadClient>()
@@ -31,7 +33,7 @@ class SimulationServerFacadeTest {
     @BeforeEach
     fun setUp() {
         facade = SimulationServerFacade(serverManager)
-        facade.setClients(compilationClient, simulationClient, downloadClient)
+        facade.setClients(grpcClient, compilerClient, compilationClient, simulationClient, downloadClient)
     }
 
     @AfterEach

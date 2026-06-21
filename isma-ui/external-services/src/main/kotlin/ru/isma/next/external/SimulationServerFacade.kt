@@ -11,25 +11,31 @@ import ru.isma.next.external.dtos.ValidationResult
 class SimulationServerFacade(
     private val serverManager: SimulationServerManager,
 ) {
+    private lateinit var grpcClient: GrpcSimulationClient
+    private lateinit var compilerClient: GrpcLismaCompilerClient
     private lateinit var compilationClient: CompilationClient
     private lateinit var simulationClient: SimulationClient
     private lateinit var downloadClient: DownloadClient
 
     fun warmup() {
         val socketPaths = serverManager.start()
-        val grpcClient = GrpcSimulationClient(socketPaths.grpc)
+        grpcClient = GrpcSimulationClient(socketPaths.grpc)
         val httpClient = HttpSimulationClient(socketPaths.http)
-        val compilerClient = GrpcLismaCompilerClient(socketPaths.grpc)
+        compilerClient = GrpcLismaCompilerClient(socketPaths.grpc)
         compilationClient = CompilationClient(compilerClient)
         simulationClient = SimulationClient(grpcClient)
         downloadClient = DownloadClient(grpcClient, httpClient)
     }
 
     internal fun setClients(
+        grpcClient: GrpcSimulationClient,
+        compilerClient: GrpcLismaCompilerClient,
         compilationClient: CompilationClient,
         simulationClient: SimulationClient,
         downloadClient: DownloadClient
     ) {
+        this.grpcClient = grpcClient
+        this.compilerClient = compilerClient
         this.compilationClient = compilationClient
         this.simulationClient = simulationClient
         this.downloadClient = downloadClient
@@ -63,6 +69,8 @@ class SimulationServerFacade(
         simulationClient.listMethods()
 
     fun shutdown() {
+        grpcClient.shutdown()
+        compilerClient.shutdown()
         serverManager.stop()
     }
 }

@@ -1,7 +1,8 @@
 package ru.isma.next.editor.blueprint.utilities
 
-import kotlinx.coroutines.*
 import javafx.scene.input.MouseEvent
+import kotlinx.coroutines.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class ClickDisambiguator(
     private val coroutineScope: CoroutineScope,
@@ -37,7 +38,7 @@ class ClickDisambiguator(
     private fun handleSingleClick() {
         if (pendingSingleClick == null) {
             pendingSingleClick = coroutineScope.launch {
-                delay(clickDelay)
+                delay(clickDelay.milliseconds)
                 pendingSingleClick = null
                 if (!isDragged) singleClick(lastEvent!!)
             }

@@ -11,7 +11,7 @@ import ru.nstu.grin.concatenation.function.model.FileType
 import tornadofx.*
 
 class FileOptionsView : Fragment() {
-    private val model: FileModel by inject()
+    private val model = FileModel()
     private val controller: FileOptionsController by inject()
 
     init {

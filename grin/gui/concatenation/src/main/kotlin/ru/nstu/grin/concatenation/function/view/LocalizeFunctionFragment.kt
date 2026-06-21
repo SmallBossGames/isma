@@ -4,11 +4,11 @@ import javafx.scene.Parent
 import javafx.scene.control.ListView
 import ru.nstu.grin.concatenation.function.controller.LocalizeFunctionController
 import ru.nstu.grin.concatenation.function.model.ConcatenationFunction
-import ru.nstu.grin.concatenation.function.model.LocalizeFunctionModel
+import ru.nstu.grin.concatenation.function.model.LocalizeFunctionData
 import tornadofx.*
 
 class LocalizeFunctionFragment : Fragment() {
-    private val model: LocalizeFunctionModel by inject()
+    private val model = LocalizeFunctionData()
     private val controller: LocalizeFunctionController = find { }
 
     private lateinit var list: ListView<ConcatenationFunction>

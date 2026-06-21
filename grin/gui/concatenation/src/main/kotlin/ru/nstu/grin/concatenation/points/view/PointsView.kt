@@ -5,14 +5,14 @@ import javafx.scene.Parent
 import ru.nstu.grin.concatenation.points.controller.PointsViewController
 import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
-import ru.nstu.grin.concatenation.points.model.PointsViewModel
+import ru.nstu.grin.concatenation.points.model.PointsModel
 import ru.nstu.grin.concatenation.function.model.FileModel
 import tornadofx.*
 
 class PointsView : Fragment() {
-    private val controller: PointsViewController by inject()
-    private val model: PointsViewModel by inject()
-    private val fileModel: FileModel by inject()
+    private val model = PointsModel()
+    private val fileModel = FileModel()
+    private val controller = PointsViewController(model, fileModel)
 
     init {
         controller.readPoints()

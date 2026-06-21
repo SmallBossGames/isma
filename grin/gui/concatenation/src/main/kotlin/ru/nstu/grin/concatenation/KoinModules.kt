@@ -193,7 +193,7 @@ val grinGuiModule = module {
         // Access to the TornadoFX world. Should be removed later.
         scoped { Scope() }
 
-        scoped { find<FileModel>(get<Scope>()) }
+
         scoped { find<FileOptionsView>(get<Scope>()) }
     }
 

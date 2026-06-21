@@ -4,23 +4,32 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import ru.nstu.grin.common.model.WaveletDirection
 import ru.nstu.grin.common.model.WaveletTransformFun
 import tornadofx.*
 
-class PointsViewModel : ViewModel() {
+class PointsModel {
     val pointsListProperty: SimpleListProperty<List<String>> = SimpleListProperty(FXCollections.observableArrayList())
-    val pointsList by pointsListProperty
+    val pointsList: ObservableList<List<String>> get() = pointsListProperty.value
 
     val addFunctionsModeProperty = SimpleObjectProperty<AddFunctionsMode>()
-    var addFunctionsMode by addFunctionsModeProperty
+    var addFunctionsMode: AddFunctionsMode
+        get() = addFunctionsModeProperty.value!!
+        set(value) { addFunctionsModeProperty.value = value }
 
     var waveletTransformFunProperty = SimpleObjectProperty<WaveletTransformFun>()
-    var waveletTransformFun by waveletTransformFunProperty
+    var waveletTransformFun: WaveletTransformFun?
+        get() = waveletTransformFunProperty.value
+        set(value) { waveletTransformFunProperty.value = value }
 
     var isWaveletProperty = SimpleBooleanProperty()
-    var isWavelet: Boolean by isWaveletProperty
+    var isWavelet: Boolean
+        get() = isWaveletProperty.value
+        set(value) { isWaveletProperty.value = value }
 
     var waveletDirectionProperty = SimpleObjectProperty<WaveletDirection>()
-    var waveletDirection by waveletDirectionProperty
+    var waveletDirection: WaveletDirection?
+        get() = waveletDirectionProperty.value
+        set(value) { waveletDirectionProperty.value = value }
 }

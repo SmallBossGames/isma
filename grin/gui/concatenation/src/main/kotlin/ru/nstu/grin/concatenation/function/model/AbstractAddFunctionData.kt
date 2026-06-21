@@ -6,11 +6,10 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.scene.paint.Color
 import ru.nstu.grin.concatenation.axis.model.Direction
 import ru.nstu.grin.concatenation.canvas.model.ExistDirection
-import tornadofx.ViewModel
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 
-abstract class AbstractAddFunctionModel : ViewModel() {
+abstract class AbstractAddFunctionData {
     var functionNameProperty = SimpleStringProperty(this, "functionName", "Функция номер 1")
     var functionName: String by functionNameProperty
 

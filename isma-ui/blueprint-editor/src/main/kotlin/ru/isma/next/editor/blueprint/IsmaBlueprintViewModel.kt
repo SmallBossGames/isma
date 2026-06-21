@@ -1,30 +1,41 @@
 package ru.isma.next.editor.blueprint
 
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.Node
 import javafx.scene.control.Tab
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import ru.isma.next.editor.blueprint.constants.*
-import ru.isma.next.editor.blueprint.controls.*
+import ru.isma.next.editor.blueprint.controls.EditArrowPopOver
+import ru.isma.next.editor.blueprint.controls.ITransactionArrowData
+import ru.isma.next.editor.blueprint.controls.LoopTransactionArrow
+import ru.isma.next.editor.blueprint.controls.StateBox
+import ru.isma.next.editor.blueprint.controls.TransactionArrow
 import ru.isma.next.editor.blueprint.models.*
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
+import ru.isma.next.editor.blueprint.views.BlueprintViewAdapter
+import ru.isma.next.editor.blueprint.views.JavaFxBlueprintViewAdapter
 import javafx.scene.paint.Color
 import kotlin.math.max
 
 class IsmaBlueprintViewModel(
     private val editorFactory: ITextEditorFactory,
-    private val canvasPane: Pane? = null,
-    var onStateDoubleClick: (StateBox) -> Unit = {}
+    private val canvasPane: Pane,
+    private val viewAdapter: BlueprintViewAdapter = JavaFxBlueprintViewAdapter()
 ) {
     val editorModeProperty = SimpleObjectProperty<EditorMode>(EditorMode.Idle)
     var editorMode: EditorMode
         get() = editorModeProperty.value
         private set(value) { editorModeProperty.value = value }
 
+    var onStateDoubleClick: (StateBox) -> Unit = {}
+
     private val canvasViewModel = CanvasViewModel()
     private val nameChangingMonitor = NameChangingMonitor("New state")
+
+    private val stateBoxMap = mutableMapOf<String, StateBox>()
 
     private var activeStateBox: StateBox? = null
     private var xOffset = 0.0
@@ -55,24 +66,32 @@ class IsmaBlueprintViewModel(
     fun isNotEditingMode(): Boolean = editorMode.isNotEditingMode()
 
     fun addState(positionX: Double = 10.0, positionY: Double = 200.0, stateText: String = ""): StateBox {
-        val stateBox = instantiateStateBox(
-            positionX = positionX,
-            positionY = positionY,
-            stateText = stateText,
-        )
-        canvasViewModel.addState(stateBox)
+        val model = BlueprintStateModel(positionX, positionY, "", stateText)
+        val node = viewAdapter.createStateBox(model, positionX, positionY, canvasPane) { m, x, y ->
+            instantiateStateBox(
+                positionX = x,
+                positionY = y,
+                stateName = m.name,
+                stateText = m.text,
+            )
+        }
+        val stateBox = node as StateBox
+        stateBoxMap[model.name] = stateBox
+        canvasViewModel.addState(model, node)
         return stateBox
     }
 
     fun removeState(stateBox: StateBox) {
         if (stateBox.name == MAIN_STATE || stateBox.name == INIT_STATE) return
-        canvasViewModel.removeState(stateBox)
+        canvasViewModel.removeState(BlueprintStateModel(0.0, 0.0, stateBox.name, ""))
+        viewAdapter.removeNodeFromCanvas(canvasPane, stateBox as Node)
+        stateBoxMap.remove(stateBox.name)
         nameChangingMonitor.tryUnregister(stateBox.name)
     }
 
     fun getMainStateBox(): StateBox = mainStateBox
     fun getInitStateBox(): StateBox = initStateBox
-    fun getAllStates(): List<StateBox> = canvasViewModel.states
+    fun getAllStates(): List<BlueprintStateModel> = canvasViewModel.states.map { it.model }
 
     fun recordTransitionSource(stateBox: StateBox) {
         if (editorMode is EditorMode.AddTransition) {
@@ -99,79 +118,79 @@ class IsmaBlueprintViewModel(
     fun addTransactionArrow(startBox: StateBox, endBox: StateBox, predicate: String, alias: String) {
         if (canvasViewModel.transactions.any { it.startBox == startBox && it.endBox == endBox }) return
 
-        val arrow = TransactionArrow(
-            onClick = { source, _ ->
-                if (editorMode is EditorMode.RemoveTransition) {
-                    canvasViewModel.removeTransaction(source)
-                    canvasPane?.children?.remove(source)
-                }
-            },
-            onArrowClick = { source, event ->
-                canvasPane?.let { canvas ->
-                    val converted = canvas.sceneToLocal(event.sceneX, event.sceneY)
+        val model = BlueprintTransactionModel(startBox.name, endBox.name, predicate, alias)
+        val node = viewAdapter.addTransactionArrow(startBox as Node, endBox as Node, model, canvasPane) { m, sb, eb ->
+            TransactionArrow(
+                onClick = { source, _ ->
+                    if (editorMode is EditorMode.RemoveTransition) {
+                        canvasViewModel.removeTransaction(source)
+                        viewAdapter.removeNodeFromCanvas(canvasPane, source)
+                    }
+                },
+                onArrowClick = { source, event ->
+                    val converted = canvasPane.sceneToLocal(event.sceneX, event.sceneY)
                     val popover = createEditPopOver(source, converted.x, converted.y)
-                    canvas.children.add(popover)
+                    canvasPane.children.add(popover)
                 }
+            ).apply {
+                startXProperty.bind(startBox.centerXProperty())
+                startYProperty.bind(startBox.centerYProperty())
+                endXProperty.bind(endBox.centerXProperty())
+                endYProperty.bind(endBox.centerYProperty())
+                this.text = m.predicate
+                this.alias = m.alias
             }
-        ).apply {
-            startXProperty.bind(startBox.centerXProperty())
-            startYProperty.bind(startBox.centerYProperty())
-            endXProperty.bind(endBox.centerXProperty())
-            endYProperty.bind(endBox.centerYProperty())
-            this.text = predicate
-            this.alias = alias
         }
-
-        canvasPane?.children?.add(arrow)
-        canvasViewModel.addTransaction(CanvasViewModel.EditorTransaction(startBox, endBox, arrow))
+        val arrow = node as TransactionArrow
+        canvasViewModel.addTransaction(CanvasViewModel.EditorTransaction(startBox, endBox, arrow, node))
     }
 
     fun addLoopArrow(stateBox: StateBox, text: String, predicate: String, alias: String) {
         if (canvasViewModel.loopTransactions.any { it.stateBox == stateBox }) return
 
-        val arrow = LoopTransactionArrow(
-            onClick = { source, _ ->
-                if (editorMode is EditorMode.RemoveTransition) {
-                    canvasViewModel.removeLoopTransaction(source)
-                    canvasPane?.children?.remove(source)
-                }
-            },
-            onArrowClick = { source, event ->
-                canvasPane?.let { canvas ->
-                    val converted = canvas.sceneToLocal(event.sceneX, event.sceneY)
+        val model = BlueprintLoopTransactionModel(stateBox.name, predicate, alias, text)
+        val node = viewAdapter.addLoopTransactionArrow(stateBox as Node, model, canvasPane) { m, sb ->
+            LoopTransactionArrow(
+                onClick = { source, _ ->
+                    if (editorMode is EditorMode.RemoveTransition) {
+                        canvasViewModel.removeLoopTransaction(source)
+                        viewAdapter.removeNodeFromCanvas(canvasPane, source)
+                    }
+                },
+                onArrowClick = { source, event ->
+                    val converted = canvasPane.sceneToLocal(event.sceneX, event.sceneY)
                     val popover = createEditPopOver(source, converted.x, converted.y)
-                    canvas.children.add(popover)
-                }
-            },
-            onArrowDoubleClick = { _, _ ->
-                // View handles text editor - no-op in ViewModel
-            },
-            text = text,
-            alias = alias,
-            predicate = predicate
-        ).apply {
-            layoutXProperty().bind(stateBox.centerXProperty())
-            layoutYProperty().bind(stateBox.centerYProperty())
+                    canvasPane.children.add(popover)
+                },
+                onArrowDoubleClick = { _, _ ->
+                    // View handles text editor - no-op in ViewModel
+                },
+                text = m.text,
+                alias = m.alias,
+                predicate = m.predicate
+            ).apply {
+                layoutXProperty().bind(stateBox.centerXProperty())
+                layoutYProperty().bind(stateBox.centerYProperty())
+            }
         }
-
-        canvasPane?.children?.add(arrow)
-        canvasViewModel.addLoopTransaction(CanvasViewModel.EditorLoopTransaction(stateBox, arrow))
+        val arrow = node as LoopTransactionArrow
+        canvasViewModel.addLoopTransaction(CanvasViewModel.EditorLoopTransaction(stateBox, arrow, node))
     }
 
     fun removeTransaction(arrow: TransactionArrow) {
         canvasViewModel.removeTransaction(arrow)
-        canvasPane?.children?.remove(arrow)
+        viewAdapter.removeNodeFromCanvas(canvasPane, arrow as Node)
     }
 
     fun removeLoopArrow(arrow: LoopTransactionArrow) {
         canvasViewModel.removeLoopTransaction(arrow)
-        canvasPane?.children?.remove(arrow)
+        viewAdapter.removeNodeFromCanvas(canvasPane, arrow as Node)
     }
 
     fun toBlueprintModel(): BlueprintModel {
         val main = mainStateBox.toBlueprintState()
         val init = initStateBox.toBlueprintState()
-        val states = canvasViewModel.states.map { it.toBlueprintState() }.toTypedArray()
+        val states = canvasViewModel.states.map { (it.node as StateBox).toBlueprintState() }.toTypedArray()
         val blueprintTransactions = canvasViewModel.transactions.map { it.toBlueprintTransaction() }.toTypedArray()
         val blueprintLoopTransactions = canvasViewModel.loopTransactions.map { it.toBlueprintLoopTransaction() }.toTypedArray()
 
@@ -180,9 +199,10 @@ class IsmaBlueprintViewModel(
 
     fun fromBlueprintModel(model: BlueprintModel) {
         canvasViewModel.states.toList().forEach {
-            canvasViewModel.removeState(it)
-            canvasPane?.children?.remove(it)
+            canvasViewModel.removeState(it.model)
+            viewAdapter.removeNodeFromCanvas(canvasPane, it.node)
         }
+        viewAdapter.clearCanvas(canvasPane)
 
         mainStateBox.applyBlueprintState(model.main)
         initStateBox.applyBlueprintState(model.init)
@@ -196,7 +216,12 @@ class IsmaBlueprintViewModel(
             { instantiateStateBoxFromBlueprintState(it) }
         )
 
-        stateMap.values.filter { it !== mainStateBox && it !== initStateBox }.forEach { canvasViewModel.addState(it) }
+        stateMap.values.filter { it !== mainStateBox && it !== initStateBox }.forEach {
+            val model2 = BlueprintStateModel(it.layoutXProperty().value, it.layoutYProperty().value, it.name, it.text)
+            canvasViewModel.addState(model2, it)
+            stateBoxMap[it.name] = it
+            viewAdapter.addNodeToCanvas(canvasPane, it)
+        }
 
         model.transactions.forEach {
             addTransactionArrow(
@@ -223,7 +248,7 @@ class IsmaBlueprintViewModel(
             onTextChanged = { state.text = it }
         )
 
-        return Tab(state.name, editor).apply {
+        return viewAdapter.createTab(state.name, editor).apply {
             textProperty().bind(state.nameProperty)
 
             setOnCloseRequest {
@@ -238,7 +263,7 @@ class IsmaBlueprintViewModel(
             onTextChanged = { arrow.text = it }
         )
 
-        return Tab("${stateBox.name} (loop)", editor).apply {
+        return viewAdapter.createTab("${stateBox.name} (loop)", editor).apply {
             textProperty().bind(stateBox.nameProperty.concat(" (loop)"))
 
             setOnCloseRequest {
@@ -323,48 +348,62 @@ class IsmaBlueprintViewModel(
     }
 
     private fun createMainStateBox(): StateBox {
-        return StateBox(
-            onDoubleClick = { source, _ -> onStateDoubleClick(source) },
-            onPress = { source, event ->
-                onStatePress(source, event)
-            },
-            onRelease = { _, _ ->
-                onStateRelease()
-            }
-        ).apply {
-            color = Color.LIGHTGREEN
-            isEditable = false
-            squareHeight = FIXED_STATE_HEIGHT
-            name = MAIN_STATE
-            layoutXProperty().value += STATE_INSET
-            layoutXProperty().value += STATE_INSET
+        val model = BlueprintStateModel(STATE_INSET, 0.0, MAIN_STATE, "")
+        val node = viewAdapter.createStateBox(model, STATE_INSET, 0.0, canvasPane) { m, x, y ->
+            StateBox(
+                onDoubleClick = { source, _ -> onStateDoubleClick(source) },
+                onPress = { source, event ->
+                    onStatePress(source, event)
+                },
+                onRelease = { _, _ ->
+                    onStateRelease()
+                }
+            ).apply {
+                color = Color.LIGHTGREEN
+                isEditable = false
+                squareHeight = FIXED_STATE_HEIGHT
+                name = m.name
+                layoutXProperty().value = x + STATE_INSET
+                layoutXProperty().value = x + STATE_INSET
 
-            nameChangingMonitor.tryRegister(name)
+                nameChangingMonitor.tryRegister(name)
+            }
         }
+        val stateBox = node as StateBox
+        stateBoxMap[model.name] = stateBox
+        canvasViewModel.addState(model, node)
+        return stateBox
     }
 
     private fun createInitStateBox(): StateBox {
-        return StateBox(
-            onClick = { source, _ ->
-                recordTransitionSource(source)
-            },
-            onPress = { source, event ->
-                onStatePress(source, event)
-            },
-            onRelease = { _, _ ->
-                onStateRelease()
-            }
-        ).apply {
-            color = Color.LIGHTBLUE
-            isEditButtonVisible = false
-            isEditable = false
-            squareHeight = FIXED_STATE_HEIGHT
-            name = INIT_STATE
-            layoutXProperty().value += STATE_INSET
-            layoutYProperty().value += 100
+        val model = BlueprintStateModel(STATE_INSET, 100.0, INIT_STATE, "")
+        val node = viewAdapter.createStateBox(model, STATE_INSET, 100.0, canvasPane) { m, x, y ->
+            StateBox(
+                onClick = { source, _ ->
+                    recordTransitionSource(source)
+                },
+                onPress = { source, event ->
+                    onStatePress(source, event)
+                },
+                onRelease = { _, _ ->
+                    onStateRelease()
+                }
+            ).apply {
+                color = Color.LIGHTBLUE
+                isEditButtonVisible = false
+                isEditable = false
+                squareHeight = FIXED_STATE_HEIGHT
+                name = m.name
+                layoutXProperty().value = x + STATE_INSET
+                layoutYProperty().value = y
 
-            nameChangingMonitor.tryRegister(name)
+                nameChangingMonitor.tryRegister(name)
+            }
         }
+        val stateBox = node as StateBox
+        stateBoxMap[model.name] = stateBox
+        canvasViewModel.addState(model, node)
+        return stateBox
     }
 
     private fun StateBox.toBlueprintState(): BlueprintStateModel {
@@ -415,7 +454,7 @@ class IsmaBlueprintViewModel(
     private fun createEditPopOver(arrow: ITransactionArrowData, x: Double, y: Double) =
         EditArrowPopOver(arrow, x, y).apply {
             setOnMouseExited {
-                canvasPane?.children?.remove(this)
+                viewAdapter.removeNodeFromCanvas(canvasPane, this)
             }
         }
 }

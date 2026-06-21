@@ -14,4 +14,5 @@ module isma.ui.editor.blueprint {
     exports ru.isma.next.editor.blueprint.models;
     exports ru.isma.next.editor.blueprint.services;
     exports ru.isma.next.editor.blueprint.utilities;
+    exports ru.isma.next.editor.blueprint.views;
 }

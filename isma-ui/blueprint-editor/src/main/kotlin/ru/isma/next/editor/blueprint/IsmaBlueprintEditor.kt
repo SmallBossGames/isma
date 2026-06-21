@@ -6,7 +6,9 @@ import javafx.scene.control.*
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
+import ru.isma.next.editor.blueprint.controls.StateBox
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
+import ru.isma.next.editor.blueprint.views.JavaFxBlueprintViewAdapter
 
 class IsmaBlueprintEditor(
     editorFactory: ITextEditorFactory
@@ -17,18 +19,19 @@ class IsmaBlueprintEditor(
         isClosable = false
     }
     private val tabs = TabPane(diagramTab)
-    private val viewModel = IsmaBlueprintViewModel(editorFactory, canvas)
+    private val viewModel = IsmaBlueprintViewModel(
+        editorFactory,
+        canvas,
+        JavaFxBlueprintViewAdapter()
+    )
 
     init {
-        viewModel.onStateDoubleClick = { state ->
+        viewModel.onStateDoubleClick = { state: StateBox ->
             val tab = viewModel.openStateTextEditor(state)
             tabs.tabs.add(tab)
         }
 
-        canvas.children.add(viewModel.getMainStateBox())
-        canvas.children.add(viewModel.getInitStateBox())
-
-        canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED) { event ->
+        canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED) { event: MouseEvent ->
             viewModel.onCanvasDrag(event)
         }
 
@@ -104,10 +107,6 @@ class IsmaBlueprintEditor(
     fun getBlueprintModel() = viewModel.toBlueprintModel()
 
     fun setBlueprintModel(model: ru.isma.next.editor.blueprint.models.BlueprintModel) {
-        canvas.children.clear()
         viewModel.fromBlueprintModel(model)
-        canvas.children.add(viewModel.getMainStateBox())
-        canvas.children.add(viewModel.getInitStateBox())
-        viewModel.getAllStates().forEach { canvas.children.add(it) }
     }
 }

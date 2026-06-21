@@ -2,24 +2,32 @@ package ru.isma.next.editor.blueprint.models
 
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
+import javafx.scene.Node
 import ru.isma.next.editor.blueprint.controls.LoopTransactionArrow
 import ru.isma.next.editor.blueprint.controls.StateBox
 import ru.isma.next.editor.blueprint.controls.TransactionArrow
 
 class CanvasViewModel {
+    data class EditorState(
+        val model: BlueprintStateModel,
+        val node: Node
+    )
+
     data class EditorTransaction(
         val startBox: StateBox,
         val endBox: StateBox,
-        val arrow: TransactionArrow
+        val arrow: TransactionArrow,
+        val node: Node
     )
 
     data class EditorLoopTransaction(
         val stateBox: StateBox,
-        val arrow: LoopTransactionArrow
+        val arrow: LoopTransactionArrow,
+        val node: Node
     )
 
-    private val _states = FXCollections.observableArrayList<StateBox>()
-    val states: ObservableList<StateBox> = _states
+    private val _states = FXCollections.observableArrayList<EditorState>()
+    val states: ObservableList<EditorState> = _states
 
     private val _transactions = FXCollections.observableArrayList<EditorTransaction>()
     val transactions: ObservableList<EditorTransaction> = _transactions
@@ -27,14 +35,18 @@ class CanvasViewModel {
     private val _loopTransactions = FXCollections.observableArrayList<EditorLoopTransaction>()
     val loopTransactions: ObservableList<EditorLoopTransaction> = _loopTransactions
 
-    fun addState(box: StateBox) {
-        _states.add(box)
+    fun addState(model: BlueprintStateModel, node: Node) {
+        _states.add(EditorState(model, node))
     }
 
-    fun removeState(box: StateBox) {
-        _states.remove(box)
-        _transactions.removeAll { it.startBox == box || it.endBox == box }
-        _loopTransactions.removeAll { it.stateBox == box }
+    fun removeState(model: BlueprintStateModel) {
+        _states.removeAll { it.model == model }
+        _transactions.removeAll { it.startBox.name == model.name || it.endBox.name == model.name }
+        _loopTransactions.removeAll { it.stateBox.name == model.name }
+    }
+
+    fun getStateNode(model: BlueprintStateModel): Node? {
+        return _states.find { it.model == model }?.node
     }
 
     fun addTransaction(tx: EditorTransaction) {

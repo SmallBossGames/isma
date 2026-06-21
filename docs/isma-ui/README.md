@@ -24,18 +24,22 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | File | Role |
 | --- | --- |
 | `app/src/main/kotlin/.../launcher/IsmaApplication.kt` | JavaFX `Application` entry point |
-| `app/src/main/kotlin/.../launcher/DependecyInjectionRootModule.kt` | Koin DI root startup |
+| `app/src/main/kotlin/.../launcher/DependencyInjectionRootModule.kt` | Koin DI root startup |
 | `app/src/main/kotlin/.../launcher/GrinProcessLauncher.kt` | Grin chart viewer process launcher |
 | `app/src/main/kotlin/.../services/koin/KoinExtentions.kt` | Service-layer DI modules |
 | `app/src/main/kotlin/.../views/koin/KoinExtensions.kt` | View-layer DI modules |
 | `app/src/main/kotlin/.../services/project/ProjectService.kt` | Project lifecycle management |
-| `app/src/main/kotlin/.../services/simualtion/SimulationService.kt` | Thin coordinator (delegates to SimulationTaskService) |
-| `app/src/main/kotlin/.../services/simualtion/SimulationTaskService.kt` | Full simulation lifecycle (compile, run, monitor, download) |
-| `app/src/main/kotlin/.../services/simualtion/SimulationParametersService.kt` | Simulation parameter management |
+| `app/src/main/kotlin/.../services/simulation/SimulationService.kt` | Thin coordinator (delegates to SimulationTaskService) |
+| `app/src/main/kotlin/.../services/simulation/SimulationTaskService.kt` | Full simulation lifecycle (compile, run, monitor, download) |
+| `app/src/main/kotlin/.../services/simulation/SimulationParametersService.kt` | Simulation parameter management |
+| `app/src/main/kotlin/.../di/serviceModules.kt` | Service-layer Koin DI (replaces services/koin/KoinExtentions.kt) |
+| `app/src/main/kotlin/.../di/viewModules.kt` | View-layer Koin DI (replaces views/koin/KoinExtensions.kt) |
+| `app/src/main/kotlin/.../services/project/IProjectService.kt` | Project service interface (adds getAllProjects()) |
+| `app/src/main/kotlin/.../services/simulation/ISimulationTaskService.kt` | Simulation task service interface |
+| `app/src/main/kotlin/.../services/simulation/ISimulationService.kt` | Simulation service interface |
 | `app/src/main/kotlin/.../models/projects/LismaTextModel.kt` | LISMA text model with CodeRegion tracking |
 | `app/src/main/kotlin/.../models/simulation/SimulationTask.kt` | Running/completed/failed simulation task tracking |
 | `app/src/main/kotlin/.../models/simulation/CompletedSimulationModel.kt` | Completed simulation result wrapper |
-| `app/src/main/kotlin/.../utilities/BlueprintModelExtensions.kt` | Blueprint-to-LISMA conversion |
 | `app/src/main/kotlin/.../services/ModelErrorService.kt` | Compilation/validation error tracking |
 | `app/src/main/kotlin/.../services/editors/SyntaxHighlighterService.kt` | Syntax highlighting service |
 | `app/src/main/kotlin/.../services/editors/TextEditorFactory.kt` | Text editor factory |
@@ -44,7 +48,10 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | `app/src/main/kotlin/.../views/dialogs/ItemsPickerDialog.kt` | Variable/axis selection dialog |
 | `external-services/src/main/kotlin/.../SimulationServerFacade.kt` | Server communication facade |
 | `external-services/src/main/kotlin/.../SimulationServerManager.kt` | Server process lifecycle |
-| `external-services/src/main/kotlin/.../RunSimulationParams.kt` | Simulation parameter DTO |
+| `external-services/src/main/kotlin/.../CompilationClient.kt` | Compile/validate/highlight/delete operations |
+| `external-services/src/main/kotlin/.../DownloadClient.kt` | Result download operations |
+| `external-services/src/main/kotlin/.../dtos/ExternalDtoTypes.kt` | DTO types (relocated from facade) |
+| `external-services/src/main/kotlin/.../dtos/RunSimulationParams.kt` | Simulation parameter DTO |
 | `text-editor/src/main/kotlin/.../IsmaTextEditor.kt` | Rich text editor (fxmisc.richtext) |
 | `text-editor/src/main/kotlin/.../services/EditorPlatformService.kt` | Cut/copy/paste event propagation |
 | `blueprint-editor/src/main/kotlin/.../IsmaBlueprintEditor.kt` | Visual statechart editor (UI only) |
@@ -54,6 +61,8 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | `domain/src/main/kotlin/.../models/SimulationResult.kt` | Domain model for simulation results |
 | `toolkit/src/main/kotlin/.../controls/PropertiesGrid.kt` | Reusable property grid component |
 | `toolkit/src/main/kotlin/.../coroutines/flow/CollectionsExtensions.kt` | ObservableList/Set → Flow bridges |
+| `toolkit/src/main/kotlin/.../coroutines/UiThreadExecutor.kt` | UI thread execution interface |
+| `toolkit/src/main/kotlin/.../viewmodel/BaseViewModel.kt` | Abstract base VM with StateFlow lifecycle |
 
 ## Building
 

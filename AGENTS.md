@@ -26,11 +26,11 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 ## Project Modules
 
 ### Core Math & Analysis
-- **grin/** - GUI framework and analytical functions
-  - `gui/` - Swing-based GUI components
+- **grin/** - JavaFX-based interactive function visualization and analysis environment
+  - `gui/` - JavaFX GUI components
   - `gui:app/`, `gui:common/`, `gui:concatenation/` - GUI submodules
-  - `analytic-fu/` - Analytical function utilities
-  - `math/` - Mathematical core
+  - `analytic-fu/` - Analytical function parser, expression evaluator, validator
+  - `math/` - Numerical math primitives — derivatives, integration, intersection search
 
 ### Compiler Infrastructure
 - **isma-compiler/** - HSM (High School Math) compiler
@@ -63,7 +63,9 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 ### Protocol Buffers
 - **protobuf-contracts/** - Shared protobuf definitions
-  - `simulation/` - Simulation service proto files
+  - `v1/` - Proto definitions
+    - `simulation_service/` - Simulation service proto files
+    - `compiler_service/` - LISMA compiler service proto files
 
 ### Server (gRPC-based)
 - **isma-server/** - Server with Netty transport and Koin DI
@@ -75,8 +77,11 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 ### Documentation
 - **docs/isma-server/** - Server module documentation
+- **docs/isma-ui/** - UI module documentation
+- **docs/grin/** - Grin (Graphical Interactive Functions) documentation
 - **docs/dotnet-ui-migration/** - WPF to Avalonia migration documentation and guides
 - **docs/legacy/** - Legacy system documentation and historical context
+- **docs/todo/** - TODO templates and planning
 
 ### Out-of-Process Architecture (UI + Server)
 
@@ -126,4 +131,4 @@ This ensures that protocol changes only affect the mapping layer, not the busine
 
 ## Proto Contracts
 
-All protobuf definitions live in `protobuf-contracts/simulation/`. Proto changes require rebuilding both `isma-server:grpc` and `isma-ui:grpc` modules.
+All protobuf definitions live in `protobuf-contracts/v1/`. Proto changes require rebuilding both `isma-server:grpc` and `isma-ui:grpc` modules.

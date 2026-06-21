@@ -16,17 +16,21 @@
 #### `grpc/build.gradle.kts`
 
 ```kotlin
+group = "ru.nstu.isma.server"
+version = "1.0.0-SNAPSHOT"
+
 plugins {
     alias(libs.plugins.google.protobuf)
+    alias(libs.plugins.java.modules)
 }
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:<version>"
+        artifact = "com.google.protobuf:protoc:${libs.protobuf.java.get().version}"
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:<version>"
+            artifact = "io.grpc:protoc-gen-grpc-java:${libs.grpc.java.get().version}"
         }
     }
     generateProtoTasks {
@@ -63,6 +67,14 @@ dependencies {
 #### `domain/build.gradle.kts`
 
 ```kotlin
+group = "ru.nstu.isma.server"
+version = "1.0.0-SNAPSHOT"
+
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
+}
+
 dependencies {
     implementation(project(":isma-solver:api"))
     implementation(project(":isma-compiler:hsm-core"))
@@ -76,6 +88,14 @@ Domain depends only on external libraries and core project modules. No infrastru
 #### `infrastructure/build.gradle.kts`
 
 ```kotlin
+group = "ru.nstu.isma.server"
+version = "1.0.0-SNAPSHOT"
+
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
+}
+
 dependencies {
     implementation(project(":isma-server:domain"))
     implementation(project(":isma-jvm-lib:exchange-format"))
@@ -97,8 +117,12 @@ dependencies {
 #### `app/build.gradle.kts`
 
 ```kotlin
+group = "ru.nstu.isma.server"
+version = "1.0.0-SNAPSHOT"
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
     application
 }
 

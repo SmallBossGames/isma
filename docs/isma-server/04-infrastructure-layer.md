@@ -327,8 +327,8 @@ private sealed class QueueItem {
 
 **Variable naming in output file:** Variable names are derived from `EquationIndexProvider`:
 - `TIME` — simulation time
-- `DE_i-{code}` — differential equation `i` with optional equation code
-- `AE_i-{code}` — algebraic equation `i` with optional equation code
+- `DE_i-{code}` — differential equation `i` with optional equation code (falls back to `DE_i` when code is null)
+- `AE_i-{code}` — algebraic equation `i` with optional equation code (falls back to `AE_i` when code is null)
 - `f_i` — right-hand side function value for differential equation `i`
 
 **9. Result File Format**

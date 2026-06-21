@@ -900,7 +900,7 @@ When building a replacement UI with the same features:
 2. **Server communication:** All compilation, validation, and simulation happen on a separate server process. The UI communicates via gRPC (compile, validate, run, monitor, cancel, download, highlight) and HTTP (binary result download).
 3. **Multi-project:** Projects are managed in an observable set with an active project concept. Each project has its own editor and Koin scope.
 4. **Observable collections:** UI state is driven by observable collections (projects, tasks, results, errors) that update the UI reactively via `addedAsFlow()` and `changeAsFlow()` extensions.
-5. **Blueprint-to-text:** The blueprint editor is a visual layer that serializes to/from a LISMA text representation. The conversion happens at compile time via `BlueprintModelExenstions.convertToLisma()`, not in real-time.
+5. **Blueprint-to-text:** The blueprint editor is a visual layer that serializes to/from a LISMA text representation. The conversion happens at compile time via `BlueprintModel.convertToLisma()`, not in real-time.
 6. **External processes:** Two external processes are launched by the UI:
    - ISMA Server (gRPC backend) — launched automatically on startup via `SimulationServerManager`
    - Grin Chart Viewer — launched on-demand when user clicks "Show" on results via `GrinProcessLauncher`

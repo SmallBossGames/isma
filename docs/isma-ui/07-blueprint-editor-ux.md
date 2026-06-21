@@ -36,8 +36,9 @@ blueprint-editor/src/main/kotlin/ru/isma/next/editor/blueprint/
 │   ├── LoopTransactionArrow.kt     # Self-loop arrow
 │   ├── EditArrowPopOver.kt         # Floating edit popover
 │   └── CoroutineScopeProvider.kt   # Shared CoroutineScope(Dispatchers.JavaFx)
-└── utilities/
-    └── ArrowGeometry.kt            # Arrow geometry calculations
+├── utilities/
+│   └── ArrowGeometry.kt            # Arrow geometry calculations
+└── views/                          # (new, exported in module-info)
 ```
 
 The Blueprint Editor follows an MVVM pattern: `IsmaBlueprintEditor` is the View (UI only), `IsmaBlueprintViewModel` is the ViewModel (all logic), and `BlueprintModel` / `CanvasViewModel` are the Models.

@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.grpc.protobuf)
     implementation(libs.grpc.stub)
     implementation(libs.protobuf.java)
+    implementation(libs.slf4j.api)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
@@ -198,7 +199,7 @@ plugins {
 
 javafx {
     version = "25.0.2"
-    modules = listOf("javafx.controls", "javafx.fxml")
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
 }
 
 dependencies {
@@ -233,7 +234,7 @@ dependencies {
 }
 ```
 
-Provides shared JavaFX utilities: `PropertiesGrid` (reusable property grid component), `ComboBox` extension (custom cell factory), `ListView` cell factory, `CollectionsExtensions` (coroutine flow extensions for JavaFX collections: `addedAsFlow()`, `changeAsFlow()`), and `Properties` helper.
+Provides shared JavaFX utilities: `PropertiesGrid` (reusable property grid component), `ComboBox` extension (custom cell factory), `ListView` cell factory, `CollectionsExtensions` (coroutine flow extensions for JavaFX collections: `addedAsFlow()`, `changeAsFlow()`), `Properties` helper, `UiThreadExecutor` hierarchy (UI thread execution abstraction), and `BaseViewModel` (abstract base VM with `StateFlow` lifecycle tracking).
 
 **Source structure:**
 ```
@@ -241,10 +242,16 @@ toolkit/src/main/kotlin/ru/isma/javafx/extensions/
 ├── controls/
 │   ├── PropertiesGrid.kt       # Reusable property grid (label + control layout)
 │   └── ComboBox.kt             # Custom ComboBox extensions
-├── coroutines/flow/
-│   └── CollectionsExtensions.kt  # ObservableList/Set → Flow bridges
-└── helpers/
-    └── Properties.kt           # Property utility helpers
+├── coroutines/
+│   ├── UiThreadExecutor.kt     # UI thread execution interface
+│   ├── JavaFxUiThreadExecutor.kt  # JavaFX implementation
+│   ├── TestUiThreadExecutor.kt   # Test implementation
+│   └── flow/
+│       └── CollectionsExtensions.kt  # ObservableList/Set → Flow bridges
+├── helpers/
+│   └── Properties.kt           # Property utility helpers
+└── viewmodel/
+    └── BaseViewModel.kt        # Abstract base VM with StateFlow lifecycle tracking
 ```
 
 ## Java Module System
@@ -255,11 +262,11 @@ Each module declares a `module-info.java` with appropriate `exports`:
 | --- | --- | --- |
 | `app` | `isma.ui.app.main` | `ru.isma.next.app.launcher` |
 | `domain` | `isma.ui.domain` | `ru.isma.next.domain.models` |
-| `external-services` | `isma.ui.external.services` | `ru.isma.next.external` |
-| `grpc` | `isma.ui.grpc` | `ru.nstu.isma.contracts.simulation` |
+| `external-services` | `isma.ui.external.services` | `ru.isma.next.external`, `ru.isma.next.external.dtos` |
+| `grpc` | `isma.ui.grpc` | `ru.nstu.isma.contracts.v1.simulation_service`, `ru.nstu.isma.contracts.v1.compiler_service` |
 | `text-editor` | `isma.ui.editor.text` | `ru.isma.next.editor.text`, `services`, `services.contracts` |
-| `blueprint-editor` | `isma.ui.editor.blueprint` | `ru.isma.next.editor.blueprint`, `services`, `models` |
-| `toolkit` | `isma.ui.toolkit` | `ru.isma.javafx.extensions.controls`, `coroutines.flow`, `helpers` |
+| `blueprint-editor` | `isma.ui.editor.blueprint` | `ru.isma.next.editor.blueprint`, `ru.isma.next.editor.blueprint.constants`, `ru.isma.next.editor.blueprint.controls`, `ru.isma.next.editor.blueprint.models`, `ru.isma.next.editor.blueprint.services`, `ru.isma.next.editor.blueprint.utilities`, `ru.isma.next.editor.blueprint.views` |
+| `toolkit` | `isma.ui.toolkit` | `ru.isma.javafx.extensions.controls`, `ru.isma.javafx.extensions.coroutines`, `ru.isma.javafx.extensions.coroutines.flow`, `ru.isma.javafx.extensions.helpers`, `ru.isma.javafx.extensions.viewmodel` |
 
 **Requires notes:**
 - `text-editor` requires `javafx.graphics` (not `javafx.controls`)

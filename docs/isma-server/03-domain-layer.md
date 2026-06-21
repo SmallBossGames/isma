@@ -101,6 +101,7 @@ data class RunSimulationParameters(
 ```kotlin
 while (true) {
     val currentSession = sessionStore.get(simulationId)
+        ?: throw IllegalStateException("Simulation session '$simulationId' disappeared")
     val currentTime = currentSession.currentTime
 
     // Determine whether to report
@@ -187,15 +188,21 @@ translationResult.fold(
         // Extract errors from TranslationException or fallback to validation
         val ismaErrors = when (error) {
             is TranslationException -> error.errors
-            else -> translator.validate(sourceCode)  // fallback
+            else -> {
+                val errors = translator.validate(sourceCode)
+                if (errors.isNotEmpty()) errors else null
+            }
         }
         // Map IsmaSyntaxError/IsmaSemanticError → CompilationError
+        val compilationErrors = ismaErrors
+            ?.map { /* map to CompilationError */ }
+            ?: listOf(CompilationError(-1, -1, error.message ?: "Unknown error"))
         CompileLismaResult(compiledModelId = "", errors = compilationErrors, warnings = [])
     }
 )
 ```
 
-**Error recovery:** On translation failure, the handler falls back to validation to extract detailed error positions if the original exception wasn't a `TranslationException`.
+**Error recovery:** On translation failure, the handler falls back to validation to extract detailed error positions. If the fallback validation also returns empty errors, a generic `CompilationError(-1, -1, "Unknown error")` is returned via null-coalescing fallback.
 
 ---
 
@@ -361,6 +368,8 @@ interface IIntegrationMethodsStore {
 Provides access to available numerical integration methods.
 
 ### ILismaTranslator
+
+**File:** `domain/handlers/runSimulation/ILismaTranslator.kt`
 
 ```kotlin
 interface ILismaTranslator {

@@ -65,6 +65,7 @@ curl -o result.bin \
 | `isma-server/domain/src/main/kotlin/.../handlers/compileLisma/CompileLismaHandlerImpl.kt` | LISMA → HSM compilation |
 | `isma-server/domain/src/main/kotlin/.../handlers/validateLisma/ValidateLismaHandlerImpl.kt` | LISMA validation |
 | `isma-server/domain/src/main/kotlin/.../DomainModule.kt` | DI configuration (handler interfaces → implementations) |
+| `isma-server/domain/src/main/kotlin/.../handlers/runSimulation/ILismaTranslator.kt` | ILismaTranslator interface + TranslationException |
 | `isma-server/infrastructure/src/main/kotlin/.../SimulationExecutorImpl.kt` | Simulation execution engine (virtual threads, result writing) |
 | `isma-server/infrastructure/src/main/kotlin/.../LismaTranslatorImpl.kt` | LISMA → HSM translation with FDM support |
 | `isma-server/infrastructure/src/main/kotlin/.../HighlightLismaHandlerImpl.kt` | ANTLR4-based syntax highlighting |

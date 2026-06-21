@@ -10,12 +10,16 @@ The `external-services` module handles all communication with the ISMA server pr
 external-services/src/main/kotlin/ru/isma/next/external/
 ├── BinaryEquationIndexProvider.kt
 ├── BinaryFilePointProvider.kt
+├── CompilationClient.kt
+├── DownloadClient.kt
 ├── GrpcLismaCompilerClient.kt
 ├── GrpcSimulationClient.kt
 ├── HttpSimulationClient.kt
-├── RunSimulationParams.kt
 ├── SimulationServerFacade.kt
 └── SimulationServerManager.kt
+└── dtos/
+    ├── ExternalDtoTypes.kt
+    └── RunSimulationParams.kt
 ```
 
 Module group: `ru.isma.next.ui`, version: `1.0.0-SNAPSHOT`.
@@ -148,7 +152,7 @@ class SimulationServerFacade(
 | `getSimulationMethods()` | `grpcClient` | Lists available integration methods |
 | `shutdown()` | All | Shuts down clients and server process |
 
-**DTOs defined in the facade:**
+**DTOs defined in `dtos/ExternalDtoTypes.kt`:**
 
 ```kotlin
 data class CachedSimulationResult(val file: File, val columnNames: List<String>)
@@ -160,6 +164,12 @@ enum class SyntaxTokenKind { UNSPECIFIED, KEYWORD, COMMENT, NUMBER, TEXT }
 data class SyntaxTokenDto(val start: Int, val length: Int, val kind: SyntaxTokenKind)
 ```
 
+**DTOs relocated from facade:** `RunSimulationParams.kt` is now in `dtos/` subdirectory (was previously at the root of `external/`).
+
+**New extracted clients:**
+- `CompilationClient.kt` — encapsulates compile, validate, highlight, and delete-compiled-model operations (previously inline in `SimulationServerFacade`)
+- `DownloadClient.kt` — encapsulates result download logic (previously inline in `SimulationServerFacade`)
+
 ## gRPC Clients
 
 ### GrpcSimulationClient
@@ -170,7 +180,7 @@ Netty gRPC client using Linux Epoll for Unix Domain Socket transport.
 
 ### RunSimulationParams
 
-**File:** `RunSimulationParams.kt`
+**File:** `dtos/RunSimulationParams.kt`
 
 DTO passed to `serverFacade.runSimulation()`:
 

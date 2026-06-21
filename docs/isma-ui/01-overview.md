@@ -16,7 +16,7 @@ isma-ui/
 │       ├── viewmodels/           # Plain JavaFX property-based view models for settings
 │       ├── views/                # JavaFX UI components (MainView, toolbars, settings)
 │       ├── utilities/            # BlueprintModel extensions (convertToLisma)
-│       ├── extentions/           # Ikonli icon helpers, button extensions
+│       ├── extensions/           # ButtonExtensions.kt (Ikonli helpers removed)
 │       └── constants/            # File extension constants, preferences paths
 ├── domain/                       # Pure Kotlin domain models (no UI deps)
 ├── external-services/            # gRPC clients, HTTP client, server manager
@@ -65,6 +65,8 @@ simulationServerModule → appServicesModule → grinProcessLauncherModule
     → editorModule → lismaTextEditorModule → blueprintEditorModule
     → toolbarsModule → editorTabPaneModule → settingsPanelModule → mainViewModule
 ```
+
+Service-layer DI modules are defined in `di/serviceModules.kt` (replacing the old `services/koin/KoinExtentions.kt`). View-layer DI modules are in `di/viewModules.kt` (replacing `views/koin/KoinExtensions.kt`).
 
 Scoped DI is used for project-specific editors: each `LismaProjectModel` and `BlueprintProjectModel` gets its own Koin scope with scoped `IsmaTextEditor` instances that are cleaned up on `dispose()`.
 

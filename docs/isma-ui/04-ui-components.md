@@ -9,6 +9,9 @@ The `app` module is the application layer — it contains the JavaFX UI componen
 ```
 app/src/main/kotlin/ru/isma/next/app/
 ├── launcher/                     # IsmaApplication, Koin DI root, GrinProcessLauncher
+├── di/                           # Koin DI module definitions (services + views)
+│   ├── serviceModules.kt         # service-layer DI (replaces services/koin/KoinExtentions.kt)
+│   └── viewModules.kt            # view-layer DI (replaces views/koin/KoinExtensions.kt)
 ├── models/
 │   ├── ErrorViewModel.kt
 │   ├── preferences/              # PreferencesModel, WindowPreferencesModel
@@ -21,19 +24,16 @@ app/src/main/kotlin/ru/isma/next/app/
 ├── services/
 │   ├── ModelErrorService.kt
 │   ├── editors/                  # SyntaxHighlighterService, TextEditorFactory
-│   ├── koin/                     # Koin DI module definitions (services)
 │   ├── preferences/              # PreferencesProvider
-│   ├── project/                  # ProjectService, ProjectFileService, LismaPdeService
+│   ├── project/                  # IProjectService, ProjectService, ProjectFileService, LismaPdeService
 │   │   └── LismaPdeTranslationResult.kt  # Success/Failed sealed interface
-│   └── simualtion/               # SimulationService, SimulationResultService, SimulationParametersService
+│   └── simulation/               # ISimulationService, ISimulationTaskService, SimulationService, SimulationResultService, SimulationParametersService
 ├── viewmodels/                   # Plain JavaFX property-based view models for settings
-├── utilities/                    # BlueprintModelExtensions.kt (convertToLisma)
-├── extentions/                   # ButtonExtensions.kt, FormsExtensions.kt
+├── extensions/                   # ButtonExtensions.kt
 └── constants/                    # FileExtensions.kt (file type constants)
 ├── views/
 │   ├── MainView.kt               # Main BorderPane layout
 │   ├── dialogs/                  # ItemsPickerDialog
-│   ├── koin/                     # Koin DI module definitions (views)
 │   ├── layout/                   # Drawer
 │   ├── settings/                 # Settings panel views
 │   ├── tabpane/                  # IsmaEditorTabPane
@@ -177,23 +177,25 @@ Data providers that act as the shared model between the project model and the ed
 
 ## Services
 
-### ProjectService
+### IProjectService / ProjectService
 
-**File:** `ProjectService.kt`
+**File:** `services/project/IProjectService.kt`
 
 ```kotlin
-class ProjectService {
-    val projects = FXCollections.observableSet<IProjectModel>()
-    var activeProject: IProjectModel? = null
-
-    fun createNewBlueprint(name: String = "New statechart") { ... }
-    fun createNew(name: String = "New project") { ... }
-    fun addText(project: LismaProjectModel) { projects.add(project) }
-    fun addBlueprint(project: BlueprintProjectModel) { projects.add(project) }
-    fun close(project: IProjectModel) { projects.remove(project); project.dispose() }
-    fun closeAll() { ... }
+interface IProjectService {
+    val projects: ObservableSet<IProjectModel>
+    var activeProject: IProjectModel?
+    fun createNewBlueprint(name: String = "New statechart")
+    fun createNew(name: String = "New project")
+    fun addText(project: LismaProjectModel)
+    fun addBlueprint(project: BlueprintProjectModel)
+    fun close(project: IProjectModel)
+    fun closeAll()
+    fun getAllProjects(): Array<IProjectModel>
 }
 ```
+
+`ProjectService` implements `IProjectService`. The additional `getAllProjects()` method returns all projects as a snapshot array.
 
 Manages the observable set of projects. `IsmaEditorTabPane` observes this set to create/delete tabs.
 
@@ -208,27 +210,27 @@ FileChooser-based open/save operations. Supports three file types:
 
 Save operations write `project.lismaText` or `Json.encodeToString(project.blueprint)` to file.
 
-### SimulationService (thin coordinator)
+### ISimulationService / SimulationService (thin coordinator)
 
-**File:** `SimulationService.kt`
+**File:** `services/simulation/ISimulationService.kt`
 
 A 36-line thin wrapper that delegates to `SimulationTaskService`. It snapshots parameters, resolves the active project, and calls `SimulationTaskService.submit()`.
 
 ```kotlin
 class SimulationService(
-    private val projectService: ProjectService,
-    private val simulationTaskService: SimulationTaskService,
+    private val projectService: IProjectService,
+    private val simulationTaskService: ISimulationTaskService,
     private val simulationParametersService: SimulationParametersService,
-) : KoinComponent {
+) : KoinComponent, ISimulationService {
     fun simulate() { ... }
     fun stopSimulation(task: SimulationTask) { simulationTaskService.cancelTask(task) }
     companion object { val SimulationScope = SimulationTaskService.SimulationScope }
 }
 ```
 
-### SimulationTaskService (full lifecycle)
+### ISimulationTaskService / SimulationTaskService (full lifecycle)
 
-**File:** `SimulationTaskService.kt`
+**File:** `services/simulation/ISimulationTaskService.kt`
 
 The complete simulation pipeline (151 lines). Owns `val tasks: ObservableList<SimulationTask> = SimulationTask.ALL` and manages the 4-phase lifecycle:
 
@@ -245,19 +247,20 @@ Uses `SimulationScope` — a global `CoroutineScope` backed by `Executors.newVir
 class SimulationTaskService(
     private val serverFacade: SimulationServerFacade,
     private val modelErrorService: ModelErrorService,
-    private val projectService: ProjectService,
-) : KoinComponent {
+    private val projectService: IProjectService,
+    private val uiThreadExecutor: UiThreadExecutor,
+) : KoinComponent, ISimulationTaskService {
     val tasks: ObservableList<SimulationTask> = SimulationTask.ALL
     fun submit(modelName: String, params: RunSimulationParams, simulationParameters: SimulationParametersModel): SimulationTask
     fun cancelTask(task: SimulationTask)
 }
 ```
 
-### SimulationResultService
+### ISimulationResultService / SimulationResultService
 
-**File:** `SimulationResultService.kt`
+**File:** `services/simulation/ISimulationResultService.kt`
 
-Manages completed simulation results. Constructor takes `SimulationTaskService` (for task removal from `SimulationTask.ALL`) and `GrinProcessLauncher`.
+Manages completed simulation results. Constructor takes `SimulationTaskService`, `GrinProcessLauncher`, and `UiThreadExecutor` (3 params).
 
 | Method | Description |
 | --- | --- |
@@ -722,38 +725,42 @@ Inner data classes replace the old `BlueprintEditorTransactionModel` / `Blueprin
 
 ## DI Configuration
 
-### Service Module (`KoinExtentions.kt`)
+### Service Module (`serviceModules.kt`)
 
-**File:** `app/src/main/kotlin/.../services/koin/KoinExtentions.kt`
+**File:** `app/src/main/kotlin/.../di/serviceModules.kt`
 
 ```kotlin
 val simulationServerModule = module {
     single { SimulationServerManager() }
     single { SimulationServerFacade(get()) }
+    single<UiThreadExecutor> { JavaFxUiThreadExecutor() }
 }
 
 val appServicesModule = module {
     single<IEditorPlatformService> { EditorPlatformService() }
-    single<ProjectService> { ProjectService() }
+    single<IProjectService> { ProjectService(get()) }
     single<ProjectFileService> { ProjectFileService(get()) }
     single<ModelErrorService> { ModelErrorService() }
     single<LismaPdeService> { LismaPdeService(get(), get()) }
     single<SimulationParametersService> { SimulationParametersService(get<SimulationServerFacade>().getSimulationMethods()) }
-    single<SimulationTaskService> { SimulationTaskService(get(), get(), get()) }
-    single<SimulationResultService> { SimulationResultService(get(), get()) }
-    single<SimulationService> { SimulationService(get(), get(), get()) }
+    single<ISimulationTaskService> { SimulationTaskService(get(), get(), get(), get()) }
+    single<ISimulationResultService> { SimulationResultService(get(), get(), get()) }
+    single<ISimulationService> { SimulationService(get(), get(), get()) }
     single { PreferencesProvider(APPLICATION_PREFERENCES_FILE) }
 }
 ```
 
-**Changes from previous version:**
-- `SimulationTaskService` added (takes `serverFacade`, `modelErrorService`, `projectService`)
-- `SimulationResultService` now takes 2 params (`grinProcessLauncher`, `simulationTaskService`)
-- `SimulationService` now takes 3 params (`projectService`, `simulationTaskService`, `simulationParametersService`) — no longer depends on `SimulationResultService`, `serverFacade`, or `ModelErrorService` directly
+**Key changes from previous version:**
+- `SimulationTaskService` now takes 4 parameters (includes `UiThreadExecutor`)
+- `SimulationResultService` now takes 3 parameters (includes `UiThreadExecutor`)
+- `SimulationService` now takes 3 parameters (`projectService`, `simulationTaskService`, `simulationParametersService`)
+- Interfaces are registered (`ISimulationTaskService`, `ISimulationService`, `IProjectService`) rather than concrete classes
+- `IProjectService` adds `getAllProjects(): Array<IProjectModel>` method
+- `UiThreadExecutor` provides JavaFX thread execution abstraction
 
-### Launcher Module (`DependecyInjectionRootModule.kt`)
+### Launcher Module (`DependencyInjectionRootModule.kt`)
 
-**File:** `app/src/main/kotlin/.../launcher/DependecyInjectionRootModule.kt`
+**File:** `app/src/main/kotlin/.../launcher/DependencyInjectionRootModule.kt`
 
 ```kotlin
 fun ismaKoinStart() = startKoin {
@@ -783,9 +790,9 @@ val grinProcessLauncherModule = module {
 
 DI initialization order: service modules → Grin launcher → view modules. All registrations use `single()` (singleton) lifecycle.
 
-### View Module (`KoinExtensions.kt`)
+### View Module (`viewModules.kt`)
 
-**File:** `app/src/main/kotlin/.../views/koin/KoinExtensions.kt`
+**File:** `app/src/main/kotlin/.../di/viewModules.kt`
 
 ```kotlin
 class IsmaEditorQualifier

@@ -33,7 +33,7 @@ gRPC client layer for communicating with the ISMA server.
 ### grpc/
 Generated gRPC stubs from protobuf contracts.
 
-- Protobuf source: `../../protobuf-contracts`
+- Protobuf source: `../../protobuf-contracts/v1/`
 - Uses gRPC-Java with Netty transport
 
 ### text-editor/

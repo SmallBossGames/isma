@@ -293,7 +293,7 @@ Performs lexical analysis on LISMA source code, returning syntax tokens for IDE 
 | `NUMBER` | Floating-point and decimal literals |
 | `TEXT` | Reserved — never produced by the handler |
 
-Note: `TEXT` is defined in the proto but the handler silently filters all non-keyword/non-comment/non-number tokens.
+Note: `TEXT` is defined in the proto. The infrastructure handler (`HighlightLismaHandlerImpl`) filters out TEXT tokens (`else -> return@mapNotNull null`), so TEXT never reaches the gRPC layer in practice. However, the gRPC mapping code in `LismaCompilerServiceGrpcImpl` includes a mapping for `SyntaxKind.TEXT -> TokenKind.TOKEN_KIND_TEXT`, meaning it's prepared to send TEXT tokens if they ever appeared.
 
 **Implementation:** Uses ANTLR4 `LismaLexer` to tokenize source code. Only keywords, comments, and numbers are returned (other token types are filtered out).
 

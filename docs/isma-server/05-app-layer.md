@@ -204,6 +204,7 @@ fun Routing.simulationResultRoutes(sessionStore: ISimulationSessionStore) {
 
         val session = sessionStore.get(simulationId)
         if (session == null || session.status != SimulationStatus.COMPLETED) {
+            val status = if (session == null) "not found" else "not completed (${session.status})"
             call.respond(HttpStatusCode.NotFound, "Simulation $simulationId: $status")
             return@get
         }

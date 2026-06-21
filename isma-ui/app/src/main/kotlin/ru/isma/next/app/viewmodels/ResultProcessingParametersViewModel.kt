@@ -2,12 +2,12 @@ package ru.isma.next.app.viewmodels
 
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
-import tornadofx.booleanProperty
+import javafx.beans.property.SimpleBooleanProperty
 import ru.isma.javafx.extensions.helpers.getValue
 import ru.isma.javafx.extensions.helpers.setValue
 
 class ResultProcessingParametersViewModel {
-    val isSimplifyInUseProperty = booleanProperty()
+    val isSimplifyInUseProperty = SimpleBooleanProperty()
     var isSimplifyInUse by isSimplifyInUseProperty
 
     val selectedSimplifyMethodProperty = SimpleStringProperty()

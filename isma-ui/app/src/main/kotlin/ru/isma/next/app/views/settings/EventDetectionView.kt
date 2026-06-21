@@ -11,7 +11,7 @@ class EventDetectionView(
     val title: String = "Event detection"
 
     init {
-        content = ScrollPane(
+        val scrollPane = ScrollPane(
             propertiesGrid {
                 addNode("In use", parametersService.eventDetection.isEventDetectionInUseProperty)
                 addNode("Gamma", parametersService.eventDetection.gammaProperty).apply {
@@ -23,5 +23,7 @@ class EventDetectionView(
                 }
             }
         )
+        scrollPane.isFitToWidth = true
+        children.add(scrollPane)
     }
 }

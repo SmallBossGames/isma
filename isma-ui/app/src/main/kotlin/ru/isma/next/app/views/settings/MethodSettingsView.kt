@@ -11,7 +11,7 @@ class MethodSettingsView(
     val title: String = "Integration"
 
     init {
-        content = ScrollPane(
+        val scrollPane = ScrollPane(
             propertiesGrid {
                 addNode(
                     "Method",
@@ -32,5 +32,7 @@ class MethodSettingsView(
                 }
             }
         )
+        scrollPane.isFitToWidth = true
+        children.add(scrollPane)
     }
 }

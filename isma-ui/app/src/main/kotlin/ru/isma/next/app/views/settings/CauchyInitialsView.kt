@@ -11,12 +11,14 @@ class CauchyInitialsView(
     val title: String = "Initials"
 
     init {
-        content = ScrollPane(
+        val scrollPane = ScrollPane(
             propertiesGrid {
                 addNode("Start", parametersService.cauchyInitials.startTimeProperty())
                 addNode("End", parametersService.cauchyInitials.endTimeProperty())
                 addNode("Step", parametersService.cauchyInitials.stepProperty())
             }
         )
+        scrollPane.isFitToWidth = true
+        children.add(scrollPane)
     }
 }

@@ -2,7 +2,6 @@ package ru.isma.next.app.views.settings
 
 import javafx.scene.layout.VBox
 import ru.isma.javafx.extensions.controls.PropertiesAccordion
-import ru.isma.javafx.extensions.controls.propertiesGrid
 
 class SettingsPanelView(
     private val cauchyInitialsView: CauchyInitialsView,

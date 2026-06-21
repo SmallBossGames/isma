@@ -13,7 +13,7 @@ class ResultProcessingView(
     val title: String = "Result processing"
 
     init {
-        content = ScrollPane(
+        val scrollPane = ScrollPane(
             propertiesGrid {
                 addNode(
                     "Save result",
@@ -22,5 +22,7 @@ class ResultProcessingView(
                 )
             }
         )
+        scrollPane.isFitToWidth = true
+        children.add(scrollPane)
     }
 }

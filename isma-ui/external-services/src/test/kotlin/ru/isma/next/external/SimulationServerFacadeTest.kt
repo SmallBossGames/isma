@@ -31,6 +31,7 @@ class SimulationServerFacadeTest {
     @BeforeEach
     fun setUp() {
         facade = SimulationServerFacade(serverManager)
+        facade.setClients(compilationClient, simulationClient, downloadClient)
     }
 
     @AfterEach

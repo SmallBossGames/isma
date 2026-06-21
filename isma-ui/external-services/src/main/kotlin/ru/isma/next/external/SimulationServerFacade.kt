@@ -10,45 +10,57 @@ import ru.isma.next.external.dtos.ValidationResult
 
 class SimulationServerFacade(
     private val serverManager: SimulationServerManager,
-    private val compilationClient: CompilationClient? = null,
-    private val simulationClient: SimulationClient? = null,
-    private val downloadClient: DownloadClient? = null,
 ) {
-    private val _compilationClient = compilationClient ?: CompilationClient(GrpcLismaCompilerClient(""))
-    private val _simulationClient = simulationClient ?: SimulationClient(GrpcSimulationClient(""))
-    private val _downloadClient = downloadClient ?: DownloadClient(GrpcSimulationClient(""), HttpSimulationClient(""))
+    private lateinit var compilationClient: CompilationClient
+    private lateinit var simulationClient: SimulationClient
+    private lateinit var downloadClient: DownloadClient
 
     fun warmup() {
         val socketPaths = serverManager.start()
-        _compilationClient.compile("") // force initialization
+        val grpcClient = GrpcSimulationClient(socketPaths.grpc)
+        val httpClient = HttpSimulationClient(socketPaths.http)
+        val compilerClient = GrpcLismaCompilerClient(socketPaths.grpc)
+        compilationClient = CompilationClient(compilerClient)
+        simulationClient = SimulationClient(grpcClient)
+        downloadClient = DownloadClient(grpcClient, httpClient)
+    }
+
+    internal fun setClients(
+        compilationClient: CompilationClient,
+        simulationClient: SimulationClient,
+        downloadClient: DownloadClient
+    ) {
+        this.compilationClient = compilationClient
+        this.simulationClient = simulationClient
+        this.downloadClient = downloadClient
     }
 
     fun compileModel(lismaSourceCode: String): CompileResult =
-        _compilationClient.compile(lismaSourceCode)
+        compilationClient.compile(lismaSourceCode)
 
     fun validateModel(lismaSourceCode: String): ValidationResult =
-        _compilationClient.validate(lismaSourceCode)
+        compilationClient.validate(lismaSourceCode)
 
     fun getHighlighting(lismaSourceCode: String): List<SyntaxTokenDto> =
-        _compilationClient.highlight(lismaSourceCode)
+        compilationClient.highlight(lismaSourceCode)
 
     fun deleteCompiledModel(modelId: String): Boolean =
-        _compilationClient.deleteModel(modelId)
+        compilationClient.deleteModel(modelId)
 
     fun runSimulation(params: RunSimulationParams): Long =
-        _simulationClient.run(params)
+        simulationClient.run(params)
 
     fun monitorSimulation(simulationId: Long, accuracy: Double): Flow<SimulationProgress> =
-        _simulationClient.monitor(simulationId, accuracy)
+        simulationClient.monitor(simulationId, accuracy)
 
     suspend fun downloadResultToCache(simulationId: Long): CachedSimulationResult =
-        _downloadClient.downloadResultToCache(simulationId)
+        downloadClient.downloadResultToCache(simulationId)
 
     fun cancelSimulation(simulationId: Long) =
-        _simulationClient.cancel(simulationId)
+        simulationClient.cancel(simulationId)
 
     fun getSimulationMethods(): List<String> =
-        _simulationClient.listMethods()
+        simulationClient.listMethods()
 
     fun shutdown() {
         serverManager.stop()

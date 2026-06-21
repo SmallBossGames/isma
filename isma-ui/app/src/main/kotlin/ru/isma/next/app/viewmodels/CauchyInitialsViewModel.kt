@@ -1,7 +1,8 @@
 package ru.isma.next.app.viewmodels
 
-import tornadofx.*
 import javafx.beans.property.SimpleDoubleProperty
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 import ru.isma.next.app.models.simulation.CauchyInitialsModel
 
 class CauchyInitialsViewModel {

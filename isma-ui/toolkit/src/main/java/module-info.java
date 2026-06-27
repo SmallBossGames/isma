@@ -7,5 +7,4 @@ module isma.ui.toolkit {
     exports ru.isma.javafx.extensions.coroutines;
     exports ru.isma.javafx.extensions.coroutines.flow;
     exports ru.isma.javafx.extensions.helpers;
-    exports ru.isma.javafx.extensions.viewmodel;
 }

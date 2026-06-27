@@ -2,46 +2,30 @@ package ru.isma.next.app.viewmodels
 
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import ru.isma.javafx.extensions.viewmodel.BaseViewModel
-import ru.isma.javafx.extensions.helpers.getValue
-import ru.isma.javafx.extensions.helpers.setValue
 import ru.isma.next.app.models.simulation.EventDetectionParametersModel
 
-class EventDetectionParametersViewModel : BaseViewModel() {
-    private val _isEventDetectionInUseFlow = MutableStateFlow(false)
-    val isEventDetectionInUseFlow: StateFlow<Boolean> = _isEventDetectionInUseFlow.asStateFlow()
+class EventDetectionParametersViewModel {
+    val isEventDetectionInUseProperty = SimpleBooleanProperty(false)
+    var isEventDetectionInUse: Boolean
+        get() = isEventDetectionInUseProperty.value
+        set(value) { isEventDetectionInUseProperty.value = value }
 
-    private val _isStepLimitInUseFlow = MutableStateFlow(false)
-    val isStepLimitInUseFlow: StateFlow<Boolean> = _isStepLimitInUseFlow.asStateFlow()
+    val isStepLimitInUseProperty = SimpleBooleanProperty(false)
+    var isStepLimitInUse: Boolean
+        get() = isStepLimitInUseProperty.value
+        set(value) { isStepLimitInUseProperty.value = value }
 
-    private val _gammaFlow = MutableStateFlow(0.0)
-    val gammaFlow: StateFlow<Double> = _gammaFlow.asStateFlow()
+    val gammaProperty = SimpleDoubleProperty(0.0)
+    var gamma: Double
+        get() = gammaProperty.value
+        set(value) { gammaProperty.value = value }
+    fun gammaProperty() = gammaProperty
 
-    private val _lowBorderFlow = MutableStateFlow(0.0)
-    val lowBorderFlow: StateFlow<Double> = _lowBorderFlow.asStateFlow()
-
-    val isEventDetectionInUseProperty = SimpleBooleanProperty(false).also {
-        it.addListener { _, _, newValue -> _isEventDetectionInUseFlow.value = newValue as Boolean }
-    }
-    var isEventDetectionInUse by isEventDetectionInUseProperty
-
-    val isStepLimitInUseProperty = SimpleBooleanProperty(false).also {
-        it.addListener { _, _, newValue -> _isStepLimitInUseFlow.value = newValue as Boolean }
-    }
-    var isStepLimitInUse by isStepLimitInUseProperty
-
-    val gammaProperty = SimpleDoubleProperty(0.0).also {
-        it.addListener { _, _, newValue -> _gammaFlow.value = newValue as Double }
-    }
-    var gamma by gammaProperty
-
-    val lowBorderProperty = SimpleDoubleProperty(0.0).also {
-        it.addListener { _, _, newValue -> _lowBorderFlow.value = newValue as Double }
-    }
-    var lowBorder by lowBorderProperty
+    val lowBorderProperty = SimpleDoubleProperty(0.0)
+    var lowBorder: Double
+        get() = lowBorderProperty.value
+        set(value) { lowBorderProperty.value = value }
+    fun lowBorderProperty() = lowBorderProperty
 
     fun commit(model: EventDetectionParametersModel){
         isEventDetectionInUse = model.isEventDetectionInUse

@@ -7,10 +7,10 @@ import ru.isma.javafx.extensions.controls.propertiesGrid
 import ru.isma.next.app.services.simulation.SimulationParametersService
 import ru.isma.next.app.models.simulation.SaveTarget
 
-class ResultProcessingView(
+class ResultSavingView(
     private val parametersService: SimulationParametersService
 ) : Pane() {
-    val title: String = "Result processing"
+    val title: String = "Result saving"
 
     init {
         val scrollPane = ScrollPane(

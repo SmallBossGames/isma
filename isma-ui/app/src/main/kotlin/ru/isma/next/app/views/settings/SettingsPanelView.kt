@@ -7,13 +7,13 @@ class SettingsPanelView(
     private val cauchyInitialsView: CauchyInitialsView,
     private val methodSettingsView: MethodSettingsView,
     private val eventDetectionView: EventDetectionView,
-    private val resultProcessingView: ResultProcessingView,
+    private val resultSavingView: ResultSavingView,
 ) : PropertiesAccordion() {
     init {
         addItem(cauchyInitialsView.title, settingsBox(cauchyInitialsView))
         addItem(methodSettingsView.title, settingsBox(methodSettingsView))
         addItem(eventDetectionView.title, settingsBox(eventDetectionView))
-        addItem(resultProcessingView.title, settingsBox(resultProcessingView))
+        addItem(resultSavingView.title, settingsBox(resultSavingView))
     }
 
     private fun settingsBox(view: javafx.scene.Node): VBox {

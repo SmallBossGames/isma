@@ -366,7 +366,6 @@ class IsmaBlueprintViewModel(
                 squareHeight = FIXED_STATE_HEIGHT
                 name = m.name
                 layoutXProperty().value = x + STATE_INSET
-                layoutXProperty().value = x + STATE_INSET
 
                 nameChangingMonitor.tryRegister(name)
             }

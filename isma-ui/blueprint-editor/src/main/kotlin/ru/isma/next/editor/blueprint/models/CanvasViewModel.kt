@@ -45,10 +45,6 @@ class CanvasViewModel {
         _loopTransactions.removeAll { it.stateBox.name == model.name }
     }
 
-    fun getStateNode(model: BlueprintStateModel): Node? {
-        return _states.find { it.model == model }?.node
-    }
-
     fun addTransaction(tx: EditorTransaction) {
         _transactions.add(tx)
     }

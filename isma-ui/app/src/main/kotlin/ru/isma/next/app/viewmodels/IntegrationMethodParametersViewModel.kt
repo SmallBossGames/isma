@@ -1,81 +1,52 @@
 package ru.isma.next.app.viewmodels
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleStringProperty
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import ru.isma.javafx.extensions.viewmodel.BaseViewModel
-import ru.isma.javafx.extensions.helpers.getValue
-import ru.isma.javafx.extensions.helpers.setValue
+import javafx.beans.property.*
 import ru.isma.next.app.models.simulation.IntegrationMethodParametersModel
 
-class IntegrationMethodParametersViewModel : BaseViewModel() {
-    private val _selectedMethodFlow = MutableStateFlow("")
-    val selectedMethodFlow: StateFlow<String> = _selectedMethodFlow.asStateFlow()
+class IntegrationMethodParametersViewModel {
+    val selectedMethodProperty = SimpleStringProperty("")
+    var selectedMethod: String
+        get() = selectedMethodProperty.value
+        set(value) { selectedMethodProperty.value = value }
+    fun selectedMethodProperty() = selectedMethodProperty
 
-    private val _accuracyFlow = MutableStateFlow(0.0)
-    val accuracyFlow: StateFlow<Double> = _accuracyFlow.asStateFlow()
+    val accuracyProperty = SimpleDoubleProperty(0.0)
+    var accuracy: Double
+        get() = accuracyProperty.value
+        set(value) { accuracyProperty.value = value }
+    fun accuracyProperty() = accuracyProperty
 
-    private val _isAccuracyInUseFlow = MutableStateFlow(false)
-    val isAccuracyInUseFlow: StateFlow<Boolean> = _isAccuracyInUseFlow.asStateFlow()
+    val isAccuracyInUseProperty = SimpleBooleanProperty(false)
+    var isAccuracyInUse: Boolean
+        get() = isAccuracyInUseProperty.value
+        set(value) { isAccuracyInUseProperty.value = value }
 
-    private val _isStableAllowedInUseFlow = MutableStateFlow(false)
-    val isStableAllowedInUseFlow: StateFlow<Boolean> = _isStableAllowedInUseFlow.asStateFlow()
+    val isStableAllowedInUseProperty = SimpleBooleanProperty(false)
+    var isStableAllowedInUse: Boolean
+        get() = isStableAllowedInUseProperty.value
+        set(value) { isStableAllowedInUseProperty.value = value }
 
-    private val _isStableInUseFlow = MutableStateFlow(false)
-    val isStableInUseFlow: StateFlow<Boolean> = _isStableInUseFlow.asStateFlow()
+    val isStableInUseProperty = SimpleBooleanProperty(false)
+    var isStableInUse: Boolean
+        get() = isStableInUseProperty.value
+        set(value) { isStableInUseProperty.value = value }
 
-    private val _isParallelInUseFlow = MutableStateFlow(false)
-    val isParallelInUseFlow: StateFlow<Boolean> = _isParallelInUseFlow.asStateFlow()
+    val isParallelInUseProperty = SimpleBooleanProperty(false)
+    var isParallelInUse: Boolean
+        get() = isParallelInUseProperty.value
+        set(value) { isParallelInUseProperty.value = value }
 
-    private val _serverFlow = MutableStateFlow("")
-    val serverFlow: StateFlow<String> = _serverFlow.asStateFlow()
+    val serverProperty = SimpleStringProperty("")
+    var server: String
+        get() = serverProperty.value
+        set(value) { serverProperty.value = value }
+    fun serverProperty() = serverProperty
 
-    private val _portFlow = MutableStateFlow(0)
-    val portFlow: StateFlow<Int> = _portFlow.asStateFlow()
-
-    val selectedMethodProperty = SimpleStringProperty("").also {
-        it.addListener { _, _, newValue -> _selectedMethodFlow.value = newValue as String }
-    }
-    var selectedMethod: String by selectedMethodProperty
-
-    val accuracyProperty = SimpleDoubleProperty(0.0).also {
-        it.addListener { _, _, newValue -> _accuracyFlow.value = newValue as Double }
-    }
-    var accuracy by accuracyProperty
-
-    val isAccuracyInUseProperty = SimpleBooleanProperty(false).also {
-        it.addListener { _, _, newValue -> _isAccuracyInUseFlow.value = newValue as Boolean }
-    }
-    var isAccuracyInUse by isAccuracyInUseProperty
-
-    val isStableAllowedProperty = SimpleBooleanProperty(false).also {
-        it.addListener { _, _, newValue -> _isStableAllowedInUseFlow.value = newValue as Boolean }
-    }
-    var isStableAllowedInUse by isStableAllowedProperty
-
-    val isStableInUseProperty = SimpleBooleanProperty(false).also {
-        it.addListener { _, _, newValue -> _isStableInUseFlow.value = newValue as Boolean }
-    }
-    var isStableInUse by isStableInUseProperty
-
-    val isParallelInUseProperty = SimpleBooleanProperty(false).also {
-        it.addListener { _, _, newValue -> _isParallelInUseFlow.value = newValue as Boolean }
-    }
-    var isParallelInUse by isParallelInUseProperty
-
-    val serverProperty = SimpleStringProperty("").also {
-        it.addListener { _, _, newValue -> _serverFlow.value = newValue as String }
-    }
-    var server: String by serverProperty
-
-    val portProperty = SimpleIntegerProperty(0).also {
-        it.addListener { _, _, newValue -> _portFlow.value = newValue as Int }
-    }
-    var port by portProperty
+    val portProperty = SimpleIntegerProperty(0)
+    var port: Int
+        get() = portProperty.value
+        set(value) { portProperty.value = value }
+    fun portProperty() = portProperty
 
     fun commit(model: IntegrationMethodParametersModel){
         selectedMethod = model.selectedMethod

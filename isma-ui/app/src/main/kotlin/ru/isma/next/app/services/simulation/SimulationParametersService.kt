@@ -13,21 +13,16 @@ import ru.isma.next.app.models.simulation.SimulationParametersModel
 class SimulationParametersService(methodNames: List<String>) {
     val integrationMethods = FXCollections.observableArrayList(methodNames)
 
-    val simplifyMethods = FXCollections.observableArrayList("Radial-Distance", "Douglas-Peucker")
-
     val cauchyInitials = CauchyInitialsViewModel()
 
     val integrationMethod = IntegrationMethodParametersViewModel()
 
     val resultSaving = ResultSavingParametersViewModel()
 
-    val resultProcessing = ResultProcessingParametersViewModel()
-
     val eventDetection = EventDetectionParametersViewModel()
 
     init {
         integrationMethod.selectedMethod = integrationMethods.first()
-        resultProcessing.selectedSimplifyMethod = simplifyMethods.first()
 
         cauchyInitials.step = 0.1
         cauchyInitials.startTime = 0.0
@@ -38,8 +33,6 @@ class SimulationParametersService(methodNames: List<String>) {
         integrationMethod.port = 7890
 
         resultSaving.savingTarget = SaveTarget.MEMORY
-
-        resultProcessing.tolerance = 20.0
 
         eventDetection.gamma = 0.8
         eventDetection.lowBorder = 0.001

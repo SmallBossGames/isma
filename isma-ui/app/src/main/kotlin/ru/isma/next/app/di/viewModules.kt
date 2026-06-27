@@ -70,7 +70,7 @@ val settingsPanelModule = module {
     single { CauchyInitialsView(get()) }
     single { EventDetectionView(get()) }
     single { MethodSettingsView(get()) }
-    single { ResultProcessingView(get()) }
+    single { ResultSavingView(get()) }
     single { SettingsPanelView(get(),get(),get(),get()) }
 }
 

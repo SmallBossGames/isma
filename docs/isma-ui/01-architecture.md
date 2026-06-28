@@ -1,4 +1,4 @@
-# ISMA-UI Architecture Overview
+# ISMA-UI Architecture
 
 ## Purpose
 
@@ -108,78 +108,33 @@ sequenceDiagram
 
 ### IProjectModel
 
-Defined in `app/src/main/kotlin/.../models/projects/IProjectModel.kt`:
-
-```kotlin
-interface IProjectModel {
-    var name: String
-    var file: File?
-    val editor: Node
-    fun nameProperty(): SimpleStringProperty
-    fun snapshot(): LismaTextModel
-    fun dispose()
-}
-```
-
-Two implementations exist:
-- `LismaProjectModel` — text-based LISMA projects, backed by `LismaProjectDataProvider` in a Koin scope
-- `BlueprintProjectModel` — visual statechart projects, backed by `BlueprintProjectDataProvider`
-
-Both implement `KoinScopeComponent` for per-project DI scoping.
+Defined in [`IProjectModel.kt`](app/src/main/kotlin/ru/isma/next/app/models/projects/IProjectModel.kt). Two implementations: `LismaProjectModel` and `BlueprintProjectModel`, both implementing `KoinScopeComponent` for per-project DI scoping.
 
 ### SimulationTask
 
-Tracks running, completed, failed, and cancelled simulations. Replaced the old `InProgressSimulationModel`.
+Defined in [`SimulationTask.kt`](app/src/main/kotlin/ru/isma/next/app/models/simulation/SimulationTask.kt). Tracks lifecycle state through `ObjectProperty<SimulationTaskStatus>` with a global `ALL` observable list shared across `SimulationTaskService`, `TasksPopOver`, and `SimulationResultService`.
 
-```kotlin
-enum class SimulationTaskStatus { RUNNING, COMPLETED, FAILED, CANCELLED }
+### SimulationService
 
-class SimulationTask(
-    val id: Long,
-    val modelName: String,
-    val parameters: SimulationParametersModel,
-    initialStatus: SimulationTaskStatus = SimulationTaskStatus.RUNNING,
-) {
-    val status: ObjectProperty<SimulationTaskStatus>
-    val progress: DoubleProperty
-    val error: ObjectProperty<String?>
-    var result: CompletedSimulationModel? = null
+Defined in [`SimulationService.kt`](app/src/main/kotlin/ru/isma/next/app/services/simulation/SimulationService.kt). 36-line thin coordinator that delegates to `SimulationTaskService`. See [`ui-components/02-services.md`](ui-components/02-services.md) for the full simulation pipeline.
 
-    companion object {
-        val ALL = FXCollections.observableArrayList<SimulationTask>()
-    }
-}
-```
+### SimulationTaskService
 
-- `status` — tracks lifecycle state (RUNNING → COMPLETED/FAILED/CANCELLED)
-- `progress` — normalized 0.0–1.0, updated by `SimulationTaskService` via `Platform.runLater`
-- `error` — set on failure, displayed in `TasksPopOver`
-- `result` — populated when status becomes COMPLETED
-- `ALL` — global observable list, shared across `SimulationTaskService`, `TasksPopOver`, and `SimulationResultService`
+Defined in [`SimulationTaskService.kt`](app/src/main/kotlin/ru/isma/next/app/services/simulation/SimulationTaskService.kt). 151 lines. Owns the `tasks` list and manages the 4-phase lifecycle (compile → run → monitor → download). Full algorithm in [`ui-components/02-services.md`](ui-components/02-services.md).
 
-### SimulationService (thin wrapper)
+## Architecture Decisions
 
-The `SimulationService` class is now a 36-line thin coordinator that delegates to `SimulationTaskService`. It snapshots parameters, resolves the active project, and calls `SimulationTaskService.submit()`.
+### Why Koin over constructor injection
+Koin provides a visible DI graph, scoped instances per project, and avoids verbose constructor chains across 7 modules. Constructor injection would require passing 10+ dependencies through every layer.
 
-```kotlin
-class SimulationService(
-    private val projectService: ProjectService,
-    private val simulationTaskService: SimulationTaskService,
-    private val simulationParametersService: SimulationParametersService,
-) : KoinComponent {
-    fun simulate() { ... }
-    fun stopSimulation(task: SimulationTask) { simulationTaskService.cancelTask(task) }
-    companion object { val SimulationScope = SimulationTaskService.SimulationScope }
-}
-```
+### Why virtual threads for simulation
+`Executors.newVirtualThreadPerTaskExecutor()` enables concurrent simulation runs without managing a bounded thread pool. Each simulation is an independent coroutine in a `SupervisorJob` scope.
 
-### SimulationTaskService (full lifecycle)
+### Why `SupervisorJob` for simulation scope
+Prevents cancellation propagation between concurrent simulations. If one simulation fails, it does not cancel other running simulations.
 
-The complete simulation pipeline moved to `SimulationTaskService` (151 lines). It owns the `tasks` list and manages the 4-phase lifecycle:
+### Why server-driven syntax highlighting
+Centralized grammar in the server avoids duplicating tokenization logic in the UI. The UI receives token positions and kinds via gRPC, then applies CSS class-based styling.
 
-1. **Compile** — `serverFacade.compileModel(sourceCode)`, populates `ModelErrorService`
-2. **Run** — `serverFacade.runSimulation(runParams)`, adds task to `tasks` list
-3. **Monitor** — `serverFacade.monitorSimulation(id)` flow → `task.setProgress(normalized)`
-4. **Download** — `serverFacade.downloadResultToCache(id)` → creates `CompletedSimulationModel` → sets `task.result` and `task.setStatus(COMPLETED)`
-
-All UI updates go through `Platform.runLater`. The coroutine scope uses Java 21 virtual threads (`Executors.newVirtualThreadPerTaskExecutor()`).
+### Why `BlueprintViewAdapter` abstraction
+Decouples the blueprint editor ViewModel from JavaFX types, enabling framework-independent logic. The concrete `JavaFxBlueprintViewAdapter` delegates to JavaFX `Pane.children` and `Tab` creation.

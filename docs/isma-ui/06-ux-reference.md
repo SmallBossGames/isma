@@ -156,61 +156,13 @@ A rich text editor with:
 
 #### Blueprint Editor Tab (Visual statechart)
 
-A drag-and-drop visual canvas for building state machines:
+A drag-and-drop visual canvas for building finite-state machines. The blueprint editor follows an MVVM pattern with a canvas (Pane), toolbar (bottom), and text editor integration. States are draggable boxes with transitions (arrows) and loop transitions (self-circles). For detailed specification — state boxes, transitions, popover, toolbar modes, geometry algorithms, LISMA conversion, dimensions — see [`blueprint-editor/README.md`](blueprint-editor/README.md).
 
-**Canvas layout:**
-- Scrollable pane with a "Diagram" tab
-- Two pre-created states: **Main** (green, top-left, non-editable) and **init** (blue, below Main, non-editable, no rename)
-- User-created states: Coral-colored rounded rectangles, draggable, editable names
-- Transitions: Arrows connecting states with optional predicate and alias labels
-- Loop transitions: Circular arrows self-connecting a state to itself
-
-**Toolbar (at the bottom of the blueprint editor):**
-
-| Button | Action |
-|--------|--------|
-| **New state** | Immediately creates a new state at position (10, 200) with an auto-generated name |
-| **New transition** → **Stop adding transaction** | Toggles add-transition mode — click source state, then click target state |
-| **Remove state** → **Stop remove state** | Toggles remove-state mode — click a state to delete it (and all its arrows) |
-| **Remove transition** → **Stop remove transition** | Toggles remove-transition mode — click an arrow to delete it |
-
-**Interaction modes (mutually exclusive):**
-
-1. **Default (drag) mode:** Drag states to reposition them on the canvas
-2. **Add transition mode:** Click a source state, then click a target state. If the same state is clicked twice, a loop (self-transition) is created. Mode auto-resets after creating the transition.
-3. **Remove state mode:** Click any user state to delete it along with all associated arrows. Main and Init states are protected — clicking them has no effect.
-4. **Remove transition mode:** Click any transition arrow to delete it
-
-**State box details:**
-- **Shape:** Rounded rectangle (arc radius 20px), width 110px, height 65px
-- **Colors:** Main state = LightGreen, init state = LightBlue, user states = Coral (default fill)
-- **Name editing:** Single-click a state to enter inline name-edit mode. Names must be unique across all states.
-- **Double-click:** Opens a text editor tab for editing the state's content text
-  - For regular states: tab named after the state (e.g., "MyState")
-  - For loop transitions: tab named "{stateName} (loop)"
-
-**Transition arrow details:**
-- **Regular transition:** Straight line with arrowhead from source state center to target state center
-- **Loop transition:** Circle (radius 40px) attached to the state, arrowhead returns to the state
-- **Label:** Shows the predicate condition and/or alias name
-- **Single-click arrow body:** Opens Edit Arrow PopOver (see below)
-- **Single-click arrowhead:** Opens Edit Arrow PopOver
-- **Double-click arrowhead:** Opens a text editor tab for editing loop content
-
-**Edit Arrow PopOver:**
-- Floating white card with DropShadow, positioned near the clicked arrow
-- Contains two labeled text fields:
-  - **"Alias (optional)"** — optional label for the transition
-  - **"Predicate"** — the condition/trigger for the transition
-- Changes are reflected on the arrow in real-time (bidirectional binding)
-- Auto-closes when mouse exits the popover
-
-**Blueprint-to-LISMA conversion:**
-When a blueprint project is compiled/simulated, the visual statechart is automatically converted to LISMA text format:
-- Main state → `state "Main" { ... }`
-- Init state → `state "init" { ... }`
-- Transitions → `state "predicate" { ... } from startState;`
-- Loop transitions → pseudo-state pattern with `(predicate)` syntax
+**Key behaviors:**
+- **Canvas layout:** Scrollable pane with "Diagram" tab, two fixed states (Main/init), and user-created states
+- **Toolbar:** New state, New transition/Stop, Remove state/Stop, Remove transition/Stop
+- **Interaction modes:** Mutually exclusive — Default (drag), Add transition, Remove state, Remove transition
+- **Blueprint-to-LISMA conversion:** Automatic at compile time — states become `state "Name" { ... }`, transitions become `from startState;`, loops use pseudo-state expansion
 
 ---
 
@@ -810,65 +762,9 @@ sequenceDiagram
 
 ---
 
-## Blueprint Editor Interaction Model (Detailed)
+## Blueprint Editor Interaction Model
 
-### State Creation Flow
-
-```mermaid
-stateDiagram-v2
-    [*] --> DefaultMode
-    DefaultMode --> AddStateMode: Click "New state" toolbar button
-    AddStateMode --> Canvas: Click on canvas
-    Canvas --> AddStateMode: Continue adding states
-    AddStateMode --> DefaultMode: Reset mode / select another tool
-
-    state Canvas {
-        [*] --> EditingName: Single-click state
-        EditingName --> DefaultMode: Press Enter / lose focus
-        DefaultMode --> Dragging: Click and drag
-        Dragging --> DefaultMode: Release mouse
-        DefaultMode --> OpenTextEditor: Double-click state
-        OpenTextEditor --> DefaultMode: Close text tab
-    }
-
-    DefaultMode --> AddTransitionMode: Click "New transition" toolbar button
-    AddTransitionMode --> WaitForSource: Click first state
-    WaitForSource --> WaitForTarget: Click second state
-    WaitForTarget --> DefaultMode: Arrow created
-    WaitForTarget --> LoopMode: Same state clicked twice
-    LoopMode --> DefaultMode: Loop arrow created
-
-    DefaultMode --> RemoveStateMode: Click "Remove state" toolbar button
-    RemoveStateMode --> Canvas: Click state to delete
-    Canvas --> DefaultMode: State removed
-
-    DefaultMode --> RemoveTransitionMode: Click "Remove transition" toolbar button
-    RemoveTransitionMode --> Canvas: Click arrow to delete
-    Canvas --> DefaultMode: Arrow removed
-```
-
-### State Box Properties
-
-| Property | Type | Constraint |
-|----------|------|------------|
-| Name | String | Must be unique across all states |
-| Position (X, Y) | Double | Minimum 0 for both axes |
-| Content text | String | Arbitrary text, edited in separate text editor tab |
-| Fill color | Paint | Coral (user), LightGreen (Main), LightBlue (init) |
-| Dimensions | Width=110, Height=65 | Fixed for all user states |
-| Editable | Boolean | False for Main and init states; True for user states |
-| Edit button visible | Boolean | False for init state; True for all others |
-
-### Transition Properties
-
-| Property | Type | Constraint |
-|----------|------|------------|
-| Source state | StateBox reference | Required |
-| Target state | StateBox reference | Required (different from source for regular, same for loop) |
-| Predicate | String | Condition expression |
-| Alias | String | Optional label |
-| Arrowhead | Polygon | Auto-rotated to match line angle |
-| Connection | Bound to state centers | Updates when states are dragged |
+For detailed specification of the blueprint editor interaction model (state creation flow, interaction modes, state box properties, transition properties, toolbar modes), see [`blueprint-editor/02-algorithms.md`](blueprint-editor/02-algorithms.md) and [`blueprint-editor/03-ux-spec.md`](blueprint-editor/03-ux-spec.md).
 
 ---
 

@@ -10,13 +10,13 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 
 | Document | Description |
 | --- | --- |
-| [Overview](01-overview.md) | Architecture, module structure, dependency graph, DI wiring |
+| [Architecture](01-architecture.md) | Design principles, module structure, dependency graph, startup flow, architecture decisions |
 | [Domain Layer](02-domain-layer.md) | Domain models, interfaces, result streaming |
 | [External Services](03-external-services.md) | gRPC client, HTTP client, server lifecycle, facade |
-| [UI Components](04-ui-components.md) | App entry point, views, editors, toolbars, models |
+| [UI Components](ui-components/README.md) | App module structure, DI, services, views, editors |
 | [Build & Deployment](05-build-and-deployment.md) | Gradle config, modules, dependencies, startup |
 | [UX Reference](06-ux-reference.md) | Complete user experience specification: windows, menus, dialogs, transitions, features |
-| [Blueprint Editor UX](07-blueprint-editor-ux.md) | Detailed specification of the visual statechart editor: canvas, states, arrows, popover, toolbar, modes, LISMA conversion, Avalonia migration mapping |
+| [Blueprint Editor](blueprint-editor/README.md) | MVVM architecture, algorithms (geometry, name uniqueness, LISMA conversion), UX spec (states, transitions, popover, toolbar, modes, dimensions) |
 | [Use Cases](use-cases/README.md) | End-to-end user flows: startup, editing, simulation, results, multi-project workflows |
 
 ## Key Files
@@ -95,11 +95,11 @@ When running via Gradle (`JavaExec`), these are auto-configured to `$rootDir/bui
 
 | Document | Target Audience |
 | --- | --- |
-| [01-overview](01-overview.md) | Architects, contributors understanding module layout |
+| [01-architecture](01-architecture.md) | Architects, contributors understanding module layout and design decisions |
 | [02-domain-layer](02-domain-layer.md) | Backend developers working with simulation models |
 | [03-external-services](03-external-services.md) | Developers modifying server communication |
-| [04-ui-components](04-ui-components.md) | Developers modifying existing JavaFX UI |
+| [ui-components/](ui-components/README.md) | Developers modifying existing JavaFX UI |
 | [05-build-and-deployment](05-build-and-deployment.md) | DevOps, contributors setting up the build |
 | [06-ux-reference](06-ux-reference.md) | Anyone implementing a replacement UI with feature parity |
-| [07-blueprint-editor-ux](07-blueprint-editor-ux.md) | Migrator implementing the Avalonia statechart editor, or anyone needing deep canvas/interaction details |
+| [blueprint-editor/](blueprint-editor/README.md) | Developers implementing or modifying the visual statechart editor, or anyone needing deep canvas/interaction details |
 | [Use Cases](use-cases/README.md) | Product owners, testers, and new contributors understanding end-to-end user workflows |

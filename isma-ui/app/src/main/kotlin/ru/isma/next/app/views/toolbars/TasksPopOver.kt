@@ -26,7 +26,7 @@ import ru.isma.next.app.services.simulation.ISimulationTaskService
 class TasksPopOver(
     private val simulationTaskService: ISimulationTaskService,
     private val simulationResultService: SimulationResultService,
-): PopOver() {
+) : PopOver() {
     private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
     private val inProgressContainer = VBox()
@@ -236,7 +236,7 @@ class TasksPopOver(
                 .appendLine("Method: ${parameters.integrationMethodParameters.selectedMethod}")
                 .appendLine("Is accurate: ${parameters.integrationMethodParameters.isAccuracyInUse}")
 
-            if(parameters.integrationMethodParameters.isAccuracyInUse){
+            if (parameters.integrationMethodParameters.isAccuracyInUse) {
                 builder.appendLine("Accuracy: ${parameters.integrationMethodParameters.accuracy}")
             }
 

@@ -6,46 +6,11 @@ ISMA-UI is a multi-module JavaFX desktop application that provides editing, simu
 
 ## Module Structure
 
-```
-isma-ui/
-├── app/                          # Main application entry point
-│   └── src/main/kotlin/ru/isma/next/app/
-│       ├── launcher/             # IsmaApplication, Koin DI root, GrinProcessLauncher
-│       ├── models/               # UI models (projects, simulation, preferences)
-│       ├── services/             # Business logic services
-│       ├── viewmodels/           # Plain JavaFX property-based view models for settings
-│       ├── views/                # JavaFX UI components (MainView, toolbars, settings)
-│       ├── utilities/            # BlueprintModel extensions (convertToLisma)
-│       ├── extensions/           # ButtonExtensions.kt (Ikonli helpers removed)
-│       └── constants/            # File extension constants, preferences paths
-├── domain/                       # Pure Kotlin domain models (no UI deps)
-├── external-services/            # gRPC clients, HTTP client, server manager
-├── grpc/                         # Generated gRPC stubs
-├── text-editor/                  # Rich text editor with syntax highlighting
-├── blueprint-editor/             # Visual statechart editor
-└── toolkit/                      # Shared JavaFX utilities
-```
+The `isma-ui/` directory contains the following modules: `app/` (main application entry point with launcher, models, services, viewmodels, views, utilities, extensions, and constants), `domain/` (pure Kotlin domain models with no UI dependencies), `external-services/` (gRPC clients, HTTP client, server manager), `grpc/` (generated gRPC stubs), `text-editor/` (rich text editor with syntax highlighting), `blueprint-editor/` (visual statechart editor), and `toolkit/` (shared JavaFX utilities).
 
 ## Dependency Graph
 
-```mermaid
-flowchart LR
-    app["app"] --> text-editor
-    app --> blueprint-editor
-    app --> toolkit
-    app --> external-services
-    app --> grpc
-    app --> domain
-
-    external-services --> grpc
-    external-services --> domain
-    external-services --> exchange-format
-
-    blueprint-editor --> text-editor
-    blueprint-editor --> toolkit
-```
-
-The `app` module depends on all other isma-ui modules. `external-services` depends on `grpc` and `domain`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
+The `app` module depends on all other isma-ui modules (text-editor, blueprint-editor, toolkit, external-services, grpc, domain). The `external-services` module depends on `grpc`, `domain`, and `exchange-format`. The `blueprint-editor` module depends on `text-editor` and `toolkit`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
 
 ## Design Principles
 
@@ -58,15 +23,7 @@ The `app` module depends on all other isma-ui modules. `external-services` depen
 
 ### Koin Dependency Injection
 
-All services and UI components are instantiated through Koin. There are no constructors called manually outside the DI root. The DI hierarchy follows module boundaries:
-
-```
-simulationServerModule → appServicesModule → grinProcessLauncherModule
-    → editorModule → lismaTextEditorModule → blueprintEditorModule
-    → toolbarsModule → editorTabPaneModule → settingsPanelModule → mainViewModule
-```
-
-Service-layer DI modules are defined in `di/serviceModules.kt` (replacing the old `services/koin/KoinExtentions.kt`). View-layer DI modules are in `di/viewModules.kt` (replacing `views/koin/KoinExtensions.kt`).
+All services and UI components are instantiated through Koin. There are no constructors called manually outside the DI root. The DI hierarchy follows module boundaries: simulationServerModule → appServicesModule → grinProcessLauncherModule → editorModule → lismaTextEditorModule → blueprintEditorModule → toolbarsModule → editorTabPaneModule → settingsPanelModule → mainViewModule. Service-layer DI modules are defined in `di/serviceModules.kt` (replacing the old `services/koin/KoinExtentions.kt`). View-layer DI modules are in `di/viewModules.kt` (replacing `views/koin/KoinExtensions.kt`).
 
 Scoped DI is used for project-specific editors: each `LismaProjectModel` and `BlueprintProjectModel` gets its own Koin scope with scoped `IsmaTextEditor` instances that are cleaned up on `dispose()`.
 
@@ -84,25 +41,31 @@ UI state is managed through JavaFX `ObservableList` and `ObservableSet` collecti
 
 ```mermaid
 sequenceDiagram
-    participant Main as Launcher.main()
-    participant App as IsmaApplication
-    participant Koin as ismaKoinStart()
-    participant Server as SimulationServerFacade
-    participant JavaFX as JavaFX.start()
+    participant U as User
+    participant L as Launcher.main()
+    participant JFX as JavaFX Application
+    participant K as Koin DI
+    participant S as SimulationServerFacade
+    participant JVM as Server Process
+    participant M as MainView
 
-    Main->>App: Application.launch()
-    App->>Koin: init block → startKoin()
-    Koin-->>App: Koin ready
-    App->>Server: warmup()
-    Server->>Server: start server process
-    Server->>Server: create gRPC + HTTP clients
-    Server-->>App: warmup complete
-    App->>JavaFX: start(stage)
-    JavaFX->>JavaFX: create Scene(MainView)
-    JavaFX->>JavaFX: load window preferences
-    JavaFX->>JavaFX: open last projects
-    JavaFX->>JavaFX: show stage
+    U->>L: Launch application
+    L->>JFX: Application.launch(IsmaApplication)
+    JFX->>JFX: init block
+    JFX->>K: startKoin()
+    K-->>JFX: DI container ready
+    JFX->>S: warmup()
+    S->>JVM: Launch server process
+    JVM-->>S: gRPC + HTTP socket paths
+    S-->>JFX: warmup complete
+    JFX->>JFX: JavaFX.start(stage)
+    JFX->>M: new Scene(MainView)
+    M->>M: Load window preferences
+    M->>M: Open last projects
+    M-->>U: Show main window
 ```
+
+The startup sequence follows this flow: `Launcher.main()` calls `Application.launch(IsmaApplication::class.java)`. The `IsmaApplication.init` block calls `startKoin()` to initialize the Koin DI container. After Koin is ready, `warmup()` is called on `SimulationServerFacade`, which starts the server process and creates the gRPC and HTTP clients. Once warmup completes, `JavaFX.start(stage)` is invoked, which creates a `Scene` with `MainView`, loads window preferences, opens the last projects, and shows the stage. See `IsmaApplication.kt` in the launcher package for the full implementation.
 
 ## Key Interfaces
 

@@ -118,98 +118,158 @@ JSON file persistence using `kotlinx.serialization`. Constructor takes `settings
 
 ```mermaid
 sequenceDiagram
-    participant SimSvc as SimulationService
-    participant TaskSvc as SimulationTaskService
-    participant Facade as SimulationServerFacade
-    participant ErrSvc as ModelErrorService
+    participant SS as SimulationService
+    participant STS as SimulationTaskService
+    participant Facade as ServerFacade
+    participant Server as ISMA Server
+    participant ErrorSvc as ModelErrorService
+    participant Tasks as TasksPopOver
     participant ResultSvc as SimulationResultService
 
-    SimSvc->>TaskSvc: submit(modelName, params, simParams)
-    TaskSvc->>Facade: compileModel(source)
-    Facade-->>TaskSvc: CompileResult
-    alt errors
-        TaskSvc->>ErrSvc: putErrorList(ErrorViewModel[])
-        TaskSvc-->>SimSvc: Task FAILED
-    else success
-        TaskSvc->>Facade: runSimulation(params)
-        Facade-->>TaskSvc: simulationId
-        TaskSvc->>Facade: monitorSimulation(id)
-        Facade-->>TaskSvc: Flow<SimulationProgress>
-        TaskSvc->>TaskSvc: task.setProgress(normalized)
-        TaskSvc->>Facade: downloadResultToCache(id)
-        Facade-->>TaskSvc: CachedSimulationResult
-        TaskSvc->>ResultSvc: Task COMPLETED + result
+    SS->>STS: submit(modelName, params, simParams)
+    STS->>Facade: compileModel(source)
+    Facade->>Server: gRPC CompileRequest
+    Server-->>Facade: CompileResponse
+    alt Compilation errors
+        Facade-->>ErrorSvc: putErrorList(errors)
+        Facade-->>STS: FAILED
+        STS-->>Tasks: Add Failed row
+        STS-->>SS: FAILED
+    else Compilation success
+        STS->>Facade: runSimulation(params)
+        Facade->>Server: gRPC RunSimulationRequest
+        Server-->>Facade: simulationId
+        STS->>Facade: monitorSimulation(id)
+        Facade->>Server: gRPC monitor stream
+        Server-->>Facade: Flow<SimulationProgress>
+        loop Progress updates
+            Facade-->>STS: SimulationProgress
+            STS-->>Tasks: Update progress bar
+        end
+        STS->>Facade: downloadResultToCache(id)
+        Facade->>Server: gRPC getSimulationResult()
+        Server-->>Facade: download URL
+        Facade->>Facade: HTTP GET binary file
+        Facade-->>STS: CachedSimulationResult
+        STS->>STS: setStatus(COMPLETED)
+        STS->>STS: task.result = result
+        STS->>ResultSvc: pass completed task
+        STS-->>SS: COMPLETED
     end
 ```
+
+The service data flow follows this sequence: `SimulationService` calls `SimulationTaskService.submit(modelName, params, simParams)`. `SimulationTaskService` calls `Facade.compileModel(source)`. If errors, they are sent to `ModelErrorService.putErrorList(ErrorViewModel[])` and the task returns FAILED to `SimulationService`. If success: `runSimulation(params)` returns a `simulationId`, then `monitorSimulation(id)` returns a `Flow<SimulationProgress>` which is used to call `task.setProgress(normalized)`, then `downloadResultToCache(id)` returns a `CachedSimulationResult`, and finally the task is marked COMPLETED with the result and passed to `SimulationResultService`.
 
 ## CSV Export Algorithm
 
 ```mermaid
-flowchart TD
-    Start["SimulationResultService.exportToFile()"] --> FileChooser["FileChooser opens"]
-    FileChooser --> Result["Get CompletedSimulationModel from task"]
-    Result --> Header["buildHeader(): x, DE codes, AE codes, fN codes"]
-    Header --> Stream["BinaryFilePointProvider.results.collect { }"]
-    Stream --> Write["writer.appendLine(value.toCsvLine())"]
-    Write --> Done["CSV file written"]
+sequenceDiagram
+    participant User as User
+    participant Tasks as TasksPopOver
+    participant ResultSvc as SimulationResultService
+    participant FC as FileChooser
+    participant CompSim as CompletedSimulationModel
+    participant BPP as BinaryFilePointProvider
+    participant Writer as Buffered Writer
+    participant File as CSV file
 
-    subgraph CSV Format
-        Header --> H["x, DE_1, DE_2, ..., AE_1, ..., f0, f1, ..."]
+    User->>Tasks: Click "Export"
+    Tasks->>ResultSvc: exportToFile(task, file)
+    ResultSvc->>FC: Open file chooser (.csv)
+    FC-->>ResultSvc: User selects path
+    ResultSvc->>CompSim: Get from task
+    ResultSvc->>BPP: results (Flow<SimulationPoint>)
+    ResultSvc->>Writer: Create buffered writer
+    Writer->>Writer: Write header: x, DE cols, AE cols, fN cols
+    loop Each SimulationPoint
+        BPP-->>ResultSvc: SimulationPoint
+        ResultSvc->>Writer: appendLine(point.toCsvLine())
     end
+    Writer->>File: Flush and close
+    File-->>ResultSvc: Written
 ```
 
-CSV header: `x, [DE column names], [AE column names], f0, f1, ..., fN`. Each subsequent row = one simulation time step. Runs on `Dispatchers.IO` via `ResultServiceScope` (`CoroutineScope(Dispatchers.Default)`).
+`SimulationResultService.exportToFile()` opens a FileChooser, gets the `CompletedSimulationModel` from the task, builds a CSV header with `x, DE codes, AE codes, fN codes`, streams `BinaryFilePointProvider.results` and writes each value via `writer.appendLine(value.toCsvLine())`. CSV header: `x, [DE column names], [AE column names], f0, f1, ..., fN`. Each subsequent row = one simulation time step. Runs on `Dispatchers.IO` via `ResultServiceScope` (`CoroutineScope(Dispatchers.Default)`).
 
 ## Parameter Snapshot / Commit Pattern
 
 ```mermaid
-flowchart LR
-    subgraph ViewModel Layer
-        VM1["CauchyInitialsViewModel"]
-        VM2["IntegrationMethodParametersViewModel"]
-        VM3["EventDetectionParametersViewModel"]
-        VM4["ResultSavingParametersViewModel"]
+graph LR
+    subgraph Snapshot Flow → Server
+        subgraph ViewModels
+            Cauchy[CauchyInitialsViewModel<br/>snapshot()]
+            Integration[IntegrationMethodParametersViewModel<br/>snapshot()]
+            Event[EventDetectionParametersViewModel<br/>snapshot()]
+            ResultSaving[ResultSavingParametersViewModel<br/>snapshot()]
+        end
+        ParamsSvc[SimulationParametersService<br/>snapshot() + toRunSimulationParams()]
+        RunParams[RunSimulationParams]
+        Server[ISMA Server gRPC]
+
+        Cauchy --> ParamsSvc
+        Integration --> ParamsSvc
+        Event --> ParamsSvc
+        ResultSaving --> ParamsSvc
+        ParamsSvc --> RunParams
+        RunParams --> Server
     end
 
-    subgraph Service Layer
-        ParamsSvc["SimulationParametersService"]
+    subgraph Commit Flow ← Preset
+        ParamsModel[SimulationParametersModel]
+        ParamsSvc2[SimulationParametersService<br/>commit(model)]
+        Cauchy2[CauchyInitialsViewModel<br/>commit(model)]
+        Integration2[IntegrationMethodParametersViewModel<br/>commit(model)]
+        Event2[EventDetectionParametersViewModel<br/>commit(model)]
+        ResultSaving2[ResultSavingParametersViewModel<br/>commit(model)]
+
+        ParamsModel --> ParamsSvc2
+        ParamsSvc2 --> Cauchy2
+        ParamsSvc2 --> Integration2
+        ParamsSvc2 --> Event2
+        ParamsSvc2 --> ResultSaving2
     end
-
-    subgraph Model Layer
-        SimModel["SimulationParametersModel"]
-        RunParams["RunSimulationParams"]
-    end
-
-    VM1 -->|snapshot()| SimModel
-    VM2 -->|snapshot()| SimModel
-    VM3 -->|snapshot()| SimModel
-    VM4 -->|snapshot()| SimModel
-
-    SimModel -->|toRunSimulationParams()| RunParams
-
-    SimModel -->|commit(model)| VM1
-    SimModel -->|commit(model)| VM2
-    SimModel -->|commit(model)| VM3
-    SimModel -->|commit(model)| VM4
 ```
 
-- **Snapshot flow (ViewModel → Model → Server):** `snapshot()` on each ViewModel captures `Simple*Property` values into data class → `SimulationParametersService.snapshot()` assembles `SimulationParametersModel` → `toRunSimulationParams()` converts to `RunSimulationParams` → sent to server via gRPC
+The snapshot/commit pattern has two flows:
+
+- **Snapshot flow (ViewModel → Model → Server):** `snapshot()` on each ViewModel (CauchyInitialsViewModel, IntegrationMethodParametersViewModel, EventDetectionParametersViewModel, ResultSavingParametersViewModel) captures `Simple*Property` values into data class → `SimulationParametersService.snapshot()` assembles `SimulationParametersModel` → `toRunSimulationParams()` converts to `RunSimulationParams` → sent to server via gRPC
 - **Commit flow (Model → ViewModel):** `commit(model)` on each ViewModel applies values from `SimulationParametersModel` to `Simple*Property` instances
 
 ## Error Propagation Flow
 
 ```mermaid
-flowchart LR
-    Server["Server (compile/validate)"] --> Facade["SimulationServerFacade"]
-    Facade --> CompileResult["CompileResult(errors: List<CompilationErrorDto>)"]
-    CompileResult --> ErrorSvc["ModelErrorService.putErrorList()"]
-    ErrorSvc --> ErrorViewModel["ErrorViewModel(row, position, fragment, message)"]
-    ErrorViewModel --> ErrorList["IsmaErrorListTable (TableView)"]
+graph TB
+    subgraph Server Side
+        Server[ISMA Server<br/>Compile/Validate]
+    end
 
-    CompileResult -.-> TaskSvc["SimulationTaskService"]
-    TaskSvc --> TaskFailed["task.setStatus(FAILED)"]
-    TaskFailed --> TasksPO["TasksPopOver (Failed section)"]
+    subgraph Client Side
+        Facade[SimulationServerFacade<br/>CompileResult<br/>errors: List<CompilationErrorDto>]
+
+        subgraph Compile Errors
+            STS[SimulationTaskService<br/>setStatus(FAILED)]
+            Tasks[TasksPopOver<br/>Failed section]
+        end
+
+        subgraph Validation Errors
+            LismaPde[LismaPdeService<br/>LismaPdeTranslationResult]
+        end
+
+        ErrorSvc[ModelErrorService<br/>putErrorList()]
+        ErrorVM[ErrorViewModel<br/>row, position, fragment, message]
+        ErrorTable[IsmaErrorListTable<br/>TableView<ErrorViewModel>]
+    end
+
+    Server --> Facade
+    Facade --> STS
+    STS --> Tasks
+    Facade --> ErrorSvc
+    LismaPde --> ErrorSvc
+    ErrorSvc --> ErrorVM
+    ErrorVM --> ErrorTable
 ```
+
+The error propagation flow: Server (compile/validate) → `SimulationServerFacade` → `CompileResult(errors: List<CompilationErrorDto>)` → `ModelErrorService.putErrorList()` → `ErrorViewModel(row, position, fragment, message)` → `IsmaErrorListTable` (TableView). The `CompileResult` also flows to `SimulationTaskService` which sets `task.setStatus(FAILED)` and then to `TasksPopOver` (Failed section).
 
 Error sources:
 - **Compilation errors** (Phase 1 of simulation): `CompilationErrorDto[]` → `ErrorViewModel[]` → `ModelErrorService` → `IsmaErrorListTable`
@@ -221,19 +281,41 @@ Error sources:
 ```mermaid
 stateDiagram-v2
     [*] --> Created: ProjectService.createNew() / createNewBlueprint()
+
     Created --> ScopeCreated: KoinScopeComponent.createScope()
-    ScopeCreated --> Injected: scopedOf(::LismaProjectDataProvider)\nscopedOf(::IsmaTextEditor)
+
+    ScopeCreated --> Injected: scopedOf(::LismaProjectDataProvider / ::IsmaTextEditor)
+
     Injected --> TabCreated: IsmaEditorTabPane observes addedAsFlow()
+
     TabCreated --> Active: Tab selection → activeProject = project
+
     Active --> Closed: Tab closeRequest → projectService.close()
-    Closed --> Disposed: scope.close()\n→ IsmaTextEditor.dispose()
+
+    Closed --> Disposed: scope.close() → IsmaTextEditor.dispose()
+
     Disposed --> [*]
 
-    state ScopeCreated {
-        [*] --> LISMA: LismaProjectModel\n→ LismaProjectDataProvider\n→ IsmaTextEditor (scoped)\n→ Node qualifier
-        [*] --> Blueprint: BlueprintProjectModel\n→ BlueprintProjectDataProvider\n→ IsmaBlueprintEditor (scoped)\n→ ITextEditorFactory (scoped)\n→ IsmaTextEditor (factory)\n→ Node qualifier
-    }
+    note right of ScopeCreated
+        LISMA path: LismaProjectModel →
+        LismaProjectDataProvider →
+        IsmaTextEditor (scoped) → Node qualifier
+
+        Blueprint path: BlueprintProjectModel →
+        BlueprintProjectDataProvider →
+        IsmaBlueprintEditor (scoped) →
+        ITextEditorFactory (scoped) →
+        IsmaTextEditor (factory) → Node qualifier
+    end note
 ```
+
+The component lifecycle follows this state diagram:
+
+`[*]` → `Created` (ProjectService.createNew() / createNewBlueprint()) → `ScopeCreated` (KoinScopeComponent.createScope()) → `Injected` (scopedOf(::LismaProjectDataProvider) / scopedOf(::IsmaTextEditor)) → `TabCreated` (IsmaEditorTabPane observes addedAsFlow()) → `Active` (Tab selection → activeProject = project) → `Closed` (Tab closeRequest → projectService.close()) → `Disposed` (scope.close() → IsmaTextEditor.dispose()) → `[*]`.
+
+In the `ScopeCreated` state:
+- **LISMA path:** LismaProjectModel → LismaProjectDataProvider → IsmaTextEditor (scoped) → Node qualifier
+- **Blueprint path:** BlueprintProjectModel → BlueprintProjectDataProvider → IsmaBlueprintEditor (scoped) → ITextEditorFactory (scoped) → IsmaTextEditor (factory) → Node qualifier
 
 **Project creation:**
 1. `ProjectService.createNew()` → `LismaProjectModel` or `ProjectService.createNewBlueprint()` → `BlueprintProjectModel`

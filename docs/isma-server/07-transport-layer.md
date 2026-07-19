@@ -13,35 +13,7 @@ This document covers the Netty-based Unix domain socket transport in detail.
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    subgraph Client["ISMA UI (JavaFX)"]
-        UI["UI Process"]
-    end
-    
-    subgraph Server["isma-server Process"]
-        direction LR
-        App["app/"]
-        Dom["domain/"]
-        Infra["infrastructure/"]
-    end
-    
-    subgraph UnixSockets["Unix Domain Sockets"]
-        direction LR
-        G["isma-{UUID}.sock<br/>gRPC (port 0)"
-        H["isma-http-{UUID}.sock<br/>HTTP (port 0)"
-    end
-    
-    UI -->|"gRPC calls<br/>via Unix socket"| G
-    G --> App
-    App --> Dom
-    Dom --> Infra
-    
-    UI -->|"GET /simulation/{id}/download"<br/>via Unix socket| H
-    H --> App
-    
-    App --> Infra
-```
+The ISMA UI (JavaFX process) communicates with the isma-server process via two Unix domain sockets: `isma-{UUID}.sock` for gRPC (port 0) and `isma-http-{UUID}.sock` for HTTP (port 0). The UI sends gRPC calls over the gRPC socket to the `app/` module, which delegates to `domain/` and then `infrastructure/`. The UI also sends HTTP GET requests to `/simulation/{id}/download` over the HTTP socket, which is handled by the `app/` module's embedded Ktor server.
 
 ### Socket Paths
 
@@ -58,89 +30,17 @@ UUIDs are generated at startup to avoid collisions between concurrent server ins
 
 ### 1. Dependencies
 
-```kotlin
-// app/build.gradle.kts
-implementation(libs.grpc.netty)           // io.grpc:grpc-netty:1.82.0
-implementation(libs.netty.transport)           // io.netty:netty-transport:4.2.15.Final
-implementation(libs.netty.transport.classes.epoll)  // io.netty:netty-transport-classes-epoll:4.2.15.Final
-implementation(libs.netty.transport.native.epoll) {
-    classifier = "linux-x86_64"               // Native epoll library (Linux)
-}
-implementation(libs.netty.transport.native.epoll) {
-    classifier = "windows-x86_64"             // Native epoll library (Windows 11)
-}
-implementation(libs.netty.codec)               // io.netty:netty-codec:4.2.15.Final
-implementation(libs.netty.handler)             // io.netty:netty-handler:4.2.15.Final
-```
+See `app/build.gradle.kts` for the full dependency declarations. The server depends on `grpc-netty`, `netty-transport`, `netty-transport-classes-epoll`, `netty-transport-native-epoll` (with `linux-x86_64` and `windows-x86_64` classifiers), `netty-codec`, and `netty-handler`.
 
 ### 2. Server Bootstrap Code
 
-Platform detection dispatches to platform-specific setup objects. Epoll code lives in `LinuxServerSetup`, NIO code in `WindowsServerSetup`:
+Platform detection dispatches to platform-specific setup objects. See `Application.kt` for the bootstrap code that detects Linux vs. other platforms and creates gRPC handles accordingly.
 
-```kotlin
-// Application.kt
-val isLinux = System.getProperty("os.name")?.contains("linux", ignoreCase = true) == true
-val grpcHandles = if (isLinux) {
-    LinuxServerSetup.createGrpcHandles(socketPath, koin)
-} else {
-    WindowsServerSetup.createGrpcHandles(socketPath, koin)
-}
+**Linux path** (`LinuxServerSetup.kt`): Creates `MultiThreadIoEventLoopGroup` with `EpollIoHandler.newFactory()` for both boss and worker groups, builds a `NettyServerBuilder` with `EpollServerDomainSocketChannel`, registers both gRPC services and the reflection service, and returns `GrpcServerHandles`.
 
-val httpServer = embeddedServer(CIO, configure = {
-    unixConnector(httpSocketPath) { }
-}) {
-    routing { simulationResultRoutes(koin.sessionStore) }
-}
+**Windows path** (`WindowsServerSetup.kt`): Creates `NioEventLoopGroup()` for both boss and worker groups, builds a `NettyServerBuilder` with `NioServerSocketChannel`, registers both gRPC services and the reflection service, and returns `GrpcServerHandles`.
 
-val handles = ServerHandles(grpcHandles.grpcServer, httpServer, grpcHandles.bossGroup, grpcHandles.workerGroup)
-```
-
-**Linux path** (`LinuxServerSetup.kt`):
-```kotlin
-object LinuxServerSetup {
-    fun createGrpcHandles(socketPath: String, koin: KoinHolder): GrpcServerHandles {
-        val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-        val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-        val grpcServer = NettyServerBuilder
-            .forAddress(DomainSocketAddress(socketPath))
-            .channelType(EpollServerDomainSocketChannel::class.java)
-            .bossEventLoopGroup(bossGroup)
-            .workerEventLoopGroup(workerGroup)
-            .addService(koin.grpcService)
-            .addService(koin.compilerService)
-            .addService(ProtoReflectionServiceV1.newInstance())
-            .build()
-        return GrpcServerHandles(grpcServer, bossGroup, workerGroup)
-    }
-}
-```
-
-**Windows path** (`WindowsServerSetup.kt`):
-```kotlin
-object WindowsServerSetup {
-    fun createGrpcHandles(socketPath: String, koin: KoinHolder): GrpcServerHandles {
-        val bossGroup = NioEventLoopGroup()
-        val workerGroup = NioEventLoopGroup()
-        val grpcServer = NettyServerBuilder
-            .forAddress(DomainSocketAddress(socketPath))
-            .channelType(NioServerSocketChannel::class.java)
-            .bossEventLoopGroup(bossGroup)
-            .workerEventLoopGroup(workerGroup)
-            .addService(koin.grpcService)
-            .addService(koin.compilerService)
-            .addService(ProtoReflectionServiceV1.newInstance())
-            .build()
-        return GrpcServerHandles(grpcServer, bossGroup, workerGroup)
-    }
-}
-```
-
-**Print socket paths:**
-```kotlin
-println("GRPC_SOCKET=$socketPath")
-println("HTTP_SOCKET=$httpSocketPath")
-handles.grpcServer.awaitTermination()
-```
+**Print socket paths:** See `Application.kt` for the `println("GRPC_SOCKET=...")` and `println("HTTP_SOCKET=...")` calls followed by `handles.grpcServer.awaitTermination()`.
 
 ### 3. Key Components
 
@@ -163,54 +63,25 @@ The server automatically detects platform capabilities at runtime:
 
 ### Startup Phase
 
-```
-1. CLI argument parsing
-   └─> Determine socket paths (--socket-path / --http-socket-path)
-
-2. Socket cleanup
-   └─> File(socketPath).delete()  ← Remove stale socket files from crashes
-
-3. Koin DI initialization
-   └─> modules(domainModule, infrastructureModule, appModule)
-
-4. Netty event loop groups
-   └─> bossGroup + workerGroup (Epoll on Linux, NIO on Windows 11)
-
-5. gRPC server build (not yet started)
-   └─> NettyServerBuilder → .build()
-
-6. HTTP server build + start
-   └─> embeddedServer(CIO, unixConnector(...)) → .start()
-
-7. gRPC server start
-   └─> grpcServer.start()
-
-8. Print socket paths
-   └─> stdout: GRPC_SOCKET=... / HTTP_SOCKET=...
-```
+1. CLI argument parsing — determine socket paths (`--socket-path` / `--http-socket-path`)
+2. Socket cleanup — `File(socketPath).delete()` to remove stale socket files from crashes
+3. Koin DI initialization — `modules(domainModule, infrastructureModule, appModule)`
+4. Netty event loop groups — `bossGroup` + `workerGroup` (Epoll on Linux, NIO on Windows 11)
+5. gRPC server build (not yet started) — `NettyServerBuilder → .build()`
+6. HTTP server build + start — `embeddedServer(CIO, unixConnector(...)) → .start()`
+7. gRPC server start — `grpcServer.start()`
+8. Print socket paths — stdout: `GRPC_SOCKET=...` / `HTTP_SOCKET=...`
 
 ### Runtime
 
-```
-gRPC socket:  isma-{UUID}.sock   ← Unix socket special file (type: socket)
-HTTP socket:  isma-http-{UUID}.sock  ← Unix socket special file (type: socket)
+- **gRPC socket:** `isma-{UUID}.sock` — Unix socket special file (type: socket)
+- **HTTP socket:** `isma-http-{UUID}.sock` — Unix socket special file (type: socket)
 
-Both sockets persist as special files in the filesystem.
-The socket file is NOT the data — it's a naming mechanism.
-```
+Both sockets persist as special files in the filesystem. The socket file is NOT the data — it's a naming mechanism.
 
 ### Shutdown Phase
 
-```kotlin
-Runtime.getRuntime().addShutdownHook(Thread {
-    grpcServer.shutdown()                              // Graceful gRPC shutdown
-    httpServer.stop(1, 2, SECONDS)                     // Ktor shutdown (1s wait, 2s force)
-    bossGroup.shutdownGracefully()                     // Netty boss loop cleanup
-    workerGroup.shutdownGracefully()                   // Netty worker loop cleanup
-    File(socketPath).delete()                          // Remove gRPC socket file
-    File(httpSocketPath).delete()                      // Remove HTTP socket file
-})
-```
+See `Application.kt` for the shutdown hook implementation. It calls `grpcServer.shutdown()`, `httpServer.stop(1, 2, SECONDS)`, `bossGroup.shutdownGracefully()`, `workerGroup.shutdownGracefully()`, and deletes both socket files.
 
 ---
 
@@ -220,19 +91,11 @@ The UI process discovers server socket paths via two mechanisms:
 
 ### 1. Environment Variable (Bundle Mode)
 
-```bash
-export ISMA_SERVER_SCRIPT=/path/to/run-ui.sh
-```
-
-The `run-ui.sh` launcher script exports socket paths to the UI process environment.
+Set `ISMA_SERVER_SCRIPT=/path/to/run-ui.sh`. The `run-ui.sh` launcher script exports socket paths to the UI process environment.
 
 ### 2. System Property (Development Mode)
 
-```bash
-java -Disma.server.script=/path/to/run-ui.sh -jar isma-ui.jar
-```
-
-The `isma.server.script` property tells the UI to source a shell script that sets socket paths.
+Launch with `-Disma.server.script=/path/to/run-ui.sh -jar isma-ui.jar`. The `isma.server.script` property tells the UI to source a shell script that sets socket paths.
 
 ---
 
@@ -250,69 +113,42 @@ The `isma.server.script` property tells the UI to source a shell script that set
 
 ### Connection Flow
 
+The UI process resolves the socket path (from environment variable or system property), creates a Unix socket connection via Netty, and connects to the server. The server accepts the connection and a gRPC channel is established. The UI sends gRPC requests (e.g., `RunSimulationRequest`) which are routed through the server to the domain layer, then to the infrastructure layer for simulation execution. Results flow back through the same chain: infrastructure → domain → server → Netty → UI.
+
 ```mermaid
 sequenceDiagram
-    participant UI as UI Process
-    participant Netty as Netty gRPC Client
-    participant Server as isma-server
-    
-    UI->>Netty: Resolve socket path
-    Netty->>UI: GRPC_SOCKET=/tmp/isma-abc123.sock
-    Netty->>Netty: Create Unix socket connection
-    Netty->>Server: CONNECT (Unix socket)
-    Server->>Netty: Accept connection
-    Netty->>Netty: Create gRPC channel
-    
-    UI->>Netty: RunSimulationRequest
-    Netty->>Server: gRPC call (RunSimulation)
-    Server->>Domain: Delegate to handler
-    Domain->>Infra: Execute simulation
-    Infra-->>Domain: Result
-    Domain-->>Server: Response builder
-    Server-->>Netty: gRPC response
-    Netty-->>UI: RunSimulationResponse
+    participant UI as ISMA UI Process
+    participant Client as Netty gRPC Client
+    participant Server as Netty gRPC Server
+    participant App as app/
+    participant Domain as domain/
+    participant Infra as infrastructure/
+
+    UI->>Client: Resolve socket path (env var / sysprop)
+    Client->>Client: Create Unix socket channel<br/>(EpollDomainSocketChannel / NioSocketChannel)
+    Client->>Server: Connect to DomainSocketAddress
+    Server->>Server: Accept connection (EpollServerDomainSocketChannel)
+    Server-->>Client: gRPC channel established
+
+    UI->>Client: RunSimulationRequest
+    Client->>Server: gRPC request
+    Server->>App: SimulationServiceGrpcImpl
+    App->>Domain: RunSimulationHandlerImpl
+    Domain->>Infra: SimulationExecutorImpl
+    Infra-->>Domain: simulation running (async)
+    Domain-->>App: RunSimulationResponse(simulationId)
+    App-->>Server: protobuf response
+    Server-->>Client: gRPC response
+    Client-->>UI: simulationId
 ```
 
 ### Netty gRPC Client Setup
 
-Platform detection dispatches to platform-specific client implementations:
+Platform detection dispatches to platform-specific client implementations. See `GrpcSimulationClient.kt` for the Linux vs. Windows detection logic.
 
-```kotlin
-// In GrpcSimulationClient.kt
-val isLinux = System.getProperty("os.name")?.contains("linux", ignoreCase = true) == true
-val handle = if (isLinux) {
-    LinuxGrpcClient.createHandle(socketPath)
-} else {
-    WindowsGrpcClient.createHandle(socketPath)
-}
-val channel = handle.channel
-```
+**Linux path** (`LinuxGrpcClient.kt`): Creates a `MultiThreadIoEventLoopGroup` with `EpollIoHandler.newFactory()`, builds a `NettyChannelBuilder` with `EpollDomainSocketChannel`, `DomainSocketAddress`, `PLAINTEXT` negotiation type, and a 365-day keep-alive interval.
 
-**Linux path** (`LinuxGrpcClient.kt`):
-```kotlin
-val eventLoopGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-val channel = NettyChannelBuilder.forAddress(
-    DomainSocketAddress(socketPath)
-)
-    .channelType(EpollDomainSocketChannel::class.java)
-    .eventLoopGroup(eventLoopGroup)
-    .negotiationType(PLAINTEXT)
-    .keepAliveTime(365 * 24 * 3600, SECONDS)
-    .build()
-```
-
-**Windows path** (`WindowsGrpcClient.kt`):
-```kotlin
-val eventLoop = NioEventLoopGroup()
-val channel = NettyChannelBuilder.forAddress(
-    DomainSocketAddress(socketPath)
-)
-    .channelType(NioSocketChannel::class.java)
-    .eventLoopGroup(eventLoop)
-    .negotiationType(PLAINTEXT)
-    .keepAliveTime(365 * 24 * 3600, SECONDS)
-    .build()
-```
+**Windows path** (`WindowsGrpcClient.kt`): Creates an `NioEventLoopGroup`, builds a `NettyChannelBuilder` with `NioSocketChannel`, `DomainSocketAddress`, `PLAINTEXT` negotiation type, and a 365-day keep-alive interval.
 
 ---
 
@@ -320,30 +156,11 @@ val channel = NettyChannelBuilder.forAddress(
 
 ### Ktor CIO Engine Configuration
 
-```kotlin
-// HttpRoutes.kt
-embeddedServer(CIO, configure = {
-    unixConnector(httpSocketPath) { }
-}) {
-    routing {
-        simulationResultRoutes(sessionStore)
-    }
-}
-```
+See `HttpRoutes.kt` for the Ktor server setup. An `embeddedServer(CIO, configure = { unixConnector(httpSocketPath) { } })` is created with routing that registers `simulationResultRoutes(sessionStore)`.
 
 ### HTTP Route: Result Download
 
-```kotlin
-get("/simulation/{id}/download") {
-    val simulationId = call.parameters["id"]?.toLongOrNull()
-    // ... validation ...
-    
-    val resultFilePath = session.resultFilePath
-    call.respondFile(File(resultFilePath))
-}
-```
-
-The HTTP response uses `application/octet-stream` content type with an attachment header for the binary simulation result file.
+The HTTP route at `/simulation/{id}/download` validates the simulation ID, checks the session, and serves the result file via `call.respondFile(File(resultFilePath))`. The HTTP response uses `application/octet-stream` content type with an attachment header for the binary simulation result file.
 
 ---
 
@@ -382,24 +199,13 @@ The HTTP response uses `application/octet-stream` content type with an attachmen
 
 ### Debugging Commands
 
-```bash
-# Check socket existence
-ls -la /tmp/isma-*.sock
-
-# Verify socket type
-file /tmp/isma-*.sock
-# Output: /tmp/isma-abc123.sock: socket
-
-# Check listening sockets
-ss -X -a | grep isma
-
-# Test gRPC connectivity (grpcurl)
-grpcurl -plaintext -d '{}' -authority simulation /tmp/isma.sock \
-    ru.nstu.isma.contracts.simulation.SimulationService/ListSimulationMethods
-
-# Test HTTP connectivity
-curl --unix-socket /tmp/isma-http.sock http://localhost/simulation/1/download
-```
+| Command | Purpose |
+|---------|---------|
+| `ls -la /tmp/isma-*.sock` | Check socket existence |
+| `file /tmp/isma-*.sock` | Verify socket type (output: `socket`) |
+| `ss -X -a \| grep isma` | Check listening sockets |
+| `grpcurl -plaintext -d '{}' -authority simulation /tmp/isma.sock ru.nstu.isma.contracts.simulation.SimulationService/ListSimulationMethods` | Test gRPC connectivity |
+| `curl --unix-socket /tmp/isma-http.sock http://localhost/simulation/1/download` | Test HTTP connectivity |
 
 ---
 

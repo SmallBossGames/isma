@@ -6,39 +6,7 @@ The `app` module is the application layer — it contains the JavaFX UI componen
 
 ## Module Structure
 
-```
-app/src/main/kotlin/ru/isma/next/app/
-├── launcher/                     # IsmaApplication, Koin DI root, GrinProcessLauncher
-├── di/                           # Koin DI module definitions (services + views)
-│   ├── serviceModules.kt         # service-layer DI (replaces services/koin/KoinExtentions.kt)
-│   └── viewModules.kt            # view-layer DI (replaces views/koin/KoinExtensions.kt)
-├── models/
-│   ├── ErrorViewModel.kt
-│   ├── preferences/              # PreferencesModel, WindowPreferencesModel
-│   ├── projects/                 # IProjectModel, LismaProjectModel, BlueprintProjectModel
-│   │   └── LismaTextModel.kt     # CodeRegion for error line tracking
-│   └── simulation/               # SimulationParametersModel, CompletedSimulationModel
-│       ├── SaveTarget.kt         # MEMORY / FILE enum
-│       ├── SimulationTask.kt     # Task model with status/progress/error/result
-│       └── CompletedSimulationModel.kt
-├── services/
-│   ├── ModelErrorService.kt
-│   ├── editors/                  # SyntaxHighlighterService, TextEditorFactory
-│   ├── preferences/              # PreferencesProvider
-│   ├── project/                  # IProjectService, ProjectService, ProjectFileService, LismaPdeService
-│   │   └── LismaPdeTranslationResult.kt  # Success/Failed sealed interface
-│   └── simulation/               # ISimulationService, ISimulationTaskService, SimulationService, SimulationResultService, SimulationParametersService
-├── viewmodels/                   # Plain JavaFX property-based view models for settings
-├── extensions/                   # ButtonExtensions.kt
-└── constants/                    # FileExtensions.kt (file type constants)
-├── views/
-│   ├── MainView.kt               # Main BorderPane layout
-│   ├── dialogs/                  # ItemsPickerDialog
-│   ├── layout/                   # Drawer
-│   ├── settings/                 # Settings panel views
-│   ├── tabpane/                  # IsmaEditorTabPane
-│   └── toolbars/                 # MenuBar, ToolBar, ErrorList, ProcessBar
-```
+The `app` module source lives in `app/src/main/kotlin/ru/isma/next/app/` with subdirectories: `launcher/` (IsmaApplication, Koin DI root, GrinProcessLauncher), `di/` (Koin DI module definitions: serviceModules.kt for service-layer DI replacing services/koin/KoinExtentions.kt, viewModules.kt for view-layer DI replacing views/koin/KoinExtensions.kt), `models/` (ErrorViewModel.kt, preferences/ with PreferencesModel and WindowPreferencesModel, projects/ with IProjectModel, LismaProjectModel, BlueprintProjectModel, and LismaTextModel.kt for CodeRegion error line tracking, simulation/ with SimulationParametersModel, CompletedSimulationModel, SaveTarget.kt MEMORY/FILE enum, SimulationTask.kt task model with status/progress/error/result), `services/` (ModelErrorService.kt, editors/ with SyntaxHighlighterService and TextEditorFactory, preferences/ with PreferencesProvider, project/ with IProjectService, ProjectService, ProjectFileService, LismaPdeService, and LismaPdeTranslationResult.kt Success/Failed sealed interface, simulation/ with ISimulationService, ISimulationTaskService, SimulationService, SimulationResultService, SimulationParametersService), `viewmodels/` (Plain JavaFX property-based view models for settings), `extensions/` (ButtonExtensions.kt), `constants/` (FileExtensions.kt file type constants), `views/` (MainView.kt Main BorderPane layout, dialogs/ with ItemsPickerDialog, layout/ with Drawer, settings/ with Settings panel views, tabpane/ with IsmaEditorTabPane, toolbars/ with MenuBar, ToolBar, ErrorList, ProcessBar).
 
 ## Module Configuration
 
@@ -70,38 +38,13 @@ Launches the GRIN chart viewer as a child process. Resolves script path from `IS
 
 ## DI Dependency Graph
 
-```mermaid
-flowchart LR
-    subgraph Services
-        Facade["SimulationServerFacade"]
-        ProjSvc["ProjectService"]
-        TaskSvc["SimulationTaskService"]
-        ResultSvc["SimulationResultService"]
-        ParamsSvc["SimulationParametersService"]
-        ErrorSvc["ModelErrorService"]
-        EditorSvc["EditorPlatformService"]
-    end
+The DI dependency graph has two groups:
 
-    subgraph Views
-        TabPane["IsmaEditorTabPane"]
-        ProcBar["SimulationProcessBar"]
-        ErrDrawer["ErrorListDrawer"]
-        TasksPO["TasksPopOver"]
-        Settings["SettingsPanelView"]
-    end
+**Services:** `SimulationServerFacade` → `ProjectService`, `SimulationTaskService`, `SimulationParametersService`. `SimulationTaskService` → `ModelErrorService`, `SimulationResultService`. `EditorPlatformService`.
 
-    Facade --> ProjSvc
-    Facade --> TaskSvc
-    Facade --> ParamsSvc
-    TaskSvc --> ErrorSvc
-    TaskSvc --> ResultSvc
-    ProjSvc --> TabPane
-    TaskSvc --> ProcBar
-    ErrorSvc --> ErrDrawer
-    ResultSvc --> TasksPO
-    ParamsSvc --> Settings
-    EditorSvc -.-> TabPane
-```
+**Views:** `IsmaEditorTabPane`, `SimulationProcessBar`, `ErrorListDrawer`, `TasksPopOver`, `SettingsPanelView`.
+
+Dependencies: `Facade` → `ProjSvc`, `TaskSvc`, `ParamsSvc`. `TaskSvc` → `ErrorSvc`, `ResultSvc`, `ProcBar`. `ProjSvc` → `TabPane`. `ErrorSvc` → `ErrDrawer`. `ResultSvc` → `TasksPO`. `ParamsSvc` → `Settings`. `EditorSvc` (dashed) → `TabPane`.
 
 ## DI Wiring
 
@@ -148,24 +91,7 @@ All registrations use `single()` (singleton) except `TasksPopOver` which uses `f
 
 ## Component Dependency Graph
 
-```mermaid
-flowchart LR
-    app["app"] --> text-editor
-    app --> blueprint-editor
-    app --> toolkit
-    app --> external-services
-    app --> grpc
-    app --> domain
-
-    external-services --> grpc
-    external-services --> domain
-    external-services --> exchange-format
-
-    blueprint-editor --> text-editor
-    blueprint-editor --> toolkit
-```
-
-The `app` module depends on all other isma-ui modules. `external-services` depends on `grpc` and `domain`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
+The `app` module depends on all other isma-ui modules (text-editor, blueprint-editor, toolkit, external-services, grpc, domain). The `external-services` module depends on `grpc`, `domain`, and `exchange-format`. The `blueprint-editor` module depends on `text-editor` and `toolkit`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
 
 ## Java Module System
 
@@ -207,20 +133,5 @@ The `toolkit` module provides shared JavaFX utilities used across modules. These
 | `BaseViewModel` | `viewmodel/` | Abstract base VM with `StateFlow` lifecycle tracking |
 
 **Source structure:**
-```
-toolkit/src/main/kotlin/ru/isma/javafx/extensions/
-├── controls/
-│   ├── PropertiesGrid.kt       # Reusable property grid (label + control layout)
-│   ├── ComboBox.kt             # Custom ComboBox extensions
-│   └── ListViewExtensions.kt   # ListView cell factory
-├── coroutines/
-│   ├── UiThreadExecutor.kt     # UI thread execution interface
-│   ├── JavaFxUiThreadExecutor.kt  # JavaFX implementation
-│   ├── TestUiThreadExecutor.kt   # Test implementation
-│   └── flow/
-│       └── CollectionsExtensions.kt  # ObservableList/Set → Flow bridges
-├── helpers/
-│   └── Properties.kt           # Property utility helpers
-└── viewmodel/
-    └── BaseViewModel.kt        # Abstract base VM with StateFlow lifecycle tracking
-```
+
+The toolkit source lives in `toolkit/src/main/kotlin/ru/isma/javafx/extensions/` with subdirectories: `controls/` (PropertiesGrid.kt - reusable property grid, ComboBox.kt - custom ComboBox extensions, ListViewExtensions.kt - ListView cell factory), `coroutines/` (UiThreadExecutor.kt - UI thread execution interface, JavaFxUiThreadExecutor.kt - JavaFX implementation, TestUiThreadExecutor.kt - test implementation, flow/CollectionsExtensions.kt - ObservableList/Set to Flow bridges), `helpers/` (Properties.kt - property utility helpers), and `viewmodel/` (BaseViewModel.kt - abstract base VM with StateFlow lifecycle tracking).

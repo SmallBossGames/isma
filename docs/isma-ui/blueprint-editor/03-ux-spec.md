@@ -4,17 +4,9 @@
 
 ### Visual Structure
 
-```
-┌────────────────────────────────────┐  ← rounded rectangle, arc = 20px
-│                                    │
-│        [ State Name Label ]        │  ← Arial 16pt, centered
-│                                    │
-└────────────────────────────────────┘
-```
-
 The state box is a `Group` containing:
-1. A `Rectangle` (filled body with rounded corners) — `viewOrder = 3.0`
-2. An `HBox` (name label + optional text area) — centered inside the rectangle with `STATE_INSET` (10px) padding
+1. A `Rectangle` (filled body with rounded corners, arc = 20px) — `viewOrder = 3.0`
+2. An `HBox` (name label + optional text area, Arial 16pt centered) — centered inside the rectangle with `STATE_INSET` (10px) padding
 
 | Property | Default | Notes |
 |----------|---------|-------|
@@ -40,52 +32,56 @@ The state box is a `Group` containing:
 
 ### Inline Name Editing
 
-When a user single-clicks an editable (user) state box:
-
 ```mermaid
 sequenceDiagram
     participant U as User
-    participant CD as ClickDisambiguator
     participant SB as StateBox
+    participant CD as ClickDisambiguator
+    participant TA as TextArea
     participant NM as NameChangingMonitor
 
-    U->>CD: MOUSE_PRESSED
-    CD->>CD: isDragged = false, schedule 200ms
-    alt No drag within 200ms
-        CD->>SB: singleClick callback
-        SB->>SB: isEditModeEnabled = true
-        SB->>SB: nameTextArea.requestFocus()
-        Note over SB: TextArea visible, Label hidden
-        U->>SB: Type new name
-        U->>SB: Focus lost (Tab/Click away)
-        SB->>SB: name = textArea.text
+    U->>SB: Single-click (not dragged)
+    SB->>CD: onKeyPress() → isDragged=false
+    CD->>CD: Schedule 200ms check
+    alt 200ms elapsed, !isDragged
+        CD-->>SB: singleClick callback
+        SB->>TA: Show TextArea, populate name, request focus
+        U->>TA: Type new name
+        U->>TA: Lose focus (click away / Enter)
+        TA->>SB: name = textArea.text
         SB->>NM: tryRegister(newName)
-        alt Duplicate
+        alt Name is duplicate
             NM-->>SB: false
-            SB->>SB: name = previousName (rollback)
-        else Unique
+            SB->>SB: Restore previousName (silent rollback)
+        else Name is unique
             NM-->>SB: true
             SB->>NM: tryUnregister(previousName)
+            SB->>SB: name = newName
         end
         SB->>SB: isEditModeEnabled = false
-        Note over SB: Label visible, TextArea hidden
-    else Drag detected
-        CD->>CD: isDragged = true
-        CD->>CD: Cancel singleClick (drag handled)
+        SB->>TA: Hide TextArea, show Label
+    else Mouse was dragged
+        SB->>CD: onDragged() → isDragged=true
+        CD->>CD: Skip singleClick (drag handled)
     end
 ```
 
-1. A 200ms delay begins (coroutine)
-2. If the mouse was **not** dragged during that period:
-   - A `TextArea` appears inside the state box (replacing the `Label`)
-   - The text area is populated with the current `name`
-   - Focus is requested on the text area
+When a user single-clicks an editable (user) state box:
+
+1. A 200ms delay begins (coroutine via `ClickDisambiguator`). If the mouse was **not** dragged during that period:
+    - A `TextArea` appears inside the state box (replacing the `Label`)
+    - The text area is populated with the current `name`
+    - Focus is requested on the text area
+2. If the mouse **was** dragged during that period, `isDragged = true` and the singleClick is cancelled (drag is handled instead).
 3. When the text area loses focus:
-   - The `name` property is updated from the text area's content
-   - The `TextArea` hides, the `Label` reappears
-4. The new name is validated against `NameChangingMonitor`:
-   - If the name is **already taken**, the old name is **restored** (silent rollback)
-   - If unique, the monitor updates its registry
+    - The `name` property is updated from the text area's content
+    - The `TextArea` hides, the `Label` reappears
+4. The new name is validated against `NameChangingMonitor` via `tryRegister(newName)`:
+    - If the name is **already taken**, `tryRegister` returns `false` and the old name is **restored** (silent rollback)
+    - If unique, `tryRegister` returns `true` and `tryUnregister(previousName)` updates the registry
+5. `isEditModeEnabled` is set to `false`
+
+See `StateBox.kt` and `NameChangingMonitor.kt` for the implementation.
 
 ### Double-Click Behavior
 
@@ -109,15 +105,9 @@ Double-clicking any state box (Main, Init, or User) opens a **text editor tab** 
 
 ### Editability Bindings
 
-User state `isEditable` is dynamically bound to the editor mode:
+User state `isEditable` is dynamically bound to the editor mode: `isEditableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })`.
 
-```kotlin
-isEditableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })
-```
-
-```
-isEditable = !(isRemoveStateMode OR isAddTransitionMode)
-```
+Equivalently: `isEditable = !(isRemoveStateMode OR isAddTransitionMode)`.
 
 When in add-transition or remove-state mode, inline name editing is disabled. The `isNotEditingMode()` function returns `true` for `Idle` and `RemoveTransition` modes, `false` for `AddTransition` and `RemoveState` modes.
 
@@ -125,21 +115,11 @@ When in add-transition or remove-state mode, inline name editing is disabled. Th
 
 ### Visual Structure
 
-```
-StateBox A ────────────────────► StateBox B
-              [Predicate/Alias]
-```
-
-A straight line from the center of the source state to the center of the target state, with an arrowhead pointing at the target. The line is offset perpendicularly to avoid overlapping the state box borders.
+A straight line from the center of StateBox A to the center of StateBox B, with an arrowhead pointing at the target. The line is offset perpendicularly to avoid overlapping the state box borders. A label showing `[Predicate/Alias]` is displayed along the line.
 
 ### Arrow Geometry
 
-The line endpoints and arrowhead position are computed dynamically using `atan2`-based perpendicular offset (see `02-algorithms.md`). The arrow's `layoutX` and `layoutY` are bound to the midpoint between the two state centers:
-
-```kotlin
-layoutXProperty().bind((endXProperty.subtract(startXProperty)).divide(2).add(startXProperty))
-layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(startYProperty))
-```
+The line endpoints and arrowhead position are computed dynamically using `atan2`-based perpendicular offset (see `02-algorithms.md`). The arrow's `layoutX` and `layoutY` are bound to the midpoint between the two state centers via `layoutXProperty().bind((endXProperty.subtract(startXProperty)).divide(2).add(startXProperty))` and `layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(startYProperty))`.
 
 ### Arrowhead
 
@@ -150,11 +130,7 @@ layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(sta
 
 ### Label Display
 
-The label shows the arrow's alias if present, otherwise the predicate:
-
-```kotlin
-predicateText.text = if (alias != "") alias else predicate
-```
+The label shows the arrow's alias if present, otherwise the predicate: `predicateText.text = if (alias != "") alias else predicate`.
 
 - **Font**: Arial 16pt (`ARROW_LABEL_FONT_SIZE`)
 - **Width**: 120px fixed (`ARROW_LABEL_FIELD_WIDTH`)
@@ -176,17 +152,7 @@ predicateText.text = if (alias != "") alias else predicate
 
 ### Visual Structure
 
-```
-          ┌──────────┐
-     ┌────►│  Circle   │─────┐
-     │     │ (r=40,    │     │
-     │     └──────────┘     │
-     │                      │
-     └──────────────────────┘
-            StateBox
-```
-
-A loop arrow draws a **transparent circle** above the state, with a right-pointing arrowhead at the circle's right edge. The circle has no fill (transparent) and a black stroke.
+A loop arrow draws a **transparent circle** above the state (radius 40px), with a right-pointing arrowhead at the circle's right edge. The circle has no fill (transparent) and a black stroke.
 
 ### Properties
 
@@ -205,11 +171,7 @@ A loop arrow draws a **transparent circle** above the state, with a right-pointi
 
 ### Label Display
 
-Same alias-or-predicate logic as inter-state arrows:
-
-```kotlin
-text = if (localAlias != "") localAlias else localPredicate
-```
+Same alias-or-predicate logic as inter-state arrows: `text = if (localAlias != "") localAlias else localPredicate`.
 
 ### Click Handlers
 
@@ -234,31 +196,13 @@ Unlike inter-state transitions (which have no text content), loop arrows carry a
 
 ## ITransactionArrowData Interface
 
-Both `TransactionArrow` and `LoopTransactionArrow` implement this interface, enabling the `EditArrowPopOver` to work with either type:
-
-```kotlin
-interface ITransactionArrowData {
-    val aliasProperty: SimpleStringProperty
-    val predicateProperty: SimpleStringProperty
-}
-```
-
-The `EditArrowPopOver` binds two `TextField`s bidirectionally to these properties.
+Both `TransactionArrow` and `LoopTransactionArrow` implement this interface, enabling the `EditArrowPopOver` to work with either type. The interface declares `aliasProperty: SimpleStringProperty` and `predicateProperty: SimpleStringProperty`. The `EditArrowPopOver` binds two `TextField`s bidirectionally to these properties. See `ITransactionArrowData.kt` for the full interface.
 
 ## Edit Arrow PopOver
 
 ### Visual Structure
 
-```
-┌──────────────────────────────────────────────────┐
-│  Alias (optional)                                │
-│  ┌────────────────────────────────────────────┐  │  ← TextField, minWidth 300
-│  └────────────────────────────────────────────┘  │
-│  Predicate                                       │
-│  ┌────────────────────────────────────────────┐  │  ← TextField, minWidth 300
-│  └────────────────────────────────────────────┘  │
-└──────────────────────────────────────────────────┘
-```
+The PopOver is a `VBox` with default spacing, containing an "Alias (optional)" TextField (minWidth 300) and a "Predicate" TextField (minWidth 300).
 
 | Property | Value |
 |----------|-------|
@@ -272,55 +216,23 @@ The `EditArrowPopOver` binds two `TextField`s bidirectionally to these propertie
 
 ### Data Binding
 
-Both text fields use **bidirectional binding** to the arrow's properties:
-
-```kotlin
-TextField.textProperty().bindBidirectional(arrow.aliasProperty)
-TextField.textProperty().bindBidirectional(arrow.predicateProperty)
-```
-
-Changes in either direction propagate immediately. Typing in the PopOver updates the arrow's properties in real-time, and programmatic changes to the arrow are reflected in the PopOver.
+Both text fields use **bidirectional binding** to the arrow's properties: `TextField.textProperty().bindBidirectional(arrow.aliasProperty)` and `TextField.textProperty().bindBidirectional(arrow.predicateProperty)`. Changes in either direction propagate immediately. Typing in the PopOver updates the arrow's properties in real-time, and programmatic changes to the arrow are reflected in the PopOver.
 
 ### Dismissal
 
-The PopOver is added to `canvasPane.children` (not as a native JavaFX `Popover`). It is removed when `MOUSE_EXITED` fires on the PopOver itself — this is set in `IsmaBlueprintViewModel.createEditPopOver()`:
-
-```kotlin
-EditArrowPopOver(arrow, x, y).apply {
-    setOnMouseExited { viewAdapter.removeNodeFromCanvas(canvasPane, this) }
-}
-```
-
-This creates a "click-away" / "hover-away" behavior: moving the mouse outside the PopOver dismisses it.
+The PopOver is added to `canvasPane.children` (not as a native JavaFX `Popover`). It is removed when `MOUSE_EXITED` fires on the PopOver itself — this is set in `IsmaBlueprintViewModel.createEditPopOver()`: `EditArrowPopOver(arrow, x, y).apply { setOnMouseExited { viewAdapter.removeNodeFromCanvas(canvasPane, this) } }`. This creates a "click-away" / "hover-away" behavior: moving the mouse outside the PopOver dismisses it.
 
 ### Position Coordinate Conversion
 
-The PopOver's x/y coordinates are converted from scene to local before use:
-
-```kotlin
-val converted = canvasPane.sceneToLocal(event.sceneX, event.sceneY)
-val popover = createEditPopOver(source, converted.x, converted.y)
-```
+The PopOver's x/y coordinates are converted from scene to local before use: `val converted = canvasPane.sceneToLocal(event.sceneX, event.sceneY)` followed by `val popover = createEditPopOver(source, converted.x, converted.y)`.
 
 ## Toolbar
 
 ### Layout
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│ [New state] [New transition ▼] | [Remove state ▼] [Remove trans ▼]│
-└────────────────────────────────────────────────────────────────────┘
-```
+The toolbar appears at the **bottom** of the `BorderPane`. It contains 4 buttons: "New state", "New transition ▼" / "Stop adding transaction", "Remove state ▼" / "Stop remove state", "Remove transition ▼" / "Stop remove transition", separated by a `Separator` between the "add" group and "remove" group.
 
-The toolbar appears at the **bottom** of the `BorderPane`. It contains 4 buttons separated by a `Separator` between the "add" group and "remove" group.
-
-The toolbar binds to the Diagram tab's visibility:
-
-```kotlin
-val visible = tabs.selectionModel.selectedItemProperty().isEqualTo(diagramTab)
-visibleProperty().bind(visible)
-managedProperty().bind(visible)
-```
+The toolbar binds to the Diagram tab's visibility: `val visible = tabs.selectionModel.selectedItemProperty().isEqualTo(diagramTab)`, then `visibleProperty().bind(visible)` and `managedProperty().bind(visible)`.
 
 ### Button Behaviors
 
@@ -353,13 +265,7 @@ Toggle button. Text changes based on `EditorMode`:
 
 **Toggle logic**:
 
-```kotlin
-if (viewModel.editorMode is EditorMode.AddTransition) {
-    viewModel.resetMode()        // Turn off
-} else {
-    viewModel.toggleAddTransition()  // Turn on
-}
-```
+If `viewModel.editorMode is EditorMode.AddTransition`, call `viewModel.resetMode()` (Turn off). Otherwise, call `viewModel.toggleAddTransition()` (Turn on).
 
 **When turned ON**:
 1. `viewModel.toggleAddTransition()` → `resetMode()` then `editorMode = EditorMode.AddTransition(mutableListOf())`

@@ -16,40 +16,15 @@ Quick navigation to detailed documents:
 
 ### Building
 
-```bash
-./gradlew :isma-server:app:build
-```
+Run `./gradlew :isma-server:app:build` to build the application module and all dependencies.
 
 ### Running (from source)
 
-```bash
-java -jar build/libs/isma-server-app-1.0.0-SNAPSHOT.jar \
-    --socket-path /tmp/isma.sock \
-    --http-socket-path /tmp/isma-http.sock
-```
+Launch the JAR with `--socket-path` and `--http-socket-path` CLI arguments to specify Unix socket paths. The built artifact is located at `build/libs/isma-server-app-1.0.0-SNAPSHOT.jar`.
 
 ### Interacting
 
-```bash
-# List available simulation methods (gRPC)
-grpcurl -plaintext \
-    -grpc-header ":pseudo-protocol-version:1.0.0" \
-    -d '{}' \
-    -authority simulation \
-    /tmp/isma.sock \
-    ru.nstu.isma.contracts.simulation.SimulationService/ListSimulationMethods
-
-# Compile LISMA source
-grpcurl -plaintext \
-    -d '{"lisma_source_code": "const t = 0..10;"}' \
-    /tmp/isma.sock \
-    ru.nstu.isma.contracts.simulation.LismaCompilerService/Compile
-
-# Download simulation result (HTTP)
-curl -o result.bin \
-    --unix-socket /tmp/isma-http.sock \
-    http://localhost/simulation/1/download
-```
+Use `grpcurl` with the `-plaintext` flag and the `-grpc-header ":pseudo-protocol-version:1.0.0"` header to invoke gRPC methods over the Unix socket. For simulation result downloads, use `curl` with the `--unix-socket` flag pointing to the HTTP socket path and request the `/simulation/{id}/download` endpoint.
 
 ## Key Files
 

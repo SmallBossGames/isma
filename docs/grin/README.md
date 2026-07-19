@@ -22,21 +22,15 @@ JavaFX-based interactive function visualization and analysis environment.
 
 ### Build
 
-```bash
-./gradlew :grin:build
-```
+Run `./gradlew :grin:build` to build all GrIn submodules.
 
 ### Run
 
-```bash
-./gradlew :grin:gui:app:run
-```
+Run `./gradlew :grin:gui:app:run` to launch the application.
 
 ### Run with data file
 
-```bash
-./gradlew :grin:gui:app:run --args="--result-file data.ismx --x-axis x --charts y1,y2"
-```
+Run `./gradlew :grin:gui:app:run` with arguments like `--args="--result-file data.ismx --x-axis x --charts y1,y2"` to load a data file on startup.
 
 Command-line arguments:
 

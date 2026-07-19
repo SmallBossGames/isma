@@ -10,70 +10,7 @@ The `app/` module is the server's entry point. It bootstraps the Koin dependency
 
 ### Application.kt
 
-**Main function:** `ru.nstu.isma.server.app.ApplicationKt` (configured in `build.gradle.kts`)
-
-```kotlin
-fun main(args: Array<String>) {
-    // 1. Parse CLI arguments
-    val socketPath = ...
-    val httpSocketPath = ...
-
-    // 2. Start Koin DI
-    startKoin {
-        modules(domainModule, infrastructureModule, appModule)
-    }
-
-    // 3. Resolve gRPC service instances from Koin
-    val koin = object : KoinComponent {
-        val grpcService: SimulationServiceGrpcImpl by inject()
-        val compilerService: LismaCompilerServiceGrpcImpl by inject()
-        val sessionStore: ISimulationSessionStore by inject()
-    }
-
-    // 4. Clean up existing socket files
-    File(socketPath).delete()
-    File(httpSocketPath).delete()
-
-    // 5. Create Netty event loop groups
-    val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-    val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-
-    // 6. Create gRPC server (build only — start happens after HTTP server)
-    val grpcServer = NettyServerBuilder
-        .forAddress(DomainSocketAddress(socketPath))
-        .channelType(EpollServerDomainSocketChannel::class.java)
-        .bossEventLoopGroup(bossGroup)
-        .workerEventLoopGroup(workerGroup)
-        .addService(koin.grpcService)
-        .addService(koin.compilerService)
-        .addService(ProtoReflectionServiceV1.newInstance())
-        .build()
-
-    // 7. Create and start Ktor HTTP server
-    val httpServer = embeddedServer(CIO, configure = {
-        unixConnector(httpSocketPath) { }
-    }) {
-        routing {
-            simulationResultRoutes(koin.sessionStore)
-        }
-    }
-    httpServer.start(wait = false)
-
-    // 8. Print socket paths to stdout, then start gRPC server
-    println("Starting gRPC server on Unix socket: $socketPath")
-    println("Starting HTTP server on Unix socket: $httpSocketPath")
-    grpcServer.start()
-    println("GRPC_SOCKET=$socketPath")
-    println("HTTP_SOCKET=$httpSocketPath")
-    println("Servers started. Shutting down with Ctrl+C...")
-
-    // 9. Register shutdown hook
-    Runtime.getRuntime().addShutdownHook(Thread { ... })
-
-    // 10. Block on gRPC server termination
-    grpcServer.awaitTermination()
-}
-```
+**Main function:** `ru.nstu.isma.server.app.ApplicationKt` (configured in `build.gradle.kts`). See `Application.kt` for the full implementation. The function performs 10 steps: (1) parses CLI arguments for socket paths, (2) starts Koin DI with all three modules, (3) resolves gRPC service instances and session store from Koin via `KoinComponent`, (4) cleans up existing socket files, (5) creates Netty event loop groups (boss + worker), (6) builds the gRPC server on a Unix domain socket with both services and the reflection service, (7) creates and starts the Ktor HTTP server with result download routes, (8) prints socket paths to stdout and starts the gRPC server, (9) registers a shutdown hook, and (10) blocks on `grpcServer.awaitTermination()`.
 
 ### CLI Arguments
 
@@ -84,19 +21,11 @@ fun main(args: Array<String>) {
 
 ### Socket Lifecycle
 
-```
-Startup:  File(socket).delete()    ← remove stale socket files
-          NettyServerBuilder.bind(DomainSocketAddress(socket))
-          embeddedServer(unixConnector(socket))
+**Startup:** Socket files are deleted to remove stale files, then `NettyServerBuilder` binds to the `DomainSocketAddress` and `embeddedServer` with `unixConnector` is started.
 
-Runtime:  Socket files persist in filesystem (Unix domain socket special files)
+**Runtime:** Socket files persist in the filesystem as Unix domain socket special files.
 
-Shutdown: File(socket).delete()    ← cleanup by shutdown hook
-          grpcServer.shutdown()
-          httpServer.stop(1, 2, SECONDS)
-          bossGroup.shutdownGracefully()
-          workerGroup.shutdownGracefully()
-```
+**Shutdown:** See `Application.kt` for the shutdown hook implementation. It deletes socket files, calls `grpcServer.shutdown()`, `httpServer.stop(1, 2, SECONDS)`, and `bossGroup`/`workerGroup.shutdownGracefully()`.
 
 ---
 
@@ -109,15 +38,9 @@ The server uses Linux-specific **Netty Epoll** transport for Unix domain socket 
 - `netty-transport-classes-epoll` — Epoll channel implementation
 - `netty-transport-native-epoll` — Native epoll library (Linux x86_64)
 
-**Event loop groups:**
-```kotlin
-val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())    // Accepts connections
-val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())  // Handles I/O
-```
+**Event loop groups:** See `Application.kt` for the creation of `bossGroup` and `workerGroup` using `MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())`. The boss group accepts connections and the worker group handles I/O.
 
-> See [07-transport-layer.md](07-transport-layer.md) for complete Netty Unix domain socket configuration.
-
-> See [07-transport-layer.md](07-transport-layer.md) for complete transport architecture, client discovery, and troubleshooting.
+> See [07-transport-layer.md](07-transport-layer.md) for complete Netty Unix domain socket configuration, transport architecture, client discovery, and troubleshooting.
 
 ---
 
@@ -173,11 +96,7 @@ val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())  // H
 
 ### ProtoReflectionServiceV1
 
-```kotlin
-.addService(ProtoReflectionServiceV1.newInstance())
-```
-
-Enables dynamic service discovery via gRPC reflection. Allows tools like `grpcurl` and IDE plugins to introspect the API without generated stubs.
+See `Application.kt` for the `.addService(ProtoReflectionServiceV1.newInstance())` call. Enables dynamic service discovery via gRPC reflection. Allows tools like `grpcurl` and IDE plugins to introspect the API without generated stubs.
 
 ---
 
@@ -185,47 +104,11 @@ Enables dynamic service discovery via gRPC reflection. Allows tools like `grpcur
 
 ### HttpRoutes.kt
 
-The server embeds a Ktor HTTP server (CIO engine) on a separate Unix socket for binary file downloads.
-
-```kotlin
-fun Routing.simulationResultRoutes(sessionStore: ISimulationSessionStore) {
-    get("/simulation/{id}/download") {
-        val simulationId = call.parameters["id"]?.toLongOrNull()
-        if (simulationId == null) {
-            call.respond(HttpStatusCode.BadRequest, "Invalid simulation ID")
-            return@get
-        }
-
-        val session = sessionStore.get(simulationId)
-        if (session == null || session.status != SimulationStatus.COMPLETED) {
-            val status = if (session == null) "not found" else "not completed (${session.status})"
-            call.respond(HttpStatusCode.NotFound, "Simulation $simulationId: $status")
-            return@get
-        }
-
-        val resultFilePath = session.resultFilePath
-        if (resultFilePath == null || !File(resultFilePath).exists()) {
-            call.respond(HttpStatusCode.NotFound, "Result file not found")
-            return@get
-        }
-
-        call.response.headers.append(HttpHeaders.ContentType, "application/octet-stream")
-        call.response.headers.append(
-            HttpHeaders.ContentDisposition,
-            "attachment; filename=\"simulation_$simulationId.bin\""
-        )
-        call.respondFile(File(resultFilePath))
-    }
-}
-```
+The server embeds a Ktor HTTP server (CIO engine) on a separate Unix socket for binary file downloads. See `HttpRoutes.kt` for the full implementation. The `simulationResultRoutes()` extension function registers a single route: `GET /simulation/{id}/download`. It validates the simulation ID, checks that the session exists and is `COMPLETED`, verifies the result file exists, sets response headers (`Content-Type: application/octet-stream`, `Content-Disposition: attachment`), and serves the file via `call.respondFile()`.
 
 **Route:** `GET /simulation/{id}/download`
 
-**Response headers:**
-```
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename="simulation_<id>.bin"
-```
+**Response headers:** `Content-Type: application/octet-stream` and `Content-Disposition: attachment; filename="simulation_<id>.bin"`.
 
 **Ktor dependencies:**
 - `ktor-server-core` — Ktor server framework
@@ -236,84 +119,63 @@ Content-Disposition: attachment; filename="simulation_<id>.bin"
 
 ## Dependency Injection (AppModule)
 
-```kotlin
-val appModule = module {
-    single { SimulationServiceGrpcImpl(get(), get(), get(), get(), get()) }
-    single { LismaCompilerServiceGrpcImpl(get(), get(), get(), get()) }
-}
-```
-
-The `appModule` only registers the gRPC service implementations. All handler dependencies are resolved transitively from `domainModule` and `infrastructureModule`.
+See `AppModule.kt` for the full module definition. The `appModule` only registers the gRPC service implementations: `SimulationServiceGrpcImpl` (with 5 handler dependencies) and `LismaCompilerServiceGrpcImpl` (with 4 handler dependencies). All handler dependencies are resolved transitively from `domainModule` and `infrastructureModule`.
 
 ### DI Resolution Chain
 
+`SimulationServiceGrpcImpl` depends on 5 handlers: `IRunSimulationHandler`, `IGetSimulationResultHandler`, `IMonitorSimulationHandler`, `IListSimulationMethodsHandler`, and `ICancelSimulationHandler`. `LismaCompilerServiceGrpcImpl` depends on 4 handlers: `ICompileLismaHandler`, `IValidateLismaHandler`, `IDeleteCompiledModelHandler`, and `IHighlightLismaHandler`.
+
+The simulation handlers depend on `ICompiledModelStore`, `ISimulationSessionStore`, and `ISimulationExecutor`. The `ISimulationExecutor` depends on `IntegrationMethodsLibrary`, `IHsmCompiler`, `ISimulationSessionStore`, and `ExecutorService`. The `ICompileLismaHandler` depends on `ILismaTranslator` and `ICompiledModelStore`. The `IValidateLismaHandler` depends on `ILismaTranslator`. The `IDeleteCompiledModelHandler` depends on `ICompiledModelStore`. `ILismaTranslator` is implemented by `LismaTranslatorImpl` which wraps `InputTranslator`.
+
 ```mermaid
-flowchart TB
-    subgraph SimSvc["SimulationServiceGrpcImpl"]
-        S1["IRunSimulationHandler"] --> S1h["RunSimulationHandlerImpl"]
-        S2["IGetSimulationResultHandler"] --> S2h["GetSimulationResultHandlerImpl"]
-        S3["IMonitorSimulationHandler"] --> S3h["MonitorSimulationHandlerImpl"]
-        S4["IListSimulationMethodsHandler"] --> S4h["ListSimulationMethodsHandlerImpl"]
-        S5["ICancelSimulationHandler"] --> S5h["CancelSimulationHandlerImpl"]
-    end
+graph TD
+    App["appModule"] --> SvcGrpc["SimulationServiceGrpcImpl"]
+    App --> LispcGrpc["LismaCompilerServiceGrpcImpl"]
 
-    subgraph CompSvc["LismaCompilerServiceGrpcImpl"]
-        C1["ICompileLismaHandler"] --> C1h["CompileLismaHandlerImpl"]
-        C2["IValidateLismaHandler"] --> C2h["ValidateLismaHandlerImpl"]
-        C3["IDeleteCompiledModelHandler"] --> C3h["DeleteCompiledModelHandlerImpl"]
-        C4["IHighlightLismaHandler"] --> C4h["HighlightLismaHandlerImpl"]
-    end
+    SvcGrpc --> RunH["IRunSimulationHandler"]
+    SvcGrpc --> GetH["IGetSimulationResultHandler"]
+    SvcGrpc --> MonH["IMonitorSimulationHandler"]
+    SvcGrpc --> ListH["IListSimulationMethodsHandler"]
+    SvcGrpc --> CancelH["ICancelSimulationHandler"]
 
-    S1h --> SM1["ICompiledModelStore"]
-    S1h --> SM2["ISimulationSessionStore"]
-    S1h --> SM3["ISimulationExecutor"]
+    LispcGrpc --> CompH["ICompileLismaHandler"]
+    LispcGrpc --> ValH["IValidateLismaHandler"]
+    LispcGrpc --> DelH["IDeleteCompiledModelHandler"]
+    LispcGrpc --> HighH["IHighlightLismaHandler"]
 
-    SM1 --> SM1i["CompiledModelStore"]
-    SM2 --> SM2i["SimulationSessionStore"]
-    SM3 --> SM3i["IntegrationMethodsLibrary"]
-    SM3 --> SM3i2["IHsmCompiler"]
-    SM3 --> SM3i3["ISimulationSessionStore"]
-    SM3 --> SM3i4["ExecutorService"]
+    RunH --> CompStore["ICompiledModelStore"]
+    RunH --> SessionStore["ISimulationSessionStore"]
+    RunH --> Exec["ISimulationExecutor"]
 
-    S2h --> SM2
-    S3h --> SM2
-    S4h --> SM4["IIntegrationMethodsStore"]
-    S5h --> SM2
+    GetH --> SessionStore
+    MonH --> SessionStore
+    CancelH --> SessionStore
 
-    C1h --> C1a["ILismaTranslator"]
-    C1h --> SM1
-    C2h --> C1a
-    C3h --> SM1
+    Exec --> IntgLib["IntegrationMethodsLibrary"]
+    Exec --> HsmComp["IHsmCompiler"]
+    Exec --> SessionStore2["ISimulationSessionStore"]
+    Exec --> ThreadPool["ExecutorService"]
 
-    C1a --> C1ai["InputTranslator / LismaTranslator()"]
+    CompH --> Translator["ILismaTranslator"]
+    CompH --> CompStore2["ICompiledModelStore"]
 
-    classDef grpc fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
-    classDef handler fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef store fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef external fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    ValH --> Translator2["ILismaTranslator"]
 
-    class SimSvc,CompSvc grpc
-    class S1h,S2h,S3h,S4h,S5h,C1h,C2h,C3h,C4h handler
-    class SM1,SM2,SM3,SM1i,SM2i,SM4 store
-    class SM3i,SM3i2,SM3i3,SM3i4,C1ai external
+    DelH --> CompStore3["ICompiledModelStore"]
+
+    HighH -.-> Infra["infrastructureModule"]
+
+    CompStore -.-> Domain["domainModule"]
+    SessionStore -.-> Domain
+    Exec -.-> Domain
+    CompH -.-> Domain
+    ValH -.-> Domain
+    DelH -.-> Domain
+    Translator -.-> Infra2["infrastructureModule"]
 ```
 
 ---
 
 ## Logging
 
-Configuration in `logback.xml`:
-
-```xml
-<logger name="io.grpc" level="INFO"/>
-<logger name="io.netty" level="INFO"/>
-<logger name="io.ktor" level="INFO"/>
-<root level="INFO">
-    <appender-ref ref="STDOUT"/>
-</root>
-```
-
-- All output to stdout
-- Pattern: `%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n`
-- Third-party frameworks logged at INFO level
-- gRPC service methods log errors via `logger.error()` with exception stack traces before propagating to gRPC clients
+Configuration is in `logback.xml`. See the file for the full configuration. All logging output goes to stdout with the pattern `%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n`. Third-party frameworks (`io.grpc`, `io.netty`, `io.ktor`) are logged at INFO level. gRPC service methods log errors via `logger.error()` with exception stack traces before propagating to gRPC clients.

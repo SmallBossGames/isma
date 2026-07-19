@@ -43,11 +43,7 @@ At step 1, if there are no completed simulations in the Tasks panel, there is no
 
 ## CSV Format Example
 
-```
-x,DE_var1,DE_var2,AE_var1,f0,f1,f2
-0.0,1.0,0.5,3.0,0.5,0.25,1.5
-0.1,1.05,0.48,3.01,0.52,0.24,1.51
-```
+The CSV format has a header row like `x,DE_var1,DE_var2,AE_var1,f0,f1,f2` followed by data rows like `0.0,1.0,0.5,3.0,0.5,0.25,1.5` and `0.1,1.05,0.48,3.01,0.52,0.24,1.51`. Each row represents one simulation time step with the time value, variable values, and RHS values.
 
 ## Related Use Cases
 

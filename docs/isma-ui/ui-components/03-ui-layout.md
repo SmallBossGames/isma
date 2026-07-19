@@ -2,50 +2,18 @@
 
 ## Main Window
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│ Menu Bar: [File] [Edit] [Simulation]                              │
-├────────────────────────────────────────────────────────────────────┤
-│ Toolbar: [New] [Blueprint] [Open] [Save] [SaveAll] │ [Cut] [Copy] │
-│          [Paste] │ [Verify] │ [Store] [Load]                      │
-├──────────────────────────────────────────┬────────────────────────┤
-│                                          │ ┌────────────────────┐ │
-│                                          │ │ Settings Panel     │ │
-│                                          │ │ [Initials]         │ │
-│                                          │ │ [Integration]      │ │
-│                                          │ │ [Event detection]  │ │
-│                                          │ │ [Result saving]    │ │
-│                                          │ └────────────────────┘ │
-│  ┌─────────────────────────────────────┐ │                        │
-│  │  Editor Area (TabPane)              │ │                        │
-│  │  [New project | Tab 2 | ...]        │ │                        │
-│  │  ┌───────────────────────────────┐  │ │                        │
-│  │  │  Text Editor or               │ │ │                        │
-│  │  │  Blueprint Canvas             │ │ │                        │
-│  │  │                               │ │ │                        │
-│  │  └───────────────────────────────┘  │ │                        │
-│  ├─────────────────────────────────────┤ │                        │
-│  │ Error List (collapsible)            │ │                        │
-│  │ ┌────┬────┬─────────┬───────────┐  │ │                        │
-│  │ │Row │Pos │Fragment │Message    │  │ │                        │
-│  │ └────┴────┴─────────┴───────────┘  │ │                        │
-│  ├─────────────────────────────────────┤ │                        │
-│  │ [▶ Play] [Tasks ▼]                  │ │                        │
-│  └─────────────────────────────────────┘ │                        │
-└──────────────────────────────────────────┴────────────────────────┘
-```
+The main window is a `BorderPane` with the following layout:
+
+- **top:** A `VBox` containing the menu bar (File, Edit, Simulation menus) and the main toolbar (New, Blueprint, Open, Save, SaveAll, Cut, Copy, Paste, Verify, Store, Load buttons)
+- **center:** The editor area containing a `TabPane` with tabs for each open project (text editor or blueprint canvas)
+- **right:** The settings panel with sections for Initials, Integration, Event detection, and Result saving
+- **bottom:** A nested `BorderPane` with the error list drawer (collapsible table with Row, Position, Fragment, Message columns) above the simulation process bar (Play button and Tasks button)
 
 The left drawer (`Drawer`) is commented out. The error list is a dedicated `ErrorListDrawer` in the bottom area (above the simulation process bar).
 
 ## Toolbar Layout
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│ [add_circle_outline] [add_box] [folder_open] [save] [save_alt] │ [cut]│
-│ [copy] [paste] │ [check_circle] │ [bookmark] [bookmark_border]       │
-└──────────────────────────────────────────────────────────────────────┘
-  New   Blueprint  Open   Save   SaveAll  Cut  Copy Paste Verify Store Load
-```
+The toolbar contains buttons arranged left to right: New (`add_circle_outline`), Blueprint (`add_box`), Open (`folder_open`), Save (`save`), SaveAll (`save_alt`), separator, Cut (`content_cut`), Copy (`content_copy`), Paste (`content_paste`), separator, Verify (`check_circle`), separator, Store Settings (`bookmark`), Load Settings (`bookmark_border`). Icons use Material Design glyphs.
 
 | # | Icon Glyph | Tooltip | Action |
 |---|-----------|---------|--------|
@@ -68,61 +36,19 @@ Icons use Material Design glyphs.
 
 ## Settings Panel Accordion
 
-```
-┌──────────────────────────────┐
-│ ▼ Initials                   │
-│ ┌──────────────────────────┐ │
-│ │ Start:    [_____]        │ │
-│ │ End:      [_____]        │ │
-│ │ Step:     [_____]        │ │
-│ └──────────────────────────┘ │
-│ ▼ Integration                │
-│ ┌──────────────────────────┐ │
-│ │ Method:   [Euler    ▼]   │ │
-│ │ Accurate: [☐]            │ │
-│ │ Accuracy: [_____]        │ │
-│ │ Stable:   [☐]            │ │
-│ │ Parallel:[☐]             │ │
-│ │ Server:   [localhost]    │ │
-│ │ Port:     [7890    ]     │ │
-│ └──────────────────────────┘ │
-│ ▼ Event Detection            │
-│ ┌──────────────────────────┐ │
-│ │ In use:   [☐]            │ │
-│ │ Gamma:    [_____]        │ │
-│ │ Step limit:[☐]           │ │
-│ │ Low border:[_____]       │ │
-│ └──────────────────────────┘ │
-│ ▼ Result Saving              │
-│ ┌──────────────────────────┐ │
-│ │ Save result: [MEMORY ▼]  │ │
-│ └──────────────────────────┘ │
-└──────────────────────────────┘
-```
+The settings panel is a `PropertiesAccordion` with 4 expandable sections:
+
+1. **Initials:** Start (Number field), End (Number field), Step (Number field)
+2. **Integration:** Method (ComboBox), Accurate (Checkbox), Accuracy (Number field, disabled when Accurate unchecked), Stable (Checkbox), Parallel (Checkbox), Server (Text field, disabled when Parallel unchecked), Port (Number field, disabled when Parallel unchecked)
+3. **Event Detection:** In use (Checkbox), Gamma (Number field, disabled when In use unchecked), Step limit (Checkbox), Low border (Number field, disabled when Step limit unchecked)
+4. **Result Saving:** Save result (ComboBox, MEMORY/FILE)
 
 The settings panel extends `PropertiesAccordion` (from toolkit) with 4 sub-views wrapped in `VBox` with `styleClass = "settings-box"` and `prefWidth = 240.0`. Each sub-view contains a `ScrollPane` with a `propertiesGrid` layout (label on the left, control on the right).
 
 ## Tab Lifecycle
 
-```mermaid
-sequenceDiagram
-    participant Proj as ProjectService
-    participant TabPane as IsmaEditorTabPane
-    participant Tab as Tab
-    participant Project as IProjectModel
+The tab lifecycle follows this sequence: `ProjectService` adds a project → `IsmaEditorTabPane` observes `addedAsFlow()` which emits → a `Tab(project.name, project.editor)` is created → the tab sets `activeProject = project` → `Tab.textProperty()` is bound to `project.nameProperty()`.
 
-    Proj->>TabPane: projects.add(project)
-    TabPane->>TabPane: addedAsFlow() emits
-    TabPane->>Tab: Tab(project.name, project.editor)
-    Tab->>Proj: activeProject = project
-    Tab->>Tab: textProperty() bind project.nameProperty()
-
-    alt Tab close
-        Tab->>Proj: closeRequest
-        Proj->>Project: dispose()
-        Proj->>TabPane: projects.remove(project)
-        TabPane->>Tab: tabs.remove(tab)
-    end
-```
+On tab close: the tab fires a `closeRequest` → `ProjectService` calls `dispose()` on the project → `projects.remove(project)` → `IsmaEditorTabPane` removes the tab from `tabs`.
 
 `IsmaEditorTabPane` observes `ProjectService.projects` via coroutine flow. Creates a `Tab` for each project with `Tab(it.name, it.editor)`. On tab close, calls `projectController.close(project)` which removes from the set and disposes the project scope. Tab text is bound to `project.nameProperty()`. Tab selection sets `projectController.activeProject = project`.

@@ -6,40 +6,14 @@ The `infrastructure/` module provides concrete implementations of domain interfa
 
 ### DI Registration (`InfrastructureModule.kt`)
 
-```kotlin
-val infrastructureModule = module {
-    // Stores (domain interfaces → concrete implementations)
-    single<IIntegrationMethodsStore> { IntegrationMethodsStore() }
-    single<ISimulationSessionStore> { SimulationSessionStore() }
-    single<ICompiledModelStore> { CompiledModelStore() }
+See `InfrastructureModule.kt` for the full Koin module definition. All registrations use `single()` — every DI resolution returns the same instance (singleton). The module registers:
 
-    // Translators / Compilers
-    single<InputTranslator> { LismaTranslator() }
-    single<ILismaTranslator> { LismaTranslatorImpl(get()) }
-    single<IHsmCompiler> { HsmCompiler() }
-
-    // Integration methods library
-    single<IntegrationMethodsLibrary> { IntegrationMethodLibraryLoader.load() }
-
-    // Thread pool for async simulation execution
-    single<ExecutorService> { Executors.newCachedThreadPool() }
-
-    // Simulation executor (depends on library, compiler, stores, executor)
-    single<ISimulationExecutor> {
-        SimulationExecutorImpl(
-            integrationMethodsLibrary = get(),
-            hsmCompiler = get(),
-            sessionStore = get(),
-            executorService = get(),
-        )
-    }
-
-    // Highlight handler (no external dependencies)
-    single<IHighlightLismaHandler> { HighlightLismaHandlerImpl() }
-}
-```
-
-All registrations use `single()` — every DI resolution returns the same instance (singleton).
+- **Stores:** `IntegrationMethodsStore`, `SimulationSessionStore`, `CompiledModelStore` implementing domain interfaces
+- **Translators/Compilers:** `LismaTranslator`, `LismaTranslatorImpl`, `HsmCompiler`
+- **Integration methods library:** Loaded via `IntegrationMethodLibraryLoader.load()`
+- **Thread pool:** `Executors.newCachedThreadPool()` for async simulation execution
+- **Simulation executor:** `SimulationExecutorImpl` with dependencies on library, compiler, session store, and executor service
+- **Highlight handler:** `HighlightLismaHandlerImpl` with no external dependencies
 
 ---
 
@@ -47,18 +21,7 @@ All registrations use `single()` — every DI resolution returns the same instan
 
 ### CompiledModelStore
 
-```kotlin
-class CompiledModelStore : ICompiledModelStore {
-    private val models = ConcurrentHashMap<String, HSM>()
-    // create, get, delete, exists
-}
-```
-
-- **Storage:** In-memory `ConcurrentHashMap<String, HSM>`
-- **Keys:** UUID strings generated on `create()`
-- **Thread safety:** Lock-free via `ConcurrentHashMap`
-- **Lifecycle:** Models live for the entire server lifetime (no cleanup mechanism other than explicit `delete()`)
-- **Memory management:** No eviction, no TTL — models accumulate until server restart
+See `CompiledModelStore.kt` for the implementation. It stores compiled HSM models in an in-memory `ConcurrentHashMap<String, HSM>`. Keys are UUID strings generated on `create()`. Thread safety is achieved via lock-free `ConcurrentHashMap` operations. Models live for the entire server lifetime — no cleanup mechanism other than explicit `delete()`. No eviction or TTL; models accumulate until server restart.
 
 **Operations:**
 
@@ -73,18 +36,7 @@ class CompiledModelStore : ICompiledModelStore {
 
 ### SimulationSessionStore
 
-```kotlin
-class SimulationSessionStore : ISimulationSessionStore {
-    private val sessions = ConcurrentHashMap<Long, SimulationSession>()
-    private val nextId = AtomicLong(1L)
-    // create, get, getAll, update, updateStatus, updateProgress, completeSimulation, failSimulation, delete, exists
-}
-```
-
-- **Storage:** In-memory `ConcurrentHashMap<Long, SimulationSession>`
-- **ID generation:** `AtomicLong` starting at 1, auto-incrementing
-- **Thread safety:** Lock-free concurrent access via `ConcurrentHashMap`
-- **Immutability:** Sessions are immutable data classes; all mutations produce a copy via `session.copy(...)`
+See `SimulationSessionStore.kt` for the implementation. It stores sessions in an in-memory `ConcurrentHashMap<Long, SimulationSession>` with an `AtomicLong` starting at 1 for auto-incrementing ID generation. Thread safety is achieved via lock-free concurrent access. Sessions are immutable data classes; all mutations produce a copy via `session.copy(...)`.
 
 **Operations:**
 
@@ -103,41 +55,26 @@ class SimulationSessionStore : ISimulationSessionStore {
 
 **Session state transitions:**
 
+A session starts in `RUNNING` status. It transitions to `COMPLETED` when the simulation finishes successfully (with `resultFilePath` set), to `FAILED` when an exception occurs during execution (with an error message set), or to `CANCELLED` when the client sends a `CancelSimulation` request (no extra data).
+
 ```mermaid
 stateDiagram-v2
-    [*] --> RUNNING
+    [*] --> RUNNING: create(startTime, endTime)
 
-    RUNNING --> COMPLETED: simulation finishes successfully
-    RUNNING --> FAILED: exception during execution
-    RUNNING --> CANCELLED: client sends CancelSimulation
+    RUNNING --> COMPLETED: simulation finishes successfully\n(resultFilePath set)
+    RUNNING --> FAILED: exception during execution\n(error message set)
+    RUNNING --> CANCELLED: CancelSimulation request
 
-    COMPLETED: resultFilePath set
-    FAILED: error message set
-    CANCELLED: no extra data
+    COMPLETED --> [*]
+    FAILED --> [*]
+    CANCELLED --> [*]
 ```
 
 ---
 
 ### IntegrationMethodsStore
 
-```kotlin
-class IntegrationMethodsStore : IIntegrationMethodsStore {
-    private val methods: Map<String, IIntegrationMethodFactory>
-
-    init {
-        val loader = ServiceLoader.load(IIntegrationMethodFactory::class.java)
-        methods = loader.associateBy { it.name }
-    }
-
-    override fun getMethodNames(): List<String> = methods.keys.sorted()
-    override fun getMethod(name: String): IIntegrationMethodFactory =
-        methods[name] ?: throw UnsupportedOperationException("Integration method '$name' not found")
-}
-```
-
-- **Discovery mechanism:** Java `ServiceLoader` loads all `IIntegrationMethodFactory` implementations at startup
-- **Mapping:** Factory names → factory instances (immutable map)
-- **Thread safety:** Read-only immutable map after initialization — inherently thread-safe
+See `IntegrationMethodsStore.kt` for the implementation. It uses Java `ServiceLoader` to load all `IIntegrationMethodFactory` implementations at startup, mapping factory names to factory instances in an immutable map. Thread safety is inherent since the map is read-only after initialization.
 
 **Discovered methods (from isma-solver):**
 - `euler`
@@ -168,40 +105,31 @@ The most complex component in the infrastructure layer. It orchestrates the enti
 
 ### Execution Architecture
 
-```mermaid
-flowchart TB
-    subgraph Main["ExecutorService Thread"]
-        E["execute()"] --> R["runSimulation()"]
-        R --> S["Simulator Thread<br/>(Thread.ofVirtual())"]
-        R --> W["Writer Thread<br/>(Thread.ofVirtual())"]
-    end
-
-    subgraph Simulator["Simulator Thread"]
-        direction TB
-        S1["HybridSystemSimulator<br/>.runAsync()"] --> S2["IntgResultPoint"]
-        S2 --> S3["stepChangeHandlers:<br/>updateProgress / check CANCELLED"]
-        S3 --> S4["resultPointHandlers:<br/>pointQueue.put()"]
-    end
-
-    subgraph Writer["Writer Thread"]
-        direction TB
-        W1["pointQueue.take()"] --> W2["convertToDoubleArray()"]
-        W2 --> W3["writeAll(tempFile)"]
-        W3 --> W4["EndOfStream"]
-    end
-
-    S3 -.->|cancellation check| Main
-    S4 -->|"LinkedBlockingQueue"| W1
-    W3 -->|"tempFile.bin"| C["sessionStore.completeSimulation()"]
-
-    classDef thread fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
-    classDef action fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef queue fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-
-    linkStyle 6,7 stroke:#f57c00,stroke-width:3px
-```
+See `SimulationExecutorImpl.kt` for the full implementation. The execution uses three threads: an `ExecutorService` thread (entry point that catches exceptions and updates the session store), a virtual thread for the simulator (runs `HybridSystemSimulator.runAsync()` which produces `IntgResultPoint` objects, with step change handlers that update progress and check for cancellation, and result point handlers that put points into a `LinkedBlockingQueue`), and a virtual thread for the writer (consumes points from the queue, converts them to double arrays, and writes them to a temp file via `writeAll()`, signaling `EndOfStream` when done). After both virtual threads complete, `sessionStore.completeSimulation()` is called with the temp file path.
 
 **Thread model:**
+
+```mermaid
+graph TB
+    subgraph ExecutorService["ExecutorService Thread\n(entry point)"]
+        ES["submit() → try-catch wrapper"]
+    end
+
+    subgraph VirtualThreads["Virtual Threads"]
+        Sim["Simulator Thread\nHybridSystemSimulator.runAsync()"]
+        Writer["Writer Thread\nLinkedBlockingQueue → temp file"]
+    end
+
+    ES --> Sim
+    ES --> Writer
+    Sim -->|"IntgResultPoint"| Q["LinkedBlockingQueue"]
+    Q --> Writer
+    Writer -->|"EndOfStream"| ES
+    Sim -->|"check CANCELLED"| Sim
+    ES -->|"join both"| ES
+    ES -->|"completeSimulation"| Store["sessionStore.completeSimulation()"]
+```
+
 1. `ExecutorService` thread — entry point, catches exceptions and updates session store
 2. `Thread.ofVirtual()` (simulator) — runs the numerical integration asynchronously
 3. `Thread.ofVirtual()` (writer) — consumes result points and writes to binary file
@@ -209,121 +137,25 @@ flowchart TB
 
 ### Step-by-Step Execution
 
-**1. HSM Initialization**
-```kotlin
-hsm.initTimeEquation(parameters.startTime)
-```
-Sets the initial time for the HSM model's time equation.
+See `SimulationExecutorImpl.kt` for the complete implementation. The execution proceeds as follows:
 
-**2. Integration Method Setup**
-```kotlin
-val integrationMethod = integrationMethodsLibrary
-    .getIntegrationMethod(parameters.methodName)
-    .create()
-```
-Retrieves the factory by name, creates an instance, and configures:
-- `accuracyController.enabled` / `accuracyController.accuracy` (if accuracy config is present)
-- `stabilityController.enabled` (if stability config is present)
+**1. HSM Initialization:** Calls `hsm.initTimeEquation(parameters.startTime)` to set the initial time for the HSM model's time equation.
 
-**3. Factory Proxies**
+**2. Integration Method Setup:** Retrieves the integration method factory by name from `integrationMethodsLibrary`, creates an instance, and configures accuracy controller and stability controller based on config presence.
 
-The executor creates anonymous adapter objects to bridge between domain types and the next-core solver types:
+**3. Factory Proxies:** The executor creates anonymous adapter objects (`IIntegrationMethodProvider`, `IDaeSystemSolverFactory`, `IEventDetectorFactory`) to bridge between domain types and the next-core solver types. The `IDaeSystemSolverFactory` creates `DefaultDaeSystemStepSolver` with the integration method and DAE system. The `IEventDetectorFactory` creates a `DefaultEventDetector` if gamma and lowBorder are provided, otherwise returns null.
 
-```kotlin
-val integrationMethodProvider = object : IIntegrationMethodProvider {
-    override val method = integrationMethod
-}
+**4. Hybrid System Simulator:** Creates a `HybridSystemSimulator` with the DAE solver factory and event detector factory, then compiles the HSM model via `hsmCompiler.compile(hsm)`.
 
-val daeSystemSolverFactory = object : IDaeSystemSolverFactory {
-    override fun create(hsmCompilationResult): DaeSystemStepSolver {
-        return DefaultDaeSystemStepSolver(integrationMethod.method, hsmCompilationResult.hybridSystem.daeSystem)
-    }
-}
+**5. Initial Conditions:** Calls `createOdeInitials()` to map ODE definitions from the HSM model to the solver's differential equation indices.
 
-val eventDetectorFactory = object : IEventDetectorFactory {
-    override fun create(): IEventDetector? {
-        return if (gamma != null && lowBorder != null)
-            DefaultEventDetector(gamma, stepLowBound)
-        else
-            null
-    }
-}
-```
+**6. Simulation Parameters:** Creates `SimulationInitials` with the differential equation initials, start time, end time, and initial step.
 
-**4. Hybrid System Simulator**
-```kotlin
-val simulator = HybridSystemSimulator(daeSystemSolverFactory, eventDetectorFactory)
-val compilationResult = hsmCompiler.compile(hsm)
-```
+**7. Temporary File:** Creates a temp file using `File.createTempFile("isma_simulation_$simulationId", ".bin")` in the system temp directory.
 
-**5. Initial Conditions**
-```kotlin
-val differentialEquationInitials = createOdeInitials(compilationResult.indexProvider, hsm)
-```
-Maps ODE definitions from the HSM model to the solver's differential equation indices.
+**8. Async Simulation + Result Writing:** Two virtual threads run concurrently. The simulator thread runs `HybridSystemSimulator.runAsync()` with step change handlers that check for cancellation (throwing `InterruptedException` if status is `CANCELLED`) and update progress, and result point handlers that put points into a `LinkedBlockingQueue<QueueItem>`. The writer thread consumes from the queue, converts points to double arrays via a sequence, and writes them to the temp file. When `EndOfStream` is received, the writer exits the loop.
 
-**6. Simulation Parameters**
-```kotlin
-val simulationInitials = SimulationInitials(
-    differentialEquationInitials = odeInitials,
-    start = parameters.startTime,
-    end = parameters.endTime,
-    step = parameters.initialStep
-)
-```
-
-**7. Temporary File**
-```kotlin
-val tempFile = File.createTempFile("isma_simulation_$simulationId", ".bin")
-```
-Each simulation writes to a unique temp file in the system temp directory.
-
-**8. Async Simulation + Result Writing**
-
-Two virtual threads run concurrently:
-
-**Simulator thread** — runs the simulation with callbacks:
-```kotlin
-val simulatorParameters = HybridSystemSimulatorParameters(
-    compilationResult,
-    simulationInitials,
-    stepChangeHandlers = { currentTime ->
-        // Check cancellation
-        val session = sessionStore.get(simulationId)
-        if (session?.status == SimulationStatus.CANCELLED)
-            throw InterruptedException("Simulation was cancelled")
-        // Update progress
-        sessionStore.updateProgress(simulationId, currentTime)
-    },
-    resultPointHandlers = { point ->
-        pointQueue.put(QueueItem.Point(point))
-    }
-)
-metricData = simulator.runAsync(simulatorParameters)
-```
-
-**Writer thread** — consumes points and writes the file:
-```kotlin
-val pointsSequence = sequence {
-    while (true) {
-        val item = pointQueue.take()
-        if (item is QueueItem.EndOfStream) break
-        yield(convertToDoubleArray(item.point))
-    }
-}
-writeAll(tempFile, variableNames, pointsSequence)
-```
-
-**Point queue:** `LinkedBlockingQueue<QueueItem>` — unbounded blocking queue for thread synchronization between simulator and writer threads.
-
-**QueueItem sealed class:**
-
-```kotlin
-private sealed class QueueItem {
-    data class Point(val point: IntgResultPoint) : QueueItem()
-    data object EndOfStream : QueueItem()
-}
-```
+**QueueItem sealed class:** Has two variants — `Point(IntgResultPoint)` and `EndOfStream`.
 
 **Variable naming in output file:** Variable names are derived from `EquationIndexProvider`:
 - `TIME` — simulation time
@@ -342,32 +174,11 @@ The file is written via `writeAll()` from `isma-jvm-lib:exchange-format`. It con
 | `AE_0-<code>`, `AE_1-<code>`, ... | Algebraic equation variables |
 | `f0`, `f1`, ... | Right-hand side function values |
 
-**10. Completion**
-
-```kotlin
-simulatorThread.join()
-writerThread.join()
-sessionStore.completeSimulation(simulationId, tempFile.absolutePath)
-```
+**10. Completion:** The main thread joins both virtual threads and then calls `sessionStore.completeSimulation(simulationId, tempFile.absolutePath)` to mark the simulation as complete with the result file path.
 
 ### Exception Handling
 
-```kotlin
-executorService.submit {
-    try {
-        runSimulation(simulationId, parameters, hsm)
-    } catch (e: InterruptedException) {
-        if (session?.status != SimulationStatus.CANCELLED) {
-            sessionStore.failSimulation(simulationId, e.message ?: "Simulation interrupted")
-        }
-    } catch (e: Exception) {
-        sessionStore.failSimulation(simulationId, e.message ?: "Unknown error")
-    }
-}
-```
-
-- `InterruptedException` → only marks as FAILED if not already CANCELLED
-- Other exceptions → always FAILED
+See `SimulationExecutorImpl.kt` for the exception handling logic. The `executorService.submit()` block wraps the simulation in a try-catch. `InterruptedException` is only marked as FAILED if the session status is not already `CANCELLED`. Other exceptions always result in a FAILED status with the exception message.
 
 ---
 
@@ -375,40 +186,7 @@ executorService.submit {
 
 ### LismaTranslatorImpl
 
-```kotlin
-class LismaTranslatorImpl(
-    private val translator: InputTranslator,
-) : ILismaTranslator {
-
-    override fun translate(sourceCode: String): Result<HSM> {
-        return try {
-            val errors = IsmaErrorList()
-            val model = translator.translate(sourceCode, errors)
-
-            if (errors.isNotEmpty()) {
-                return Result.failure(TranslationException(errors))
-            }
-
-            val processedModel = if (model.isPDE) {
-                FDMConverter(model).convert()
-                    ?: return Result.failure(IllegalArgumentException("FDM conversion failed"))
-            } else {
-                model
-            }
-
-            Result.success(processedModel)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override fun validate(sourceCode: String): IsmaErrorList {
-        val errors = IsmaErrorList()
-        translator.translate(sourceCode, errors)
-        return errors
-    }
-}
-```
+See `LismaTranslatorImpl.kt` for the full implementation. The `translate()` method calls `InputTranslator.translate(sourceCode, errors)`, checks if the error list is non-empty (failing with `TranslationException` if so), applies `FDMConverter.convert()` for PDE models, and returns `Result.success(processedModel)` or `Result.failure(exception)`. The `validate()` method runs the same translator but discards the model, returning only the error list.
 
 **Translation pipeline:**
 
@@ -432,16 +210,4 @@ class LismaTranslatorImpl(
 
 ### HighlightLismaHandlerImpl
 
-Uses ANTLR4 runtime (no parser, only lexer) for fast lexical analysis.
-
-```kotlin
-val inputStream = CharStreams.fromString(sourceCode)
-val tokens = LismaLexer(inputStream).allTokens
-```
-
-Only three token kinds are returned (others filtered):
-- **Keywords:** `const`, `state`, `for`, `if`, `else`, `from`, `macro`, `set`
-- **Comments:** Block comments and single-line comments (`//`)
-- **Numbers:** Floating-point literals and decimal integers
-
-All identifiers, operators, and punctuation are silently ignored — this is sufficient for basic syntax highlighting in an IDE.
+See `HighlightLismaHandlerImpl.kt` for the implementation. Uses ANTLR4 runtime (no parser, only lexer) for fast lexical analysis. It creates a `CharStreams.fromString(sourceCode)` and tokenizes with `LismaLexer`. Only three token kinds are returned (others filtered): **Keywords** (`const`, `state`, `for`, `if`, `else`, `from`, `macro`, `set`), **Comments** (block comments and single-line comments), and **Numbers** (floating-point literals and decimal integers). All identifiers, operators, and punctuation are silently ignored — this is sufficient for basic syntax highlighting in an IDE.

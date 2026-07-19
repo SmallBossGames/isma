@@ -6,57 +6,13 @@ The `external-services` module handles all communication with the ISMA server pr
 
 ## Structure
 
-```
-external-services/src/main/kotlin/ru/isma/next/external/
-├── BinaryEquationIndexProvider.kt
-├── BinaryFilePointProvider.kt
-├── CompilationClient.kt
-├── DownloadClient.kt
-├── GrpcLismaCompilerClient.kt
-├── GrpcSimulationClient.kt
-├── HttpSimulationClient.kt
-├── SimulationServerFacade.kt
-└── SimulationServerManager.kt
-└── dtos/
-    ├── ExternalDtoTypes.kt
-    └── RunSimulationParams.kt
-```
-
-Module group: `ru.isma.next.ui`, version: `1.0.0-SNAPSHOT`.
+The module source lives in `external-services/src/main/kotlin/ru/isma/next/external/` and contains: `BinaryEquationIndexProvider.kt`, `BinaryFilePointProvider.kt`, `CompilationClient.kt`, `DownloadClient.kt`, `GrpcLismaCompilerClient.kt`, `GrpcSimulationClient.kt`, `HttpSimulationClient.kt`, `SimulationServerFacade.kt`, and `SimulationServerManager.kt`. The `dtos/` subdirectory contains `ExternalDtoTypes.kt` and `RunSimulationParams.kt`. Module group: `ru.isma.next.ui`, version: `1.0.0-SNAPSHOT`.
 
 ## Module Configuration
 
 **File:** `external-services/build.gradle.kts`
 
-```kotlin
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java.modules)
-}
-
-dependencies {
-    implementation(project(":isma-ui:grpc"))
-    implementation(project(":isma-ui:domain"))
-    implementation(project(":isma-jvm-lib:exchange-format"))
-
-    implementation(libs.grpc.netty)
-    implementation(libs.grpc.protobuf)
-    implementation(libs.grpc.stub)
-    implementation(libs.protobuf.java)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.slf4j.api)
-
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.kotlinx.io.core)
-
-    implementation(libs.netty.transport)
-    implementation(libs.netty.transport.classes.epoll)
-    implementation(libs.netty.transport.native.epoll) {
-        artifact { classifier = "linux-x86_64" }
-    }
-}
-```
+The module applies the Kotlin JVM plugin and Java modules plugin. Dependencies include project references to `:isma-ui:grpc`, `:isma-ui:domain`, and `:isma-jvm-lib:exchange-format`. External dependencies cover gRPC-Netty, gRPC-protobuf, gRPC-stub, protobuf-java, kotlinx-coroutines-core, slf4j-api, ktor-client-core, ktor-client-cio, kotlinx-io-core, and Netty transport (with Linux x86_64 epoll classifier). See `external-services/build.gradle.kts` for the full configuration.
 
 ## Server Lifecycle
 
@@ -64,18 +20,7 @@ dependencies {
 
 **File:** `SimulationServerManager.kt`
 
-Manages the isma-server child process. The script path is resolved from environment variable `ISMA_SERVER_SCRIPT` or system property `isma.server.script`.
-
-```kotlin
-class SimulationServerManager(
-    private val scriptPath: String = resolveServerScriptPath(),
-) {
-    data class SocketPaths(val grpc: String, val http: String)
-
-    fun start(): SocketPaths
-    fun stop()
-}
-```
+Manages the isma-server child process. The script path is resolved from environment variable `ISMA_SERVER_SCRIPT` or system property `isma.server.script`. The class contains a nested `SocketPaths` data class with `grpc` and `http` string properties, and exposes `start(): SocketPaths` and `stop()` methods.
 
 **Startup protocol:**
 
@@ -85,56 +30,13 @@ class SimulationServerManager(
 4. Extracts gRPC socket path and HTTP socket path (line containing `HTTP_SOCKET=<path>`)
 5. Returns `SocketPaths(grpc, http)`
 
-```kotlin
-fun start(): SocketPaths {
-    if (running) return socketPaths!!
-
-    process = ProcessBuilder(scriptPath)
-        .redirectErrorStream(true)
-        .start()
-
-    val reader = process!!.inputStream.bufferedReader()
-    val lines = mutableListOf<String>()
-
-    while (lines.size < 4) {
-        val line = reader.readLine() ?: break
-        if (line.startsWith("WARNING:") || line.startsWith("SLF4J:") || line.isBlank()) continue
-        if (line.contains(" INFO ") || line.contains(" WARN ")) continue
-        lines.add(line)
-    }
-
-    val grpcSocket = lines[0].substringAfter(": ").trim()
-    val httpSocket = lines.find { it.startsWith("HTTP_SOCKET=") }
-        ?.substringAfter("=")?.trim()
-        ?: throw IllegalStateException("HTTP socket not found")
-
-    socketPaths = SocketPaths(grpc = grpcSocket, http = httpSocket)
-    running = true
-    Runtime.getRuntime().addShutdownHook(Thread { stop() })
-    return socketPaths!!
-}
-```
-
-A shutdown hook registers `stop()` to ensure the server process is destroyed on JVM exit.
+The `start()` method checks if already running, creates a `ProcessBuilder`, reads the first 4 non-skipped lines from stdout, extracts the gRPC socket from the first line and the HTTP socket from the `HTTP_SOCKET=` line (throwing `IllegalStateException` if not found), stores the paths, sets `running = true`, and registers a shutdown hook. See `SimulationServerManager.kt` for the full implementation. A shutdown hook registers `stop()` to ensure the server process is destroyed on JVM exit.
 
 ### SimulationServerFacade
 
 **File:** `SimulationServerFacade.kt`
 
-The facade orchestrates the three client connections. It's initialized lazily via `warmup()` called from `IsmaApplication.init`.
-
-```kotlin
-class SimulationServerFacade(
-    private val serverManager: SimulationServerManager,
-) {
-    private lateinit var grpcClient: GrpcSimulationClient
-    private lateinit var httpClient: HttpSimulationClient
-    private lateinit var compilerClient: GrpcLismaCompilerClient
-
-    fun warmup()
-    fun shutdown()
-}
-```
+The facade orchestrates the three client connections. It's initialized lazily via `warmup()` called from `IsmaApplication.init`. The class takes a `SimulationServerManager` in its constructor and holds late-initialized references to `grpcClient` (GrpcSimulationClient), `httpClient` (HttpSimulationClient), and `compilerClient` (GrpcLismaCompilerClient). Exposes `warmup()` and `shutdown()` methods. See `SimulationServerFacade.kt` for the full implementation.
 
 **Methods:**
 
@@ -154,15 +56,7 @@ class SimulationServerFacade(
 
 **DTOs defined in `dtos/ExternalDtoTypes.kt`:**
 
-```kotlin
-data class CachedSimulationResult(val file: File, val columnNames: List<String>)
-data class CompileResult(val modelId: String, val errors: List<CompilationErrorDto>, val warnings: List<String>)
-data class ValidationResult(val errors: List<CompilationErrorDto>, val warnings: List<String>)
-data class CompilationErrorDto(val row: Int, val column: Int, val message: String)
-
-enum class SyntaxTokenKind { UNSPECIFIED, KEYWORD, COMMENT, NUMBER, TEXT }
-data class SyntaxTokenDto(val start: Int, val length: Int, val kind: SyntaxTokenKind)
-```
+`CachedSimulationResult` (File + List<String> columnNames), `CompileResult` (String modelId + List<CompilationErrorDto> errors + List<String> warnings), `ValidationResult` (List<CompilationErrorDto> errors + List<String> warnings), `CompilationErrorDto` (Int row + Int column + String message), `SyntaxTokenKind` enum (UNSPECIFIED, KEYWORD, COMMENT, NUMBER, TEXT), and `SyntaxTokenDto` (Int start + Int length + SyntaxTokenKind kind). See `ExternalDtoTypes.kt` for the full definitions.
 
 **DTOs relocated from facade:** `RunSimulationParams.kt` is now in `dtos/` subdirectory (was previously at the root of `external/`).
 
@@ -176,57 +70,19 @@ data class SyntaxTokenDto(val start: Int, val length: Int, val kind: SyntaxToken
 
 **File:** `GrpcSimulationClient.kt`
 
-Netty gRPC client using Linux Epoll for Unix Domain Socket transport.
+Netty gRPC client using Linux Epoll for Unix Domain Socket transport. See `GrpcSimulationClient.kt` for the full implementation.
 
 ### RunSimulationParams
 
 **File:** `dtos/RunSimulationParams.kt`
 
-DTO passed to `serverFacade.runSimulation()`:
-
-```kotlin
-data class RunSimulationParams(
-    val startTime: Double,
-    val endTime: Double,
-    val initialStep: Double,
-    val methodName: String,
-    val accuracy: Double,
-    val isAccuracyInUse: Boolean,
-    val isStabilityControlInUse: Boolean,
-    val compiledModelId: String,
-    val eventDetectionGamma: Double? = null,
-    val eventDetectionLowBorder: Double? = null,
-)
-```
-
-Optional fields (`eventDetectionGamma`, `eventDetectionLowBorder`) are null when event detection is disabled.
+DTO passed to `serverFacade.runSimulation()` containing: `startTime`, `endTime`, `initialStep` (all Double), `methodName` (String), `accuracy` (Double), `isAccuracyInUse` (Boolean), `isStabilityControlInUse` (Boolean), `compiledModelId` (String), and optional `eventDetectionGamma` and `eventDetectionLowBorder` (both Double?, null when event detection is disabled). See `RunSimulationParams.kt` for the full definition.
 
 ### GrpcSimulationClient
 
 **File:** `GrpcSimulationClient.kt`
 
-```kotlin
-class GrpcSimulationClient(socketPath: String) {
-    private val eventLoopGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-
-    private val channel: ManagedChannel = NettyChannelBuilder
-        .forAddress(DomainSocketAddress(socketPath))
-        .channelType(EpollDomainSocketChannel::class.java)
-        .eventLoopGroup(eventLoopGroup)
-        .negotiationType(NegotiationType.PLAINTEXT)
-        .keepAliveTime(365 * 24 * 3600, TimeUnit.SECONDS)
-        .build()
-
-    val blockingStub = SimulationServiceGrpc.newBlockingStub(channel)
-
-    fun shutdown() {
-        channel.shutdown()
-        eventLoopGroup.shutdownGracefully()
-    }
-}
-```
-
-Uses a 1-year keepalive interval (effectively disabled) since the channel lives for the application lifetime.
+A class that takes a `socketPath` string in its constructor. Creates a `MultiThreadIoEventLoopGroup` with `EpollIoHandler.newFactory()`, builds a `ManagedChannel` via `NettyChannelBuilder` targeting a `DomainSocketAddress` with `EpollDomainSocketChannel`, plaintext negotiation, and a 1-year keepalive interval (effectively disabled since the channel lives for the application lifetime). Exposes a `blockingStub` via `SimulationServiceGrpc.newBlockingStub(channel)`. The `shutdown()` method shuts down the channel and event loop group. See `GrpcSimulationClient.kt` for the full implementation.
 
 ### GrpcLismaCompilerClient
 
@@ -248,21 +104,7 @@ Ktor CIO HTTP client for downloading simulation result files over Unix Domain So
 
 **File:** `BinaryFilePointProvider.kt`
 
-Implements `SimulationResultReader`. Reads binary simulation results using `ru.isma.next.exchange.format.readAllPointsSequence()` and streams as `Flow<SimulationPoint>`.
-
-```kotlin
-class BinaryFilePointProvider(
-    private val file: File,
-    private val columnNames: List<String>,
-) : SimulationResultReader {
-    override val results: Flow<SimulationPoint>
-        get() = flow { /* ... */ }
-
-    companion object {
-        fun readMetadata(file: File): SimulationMetadata
-    }
-}
-```
+Implements `SimulationResultReader`. Takes a `File` and `List<String>` columnNames in its constructor. Reads binary simulation results using `ru.isma.next.exchange.format.readAllPointsSequence()` and streams as `Flow<SimulationPoint>`. Provides a companion object method `readMetadata(file: File): SimulationMetadata`. See `BinaryFilePointProvider.kt` for the full implementation.
 
 ### BinaryEquationIndexProvider
 
@@ -277,45 +119,7 @@ Derives equation counts and codes from the column metadata returned with the sim
 
 ## Communication Flow: Simulation Run
 
-```mermaid
-sequenceDiagram
-    participant UI as SimulationService
-    participant Facade as SimulationServerFacade
-    participant Grpc as GrpcSimulationClient
-    participant Http as HttpSimulationClient
-    participant Server as isma-server
-
-    UI->>Facade: compileModel(source)
-    Facade->>Grpc: CompileRequest
-    Grpc->>Server: compile()
-    Server-->>Grpc: CompileResponse
-    Grpc-->>Facade: CompileResult
-
-    UI->>Facade: runSimulation(params)
-    Facade->>Grpc: RunSimulationRequest
-    Grpc->>Server: runSimulation()
-    Server-->>Grpc: simulationId
-    Grpc-->>Facade: simulationId
-
-    UI->>Facade: monitorSimulation(id)
-    Facade->>Grpc: MonitorSimulationRequest
-    Grpc->>Server: monitorSimulation()
-    Server-->>Grpc: ServerStream<SimulationProgress>
-    Grpc-->>Facade: Flow<SimulationProgress>
-    Facade-->>UI: emit progress
-
-    UI->>Facade: downloadResultToCache(id)
-    Facade->>Grpc: GetSimulationResultRequest
-    Grpc->>Server: getSimulationResult()
-    Server-->>Grpc: downloadUrl
-    Grpc-->>Facade: downloadUrl
-    Facade->>Http: downloadToFile(url, file)
-    Http->>Server: HTTP GET
-    Server-->>Http: binary data
-    Http-->>Facade: cached file
-
-    Facade-->>UI: CachedSimulationResult
-```
+The simulation run follows this sequence: `SimulationService` calls `Facade.compileModel(source)`, which sends a `CompileRequest` via `GrpcSimulationClient` to the server. The server returns a `CompileResponse`, which the client converts to `CompileResult`. Next, `runSimulation(params)` sends a `RunSimulationRequest` and returns a `simulationId`. Then `monitorSimulation(id)` initiates a server stream of `SimulationProgress` values, which the client emits as a `Flow<SimulationProgress>`. Finally, `downloadResultToCache(id)` calls `getSimulationResult()` to get a download URL, then the `HttpSimulationClient` fetches the binary file via HTTP GET. The facade returns a `CachedSimulationResult` to the UI.
 
 ## Error Handling
 

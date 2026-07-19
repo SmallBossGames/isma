@@ -4,165 +4,34 @@
 
 ### Gradle Modules
 
-```
-:isma-server:grpc          — gRPC code generation (protobuf → Java)
-:isma-server:domain        — Domain interfaces + handler implementations
-:isma-server:infrastructure — Concrete store/executor implementations
-:isma-server:app           — Application entry point + gRPC/HTTP services
-```
+| Module | Purpose |
+|--------|---------|
+| `:isma-server:grpc` | gRPC code generation (protobuf → Java) |
+| `:isma-server:domain` | Domain interfaces + handler implementations |
+| `:isma-server:infrastructure` | Concrete store/executor implementations |
+| `:isma-server:app` | Application entry point + gRPC/HTTP services |
 
 ### Build Scripts
 
 #### `grpc/build.gradle.kts`
 
-```kotlin
-group = "ru.nstu.isma.server"
-version = "1.0.0-SNAPSHOT"
+See `grpc/build.gradle.kts` for the full configuration. It applies the `google.protobuf` and `java.modules` plugins, configures `protoc` and `protoc-gen-grpc-java` code generation, sets the proto source directory to `../../protobuf-contracts`, and depends on gRPC and protobuf libraries.
 
-plugins {
-    alias(libs.plugins.google.protobuf)
-    alias(libs.plugins.java.modules)
-}
-
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${libs.protobuf.java.get().version}"
-    }
-    plugins {
-        id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:${libs.grpc.java.get().version}"
-        }
-    }
-    generateProtoTasks {
-        ofSourceSet("main").forEach {
-            it.plugins { id("grpc") {} }
-        }
-    }
-}
-
-sourceSets {
-    main {
-        proto {
-            srcDir("../../protobuf-contracts")   // Proto source location
-        }
-    }
-}
-
-dependencies {
-    implementation(libs.grpc.netty.shaded)
-    implementation(libs.grpc.stub)
-    implementation(libs.grpc.protobuf)
-    implementation(libs.protobuf.java)
-    implementation(libs.grpc.java)
-}
-```
-
-**Code generation:** Protobuf files from `protobuf-contracts/v1/` are compiled into Java gRPC stubs. The generated classes include:
-- Service interfaces (`SimulationServiceGrpc`, `LismaCompilerServiceGrpc`)
-- Message classes (`RunSimulationRequest`, `CompileResponse`, etc.)
-- Builder classes for all messages
+**Code generation:** Protobuf files from `protobuf-contracts/v1/` are compiled into Java gRPC stubs. The generated classes include service interfaces (`SimulationServiceGrpc`, `LismaCompilerServiceGrpc`), message classes (`RunSimulationRequest`, `CompileResponse`, etc.), and builder classes for all messages.
 
 **Important:** Proto changes require rebuilding this module. Generated code should NOT be committed (it's derived from `.proto` files).
 
 #### `domain/build.gradle.kts`
 
-```kotlin
-group = "ru.nstu.isma.server"
-version = "1.0.0-SNAPSHOT"
-
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java.modules)
-}
-
-dependencies {
-    implementation(project(":isma-solver:api"))
-    implementation(project(":isma-compiler:hsm-core"))
-    implementation(project(":isma-next-core"))
-    implementation(libs.koin.core)
-}
-```
-
-Domain depends only on external libraries and core project modules. No infrastructure or app dependencies.
+See `domain/build.gradle.kts` for the full configuration. It applies `kotlin.jvm` and `java.modules` plugins and depends on `isma-solver:api`, `isma-compiler:hsm-core`, `isma-next-core`, and `koin-core`. Domain depends only on external libraries and core project modules. No infrastructure or app dependencies.
 
 #### `infrastructure/build.gradle.kts`
 
-```kotlin
-group = "ru.nstu.isma.server"
-version = "1.0.0-SNAPSHOT"
-
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java.modules)
-}
-
-dependencies {
-    implementation(project(":isma-server:domain"))
-    implementation(project(":isma-jvm-lib:exchange-format"))
-    implementation(project(":isma-solver:api"))
-    implementation(project(":isma-solver:core"))
-    implementation(project(":isma-solver:lib-utils"))
-    implementation(project(":isma-compiler:lisma-translator-hsm"))
-    implementation(project(":isma-compiler:hsm-core"))
-    implementation(project(":isma-compiler:hsm-fdm"))
-    implementation(project(":isma-compiler:hsm-jvm"))
-    implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
-    implementation(project(":isma-next-core"))
-    implementation(libs.antlr4.runtime)
-    implementation(libs.koin.core)
-    implementation(libs.slf4j.api)
-}
-```
+See `infrastructure/build.gradle.kts` for the full configuration. It applies `kotlin.jvm` and `java.modules` plugins and depends on the domain module, `isma-jvm-lib:exchange-format`, `isma-solver:api/core/lib-utils`, `isma-compiler:lisma-translator-hsm/hsm-core/hsm-fdm/hsm-jvm/hsm-jvm-calcmodel`, `isma-next-core`, `antlr4-runtime`, `koin-core`, and `slf4j-api`.
 
 #### `app/build.gradle.kts`
 
-```kotlin
-group = "ru.nstu.isma.server"
-version = "1.0.0-SNAPSHOT"
-
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java.modules)
-    application
-}
-
-application {
-    mainClass.set("ru.nstu.isma.server.app.ApplicationKt")
-}
-
-dependencies {
-    implementation(project(":isma-server:domain"))
-    implementation(project(":isma-server:grpc"))
-    implementation(project(":isma-server:infrastructure"))
-    implementation(project(":isma-solver:lib-meta"))
-
-    // gRPC + Netty
-    implementation(libs.grpc.netty)
-    implementation(libs.netty.transport)
-    implementation(libs.netty.transport.classes.epoll)
-    implementation(libs.netty.transport.native.epoll) {
-        artifact { classifier = "linux-x86_64" }
-    }
-    implementation(libs.netty.codec)
-    implementation(libs.netty.handler)
-    implementation(libs.grpc.stub)
-    implementation(libs.grpc.protobuf)
-    implementation(libs.protobuf.java)
-    implementation(libs.grpc.java)
-    implementation(libs.grpc.services)
-
-    // DI & Logging
-    implementation(libs.kotlin.reflect)
-    implementation(libs.koin.core)
-    implementation(libs.slf4j.api)
-    runtimeOnly(libs.logback.classic)
-
-    // HTTP (Ktor)
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.cio)
-    implementation(libs.ktor.server.content.negotiation)
-}
-```
+See `app/build.gradle.kts` for the full configuration. It applies `kotlin.jvm`, `java.modules`, and `application` plugins, sets `mainClass` to `ru.nstu.isma.server.app.ApplicationKt`, and depends on all three internal modules, `isma-solver:lib-meta`, gRPC/Netty libraries, Kotlin reflection, Koin, SLF4J/Logback, and Ktor server libraries.
 
 ### Dependency Versions
 
@@ -258,6 +127,8 @@ flowchart TD
     class Koin,GrpcBuild subgraph
 ```
 
+See `Application.kt` for the full startup sequence. The function performs 12 steps: (1) parse CLI arguments (`--socket-path`, `--http-socket-path`), (2) call `startKoin { modules(domainModule, infrastructureModule, appModule) }` — initializes `IntegrationMethodsStore` (ServiceLoader), `IntegrationMethodLibraryLoader`, `LismaTranslator`, `HsmCompiler`, `Executors.newCachedThreadPool()`, and all handler instances, (3) delete stale socket files, (4) create Netty Epoll event loop groups (boss + worker), (5) build gRPC server — binds to `DomainSocketAddress`, registers `SimulationServiceGrpcImpl`, `LismaCompilerServiceGrpcImpl`, and `ProtoReflectionServiceV1`, (6) start gRPC server (`.start()`), (7) create Ktor HTTP server (CIO engine, Unix socket), (8) register HTTP route `GET /simulation/{id}/download`, (9) start HTTP server (`start(false)`), (10) print `GRPC_SOCKET` and `HTTP_SOCKET` to stdout, (11) register shutdown hook, (12) block on `grpcServer.awaitTermination()` (blocks main thread).
+
 ---
 
 ## Shutdown Sequence
@@ -277,26 +148,19 @@ flowchart LR
     class S1,S2,S3,S4,S5,S6 action
 ```
 
+See `Application.kt` for the shutdown hook implementation. The shutdown proceeds in 6 steps: (1) `grpcServer.shutdown()` — stop accepting new requests, (2) `httpServer.stop(1, 2, SECONDS)` — stop HTTP server, (3) `bossGroup.shutdownGracefully()` — close boss event loop, (4) `workerGroup.shutdownGracefully()` — close worker event loop, (5) `File(socketPath).delete()` — remove gRPC socket file, (6) `File(httpSocketPath).delete()` — remove HTTP socket file.
+
 ---
 
 ## Build Commands
 
-```bash
-# Build entire isma-server module (all 4 submodules)
-./gradlew :isma-server:build
-
-# Build just the application (includes all dependencies)
-./gradlew :isma-server:app:build
-
-# Generate gRPC stubs only (after proto changes)
-./gradlew :isma-server:grpc:generateProto
-
-# Build with tests
-./gradlew :isma-server:test
-
-# Build distribution bundle (UI + server together)
-./.ci-cd/build-bundle.sh
-```
+| Command | Purpose |
+|---------|---------|
+| `./gradlew :isma-server:build` | Build entire isma-server module (all 4 submodules) |
+| `./gradlew :isma-server:app:build` | Build just the application (includes all dependencies) |
+| `./gradlew :isma-server:grpc:generateProto` | Generate gRPC stubs only (after proto changes) |
+| `./gradlew :isma-server:test` | Build with tests |
+| `./.ci-cd/build-bundle.sh` | Build distribution bundle (UI + server together) |
 
 ### Common Issues
 

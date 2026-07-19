@@ -2,25 +2,14 @@
 
 ## View Hierarchy
 
-```mermaid
-flowchart TD
-    MainView["MainView (BorderPane)"]
-    MainView --> Top["top: VBox"]
-    MainView --> Center["center: IsmaEditorTabPane"]
-    MainView --> Right["right: SettingsPanelView"]
-    MainView --> Bottom["bottom: BorderPane"]
-    Top --> MenuBar["IsmaMenuBar"]
-    Top --> ToolBar["IsmaToolBar"]
-    Center --> TabPane["TabPane → one Tab per IProjectModel"]
-    Bottom --> ErrDrawer["top: ErrorListDrawer"]
-    Bottom --> ProcBar["bottom: SimulationProcessBar"]
-    ProcBar --> TasksPO["TasksPopOver (factory)"]
-    Right --> SettingsAcc["PropertiesAccordion"]
-    SettingsAcc --> Cauchy["CauchyInitialsView"]
-    SettingsAcc --> Method["MethodSettingsView"]
-    SettingsAcc --> Event["EventDetectionView"]
-    SettingsAcc --> Result["ResultSavingView"]
-```
+The view hierarchy is:
+
+- `MainView` (BorderPane) has four regions:
+  - **top:** `VBox` containing `IsmaMenuBar` + `IsmaToolBar`
+  - **center:** `IsmaEditorTabPane` (TabPane → one Tab per IProjectModel)
+  - **right:** `SettingsPanelView` which extends `PropertiesAccordion` containing `CauchyInitialsView`, `MethodSettingsView`, `EventDetectionView`, `ResultSavingView`
+  - **bottom:** nested `BorderPane` with `ErrorListDrawer` (top) + `SimulationProcessBar` (bottom)
+- `SimulationProcessBar` contains `TasksPopOver` (factory)
 
 ## MainView
 
@@ -150,18 +139,7 @@ Populated by:
 
 **File:** [`TasksPopOver.kt`](../../app/src/main/kotlin/.../views/toolbars/TasksPopOver.kt)
 
-A floating panel that opens from the "Tasks" button. Shows running and completed simulations. Bound to `SimulationTaskService.tasks` via `changeAsFlow()`.
-
-```mermaid
-flowchart TD
-    TasksPO["TasksPopOver (factory)"]
-    TasksPO --> InProgress["In progress section"]
-    TasksPO --> Completed["Completed section"]
-    TasksPO --> Failed["Failed section"]
-    Completed --> ShowBtn["Show → SimulationResultService.showChart()"]
-    Completed --> ExportBtn["Export → SimulationResultService.exportToFile()"]
-    Completed --> DetailsBtn["Details → nested PopOver"]
-```
+A floating panel that opens from the "Tasks" button. Shows running and completed simulations. Bound to `SimulationTaskService.tasks` via `changeAsFlow()`. It has three sections: "In progress" (task label, progress bar, Abort button), "Completed" (task label, Show button → `SimulationResultService.showChart()`, Export button → `SimulationResultService.exportToFile()`, Details button → nested PopOver), and "Failed" (task label, error message, Remove button).
 
 **In progress section:** Task label, progress bar, Abort button. Removed on completion or abort.
 

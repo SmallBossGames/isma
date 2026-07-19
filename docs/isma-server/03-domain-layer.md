@@ -4,34 +4,11 @@
 
 The `domain/` module implements the business logic using a **handler-based architecture** with interface-implementation separation. Each use case is encapsulated in a handler pair: an interface (contract) and an implementation.
 
-The domain layer is unusual in that it contains **both interfaces and their implementations**, while infrastructure implementations (stores, executors) live in the `infrastructure/` module. This creates a two-level dependency pattern:
-
-```
-domain handlers ──depends on──► infrastructure stores/executors
-```
+The domain layer is unusual in that it contains **both interfaces and their implementations**, while infrastructure implementations (stores, executors) live in the `infrastructure/` module. This creates a two-level dependency pattern: domain handlers depend on infrastructure stores and executors.
 
 ## Dependency Injection
 
-All domain bindings are defined in `DomainModule.kt`:
-
-```kotlin
-val domainModule = module {
-    // Simulation handlers
-    single<IRunSimulationHandler> { RunSimulationHandlerImpl(get(), get(), get()) }
-    single<IGetSimulationResultHandler> { GetSimulationResultHandlerImpl(get()) }
-    single<IMonitorSimulationHandler> { MonitorSimulationHandlerImpl(get()) }
-    single<IListSimulationMethodsHandler> { ListSimulationMethodsHandlerImpl(get()) }
-    single<ICancelSimulationHandler> { CancelSimulationHandlerImpl(get()) }
-
-    // LISMA compiler handlers
-    single<ICompileLismaHandler> { CompileLismaHandlerImpl(get(), get()) }
-    single<IValidateLismaHandler> { ValidateLismaHandlerImpl(get()) }
-    single<IDeleteCompiledModelHandler> { DeleteCompiledModelHandlerImpl(get()) }
-    single<IHighlightLismaHandler> { get<IHighlightLismaHandler>() }  // resolved from infrastructure
-}
-```
-
-All handlers are registered as **singletons** (`single`) — they are stateless and delegate to injected dependencies.
+All domain bindings are defined in `DomainModule.kt`. Each handler interface is registered as a singleton via `single<Interface> { Implementation(...) }`. Simulation handlers include `IRunSimulationHandler`, `IGetSimulationResultHandler`, `IMonitorSimulationHandler`, `IListSimulationMethodsHandler`, and `ICancelSimulationHandler`. LISMA compiler handlers include `ICompileLismaHandler`, `IValidateLismaHandler`, `IDeleteCompiledModelHandler`, and `IHighlightLismaHandler` (which is resolved from the infrastructure module). All handlers are registered as **singletons** (`single`) — they are stateless and delegate to injected dependencies.
 
 ---
 
@@ -54,22 +31,7 @@ All handlers are registered as **singletons** (`single`) — they are stateless 
 3. Call `simulationExecutor.execute(sessionId, parameters, hsm)`
 4. Return `RunningSimulationResult(sessionId)`
 
-**Parameters:** `RunSimulationParameters` data class:
-
-```kotlin
-data class RunSimulationParameters(
-    val startTime: Double,
-    val endTime: Double,
-    val initialStep: Double,
-    val methodName: String,
-    val accuracy: Double,
-    val isAccuracyInUse: Boolean,
-    val isStabilityControlInUse: Boolean,
-    val compiledModelId: String,
-    val eventDetectionGamma: Double? = null,
-    val eventDetectionLowBorder: Double? = null,
-)
-```
+**Parameters:** `RunSimulationParameters` data class contains: `startTime`, `endTime`, `initialStep`, `methodName`, `accuracy`, `isAccuracyInUse`, `isStabilityControlInUse`, `compiledModelId`, `eventDetectionGamma`, and `eventDetectionLowBorder`. See `RunSimulationParameters.kt` for the full data class definition.
 
 ---
 
@@ -97,26 +59,7 @@ data class RunSimulationParameters(
 **Dependencies:**
 - `ISimulationSessionStore` — reads session state
 
-**Flow:**
-```kotlin
-while (true) {
-    val currentSession = sessionStore.get(simulationId)
-        ?: throw IllegalStateException("Simulation session '$simulationId' disappeared")
-    val currentTime = currentSession.currentTime
-
-    // Determine whether to report
-    val isFinal = currentSession.status != SimulationStatus.RUNNING
-    val shouldReport = isFinal || (threshold > 0.0 && (currentTime - lastReportedTime) >= threshold)
-
-    if (shouldReport) {
-        onProgress(SimulationProgress(...))
-        lastReportedTime = currentTime
-    }
-
-    if (isFinal) break
-    Thread.sleep(100L)  // poll interval
-}
-```
+**Flow:** See `MonitorSimulationHandlerImpl.kt` for the implementation. The handler runs an infinite polling loop that retrieves the current session from the store (throwing `IllegalStateException` if the session disappeared), calculates whether to report based on the time threshold or final status, calls the `onProgress` callback with a `SimulationProgress` object, and sleeps 100ms between polls. The loop breaks when the simulation reaches a terminal status.
 
 **Threshold calculation:** `threshold = accuracy * (endTime - startTime)`. If accuracy is 0, only final status is reported.
 
@@ -175,32 +118,7 @@ while (true) {
 - `ILismaTranslator` — performs source-to-HSM translation
 - `ICompiledModelStore` — stores the compiled model
 
-**Flow:**
-```kotlin
-val translationResult = translator.translate(sourceCode)
-
-translationResult.fold(
-    onSuccess = { hsm ->
-        val modelId = compiledModelStore.create(hsm)
-        CompileLismaResult(compiledModelId = modelId, errors = [], warnings = [])
-    },
-    onFailure = { error ->
-        // Extract errors from TranslationException or fallback to validation
-        val ismaErrors = when (error) {
-            is TranslationException -> error.errors
-            else -> {
-                val errors = translator.validate(sourceCode)
-                if (errors.isNotEmpty()) errors else null
-            }
-        }
-        // Map IsmaSyntaxError/IsmaSemanticError → CompilationError
-        val compilationErrors = ismaErrors
-            ?.map { /* map to CompilationError */ }
-            ?: listOf(CompilationError(-1, -1, error.message ?: "Unknown error"))
-        CompileLismaResult(compiledModelId = "", errors = compilationErrors, warnings = [])
-    }
-)
-```
+**Flow:** See `CompileLismaHandlerImpl.kt` for the full implementation. The handler calls `translator.translate(sourceCode)` and uses `fold()` to handle success and failure branches. On success, it stores the HSM model in `CompiledModelStore` and returns a `CompileLismaResult` with the model ID. On failure, it extracts errors from `TranslationException` or falls back to validation to get detailed error positions, maps `IsmaSyntaxError`/`IsmaSemanticError` to `CompilationError`, and returns a result with an empty `compiledModelId` and the error list. If the fallback validation also returns empty errors, a generic `CompilationError(-1, -1, "Unknown error")` is returned.
 
 **Error recovery:** On translation failure, the handler falls back to validation to extract detailed error positions. If the fallback validation also returns empty errors, a generic `CompilationError(-1, -1, "Unknown error")` is returned via null-coalescing fallback.
 
@@ -264,17 +182,7 @@ All other token types are silently filtered out. The `SyntaxKind` enum also incl
 
 ### SimulationSession
 
-```kotlin
-data class SimulationSession(
-    val simulationId: Long = 0L,
-    val startTime: Double,
-    val endTime: Double,
-    val currentTime: Double = 0.0,
-    val status: SimulationStatus = SimulationStatus.RUNNING,
-    val resultFilePath: String? = null,
-    val error: String? = null,
-)
-```
+See `SimulationSession.kt` for the full data class definition. It contains: `simulationId` (auto-incremented `Long`), `startTime`, `endTime`, `currentTime`, `status` (enum), `resultFilePath` (nullable `String`), and `error` (nullable `String`).
 
 **Lifecycle:**
 1. **Created** with `RUNNING` status, `startTime`, `endTime`
@@ -287,28 +195,11 @@ data class SimulationSession(
 
 ### SimulationStatus
 
-```kotlin
-enum class SimulationStatus {
-    RUNNING,    // Simulation is executing
-    COMPLETED,  // Finished successfully
-    FAILED,     // Execution failed with error
-    CANCELLED,  // Explicitly cancelled by client
-}
-```
+See `SimulationStatus.kt` for the enum definition. It has four values: `RUNNING` (simulation is executing), `COMPLETED` (finished successfully), `FAILED` (execution failed with error), and `CANCELLED` (explicitly cancelled by client).
 
 ### Supporting Data Classes
 
-```kotlin
-// Handler return types
-data class RunningSimulationResult(val simulationId: Long)
-data class SimulationProgress(val startTime: Double, val endTime: Double, val currentTime: Double)
-data class SimulationMethodItem(val name: String, val title: String)
-data class CompilationError(val row: Int, val column: Int, val message: String)
-data class CompileLismaResult(val compiledModelId: String, val errors: List<CompilationError>, val warnings: List<String>)
-data class ValidateLismaResult(val errors: List<CompilationError>, val warnings: List<String>)
-data class HighlightLismaResult(val tokens: List<SyntaxToken>)
-data class SyntaxToken(val start: Int, val length: Int, val kind: SyntaxKind)
-```
+See the respective source files for full definitions. The domain layer defines these data classes: `RunningSimulationResult` (holds `simulationId`), `SimulationProgress` (holds `startTime`, `endTime`, `currentTime`), `SimulationMethodItem` (holds `name` and `title`), `CompilationError` (holds `row`, `column`, `message`), `CompileLismaResult` (holds `compiledModelId`, `errors`, `warnings`), `ValidateLismaResult` (holds `errors`, `warnings`), `HighlightLismaResult` (holds `tokens`), and `SyntaxToken` (holds `start`, `length`, `kind`).
 
 ---
 
@@ -316,78 +207,26 @@ data class SyntaxToken(val start: Int, val length: Int, val kind: SyntaxKind)
 
 ### ICompiledModelStore
 
-```kotlin
-interface ICompiledModelStore {
-    fun create(hsm: HSM): String
-    fun get(id: String): HSM?
-    fun delete(id: String): Boolean
-    fun exists(id: String): Boolean
-}
-```
-
-Manages in-memory storage of compiled HSM models keyed by UUID.
+See `ICompiledModelStore.kt` for the interface definition. It declares methods: `create(hsm: HSM): String` (stores model, returns UUID), `get(id: String): HSM?` (retrieves model), `delete(id: String): Boolean` (removes model), and `exists(id: String): Boolean` (checks presence). Manages in-memory storage of compiled HSM models keyed by UUID.
 
 ### ISimulationSessionStore
 
-```kotlin
-interface ISimulationSessionStore {
-    fun create(startTime: Double, endTime: Double): SimulationSession
-    fun get(id: Long): SimulationSession?
-    fun getAll(): Map<Long, SimulationSession>
-    fun update(id: Long, session: SimulationSession): SimulationSession
-    fun updateStatus(id: Long, status: SimulationStatus)
-    fun updateProgress(id: Long, currentTime: Double)
-    fun completeSimulation(id: Long, resultFilePath: String)
-    fun failSimulation(id: Long, error: String)
-    fun delete(id: Long): Boolean
-    fun exists(id: Long): Boolean
-}
-```
-
-Manages simulation session state. All methods are thread-safe via `ConcurrentHashMap`.
+See `ISimulationSessionStore.kt` for the interface definition. It declares methods: `create(startTime, endTime)` (creates new session), `get(id)` (retrieves session), `getAll()` (returns all sessions), `update(id, session)` (replaces session), `updateStatus(id, status)` (updates status), `updateProgress(id, currentTime)` (updates progress), `completeSimulation(id, resultFilePath)` (marks completed), `failSimulation(id, error)` (marks failed), `delete(id)` (removes session), and `exists(id)` (checks presence). Manages simulation session state. All methods are thread-safe via `ConcurrentHashMap`.
 
 ### ISimulationExecutor
 
-```kotlin
-interface ISimulationExecutor {
-    fun execute(simulationId: Long, parameters: RunSimulationParameters, hsm: HSM)
-}
-```
-
-Executes a simulation asynchronously. Implementation runs on a separate thread from the `ExecutorService`.
+See `ISimulationExecutor.kt` for the interface definition. It declares a single method `execute(simulationId: Long, parameters: RunSimulationParameters, hsm: HSM)`. Executes a simulation asynchronously. Implementation runs on a separate thread from the `ExecutorService`.
 
 ### IIntegrationMethodsStore
 
-```kotlin
-interface IIntegrationMethodsStore {
-    fun getMethodNames(): List<String>
-    fun getMethod(name: String): IIntegrationMethodFactory
-}
-```
-
-Provides access to available numerical integration methods.
+See `IIntegrationMethodsStore.kt` for the interface definition. It declares methods: `getMethodNames()` (returns sorted list of method names) and `getMethod(name)` (returns the factory for a named method). Provides access to available numerical integration methods.
 
 ### ILismaTranslator
 
 **File:** `domain/handlers/runSimulation/ILismaTranslator.kt`
 
-```kotlin
-interface ILismaTranslator {
-    fun translate(sourceCode: String): Result<HSM>
-    fun validate(sourceCode: String): IsmaErrorList
-}
-
-class TranslationException(val errors: IsmaErrorList) : Exception("Translation failed")
-```
-
-Translates LISMA source code to HSM models. The `translate()` method returns `Result<HSM>` — `success` with the model or `failure` with a `TranslationException`.
+See `ILismaTranslator.kt` for the interface and exception class definition. The interface declares `translate(sourceCode: String): Result<HSM>` and `validate(sourceCode: String): IsmaErrorList`. The `TranslationException` class holds an `IsmaErrorList` and extends `Exception`. Translates LISMA source code to HSM models. The `translate()` method returns `Result<HSM>` — `success` with the model or `failure` with a `TranslationException`.
 
 ### IHighlightLismaHandler
 
-```kotlin
-interface IHighlightLismaHandler {
-    fun handle(sourceCode: String): HighlightLismaResult
-}
-```
-
-Lexical analysis contract for syntax highlighting.
+See `IHighlightLismaHandler.kt` for the interface definition. It declares `handle(sourceCode: String): HighlightLismaResult`. Lexical analysis contract for syntax highlighting.

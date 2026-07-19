@@ -21,17 +21,29 @@ Constructor takes `textEditorService: IEditorPlatformService` and `highlightingS
 ### Syntax Highlighting Pipeline
 
 ```mermaid
-flowchart LR
-    User["User types in CodeArea"] --> TextProp["textProperty() change"]
-    TextProp --> HighlightingSvc["IHighlightingService.createHighlightingStyleSpans()"]
-    HighlightingSvc --> Facade["SimulationServerFacade.highlightSource()"]
-    Facade --> Tokens["SyntaxTokenDto[]"]
-    Tokens --> HighlightingSvc
-    HighlightingSvc --> StyleSpans["StyleSpans<Collection<String>>"]
-    StyleSpans --> CSS["CSS classes: syntax-keyword, syntax-comment,\nsyntax-decimal, syntax-default"]
-    CodeArea["CodeArea.setStyleSpans(0, StyleSpans)"]
-    StyleSpans --> CodeArea
+sequenceDiagram
+    participant User as User
+    participant CA as CodeArea
+    participant Listener as textProperty() listener
+    participant Service as IHighlightingService
+    participant Facade as SimulationServerFacade
+    participant Server as ISMA Server
+    participant Spans as StyleSpans<Collection<String>>
+    participant CSS as CSS classes
+
+    User->>CA: Type in editor
+    CA->>Listener: textProperty() change
+    Listener->>Service: createHighlightingStyleSpans(text)
+    Service->>Facade: highlightSource(text)
+    Facade->>Server: gRPC HighlightRequest
+    Server-->>Facade: SyntaxTokenDto[]
+    Facade-->>Service: SyntaxTokenDto[]
+    Service->>Spans: Build StyleSpans
+    Spans->>CSS: syntax-keyword, syntax-comment,<br/>syntax-decimal, syntax-default
+    CSS->>CA: setStyleSpans(0, StyleSpans)
 ```
+
+The syntax highlighting pipeline: User types in `CodeArea` → `textProperty()` change → `IHighlightingService.createHighlightingStyleSpans()` → `SimulationServerFacade.highlightSource()` → `SyntaxTokenDto[]` → back to `IHighlightingService` → `StyleSpans<Collection<String>>` → CSS classes (`syntax-keyword`, `syntax-comment`, `syntax-decimal`, `syntax-default`) → `CodeArea.setStyleSpans(0, StyleSpans)`.
 
 CSS classes applied: `syntax-keyword`, `syntax-comment`, `syntax-decimal`, `syntax-default`.
 
@@ -39,16 +51,21 @@ CSS classes applied: `syntax-keyword`, `syntax-comment`, `syntax-decimal`, `synt
 
 ```mermaid
 sequenceDiagram
-    participant Menu as IsmaToolBar / IsmaMenuBar
-    participant Service as EditorPlatformService
-    participant Flow as MutableSharedFlow<Unit>
-    participant Editor as IsmaTextEditor (CodeArea)
+    participant UI as IsmaToolBar / IsmaMenuBar
+    participant EPS as EditorPlatformService<br/>MutableSharedFlow<Unit>
+    participant CA as IsmaTextEditor (CodeArea)
+    participant Platform as JavaFX Platform Clipboard
 
-    Menu->>Service: cut() / copy() / paste()
-    Service->>Flow: emit(Unit)
-    Flow->>Editor: collect { if (isFocused) cut() }
-    Editor->>Editor: Platform cut/copy/paste
+    UI->>EPS: cut() / copy() / paste()
+    EPS->>EPS: emit to SharedFlow
+    loop Flow collection
+        EPS-->>CA: Flow<Unit> event
+    end
+    CA->>CA: if focused → call cut()/copy()/paste()
+    CA->>Platform: Platform cut/copy/paste
 ```
+
+The clipboard propagation flow: `IsmaToolBar` / `IsmaMenuBar` calls `cut()` / `copy()` / `paste()` on `EditorPlatformService` → `EditorPlatformService` emits to `MutableSharedFlow<Unit>` → the flow is collected by `IsmaTextEditor` (CodeArea) which calls `cut()` if focused → Platform cut/copy/paste is performed.
 
 **File:** [`EditorPlatformService.kt`](../../text-editor/src/main/kotlin/.../services/EditorPlatformService.kt)
 
@@ -73,22 +90,44 @@ Implementation of `IHighlightingService` that delegates to `SimulationServerFaca
 ### MVVM Split
 
 ```mermaid
-flowchart LR
-    View["IsmaBlueprintEditor\n(UI only, 112 lines)"]
-    VM["IsmaBlueprintViewModel\n(all logic, 461 lines)"]
-    Model["BlueprintModel / CanvasViewModel"]
+graph TB
+    subgraph View
+        Editor[IsmaBlueprintEditor<br/>BorderPane, 112 lines<br/>UI only, zero business logic]
+        Canvas[Pane<br/>Canvas]
+        ToolBar[ToolBar<br/>Bottom]
+        TabPane[TabPane<br/>Diagram tab]
+    end
 
-    View --> VM
-    VM --> Model
+    subgraph ViewModel
+        VM[IsmaBlueprintViewModel<br/>All business logic, 461 lines]
+    end
 
-    View --> Canvas["Pane (canvas)"]
-    View --> Toolbar["ToolBar (bottom)"]
-    View --> Tabs["TabPane (Diagram tab)"]
+    subgraph Model_Serializable
+        BM[BlueprintModel<br/>@Serializable]
+        CVM[CanvasViewModel<br/>ObservableLists]
+    end
 
-    VM --> StateBox["StateBox[]"]
-    VM --> Arrow["TransactionArrow[] / LoopTransactionArrow[]"]
-    VM --> PopOver["EditArrowPopOver (floating)"]
+    subgraph Controls
+        SB[StateBox[]]
+        TA[TransactionArrow[]]
+        LTA[LoopTransactionArrow[]]
+        EAP[EditArrowPopOver<br/>Floating]
+    end
+
+    Editor --> VM
+    Editor --> Canvas
+    Editor --> ToolBar
+    Editor --> TabPane
+
+    VM --> BM
+    VM --> CVM
+    VM --> SB
+    VM --> TA
+    VM --> LTA
+    VM --> EAP
 ```
+
+The MVVM split: `IsmaBlueprintEditor` (View, UI only, 112 lines) depends on `IsmaBlueprintViewModel` (ViewModel, all logic, 461 lines), which depends on `BlueprintModel` / `CanvasViewModel` (Model). The View also depends on `Pane` (canvas), `ToolBar` (bottom), and `TabPane` (Diagram tab). The ViewModel depends on `StateBox[]`, `TransactionArrow[]` / `LoopTransactionArrow[]`, and `EditArrowPopOver` (floating).
 
 **File:** [`IsmaBlueprintEditor.kt`](../../blueprint-editor/src/main/kotlin/.../IsmaBlueprintEditor.kt) (112 lines)
 
@@ -118,18 +157,24 @@ Contains all editor logic: state management, arrow creation/removal, canvas oper
 ### Canvas Architecture
 
 ```mermaid
-flowchart TD
-    Canvas["Pane (scrollable via ScrollPane)"]
-    Canvas --> MainState["Main state box (fixed, LightGreen)"]
-    Canvas --> InitState["Init state box (fixed, LightBlue)"]
-    Canvas --> UserStates["User states [] (Coral, draggable)"]
-    Canvas --> Arrows["Transaction arrows [] (center-to-center)"]
-    Canvas --> Loops["Loop arrows [] (circle + arrowhead)"]
-    Canvas --> PopOver["EditArrowPopOver (transient)"]
+graph TB
+    subgraph Canvas Pane
+        Scroll[ScrollPane]
+        subgraph CanvasContent[Pane - Absolute Positioning]
+            MainState[Main state box<br/>fixed, LightGreen<br/>position (20, 0)]
+            InitState[Init state box<br/>fixed, LightBlue<br/>position (10, 100)]
+            UserStates[User states []<br/>Coral, draggable]
+            TransArrows[Transaction arrows []<br/>center-to-center]
+            LoopArrows[Loop arrows []<br/>circle + arrowhead]
+            EditPopOver[EditArrowPopOver<br/>transient, floating]
+        end
+    end
 
-    UserStates -.-> Arrows
-    UserStates -.-> Loops
+    UserStates -.->|referenced by| TransArrows
+    UserStates -.->|referenced by| LoopArrows
 ```
+
+The canvas is a `Pane` (scrollable via `ScrollPane`) containing: `Main state box` (fixed, LightGreen), `Init state box` (fixed, LightBlue), `User states []` (Coral, draggable), `Transaction arrows []` (center-to-center), `Loop arrows []` (circle + arrowhead), and `EditArrowPopOver` (transient). User states are referenced by arrows and loops.
 
 **File:** [`CanvasViewModel.kt`](../../blueprint-editor/src/main/kotlin/.../models/CanvasViewModel.kt) (69 lines)
 

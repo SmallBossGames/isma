@@ -17,15 +17,7 @@ Both services use **unary RPCs** (request/response) except `MonitorSimulation` w
 
 ### RPC Methods
 
-```protobuf
-service SimulationService {
-  rpc RunSimulation(RunSimulationRequest) returns (RunSimulationResponse);
-  rpc GetSimulationResult(GetSimulationResultRequest) returns (GetSimulationResultResponse);
-  rpc MonitorSimulation(MonitorSimulationRequest) returns (stream MonitorSimulationResponse);
-  rpc ListSimulationMethods(ListSimulationMethodsRequest) returns (ListSimulationMethodsResponse);
-  rpc CancelSimulation(CancelSimulationRequest) returns (CancelSimulationResponse);
-}
-```
+The `SimulationService` exposes five RPC methods: `RunSimulation`, `GetSimulationResult`, `MonitorSimulation` (server-streaming), `ListSimulationMethods`, and `CancelSimulation`. See `protobuf-contracts/v1/` for the full `.proto` definition.
 
 ### RunSimulation
 
@@ -177,14 +169,7 @@ Cancels a running simulation.
 
 ### RPC Methods
 
-```protobuf
-service LismaCompilerService {
-  rpc Compile(CompileRequest) returns (CompileResponse);
-  rpc Validate(ValidateRequest) returns (ValidateResponse);
-  rpc Delete(DeleteCompiledModelRequest) returns (DeleteCompiledModelResponse);
-  rpc Highlight(HighlightRequest) returns (HighlightResponse);
-}
-```
+The `LismaCompilerService` exposes four RPC methods: `Compile`, `Validate`, `Delete`, and `Highlight`. See `protobuf-contracts/v1/` for the full `.proto` definition.
 
 ### Compile
 
@@ -311,16 +296,6 @@ Both services use the same exception-to-gRPC-status mapping in their private `to
 | `IllegalStateException` | `FAILED_PRECONDITION` | Operation not valid in current state |
 | Other `Exception` | `INTERNAL` | Unexpected server error |
 
-Validation (blank input) returns `INVALID_ARGUMENT` before reaching the handler:
-
-```kotlin
-if (request.lismaSourceCode.isBlank()) {
-    responseObserver.onError(
-        Status.INVALID_ARGUMENT.withDescription("LISMA source code is required").asException()
-    )
-    return
-}
-```
+Validation (blank input) returns `INVALID_ARGUMENT` before reaching the handler. See `SimulationServiceGrpcImpl.kt` and `LismaCompilerServiceGrpcImpl.kt` for the blank-check validation logic that calls `responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(...).asException())` and returns early.
 
 **Note:** `low_border` is the proto field name; the Java getter is `lowBorder`.
-```

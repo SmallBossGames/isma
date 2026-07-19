@@ -6,54 +6,65 @@ This document provides a comprehensive, multi-step migration plan for porting th
 
 ## Target Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  ISMA.Tests (xUnit + FluentAssertions + Moq)                    │
-│  ├── Domain/         (Model + conversion tests)                │
-│  └── ViewModels/     (ViewModel + service tests)               │
-├─────────────────────────────────────────────────────────────────┤
-│  ISMA.Domain (Domain Layer — pure, no dependencies)             │
-│  ├── Models/         (Pure POCOs + DTOs)                       │
-│  ├── Conversion/     (BlueprintToLismaConverter — pure algo)   │
-│  ├── Results/      (LismaPdeTranslationResult sealed interface)│
-│  └── Contracts/      (Service interfaces — Infrastructure + App)│
-├─────────────────────────────────────────────────────────────────┤
-│  ISMA.Infrastructure (Infrastructure Layer)                     │
-│  ├── Server/         (gRPC/HTTP client, server mgmt)           │
-│  ├── FileStorage/    (PreferencesProvider, raw file I/O)       │
-│  └── ChartViewer/    (GrinProcessLauncher)                     │
-├─────────────────────────────────────────────────────────────────┤
-│  ISMA.ViewModels (Presentation Layer — UI-framework agnostic)   │
-│  ├── ViewModels/             (All MVVM viewmodels)             │
-│  ├── Services/               (Presentation services — NO UI)   │
-│  ├── Models/               (NamedPickerItem, etc.)             │
-│  └── Converters/             (IValueConverter implementations) │
-├─────────────────────────────────────────────────────────────────┤
-│  ISMA.App (Avalonia 12 UI + UI-dependent services)             │
-│  ├── Services/               (ProjectFileService, SimulationResultService,    │
-│  │                           SimulationParametersService — all need FileDialog)│
-│  ├── Controls/       (BlueprintCanvasPanel, PropertiesGrid, NumericCell)     │
-│  ├── Views/          (All AXAML views)                         │
-│  └── App.axaml / Program.cs                                    │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph ISMA.App["ISMA.App — Avalonia 12 UI + UI-dependent services"]
+        Views[Views/ — All AXAML views]
+        Controls[Controls/ — BlueprintCanvasPanel, PropertiesGrid, NumericCell]
+        AppServices[Services/ — ProjectFileService, SimulationResultService, SimulationParametersService]
+        AppFiles[App.axaml / Program.cs]
+    end
+
+    subgraph ISMA.ViewModels["ISMA.ViewModels — Presentation layer (UI-framework agnostic)"]
+        VMs[ViewModels/ — All MVVM viewmodels]
+        PServices[Services/ — Presentation services, NO UI deps]
+        Models[Models/ — NamedPickerItem, etc.]
+        Converters[Converters/ — IValueConverter implementations]
+    end
+
+    subgraph ISMA.Infrastructure["ISMA.Infrastructure — Infrastructure Layer"]
+        Server[Server/ — gRPC/HTTP client, server mgmt]
+        FileStorage[FileStorage/ — PreferencesProvider, raw file I/O]
+        ChartViewer[ChartViewer/ — GrinProcessLauncher]
+    end
+
+    subgraph ISMA.Domain["ISMA.Domain — Domain Layer (pure, no dependencies)"]
+        DModels[Models/ — Pure POCOs + DTOs]
+        Conversion[Conversion/ — BlueprintToLismaConverter]
+        Results[Results/ — LismaPdeTranslationResult]
+        Contracts[Contracts/ — Service interfaces]
+    end
+
+    subgraph ISMA.Tests["ISMA.Tests — xUnit + FluentAssertions + Moq"]
+        DTests[Domain/ — Model + conversion tests]
+        VMTests[ViewModels/ — ViewModel + service tests]
+    end
+
+    ISMA.App --> ISMA.ViewModels
+    ISMA.App --> ISMA.Infrastructure
+    ISMA.ViewModels --> ISMA.Domain
+    ISMA.Infrastructure --> ISMA.Domain
+    ISMA.Tests --> ISMA.Domain
+    ISMA.Tests --> ISMA.ViewModels
+
+    style ISMA.App fill:#e1f5fe
+    style ISMA.ViewModels fill:#f3e5f5
+    style ISMA.Infrastructure fill:#fff3e0
+    style ISMA.Domain fill:#e8f5e9
+    style ISMA.Tests fill:#fce4ec
 ```
 
-**Dependency graph:**
-```
-ISMA.App → ISMA.ViewModels → ISMA.Domain
-ISMA.App → ISMA.Infrastructure → ISMA.Domain
-ISMA.ViewModels → ISMA.Domain
-ISMA.Tests → ISMA.Domain, ISMA.ViewModels (mocking ISMA.Infrastructure)
+**Dependency direction:** App depends on ViewModels and Infrastructure. ViewModels depends on Domain (interfaces only). Infrastructure depends on Domain (interfaces and models). Tests depends on Domain and ViewModels (Infrastructure is mocked).
 
-Dependency direction:
-  App depends on ViewModels + Infrastructure
-  ViewModels depends on Domain (interfaces only)
-  Infrastructure depends on Domain (interfaces + models)
-  Tests depends on Domain + ViewModels (Infrastructure is mocked)
+CRITICAL: ViewModels layer must NOT depend on Avalonia types. Any service requiring FileDialog, Window, or other UI types MUST be in the App layer.
 
-CRITICAL: ViewModels layer must NOT depend on Avalonia types.
-  Any service requiring FileDialog, Window, or other UI types MUST be in App layer.
-```
+The solution consists of five projects organized in a clean architecture:
+
+- **ISMA.Tests** (xUnit + FluentAssertions + Moq) — Domain tests (models and conversion) and ViewModels tests (viewmodels and service tests).
+- **ISMA.Domain** (pure domain layer, no external dependencies) — Models (pure POCOs and DTOs), Conversion (BlueprintToLismaConverter as a pure algorithm), Results (LismaPdeTranslationResult sealed interface), and Contracts (service interfaces implemented by Infrastructure and App layers).
+- **ISMA.Infrastructure** (infrastructure layer) — Server (gRPC/HTTP client and server management), FileStorage (PreferencesProvider and raw file I/O), and ChartViewer (GrinProcessLauncher).
+- **ISMA.ViewModels** (presentation layer, UI-framework agnostic) — ViewModels (all MVVM viewmodels), Services (presentation services with no UI dependencies), Models (NamedPickerItem and similar), and Converters (IValueConverter implementations).
+- **ISMA.App** (Avalonia 12 UI and UI-dependent services) — Services (ProjectFileService, SimulationResultService, SimulationParametersService — all require FileDialog), Controls (BlueprintCanvasPanel, PropertiesGrid, NumericCell), Views (all AXAML views), and App.axaml / Program.cs.
 
 **Key architectural decisions:**
 
@@ -88,173 +99,67 @@ This migration plan is derived from the original Java/JavaFX ISMA-UI documentati
 
 ## Project Structure
 
-```
-isma-ui-dotnet/
-├── ISMA.Domain/                              # Pure domain models + DTOs + interfaces
-│   ├── Models/
-│   │   ├── SimulationPoint.cs                # x, yForDe (double[]), rhs (double[][])
-│   │   ├── SimulationProgress.cs             # startTime, endTime, currentTime
-│   │   ├── SimulationMetadata.cs             # columnNames (List<string>)
-│   │   ├── MetricData.cs                     # startTime, endTime, simulationTime
-│   │   ├── CauchyInitials.cs                 # startTime, endTime, initialStep
-│   │   ├── IntegrationMethodParameters.cs    # selectedMethod, accuracy, isAccuracyInUse,
-│   │   │                                   #   isStableAllowedInUse, isStableInUse,
-│   │   │                                   #   isParallelInUse, server, port
-│   │   ├── EventDetectionParameters.cs       # isEventDetectionInUse, isStepLimitInUse,
-│   │   │                                   #   gamma, lowBorder
-│   │   ├── ResultSavingParameters.cs         # savingTarget (SaveTarget enum)
-│   │   ├── ResultProcessingParameters.cs     # isSimplifyInUse, selectedSimplifyMethod, tolerance
-│   │   ├── SimulationParameters.cs           # composite: cauchyInitials, eventDetection,
-│   │   │                                   #   integrationMethod, resultSaving
-│   │   ├── LismaTextModel.cs                 # fullText, regions (List<CodeRegion>)
-│   │   ├── CodeRegion.cs                     # name, startLine, endLine + fragmentNameByIndex()
-│   │   ├── BlueprintModel.cs                 # main, init, states[], transactions[], loopTransactions[]
-│   │   ├── BlueprintStateModel.cs            # canvasPositionX, canvasPositionY, name, text
-│   │   ├── BlueprintTransactionModel.cs      # startStateName, endStateName, predicate, alias
-│   │   ├── BlueprintLoopTransactionModel.cs  # stateName, predicate, alias, text
-│   │   ├── ErrorInfo.cs                      # row, position, fragmentName, message
-│   │   ├── InProgressSimulation.cs           # id, modelName, parameters, progress (0.0–1.0)
-│   │   ├── CompletedSimulation.cs            # id, modelName, equationIndexProvider, metricData,
-│   │   │                                   #   parameters, cachedFile, cachedColumnNames
-│   │   ├── WindowPreferences.cs              # x, y, width, height, isMaximized
-│   │   ├── DefaultFilesPreferences.cs        # lastOpenedProjectPath (string[])
-│   │   └── Preferences.cs                    # windowPreferences, defaultFilesPreferences
-│   ├── Dtos/                                 # DTOs for server communication
-│   │   ├── CompileResult.cs                  # modelId, errors (List<CompilationError>), warnings
-│   │   ├── ValidationResult.cs               # errors, warnings
-│   │   ├── CompilationError.cs               # row, column, message
-│   │   ├── SyntaxTokenDto.cs                 # start, length, kind (SyntaxTokenKind enum)
-│   │   ├── SyntaxTokenKind.cs                # Unspecified, Keyword, Comment, Number, Text
-│   │   ├── CachedSimulationResult.cs         # file (FileInfo), columnNames
-│   │   ├── RunSimulationParams.cs            # startTime, endTime, initialStep, methodName,
-│   │   │                                   #   accuracy, isAccuracyInUse, isStabilityControlInUse,
-│   │   │                                   #   compiledModelId, eventDetectionGamma, eventDetectionLowBorder
-│   │   └── SocketPaths.cs                    # grpc, http (Unix socket paths)
-│   ├── Conversion/
-   │   │   └── BlueprintToLismaConverter.cs      # BlueprintModel → LismaTextModel (pure algorithm)
-   │   │       ├── ConvertToLisma()              # Main flow: main text → transactions → loops
-   │   │       ├── CreateTransactionKey()        # "{targetStateName} ({predicate})"
-   │   │       └── StateBlockModel.cs            # Helper for state block generation
-   │   ├── Results/                              # Sealed result types for domain operations
-   │   │   └── LismaPdeTranslationResult.cs      # Sealed interface: SuccessTranslation / FailedTranslation
-   │   ├── Contracts/                            # Service interfaces (implemented in Infrastructure or App)
-│   │   ├── ISimulationServerFacade.cs        # compile, validate, highlight, run, monitor,
-│   │   │                                   #   download, cancel, getMethods, shutdown
-│   │   ├── IEquationIndexProvider.cs         # getDifferentialEquationCount, getAlgebraicEquationCount,
-│   │   │                                   #   getDifferentialEquationCode, getAlgebraicEquationCode
-│   │   ├── ISimulationResultReader.cs        # Results (IEnumerable<SimulationPoint>)
-│   │   ├── ISyntaxHighlighter.cs             # Highlight(source) → List<SyntaxTokenDto>
-│   │   ├── ITextEditorFactory.cs             # CreateTextEditor(text, onTextChanged), DisposeInstance
-│   │   └── ISimulationResultService.cs       # CommitResult, RemoveResult, ShowChart, ExportToFile
-│   │                                   # NOTE: ISimulationResultService is implemented in App layer
-│   │                                   # because ShowChart requires FileDialog and GrinProcessLauncher
-│   └── ISMA.Domain.csproj
-├── ISMA.Infrastructure/                      # gRPC, file I/O, external processes
-│   ├── Server/
-│   │   ├── SimulationServerManager.cs        # Process lifecycle, socket path parsing
-│   │   ├── SimulationServerFacade.cs         # Orchestration: compile, validate, run, monitor...
-│   │   ├── GrpcSimulationClient.cs           # gRPC client for SimulationServiceGrpc
-│   │   ├── GrpcLismaCompilerClient.cs        # gRPC client for LismaCompilerServiceGrpc
-│   │   ├── HttpSimulationClient.cs           # HTTP client for binary result downloads
-│   │   ├── BinaryFilePointProvider.cs        # Read binary results → IEnumerable<SimulationPoint>
-│   │   └── BinaryEquationIndexProvider.cs    # Parse column prefixes (DE_, AE_, f)
-│   ├── FileStorage/
-│   │   └── PreferencesProvider.cs            # preferences.json persistence (raw file I/O)
-│   ├── ChartViewer/
-│   │   └── GrinProcessLauncher.cs            # Launch external chart viewer process
-│   └── ISMA.Infrastructure.csproj
-├── ISMA.ViewModels/                          # Presentation layer (UI-framework agnostic)
-│   ├── ViewModels/
-│   │   ├── MainWindowViewModel.cs            # Projects, ActiveProject, 14 commands
-│   │   ├── IProjectViewModel.cs              # Name, File, EditorContent, NameChanged, Dispose
-│   │   ├── LismaProjectViewModel.cs          # LISMA text content, data provider bridge
-│   │   ├── BlueprintProjectViewModel.cs      # Blueprint model, convertToLisma integration
-│   │   ├── SimulationParametersViewModel.cs  # 5 parameter sections with snapshot/commit
-│   │   ├── SimulationServiceViewModel.cs     # Simulate(), StopSimulation(), TrackingTasks
-│   │   ├── SimulationResultViewModel.cs      # CommitResult(), ShowChart(), ExportToFile()
-│   │   ├── ErrorListViewModel.cs             # Errors collection, PutErrorList()
-│   │   ├── CauchyInitialsViewModel.cs        # Bound to CauchyInitials properties
-   │   ├── IntegrationMethodViewModel.cs     # Bound to IntegrationMethod properties + method list
-   │   ├── EventDetectionViewModel.cs        # Bound to EventDetection properties
-   │   └── ResultProcessingViewModel.cs      # Bound to ResultProcessing properties
-│   │   ├── BlueprintEditorViewModel.cs       # States, Transactions, Modes, Add/Remove operations
-│   │   ├── TasksPopOverViewModel.cs          # InProgress + Completed sections
-│   │   ├── SelectVariablesDialogViewModel.cs # XAxis, YAxis selection for chart viewer
-│   │   ├── EditArrowPopOverViewModel.cs      # Alias + Predicate for arrow editing
-│   │   └── InProgressSimulationViewModel.cs  # Id, ModelName, Progress, CanAbort
-│   ├── Models/                               # Presentation-specific models (NamedPickerItem, etc.)
-    │   │   └── NamedPickerItem.cs                # Generic item for axis picker dialog
-    │   ├── Services/                             # Presentation services (UI orchestration, NO Avalonia deps)
-│   │   ├── SimulationService.cs              # Orchestrates: snapshot → compile → run → monitor → download
-│   │   ├── ProjectService.cs                 # Project collection management
-│   │   ├── ModelErrorService.cs              # Error list management
-│   │   ├── LismaPdeService.cs                # LISMA validation → Success/Failure
-│   │   └── SyntaxHighlighterService.cs       # Delegates to server, maps token kinds
-│   ├── Converters/
-│   │   ├── DoubleConverter.cs                # string ↔ double (with normalization)
-│   │   ├── IntegerConverter.cs               # string ↔ int (with normalization)
-│   │   ├── ProgressToPercentConverter.cs     # 0.0–1.0 → percentage
-│   │   ├── BoolToVisibilityConverter.cs      # bool → IsVisible binding
-│   │   └── SaveTargetConverter.cs            # SaveTarget enum → display string
-│   └── ISMA.ViewModels.csproj
-├── ISMA.App/                                 # Avalonia 12 UI
-│   ├── Views/
-│   │   ├── MainWindow.axaml                  # Main window: MenuBar, ToolBar, TabControl,
-│   │   │                                   #   SettingsPanel, ErrorList, ProcessBar
-│   │   ├── SettingsPanelView.axaml           # 4-tab settings panel
-│   │   ├── EditorTabPaneView.axaml           # TabControl bound to Projects collection
-│   │   ├── IsmaTextEditorView.axaml          # AvalonEdit TextEditor with syntax highlighting
-│   │   ├── BlueprintEditorView.axaml         # Canvas panel + toolbar + edit popover
-│   │   ├── TasksPopOverView.axaml            # In-progress + Completed sections
-│   │   ├── IsmaErrorListTableView.axaml      # DataGrid for errors
-│   │   ├── SimulationProcessBarView.axaml    # Play button + Tasks button
-│   │   ├── SelectVariablesDialog.axaml       # X-axis ComboBox + Y-axis CheckBoxList
-│   │   ├── EditArrowPopOverView.axaml        # Alias + Predicate text fields
-│   │   └── Settings/
-│   │       ├── CauchyInitialsView.axaml      # Start, End, Step
-│   │       ├── MethodSettingsView.axaml      # Method, Accurate, Accuracy, Stable, Parallel,
-│   │       │                                 #   Server, Port
-│   │       ├── EventDetectionView.axaml      # In use, Gamma, Step limit, Low border
-  │   │       └── ResultProcessingView.axaml    # Save result (MEMORY/FILE), Simplify checkbox,
-    │   │                                         #   Simplify method (Radial-Distance/Douglas-Peucker), Tolerance
-    │   │                                         # NOTE: In original, Simplify/Tolerance controls are commented out (06-ux-reference.md:377-381)
-│   ├── Controls/
-│   │   ├── BlueprintCanvasPanel.cs           # Custom Panel: Draw(DrawingContext) for states/arrows
-│   │   ├── PropertiesGrid.axaml              # Reusable label+control grid
-│   │   └── NumericCell.axaml                 # Custom DataGrid cell for row/position columns
-│   ├── Services/                             # UI-specific services (Avalonia dependencies)
-│   │   ├── EditorPlatformService.cs          # Cut/Copy/Paste event propagation
-│   │   ├── TextEditorFactory.cs              # Creates/disposes AvalonEdit instances
-│   │   ├── ProjectFileService.cs             # Open/Save with FileDialog (UI-dependent)
-│   │   ├── SimulationResultService.cs        # ShowChart with FileDialog/Grin (UI-dependent)
-│   │   └── SimulationParametersService.cs    # Store/Load with FileDialog (UI-dependent)
-│   ├── ViewModels/                           # (Empty — all ViewModels in ISMA.ViewModels)
-│   ├── Converters/                           # (Empty — all converters in ISMA.ViewModels)
-│   ├── App.axaml                             # Fluent theme, resource dictionaries, styles
-│   ├── App.xaml.cs                           # DI registration, application lifecycle
-│   ├── Program.cs                            # Avalonia entry point
-│   └── ISMA.App.csproj
-├── ISMA.Tests/                               # xUnit + FluentAssertions + Moq
-│   ├── Domain/
-│   │   ├── SimulationParametersTests.cs      # Serialization, defaults, snapshot/commit
-│   │   ├── BlueprintModelTests.cs            # Empty model defaults, state/transaction creation
-│   │   ├── BlueprintToLismaConversionTests.cs # All conversion scenarios
-│   │   ├── PreferencesTests.cs               # Load/save, window geometry
-│   │   ├── SimulationPointTests.cs           # Equals/GetHashCode for arrays
-│   │   └── CodeRegionTests.cs                # Line range tracking, fragmentNameByIndex
-│   ├── ViewModels/
-│   │   ├── SimulationServiceViewModelTests.cs # Mock server: compile errors, success, progress, cancel
-│   │   ├── ProjectViewModelTests.cs          # Create/close projects, name changes, file save
-│   │   ├── SimulationParametersViewModelTests.cs # Snapshot captures, commit applies
-│   │   ├── ErrorListViewModelTests.cs        # Clear and repopulate
-│   │   ├── MainWindowViewModelTests.cs       # Commands exist and invoke
-│   │   ├── BlueprintEditorViewModelTests.cs  # Add/remove states and transitions
-│   │   └── BlueprintToLismaConversionViewModelTests.cs # ViewModel uses converter correctly
-│   └── ISMA.Tests.csproj
-├── Directory.Build.props                     # Common properties: nullable, analyzers, LangVersion
-├── Directory.Packages.props                  # Centralized package versions
-└── isma-ui-dotnet.sln
-```
+The solution `isma-ui-dotnet/` contains five projects plus shared configuration files:
+
+**ISMA.Domain/** — Pure domain models, DTOs, and interfaces.
+
+Models/ directory contains: SimulationPoint (x, yForDe as double arrays, rhs as double[][]), SimulationProgress (startTime, endTime, currentTime), SimulationMetadata (columnNames as List<string>), MetricData (startTime, endTime, simulationTime), CauchyInitials (startTime, endTime, initialStep), IntegrationMethodParameters (selectedMethod, accuracy, isAccuracyInUse, isStableAllowedInUse, isStableInUse, isParallelInUse, server, port), EventDetectionParameters (isEventDetectionInUse, isStepLimitInUse, gamma, lowBorder), ResultSavingParameters (savingTarget enum), ResultProcessingParameters (isSimplifyInUse, selectedSimplifyMethod, tolerance), SimulationParameters (composite of all parameter models), LismaTextModel (fullText, regions as List<CodeRegion>), CodeRegion (name, startLine, endLine, fragmentNameByIndex method), BlueprintModel (main, init, states array, transactions array, loopTransactions array), BlueprintStateModel (canvasPositionX, canvasPositionY, name, text), BlueprintTransactionModel (startStateName, endStateName, predicate, alias), BlueprintLoopTransactionModel (stateName, predicate, alias, text), ErrorInfo (row, position, fragmentName, message), InProgressSimulation (id, modelName, parameters, progress 0.0–1.0), CompletedSimulation (id, modelName, equationIndexProvider, metricData, parameters, cachedFile, cachedColumnNames), WindowPreferences (x, y, width, height, isMaximized), DefaultFilesPreferences (lastOpenedProjectPath as string array), and Preferences (windowPreferences, defaultFilesPreferences).
+
+Dtos/ directory contains DTOs for server communication: CompileResult (modelId, errors, warnings), ValidationResult (errors, warnings), CompilationError (row, column, message), SyntaxTokenDto (start, length, kind enum), SyntaxTokenKind (Unspecified, Keyword, Comment, Number, Text), CachedSimulationResult (file as FileInfo, columnNames), RunSimulationParams (startTime, endTime, initialStep, methodName, accuracy, isAccuracyInUse, isStabilityControlInUse, compiledModelId, eventDetectionGamma, eventDetectionLowBorder), and SocketPaths (grpc and http Unix socket paths).
+
+Conversion/ directory contains BlueprintToLismaConverter which converts BlueprintModel to LismaTextModel as a pure algorithm. It includes ConvertToLisma() (main flow: main text to transactions to loops), CreateTransactionKey() (produces "{targetStateName} ({predicate})"), and StateBlockModel (helper for state block generation).
+
+Results/ directory contains LismaPdeTranslationResult — a sealed interface with SuccessTranslation and FailedTranslation variants.
+
+Contracts/ directory contains service interfaces: ISimulationServerFacade (compile, validate, highlight, run, monitor, download, cancel, getMethods, shutdown), IEquationIndexProvider (getDifferentialEquationCount, getAlgebraicEquationCount, getDifferentialEquationCode, getAlgebraicEquationCode), ISimulationResultReader (Results as IEnumerable<SimulationPoint>), ISyntaxHighlighter (Highlight(source) returns List<SyntaxTokenDto>), ITextEditorFactory (CreateTextEditor and DisposeInstance), and ISimulationResultService (CommitResult, RemoveResult, ShowChart, ExportToFile). NOTE: ISimulationResultService is implemented in the App layer because ShowChart requires FileDialog and GrinProcessLauncher.
+
+See `ISMA.Domain.csproj` for project configuration.
+
+**ISMA.Infrastructure/** — gRPC, file I/O, and external processes.
+
+Server/ directory contains: SimulationServerManager (process lifecycle, socket path parsing), SimulationServerFacade (orchestration: compile, validate, run, monitor), GrpcSimulationClient (gRPC client for SimulationServiceGrpc), GrpcLismaCompilerClient (gRPC client for LismaCompilerServiceGrpc), HttpSimulationClient (HTTP client for binary result downloads), BinaryFilePointProvider (reads binary results to IEnumerable<SimulationPoint>), and BinaryEquationIndexProvider (parses column prefixes DE_, AE_, f).
+
+FileStorage/ directory contains PreferencesProvider (preferences.json persistence via raw file I/O).
+
+ChartViewer/ directory contains GrinProcessLauncher (launches external chart viewer process).
+
+See `ISMA.Infrastructure.csproj` for project configuration.
+
+**ISMA.ViewModels/** — Presentation layer, UI-framework agnostic.
+
+ViewModels/ directory contains: MainWindowViewModel (Projects, ActiveProject, 14 commands), IProjectViewModel (Name, File, EditorContent, NameChanged, Dispose), LismaProjectViewModel (LISMA text content, data provider bridge), BlueprintProjectViewModel (Blueprint model, convertToLisma integration), SimulationParametersViewModel (5 parameter sections with snapshot/commit), SimulationServiceViewModel (Simulate, StopSimulation, TrackingTasks), SimulationResultViewModel (CommitResult, ShowChart, ExportToFile), ErrorListViewModel (Errors collection, PutErrorList), CauchyInitialsViewModel (bound to CauchyInitials properties), IntegrationMethodViewModel (bound to IntegrationMethod properties plus method list), EventDetectionViewModel (bound to EventDetection properties), ResultProcessingViewModel (bound to ResultProcessing properties), BlueprintEditorViewModel (States, Transactions, Modes, Add/Remove operations), TasksPopOverViewModel (InProgress and Completed sections), SelectVariablesDialogViewModel (XAxis, YAxis selection for chart viewer), EditArrowPopOverViewModel (Alias and Predicate for arrow editing), and InProgressSimulationViewModel (Id, ModelName, Progress, CanAbort).
+
+Models/ directory contains NamedPickerItem (generic item for axis picker dialog).
+
+Services/ directory contains: SimulationService (orchestrates snapshot to compile to run to monitor to download), ProjectService (project collection management), ModelErrorService (error list management), LismaPdeService (LISMA validation producing Success/Failure), and SyntaxHighlighterService (delegates to server, maps token kinds).
+
+Converters/ directory contains: DoubleConverter (string to double with normalization), IntegerConverter (string to int with normalization), ProgressToPercentConverter (0.0–1.0 to percentage), BoolToVisibilityConverter (bool to IsVisible binding), and SaveTargetConverter (SaveTarget enum to display string).
+
+See `ISMA.ViewModels.csproj` for project configuration.
+
+**ISMA.App/** — Avalonia 12 UI.
+
+Views/ directory contains: MainWindow.axaml (MenuBar, ToolBar, TabControl, SettingsPanel, ErrorList, ProcessBar), SettingsPanelView.axaml (4-tab settings panel), EditorTabPaneView.axaml (TabControl bound to Projects collection), IsmaTextEditorView.axaml (AvalonEdit TextEditor with syntax highlighting), BlueprintEditorView.axaml (Canvas panel + toolbar + edit popover), TasksPopOverView.axaml (In-progress and Completed sections), IsmaErrorListTableView.axaml (DataGrid for errors), SimulationProcessBarView.axaml (Play button + Tasks button), SelectVariablesDialog.axaml (X-axis ComboBox + Y-axis CheckBoxList), EditArrowPopOverView.axaml (Alias + Predicate text fields), and Settings/ subdirectory with CauchyInitialsView.axaml (Start, End, Step), MethodSettingsView.axaml (Method, Accurate, Accuracy, Stable, Parallel, Server, Port), EventDetectionView.axaml (In use, Gamma, Step limit, Low border), and ResultProcessingView.axaml (Save result MEMORY/FILE, Simplify checkbox, Simplify method Radial-Distance/Douglas-Peucker, Tolerance). NOTE: In the original, Simplify/Tolerance controls are commented out (see 06-ux-reference.md lines 377–381).
+
+Controls/ directory contains: BlueprintCanvasPanel.cs (custom Panel with Draw/DrawingContext for states and arrows), PropertiesGrid.axaml (reusable label+control grid), and NumericCell.axaml (custom DataGrid cell for row/position columns).
+
+Services/ directory contains UI-specific services with Avalonia dependencies: EditorPlatformService (Cut/Copy/Paste event propagation), TextEditorFactory (creates/disposes AvalonEdit instances), ProjectFileService (Open/Save with FileDialog), SimulationResultService (ShowChart with FileDialog/Grin), and SimulationParametersService (Store/Load with FileDialog).
+
+ViewModels/ and Converters/ directories are empty — all ViewModels and converters are in ISMA.ViewModels.
+
+App.axaml contains Fluent theme, resource dictionaries, and styles. App.xaml.cs handles DI registration and application lifecycle. Program.cs is the Avalonia entry point.
+
+See `ISMA.App.csproj` for project configuration.
+
+**ISMA.Tests/** — xUnit + FluentAssertions + Moq.
+
+Domain/ directory contains: SimulationParametersTests (serialization, defaults, snapshot/commit), BlueprintModelTests (empty model defaults, state/transaction creation), BlueprintToLismaConversionTests (all conversion scenarios), PreferencesTests (load/save, window geometry), SimulationPointTests (Equals/GetHashCode for arrays), and CodeRegionTests (line range tracking, fragmentNameByIndex).
+
+ViewModels/ directory contains: SimulationServiceViewModelTests (mock server: compile errors, success, progress, cancel), ProjectViewModelTests (create/close projects, name changes, file save), SimulationParametersViewModelTests (snapshot captures, commit applies), ErrorListViewModelTests (clear and repopulate), MainWindowViewModelTests (commands exist and invoke), BlueprintEditorViewModelTests (add/remove states and transitions), and BlueprintToLismaConversionViewModelTests (ViewModel uses converter correctly).
+
+See `ISMA.Tests.csproj` for project configuration.
+
+**Shared configuration:** Directory.Build.props (common properties: nullable, analyzers, LangVersion), Directory.Packages.props (centralized package versions), and isma-ui-dotnet.sln (solution file).
 
 ---
 
@@ -312,95 +217,27 @@ The original uses `ru.isma.next.exchange.format` for binary simulation result re
 
 ### Directory.Build.props
 
-```xml
-<Project>
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>13</LangVersion>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>$(WarningsNotAsErrors);CS8618;CS8604</WarningsNotAsErrors>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.0" PrivateAssets="all" />
-  </ItemGroup>
-</Project>
-```
+Sets common properties for all projects: TargetFramework is `net10.0`, Nullable and ImplicitUsings are enabled, LangVersion is 13, TreatWarningsAsErrors is true (with CS8618 and CS8604 excluded), IsPackable is false, and Microsoft.CodeAnalysis.NetAnalyzers version 10.0.0 is referenced as a private asset.
 
 ### Directory.Packages.props
 
-```xml
-<Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Avalonia" Version="12.0.5" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.0.5" />
-    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.0.5" />
-    <PackageVersion Include="Avalonia.Desktop" Version="12.0.5" />
-    <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.0.5" />
-    <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="12.0.5" />
-    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.0" />
-    <PackageVersion Include="Grpc.Net.Client" Version="2.63.0" />
-    <PackageVersion Include="Grpc.Tools" Version="2.63.0" />
-    <PackageVersion Include="Google.Protobuf" Version="3.27.0" />
-    <PackageVersion Include="ICSharpCode.AvalonEdit" Version="6.3.0.90" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
-    <PackageVersion Include="System.IO.Pipelines" Version="10.0.0" />
-    <PackageVersion Include="xunit" Version="2.9.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" />
-    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-    <PackageVersion Include="Moq" Version="4.20.70" />
-  </ItemGroup>
-</Project>
-```
+Enables central package version management with transitive pinning enabled. Package versions: Avalonia 12.0.5 (core, Themes.Fluent, Controls.DataGrid, Desktop, Fonts.Inter, UI.DiagnosticsSupport), CommunityToolkit.Mvvm 8.2.0, Grpc.Net.Client 2.63.0, Grpc.Tools 2.63.0, Google.Protobuf 3.27.0, ICSharpCode.AvalonEdit 6.3.0.90, Microsoft.Extensions.DependencyInjection 10.0.0, System.IO.Pipelines 10.0.0, xUnit 2.9.0, xunit.runner.visualstudio 2.8.0, FluentAssertions 6.12.0, Moq 4.20.70.
 
 ### .editorconfig (root)
 
-```ini
-root = true
-
-[*.cs]
-dotnet_sort_system_header_first = true
-dotnet_separate_import_directive_groups = false
-indent_style = space
-indent_size = 4
-end_of_line = \r\n
-insert_final_newline = true
-
-# CommunityToolkit.Mvvm conventions
-[mvvm*ViewModel.cs]
-dotnet_naming_rule.public_properties_have_correct_naming.convention = PublicProperty
-dotnet_naming_public_properties_have_correct_naming.style = pascal_case_style
-dotnet_naming_public_properties_have_correct_naming.style.capitalization = camel_case
-
-# Nullable context
-[*.cs]
-csharp_using_directive_placement = outside_namespace:csharp_file
-csharp_prefer_static_local_function = true:suggestion
-csharp_style_expression_bodied_methods = false:suggestion
-csharp_style_expression_bodied_properties = true:suggestion
-```
+Root-level editorconfig with space indentation (4 spaces), CRLF line endings, and final newline insertion. For all .cs files: sort system headers first, do not separate import directive groups. For mvvm*ViewModel.cs files: camel_case naming convention for public properties. Nullable context settings: using directives outside namespace, prefer static local functions (suggestion), expression-bodied methods as suggestion (false), expression-bodied properties as suggestion (true).
 
 ### gRPC Code Generation
 
 The `Grpc.Tools` package generates C# stubs from protobuf definitions. Configuration in `ISMA.Infrastructure.csproj`:
 
-```xml
-<ItemGroup>
-  <Protobuf Include="..\..\protobuf-contracts\v1\simulation_service\*.proto" GrpcServices="Client" Link="proto\%(Filename)%(Extension)" />
-</ItemGroup>
-<ItemGroup>
-  <Protobuf Include="..\..\protobuf-contracts\v1\simulation_service\*.proto" GrpcServices="Server" Link="proto\%(Filename)%(Extension)" Condition="'$(Configuration)' == 'Debug'" />
-</ItemGroup>
-```
+See `ISMA.Infrastructure.csproj` for the Protobuf ItemGroup configuration. It includes `..\..\protobuf-contracts\v1\simulation_service\*.proto` with GrpcServices="Client" linked to `proto\%(Filename)%(Extension)`, and includes the same protos with GrpcServices="Server" in Debug configuration only. Generated files appear in `obj/Debug/net10.0/` and are automatically included in compilation.
 
-Generated files appear in `obj/Debug/net10.0/` and are automatically included in the compilation.
+### gRPC Code Generation
+
+The `Grpc.Tools` package generates C# stubs from protobuf definitions. Configuration in `ISMA.Infrastructure.csproj`:
+
+See `ISMA.Infrastructure.csproj` for the Protobuf ItemGroup configuration. It includes `..\..\protobuf-contracts\v1\simulation_service\*.proto` with GrpcServices="Client" linked to `proto\%(Filename)%(Extension)`, and includes the same protos with GrpcServices="Server" in Debug configuration only. Generated files appear in `obj/Debug/net10.0/` and are automatically included in the compilation.
 
 ---
 
@@ -426,6 +263,45 @@ Generated files appear in `obj/Debug/net10.0/` and are automatically included in
 | 9 | Phase 8 | Phase 8 (text editor integration), Phase 1 (converter) |
 | 10 | Phase 7, 9 | Phase 7 (shell), Phase 9 (blueprint editor), Phase 2 (GrinProcessLauncher) |
 | 11 | All phases | All |
+
+```mermaid
+graph LR
+    P0["Phase 0<br/>Foundation &<br/>Project Setup"] --> P1["Phase 1<br/>Domain Layer"]
+    P0 --> P2["Phase 2<br/>Infrastructure<br/>Server Comm"]
+    P1 --> P2
+    P2 --> P3["Phase 3<br/>File Storage<br/>& Preferences"]
+    P1 --> P4["Phase 4<br/>ViewModels"]
+    P2 --> P4
+    P4 --> P5["Phase 5<br/>App Layer<br/>UI Services"]
+    P2 --> P5
+    P1 --> P6["Phase 6<br/>Tests"]
+    P4 --> P6
+    P4 --> P7["Phase 7<br/>UI Shell<br/>& Menu"]
+    P5 --> P7
+    P7 --> P8["Phase 8<br/>Tabs &<br/>Text Editor"]
+    P5 --> P8
+    P7 --> P9["Phase 9<br/>Blueprint<br/>Editor"]
+    P1 --> P9
+    P8 --> P9
+    P7 --> P10["Phase 10<br/>Tasks, Results<br/>& Chart"]
+    P9 --> P10
+    P2 --> P10
+    P9 --> P11["Phase 11<br/>Polish<br/>& Testing"]
+    P10 --> P11
+
+    style P0 fill:#e1f5fe
+    style P1 fill:#e8f5e9
+    style P2 fill:#fff3e0
+    style P3 fill:#fff3e0
+    style P4 fill:#f3e5f5
+    style P5 fill:#e1f5fe
+    style P6 fill:#fce4ec
+    style P7 fill:#e1f5fe
+    style P8 fill:#e1f5fe
+    style P9 fill:#e1f5fe
+    style P10 fill:#e1f5fe
+    style P11 fill:#fff9c4
+```
 
 #### Cross-Reference: Phases → Features → Source Docs
 
@@ -462,58 +338,21 @@ Generated files appear in `obj/Debug/net10.0/` and are automatically included in
    - Set `<ProtobufFiles>$(IntermediateOutputPath)$(MSBuildProjectName).grpc.cs</ProtobufFiles>` for output path
    - Verify generated stubs in `obj/Debug/net10.0/` after build
 6. Set up DI registration skeleton in `App.xaml.cs` using `ServiceCollectionExtensions` pattern:
-   ```csharp
-   public partial class App : Application
-   {
-       public override void OnFrameworkInitialization()
-       {
-           var services = new ServiceCollection();
-           ConfigureInfrastructure(services);
-           ConfigureViewModels(services);
-           ConfigureAppServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
-           ConfigureServices(services);
 
-           // NOTE: The above is a placeholder. See Phase 4-5 for actual registrations.
-           // For Phase 0, just register MainWindowViewModel to verify DI works.
-           services.AddSingleton<MainWindowViewModel>();
+See `App.xaml.cs` for the DI registration implementation. The `App` class extends `Application` and overrides `OnFrameworkInitialization()`. It creates a `ServiceCollection`, calls layer-specific configuration methods (ConfigureInfrastructure, ConfigureViewModels, ConfigureAppServices), registers `MainWindowViewModel` as a singleton, builds the `ServiceProvider`, and calls the base implementation.
 
-           Provider = services.BuildServiceProvider();
-           base.OnFrameworkInitialization();
-       }
-   }
-   ```
-   - Create `ServiceCollectionExtensions.cs` in each layer for modular registration
-   - Phase 0: register only `MainWindowViewModel`
-   - Phase 4: register all ViewModels and presentation services
-   - Phase 5: register UI-dependent services
-7. Create minimal `MainWindow.axaml` with empty content to verify the app runs
+- Create `ServiceCollectionExtensions.cs` in each layer for modular registration
+- Phase 0: register only `MainWindowViewModel`
+- Phase 4: register all ViewModels and presentation services
+- Phase 5: register UI-dependent services
+7. Create minimal `MainWindow.axaml` with empty content to verify the app runs.
+
 8. Create `ViewLocator` for automatic View resolution from ViewModel type:
-   ```csharp
-   public class ViewLocator : IDataTemplate
-   {
-       public Control? Build(object? param)
-       {
-           if (param is null) return null;
-           var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-           var assembly = param.GetType().Assembly;
-           return assembly.GetType(name)?.CreateInstance() as Control;
-       }
 
-       public Control? Create() => Build(null);
-   }
-   ```
-   - Register in `App.axaml`: `<DataTemplate DataType="{x:Type vm:MainWindowViewModel}"><views:MainWindow /></DataTemplate>`
-   - Or use `ViewLocator` as default data template for `ContentControl`
+See the ViewLocator implementation — a class implementing `IDataTemplate` with a `Build(object? param)` method that replaces "ViewModel" with "View" in the full type name, resolves the type from the same assembly, and creates an instance. The `Create()` method delegates to `Build(null)`.
+
+- Register in `App.axaml`: `<DataTemplate DataType="{x:Type vm:MainWindowViewModel}"><views:MainWindow /></DataTemplate>`
+- Or use `ViewLocator` as default data template for `ContentControl`
 
 #### Acceptance Checklist
 

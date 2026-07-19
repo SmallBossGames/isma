@@ -6,131 +6,86 @@
 
 ## Position in the ISMA Architecture
 
-```mermaid
-flowchart TB
-    UI["🖥 ISMA UI\n(JavaFX / Blueprint Editor)"] -->|"gRPC over\nUnix Domain Socket"| Server
-    subgraph Server["isma-server"]
-        direction LR
-        App["📦 app/"]
-        Dom["📦 domain/"]
-        Infra["📦 infrastructure/"]
-    end
-    Server -->|depends on| ExtDeps["External Dependencies"]
-    subgraph ExtDeps["External Libraries"]
-        direction LR
-        Solver["isma-solver:lib-meta\nSolver Methods"]
-        Compiler["isma-compiler/\nHSM / FDM / JVM"]
-        Next["isma-next-core\nHSM Compiler / FDM"]
-    end
-    App <--> Dom
-    Dom <--> Infra
-    App -->|imports| Dom
-    Infra -->|implements| Dom
-```
+The ISMA UI (JavaFX / Blueprint Editor) communicates with the server via gRPC over a Unix domain socket. The server consists of three internal modules: `app/` (entry point and services), `domain/` (business logic), and `infrastructure/` (concrete implementations). The server depends on external libraries including `isma-solver:lib-meta` (solver method factories), `isma-compiler/` (HSM, FDM, JVM backends), and `isma-next-core` (HSM compiler and finite difference method support). The `app/` module imports `domain/`, `domain/` and `infrastructure/` have a bidirectional dependency (domain declares interfaces, infrastructure implements them).
 
 The server communicates with the UI via a **two-service gRPC architecture**:
 
 1. **SimulationService** — Run, monitor, and manage numerical simulations
 2. **LismaCompilerService** — Compile, validate, and highlight LISMA source code
 
+```mermaid
+graph LR
+    UI["ISMA UI\n(JavaFX / Blueprint Editor)"] -->|"gRPC :0"| GrpcSocket["isma-{UUID}.sock"]
+    UI -->|"HTTP GET"| HttpSocket["isma-http-{UUID}.sock"]
+    GrpcSocket --> App["app/"]
+    HttpSocket --> App
+    App --> Domain["domain/\nBusiness logic"]
+    App --> Infra["infrastructure/\nConcrete implementations"]
+    Domain -.->|"interfaces"| Infra
+    Infra -->|"implements"| Domain
+```
+
 ## Module Structure
 
-```
-isma-server/
-├── app/                  # Application entry point, gRPC & HTTP services
-│   └── src/main/kotlin/ru/nstu/isma/server/app/
-│       ├── Application.kt            # Main class, server startup
-│       ├── AppModule.kt              # Koin DI module (gRPC service bindings)
-│       ├── grpc/
-│       │   ├── SimulationServiceGrpcImpl.kt
-│       │   └── LismaCompilerServiceGrpcImpl.kt
-│       └── http/
-│           └── HttpRoutes.kt         # Ktor HTTP routes (result download)
-│
-├── domain/               # Domain layer: interfaces + handler implementations
-│   └── src/main/kotlin/ru/nstu/isma/domain/
-│       ├── DomainModule.kt           # Koin DI module (handler bindings)
-│       ├── compiler/
-│       │   └── ICompiledModelStore.kt
-│       ├── handlers/
-│       │   ├── cancelSimulation/
-│       │   ├── compileLisma/
-│       │   ├── deleteCompiledModel/
-│       │   ├── getSimulationResult/
-│       │   ├── highlightLisma/
-│       │   ├── listSimulationMethods/
-│       │   ├── monitorSimulation/
-│       │   ├── runSimulation/
-│       │   └── validateLisma/
-│       ├── integration/
-│       │   └── IIntegrationMethodsStore.kt
-│       └── simulation/
-│           ├── ISimulationExecutor.kt
-│           ├── ISimulationSessionStore.kt
-│           ├── SimulationSession.kt
-│           └── SimulationStatus.kt
-│
-├── infrastructure/       # Infrastructure layer: concrete implementations
-│   └── src/main/kotlin/ru/nstu/isma/server/infrastructure/
-│       ├── InfrastructureModule.kt   # Koin DI module (infrastructure bindings)
-│       ├── highlight/
-│       │   └── HighlightLismaHandlerImpl.kt
-│       ├── simulation/
-│       │   └── SimulationExecutorImpl.kt
-│       ├── stores/
-│       │   ├── compiledModels/CompiledModelStore.kt
-│       │   ├── integrationMethods/IntegrationMethodsStore.kt
-│       │   └── simulationSessions/SimulationSessionStore.kt
-│       └── translation/
-│           └── LismaTranslatorImpl.kt
-│
-└── grpc/                 # gRPC code generation (proto → Java stubs)
-    └── Protobuf source: ../../protobuf-contracts/
-```
+| Directory | Purpose |
+|-----------|---------|
+| `app/src/main/kotlin/ru/nstu/isma/server/app/` | Application entry point, gRPC & HTTP services |
+| `Application.kt` | Main class, server startup |
+| `AppModule.kt` | Koin DI module (gRPC service bindings) |
+| `grpc/` | gRPC service implementations |
+| `SimulationServiceGrpcImpl.kt` | SimulationService gRPC handler |
+| `LismaCompilerServiceGrpcImpl.kt` | LismaCompilerService gRPC handler |
+| `http/HttpRoutes.kt` | Ktor HTTP routes (result download) |
+| `domain/src/main/kotlin/ru/nstu/isma/domain/` | Domain layer: interfaces + handler implementations |
+| `DomainModule.kt` | Koin DI module (handler bindings) |
+| `compiler/ICompiledModelStore.kt` | Compiled model store interface |
+| `handlers/` | Handler packages (cancelSimulation, compileLisma, deleteCompiledModel, getSimulationResult, highlightLisma, listSimulationMethods, monitorSimulation, runSimulation, validateLisma) |
+| `integration/IIntegrationMethodsStore.kt` | Integration methods store interface |
+| `simulation/` | Simulation domain (ISimulationExecutor, ISimulationSessionStore, SimulationSession, SimulationStatus) |
+| `infrastructure/src/main/kotlin/ru/nstu/isma/server/infrastructure/` | Infrastructure layer: concrete implementations |
+| `InfrastructureModule.kt` | Koin DI module (infrastructure bindings) |
+| `highlight/HighlightLismaHandlerImpl.kt` | Syntax highlighting implementation |
+| `simulation/SimulationExecutorImpl.kt` | Simulation execution engine |
+| `stores/` | Concrete store implementations (CompiledModelStore, IntegrationMethodsStore, SimulationSessionStore) |
+| `translation/LismaTranslatorImpl.kt` | LISMA to HSM translator |
+| `grpc/` | gRPC code generation (proto → Java stubs) |
+| Protobuf source | `../../protobuf-contracts/` |
 
 ### Module Dependencies
 
+The `:isma-server:grpc` module generates Java stubs from protobuf definitions and has no project dependencies. The `:isma-server:domain` module depends on `isma-solver:api`, `isma-compiler:hsm-core`, `isma-next-core`, and `koin-core`. The `:isma-server:infrastructure` module depends on `isma-solver:core`, `isma-solver:lib-utils`, `isma-compiler:hsm-fdm`, `isma-compiler:hsm-jvm`, `isma-compiler:lisma-translator-hsm`, `antlr4-runtime`, and other compiler modules. The `:isma-server:app` module depends on all three internal modules (domain, grpc, infrastructure) plus `isma-solver:lib-meta` and gRPC/Netty/Ktor libraries.
+
 ```mermaid
-flowchart LR
-    Grpc["📦 :isma-server:grpc\n(generated stubs, no project deps)"]
-    Domain["📦 :isma-server:domain\n(handlers + interfaces)"]
-    Infra["📦 :isma-server:infrastructure\n(concrete implementations)"]
-    App["📦 :isma-server:app\n(entry point + services)"]
-    Ext1["isma-solver:api\nisma-compiler:hsm-core\nisma-next-core\nkoin-core"]
-    Ext2["isma-solver:core/lib-utils\nisma-compiler:hsm-fdm/jvm/translator\nantlr4-runtime"]
-    Ext3["isma-solver:lib-meta\ngRPC/Netty/Ktor libs"]
-    Grpc -.->|no project deps| Ext1
-    Domain -->|depends on| Ext1
-    Infra -->|depends on| Ext2
-    App -->|depends on| Domain
-    App -->|depends on| Grpc
-    App -->|depends on| Infra
-    App -->|depends on| Ext3
+graph TD
+    Proto["protobuf-contracts/v1/\n.proto definitions"] --> Grpc[":isma-server:grpc\nJava stubs"]
+    SolverApi["isma-solver:api"] --> Domain[":isma-server:domain"]
+    HsmCore["isma-compiler:hsm-core"] --> Domain
+    NextCore["isma-next-core"] --> Domain
+    Koin["koin-core"] --> Domain
+    Domain --> Infra[":isma-server:infrastructure"]
+    SolverCore["isma-solver:core"] --> Infra
+    SolverLibUtils["isma-solver:lib-utils"] --> Infra
+    HsmFdm["isma-compiler:hsm-fdm"] --> Infra
+    HsmJvm["isma-compiler:hsm-jvm"] --> Infra
+    LismaTrans["isma-compiler:lisma-translator-hsm"] --> Infra
+    Antlr["antlr4-runtime"] --> Infra
+    Grpc --> App[":isma-server:app"]
+    Domain --> App
+    Infra --> App
+    SolverMeta["isma-solver:lib-meta"] --> App
+    GrpcLib["grpc-netty"] --> App
+    Ktor["ktor"] --> App
 ```
 
 ## Design Principles
 
 ### 1. Interface-Based Domain Layer
 
-The `domain/` module contains both **interfaces** and **handler implementations**, following a hexagonal architecture pattern. Interfaces define contracts; implementations are in the `infrastructure/` module. The `domain/` module's handler implementations depend on infrastructure interfaces declared in the same module.
-
-```mermaid
-flowchart LR
-    subgraph Domain["📦 domain/"]
-        Dir["Domain Interfaces"]
-        Dih["Domain Handler Impls"]
-    end
-    subgraph Infra["📦 infrastructure/"]
-        Ish["Infrastructure Impls"]
-    end
-    Dir -->|"declares"| Dih
-    Dih -->|depends on| Ish
-    Ish -->|"implements"| Dir
-```
+The `domain/` module contains both **interfaces** and **handler implementations**, following a hexagonal architecture pattern. Interfaces define contracts; implementations are in the `infrastructure/` module. The `domain/` module's handler implementations depend on infrastructure interfaces declared in the same module. The dependency pattern is: domain interfaces declare domain handler implementations, which depend on infrastructure implementations, which implement the domain interfaces.
 
 ### 2. Koin Dependency Injection
 
-Three Koin modules are layered:
+Three Koin modules are layered in startup order:
 
 | Module                 | Contents                                                          |
 | ---------------------- | ----------------------------------------------------------------- |
@@ -138,12 +93,7 @@ Three Koin modules are layered:
 | `infrastructureModule` | All store interfaces → implementations, external service wrappers |
 | `appModule`            | gRPC service implementations that wire handlers together          |
 
-```kotlin
-// Startup order (appModule depends on the others)
-startKoin {
-    modules(domainModule, infrastructureModule, appModule)
-}
-```
+See `Application.kt` for the `startKoin { modules(domainModule, infrastructureModule, appModule) }` call that initializes all three modules. The `appModule` depends on the other two, so it must be loaded last.
 
 ### 3. Thread Pool Architecture
 
@@ -158,73 +108,88 @@ startKoin {
 
 ### Simulation Lifecycle
 
+The client sends a `RunSimulationRequest` to `SimulationServiceGrpcImpl`, which delegates to `RunSimulationHandlerImpl`. The handler retrieves the HSM model from `CompiledModelStore`, creates a new `SimulationSession`, and submits async execution to the `ExecutorService`. The server returns a `RunSimulationResponse` with the `simulationId`. The simulation runs asynchronously on an `ExecutorService` thread. The client can then send `MonitorSimulationRequest` messages, which trigger a polling loop in `MonitorSimulationHandlerImpl` that checks the session store every 100ms and sends progress updates via callback when the time delta threshold is reached or the simulation reaches a terminal status. The client sends `CancelSimulationRequest` to set the session status to `CANCELLED`; the running simulation detects this and throws `InterruptedException` to halt. The client sends `GetSimulationResultRequest` to validate the session is `COMPLETED`, and the server returns a download URL `/simulation/{id}/download`. The client then makes an HTTP GET request to the Ktor server on the separate Unix socket, which reads the result file and returns the binary data.
+
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant Server as Server (gRPC)<br/>SimulationServiceGrpcImpl
-    participant Domain as Domain<br/>RunSimulationHandlerImpl
-    participant Infra as Infrastructure<br/>SimulationSessionStore / ExecutorService
-    participant HTTP as HTTP<br/>Ktor Server
+    participant Client as UI Client
+    participant Grpc as SimulationServiceGrpcImpl
+    participant Handler as RunSimulationHandlerImpl
+    participant Store as CompiledModelStore
+    participant Session as SimulationSessionStore
+    participant Executor as ExecutorService
+    participant Sim as Simulation (async)
+    participant Mon as MonitorSimulationHandlerImpl
+    participant Http as Ktor HTTP Server
 
-    Client->>Server: RunSimulationRequest
-    Server->>Domain: handle(RunSimulationParameters)
-    Domain->>Infra: get HSM model from CompiledModelStore
-    Domain->>Infra: create session
-    Domain->>Infra: execute() → submit to ExecutorService
-    Domain-->>Server: RunningSimulationResult(simulationId)
-    Server-->>Client: RunSimulationResponse (simulationId)
+    Client->>Grpc: RunSimulationRequest
+    Grpc->>Handler: handle(request)
+    Handler->>Store: get(compiledModelId)
+    Store-->>Handler: HSM model
+    Handler->>Session: create(startTime, endTime)
+    Session-->>Handler: sessionId
+    Handler->>Executor: execute(sessionId, params, hsm)
+    Handler-->>Grpc: RunSimulationResponse(simulationId)
+    Grpc-->>Client: simulationId
 
-    Note over Infra: async simulation run (ExecutorService thread)
+    Executor->>Sim: run simulation (async thread)
 
-    Client->>Server: MonitorSimulationRequest
-    Server->>Domain: handle(simulationId, accuracy, callback)
-    Domain->>Infra: poll session state (100ms interval)
-    Infra-->>Domain: SimulationSession
-    Domain->>Domain: compare currentTime vs threshold
-    Domain->>Server: callback(SimulationProgress)
-    Server-->>Client: MonitorSimulationResponse (progress)
+    Client->>Grpc: MonitorSimulationRequest
+    Grpc->>Mon: handle(request)
+    Mon->>Session: get(sessionId)
+    loop Poll every 100ms
+        Session-->>Mon: SimulationSession
+        Mon->>Mon: check time delta threshold
+        Mon-->>Client: MonitorSimulationResponse(progress)
+    end
+    Sim-->>Session: status=COMPLETED
 
-    Client->>Server: CancelSimulationRequest
-    Server->>Infra: updateStatus(CANCELLED)
-    Note over Infra: Simulation detects CANCELLED<br/>throws InterruptedException
+    opt Cancel
+        Client->>Grpc: CancelSimulationRequest
+        Grpc->>Session: updateStatus(CANCELLED)
+        Sim->>Sim: detect CANCELLED, throw InterruptedException
+        Session-->>Sim: status=CANCELLED
+    end
 
-    Client->>Server: GetSimulationResultRequest
-    Server->>Infra: validate session is COMPLETED
-    Server-->>Client: Download URL /simulation/{id}/download
+    Client->>Grpc: GetSimulationResultRequest
+    Grpc-->>Client: GetSimulationResultResponse(download_url)
 
-    Client->>HTTP: GET /simulation/{id}/download
-    HTTP->>Infra: read result file (.bin)
-    HTTP-->>Client: Result file data
+    Client->>Http: GET /simulation/{id}/download
+    Http-->>Client: application/octet-stream (binary result)
 ```
 
 ### Model Compilation Flow
 
+The client sends a `CompileRequest` with LISMA source code to `LismaCompilerServiceGrpcImpl`, which delegates to `CompileLismaHandlerImpl`. The handler calls `LismaTranslatorImpl.translate(sourceCode)` which converts LISMA source to an HSM model, and if the model is a PDE, applies `FDMConverter.convert()` for finite difference discretization. On success, the handler stores the HSM model in `CompiledModelStore` and returns the generated UUID as `compiledModelId`. On failure, the handler falls back to validation to extract detailed error positions and returns them as `CompilationError` objects in the response.
+
+### Model Compilation Flow
+
+The client sends a `CompileRequest` with LISMA source code to `LismaCompilerServiceGrpcImpl`, which delegates to `CompileLismaHandlerImpl`. The handler calls `LismaTranslatorImpl.translate(sourceCode)` which converts LISMA source to an HSM model, and if the model is a PDE, applies `FDMConverter.convert()` for finite difference discretization. On success, the handler stores the HSM model in `CompiledModelStore` and returns the generated UUID as `compiledModelId`. On failure, the handler falls back to validation to extract detailed error positions and returns them as `CompilationError` objects in the response.
+
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant CompilerService as LismaCompilerServiceGrpcImpl
-    participant CompileHandler as CompileLismaHandlerImpl
+    participant Client as UI Client
+    participant Grpc as LismaCompilerServiceGrpcImpl
+    participant Handler as CompileLismaHandlerImpl
     participant Translator as LismaTranslatorImpl
-    participant ModelStore as CompiledModelStore
+    participant FDM as FDMConverter
+    participant Store as CompiledModelStore
 
-    Client->>CompilerService: CompileRequest(lismaSourceCode)
-    CompilerService->>CompileHandler: handle(sourceCode)
-    CompileHandler->>Translator: translate(sourceCode)
-    Translator->>Translator: LISMA source → HSM model
-    alt model.isPDE
-        Translator->>Translator: FDMConverter.convert()
-    end
-    Translator-->>CompileHandler: Result<HSM>
-    CompileHandler->>ModelStore: create(hsm)
-    ModelStore-->>CompileHandler: UUID
-    CompileHandler-->>CompilerService: CompileLismaResult
-    CompilerService-->>Client: CompileResponse(compiledModelId)
+    Client->>Grpc: CompileRequest(lisma_source_code)
+    Grpc->>Handler: handle(request)
+    Handler->>Translator: translate(sourceCode)
+    Translator-->>Handler: Result<HSM>
 
-    alt translation failed
-        CompileHandler->>Translator: validate(sourceCode)
-        Translator-->>CompileHandler: IsmaErrorList
-        CompileHandler-->>CompilerService: CompileLismaResult(errors)
-        CompilerService-->>Client: CompileResponse(errors)
+    alt Success
+        Handler->>Handler: if PDE then FDMConverter.convert()
+        Handler->>Store: create(hsm)
+        Store-->>Handler: compiledModelId (UUID)
+        Handler-->>Grpc: CompileResponse(compiledModelId)
+        Grpc-->>Client: compiledModelId
+    else Failure
+        Handler->>Handler: fallback to validation
+        Handler-->>Grpc: CompileResponse(errors[])
+        Grpc-->>Client: errors[]
     end
 ```
 

@@ -66,9 +66,7 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 
 ## Building
 
-```bash
-./gradlew :isma-ui:app:build
-```
+Run `./gradlew :isma-ui:app:build` to build the application module.
 
 ## Running
 

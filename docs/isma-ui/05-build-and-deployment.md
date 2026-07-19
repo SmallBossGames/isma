@@ -8,38 +8,7 @@ All modules use the Kotlin JVM plugin (`alias(libs.plugins.kotlin.jvm)`) and Jav
 
 **File:** `app/build.gradle.kts`
 
-```kotlin
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.java.modules)
-    alias(libs.plugins.javafx)
-    application
-}
-
-application {
-    mainModule.set("isma.ui.app.main")
-    mainClass.set("ru.isma.next.app.launcher.IsmaApplication")
-    applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=javafx.graphics",
-        "--enable-native-access=io.netty.common",
-    )
-}
-
-tasks.withType<JavaExec>().configureEach {
-    jvmArgs(
-        "--enable-native-access=javafx.graphics",
-        "--enable-native-access=io.netty.common",
-        "-Disma.server.script=$rootDir/build/bundle/isma-server-app/bin/app",
-        "-Disma.grin.script=$rootDir/build/bundle/grin-app/bin/app"
-    )
-}
-
-javafx {
-    version = "25.0.2"
-    modules = listOf("javafx.controls", "javafx.fxml")
-}
-```
+The module applies plugins: `kotlin.jvm`, `kotlin.serialization`, `java.modules`, `javafx`, and `application`. Configuration sets `mainModule` to `isma.ui.app.main`, `mainClass` to `ru.isma.next.app.launcher.IsmaApplication`, and `applicationDefaultJvmArgs` to include `--enable-native-access=javafx.graphics` and `--enable-native-access=io.netty.common`. `JavaExec` tasks are configured with JVM args for native access and system properties pointing to server and Grin scripts. JavaFX version is 25.0.2 with modules `javafx.controls` and `javafx.fxml`. See `app/build.gradle.kts` for the full configuration.
 
 Key configuration:
 - JavaFX 25.0.2 with `controls` and `fxml` modules
@@ -51,16 +20,7 @@ Key configuration:
 
 **File:** `domain/build.gradle.kts`
 
-```kotlin
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java.modules)
-}
-
-dependencies {
-    implementation(libs.kotlinx.coroutines.core)
-}
-```
+The module applies the Kotlin JVM plugin and Java modules plugin. Its only dependency is `kotlinx-coroutines-core`. See `domain/build.gradle.kts` for the full configuration.
 
 No JavaFX modules. Pure Kotlin module with only kotlinx-coroutines-core.
 
@@ -68,37 +28,7 @@ No JavaFX modules. Pure Kotlin module with only kotlinx-coroutines-core.
 
 **File:** `external-services/build.gradle.kts`
 
-```kotlin
-group = "ru.isma.next.ui"
-version = "1.0.0-SNAPSHOT"
-
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java.modules)
-}
-
-dependencies {
-    implementation(project(":isma-ui:grpc"))
-    implementation(project(":isma-ui:domain"))
-    implementation(project(":isma-jvm-lib:exchange-format"))
-
-    implementation(libs.grpc.netty)
-    implementation(libs.grpc.protobuf)
-    implementation(libs.grpc.stub)
-    implementation(libs.protobuf.java)
-    implementation(libs.slf4j.api)
-
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.kotlinx.io.core)
-
-    implementation(libs.netty.transport)
-    implementation(libs.netty.transport.classes.epoll)
-    implementation(libs.netty.transport.native.epoll) {
-        artifact { classifier = "linux-x86_64" }
-    }
-}
-```
+The module sets group `ru.isma.next.ui` and version `1.0.0-SNAPSHOT`. Applies the Kotlin JVM plugin and Java modules plugin. Dependencies include project references to `:isma-ui:grpc`, `:isma-ui:domain`, and `:isma-jvm-lib:exchange-format`, plus gRPC-Netty, gRPC-protobuf, gRPC-stub, protobuf-java, slf4j-api, ktor-client-core, ktor-client-cio, kotlinx-io-core, and Netty transport (with Linux x86_64 epoll classifier). See `external-services/build.gradle.kts` for the full configuration.
 
 No JavaFX modules. Depends on gRPC-Netty, Ktor CIO, and Netty Epoll for Unix Domain Socket support.
 
@@ -106,57 +36,7 @@ No JavaFX modules. Depends on gRPC-Netty, Ktor CIO, and Netty Epoll for Unix Dom
 
 **File:** `grpc/build.gradle.kts`
 
-```kotlin
-import com.google.protobuf.gradle.*
-
-plugins {
-    alias(libs.plugins.google.protobuf)
-    alias(libs.plugins.java.modules)
-}
-
-group = "ru.isma.next.ui"
-version = "1.0.0-SNAPSHOT"
-
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${libs.protobuf.java.get().version}"
-    }
-    plugins {
-        id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:${libs.grpc.java.get().version}"
-        }
-    }
-    generateProtoTasks {
-        ofSourceSet("main").forEach {
-            it.plugins { id("grpc") {} }
-        }
-    }
-}
-
-sourceSets {
-    main {
-        proto {
-            srcDir("../../protobuf-contracts")
-        }
-    }
-}
-
-dependencies {
-    implementation(libs.grpc.netty)
-    implementation(libs.netty.transport)
-    implementation(libs.netty.transport.classes.epoll)
-    implementation(libs.netty.transport.native.epoll) {
-        artifact {
-            classifier = "linux-x86_64"
-        }
-    }
-    implementation(libs.grpc.stub)
-    implementation(libs.grpc.protobuf)
-    implementation(libs.protobuf.java)
-    implementation(libs.grpc.java)
-    implementation(libs.com.google.guava)
-}
-```
+The module sets group `ru.isma.next.ui` and version `1.0.0-SNAPSHOT`. Applies the Google protobuf plugin and Java modules plugin. Protobuf configuration uses `protoc` from the centralized version, generates gRPC Java stubs, and sources proto files from `../../protobuf-contracts`. Dependencies include gRPC-Netty, Netty transport (with Linux x86_64 epoll classifier), gRPC-stub, gRPC-protobuf, protobuf-java, grpc-java, and Guava. See `grpc/build.gradle.kts` for the full configuration.
 
 Generates Java gRPC stubs from protobuf definitions in `../../protobuf-contracts`. Exports `ru.nstu.isma.contracts.simulation`.
 
@@ -164,24 +44,7 @@ Generates Java gRPC stubs from protobuf definitions in `../../protobuf-contracts
 
 **File:** `text-editor/build.gradle.kts`
 
-```kotlin
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.java.modules)
-    alias(libs.plugins.javafx)
-}
-
-javafx {
-    version = "25.0.2"
-    modules = listOf("javafx.controls", "javafx.fxml")
-}
-
-dependencies {
-    implementation(libs.fxmisc.richtext.core)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.javafx)
-}
-```
+The module applies the Kotlin JVM plugin, Java modules plugin, and JavaFX plugin. JavaFX version is 25.0.2 with modules `javafx.controls` and `javafx.fxml`. Dependencies include `fxmisc.richtext.core`, `kotlinx-coroutines-core`, and `kotlinx-coroutines-javafx`. See `text-editor/build.gradle.kts` for the full configuration.
 
 JavaFX module using `fxmisc.richtext` for rich text editing.
 
@@ -189,25 +52,7 @@ JavaFX module using `fxmisc.richtext` for rich text editing.
 
 **File:** `blueprint-editor/build.gradle.kts`
 
-```kotlin
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.java.modules)
-    alias(libs.plugins.javafx)
-}
-
-javafx {
-    version = "25.0.2"
-    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
-}
-
-dependencies {
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.javafx)
-}
-```
+The module applies the Kotlin JVM plugin, Kotlin serialization plugin, Java modules plugin, and JavaFX plugin. JavaFX version is 25.0.2 with modules `javafx.controls`, `javafx.fxml`, and `javafx.swing`. Dependencies include `kotlinx-serialization-json`, `kotlinx-coroutines-core`, and `kotlinx-coroutines-javafx`. See `blueprint-editor/build.gradle.kts` for the full configuration.
 
 JavaFX module with kotlinx-serialization for `BlueprintModel` JSON persistence.
 
@@ -215,44 +60,13 @@ JavaFX module with kotlinx-serialization for `BlueprintModel` JSON persistence.
 
 **File:** `toolkit/build.gradle.kts`
 
-```kotlin
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    java
-    alias(libs.plugins.java.modules)
-    alias(libs.plugins.javafx)
-}
-
-javafx {
-    version = "25.0.2"
-    modules = listOf("javafx.controls")
-}
-
-dependencies {
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.javafx)
-}
-```
+The module applies the Kotlin JVM plugin, Java plugin, Java modules plugin, and JavaFX plugin. JavaFX version is 25.0.2 with module `javafx.controls`. Dependencies include `kotlinx-coroutines-core` and `kotlinx-coroutines-javafx`. See `toolkit/build.gradle.kts` for the full configuration.
 
 Provides shared JavaFX utilities: `PropertiesGrid` (reusable property grid component), `ComboBox` extension (custom cell factory), `ListView` cell factory, `CollectionsExtensions` (coroutine flow extensions for JavaFX collections: `addedAsFlow()`, `changeAsFlow()`), `Properties` helper, `UiThreadExecutor` hierarchy (UI thread execution abstraction), and `BaseViewModel` (abstract base VM with `StateFlow` lifecycle tracking).
 
 **Source structure:**
-```
-toolkit/src/main/kotlin/ru/isma/javafx/extensions/
-├── controls/
-│   ├── PropertiesGrid.kt       # Reusable property grid (label + control layout)
-│   └── ComboBox.kt             # Custom ComboBox extensions
-├── coroutines/
-│   ├── UiThreadExecutor.kt     # UI thread execution interface
-│   ├── JavaFxUiThreadExecutor.kt  # JavaFX implementation
-│   ├── TestUiThreadExecutor.kt   # Test implementation
-│   └── flow/
-│       └── CollectionsExtensions.kt  # ObservableList/Set → Flow bridges
-├── helpers/
-│   └── Properties.kt           # Property utility helpers
-└── viewmodel/
-    └── BaseViewModel.kt        # Abstract base VM with StateFlow lifecycle tracking
-```
+
+The toolkit source lives in `toolkit/src/main/kotlin/ru/isma/javafx/extensions/` with subdirectories: `controls/` (PropertiesGrid.kt - reusable property grid, ComboBox.kt - custom ComboBox extensions), `coroutines/` (UiThreadExecutor.kt - UI thread execution interface, JavaFxUiThreadExecutor.kt - JavaFX implementation, TestUiThreadExecutor.kt - test implementation, flow/CollectionsExtensions.kt - ObservableList/Set to Flow bridges), `helpers/` (Properties.kt - property utility helpers), and `viewmodel/` (BaseViewModel.kt - abstract base VM with StateFlow lifecycle tracking).
 
 ## Java Module System
 
@@ -279,71 +93,33 @@ The `app` module uses `opens` (not `exports`) for packages that need reflection 
 
 ## Build Commands
 
-```bash
-# Build all isma-ui modules
-./gradlew :isma-ui:app:build
-
-# Build specific module
-./gradlew :isma-ui:domain:build
-./gradlew :isma-ui:external-services:build
-./gradlew :isma-ui:grpc:build
-./gradlew :isma-ui:text-editor:build
-./gradlew :isma-ui:blueprint-editor:build
-./gradlew :isma-ui:toolkit:build
-
-# Build entire project (includes isma-ui)
-./gradlew build
-
-# Build bundle (UI + server)
-./.ci-cd/build-bundle.sh
-```
+- `./gradlew :isma-ui:app:build` — Build all isma-ui modules
+- `./gradlew :isma-ui:domain:build` — Build domain module
+- `./gradlew :isma-ui:external-services:build` — Build external-services module
+- `./gradlew :isma-ui:grpc:build` — Build grpc module
+- `./gradlew :isma-ui:text-editor:build` — Build text-editor module
+- `./gradlew :isma-ui:blueprint-editor:build` — Build blueprint-editor module
+- `./gradlew :isma-ui:toolkit:build` — Build toolkit module
+- `./gradlew build` — Build entire project (includes isma-ui)
+- `./.ci-cd/build-bundle.sh` — Build bundle (UI + server)
 
 ## Dependency Resolution
 
-All dependency versions are centralized in `gradle/libs.versions.toml` with aliases:
-
-```toml
-[versions]
-javafx = "25.0.2"
-koin = "4.x.x"
-grpc = "1.x.x"
-
-[libraries]
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-grpc-netty = { module = "io.grpc:grpc-netty", version.ref = "grpc" }
-```
-
-The `app` module imports `libs.koin.core` for DI and `libs.kotlinx.coroutines.*` for coroutine-based concurrency. No TornadoFX dependency.
+All dependency versions are centralized in `gradle/libs.versions.toml` with aliases. The file defines `[versions]` sections for javafx (25.0.2), koin (4.x.x), and grpc (1.x.x), and `[libraries]` sections mapping aliases to module coordinates with version references. The `app` module imports `libs.koin.core` for DI and `libs.kotlinx.coroutines.*` for coroutine-based concurrency. No TornadoFX dependency. See `gradle/libs.versions.toml` for the full configuration.
 
 ## Running
 
 ### Via Gradle
 
-The `JavaExec` task in `app/build.gradle.kts` auto-configures system properties:
-
-```kotlin
-tasks.withType<JavaExec>().configureEach {
-    jvmArgs(
-        "-Disma.server.script=$rootDir/build/bundle/isma-server-app/bin/app",
-        "-Disma.grin.script=$rootDir/build/bundle/grin-app/bin/app"
-    )
-}
-```
-
-Run with:
-```bash
-./gradlew :isma-ui:app:run
-```
+The `JavaExec` task in `app/build.gradle.kts` auto-configures system properties `isma.server.script` and `isma.grin.script` pointing to the bundle paths. Run with: `./gradlew :isma-ui:app:run`. See `app/build.gradle.kts` for the full configuration.
 
 ### Via IDE
 
 Set VM options in run configuration:
-```
---enable-native-access=javafx.graphics
---enable-native-access=io.netty.common
--Disma.server.script=/path/to/isma-server-script
--Disma.grin.script=/path/to/grin-script
-```
+- `--enable-native-access=javafx.graphics`
+- `--enable-native-access=io.netty.common`
+- `-Disma.server.script=/path/to/isma-server-script`
+- `-Disma.grin.script=/path/to/grin-script`
 
 ### Via Bundle
 
@@ -359,12 +135,7 @@ Same pattern for Grin: `ISMA_GRIN_SCRIPT` → `isma.grin.script` → exception.
 
 ## Cache Directory
 
-Simulation results are cached to:
-```
-<java.io.tmpdir>/isma-simulation-cache/simulation_<id>.bin
-```
-
-The directory is created automatically on first download if it doesn't exist.
+Simulation results are cached to `<java.io.tmpdir>/isma-simulation-cache/simulation_<id>.bin`. The directory is created automatically on first download if it doesn't exist.
 
 ## Version Alignment
 

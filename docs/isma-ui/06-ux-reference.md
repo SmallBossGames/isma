@@ -8,42 +8,30 @@ This document describes the complete user experience of the ISMA desktop applica
 
 ### Main Window Layout
 
+```mermaid
+graph TD
+    subgraph Main Window BorderPane
+        Top[VBox: MenuBar + ToolBar]
+        Center[TabPane: Editor Area]
+        Right[PropertiesAccordion: Settings Panel]
+        subgraph Bottom Nested BorderPane
+            Error[ErrorListDrawer]
+            ProcessBar[SimulationProcessBar: Play + Tasks]
+        end
+    end
+
+    Top --> Center
+    Top --> Right
+    Center --> Bottom
+    Error --> ProcessBar
 ```
-┌────────────────────────────────────────────────────────────────────┐
-│ Menu Bar: [File] [Edit] [Simulation]                              │
-├────────────────────────────────────────────────────────────────────┤
-│ Toolbar: [New] [Blueprint] [Open] [Save] [SaveAll] │ [Cut] [Copy] │
-│          [Paste] │ [Verify] │ [Store] [Load]                      │
-├──────────────────────────────────────────┬────────────────────────┤
-│                                          │ ┌────────────────────┐ │
-│                                          │ │ Settings Panel     │ │
-│                                          │ │ [Initials]         │ │
-│                                          │ │ [Integration]      │ │
-│                                          │ │ [Event detection]  │ │
-│                                          │ │ [Result proc.]     │ │
-│                                          │ └────────────────────┘ │
-│  ┌─────────────────────────────────────┐ │                        │
-│  │                                     │ │                        │
-│  │  Editor Area (TabPane)              │ │                        │
-│  │  ┌───────────────────────────────┐  │ │                        │
-│  │  │ [New project | Tab 2 | ...]   │  │ │                        │
-│  │  ├───────────────────────────────┤  │ │                        │
-│  │  │                               │ │ │                        │
-│  │  │  Text Editor or               │ │ │                        │
-│  │  │  Blueprint Canvas             │ │ │                        │
-│  │  │                               │ │ │                        │
-│  │  │                               │ │ │                        │
-│  │  └───────────────────────────────┘  │ │                        │
-│  ├─────────────────────────────────────┤ │                        │
-│  │ Error List (collapsible drawer)     │ │                        │
-│  │ ┌────┬────┬─────────┬───────────┐  │ │                        │
-│  │ │Row │Pos │Fragment │Message    │  │ │                        │
-│  │ └────┴────┴─────────┴───────────┘  │ │                        │
-│  ├─────────────────────────────────────┤ │                        │
-│  │ [▶ Play] [Tasks ▼]                  │ │                        │
-│  └─────────────────────────────────────┘ │                        │
-└──────────────────────────────────────────┴────────────────────────┘
-```
+
+The main window is a `BorderPane` with the following layout:
+
+- **top:** A `VBox` containing the menu bar (File, Edit, Simulation menus) and the main toolbar (New, Blueprint, Open, Save, SaveAll, Cut, Copy, Paste, Verify, Store, Load buttons)
+- **center:** The editor area containing a `TabPane` with tabs for each open project (text editor or blueprint canvas)
+- **right:** The settings panel with sections for Initials, Integration, Event detection, and Result processing
+- **bottom:** A nested `BorderPane` with the error list drawer (collapsible table with Row, Position, Fragment, Message columns) above the simulation process bar (Play button and Tasks button)
 
 **Window properties:**
 - **Minimum size:** 500×600
@@ -323,17 +311,43 @@ A drag-and-drop visual canvas for building finite-state machines. The blueprint 
 
 ### Data Flow Summary
 
+```mermaid
+graph LR
+    subgraph User
+        Settings[Settings Panel UI]
+    end
+    subgraph ViewModels
+        Cauchy[CauchyInitialsViewModel]
+        Integration[IntegrationMethodParametersViewModel]
+        Event[EventDetectionParametersViewModel]
+        ResultSaving[ResultSavingParametersViewModel]
+        ResultProc[ResultProcessingParametersViewModel]
+    end
+    subgraph Service
+        ParamsSvc[SimulationParametersService]
+        SimModel[SimulationParametersModel]
+        RunParams[RunSimulationParams]
+    end
+    subgraph Server
+        Server[ISMA Server gRPC]
+    end
+
+    Settings --> Cauchy
+    Settings --> Integration
+    Settings --> Event
+    Settings --> ResultSaving
+    Settings --> ResultProc
+
+    Cauchy -->|snapshot()| ParamsSvc
+    Integration -->|snapshot()| ParamsSvc
+    Event -->|snapshot()| ParamsSvc
+    ResultSaving -->|snapshot()| ParamsSvc
+
+    ParamsSvc -->|toRunSimulationParams()| RunParams
+    RunParams --> Server
 ```
-User edits settings → ViewModel properties (JavaFX Simple*Property)
-       ↓
-SimulationParametersService holds all 5 ViewModels as singletons
-       ↓
-On "Run" click → snapshot() captures all ViewModels → SimulationParametersModel
-       ↓
-toRunSimulationParams() converts to RunSimulationParams (gRPC message)
-       ↓
-ServerFacade.runSimulation(params) sends to server via gRPC
-```
+
+The data flow is: User edits settings → ViewModel properties (JavaFX Simple*Property) → `SimulationParametersService` holds all 5 ViewModels as singletons → On "Run" click, `snapshot()` captures all ViewModels into `SimulationParametersModel` → `toRunSimulationParams()` converts to `RunSimulationParams` (gRPC message) → `ServerFacade.runSimulation(params)` sends to server via gRPC.
 
 **Parameters sent to server:** Cauchy initials (start, end, step), integration method (name, accuracy, flags), event detection (gamma, low border — only when enabled).
 
@@ -377,29 +391,7 @@ Located at the very bottom of the window:
 
 ## Tasks PopOver
 
-A floating panel that opens from the "Tasks" button. Shows running and completed simulations.
-
-### Layout
-
-```
-┌─────────────────────────────────────────┐
-│ In progress                             │
-│ ┌─────────────────────────────────────┐ │
-│ │ Task #1  [████████░░] [✕ Abort]    │ │
-│ └─────────────────────────────────────┘ │
-├─────────────────────────────────────────┤
-│ Completed                               │
-│ ┌─────────────────────────────────────┐ │
-│ │ Task #1  [Show] [Export] [Remove]   │ │
-│ │            [⋯ Details]             │ │
-│ └─────────────────────────────────────┘ │
-├─────────────────────────────────────────┤
-│ Failed                                  │
-│ ┌─────────────────────────────────────┐ │
-│ │ Task #1  [Error message] [Remove]  │ │
-│ └─────────────────────────────────────┘ │
-└─────────────────────────────────────────┘
-```
+A floating panel that opens from the "Tasks" button. Shows running and completed simulations. It has three sections: "In progress" (one row per running simulation with task label, progress bar, and Abort button), "Completed" (one row per completed simulation with task label, Show button, Export button, Remove button, and Details chevron), and "Failed" (one row per failed or cancelled simulation with task label, red error message, and Remove button).
 
 ### In Progress Section
 
@@ -430,26 +422,7 @@ Tasks appear here when compilation fails, monitoring throws an exception, or res
 
 ### Details PopOver (nested)
 
-Triggered by clicking the "Details" chevron button. Shows:
-
-```
-Model
-Name: Project name
-
-Cauchy Initials
-Start: 0.0
-End: 10.0
-Initial step: 0.1
-
-Integration Method
-Method: Euler
-Is accurate: true
-Accuracy: 0.1
-Is stable: true
-
-Statistic
-Simulation time: 1234ms
-```
+Triggered by clicking the "Details" chevron button. Shows model name, Cauchy initials (Start, End, Initial step), Integration method (Method name, Accuracy status, Accuracy value if enabled, Stability status), and Statistics (wall-clock simulation time in milliseconds).
 
 **Fields displayed:**
 - Model name
@@ -467,24 +440,7 @@ Opens when the user clicks "Show" on a completed simulation. Used to select whic
 
 **Title:** "Select variables"
 
-**Layout:**
-
-```
-┌─────────────────────────────────────────┐
-│ X Axis:   [━━━━━━━━━━━━━━━━━━━━━━━━━▼] │
-│                                           │
-│ Y Axis:   [☐ Variable 1]                │
-│            [☐ Variable 2]                │
-│            [☐ Variable 3]                │
-│            [☐ TIME] (pre-selected)       │
-│            [☐ Variable N]                │
-│                                           │
-│                    [Select all] [Unselect │
-│                         all]              │
-│                                           │
-│              [Ok]          [Close]        │
-└─────────────────────────────────────────┘
-```
+**Layout:** An X Axis ComboBox (dropdown listing all available columns, one item selectable, TIME pre-selected) and a Y Axis ListView (scrollable list with checkboxes, multiple items selectable). Includes "Select all" and "Unselect all" buttons for bulk toggling, and "Ok" / "Close" buttons. See `ItemsPickerDialog.kt` for the implementation.
 
 **Elements:**
 - **X Axis ComboBox:** Dropdown listing all available columns. One item selectable. Default: "TIME" column pre-selected.
@@ -508,83 +464,92 @@ Opens when the user clicks "Show" on a completed simulation. Used to select whic
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant UI as Main Window
-    participant SimSvc as Simulation<br/>Service (thin)
-    participant TaskSvc as SimulationTask<br/>Service (lifecycle)
+    participant U as User
+    participant SS as SimulationService
+    participant STS as SimulationTaskService
+    participant Facade as ServerFacade
     participant Server as ISMA Server
-    participant Errors as Error List
-    participant Tasks as Tasks PopOver
-    participant Result as Results<br/>Service
-    participant Grin as Grin<br/>Chart Viewer
+    participant Tasks as TasksPopOver
+    participant Error as Error List
 
-    User->>UI: Configure settings (right panel)
-    User->>UI: Edit source (editor tab)
-    User->>UI: Click ▶ Play (or Ctrl+F5)
-    UI->>SimSvc: simulate()
-
-    SimSvc->>SimSvc: Snapshot parameters
-    SimSvc->>SimSvc: Get active project source
-    SimSvc->>TaskSvc: submit(modelName, params, simParams)
-
-    TaskSvc->>Server: compileModel(source)
-    Server-->>TaskSvc: CompileResult
-
+    U->>SS: Click Play / Ctrl+F5
+    SS->>SS: snapshot() parameters
+    SS->>STS: submit(modelName, params, simParams)
+    STS->>Facade: compileModel(source)
+    Facade->>Server: gRPC CompileRequest
+    Server-->>Facade: CompileResponse
     alt Compilation errors
-        TaskSvc->>Errors: Display errors in table
-        TaskSvc->>Tasks: Add "Failed" row with error message
-        TaskSvc-->>SimSvc: Task (FAILED)
-    else Compilation succeeds
-        TaskSvc->>Server: runSimulation(params)
-        Server-->>TaskSvc: simulationId
-
-        TaskSvc->>Tasks: Add "In progress" row
-        TaskSvc->>Server: monitorSimulation(id)
-
+        Facade-->>Error: putErrorList(errors)
+        Facade-->>STS: FAILED
+        STS-->>Tasks: Add Failed row
+    else Compilation success
+        STS->>Facade: runSimulation(params)
+        Facade->>Server: gRPC RunSimulationRequest
+        Server-->>Facade: simulationId
+        STS->>Facade: monitorSimulation(id)
+        Facade->>Server: gRPC monitor stream
+        Server-->>Facade: Flow<SimulationProgress>
         loop Progress updates
-            Server-->>TaskSvc: SimulationProgress
-            TaskSvc->>Tasks: Update progress bar
+            Facade-->>STS: SimulationProgress
+            STS-->>Tasks: Update progress bar
         end
-
-        TaskSvc->>Server: downloadResultToCache(id)
-        Server-->>TaskSvc: CachedSimulationResult(file)
-
-        TaskSvc->>Result: Task (COMPLETED, result populated)
-        Result->>Tasks: Move to "Completed"
-
-        TaskSvc->>Tasks: Remove "In progress" row (task status changed)
+        STS->>Facade: downloadResultToCache(id)
+        Facade->>Server: gRPC getSimulationResult()
+        Server-->>Facade: download URL
+        Facade->>Facade: HTTP GET binary file
+        Facade-->>STS: CachedSimulationResult
+        STS->>STS: setStatus(COMPLETED)
+        STS-->>Tasks: Move to Completed section
     end
-
-    User->>Tasks: Click "Show" on completed task
-    Tasks->>Result: showChart(result)
-    Result->>UI: Open axis picker dialog
-    User->>UI: Select X and Y variables
-    UI-->>Result: Selected axes
-    Result->>Grin: Launch with data + axis params
-    Grin-->>User: Display chart window
+    U->>Tasks: Click "Show"
+    Tasks-->>U: Axis picker dialog
+    U->>U: Select X/Y variables
+    U->>U: Launch Grin chart viewer
 ```
+
+The simulation run follows this sequence:
+
+1. User configures settings in the right panel and edits source in an editor tab
+2. User clicks Play button or Ctrl+F5, which calls `simulate()` on `SimulationService`
+3. `SimulationService` snapshots parameters, gets the active project source, and calls `SimulationTaskService.submit(modelName, params, simParams)`
+4. **Compile phase:** `SimulationTaskService` calls `serverFacade.compileModel(source)`. If compilation errors occur, they are displayed in the Error List and a "Failed" row is added to Tasks PopOver. If compilation succeeds:
+5. **Run phase:** `runSimulation(params)` is called, returning a `simulationId` from the server
+6. **Monitor phase:** `monitorSimulation(id)` starts a server stream; progress updates are received and the progress bar in Tasks PopOver is updated
+7. **Download phase:** `downloadResultToCache(id)` fetches the result, creating a `CachedSimulationResult`
+8. The task status changes to COMPLETED and moves from "In progress" to "Completed" in Tasks PopOver
+9. User clicks "Show" on the completed task, which opens the axis picker dialog
+10. User selects X and Y variables, confirms, and the Grin chart viewer launches with the data
+
+See `SimulationService.kt`, `SimulationTaskService.kt`, and `SimulationResultService.kt` for the implementation details.
 
 ### Verify Flow
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant UI as Main Window
-    participant PdeSvc as LismaPde<br/>Service
+    participant U as User
+    participant LismaPde as LismaPdeService
+    participant Facade as ServerFacade
     participant Server as ISMA Server
-    participant Errors as Error List
+    participant Error as Error List
 
-    User->>UI: Click Verify (toolbar or Ctrl+F4)
-    UI->>PdeSvc: translateLisma(source)
-    PdeSvc->>Server: validateModel(source)
-    Server-->>PdeSvc: ValidationResult
-
-    alt Validation errors
-        PdeSvc->>Errors: Display errors in table
+    U->>LismaPde: Click Verify / Ctrl+F4
+    LismaPde->>Facade: validateModel(source)
+    Facade->>Server: gRPC ValidateRequest
+    Server-->>Facade: ValidationResult
+    alt Validation errors exist
+        Facade-->>LismaPde: ValidationResult(errors)
+        LismaPde->>Error: putErrorList(errors)
     else No errors
-        PdeSvc->>Errors: Clear error table
+        Facade-->>LismaPde: ValidationResult(no errors)
+        LismaPde->>Error: Clear error table
     end
 ```
+
+1. User clicks Verify (toolbar or Ctrl+F4), which calls `translateLisma(source)` on `LismaPdeService`
+2. `LismaPdeService` calls `serverFacade.validateModel(source)`
+3. If validation errors exist, they are displayed in the Error List table. If no errors, the error table is cleared.
+
+See `LismaPdeService.kt` for the implementation.
 
 ---
 

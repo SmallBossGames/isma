@@ -6,48 +6,17 @@ GrIn is an interactive function visualization and analysis environment built on 
 
 ## Module Structure
 
-```
-grin/
-├── analytic-fu/                  # Analytical function parser + evaluator
-│   ├── model/                    # Expression, Calculated, Number, Fraction
-│   ├── parser/                   # ExpressionParser, ExpressionConverter, Litter AST
-│   ├── operators/                # BinaryOperator interface + impl
-│   ├── validators/               # FunctionValidator
-│   └── calculation/              # Calculator (RPN evaluator)
-├── math/                         # Numerical math primitives
-│   ├── Integration.kt            # Trapezoidal integration
-│   ├── Derivatives.kt            # Left/right/central numerical derivatives
-│   └── IntersectionSearcher.kt   # Segment intersection detection (coroutines)
-├── gui/
-│   ├── common/                   # Shared UI models + draw elements
-│   │   ├── model/                # Point, FunctionModel, WaveletTransformFun, WaveletDirection, DrawSize, ChooseFunctionWay
-│   │   ├── draw/elements/        # GridDrawElement, ClearDrawElement
-│   │   ├── view/                 # ChainDrawElement, ChainDrawer
-│   │   ├── controller/           # PointsBuilder
-│   │   ├── converters/           # Converter<In, Out> interface
-│   │   ├── common/               # SettingsProvider (canvas dimensions)
-│   │   └── extensions/           # BytesExtension
-│   ├── concatenation/            # Main canvas application
-│   │   ├── canvas/               # Canvas view, model, view model, handlers, controller
-│   │   │   ├── model/project/    # ProjectSnapshot + serialization (toSnapshot/toModel)
-│   │   │   ├── converter/        # CartesianSpaceConverter
-│   │   │   ├── dto/              # CartesianSpaceDTO
-│   │   │   └── view/             # ConcatenationView, toolbars, context menu, chain drawer
-│   │   ├── cartesian/            # CartesianSpace CRUD views + services
-│   │   ├── function/             # Function CRUD + operations + transforms + DTOs + converters
-│   │   │   ├── transform/        # IAsyncPointsTransformer implementations
-│   │   │   ├── dto/              # ConcatenationFunctionDTO
-│   │   │   └── converter/        # ConcatenationFunctionConverter
-│   │   ├── description/          # Annotation/description management
-│   │   ├── axis/                 # Axis configuration + draw strategies + mark builders
-│   │   ├── file/                 # File I/O (CSV, XLS, XLSX) + project loader (.chart.json)
-│   │   │   ├── readers/          # CsvReader, XLSReader, XLSXReader, FileRecognizer, ExcelRange
-│   │   │   └── options/          # FileOptionsView, FileReaderMode, FileDetails
-│   │   ├── points/               # Points-based function input (manual entry)
-│   │   ├── koin/                 # Scope classes + DI wiring
-│   │   └── KoinModules.kt        # grinGuiModule — all DI registrations
-│   └── app/                      # Application entry point + DI root
-```
+The `grin` module has four main submodules:
+
+- **`grin/analytic-fu/`** — Analytical function parser and evaluator. Contains `model/` (Expression, Calculated, Number, Fraction), `parser/` (ExpressionParser, ExpressionConverter, Litter AST), `operators/` (BinaryOperator interface and implementations), `validators/` (FunctionValidator), and `calculation/` (Calculator, an RPN evaluator). See `grin/analytic-fu/src/main/kotlin/.../parser/ExpressionParser.kt`, `grin/analytic-fu/src/main/kotlin/.../parser/ExpressionConverter.kt`, `grin/analytic-fu/src/main/kotlin/.../parser/Litter.kt`, and `grin/analytic-fu/src/main/kotlin/.../calculation/Calculator.kt` for implementation.
+
+- **`grin/math/`** — Numerical math primitives. Contains `Integration.kt` (trapezoidal integration), `Derivatives.kt` (left/right/central numerical derivatives), and `IntersectionSearcher.kt` (segment intersection detection using coroutines). See `grin/math/src/main/kotlin/.../math/Derivatives.kt`, `grin/math/src/main/kotlin/.../math/Integration.kt`, and `grin/math/src/main/kotlin/.../math/IntersectionSearcher.kt`.
+
+- **`grin/gui/common/`** — Shared UI models and draw elements. Contains `model/` (Point, FunctionModel, WaveletTransformFun, WaveletDirection, DrawSize, ChooseFunctionWay), `draw/elements/` (GridDrawElement, ClearDrawElement), `view/` (ChainDrawElement, ChainDrawer), `controller/` (PointsBuilder), `converters/` (Converter interface), `common/` (SettingsProvider), and `extensions/` (BytesExtension). See `grin/gui/common/src/main/kotlin/.../model/Point.kt`, `grin/gui/common/src/main/kotlin/.../view/ChainDrawElement.kt`, `grin/gui/common/src/main/kotlin/.../view/ChainDrawer.kt`, `grin/gui/common/src/main/kotlin/.../converters/Converter.kt`, and `grin/gui/common/src/main/kotlin/.../common/SettingsProvider.kt`.
+
+- **`grin/gui/concatenation/`** — Main canvas application. Contains `canvas/` (canvas view, model, view model, handlers, controller, with `model/project/` for project serialization, `converter/` for CartesianSpaceConverter, `dto/` for CartesianSpaceDTO, and `view/` for ConcatenationView, toolbars, context menu, chain drawer), `cartesian/` (CartesianSpace CRUD views and services), `function/` (function CRUD, operations, transforms, DTOs, converters — with `transform/` for IAsyncPointsTransformer implementations, `dto/` for ConcatenationFunctionDTO, and `converter/` for ConcatenationFunctionConverter), `description/` (annotation/description management), `axis/` (axis configuration, draw strategies, mark builders), `file/` (file I/O for CSV/XLS/XLSX and project loader for `.chart.json` — with `readers/` for CsvReader, XLSReader, XLSXReader, FileRecognizer, ExcelRange, and `options/` for FileOptionsView, FileReaderMode, FileDetails), `points/` (points-based function input), `koin/` (scope classes and DI wiring), and `KoinModules.kt` (grinGuiModule with all DI registrations). See `grin/gui/concatenation/src/main/kotlin/.../KoinModules.kt`, `grin/gui/concatenation/src/main/kotlin/.../canvas/model/ConcatenationCanvasModel.kt`, `grin/gui/concatenation/src/main/kotlin/.../canvas/model/ConcatenationCanvasViewModel.kt`, `grin/gui/concatenation/src/main/kotlin/.../canvas/view/ConcatenationCanvas.kt`, and `grin/gui/concatenation/src/main/kotlin/.../function/model/ConcatenationFunction.kt`.
+
+- **`grin/gui/app/`** — Application entry point and DI root. See `grin/gui/app/src/main/kotlin/.../launcher/GrinApplication.kt` and `grin/gui/app/src/main/kotlin/.../launcher/Launcher.kt`.
 
 ## Dependency Diagram
 
@@ -76,52 +45,9 @@ Each subdomain has its own `controller/`, `view/`, `model/`, and `service/` pack
 
 ### 2. Koin-Scoped Dependency Injection
 
-All UI components use Koin with a hierarchical scoping system. The `MainGrinScope` is a top-level Koin scope created at application startup, and each modal dialog gets its own child scope:
+All UI components use Koin with a hierarchical scoping system. The `MainGrinScope` is a top-level Koin scope created at application startup, and each modal dialog gets its own child scope. See `grin/gui/concatenation/src/main/kotlin/.../koin/KoinExtensions.kt` for the `MainGrinScope` and `FunctionChangeModalScope` class definitions.
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../koin/KoinExtensions.kt
-class MainGrinScope(val primaryStage: Stage) : KoinScopeComponent {
-    override val scope: Scope by lazy { createScope(this) }
-}
-
-class FunctionChangeModalScope: KoinScopeComponent {
-    override val scope: Scope by lazy { createScope(this) }
-}
-```
-
-The DI configuration is centralized in `grinGuiModule` (`KoinModules.kt`):
-
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../KoinModules.kt
-val grinGuiModule = module {
-    scope<MainGrinScope> {
-        scopedOf(::ConcatenationCanvasController)
-        scopedOf(::ConcatenationCanvasModel)
-        scopedOf(::ConcatenationCanvasViewModel)
-        scopedOf(::ConcatenationChainDrawer)
-        scopedOf(::FunctionOperationsService)
-        scopedOf(::CartesianCanvasService)
-        scopedOf(::AxisCanvasService)
-        scopedOf(::DescriptionCanvasService)
-        // ... + all views, controllers, draw elements, handlers, toolbars
-
-        factory {
-            FunctionChangeModalScope().apply {
-                scope.linkTo(get<MainGrinScope>().scope)
-            }
-        }
-        // ... + other modal scopes (AxisChange, FunctionCopy, DescriptionChange, etc.)
-    }
-
-    scope<FunctionChangeModalScope> {
-        scopedOf(::ChangeFunctionFragment)
-        scopedOf(::ChangeFunctionViewModel)
-    }
-    // ... + other modal scope registrations
-}
-```
-
-Scopes are closed on dialog close via `onClose` hooks in the Koin module registration.
+The DI configuration is centralized in `grinGuiModule` defined in `grin/gui/concatenation/src/main/kotlin/.../KoinModules.kt`. It registers all canvas controllers, models, view models, services, views, controllers, draw elements, and handlers within the `MainGrinScope`. Modal scopes (FunctionChangeModalScope, AxisChange, FunctionCopy, DescriptionChange, etc.) are created via factory functions and linked to the main scope. Scopes are closed on dialog close via `onClose` hooks in the Koin module registration.
 
 ### 3. Canvas Model and ViewModel
 
@@ -130,40 +56,13 @@ The canvas state is split into two layers:
 - **`ConcatenationCanvasModel`** — holds the domain data: cartesian spaces, functions, axes, descriptions. Publishes `SharedFlow` events for state changes.
 - **`ConcatenationCanvasViewModel`** — holds UI state: graphics contexts for both layers, canvas dimensions, functions area insets, selected functions/descriptions.
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../canvas/model/ConcatenationCanvasModel.kt
-class ConcatenationCanvasModel {
-    val cartesianSpaces = mutableListOf<CartesianSpace>()
-    val functions get() = cartesianSpaces.map { it.functions }.flatten()
-    val axes get() = cartesianSpaces.map { listOf(it.xAxis, it.yAxis) }.flatten()
-    val descriptions get() = cartesianSpaces.map { it.descriptions }.flatten()
-
-    // SharedFlow events for reactive updates
-    val functionsListUpdatedEvent = ...
-    val axesListUpdatedEvent = ...
-    val cartesianSpacesListUpdatedEvent = ...
-    val descriptionsListUpdatedEvent = ...
-}
-```
+See `grin/gui/concatenation/src/main/kotlin/.../canvas/model/ConcatenationCanvasModel.kt` for implementation. The `ConcatenationCanvasModel` class holds `cartesianSpaces` as a mutable list, with convenience accessors for `functions`, `axes`, and `descriptions` that flatten from the cartesian spaces. It publishes `SharedFlow` events for reactive updates: `functionsListUpdatedEvent`, `axesListUpdatedEvent`, `cartesianSpacesListUpdatedEvent`, and `descriptionsListUpdatedEvent`.
 
 ### 4. Edit Mode System
 
 The canvas supports multiple interaction modes controlled by `EditModeViewModel`:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../canvas/model/EditMode.kt
-enum class EditMode {
-    NONE,       // No interaction
-    VIEW,       // Pan/scroll
-    SCALE,      // Zoom
-    EDIT,       // Edit function parameters
-    WINDOWED,   // Windowed view
-    SELECTION,  // Select region
-    MOVE        // Move elements
-}
-```
-
-Mouse handlers delegate based on the current edit mode: `PressedMouseHandler`, `DraggedHandler`, `ReleaseMouseHandler`, and `ScalableScrollHandler`.
+See `grin/gui/concatenation/src/main/kotlin/.../canvas/model/EditMode.kt` for the `EditMode` enum, which defines the following modes: `NONE` (no interaction), `VIEW` (pan/scroll), `SCALE` (zoom), `EDIT` (edit function parameters), `WINDOWED` (windowed view), `SELECTION` (select region), and `MOVE` (move elements). Mouse handlers delegate based on the current edit mode: `PressedMouseHandler`, `DraggedHandler`, `ReleaseMouseHandler`, and `ScalableScrollHandler`.
 
 ### 5. Selection and Tracing
 
@@ -176,12 +75,7 @@ The canvas supports two interactive overlays:
 
 Functions support composable point transformations via the `IAsyncPointsTransformer` interface:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../function/transform/IAsyncPointsTransformer.kt
-interface IAsyncPointsTransformer {
-    suspend fun transform(x: DoubleArray, y: DoubleArray): Pair<DoubleArray, DoubleArray>
-}
-```
+See `grin/gui/concatenation/src/main/kotlin/.../function/transform/IAsyncPointsTransformer.kt` for the `IAsyncPointsTransformer` interface definition, which declares a `suspend fun transform(x: DoubleArray, y: DoubleArray): Pair<DoubleArray, DoubleArray>` method.
 
 Transformers include:
 
@@ -196,35 +90,13 @@ Transformers include:
 
 The `ConcatenationFunction` class uses an `AtomicReference` CAS loop to apply transformation pipelines concurrently:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../function/model/ConcatenationFunction.kt
-suspend fun updateTransformersTransaction(
-    operation: (Array<IAsyncPointsTransformer>) -> Array<IAsyncPointsTransformer>
-) = coroutineScope {
-    while (true) {
-        if (tryUpdateCacheCandidate(operation)) break
-    }
-    // ... apply candidate transformers
-}
-```
+See `grin/gui/concatenation/src/main/kotlin/.../function/model/ConcatenationFunction.kt` for implementation. The `ConcatenationFunction` class uses an `AtomicReference` CAS loop in `updateTransformersTransaction()` to apply transformation pipelines concurrently.
 
 ### 7. Reactive Canvas Updates
 
 The `ConcatenationCanvasModel` publishes `SharedFlow` events for state changes. The `ConcatenationCanvas` subscribes to all events and triggers redraw:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../canvas/view/ConcatenationCanvas.kt
-fxCoroutineScope.launch {
-    merge(
-        model.axesListUpdatedEvent,
-        model.functionsListUpdatedEvent,
-        model.descriptionsListUpdatedEvent,
-        model.cartesianSpacesListUpdatedEvent,
-    ).collectLatest {
-        chainDrawer.draw()
-    }
-}
-```
+See `grin/gui/concatenation/src/main/kotlin/.../canvas/view/ConcatenationCanvas.kt` for implementation. The canvas launches a coroutine that merges all four `SharedFlow` events from the model and calls `chainDrawer.draw()` via `collectLatest` on any state change.
 
 ### 8. Two-Layer Canvas
 
@@ -235,73 +107,27 @@ The canvas uses two `Canvas` (JavaFX 2D) overlays:
 
 The `ConcatenationChainDrawer` orchestrates drawing by chaining `ChainDrawElement` implementations:
 
-```kotlin
-// grin/gui/common/src/main/kotlin/.../view/ChainDrawElement.kt
-interface ChainDrawElement {
-    fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double)
-}
-```
+See `grin/gui/common/src/main/kotlin/.../view/ChainDrawElement.kt` for the `ChainDrawElement` interface, which declares `fun draw(context: GraphicsContext, canvasWidth: Double, canvasHeight: Double)`. Draw elements include `GridDrawElement`, `AxisDrawElement`, `ConcatenationFunctionDrawElement`, `DescriptionDrawElement`, and `SelectionDrawElement`.
 
-Draw elements include `GridDrawElement`, `AxisDrawElement`, `ConcatenationFunctionDrawElement`, `DescriptionDrawElement`, and `SelectionDrawElement`.
-
-The draw pipeline:
-
-```
-ConcatenationChainDrawer.draw()
-  → findFunctionsAreaInsets()          // compute functions area from axes
-  → transformSpaces()                  // apply space-level transformations
-  → drawFunctionsLayerInternal()       // clear → functions → axes → descriptions
-  → drawUiLayerInternal()              // clear → selection overlay
-```
+The draw pipeline: `ConcatenationChainDrawer.draw()` calls `findFunctionsAreaInsets()` to compute the functions area from axes, then `transformSpaces()` to apply space-level transformations, then `drawFunctionsLayerInternal()` (clear → functions → axes → descriptions), then `drawUiLayerInternal()` (clear → selection overlay).
 
 ### 9. Pixel-to-Unit Transformation
 
 The `MatrixTransformer` converts between canvas pixel coordinates and mathematical unit coordinates:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../canvas/controller/MatrixTransformer.kt
-fun transformPixelToUnits(number: Double, scaleProperties: AxisScaleProperties, direction: Direction): Double
-fun transformUnitsToPixel(number: Double, scaleProperties: AxisScaleProperties, direction: Direction): Double
-fun transformUnitsToPixel(input: DoubleArray, output: DoubleArray, ...): Unit
-```
-
-It respects axis direction (`Direction.LEFT`, `Direction.RIGHT`, `Direction.TOP`, `Direction.BOTTOM`) and scale properties (`minValue`, `maxValue`). The `functionsArea` insets from `ConcatenationCanvasViewModel` define the usable drawing region within the canvas.
+See `grin/gui/concatenation/src/main/kotlin/.../canvas/controller/MatrixTransformer.kt` for implementation. The `MatrixTransformer` provides `transformPixelToUnits()` and `transformUnitsToPixel()` methods (both single-value and array variants) that respect axis direction (`Direction.LEFT`, `Direction.RIGHT`, `Direction.TOP`, `Direction.BOTTOM`) and scale properties (`minValue`, `maxValue`). The `functionsArea` insets from `ConcatenationCanvasViewModel` define the usable drawing region within the canvas.
 
 ### 10. Analytical Expression Pipeline
 
 The `analytic-fu` module implements a classic expression evaluation pipeline:
 
-```
-String → ExpressionParser → List<Litter> → ExpressionConverter → Inverse Polish (RPN) → Calculator → Double
-```
+The pipeline: a `String` is parsed by `ExpressionParser` into a `List<Litter>`, converted by `ExpressionConverter` into Inverse Polish notation (RPN), and evaluated by `Calculator` to produce a `Double`.
 
 The AST is a sealed hierarchy of leaf nodes:
 
-```kotlin
-// grin/analytic-fu/src/main/kotlin/.../parser/Litter.kt
-sealed class Litter
-data class Number(val value: Double) : Litter()
-object X : Litter()
-object PlusOperator : Litter()
-object MinusOperator : Litter()
-object DelOperator : Litter()       // Division (del = delenie)
-object MultiplyOperator : Litter()
-object LeftBracket : Litter()
-object RightBracket : Litter()
-```
+See `grin/analytic-fu/src/main/kotlin/.../parser/Litter.kt` for the AST definition. The AST is a sealed hierarchy of leaf nodes: `Number` (numeric value), `X` (variable), `PlusOperator`, `MinusOperator`, `DelOperator` (division — "del" = delenie), `MultiplyOperator`, `LeftBracket`, and `RightBracket`.
 
-The `Calculator` evaluates RPN using a stack:
-
-```kotlin
-// grin/analytic-fu/src/main/kotlin/.../calculation/Calculator.kt
-class Calculator(private val list: List<Litter>) {
-    fun calculate(x: Double): Double {
-        val stack = Stack<Double>()
-        list.forEach { /* push numbers/variables, apply operators */ }
-        return stack.pop()
-    }
-}
-```
+The `Calculator` evaluates RPN using a stack. See `grin/analytic-fu/src/main/kotlin/.../calculation/Calculator.kt` for implementation.
 
 The `FunctionValidator` checks expression correctness before parsing.
 
@@ -343,84 +169,21 @@ GrIn supports three file formats for data import:
 
 Projects are saved and loaded as JSON files (`.chart.json`) using Kotlinx Serialization:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../file/CanvasProjectLoader.kt
-class CanvasProjectLoader(
-    private val model: ConcatenationCanvasModel,
-    private val concatenationCanvasController: ConcatenationCanvasController,
-) {
-    fun save(window: Window? = null)  // → *.chart.json
-    fun load(window: Window? = null)  // ← *.chart.json
-}
-```
+See `grin/gui/concatenation/src/main/kotlin/.../file/CanvasProjectLoader.kt` for the `CanvasProjectLoader` class, which takes `ConcatenationCanvasModel` and `ConcatenationCanvasController` in its constructor and provides `save()` (writes `*.chart.json`) and `load()` (reads `*.chart.json`) methods.
 
-The serialization model (`ProjectSnapshotModels.kt`) includes:
-
-```kotlin
-@Serializable
-data class ProjectSnapshot(
-    val spaces: List<CartesianSpaceSnapshot>
-)
-
-@Serializable
-data class CartesianSpaceSnapshot(
-    val name: String,
-    val functions: List<ConcatenationFunctionSnapshot>,
-    val descriptions: List<DescriptionSnapshot>,
-    val xAxis: ConcatenationAxisSnapshot,
-    val yAxis: ConcatenationAxisSnapshot,
-    val isShowGrid: Boolean,
-)
-
-@Serializable
-data class ConcatenationFunctionSnapshot(
-    val name: String,
-    val xPoints: List<Double>,
-    val yPoints: List<Double>,
-    val isHide: Boolean,
-    val functionColor: ColorSnapshot,
-    val lineSize: Double,
-    val lineType: LineType,
-    val transformers: List<TransformerSnapshot>   // serializable transformer representations
-)
-```
-
-Each transformer type has a corresponding `@Serializable` snapshot class (`DerivativeTransformerSnapshot`, `MirrorTransformerSnapshot`, `TranslateTransformerSnapshot`, `LogTransformerSnapshot`, `IntegratorTransformerSnapshot`, `WaveletTransformerSnapshot`). Conversion functions (`toSnapshot()`/`toModel()`) handle bidirectional mapping.
+The serialization model is defined in `grin/gui/concatenation/src/main/kotlin/.../canvas/model/project/ProjectSnapshotModels.kt`. It includes `@Serializable` data classes: `ProjectSnapshot` (containing a list of `CartesianSpaceSnapshot`), `CartesianSpaceSnapshot` (name, functions list, descriptions list, xAxis, yAxis, isShowGrid), and `ConcatenationFunctionSnapshot` (name, xPoints, yPoints, isHide, functionColor, lineSize, lineType, transformers list of serializable transformer representations). Each transformer type has a corresponding `@Serializable` snapshot class (`DerivativeTransformerSnapshot`, `MirrorTransformerSnapshot`, `TranslateTransformerSnapshot`, `LogTransformerSnapshot`, `IntegratorTransformerSnapshot`, `WaveletTransformerSnapshot`). Conversion functions (`toSnapshot()`/`toModel()`) handle bidirectional mapping.
 
 ### 15. Cartesian Space System
 
 A `CartesianSpace` is a named coordinate system containing functions, descriptions, and axis configuration:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../cartesian/model/CartesianSpace.kt
-data class CartesianSpace(
-    var name: String,
-    val functions: MutableList<ConcatenationFunction>,
-    val descriptions: MutableList<Description>,
-    val xAxis: ConcatenationAxis,
-    val yAxis: ConcatenationAxis,
-    var isShowGrid: Boolean = false
-) : Cloneable {
-    val axes = listOf(xAxis, yAxis)
-    fun merge(inFunctions: List<ConcatenationFunction>)
-}
-```
-
-Multiple `CartesianSpace` instances can coexist in a single canvas. The `CartesianCanvasService` manages CRUD operations.
+See `grin/gui/concatenation/src/main/kotlin/.../cartesian/model/CartesianSpace.kt` for the `CartesianSpace` data class, which contains a mutable `name`, `functions` list, `descriptions` list, `xAxis`, `yAxis`, `isShowGrid` flag, an `axes` accessor, and a `merge()` method. Multiple `CartesianSpace` instances can coexist in a single canvas. The `CartesianCanvasService` manages CRUD operations.
 
 ### 16. Axis System
 
 Axes define the coordinate system for a cartesian space:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../axis/model/ConcatenationAxis.kt
-data class ConcatenationAxis(
-    var name: String,
-    var direction: Direction,          // LEFT, RIGHT, TOP, BOTTOM
-    var styleProperties: AxisStyleProperties,
-    var scaleProperties: AxisScaleProperties,
-)
-```
+See `grin/gui/concatenation/src/main/kotlin/.../axis/model/ConcatenationAxis.kt` for the `ConcatenationAxis` data class, which contains `name`, `direction` (LEFT, RIGHT, TOP, BOTTOM), `styleProperties` of type `AxisStyleProperties`, and `scaleProperties` of type `AxisScaleProperties`.
 
 `AxisScaleProperties` includes `scalingType` (LINEAR, LOGARITHMIC), `scalingLogBase`, `minValue`, `maxValue`.
 
@@ -432,35 +195,13 @@ Axis rendering uses a strategy pattern: `AxisDrawStrategy` (horizontal/vertical)
 
 Descriptions are text annotations placed at specific coordinates on the canvas:
 
-```kotlin
-// grin/gui/concatenation/src/main/kotlin/.../description/model/Description.kt
-data class Description(
-    var text: String,
-    var textOffsetX: Double,
-    var textOffsetY: Double,
-    var color: Color,
-    var font: Font,
-    var pointerX: Double,
-    var pointerY: Double,
-) {
-    fun isLocated(eventX: Double, eventY: Double): Boolean
-}
-```
-
-Descriptions are managed by `DescriptionCanvasService` and rendered by `DescriptionDrawElement`. The `ConcatenationCanvasController.openDescriptionModal()` opens an annotation dialog, and `addPointDescription()` creates auto-labeled intersection points.
+See `grin/gui/concatenation/src/main/kotlin/.../description/model/Description.kt` for the `Description` data class, which contains `text`, `textOffsetX`, `textOffsetY`, `color`, `font`, `pointerX`, `pointerY`, and an `isLocated()` method. Descriptions are managed by `DescriptionCanvasService` and rendered by `DescriptionDrawElement`. The `ConcatenationCanvasController.openDescriptionModal()` opens an annotation dialog, and `addPointDescription()` creates auto-labeled intersection points.
 
 ### 18. Converter Pattern
 
 The `Converter<In, Out>` interface provides a uniform pattern for data transformation:
 
-```kotlin
-// grin/gui/common/src/main/kotlin/.../converters/Converter.kt
-interface Converter<In, Out> {
-    fun convert(source: In): Out
-}
-```
-
-Used by `ConcatenationFunctionConverter` (DTO → model) and `CartesianSpaceConverter` (DTO → model).
+See `grin/gui/common/src/main/kotlin/.../converters/Converter.kt` for the `Converter<In, Out>` interface, which declares `fun convert(source: In): Out`. Used by `ConcatenationFunctionConverter` (DTO → model) and `CartesianSpaceConverter` (DTO → model).
 
 ## Communication Flows
 
@@ -570,15 +311,7 @@ Errors in GrIn are handled at three levels:
 | **File I/O** | `IOException` / POI-specific exceptions | Corrupted XLSX, missing columns |
 | **Canvas operations** | Silent skip / null checks | Missing `pixelsToDraw`, empty axis arrays |
 
-The application does not use a structured error handling framework — errors are logged to `System.err` or silently skipped. The command-line runner prints errors to `System.err` and continues:
-
-```kotlin
-// grin/gui/app/src/main/kotlin/.../launcher/GrinApplication.kt
-if (!file.exists()) {
-    System.err.println("Result file not found: ${config.resultFile}")
-    return
-}
-```
+The application does not use a structured error handling framework — errors are logged to `System.err` or silently skipped. The command-line runner (see `grin/gui/app/src/main/kotlin/.../launcher/GrinApplication.kt`) prints errors to `System.err` and continues, such as checking if a result file exists before loading it.
 
 ## Build Configuration
 

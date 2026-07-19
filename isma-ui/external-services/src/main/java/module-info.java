@@ -9,8 +9,8 @@ module isma.ui.external.services {
     requires io.grpc.stub;
     requires com.google.protobuf;
     requires io.netty.transport;
-    requires io.netty.transport.classes.epoll;
-    requires io.netty.transport.epoll.linux.x86_64;
+    requires static io.netty.transport.classes.epoll;
+    requires static io.netty.transport.epoll.linux.x86_64;
     requires io.netty.transport.unix.common;
     requires io.netty.common;
     requires io.netty.buffer;

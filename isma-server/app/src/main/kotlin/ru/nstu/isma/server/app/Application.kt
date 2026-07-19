@@ -1,14 +1,8 @@
 package ru.nstu.isma.server.app
 
-import io.grpc.netty.NettyServerBuilder
-import io.grpc.protobuf.services.ProtoReflectionServiceV1
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.routing.*
-import io.netty.channel.MultiThreadIoEventLoopGroup
-import io.netty.channel.epoll.EpollIoHandler
-import io.netty.channel.epoll.EpollServerDomainSocketChannel
-import io.netty.channel.unix.DomainSocketAddress
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
@@ -20,6 +14,12 @@ import ru.nstu.isma.server.app.http.simulationResultRoutes
 import ru.nstu.isma.server.infrastructure.infrastructureModule
 import java.io.File
 import java.util.*
+
+class KoinHolder(
+    val grpcService: SimulationServiceGrpcImpl,
+    val compilerService: LismaCompilerServiceGrpcImpl,
+    val sessionStore: ISimulationSessionStore
+)
 
 fun main(args: Array<String>) {
     val cliArgs = args.toList()
@@ -36,27 +36,22 @@ fun main(args: Array<String>) {
         modules(domainModule, infrastructureModule, appModule)
     }
 
-    val koin = object : KoinComponent {
+    File(socketPath).delete()
+    File(httpSocketPath).delete()
+
+    val koinObj = object : KoinComponent {
         val grpcService: SimulationServiceGrpcImpl by inject()
         val compilerService: LismaCompilerServiceGrpcImpl by inject()
         val sessionStore: ISimulationSessionStore by inject()
     }
+    val koin = KoinHolder(koinObj.grpcService, koinObj.compilerService, koinObj.sessionStore)
 
-    File(socketPath).delete()
-    File(httpSocketPath).delete()
-
-    val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-    val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-
-    val grpcServer = NettyServerBuilder
-        .forAddress(DomainSocketAddress(socketPath))
-        .channelType(EpollServerDomainSocketChannel::class.java)
-        .bossEventLoopGroup(bossGroup)
-        .workerEventLoopGroup(workerGroup)
-        .addService(koin.grpcService)
-        .addService(koin.compilerService)
-        .addService(ProtoReflectionServiceV1.newInstance())
-        .build()
+    val isLinux = System.getProperty("os.name")?.contains("linux", ignoreCase = true) == true
+    val grpcHandles = if (isLinux) {
+        LinuxServerSetup.createGrpcHandles(socketPath, koin)
+    } else {
+        WindowsServerSetup.createGrpcHandles(socketPath, koin)
+    }
 
     val httpServer = embeddedServer(CIO, configure = {
         unixConnector(httpSocketPath) { }
@@ -68,23 +63,30 @@ fun main(args: Array<String>) {
 
     httpServer.start(wait = false)
 
+    val handles = ServerHandles(
+        grpcHandles.grpcServer,
+        httpServer,
+        grpcHandles.bossGroup,
+        grpcHandles.workerGroup
+    )
+
     println("Starting gRPC server on Unix socket: $socketPath")
     println("Starting HTTP server on Unix socket: $httpSocketPath")
-    grpcServer.start()
+    handles.grpcServer.start()
     println("GRPC_SOCKET=$socketPath")
     println("HTTP_SOCKET=$httpSocketPath")
     println("Servers started. Shutting down with Ctrl+C...")
 
     Runtime.getRuntime().addShutdownHook(
         Thread {
-            grpcServer.shutdown()
-            httpServer.stop(1, 2, java.util.concurrent.TimeUnit.SECONDS)
-            bossGroup.shutdownGracefully()
-            workerGroup.shutdownGracefully()
+            handles.grpcServer.shutdown()
+            httpServer.stop(1000, 2000)
+            handles.bossGroup.shutdownGracefully().sync()
+            handles.workerGroup.shutdownGracefully().sync()
             File(socketPath).delete()
             File(httpSocketPath).delete()
         }
     )
 
-    grpcServer.awaitTermination()
+    handles.grpcServer.awaitTermination()
 }

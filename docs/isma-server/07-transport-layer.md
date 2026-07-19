@@ -64,7 +64,10 @@ implementation(libs.grpc.netty)           // io.grpc:grpc-netty:1.82.0
 implementation(libs.netty.transport)           // io.netty:netty-transport:4.2.15.Final
 implementation(libs.netty.transport.classes.epoll)  // io.netty:netty-transport-classes-epoll:4.2.15.Final
 implementation(libs.netty.transport.native.epoll) {
-    classifier = "linux-x86_64"               // Native epoll library (libepoll)
+    classifier = "linux-x86_64"               // Native epoll library (Linux)
+}
+implementation(libs.netty.transport.native.epoll) {
+    classifier = "windows-x86_64"             // Native epoll library (Windows 11)
 }
 implementation(libs.netty.codec)               // io.netty:netty-codec:4.2.15.Final
 implementation(libs.netty.handler)             // io.netty:netty-handler:4.2.15.Final
@@ -72,47 +75,87 @@ implementation(libs.netty.handler)             // io.netty:netty-handler:4.2.15.
 
 ### 2. Server Bootstrap Code
 
+Platform detection dispatches to platform-specific setup objects. Epoll code lives in `LinuxServerSetup`, NIO code in `WindowsServerSetup`:
+
 ```kotlin
 // Application.kt
-// 1. Create Epoll event loop groups (Linux-specific)
-val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
-val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
+val isLinux = System.getProperty("os.name")?.contains("linux", ignoreCase = true) == true
+val grpcHandles = if (isLinux) {
+    LinuxServerSetup.createGrpcHandles(socketPath, koin)
+} else {
+    WindowsServerSetup.createGrpcHandles(socketPath, koin)
+}
 
-// 2. Build the gRPC server on a Unix domain socket
-val grpcServer = NettyServerBuilder
-    .forAddress(DomainSocketAddress(socketPath))                // Unix socket path
-    .channelType(EpollServerDomainSocketChannel::class.java)     // Linux epoll transport
-    .bossEventLoopGroup(bossGroup)                              // Accept connections
-    .workerEventLoopGroup(workerGroup)                          // Handle I/O
-    .addService(koin.grpcService)                                // SimulationService
-    .addService(koin.compilerService)                            // LismaCompilerService
-    .addService(ProtoReflectionServiceV1.newInstance())          // Dynamic introspection
-    .build()
-
-// 3. Start HTTP server on separate socket
 val httpServer = embeddedServer(CIO, configure = {
     unixConnector(httpSocketPath) { }
 }) {
     routing { simulationResultRoutes(koin.sessionStore) }
 }
 
-// 4. Print socket paths for the client to discover
+val handles = ServerHandles(grpcHandles.grpcServer, httpServer, grpcHandles.bossGroup, grpcHandles.workerGroup)
+```
+
+**Linux path** (`LinuxServerSetup.kt`):
+```kotlin
+object LinuxServerSetup {
+    fun createGrpcHandles(socketPath: String, koin: KoinHolder): GrpcServerHandles {
+        val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
+        val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
+        val grpcServer = NettyServerBuilder
+            .forAddress(DomainSocketAddress(socketPath))
+            .channelType(EpollServerDomainSocketChannel::class.java)
+            .bossEventLoopGroup(bossGroup)
+            .workerEventLoopGroup(workerGroup)
+            .addService(koin.grpcService)
+            .addService(koin.compilerService)
+            .addService(ProtoReflectionServiceV1.newInstance())
+            .build()
+        return GrpcServerHandles(grpcServer, bossGroup, workerGroup)
+    }
+}
+```
+
+**Windows path** (`WindowsServerSetup.kt`):
+```kotlin
+object WindowsServerSetup {
+    fun createGrpcHandles(socketPath: String, koin: KoinHolder): GrpcServerHandles {
+        val bossGroup = NioEventLoopGroup()
+        val workerGroup = NioEventLoopGroup()
+        val grpcServer = NettyServerBuilder
+            .forAddress(DomainSocketAddress(socketPath))
+            .channelType(NioServerSocketChannel::class.java)
+            .bossEventLoopGroup(bossGroup)
+            .workerEventLoopGroup(workerGroup)
+            .addService(koin.grpcService)
+            .addService(koin.compilerService)
+            .addService(ProtoReflectionServiceV1.newInstance())
+            .build()
+        return GrpcServerHandles(grpcServer, bossGroup, workerGroup)
+    }
+}
+```
+
+**Print socket paths:**
+```kotlin
 println("GRPC_SOCKET=$socketPath")
 println("HTTP_SOCKET=$httpSocketPath")
-
-// 5. Start gRPC server (blocks until shutdown)
-grpcServer.awaitTermination()
+handles.grpcServer.awaitTermination()
 ```
 
 ### 3. Key Components
 
-| Component | Class | Role |
-|-----------|-------|------|
-| **Event Loop Factory** | `EpollIoHandler.newFactory()` | Linux epoll I/O multiplexing |
-| **Boss Loop Group** | `MultiThreadIoEventLoopGroup` | Accepts incoming connections |
-| **Worker Loop Group** | `MultiThreadIoEventLoopGroup` | Handles request/response I/O |
-| **Socket Channel** | `EpollServerDomainSocketChannel` | Unix domain socket transport |
-| **Address** | `DomainSocketAddress(socketPath)` | Socket file path (not IP:port) |
+The server automatically detects platform capabilities at runtime:
+
+| Component | Linux (Epoll available) | Windows 11 / macOS (NIO fallback) |
+|-----------|------------------------|----------------------------------|
+| **Event Loop Factory** | `EpollIoHandler.newFactory()` | `NioEventLoopGroup()` |
+| **Boss Loop Group** | `MultiThreadIoEventLoopGroup` | `NioEventLoopGroup()` |
+| **Worker Loop Group** | `MultiThreadIoEventLoopGroup` | `NioEventLoopGroup()` |
+| **Server Socket Channel** | `EpollServerDomainSocketChannel` | `NioServerSocketChannel` |
+| **Address** | `DomainSocketAddress(socketPath)` | `DomainSocketAddress(socketPath)` (same) |
+| **HTTP Server** | Ktor CIO `unixConnector` | Ktor CIO `unixConnector` (same) |
+
+**Platform detection strategy:** The server tries to load Epoll classes via reflection. If successful, it uses Epoll transport. If Epoll classes are not available (not on Linux), it falls back to NIO transport. This approach is automatic — no configuration or platform detection code needed.
 
 ---
 
@@ -131,7 +174,7 @@ grpcServer.awaitTermination()
    └─> modules(domainModule, infrastructureModule, appModule)
 
 4. Netty event loop groups
-   └─> bossGroup + workerGroup (both Epoll-backed)
+   └─> bossGroup + workerGroup (Epoll on Linux, NIO on Windows 11)
 
 5. gRPC server build (not yet started)
    └─> NettyServerBuilder → .build()
@@ -232,16 +275,43 @@ sequenceDiagram
 
 ### Netty gRPC Client Setup
 
-```kotlin
-// In isma-ui, the gRPC client connects via Unix socket
-val channel = NettyChannelBuilder.forAddress(
-    DomainSocketAddress(socketPath)
-).build()
+Platform detection dispatches to platform-specific client implementations:
 
-// Or using the grpc-netty-shaded transport:
+```kotlin
+// In GrpcSimulationClient.kt
+val isLinux = System.getProperty("os.name")?.contains("linux", ignoreCase = true) == true
+val handle = if (isLinux) {
+    LinuxGrpcClient.createHandle(socketPath)
+} else {
+    WindowsGrpcClient.createHandle(socketPath)
+}
+val channel = handle.channel
+```
+
+**Linux path** (`LinuxGrpcClient.kt`):
+```kotlin
+val eventLoopGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())
 val channel = NettyChannelBuilder.forAddress(
     DomainSocketAddress(socketPath)
-).build()
+)
+    .channelType(EpollDomainSocketChannel::class.java)
+    .eventLoopGroup(eventLoopGroup)
+    .negotiationType(PLAINTEXT)
+    .keepAliveTime(365 * 24 * 3600, SECONDS)
+    .build()
+```
+
+**Windows path** (`WindowsGrpcClient.kt`):
+```kotlin
+val eventLoop = NioEventLoopGroup()
+val channel = NettyChannelBuilder.forAddress(
+    DomainSocketAddress(socketPath)
+)
+    .channelType(NioSocketChannel::class.java)
+    .eventLoopGroup(eventLoop)
+    .negotiationType(PLAINTEXT)
+    .keepAliveTime(365 * 24 * 3600, SECONDS)
+    .build()
 ```
 
 ---
@@ -333,7 +403,7 @@ curl --unix-socket /tmp/isma-http.sock http://localhost/simulation/1/download
 
 ---
 
-## Platform Limitations
+## Platform Support
 
 ### Linux
 
@@ -344,21 +414,33 @@ curl --unix-socket /tmp/isma-http.sock http://localhost/simulation/1/download
 | gRPC stubs | ✅ Supported |
 | Ktor CIO | ✅ Supported |
 
-### Windows/macOS
+### Windows 11
 
 | Feature | Status |
 |---------|--------|
-| Epoll transport | ❌ Not available |
-| Unix domain sockets | ⚠️ Limited support |
+| NIO transport | ✅ Supported |
+| Unix domain sockets | ✅ Supported (native in Windows 11 build 2004+) |
 | gRPC stubs | ✅ Supported |
-| Ktor CIO | ⚠️ Limited support |
+| Ktor CIO | ✅ Supported |
 
-**Workaround:** On non-Linux platforms, the server can be started with TCP transport instead of Unix sockets (requires changing `channelType` and `forAddress`).
+### macOS
+
+| Feature | Status |
+|---------|--------|
+| NIO transport | ✅ Supported (automatic fallback) |
+| Unix domain sockets | ✅ Supported |
+| gRPC stubs | ✅ Supported |
+| Ktor CIO | ✅ Supported |
+
+**Note:** macOS is supported via NIO fallback. Epoll is Linux-only, so the server/client automatically use NIO transport on macOS. Windows 11 natively supports Unix domain sockets. Netty's NIO transport maps `DomainSocketAddress` to the Windows UDsock API automatically. Platform detection is automatic via reflection — no configuration needed.
 
 ---
 
 ## References
 
-- [Netty Unix Domain Sockets](https://netty.io/doc/latest/api/io/netty/channel/epoll/EpollServerDomainSocketChannel.html)
+- [Netty EpollServerDomainSocketChannel](https://netty.io/doc/latest/api/io/netty/channel/epoll/EpollServerDomainSocketChannel.html)
+- [Netty NioServerSocketChannel](https://netty.io/doc/latest/api/io/netty/channel/socket/nio/NioServerSocketChannel.html)
+- [Netty Unix Domain Sockets](https://netty.io/doc/latest/api/io/netty/channel/unix/DomainSocketAddress.html)
 - [gRPC Netty Transport](https://grpc.github.io/java/)
 - [Ktor Unix Domain Sockets](https://ktor.io/docs/transport-connector-unix-domain-socket)
+- [Windows 11 Unix Domain Sockets](https://learn.microsoft.com/en-us/windows/win32/winsock/using-unix-domain-sockets)

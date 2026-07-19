@@ -237,6 +237,10 @@ sequenceDiagram
 - **Customization**: Via `--socket-path` and `--http-socket-path` CLI arguments, or `isma.server.script` system property on the client side
 - **Shutdown hook**: Stops gRPC, Ktor, closes Netty groups, deletes socket files
 
+> See [07-transport-layer.md](07-transport-layer.md) for full details on Netty Unix domain socket configuration, client discovery, and troubleshooting.
+
+> See [07-transport-layer.md](07-transport-layer.md) for detailed Netty Unix domain socket configuration.
+
 ## Error Handling
 
 gRPC errors are mapped from Kotlin exceptions:

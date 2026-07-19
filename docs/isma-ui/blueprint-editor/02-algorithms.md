@@ -4,14 +4,14 @@
 
 ### Purpose
 
-Ensures all state names are unique within the blueprint. Tracks registered names and auto-increments default name counters. Source: `NameChangingMonitor.kt` (33 lines).
+Ensures all state names are unique within the blueprint. Tracks registered names in a `HashSet` and auto-increments default name counters. Source: `NameChangingMonitor.kt` (33 lines).
 
 ### Fields
 
 | Field | Type | Purpose |
 |-------|------|---------|
 | `itemDefaultName` | String | Base name prefix (e.g. "New state") |
-| `defaultNameRegex` | Regex | Pattern to extract digits from default names |
+| `defaultNameRegex` | Regex | Pattern to extract digits from default names: `^${itemDefaultName} (\d+)$` |
 | `existedNames` | HashSet<String> | Registry of all registered names |
 | `nextNameCounter` | Int | Auto-increment counter (starts at 1) |
 
@@ -21,14 +21,18 @@ Ensures all state names are unique within the blueprint. Tracks registered names
 2. If `name` matches `defaultNameRegex`, extract the digit → set `nextNameCounter = max(nextNameCounter, digit + 1)`
 3. Add `name` to `existedNames` → return `true`
 
+**Counter advancement**: When registering a name like "New state 5", the counter advances to at least 6, even if names 1–4 were never registered. This prevents generating names that are already in use.
+
 ### `tryUnregister(name)`
 
 1. If `existedNames` contains `name` → remove it → return `true`
 2. Otherwise → return `false`
 
+Unregistering does **not** adjust `nextNameCounter` — the counter only moves forward.
+
 ### `createNextDefaultName()`
 
-1. Return `"$itemDefaultName $nextNameCounter"`
+Returns `"$itemDefaultName $nextNameCounter"` and does not advance the counter (advancement happens on the next `tryRegister` call).
 
 ### Name Edit Rollback
 
@@ -39,22 +43,35 @@ When a user edits a state name via inline editing (bound to `isEditModeEnabledPr
 3. If registration fails (duplicate), `name = previousName` restores the old name
 4. If registration succeeds, `tryUnregister(previousName)` updates the registry
 
+The rollback is silent — no error dialog is shown. The name simply reverts to its previous value.
+
 ## ArrowGeometry
 
-### atan2-Based Calculation
+### atan2-Based Perpendicular Offset
 
 The line endpoints are computed in the `updateGeometry()` callback, triggered whenever any of `startXProperty`, `startYProperty`, `endXProperty`, `endYProperty` changes.
 
+The algorithm offsets the arrow line perpendicular to the direction between state centers, avoiding overlap with the state box borders.
+
+```kotlin
+fun calculateArrowGeometry(
+    startX, startY, endX, endY, layoutX, layoutY,
+    lineOffset = 10.0, textXOffset = 75.0, textYOffset = 50.0
+): ArrowGeometry
 ```
-x = endX - startX    // delta X between state centers
-y = endY - startY    // delta Y between state centers
-angle = atan2(x, y) + PI / 2  // perpendicular angle
+
+### Calculation Steps
+
+```
+dx = endX - startX    // delta X between state centers
+dy = endY - startY    // delta Y between state centers
+angle = atan2(dx, dy) + PI / 2  // perpendicular angle (swapped args + 90°)
 
 offsetDistance = 10.0
 offsetX = offsetDistance * sin(angle)
 offsetY = offsetDistance * cos(angle)
 
-// Line endpoints (offset from state centers, in local coordinates)
+// Line endpoints (offset from state centers, converted to local coordinates)
 lineStartX = startX - layoutX + offsetX
 lineStartY = startY - layoutY + offsetY
 lineEndX   = endX - layoutX + offsetX
@@ -63,85 +80,263 @@ lineEndY   = endY - layoutY + offsetY
 // Arrowhead position and rotation
 arrowhead.translateX = offsetX
 arrowhead.translateY = offsetY
-arrowhead.rotate = -angle / PI * 180.0
+arrowhead.rotate = -angle / PI * 180.0  // radians → degrees, negated
 
-// Label offset (perpendicular, further out)
-textOffsetX = 75.0 * sin(angle)
-textOffsetY = 50.0 * cos(angle)
-predicateTextWrapped.translateX = textOffsetX
-predicateTextWrapped.translateY = textOffsetY
+// Label offset (perpendicular, further out from the line)
+labelTextTranslateX = 75.0 * sin(angle)
+labelTextTranslateY = 50.0 * cos(angle)
 ```
+
+### Why `atan2(dx, dy)` Instead of `atan2(dy, dx)`?
+
+The argument order is swapped compared to the standard polar angle convention. This produces an angle measured from the Y-axis (vertical) rather than the X-axis (horizontal). Adding `PI / 2` then rotates this to get the perpendicular direction. The result is that the arrow line is offset to the "right" of the direction from start to end (when viewing from start toward end).
 
 ## ClickDisambiguator
 
 ### 200ms Delayed Coroutine Approach
 
-The `StateBox` uses a 200ms delayed coroutine to distinguish single-clicks from drag operations. Source: `utilities/ClickDisambiguator.kt`.
+Distinguishes single-clicks from drag operations using a delayed coroutine. Source: `ClickDisambiguator.kt` (53 lines).
 
 ```
-MOUSE_PRESSED → reset isDragged = false, schedule 200ms check
-  ↓
-MOUSE_DRAGGED → set isDragged = true
-  ↓
-200ms elapsed → if !isDragged → trigger single-click (inline name edit)
-                 if isDragged  → skip single-click (drag already handled)
-MOUSE_CLICKED with clickCount == 2 → cancel pending, trigger double-click
+MOUSE_PRESSED → isDragged = false, schedule 200ms check
+    ↓
+MOUSE_DRAGGED → isDragged = true
+    ↓
+200ms elapsed → if !isDragged → trigger singleClick callback
+                if isDragged  → skip (drag already handled)
+MOUSE_CLICKED with clickCount == 2 → cancel pending singleClick, trigger doubleClick
 ```
+
+### Implementation Details
+
+```kotlin
+class ClickDisambiguator(
+    private val coroutineScope: CoroutineScope,
+    private val singleClick: (MouseEvent) -> Unit,
+    private val doubleClick: (MouseEvent) -> Unit,
+    private val clickDelay: Long = 200L
+) {
+    private var pendingSingleClick: Job? = null
+    private var isDragged = false
+    private var lastEvent: MouseEvent? = null
+}
+```
+
+### Lifecycle
+
+| Event | Action |
+|-------|--------|
+| `onKeyPress()` | Reset `isDragged = false` |
+| `onDragged()` | Set `isDragged = true` |
+| `onClick(event)` | Store event, dispatch based on `clickCount` |
+| `handleSingleClick()` | Launch delayed coroutine; if `!isDragged` after delay → call `singleClick` |
+| `handleDoubleClick()` | Cancel pending single-click coroutine → call `doubleClick` |
+| `cancel()` | Cancel pending single-click coroutine |
+
+### Usage in StateBox
+
+The `StateBox` constructor creates a `ClickDisambiguator` with:
+- **singleClick**: Enables inline name editing (`isEditModeEnabled = true`) + calls `onClick` callback
+- **doubleClick**: Calls `onDoubleClick` callback (opens text editor tab)
+
+Event handlers route JavaFX mouse events to the disambiguator:
+
+```kotlin
+addEventHandler(MouseEvent.MOUSE_PRESSED) { clickDisambiguator.onKeyPress() }
+addEventHandler(MouseEvent.MOUSE_DRAGGED) { clickDisambiguator.onDragged() }
+addEventHandler(MouseEvent.MOUSE_CLICKED) { clickDisambiguator.onClick(it) }
+```
+
+### Usage in LoopTransactionArrow
+
+The `LoopTransactionArrow` uses its own `ClickDisambiguator` for arrowhead clicks:
+- **singleClick**: Opens `EditArrowPopOver`
+- **doubleClick**: Opens text editor tab for loop content
+
+The arrow body click (for removal in RemoveTransition mode) is handled separately via `setOnMouseClicked { onClick(...) }`.
 
 ## LISMA Conversion
 
 ### Overview
 
-`BlueprintModel.convertToLisma()` (in app module) transforms the visual statechart into LISMA text. This runs at compile/snapshot time, not during editing.
+`BlueprintModel.toLismaText()` (in `models/BlueprintModel.kt`) transforms the visual statechart into LISMA text. This runs at **compile/snapshot time**, not during editing. The output is a `LismaTextModel` containing the generated LISMA text and `CodeRegion` line mappings.
 
-### Output Format — Regular Transactions
+### Algorithm
 
-Each group of transitions targeting the same state with the same predicate produces a single `StateBlock`:
-
-```
-state "key" {
-    <state text>
-} from <startState1>,<startState2>,...;
+```kotlin
+fun BlueprintModel.toLismaText(): LismaTextModel
 ```
 
-Where `key` = `"{targetStateName} ({predicate})"` (trimmed).
-
-Multiple transitions from different states to the same target state with the same predicate are **merged** into a single `from` clause: `from StateA,StateB,StateC;`
-
-### Output Format — Loop Transactions
-
-Each loop transaction is expanded into **two pseudo-states**:
+The algorithm processes the model in three phases:
 
 ```
-state <stateName>_pseudo_1 (<predicate>) {
-    <loop text>
-} from <stateName>;
-
-state <stateName> (1 > 0) {
-    <original state text>
-} from <stateName>_pseudo_1;
+Phase 1: Main state text (top-level content)
+Phase 2: Regular transactions (grouped by target state + predicate)
+Phase 3: Loop transactions (expanded into pseudo-state pairs)
 ```
 
-The original state's predicate is replaced with `1 > 0` (always true), and a new pseudo-state is inserted between the state and itself to represent the loop.
+### Phase 1 — Main State Text
+
+```kotlin
+val mainTextFragment = this.main.text
+resultStringBuilder.appendLine(mainTextFragment)
+var linesCounter = mainTextFragment.lines().count() + 1
+```
+
+The main state's text is output first as top-level content (not inside a `state` block). The line counter starts after this content.
+
+### Phase 2 — Regular Transactions (StateBlock Grouping)
+
+Transactions targeting the **same state** with the **same predicate** are merged into a single `StateBlock`:
+
+```kotlin
+val stateBlockModels = HashMap<String, StateBlockModel>()
+val statesMap = this.states.associateBy { it.name }
+
+this.transactions.forEach {
+    val key = createTransactionKey(it.endStateName, it.predicate.ifBlank { LISMA_TRUE })
+    // key = "${targetStateName.trim()} (${predicate.trim()})"
+    val blockModel = stateBlockModels[key]
+    if (blockModel == null) {
+        StateBlockModel(it.endStateName, key, statesMap[it.endStateName]!!.text).apply {
+            inputStates.add(it.startStateName)
+            stateBlockModels[key] = this
+        }
+    } else {
+        blockModel.inputStates.add(it.startStateName)
+    }
+}
+```
+
+**Key insight**: The transaction key combines the target state name and predicate. Transitions from different source states to the same target with the same predicate are merged:
+
+```
+state "TargetState (predicate)" {
+    <target state text>
+} from StartState1,StartState2,StartState3;
+```
+
+Empty predicates default to `LISMA_TRUE` = `"1 > 0"` (always true).
+
+### Phase 2 Output Format
+
+```kotlin
+// StateBlockModel.toString()
+"state $transactionKey {\n" +
+"$text\n" +
+"} from $startState1,$startState2,...;"
+```
+
+### Phase 3 — Loop Transaction Expansion
+
+Each loop transaction is expanded into **two pseudo-states** that form a cycle:
+
+```kotlin
+private fun BlueprintLoopTransactionModel.toLisma(states: Map<String, BlueprintStateModel>): String {
+    val pseudoStateName = "${stateName}_pseudo_1"
+    return """
+        state $pseudoStateName (${predicate.trim()}) {
+            $text                    // loop body text
+        } from ${stateName};
+
+        state $stateName ($LISMA_TRUE) {
+            ${states[stateName]!!.text}  // original state body text
+        } from ${pseudoStateName};
+    """
+}
+```
+
+**Transformation logic**:
+1. Create pseudo-state `<stateName>_pseudo_1` with the loop's predicate and text
+2. The pseudo-state transitions **from** the original state
+3. The original state gets predicate `1 > 0` (always true) and transitions **from** the pseudo-state
+4. This creates a cycle: `State → pseudo_state → State`
+
+**Example**: A loop on state "Work" with predicate `"x > 5"` and loop text `"process()"`:
+
+```
+state Work_pseudo_1 (x > 5) {
+    process()
+} from Work;
+
+state Work (1 > 0) {
+    <original Work body text>
+} from Work_pseudo_1;
+```
 
 ### Output Order
 
-1. Main state text (first, as top-level content)
-2. All state blocks from regular transactions (grouped by target + predicate)
-3. All loop transaction expansions (one pseudo-state pair per loop)
-
-Each section is followed by a blank line.
+```
+1. Main state text
+   [blank line]
+2. State blocks from regular transactions (grouped by target + predicate)
+   [blank line after each block]
+3. Loop transaction expansions (one pseudo-state pair per loop)
+   [blank line after each pair]
+```
 
 ### Line Number Tracking
 
-For each generated fragment, start and end line numbers are tracked and returned in `CodeRegion` objects, used for error highlighting in the text editor.
+For each generated fragment, start and end line numbers are tracked:
+
+```kotlin
+val fragmentLinesCount = fragmentText.lines().count()
+val startLineNumber = linesCounter
+val endLineNumber = linesCounter + fragmentLinesCount + 1
+
+resultStringBuilder.appendLine(fragmentText).appendLine()
+fragments.add(CodeRegion(it.stateName, startLineNumber, endLineNumber))
+linesCounter = endLineNumber
+```
+
+The `+1` accounts for the trailing blank line. `CodeRegion` objects are used by the text editor for error highlighting — mapping LISMA compilation errors back to specific fragments.
+
+### fragmentNameByIndex
+
+`LismaTextModel` provides a lookup method for finding which fragment a given line index belongs to:
+
+```kotlin
+fun fragmentNameByIndex(index: Int) = regions
+    .firstOrNull { index > it.startLine && index <= it.endLine } ?: DefaultFragment
+
+companion object {
+    val DefaultFragment = CodeRegion(name = "Main", startLine = 0, endLine = 0)
+}
+```
+
+If no region matches, returns `DefaultFragment` (named "Main").
 
 ## Editability Bindings
 
-User state `isEditable` is dynamically bound:
+User state `isEditable` is dynamically bound to the editor mode:
 
-```
-isEditable = !(isRemoveStateMode OR isAddTransactionMode)
+```kotlin
+isEditableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })
 ```
 
-When in add-transition or remove-state mode, inline name editing is disabled.
+The `isNotEditingMode()` extension function:
+
+```kotlin
+fun EditorMode.isNotEditingMode(): Boolean =
+    this !is EditorMode.RemoveState && this !is EditorMode.AddTransition
+```
+
+| Mode | `isNotEditingMode()` | Inline name edit |
+|------|---------------------|-----------------|
+| `EditorMode.Idle` | `true` | Enabled |
+| `EditorMode.AddTransition` | `false` | Disabled |
+| `EditorMode.RemoveState` | `false` | Disabled |
+| `EditorMode.RemoveTransition` | `true` | Enabled |
+
+## CoroutineScopeProvider
+
+A global singleton providing a shared `CoroutineScope(Dispatchers.JavaFx)` for all click disambiguation coroutines:
+
+```kotlin
+object CoroutineScopeProvider {
+    val scope = CoroutineScope(Dispatchers.JavaFx)
+    fun cancelAll() = scope.cancel()
+}
+```
+
+All `ClickDisambiguator` instances use this shared scope. The `cancelAll()` method is available for cleanup (though not currently called anywhere in the codebase).

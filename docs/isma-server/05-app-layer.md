@@ -102,20 +102,12 @@ Shutdown: File(socket).delete()    ← cleanup by shutdown hook
 
 ## Netty Transport Configuration
 
-### Unix Domain Sockets
-
-The server uses Linux-specific **Netty Epoll** transport for Unix domain socket support:
-
-```kotlin
-channelType(EpollServerDomainSocketChannel::class.java)
-```
+The server uses Linux-specific **Netty Epoll** transport for Unix domain socket support.
 
 **Dependencies:**
-- `netty-transport` — core Netty transport
-- `netty-transport-classes-epoll` — Epoll channel implementation classes
-- `netty-transport-native-epoll` — Native Epoll library (Linux x86_64)
-- `netty-codec` — Netty codec framework
-- `netty-handler` — Netty handler framework
+- `grpc-netty` — Netty-based gRPC server transport
+- `netty-transport-classes-epoll` — Epoll channel implementation
+- `netty-transport-native-epoll` — Native epoll library (Linux x86_64)
 
 **Event loop groups:**
 ```kotlin
@@ -123,7 +115,9 @@ val bossGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())    // A
 val workerGroup = MultiThreadIoEventLoopGroup(EpollIoHandler.newFactory())  // Handles I/O
 ```
 
-**Note:** The server is Linux-only for gRPC transport due to the Epoll dependency. Windows/macOS clients must connect via a compatible transport (not supported by this server implementation).
+> See [07-transport-layer.md](07-transport-layer.md) for complete Netty Unix domain socket configuration.
+
+> See [07-transport-layer.md](07-transport-layer.md) for complete transport architecture, client discovery, and troubleshooting.
 
 ---
 

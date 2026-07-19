@@ -10,6 +10,7 @@ Quick navigation to detailed documents:
 | [04-infrastructure-layer.md](04-infrastructure-layer.md) | Stores, simulation executor, translator, syntax highlighting |
 | [05-app-layer.md](05-app-layer.md) | Entry point, gRPC services, HTTP server, DI wiring |
 | [06-build-and-deployment.md](06-build-and-deployment.md) | Build configuration, dependencies, startup/shutdown, deployment |
+| [07-transport-layer.md](07-transport-layer.md) | Unix domain sockets via Netty, Ktor CIO, client discovery, troubleshooting |
 
 ## Quick Start
 

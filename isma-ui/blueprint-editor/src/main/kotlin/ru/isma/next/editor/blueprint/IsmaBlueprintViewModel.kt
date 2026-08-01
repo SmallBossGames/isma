@@ -297,7 +297,7 @@ class IsmaBlueprintViewModel(
     }
 
     private fun StateBox.initNameChangingEvent() {
-        var previousName = ""
+        var previousName = name
         isEditModeEnabledProperty.addListener { _, _, value ->
             if (value) {
                 previousName = name

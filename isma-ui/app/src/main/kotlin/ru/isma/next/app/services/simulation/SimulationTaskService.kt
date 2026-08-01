@@ -68,12 +68,14 @@ class SimulationTaskService(
                     }
                     return@launch
                 }
-            } catch (e: Throwable) {
+            } catch (e: Exception) {
                 uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
                     task.setError("Compilation error: ${e.message}")
                 }
                 return@launch
+            } catch (e: Error) {
+                throw e
             }
 
             // Phase 2: Run
@@ -84,16 +86,18 @@ class SimulationTaskService(
 
             // Phase 3: Monitor
             try {
-                serverFacade.monitorSimulation(simulationId, 0.01).collect { progress ->
+                serverFacade.monitorSimulation(simulationId, MONITORING_POLL_INTERVAL_SECONDS).collect { progress ->
                     val normalized = ((progress.currentTime - progress.startTime) / (progress.endTime - progress.startTime)).coerceIn(0.0, 1.0)
                     uiThreadExecutor.executeOnUi { task.setProgress(normalized) }
                 }
-            } catch (e: Throwable) {
+            } catch (e: Exception) {
                 uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
                     task.setError("Monitor error: ${e.message}")
                 }
                 return@launch
+            } catch (e: Error) {
+                throw e
             }
 
             // Phase 4: Download result
@@ -115,11 +119,13 @@ class SimulationTaskService(
                     task.setStatus(SimulationTaskStatus.COMPLETED)
                     task.setProgress(1.0)
                 }
-            } catch (e: Throwable) {
+            } catch (e: Exception) {
                 uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
                     task.setError("Download error: ${e.message}")
                 }
+            } catch (e: Error) {
+                throw e
             } finally {
                 currentJobs.remove(task)
             }
@@ -134,6 +140,7 @@ class SimulationTaskService(
     }
 
     companion object {
+        private const val MONITORING_POLL_INTERVAL_SECONDS = 0.01
         private val virtualThreadDispatcher = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
         val SimulationScope = CoroutineScope(virtualThreadDispatcher + SupervisorJob())
     }

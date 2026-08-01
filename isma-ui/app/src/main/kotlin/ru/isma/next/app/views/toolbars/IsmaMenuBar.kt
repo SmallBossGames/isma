@@ -1,5 +1,6 @@
 package ru.isma.next.app.views.toolbars
 
+import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
@@ -74,7 +75,8 @@ class IsmaMenuBar(
                 MenuItem("Exit").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+W")
                     onAction = EventHandler {
-                        println("Quitting!")
+                        // TODO: Implement application shutdown logic
+                        Platform.exit()
                     }
                 }
             ),
@@ -102,7 +104,7 @@ class IsmaMenuBar(
                 MenuItem("Verify").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+F4")
                     onAction = EventHandler {
-                        println("Verify!")
+                        // TODO: Implement model verification logic
                     }
                 },
                 MenuItem("Run").apply {

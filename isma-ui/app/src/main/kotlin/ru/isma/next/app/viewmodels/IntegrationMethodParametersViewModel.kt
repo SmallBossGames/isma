@@ -8,19 +8,18 @@ class IntegrationMethodParametersViewModel {
     var selectedMethod: String
         get() = selectedMethodProperty.value
         set(value) { selectedMethodProperty.value = value }
-    fun selectedMethodProperty() = selectedMethodProperty
 
     val accuracyProperty = SimpleDoubleProperty(0.0)
     var accuracy: Double
         get() = accuracyProperty.value
         set(value) { accuracyProperty.value = value }
-    fun accuracyProperty() = accuracyProperty
 
     val isAccuracyInUseProperty = SimpleBooleanProperty(false)
     var isAccuracyInUse: Boolean
         get() = isAccuracyInUseProperty.value
         set(value) { isAccuracyInUseProperty.value = value }
 
+    // Used for server communication — not exposed in UI but required by IntegrationMethodParametersModel
     val isStableAllowedInUseProperty = SimpleBooleanProperty(false)
     var isStableAllowedInUse: Boolean
         get() = isStableAllowedInUseProperty.value
@@ -40,13 +39,11 @@ class IntegrationMethodParametersViewModel {
     var server: String
         get() = serverProperty.value
         set(value) { serverProperty.value = value }
-    fun serverProperty() = serverProperty
 
     val portProperty = SimpleIntegerProperty(0)
     var port: Int
         get() = portProperty.value
         set(value) { portProperty.value = value }
-    fun portProperty() = portProperty
 
     fun commit(model: IntegrationMethodParametersModel){
         selectedMethod = model.selectedMethod

@@ -13,9 +13,9 @@ class CauchyInitialsView(
     init {
         val scrollPane = ScrollPane(
             propertiesGrid {
-                addNode("Start", parametersService.cauchyInitials.startTimeProperty())
-                addNode("End", parametersService.cauchyInitials.endTimeProperty())
-                addNode("Step", parametersService.cauchyInitials.stepProperty())
+                addNode("Start", parametersService.cauchyInitials.startTimeProperty)
+                addNode("End", parametersService.cauchyInitials.endTimeProperty)
+                addNode("Step", parametersService.cauchyInitials.stepProperty)
             }
         )
         scrollPane.isFitToWidth = true

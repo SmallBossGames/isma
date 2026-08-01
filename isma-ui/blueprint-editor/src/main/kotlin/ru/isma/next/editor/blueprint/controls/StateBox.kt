@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Group
 import javafx.scene.control.Label
@@ -27,6 +28,8 @@ class StateBox(
     onClick: (StateBox, MouseEvent) -> Unit = { _,_ -> },
     onDoubleClick: (StateBox, MouseEvent) -> Unit = { _,_ -> },
 ) : Group() {
+    private val registeredHandlers = mutableListOf<Pair<javafx.event.EventType<MouseEvent>, EventHandler<MouseEvent>>>()
+
     val isEditModeEnabledProperty = SimpleBooleanProperty(false)
     val isEditableProperty = SimpleBooleanProperty(true)
     val nameProperty = SimpleStringProperty("")
@@ -101,18 +104,43 @@ class StateBox(
             doubleClick = { onDoubleClick(this@StateBox, it) }
         )
 
-        addEventHandler(MouseEvent.MOUSE_PRESSED) {
+        val pressedHandler = EventHandler<MouseEvent> {
             clickDisambiguator.onKeyPress()
             onPress(this@StateBox, it)
         }
-        addEventHandler(MouseEvent.MOUSE_RELEASED) {
+        val releasedHandler = EventHandler<MouseEvent> {
             onRelease(this@StateBox, it)
         }
-        addEventHandler(MouseEvent.MOUSE_DRAGGED) {
+        val draggedHandler = EventHandler<MouseEvent> {
             clickDisambiguator.onDragged()
         }
-        addEventHandler(MouseEvent.MOUSE_CLICKED) {
+        val clickedHandler = EventHandler<MouseEvent> {
             clickDisambiguator.onClick(it)
         }
+
+        addEventHandler(MouseEvent.MOUSE_PRESSED, pressedHandler)
+        addEventHandler(MouseEvent.MOUSE_RELEASED, releasedHandler)
+        addEventHandler(MouseEvent.MOUSE_DRAGGED, draggedHandler)
+        addEventHandler(MouseEvent.MOUSE_CLICKED, clickedHandler)
+
+        registeredHandlers.addAll(listOf(
+            MouseEvent.MOUSE_PRESSED to pressedHandler,
+            MouseEvent.MOUSE_RELEASED to releasedHandler,
+            MouseEvent.MOUSE_DRAGGED to draggedHandler,
+            MouseEvent.MOUSE_CLICKED to clickedHandler
+        ))
+
+        parentProperty().addListener { _, _, newParent ->
+            if (newParent == null) {
+                cleanup()
+            }
+        }
+    }
+
+    private fun cleanup() {
+        for ((eventType, handler) in registeredHandlers) {
+            removeEventHandler(eventType, handler)
+        }
+        registeredHandlers.clear()
     }
 }

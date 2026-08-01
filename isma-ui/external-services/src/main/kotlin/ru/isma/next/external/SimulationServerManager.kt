@@ -59,7 +59,9 @@ class SimulationServerManager(
         }
 
         val grpcSocket = lines[0].substringAfter(": ").trim()
-        val httpSocket = lines.find { it.startsWith("HTTP_SOCKET=") }?.substringAfter("=")?.trim()
+        val httpSocket = lines.find { it.startsWith("HTTP_SOCKET=") }
+            ?.substringAfter("=", "")
+            ?.trim()
             ?: throw IllegalStateException("HTTP socket not found in server output")
 
         socketPaths = SocketPaths(grpc = grpcSocket, http = httpSocket)

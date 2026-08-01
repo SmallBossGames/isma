@@ -53,7 +53,7 @@ class ProjectFileService(private val projectController: IProjectService) {
     fun open(file: File) {
         when {
             OLD_ISMA_PROJECT_FILE.contains(file.extension) -> {
-                TODO("Fix backward compatibility")
+                throw UnsupportedOperationException("Legacy .im files are no longer supported. Please convert to .isma format first.")
             }
             TEXT_ISMA_PROJECT_FILE.contains(file.extension) -> {
                 LismaProjectModel().apply {
@@ -70,6 +70,9 @@ class ProjectFileService(private val projectController: IProjectService) {
                     this.blueprint = Json.decodeFromString(file.readText())
                     (projectController as ProjectService).addBlueprint(this)
                 }
+            }
+            else -> {
+                throw IllegalArgumentException("Unsupported file extension: ${file.extension}")
             }
         }
     }

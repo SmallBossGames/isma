@@ -20,7 +20,9 @@ object LinuxGrpcClient {
             .channelType(EpollDomainSocketChannel::class.java)
             .eventLoopGroup(eventLoopGroup)
             .negotiationType(io.grpc.netty.NegotiationType.PLAINTEXT)
-            .keepAliveTime(365 * 24 * 3600, java.util.concurrent.TimeUnit.SECONDS)
+            .keepAliveTime(45, java.util.concurrent.TimeUnit.SECONDS)
+            .keepAliveWithoutCalls(true)
+            .maxInboundMessageSize(1024 * 1024 * 512)
             .build()
 
         return GrpcChannelHandle(channel, eventLoopGroup)

@@ -22,11 +22,16 @@ class SimulationParametersService(methodNames: List<String>) {
     val eventDetection = EventDetectionParametersViewModel()
 
     init {
-        integrationMethod.selectedMethod = integrationMethods.first()
+        if (integrationMethods.isEmpty()) {
+            throw IllegalArgumentException("integrationMethods must not be empty")
+        }
+        integrationMethod.selectedMethod = integrationMethods.firstOrNull() ?: throw IllegalArgumentException("No integration methods available")
 
         cauchyInitials.step = 0.1
+        require(cauchyInitials.step > 0) { "Step must be > 0, was ${cauchyInitials.step}" }
         cauchyInitials.startTime = 0.0
         cauchyInitials.endTime = 10.0
+        require(cauchyInitials.endTime > cauchyInitials.startTime) { "endTime must be > startTime" }
 
         integrationMethod.accuracy = 0.1
         integrationMethod.server = "localhost"

@@ -1,5 +1,6 @@
 package ru.isma.next.external
 
+import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +37,11 @@ class SimulationClient(
             }
             .build()
 
-        return grpcClient.blockingStub.runSimulation(request).simulationId
+        return try {
+            grpcClient.blockingStub.runSimulation(request).simulationId
+        } catch (e: StatusRuntimeException) {
+            throw GrpcException("Failed to run simulation: ${e.status.description}", e)
+        }
     }
 
     fun monitor(simulationId: Long, accuracy: Double): Flow<SimulationProgress> {
@@ -45,7 +50,11 @@ class SimulationClient(
             .setAccuracy(accuracy)
             .build()
 
-        val iterator = grpcClient.blockingStub.monitorSimulation(request)
+        val iterator = try {
+            grpcClient.blockingStub.monitorSimulation(request)
+        } catch (e: StatusRuntimeException) {
+            throw GrpcException("Failed to monitor simulation: ${e.status.description}", e)
+        }
 
         return kotlinx.coroutines.flow.flow {
             while (iterator.hasNext()) {
@@ -64,13 +73,21 @@ class SimulationClient(
         val request = CancelSimulationRequest.newBuilder()
             .setSimulationId(simulationId)
             .build()
-        grpcClient.blockingStub.cancelSimulation(request)
+        try {
+            grpcClient.blockingStub.cancelSimulation(request)
+        } catch (e: StatusRuntimeException) {
+            throw GrpcException("Failed to cancel simulation: ${e.status.description}", e)
+        }
     }
 
     fun listMethods(): List<String> {
-        val response = grpcClient.blockingStub.listSimulationMethods(
-            ListSimulationMethodsRequest.getDefaultInstance()
-        )
+        val response = try {
+            grpcClient.blockingStub.listSimulationMethods(
+                ListSimulationMethodsRequest.getDefaultInstance()
+            )
+        } catch (e: StatusRuntimeException) {
+            throw GrpcException("Failed to list simulation methods: ${e.status.description}", e)
+        }
         return response.methodsList.map { it.name }
     }
 }

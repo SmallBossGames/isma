@@ -8,10 +8,12 @@ object WindowsGrpcClient {
         )
         val channel = io.grpc.netty.NettyChannelBuilder
             .forAddress(io.netty.channel.unix.DomainSocketAddress(socketPath))
-            .channelType(io.netty.channel.socket.nio.NioSocketChannel::class.java)
+            .channelType(io.netty.channel.socket.nio.NioDomainSocketChannel::class.java)
             .eventLoopGroup(eventLoop)
             .negotiationType(io.grpc.netty.NegotiationType.PLAINTEXT)
-            .keepAliveTime(365 * 24 * 3600, java.util.concurrent.TimeUnit.SECONDS)
+            .keepAliveTime(45, java.util.concurrent.TimeUnit.SECONDS)
+            .keepAliveWithoutCalls(true)
+            .maxInboundMessageSize(1024 * 1024 * 512)
             .build()
         return GrpcChannelHandle(channel, eventLoop)
     }

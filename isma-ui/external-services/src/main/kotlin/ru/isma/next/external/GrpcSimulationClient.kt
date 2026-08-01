@@ -13,7 +13,7 @@ class GrpcSimulationClient(socketPath: String) {
     }
 
     private val channel: ManagedChannel get() = handle.channel
-    val blockingStub = SimulationServiceGrpc.newBlockingStub(channel)!!
+    val blockingStub = SimulationServiceGrpc.newBlockingStub(channel)
 
     fun shutdown() {
         channel.shutdown()

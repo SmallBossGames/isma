@@ -22,8 +22,9 @@ class IsmaEditorTabPane(
 
     init {
         coroutinesScope.launch {
+            // Initial emission of all existing projects, then stream of new additions
             merge(
-                projectController.projects.asFlow(),
+                projectController.projects.asIterable().asFlow(),
                 projectController.projects.addedAsFlow()
             ).cancellable().collect {
                 addTabAndSelect(

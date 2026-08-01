@@ -8,19 +8,16 @@ class CauchyInitialsViewModel {
     var startTime: Double
         get() = startTimeProperty.value
         set(value) { startTimeProperty.value = value }
-    fun startTimeProperty() = startTimeProperty
 
     val endTimeProperty = SimpleDoubleProperty(0.0)
     var endTime: Double
         get() = endTimeProperty.value
         set(value) { endTimeProperty.value = value }
-    fun endTimeProperty() = endTimeProperty
 
     val stepProperty = SimpleDoubleProperty(0.1)
     var step: Double
         get() = stepProperty.value
         set(value) { stepProperty.value = value }
-    fun stepProperty() = stepProperty
 
     fun commit(model: CauchyInitialsModel){
         startTime = model.startTime

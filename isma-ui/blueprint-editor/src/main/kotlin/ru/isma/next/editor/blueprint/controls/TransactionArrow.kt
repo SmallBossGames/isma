@@ -1,8 +1,6 @@
 package ru.isma.next.editor.blueprint.controls
 
 
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Pos
 import javafx.scene.Group
@@ -13,38 +11,21 @@ import javafx.scene.shape.Polygon
 import javafx.scene.text.Font
 import ru.isma.next.editor.blueprint.constants.*
 import ru.isma.next.editor.blueprint.utilities.calculateArrowGeometry
-import ru.isma.next.editor.blueprint.utilities.getValue
-import ru.isma.next.editor.blueprint.utilities.setValue
-
-interface ITransactionArrowData {
-    val aliasProperty: SimpleStringProperty
-    val predicateProperty: SimpleStringProperty
-}
+import ru.isma.next.editor.blueprint.viewmodels.StateViewModel
+import ru.isma.next.editor.blueprint.viewmodels.TransactionViewModel
 
 class TransactionArrow(
-    onClick: (source: TransactionArrow, event: MouseEvent) -> Unit,
-    onArrowClick: (source: TransactionArrow, event: MouseEvent) -> Unit,
-) : Group(), ITransactionArrowData {
-    override val aliasProperty = SimpleStringProperty("")
-    override val predicateProperty = SimpleStringProperty("")
-
-    val startXProperty = SimpleDoubleProperty(0.0)
-    val startYProperty = SimpleDoubleProperty(0.0)
-    val endXProperty = SimpleDoubleProperty(0.0)
-    val endYProperty = SimpleDoubleProperty(0.0)
-
-    val startX by startXProperty
-    val startY by startYProperty
-    val endX by endXProperty
-    val endY by endYProperty
-
-    var alias: String by aliasProperty
-    var text: String by predicateProperty
+    val viewModel: TransactionViewModel,
+    val startViewModel: StateViewModel,
+    val endViewModel: StateViewModel,
+    val onArrowClick: (TransactionArrow, MouseEvent) -> Unit = { _, _ -> },
+    val onClick: (TransactionArrow, MouseEvent) -> Unit = { _, _ -> }
+) : Group() {
 
     init {
         viewOrder = 4.0
-        layoutXProperty().bind((endXProperty.subtract(startXProperty)).divide( 2).add(startXProperty))
-        layoutYProperty().bind((endYProperty.subtract(startYProperty)).divide(2).add(startYProperty))
+        layoutXProperty().bind(startViewModel.centerX().add(endViewModel.centerX()).divide(2))
+        layoutYProperty().bind(startViewModel.centerY().add(endViewModel.centerY()).divide(2))
 
         val predicateText = Label().apply {
             font = Font("Arial", ARROW_LABEL_FONT_SIZE)
@@ -53,6 +34,7 @@ class TransactionArrow(
             translateX = -ARROW_LABEL_FIELD_WIDTH / 2.0
             alignment = Pos.CENTER
         }
+        predicateText.textProperty().bind(viewModel.displayText)
 
         val predicateTextWrapped = Group(predicateText)
 
@@ -72,13 +54,20 @@ class TransactionArrow(
             viewOrder = 6.0
 
             fun updateGeometry() {
+                val geoStartX = startViewModel.centerX().value
+                val geoStartY = startViewModel.centerY().value
+                val geoEndX = endViewModel.centerX().value
+                val geoEndY = endViewModel.centerY().value
+                val layoutX = this@TransactionArrow.layoutXProperty().value
+                val layoutY = this@TransactionArrow.layoutYProperty().value
+
                 val geometry = calculateArrowGeometry(
-                    startX = this@TransactionArrow.startX,
-                    startY = this@TransactionArrow.startY,
-                    endX = this@TransactionArrow.endX,
-                    endY = this@TransactionArrow.endY,
-                    layoutX = this@TransactionArrow.layoutX,
-                    layoutY = this@TransactionArrow.layoutY,
+                    startX = geoStartX,
+                    startY = geoStartY,
+                    endX = geoEndX,
+                    endY = geoEndY,
+                    layoutX = layoutX,
+                    layoutY = layoutY,
                     lineOffset = ARROW_LINE_OFFSET,
                     textXOffset = ARROW_TEXT_X_OFFSET,
                     textYOffset = ARROW_TEXT_Y_OFFSET
@@ -97,25 +86,16 @@ class TransactionArrow(
                 predicateTextWrapped.translateY = geometry.labelTextTranslateY
             }
 
-            this@TransactionArrow.startXProperty.onChange { updateGeometry() }
-            this@TransactionArrow.startYProperty.onChange { updateGeometry() }
-            this@TransactionArrow.endXProperty.onChange { updateGeometry() }
-            this@TransactionArrow.endYProperty.onChange { updateGeometry() }
-        }
+            updateGeometry()
 
-        fun updatePredicateText(){
-            val alias = aliasProperty.value
-            val predicate = predicateProperty.value
-
-            predicateText.text = if (alias != "") alias else predicate
-        }
-
-        aliasProperty.onChange {
-            updatePredicateText()
-        }
-
-        predicateProperty.onChange {
-            updatePredicateText()
+            startViewModel.xProperty.onChange { updateGeometry() }
+            startViewModel.yProperty.onChange { updateGeometry() }
+            startViewModel.squareWidthProperty.onChange { updateGeometry() }
+            startViewModel.squareHeightProperty.onChange { updateGeometry() }
+            endViewModel.xProperty.onChange { updateGeometry() }
+            endViewModel.yProperty.onChange { updateGeometry() }
+            endViewModel.squareWidthProperty.onChange { updateGeometry() }
+            endViewModel.squareHeightProperty.onChange { updateGeometry() }
         }
 
         setOnMouseClicked { onClick(this@TransactionArrow, it) }

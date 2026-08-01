@@ -10,19 +10,20 @@ import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
+import ru.isma.next.editor.blueprint.viewmodels.TransactionViewModel
 
-class EditArrowPopOver(arrow: ITransactionArrowData, x: Double, y: Double): VBox(
+class EditArrowPopOver(val viewModel: TransactionViewModel, x: Double, y: Double): VBox(
     Label("Alias (optional)"),
     TextField().apply {
         minWidth = POPOVER_MIN_WIDTH
 
-        textProperty().bindBidirectional(arrow.aliasProperty)
+        textProperty().bindBidirectional(viewModel.aliasProperty)
     },
     Label("Predicate"),
     TextField().apply {
         minWidth = POPOVER_MIN_WIDTH
 
-        textProperty().bindBidirectional(arrow.predicateProperty)
+        textProperty().bindBidirectional(viewModel.predicateProperty)
     },
 ) {
     init {

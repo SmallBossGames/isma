@@ -17,7 +17,7 @@ import ru.isma.next.app.views.settings.*
 import ru.isma.next.app.views.tabpane.IsmaEditorTabPane
 import ru.isma.next.app.views.layout.ErrorListDrawer
 import ru.isma.next.app.views.toolbars.*
-import ru.isma.next.editor.blueprint.IsmaBlueprintEditor
+import ru.isma.next.editor.blueprint.views.IsmaBlueprintEditor
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.text.IsmaTextEditor
 import ru.isma.next.editor.text.services.RemoteLismaHighlightingService
@@ -45,7 +45,7 @@ val blueprintEditorModule = module {
     includes(editorModule)
 
     scope<BlueprintProjectModel> {
-        scoped<ITextEditorFactory>{ TextEditorFactory { get() } }
+        scoped<ITextEditorFactory> { TextEditorFactory { get() } }
         factoryOf(::IsmaTextEditor) onClose { it?.dispose() }
         scopedOf(::BlueprintProjectDataProvider)
         scopedOf(::IsmaBlueprintEditor)
@@ -54,8 +54,8 @@ val blueprintEditorModule = module {
 }
 
 val toolbarsModule = module {
-    single { IsmaMenuBar(get(),get(),get(),get(),get()) }
-    single { IsmaToolBar(get(),get(),get(),get(),get()) }
+    single { IsmaMenuBar(get(), get(), get(), get(), get()) }
+    single { IsmaToolBar(get(), get(), get(), get(), get()) }
     single { SimulationProcessBar(get(), get()) }
     single { IsmaErrorListTable(get()) }
     single { ErrorListDrawer(get()) }
@@ -71,7 +71,7 @@ val settingsPanelModule = module {
     single { EventDetectionView(get()) }
     single { MethodSettingsView(get()) }
     single { ResultSavingView(get()) }
-    single { SettingsPanelView(get(),get(),get(),get()) }
+    single { SettingsPanelView(get(), get(), get(), get()) }
 }
 
 val mainViewModule = module {

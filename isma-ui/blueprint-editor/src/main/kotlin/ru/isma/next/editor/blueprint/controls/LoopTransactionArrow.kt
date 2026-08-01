@@ -1,6 +1,5 @@
 package ru.isma.next.editor.blueprint.controls
 
-import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.Group
 import javafx.scene.control.Label
@@ -11,25 +10,19 @@ import javafx.scene.shape.Polygon
 import javafx.scene.text.Font
 import ru.isma.next.editor.blueprint.constants.*
 import ru.isma.next.editor.blueprint.utilities.ClickDisambiguator
-import ru.isma.next.editor.blueprint.utilities.getValue
-import ru.isma.next.editor.blueprint.utilities.setValue
+import ru.isma.next.editor.blueprint.viewmodels.LoopTransactionViewModel
 
 
 class LoopTransactionArrow(
+    val viewModel: LoopTransactionViewModel,
+    val stateViewModel: ru.isma.next.editor.blueprint.viewmodels.StateViewModel,
     val onClick: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
     val onArrowClick: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
     val onArrowDoubleClick: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
-    var text: String = "",
-    alias: String = "",
-    predicate: String = "",
-): Group(), ITransactionArrowData {
-    override val aliasProperty = SimpleStringProperty(alias)
-    override val predicateProperty = SimpleStringProperty(predicate)
-
-    var alias: String by aliasProperty
-    var predicate: String by predicateProperty
-
+): Group() {
     init {
+        layoutXProperty().bind(stateViewModel.centerX())
+        layoutYProperty().bind(stateViewModel.centerY())
         viewOrder = 4.0
 
         val clickDisambiguator = ClickDisambiguator(
@@ -62,17 +55,7 @@ class LoopTransactionArrow(
                 translateX = LOOP_LABEL_X
                 alignment = Pos.CENTER
 
-                fun updatePredicateText(){
-                    val localAlias = aliasProperty.value
-                    val localPredicate = predicateProperty.value
-
-                    text = if (localAlias != "") localAlias else localPredicate
-                }
-
-                aliasProperty.addListener { _,_,_ -> updatePredicateText() }
-                predicateProperty.addListener { _,_,_ -> updatePredicateText() }
-
-                updatePredicateText()
+                textProperty().bind(viewModel.displayText)
             }
         )
 

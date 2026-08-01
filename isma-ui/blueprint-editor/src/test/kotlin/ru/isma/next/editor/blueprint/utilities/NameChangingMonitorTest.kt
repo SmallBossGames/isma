@@ -1,4 +1,4 @@
-package ru.isma.next.editor.blueprint
+package ru.isma.next.editor.blueprint.utilities
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach

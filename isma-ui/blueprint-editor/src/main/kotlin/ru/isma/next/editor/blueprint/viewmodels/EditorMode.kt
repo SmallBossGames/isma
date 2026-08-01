@@ -1,10 +1,8 @@
-package ru.isma.next.editor.blueprint
-
-import ru.isma.next.editor.blueprint.controls.StateBox
+package ru.isma.next.editor.blueprint.viewmodels
 
 sealed class EditorMode {
     object Idle : EditorMode()
-    data class AddTransition(val selectedStates: MutableList<StateBox> = mutableListOf()) : EditorMode()
+    data class AddTransition(val selectedStates: MutableSet<StateViewModel> = mutableSetOf()) : EditorMode()
     object RemoveState : EditorMode()
     object RemoveTransition : EditorMode()
 }

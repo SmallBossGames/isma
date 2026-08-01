@@ -1,8 +1,7 @@
-package ru.isma.next.editor.blueprint
+package ru.isma.next.editor.blueprint.viewmodels
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import ru.isma.next.editor.blueprint.controls.StateBox
 
 class EditorModeTest {
 
@@ -24,14 +23,13 @@ class EditorModeTest {
 
     @Test
     fun `AddTransition mode carries selected states`() {
-        val mode = EditorMode.AddTransition(mutableListOf<StateBox>())
-        assertTrue(mode is EditorMode.AddTransition)
+        val mode: EditorMode.AddTransition = EditorMode.AddTransition(mutableSetOf())
         assertEquals(0, mode.selectedStates.size)
     }
 
     @Test
     fun `AddTransition mode is not not-editing mode`() {
-        val mode = EditorMode.AddTransition(mutableListOf<StateBox>())
+        val mode = EditorMode.AddTransition(mutableSetOf())
         assertFalse(mode.isNotEditingMode())
     }
 
@@ -46,11 +44,22 @@ class EditorModeTest {
     fun `modes are mutually exclusive by type`() {
         val modes: List<EditorMode> = listOf(
             EditorMode.Idle,
-            EditorMode.AddTransition(mutableListOf()),
+            EditorMode.AddTransition(mutableSetOf()),
             EditorMode.RemoveState,
             EditorMode.RemoveTransition
         )
 
         assertEquals(4, modes.distinct().size)
+    }
+
+    @Test
+    fun `AddTransition mode can add and check states`() {
+        val state1 = StateViewModel(name = "State 1")
+        val state2 = StateViewModel(name = "State 2")
+        val mode = EditorMode.AddTransition(mutableSetOf(state1))
+        mode.selectedStates.add(state2)
+        assertTrue(mode.selectedStates.contains(state1))
+        assertTrue(mode.selectedStates.contains(state2))
+        assertEquals(2, mode.selectedStates.size)
     }
 }

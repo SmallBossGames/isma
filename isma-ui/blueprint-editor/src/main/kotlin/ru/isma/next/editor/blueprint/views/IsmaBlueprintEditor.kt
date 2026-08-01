@@ -1,38 +1,32 @@
-package ru.isma.next.editor.blueprint
+package ru.isma.next.editor.blueprint.views
 
-import javafx.beans.binding.Bindings
 import javafx.event.EventHandler
 import javafx.scene.control.*
-import javafx.scene.input.MouseEvent
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.Pane
-import ru.isma.next.editor.blueprint.controls.StateBox
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
-import ru.isma.next.editor.blueprint.views.JavaFxBlueprintViewAdapter
+import ru.isma.next.editor.blueprint.viewmodels.EditorMode
+import ru.isma.next.editor.blueprint.viewmodels.IsmaBlueprintViewModel
+import ru.isma.next.editor.blueprint.viewmodels.StateViewModel
 
 class IsmaBlueprintEditor(
     editorFactory: ITextEditorFactory
 ) : BorderPane() {
 
-    private val canvas = Pane()
+    private val canvas = javafx.scene.layout.Pane()
     private val diagramTab = Tab("Diagram", javafx.scene.control.ScrollPane(canvas)).apply {
         isClosable = false
     }
     private val tabs = TabPane(diagramTab)
-    private val viewModel = IsmaBlueprintViewModel(
-        editorFactory,
-        canvas,
-        JavaFxBlueprintViewAdapter()
-    )
+    private val viewModel = IsmaBlueprintViewModel(editorFactory)
+    private val canvasView = CanvasView(canvas, viewModel.canvasViewModel) { stateVm ->
+        val tab = viewModel.openStateTextEditor(stateVm)
+        tabs.tabs.add(tab)
+    }
 
     init {
-        viewModel.onStateDoubleClick = { state: StateBox ->
-            val tab = viewModel.openStateTextEditor(state)
+        viewModel.onStateDoubleClick = { stateViewModel: StateViewModel ->
+            val tab = viewModel.openStateTextEditor(stateViewModel)
             tabs.tabs.add(tab)
-        }
-
-        canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED) { event: MouseEvent ->
-            viewModel.onCanvasDrag(event)
         }
 
         center = tabs
@@ -47,7 +41,7 @@ class IsmaBlueprintEditor(
             }
         }
 
-        val newTransitionButton = Button("New transition").apply {
+        val newTransitionButton = Button().apply {
             onAction = EventHandler {
                 if (viewModel.editorMode is EditorMode.AddTransition) {
                     viewModel.resetMode()
@@ -55,17 +49,12 @@ class IsmaBlueprintEditor(
                     viewModel.toggleAddTransition()
                 }
             }
-            textProperty().bind(Bindings.createStringBinding({
-                when (viewModel.editorMode) {
-                    is EditorMode.AddTransition -> "Stop adding transaction"
-                    else -> "New transition"
-                }
-            }, viewModel.editorModeProperty))
+            textProperty().bind(viewModel.addTransitionButtonText)
         }
 
         val separator = Separator()
 
-        val removeStateButton = Button("Remove state").apply {
+        val removeStateButton = Button().apply {
             onAction = EventHandler {
                 if (viewModel.editorMode is EditorMode.RemoveState) {
                     viewModel.resetMode()
@@ -73,15 +62,10 @@ class IsmaBlueprintEditor(
                     viewModel.toggleRemoveState()
                 }
             }
-            textProperty().bind(Bindings.createStringBinding({
-                when (viewModel.editorMode) {
-                    is EditorMode.RemoveState -> "Stop remove state"
-                    else -> "Remove state"
-                }
-            }, viewModel.editorModeProperty))
+            textProperty().bind(viewModel.removeStateButtonText)
         }
 
-        val removeTransitionButton = Button("Remove transition").apply {
+        val removeTransitionButton = Button().apply {
             onAction = EventHandler {
                 if (viewModel.editorMode is EditorMode.RemoveTransition) {
                     viewModel.resetMode()
@@ -89,12 +73,7 @@ class IsmaBlueprintEditor(
                     viewModel.toggleRemoveTransition()
                 }
             }
-            textProperty().bind(Bindings.createStringBinding({
-                when (viewModel.editorMode) {
-                    is EditorMode.RemoveTransition -> "Stop remove transition"
-                    else -> "Remove transition"
-                }
-            }, viewModel.editorModeProperty))
+            textProperty().bind(viewModel.removeTransitionButtonText)
         }
 
         return ToolBar(newStateButton, newTransitionButton, separator, removeStateButton, removeTransitionButton).apply {

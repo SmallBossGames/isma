@@ -1,4 +1,4 @@
-package ru.isma.next.editor.blueprint
+package ru.isma.next.editor.blueprint.utilities
 
 import kotlin.math.max
 

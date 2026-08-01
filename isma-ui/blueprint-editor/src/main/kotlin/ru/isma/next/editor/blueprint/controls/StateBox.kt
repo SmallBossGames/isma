@@ -1,10 +1,5 @@
 package ru.isma.next.editor.blueprint.controls
 
-import javafx.beans.binding.DoubleBinding
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.Group
@@ -12,103 +7,77 @@ import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
-import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
 import ru.isma.next.editor.blueprint.constants.*
 import ru.isma.next.editor.blueprint.utilities.ClickDisambiguator
-import ru.isma.next.editor.blueprint.utilities.getValue
-import ru.isma.next.editor.blueprint.utilities.setValue
+import ru.isma.next.editor.blueprint.viewmodels.StateViewModel
 
 class StateBox(
-    onPress: (StateBox, MouseEvent) -> Unit = { _,_ -> },
-    onRelease: (StateBox, MouseEvent) -> Unit = { _,_ -> },
-    onClick: (StateBox, MouseEvent) -> Unit = { _,_ -> },
-    onDoubleClick: (StateBox, MouseEvent) -> Unit = { _,_ -> },
+    val viewModel: StateViewModel,
+    onClick: (StateViewModel) -> Unit = {},
+    onDoubleClick: (StateViewModel) -> Unit = {},
 ) : Group() {
     private val registeredHandlers = mutableListOf<Pair<javafx.event.EventType<MouseEvent>, EventHandler<MouseEvent>>>()
 
-    val isEditModeEnabledProperty = SimpleBooleanProperty(false)
-    val isEditableProperty = SimpleBooleanProperty(true)
-    val nameProperty = SimpleStringProperty("")
-    private val isEditButtonVisibleProperty = SimpleBooleanProperty(true)
-    private val textProperty = SimpleStringProperty("")
-    private val squareWidthProperty = SimpleDoubleProperty(DEFAULT_STATE_WIDTH)
-    private val squareHeightProperty = SimpleDoubleProperty(DEFAULT_STATE_HEIGHT)
-    private val colorProperty = SimpleObjectProperty<Paint>(Color.WHITE)
-
-    private var isEditModeEnabled by isEditModeEnabledProperty
-
-    var isEditable by isEditableProperty
-    var isEditButtonVisible by isEditButtonVisibleProperty
-    var name: String by nameProperty
-    var text: String by textProperty
-    var squareWidth by squareWidthProperty
-    var squareHeight by squareHeightProperty
-    var color: Paint by colorProperty
-
-    fun centerXProperty(): DoubleBinding = layoutXProperty().add(squareWidth / 2)
-    fun centerYProperty(): DoubleBinding = layoutYProperty().add(squareHeight / 2)
-
     init {
+        layoutXProperty().bind(viewModel.xProperty)
+        layoutYProperty().bind(viewModel.yProperty)
+
         children.add(Rectangle().apply {
-            heightProperty().bind(squareHeightProperty)
-            widthProperty().bind(squareWidthProperty)
-            fillProperty().bind(colorProperty)
+            heightProperty().bind(viewModel.squareHeightProperty)
+            widthProperty().bind(viewModel.squareWidthProperty)
+            fillProperty().bind(viewModel.colorProperty)
             viewOrder = 3.0
             arcWidth = CORNER_RADIUS
             arcHeight = CORNER_RADIUS
         })
 
         val nameTextArea = TextArea().apply {
-            visibleProperty().bind(isEditModeEnabledProperty)
-            managedProperty().bind(isEditModeEnabledProperty)
-            focusedProperty().addListener { _, _, value ->
-                if (value) {
-                    text = name
+            visibleProperty().bind(viewModel.editModeProperty)
+            managedProperty().bind(viewModel.editModeProperty)
+            focusedProperty().addListener { _, _, focused ->
+                if (focused) {
+                    text = viewModel.name
                 } else {
-                    name = text
-                    isEditModeEnabled = false
+                    viewModel.name = text
+                    viewModel.commitEdit()
                 }
             }
         }
 
-        val boxLabel = Label().apply {
+        val nameLabel = Label().apply {
             font = Font("Arial", STATE_NAME_FONT_SIZE)
-            textProperty().bind(nameProperty)
-            visibleProperty().bind(!isEditModeEnabledProperty)
-            managedProperty().bind(!isEditModeEnabledProperty)
+            textProperty().bind(viewModel.nameProperty)
+            visibleProperty().bind(viewModel.editModeProperty.not())
+            managedProperty().bind(viewModel.editModeProperty.not())
         }
 
         children.add(HBox().apply {
-            prefHeightProperty().bind(squareHeightProperty.subtract(20.0))
-            prefWidthProperty().bind(squareWidthProperty.subtract(20.0))
+            prefHeightProperty().bind(viewModel.squareHeightProperty.subtract(20.0))
+            prefWidthProperty().bind(viewModel.squareWidthProperty.subtract(20.0))
             translateX += STATE_INSET
             translateY += STATE_INSET
             alignment = Pos.CENTER
-            children.add(boxLabel)
+            children.add(nameLabel)
             children.add(nameTextArea)
         })
 
         val clickDisambiguator = ClickDisambiguator(
             singleClick = {
-                if (isEditable) {
-                    isEditModeEnabled = true
+                if (viewModel.editable) {
+                    viewModel.startEdit()
                     nameTextArea.requestFocus()
                 }
-                onClick(this@StateBox, it)
+                onClick(viewModel)
             },
-            doubleClick = { onDoubleClick(this@StateBox, it) },
+            doubleClick = { onDoubleClick(viewModel) },
             clickDelay = 200L
         )
 
         val pressedHandler = EventHandler<MouseEvent> {
             clickDisambiguator.onKeyPress()
-            onPress(this@StateBox, it)
-        }
-        val releasedHandler = EventHandler<MouseEvent> {
-            onRelease(this@StateBox, it)
         }
         val draggedHandler = EventHandler<MouseEvent> {
             clickDisambiguator.onDragged()
@@ -118,13 +87,11 @@ class StateBox(
         }
 
         addEventHandler(MouseEvent.MOUSE_PRESSED, pressedHandler)
-        addEventHandler(MouseEvent.MOUSE_RELEASED, releasedHandler)
         addEventHandler(MouseEvent.MOUSE_DRAGGED, draggedHandler)
         addEventHandler(MouseEvent.MOUSE_CLICKED, clickedHandler)
 
         registeredHandlers.addAll(listOf(
             MouseEvent.MOUSE_PRESSED to pressedHandler,
-            MouseEvent.MOUSE_RELEASED to releasedHandler,
             MouseEvent.MOUSE_DRAGGED to draggedHandler,
             MouseEvent.MOUSE_CLICKED to clickedHandler
         ))

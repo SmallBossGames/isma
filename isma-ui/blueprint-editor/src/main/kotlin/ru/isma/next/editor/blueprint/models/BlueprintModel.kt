@@ -41,7 +41,7 @@ class BlueprintModel(
             val blockModel = stateBlockModels[key]
 
             if (blockModel == null) {
-                StateBlockModel(it.endStateName, key, statesMap[it.endStateName]!!.text).apply {
+                StateBlockModel(it.endStateName, key, statesMap[it.endStateName]?.text ?: "").apply {
                     inputStates.add(it.startStateName)
                     stateBlockModels[key] = this
                 }
@@ -93,11 +93,16 @@ private class StateBlockModel(val stateName: String, val transactionKey: String,
             .appendLine(text)
             .append("} from ")
 
-        inputStates.forEach {
-            sb.append("$it,")
+        if (inputStates.isEmpty()) {
+            val fromIndex = sb.lastIndexOf("from ")
+            if (fromIndex >= 0) {
+                sb.delete(fromIndex, sb.length)
+            }
+            sb.append(';')
+        } else {
+            inputStates.forEach { sb.append("$it,") }
+            sb[sb.lastIndex] = ';'
         }
-
-        sb[sb.lastIndex] = ';'
 
         return sb.toString()
     }
@@ -114,7 +119,7 @@ private fun BlueprintLoopTransactionModel.toLisma(states: Map<String, BlueprintS
         appendLine()
 
         appendLine("state $stateName ($LISMA_TRUE) {")
-        appendLine(states[stateName]!!.text)
+        appendLine(states[stateName]?.text ?: "")
         appendLine("} from ${pseudoStateName};")
 
         appendLine()

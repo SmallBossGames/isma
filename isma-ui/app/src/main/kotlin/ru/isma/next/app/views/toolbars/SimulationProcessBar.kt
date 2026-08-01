@@ -32,7 +32,11 @@ class SimulationProcessBar(
             Button().apply {
                 text = "Tasks"
                 onAction = EventHandler {
-                    tasksPopOver.show(this)
+                    if (tasksPopOver.isShowing) {
+                        tasksPopOver.hide()
+                    } else {
+                        tasksPopOver.show(this)
+                    }
                 }
             }
         )

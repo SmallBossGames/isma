@@ -23,16 +23,18 @@ class SimulationResultService(
     private val uiThreadExecutor: UiThreadExecutor,
 ) {
 
+    private val resultServiceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
     private val fileFilers = arrayOf(
         FileChooser.ExtensionFilter("Comma separate file", "*.csv")
     )
 
     fun removeResult(task: SimulationTask) = uiThreadExecutor.executeOnUi {
-        SimulationTask.ALL.remove(task)
+        simulationTaskService.tasks.remove(task)
         task.result = null
     }
 
-    fun showChart(task: SimulationTask) = ResultServiceScope.launch {
+    fun showChart(task: SimulationTask) = resultServiceScope.launch {
         val result = task.result ?: return@launch
         val headerColumnPairs = result.cachedColumnNames.mapIndexed { i, header ->
             NamedPickerItem(header, i)
@@ -61,7 +63,7 @@ class SimulationResultService(
             return@run showSaveDialog(ownerWindow)
         } ?: return
 
-        ResultServiceScope.launch {
+        resultServiceScope.launch {
             exportToFileAsync(result, file)
         }
     }
@@ -104,12 +106,14 @@ class SimulationResultService(
         return builder.toString()
     }
 
+    fun close() {
+        resultServiceScope.cancel()
+    }
+
     companion object {
         private const val COMMA_AND_SPACE = ", "
         private const val RHS_DE_PART_IDX = 0
         private const val RHS_AE_PART_IDX = 1
-
-        private val ResultServiceScope = CoroutineScope(Dispatchers.Default)
 
         private fun buildHeader(result: CompletedSimulationModel): String {
             val header = StringBuilder()

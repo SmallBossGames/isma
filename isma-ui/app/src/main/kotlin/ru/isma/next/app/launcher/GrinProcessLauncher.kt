@@ -7,6 +7,7 @@ class GrinProcessLauncher() {
     companion object {
         private const val ENV_VAR = "ISMA_GRIN_SCRIPT"
         private const val PROP_NAME = "isma.grin.script"
+        private var shutdownHookRegistered = false
 
         fun resolveGrinScriptPath(): String? {
             return System.getenv(ENV_VAR)
@@ -44,7 +45,10 @@ class GrinProcessLauncher() {
             .redirectErrorStream(true)
             .start()
 
-        Runtime.getRuntime().addShutdownHook(Thread { stop() })
+        if (!shutdownHookRegistered) {
+            Runtime.getRuntime().addShutdownHook(Thread { stop() })
+            shutdownHookRegistered = true
+        }
     }
 
     fun stop() {

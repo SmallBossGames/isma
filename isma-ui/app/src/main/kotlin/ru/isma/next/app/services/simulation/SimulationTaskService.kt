@@ -1,18 +1,19 @@
 package ru.isma.next.app.services.simulation
 
+import io.grpc.StatusException
+import io.grpc.StatusRuntimeException
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import org.koin.core.component.KoinComponent
 import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
-import javafx.collections.ObservableList
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.models.simulation.SimulationTaskStatus
 import ru.isma.next.app.services.ModelErrorService
 import ru.isma.next.app.services.project.IProjectService
-import ru.isma.next.app.services.project.ProjectService
 import ru.isma.next.external.BinaryEquationIndexProvider
 import ru.isma.next.external.SimulationServerFacade
 import ru.isma.next.external.dtos.CachedSimulationResult
@@ -28,46 +29,50 @@ class SimulationTaskService(
     private val modelErrorService: ModelErrorService,
     private val projectService: IProjectService,
     private val uiThreadExecutor: UiThreadExecutor,
-) : ISimulationTaskService, KoinComponent {
+) : ISimulationTaskService, KoinComponent, AutoCloseable {
 
-    override val tasks: ObservableList<SimulationTask> = SimulationTask.ALL
+    override val tasks: ObservableList<SimulationTask> = FXCollections.observableArrayList()
 
     private val currentJobs = mutableMapOf<SimulationTask, Job>()
     private var nextId = 1L
 
+    private val virtualThreadDispatcher = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
+    private val simulationScope = CoroutineScope(virtualThreadDispatcher + SupervisorJob())
+
+    override fun close() {
+        simulationScope.cancel()
+        virtualThreadDispatcher.cancel()
+    }
+
     override fun submit(
         modelName: String,
-        params: RunSimulationParams,
         simulationParameters: SimulationParametersModel,
     ): SimulationTask {
         val task = SimulationTask(nextId++, modelName, simulationParameters)
 
-        val job = SimulationScope.launch {
-            var compileResult: CompileResult? = null
-
-            // Phase 1: Compile
-            try {
-                val sourceCode = projectService.activeProject?.snapshot()?.fullText ?: run {
-                    uiThreadExecutor.executeOnUi {
-                        task.setStatus(SimulationTaskStatus.FAILED)
-                        task.setError("No active project")
-                    }
-                    return@launch
+        val job = simulationScope.launch {
+            val sourceCode = projectService.activeProject?.snapshot()?.fullText ?: run {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("No active project")
                 }
-                compileResult = serverFacade.compileModel(sourceCode)
+                return@launch
+            }
 
-                val errorViewModels = compileResult.errors.map { error: CompilationErrorDto ->
-                    ErrorViewModel(error.row, error.column, "LISMA", error.message)
+            val compileResult = try {
+                serverFacade.compileModel(sourceCode)
+            } catch (e: StatusException) {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("Compilation error: ${e.status.description}: ${e.message}")
                 }
-                modelErrorService.putErrorList(errorViewModels)
-
-                if (compileResult!!.errors.isNotEmpty()) {
-                    uiThreadExecutor.executeOnUi {
-                        task.setStatus(SimulationTaskStatus.FAILED)
-                        task.setError("Compilation failed: ${compileResult.errors.joinToString("; ")}")
-                    }
-                    return@launch
+                return@launch
+            } catch (e: StatusRuntimeException) {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("Compilation error: ${e.status.description}: ${e.message}")
                 }
+                return@launch
             } catch (e: Exception) {
                 uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
@@ -78,18 +83,41 @@ class SimulationTaskService(
                 throw e
             }
 
-            // Phase 2: Run
-            val runParams = simulationParameters.toRunSimulationParams(compileResult!!.modelId)
+            val errorViewModels = compileResult.errors.map { error: CompilationErrorDto ->
+                ErrorViewModel(error.row, error.column, "LISMA", error.message)
+            }
+            modelErrorService.putErrorList(errorViewModels)
+
+            if (compileResult.errors.isNotEmpty()) {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("Compilation failed: ${compileResult.errors.joinToString("; ")}")
+                }
+                return@launch
+            }
+
+            val runParams = simulationParameters.toRunSimulationParams(compileResult.modelId)
             val simulationId = serverFacade.runSimulation(runParams)
 
             uiThreadExecutor.executeOnUi { tasks.add(task) }
 
-            // Phase 3: Monitor
             try {
                 serverFacade.monitorSimulation(simulationId, MONITORING_POLL_INTERVAL_SECONDS).collect { progress ->
                     val normalized = ((progress.currentTime - progress.startTime) / (progress.endTime - progress.startTime)).coerceIn(0.0, 1.0)
                     uiThreadExecutor.executeOnUi { task.setProgress(normalized) }
                 }
+            } catch (e: StatusException) {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("Monitor error: ${e.status.description}: ${e.message}")
+                }
+                return@launch
+            } catch (e: StatusRuntimeException) {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("Monitor error: ${e.status.description}: ${e.message}")
+                }
+                return@launch
             } catch (e: Exception) {
                 uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
@@ -100,7 +128,6 @@ class SimulationTaskService(
                 throw e
             }
 
-            // Phase 4: Download result
             try {
                 val cachedResult: CachedSimulationResult = serverFacade.downloadResultToCache(simulationId)
                 val resultModel = CompletedSimulationModel(
@@ -119,6 +146,16 @@ class SimulationTaskService(
                     task.setStatus(SimulationTaskStatus.COMPLETED)
                     task.setProgress(1.0)
                 }
+            } catch (e: StatusException) {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("Download error: ${e.status.description}: ${e.message}")
+                }
+            } catch (e: StatusRuntimeException) {
+                uiThreadExecutor.executeOnUi {
+                    task.setStatus(SimulationTaskStatus.FAILED)
+                    task.setError("Download error: ${e.status.description}: ${e.message}")
+                }
             } catch (e: Exception) {
                 uiThreadExecutor.executeOnUi {
                     task.setStatus(SimulationTaskStatus.FAILED)
@@ -136,13 +173,11 @@ class SimulationTaskService(
 
     override fun cancelTask(task: SimulationTask) {
         task.id.let { serverFacade.cancelSimulation(it) }
-        currentJobs.values.find { it == task }?.cancel()
+        currentJobs[task]?.cancel()
     }
 
     companion object {
         private const val MONITORING_POLL_INTERVAL_SECONDS = 0.01
-        private val virtualThreadDispatcher = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
-        val SimulationScope = CoroutineScope(virtualThreadDispatcher + SupervisorJob())
     }
 }
 

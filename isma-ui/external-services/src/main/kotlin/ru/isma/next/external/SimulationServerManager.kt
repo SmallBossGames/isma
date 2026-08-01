@@ -14,6 +14,7 @@ class SimulationServerManager(
     companion object {
         private const val ENV_VAR = "ISMA_SERVER_SCRIPT"
         private const val PROP_NAME = "isma.server.script"
+        private var shutdownHookRegistered = false
 
         private fun resolveServerScriptPath(): String {
             return System.getenv(ENV_VAR)
@@ -28,10 +29,13 @@ class SimulationServerManager(
     private var process: Process? = null
     private var socketPaths: SocketPaths? = null
     private var shutdownHook: Thread? = null
+    private val runningLock = Any()
     @Volatile private var running = false
 
     fun start(): SocketPaths {
-        if (running) return socketPaths!!
+        synchronized(runningLock) {
+            if (running) return socketPaths!!
+        }
 
         val file = File(scriptPath)
         require(file.exists()) { "isma-server script not found at: $scriptPath" }
@@ -40,10 +44,17 @@ class SimulationServerManager(
             .redirectErrorStream(true)
             .start()
 
-        val reader = process!!.inputStream.bufferedReader()
+        val proc = process ?: throw IllegalStateException("Process not initialized")
+        val reader = proc.inputStream.bufferedReader()
         val lines = mutableListOf<String>()
-        
+
+        val startTime = System.currentTimeMillis()
+        val timeoutMs = 30_000L
         while (lines.size < 4) {
+            val elapsed = System.currentTimeMillis() - startTime
+            if (elapsed >= timeoutMs) {
+                throw IllegalStateException("isma-server startup timed out after ${timeoutMs / 1000}s")
+            }
             val line = reader.readLine() ?: break
             if (line.startsWith("WARNING:") || line.startsWith("SLF4J:") || line.isBlank()) continue
             if (line.contains(" INFO ") || line.contains(" WARN ")) continue
@@ -65,19 +76,30 @@ class SimulationServerManager(
             ?: throw IllegalStateException("HTTP socket not found in server output")
 
         socketPaths = SocketPaths(grpc = grpcSocket, http = httpSocket)
-        running = true
+        synchronized(runningLock) {
+            running = true
+        }
         logger.info("isma-server started on gRPC socket: ${socketPaths!!.grpc}")
         logger.info("isma-server started on HTTP socket: ${socketPaths!!.http}")
 
-        shutdownHook = Thread { stop() }
-        Runtime.getRuntime().addShutdownHook(shutdownHook!!)
+        if (!shutdownHookRegistered) {
+            shutdownHook = Thread { stop() }
+            Runtime.getRuntime().addShutdownHook(shutdownHook!!)
+            shutdownHookRegistered = true
+        }
         return socketPaths!!
     }
 
     fun stop() {
-        if (!running) return
-        running = false
-        shutdownHook?.let { Runtime.getRuntime().removeShutdownHook(it) }
+        synchronized(runningLock) {
+            if (!running) return
+            running = false
+        }
+        try {
+            shutdownHook?.let { Runtime.getRuntime().removeShutdownHook(it) }
+        } catch (e: IllegalArgumentException) {
+            // Hook was already removed (by JVM during shutdown or by a previous stop() call)
+        }
         shutdownHook = null
         process?.destroy()
         process = null

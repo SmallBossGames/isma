@@ -61,7 +61,7 @@ class IsmaApplication : Application(), KoinComponent {
         minHeight = 500.0
         minWidth = 600.0
 
-        projectFileService.open(*defaultFilesPreferences.lastOpenedProjectPath)
+        projectFileService.open(*defaultFilesPreferences.lastOpenedProjectPath.filterNotNull().toTypedArray())
     }
 
     private fun Stage.tearDownWindow() {

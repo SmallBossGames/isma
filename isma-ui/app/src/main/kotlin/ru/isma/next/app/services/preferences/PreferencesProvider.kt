@@ -15,14 +15,22 @@ class PreferencesProvider(private val settingsFilePath: String) {
         val file = File(settingsFilePath)
 
         return if(file.exists()) {
-            Json.decodeFromString(file.readText())
+            try {
+                Json.decodeFromString(file.readText())
+            } catch (e: Exception) {
+                PreferencesModel()
+            }
         } else {
             PreferencesModel()
         }
     }
 
     private fun store() {
-        File(settingsFilePath).writeText(Json.encodeToString(preferences))
+        try {
+            File(settingsFilePath).writeText(Json.encodeToString(preferences))
+        } catch (e: java.io.IOException) {
+            e.printStackTrace()
+        }
     }
 
     fun commit(windowPreferences: WindowPreferencesModel){

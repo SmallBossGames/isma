@@ -28,7 +28,9 @@ class IsmaBlueprintViewModel(
     val editorModeProperty = SimpleObjectProperty<EditorMode>(EditorMode.Idle)
     var editorMode: EditorMode
         get() = editorModeProperty.value
-        private set(value) { editorModeProperty.value = value }
+        private set(value) {
+            editorModeProperty.value = value
+        }
 
     var onStateDoubleClick: (StateBox) -> Unit = {}
 
@@ -102,8 +104,8 @@ class IsmaBlueprintViewModel(
             }
 
             val states = (editorMode as EditorMode.AddTransition).selectedStates
-            val state1 = states[0]!!
-            val state2 = states[1]!!
+            val state1 = states[0]
+            val state2 = states[1]
 
             if (state1 === state2) {
                 addLoopArrow(state1, "", "", "")
@@ -192,7 +194,8 @@ class IsmaBlueprintViewModel(
         val init = initStateBox.toBlueprintState()
         val states = canvasViewModel.states.map { (it.node as StateBox).toBlueprintState() }.toTypedArray()
         val blueprintTransactions = canvasViewModel.transactions.map { it.toBlueprintTransaction() }.toTypedArray()
-        val blueprintLoopTransactions = canvasViewModel.loopTransactions.map { it.toBlueprintLoopTransaction() }.toTypedArray()
+        val blueprintLoopTransactions =
+            canvasViewModel.loopTransactions.map { it.toBlueprintLoopTransaction() }.toTypedArray()
 
         return BlueprintModel(main, init, states, blueprintTransactions, blueprintLoopTransactions)
     }
@@ -226,21 +229,18 @@ class IsmaBlueprintViewModel(
         }
 
         model.transactions.forEach {
-            addTransactionArrow(
-                stateMap[it.startStateName]!!,
-                stateMap[it.endStateName]!!,
-                it.predicate,
-                it.alias,
-            )
+            val startBox = stateMap[it.startStateName]
+            val endBox = stateMap[it.endStateName]
+            if (startBox != null && endBox != null) {
+                addTransactionArrow(startBox, endBox, it.predicate, it.alias)
+            }
         }
 
         model.loopTransactions.forEach { loopTransaction ->
-            addLoopArrow(
-                stateMap[loopTransaction.stateName]!!,
-                loopTransaction.text,
-                loopTransaction.predicate,
-                loopTransaction.alias
-            )
+            val stateBox = stateMap[loopTransaction.stateName]
+            if (stateBox != null) {
+                addLoopArrow(stateBox, loopTransaction.text, loopTransaction.predicate, loopTransaction.alias)
+            }
         }
     }
 

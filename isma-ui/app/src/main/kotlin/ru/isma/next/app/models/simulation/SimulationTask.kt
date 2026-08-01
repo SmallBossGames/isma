@@ -1,7 +1,6 @@
 package ru.isma.next.app.models.simulation
 
 import javafx.beans.property.*
-import javafx.collections.FXCollections
 
 enum class SimulationTaskStatus {
     RUNNING,
@@ -32,8 +31,4 @@ class SimulationTask(
     fun setError(e: String?) { _error.value = e }
 
     var result: CompletedSimulationModel? = null
-
-    companion object {
-        val ALL = FXCollections.observableArrayList<SimulationTask>()
-    }
 }

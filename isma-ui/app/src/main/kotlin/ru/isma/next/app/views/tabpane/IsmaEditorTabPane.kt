@@ -4,6 +4,8 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.merge
@@ -17,11 +19,12 @@ import ru.isma.next.app.services.project.IProjectService
 
 class IsmaEditorTabPane(
     private val projectController: IProjectService,
-): TabPane(), KoinComponent {
-    private val coroutinesScope = CoroutineScope(Dispatchers.JavaFx)
+): TabPane(), KoinComponent, AutoCloseable {
+    private val _coroutinesScope = CoroutineScope(Dispatchers.JavaFx)
+    private var _collectJob: Job? = null
 
     init {
-        coroutinesScope.launch {
+        _collectJob = _coroutinesScope.launch {
             // Initial emission of all existing projects, then stream of new additions
             merge(
                 projectController.projects.asIterable().asFlow(),
@@ -34,6 +37,11 @@ class IsmaEditorTabPane(
                 )
             }
         }
+    }
+
+    override fun close() {
+        _collectJob?.cancel()
+        _coroutinesScope.coroutineContext.cancel()
     }
 
     private fun Tab.initProjectTab(project: IProjectModel) {

@@ -10,7 +10,7 @@ import java.io.File
 class HttpSimulationClient(
     private val socketPath: String,
     private val timeoutSeconds: Long = 30,
-) {
+) : AutoCloseable {
     private val client = HttpClient(CIO) {
         engine {
             requestTimeout = timeoutSeconds * 1000
@@ -29,7 +29,7 @@ class HttpSimulationClient(
         }
     }
 
-    fun close() {
+    override fun close() {
         client.close()
     }
 }

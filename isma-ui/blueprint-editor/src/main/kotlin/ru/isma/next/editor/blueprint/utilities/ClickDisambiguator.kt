@@ -33,6 +33,7 @@ class ClickDisambiguator(
     fun cancel() {
         pendingSingleClick?.cancel()
         pendingSingleClick = null
+        lastEvent = null
     }
 
     private fun handleSingleClick() {
@@ -40,7 +41,9 @@ class ClickDisambiguator(
             pendingSingleClick = coroutineScope.launch {
                 delay(clickDelay.milliseconds)
                 pendingSingleClick = null
-                if (!isDragged) singleClick(lastEvent!!)
+                val event = lastEvent
+                lastEvent = null
+                if (!isDragged && event != null) singleClick(event)
             }
         }
     }

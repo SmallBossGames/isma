@@ -26,6 +26,14 @@ class GrpcLismaCompilerClient(socketPath: String) {
 
     fun shutdown() {
         channel.shutdown()
-        handle.eventLoop.shutdownGracefully()
+        try {
+            if (!channel.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                channel.shutdownNow()
+            }
+        } catch (e: InterruptedException) {
+            channel.shutdownNow()
+            Thread.currentThread().interrupt()
+        }
+        handle.eventLoop.shutdownGracefully().sync()
     }
 }

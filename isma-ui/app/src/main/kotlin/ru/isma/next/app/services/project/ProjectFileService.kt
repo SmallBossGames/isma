@@ -60,7 +60,7 @@ class ProjectFileService(private val projectController: IProjectService) {
                     this.name = file.name
                     this.file = file
                     this.lismaText = file.readText()
-                    (projectController as ProjectService).addText(this)
+                    projectController.addText(this)
                 }
             }
             STATE_CHART_ISMA_PROJECT_FILE.contains(file.extension) -> {
@@ -68,7 +68,7 @@ class ProjectFileService(private val projectController: IProjectService) {
                     this.name = file.name
                     this.file = file
                     this.blueprint = Json.decodeFromString(file.readText())
-                    (projectController as ProjectService).addBlueprint(this)
+                    projectController.addBlueprint(this)
                 }
             }
             else -> {

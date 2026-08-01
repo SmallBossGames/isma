@@ -20,11 +20,8 @@ class SimulationService(
         val simulationParameters = simulationParametersService.snapshot()
         val project = projectService.activeProject ?: return
 
-        val runParams = simulationParameters.toRunSimulationParams("")
-
         simulationTaskService.submit(
             modelName = project.name,
-            params = runParams,
             simulationParameters = simulationParameters,
         )
     }

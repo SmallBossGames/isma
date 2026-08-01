@@ -4,7 +4,7 @@ import javafx.beans.property.*
 import javafx.beans.value.*
 import kotlin.reflect.KProperty
 
-operator fun <T> ObservableValue<T>.getValue(thisRef: Any, property: KProperty<*>) = value!!
+operator fun <T> ObservableValue<T>.getValue(thisRef: Any, property: KProperty<*>) = value ?: throw IllegalStateException("Property ${property.name} has null value")
 operator fun <T> Property<T>.setValue(thisRef: Any, property: KProperty<*>, value: T?) = setValue(value)
 
 operator fun ObservableDoubleValue.getValue(thisRef: Any, property: KProperty<*>) = get()

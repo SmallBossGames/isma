@@ -5,8 +5,6 @@ module isma.ui.editor.blueprint {
     requires javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;
-    requires kotlinx.coroutines.core;
-    requires kotlinx.coroutines.javafx;
 
     exports ru.isma.next.editor.blueprint;
     exports ru.isma.next.editor.blueprint.constants;

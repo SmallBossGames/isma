@@ -1,18 +1,18 @@
 package ru.isma.next.editor.blueprint.utilities
 
+import javafx.animation.KeyFrame
+import javafx.animation.Timeline
 import javafx.scene.input.MouseEvent
-import kotlinx.coroutines.*
-import kotlin.time.Duration.Companion.milliseconds
+import javafx.util.Duration
 
 class ClickDisambiguator(
-    private val coroutineScope: CoroutineScope,
     private val singleClick: (MouseEvent) -> Unit,
     private val doubleClick: (MouseEvent) -> Unit,
-    private val clickDelay: Long = 200L
+    private val clickDelay: Long = 200L,
 ) {
-    private var pendingSingleClick: Job? = null
-    private var isDragged = false
+    private var pendingTimeline: Timeline? = null
     private var lastEvent: MouseEvent? = null
+    private var isDragged = false
 
     fun onKeyPress() {
         isDragged = false
@@ -23,6 +23,7 @@ class ClickDisambiguator(
     }
 
     fun onClick(event: MouseEvent) {
+        if (isDragged) return
         lastEvent = event
         when (event.clickCount) {
             1 -> handleSingleClick()
@@ -31,26 +32,29 @@ class ClickDisambiguator(
     }
 
     fun cancel() {
-        pendingSingleClick?.cancel()
-        pendingSingleClick = null
+        pendingTimeline?.stop()
+        pendingTimeline = null
         lastEvent = null
     }
 
     private fun handleSingleClick() {
-        if (pendingSingleClick == null) {
-            pendingSingleClick = coroutineScope.launch {
-                delay(clickDelay.milliseconds)
-                pendingSingleClick = null
+        pendingTimeline?.stop()
+        val timeline = Timeline(
+            KeyFrame(Duration.millis(clickDelay.toDouble()), {
+                pendingTimeline = null
                 val event = lastEvent
                 lastEvent = null
                 if (!isDragged && event != null) singleClick(event)
-            }
-        }
+            })
+        )
+        timeline.cycleCount = 1
+        timeline.play()
+        pendingTimeline = timeline
     }
 
     private fun handleDoubleClick() {
-        pendingSingleClick?.cancel()
-        pendingSingleClick = null
+        pendingTimeline?.stop()
+        pendingTimeline = null
         doubleClick(lastEvent!!)
     }
 }

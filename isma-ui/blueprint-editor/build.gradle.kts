@@ -14,8 +14,6 @@ javafx {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.javafx)
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.3.20")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")

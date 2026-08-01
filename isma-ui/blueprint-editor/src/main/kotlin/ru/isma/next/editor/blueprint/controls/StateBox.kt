@@ -17,7 +17,6 @@ import javafx.scene.paint.Paint
 import javafx.scene.shape.Rectangle
 import javafx.scene.text.Font
 import ru.isma.next.editor.blueprint.constants.*
-import ru.isma.next.editor.blueprint.controls.CoroutineScopeProvider
 import ru.isma.next.editor.blueprint.utilities.ClickDisambiguator
 import ru.isma.next.editor.blueprint.utilities.getValue
 import ru.isma.next.editor.blueprint.utilities.setValue
@@ -93,7 +92,6 @@ class StateBox(
         })
 
         val clickDisambiguator = ClickDisambiguator(
-            coroutineScope = CoroutineScopeProvider.scope,
             singleClick = {
                 if (isEditable) {
                     isEditModeEnabled = true
@@ -101,7 +99,8 @@ class StateBox(
                 }
                 onClick(this@StateBox, it)
             },
-            doubleClick = { onDoubleClick(this@StateBox, it) }
+            doubleClick = { onDoubleClick(this@StateBox, it) },
+            clickDelay = 200L
         )
 
         val pressedHandler = EventHandler<MouseEvent> {

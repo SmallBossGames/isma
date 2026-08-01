@@ -1,7 +1,5 @@
 module isma.ui.editor.blueprint {
     requires kotlin.stdlib;
-    requires kotlinx.serialization.core;
-    requires kotlinx.serialization.json;
     requires javafx.graphics;
     requires javafx.controls;
     requires javafx.fxml;

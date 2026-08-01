@@ -10,6 +10,7 @@ import ru.isma.next.app.constants.TEXT_ISMA_PROJECT_FILE
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
+import ru.isma.next.app.services.blueprint.BlueprintModelSerializer
 import ru.isma.next.app.services.project.IProjectService
 import java.io.File
 
@@ -67,7 +68,7 @@ class ProjectFileService(private val projectController: IProjectService) {
                 BlueprintProjectModel().apply {
                     this.name = file.name
                     this.file = file
-                    this.blueprint = Json.decodeFromString(file.readText())
+                    this.blueprint = BlueprintModelSerializer.fromJson(file.readText())
                     projectController.addBlueprint(this)
                 }
             }
@@ -93,7 +94,7 @@ class ProjectFileService(private val projectController: IProjectService) {
                 project.lismaText
             }
             is BlueprintProjectModel -> {
-                Json.encodeToString(project.blueprint)
+                BlueprintModelSerializer.toJson(project.blueprint)
             }
             else -> {
                 throw NotImplementedError()
@@ -114,7 +115,7 @@ class ProjectFileService(private val projectController: IProjectService) {
             }
             is BlueprintProjectModel -> {
                 filters = stateChartProjectFileFilters
-                fileOutput = Json.encodeToString(project.blueprint)
+                fileOutput = BlueprintModelSerializer.toJson(project.blueprint)
             }
             else -> {
                 throw NotImplementedError()

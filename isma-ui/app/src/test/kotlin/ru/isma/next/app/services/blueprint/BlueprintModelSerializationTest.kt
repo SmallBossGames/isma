@@ -1,10 +1,14 @@
-package ru.isma.next.editor.blueprint.models
+package ru.isma.next.app.services.blueprint
 
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
+import ru.isma.next.editor.blueprint.models.BlueprintLoopTransactionModel
+import ru.isma.next.editor.blueprint.models.BlueprintModel
+import ru.isma.next.editor.blueprint.models.BlueprintStateModel
+import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
 
 class BlueprintModelSerializationTest {
     private val json = Json {
@@ -15,8 +19,8 @@ class BlueprintModelSerializationTest {
     @Test
     fun `empty model serializes and deserializes`() {
         val model = BlueprintModel.empty
-        val serialized = json.encodeToString(BlueprintModel.serializer(), model)
-        val deserialized = json.decodeFromString(BlueprintModel.serializer(), serialized)
+        val serialized = BlueprintModelSerializer.toJson(model)
+        val deserialized = BlueprintModelSerializer.fromJson(serialized)
 
         assertEquals(model.main.name, deserialized.main.name)
         assertEquals(model.init.name, deserialized.init.name)
@@ -42,8 +46,8 @@ class BlueprintModelSerializationTest {
             )
         )
 
-        val serialized = json.encodeToString(BlueprintModel.serializer(), model)
-        val deserialized = json.decodeFromString(BlueprintModel.serializer(), serialized)
+        val serialized = BlueprintModelSerializer.toJson(model)
+        val deserialized = BlueprintModelSerializer.fromJson(serialized)
 
         assertEquals(2, deserialized.states.size)
         assertEquals("State A", deserialized.states[0].name)
@@ -72,8 +76,8 @@ class BlueprintModelSerializationTest {
             loopTransactions = emptyArray()
         )
 
-        val serialized = json.encodeToString(BlueprintModel.serializer(), model)
-        val deserialized = json.decodeFromString(BlueprintModel.serializer(), serialized)
+        val serialized = BlueprintModelSerializer.toJson(model)
+        val deserialized = BlueprintModelSerializer.fromJson(serialized)
 
         assertEquals(10.5, deserialized.main.canvasPositionX, 0.0001)
         assertEquals(20.7, deserialized.main.canvasPositionY, 0.0001)
@@ -93,7 +97,7 @@ class BlueprintModelSerializationTest {
             }
         """.trimIndent()
 
-        val deserialized = json.decodeFromString(BlueprintModel.serializer(), jsonStr)
+        val deserialized = BlueprintModelSerializer.fromJson(jsonStr)
         assertTrue(deserialized.loopTransactions.isEmpty())
     }
 }

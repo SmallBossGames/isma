@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.java.modules)
 
@@ -13,8 +12,6 @@ javafx {
 }
 
 dependencies {
-    implementation(libs.kotlinx.serialization.json)
-
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.3.20")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

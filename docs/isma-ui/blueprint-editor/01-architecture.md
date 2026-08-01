@@ -79,7 +79,7 @@ sequenceDiagram
     participant VM as IsmaBlueprintViewModel
     participant CVM as CanvasViewModel
     participant BM as BlueprintModel
-    participant JSON as kotlinx.serialization
+    participant BMS as BlueprintModelSerializer
     participant File as .scisma file
 
     App->>Editor: getBlueprintModel()
@@ -101,8 +101,8 @@ sequenceDiagram
     VM->>BM: Assemble BlueprintModel(main, init, states, transactions, loopTransactions)
     BM-->>Editor: BlueprintModel
     Editor-->>App: BlueprintModel
-    App->>JSON: encodeToString(BM)
-    JSON->>File: Write JSON
+    App->>BMS: toJson(model)
+    BMS->>File: Write JSON
 ```
 
 1. `getBlueprintModel()` is called on `IsmaBlueprintEditor`
@@ -113,7 +113,7 @@ sequenceDiagram
 6. Each `EditorLoopTransaction` in `CanvasViewModel.loopTransactions` is converted via `toBlueprintLoopTransaction()`: extracts state name, predicate, alias, text
 7. A `BlueprintModel` is assembled from main, init, states, transactions, and loopTransactions
 8. The `BlueprintModel` is returned to the editor and then to the app module
-9. `kotlinx.serialization` converts the model to JSON, which is written to a `.scisma` file
+9. `BlueprintModelSerializer.toJson()` converts the model to JSON, which is written to a `.scisma` file
 
 See `IsmaBlueprintViewModel.kt` for the full implementation.
 
@@ -123,15 +123,15 @@ See `IsmaBlueprintViewModel.kt` for the full implementation.
 sequenceDiagram
     participant App as App Module
     participant File as .scisma file
-    participant JSON as kotlinx.serialization
+    participant BMS as BlueprintModelSerializer
     participant Editor as IsmaBlueprintEditor
     participant VM as IsmaBlueprintViewModel
     participant CVM as CanvasViewModel
     participant Canvas as Canvas Pane
 
-    App->>File: Read JSON
-    File->>JSON: Parse JSON string
-    JSON->>BM: BlueprintModel
+    App->>File: Read JSON string
+    App->>BMS: fromJson(json)
+    BMS->>BM: BlueprintModel
     BM-->>App: BlueprintModel
     App->>Editor: setBlueprintModel(model)
     Editor->>VM: fromBlueprintModel(model)
@@ -159,17 +159,18 @@ sequenceDiagram
     VM->>VM: Bind all arrow geometry to state centers
 ```
 
-1. `setBlueprintModel(model)` is called on `IsmaBlueprintEditor`
-2. `fromBlueprintModel(model)` is called on `IsmaBlueprintViewModel`
-3. All existing user state boxes are removed from `CanvasViewModel` (calling `removeState(it.model)` for each) and from the canvas pane (calling `removeNodeFromCanvas(canvas, it.node)`)
-4. `clearCanvas()` removes all remaining children from the canvas `Pane`
-5. Main and Init state data is applied onto the fixed state boxes via `applyBlueprintState()`
-6. Main and Init boxes are added back to the canvas via `addNodeToCanvas()`
-7. A name → StateBox map is built including Main, Init, and new states
-8. New `StateBox` instances are created from `model.states` via `instantiateStateBoxFromBlueprintState`, added to `CanvasViewModel`, and added to the canvas
-9. For each `BlueprintTransactionModel`, start/end states are looked up by name and a `TransactionArrow` is created
-10. For each `BlueprintLoopTransactionModel`, a `LoopTransactionArrow` is created
-11. All arrows bind their geometry to the state box centers
+1. `fromJson(json)` is called on `BlueprintModelSerializer` (app module), which parses the JSON string into `BlueprintModel`
+2. `setBlueprintModel(model)` is called on `IsmaBlueprintEditor`
+3. `fromBlueprintModel(model)` is called on `IsmaBlueprintViewModel`
+4. All existing user state boxes are removed from `CanvasViewModel` (calling `removeState(it.model)` for each) and from the canvas pane (calling `removeNodeFromCanvas(canvas, it.node)`)
+5. `clearCanvas()` removes all remaining children from the canvas `Pane`
+6. Main and Init state data is applied onto the fixed state boxes via `applyBlueprintState()`
+7. Main and Init boxes are added back to the canvas via `addNodeToCanvas()`
+8. A name → StateBox map is built including Main, Init, and new states
+9. New `StateBox` instances are created from `model.states` via `instantiateStateBoxFromBlueprintState`, added to `CanvasViewModel`, and added to the canvas
+10. For each `BlueprintTransactionModel`, start/end states are looked up by name and a `TransactionArrow` is created
+11. For each `BlueprintLoopTransactionModel`, a `LoopTransactionArrow` is created
+12. All arrows bind their geometry to the state box centers
 
 See `IsmaBlueprintViewModel.kt` for the full implementation.
 
@@ -233,13 +234,13 @@ The editor lifecycle is: Create → Tab opened → onTextChanged fires on edits 
 
 1. User clicks Save (Ctrl+S) or Save All
 2. `project.blueprint` triggers `fetchBlueprint()` → `dataProvider.blueprint` → `blueprintEditor.getBlueprintModel()`
-3. The `BlueprintModel` is serialized to JSON via `kotlinx.serialization`
+3. `BlueprintModelSerializer.toJson()` converts the `BlueprintModel` to JSON
 4. JSON is written to the `.scisma` file
 
 ### Blueprint Project Load
 
 1. User opens a `.scisma` file (File → Open, filter `*.scisma`)
-2. JSON is parsed into `BlueprintModel`
+2. `BlueprintModelSerializer.fromJson()` parses the JSON string into `BlueprintModel`
 3. `project.blueprint = model` triggers `pushBlueprint()` → `dataProvider.blueprint = model` → `blueprintEditor.setBlueprintModel(model)`
 4. `setBlueprintModel` rebuilds the canvas from the model
 

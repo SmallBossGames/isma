@@ -68,15 +68,15 @@ The argument order is swapped compared to the standard polar angle convention. T
 
 ## ClickDisambiguator
 
-### 200ms Delayed Coroutine Approach
+### 200ms Delayed JavaFX Timeline Approach
 
-Distinguishes single-clicks from drag operations using a delayed coroutine. Source: `ClickDisambiguator.kt` (53 lines).
+Distinguishes single-clicks from drag operations using a JavaFX `Timeline`. Source: `ClickDisambiguator.kt` (57 lines).
 
-The flow is: `MOUSE_PRESSED` sets `isDragged = false` and schedules a 200ms check. `MOUSE_DRAGGED` sets `isDragged = true`. After 200ms, if `!isDragged` triggers the `singleClick` callback; if `isDragged`, the check is skipped (drag already handled). `MOUSE_CLICKED` with `clickCount == 2` cancels the pending `singleClick` coroutine and triggers `doubleClick`.
+The flow is: `MOUSE_PRESSED` sets `isDragged = false` and stores the event. `MOUSE_DRAGGED` sets `isDragged = true`. A 200ms `Timeline` is scheduled; if `!isDragged` after the delay, the `singleClick` callback fires; if `isDragged`, the check is skipped (drag already handled). `MOUSE_CLICKED` with `clickCount == 2` cancels the pending `Timeline` and triggers `doubleClick`.
 
 ### Implementation Details
 
-The `ClickDisambiguator` class takes `coroutineScope` (CoroutineScope), `singleClick` ((MouseEvent) -> Unit), `doubleClick` ((MouseEvent) -> Unit), and `clickDelay` (Long, default 200L) in its constructor. It holds `pendingSingleClick` (Job?), `isDragged` (Boolean), and `lastEvent` (MouseEvent?). See `ClickDisambiguator.kt` for the full implementation.
+The `ClickDisambiguator` class takes `singleClick` ((MouseEvent) -> Unit), `doubleClick` ((MouseEvent) -> Unit), and `clickDelay` (Long, default 200L) in its constructor. It holds `pendingTimeline` (Timeline?), `isDragged` (Boolean), and `lastEvent` (MouseEvent?). The `coroutineScope` parameter was removed — all timing is handled by JavaFX `Timeline` instead of coroutines. See `ClickDisambiguator.kt` for the full implementation.
 
 ### Lifecycle
 
@@ -85,15 +85,16 @@ The `ClickDisambiguator` class takes `coroutineScope` (CoroutineScope), `singleC
 | `onKeyPress()` | Reset `isDragged = false` |
 | `onDragged()` | Set `isDragged = true` |
 | `onClick(event)` | Store event, dispatch based on `clickCount` |
-| `handleSingleClick()` | Launch delayed coroutine; if `!isDragged` after delay → call `singleClick` |
-| `handleDoubleClick()` | Cancel pending single-click coroutine → call `doubleClick` |
-| `cancel()` | Cancel pending single-click coroutine |
+| `handleSingleClick()` | Stop any pending timeline, launch 200ms `Timeline`; if `!isDragged` after delay → call `singleClick` |
+| `handleDoubleClick()` | Cancel pending timeline → call `doubleClick` |
+| `cancel()` | Cancel pending timeline |
 
 ### Usage in StateBox
 
 The `StateBox` constructor creates a `ClickDisambiguator` with:
 - **singleClick**: Enables inline name editing (`isEditModeEnabled = true`) + calls `onClick` callback
 - **doubleClick**: Calls `onDoubleClick` callback (opens text editor tab)
+- **clickDelay**: 200L (passed directly to constructor, no shared scope needed)
 
 Event handlers route JavaFX mouse events to the disambiguator: `MOUSE_PRESSED` calls `clickDisambiguator.onKeyPress()`, `MOUSE_DRAGGED` calls `clickDisambiguator.onDragged()`, and `MOUSE_CLICKED` calls `clickDisambiguator.onClick(it)`. See `StateBox.kt` for the full implementation.
 
@@ -168,6 +169,4 @@ The `isNotEditingMode()` extension function returns `true` when `this !is Editor
 | `EditorMode.RemoveState` | `false` | Disabled |
 | `EditorMode.RemoveTransition` | `true` | Enabled |
 
-## CoroutineScopeProvider
 
-A global singleton providing a shared `CoroutineScope(Dispatchers.JavaFx)` for all click disambiguation coroutines. The `object CoroutineScopeProvider` exposes `scope = CoroutineScope(Dispatchers.JavaFx)` and `cancelAll() = scope.cancel()`. All `ClickDisambiguator` instances use this shared scope. The `cancelAll()` method is available for cleanup (though not currently called anywhere in the codebase).

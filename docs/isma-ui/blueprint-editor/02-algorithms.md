@@ -2,6 +2,8 @@
 
 ## NameChangingMonitor
 
+> **Legacy**: `NameChangingMonitor` is no longer used by the ViewModel. Name uniqueness is now enforced via the `isNameUnique` callback in `StateViewModel`. The class is retained for reference.
+
 ### Purpose
 
 Ensures all state names are unique within the blueprint. Tracks registered names in a `HashSet` and auto-increments default name counters. Source: `NameChangingMonitor.kt` (33 lines).
@@ -34,17 +36,6 @@ Unregistering does **not** adjust `nextNameCounter` — the counter only moves f
 
 Returns `"$itemDefaultName $nextNameCounter"` and does not advance the counter (advancement happens on the next `tryRegister` call).
 
-### Name Edit Rollback
-
-When a user edits a state name via inline editing (bound to `isEditModeEnabledProperty` in `IsmaBlueprintViewModel.initNameChangingEvent()`):
-
-1. The current name is saved as `previousName` when `isEditModeEnabled` becomes `true`
-2. On focus loss (`isEditModeEnabled` becomes `false`), `tryRegister(newName)` is called
-3. If registration fails (duplicate), `name = previousName` restores the old name
-4. If registration succeeds, `tryUnregister(previousName)` updates the registry
-
-The rollback is silent — no error dialog is shown. The name simply reverts to its previous value.
-
 ## ArrowGeometry
 
 ### atan2-Based Perpendicular Offset
@@ -61,6 +52,19 @@ The algorithm offsets the arrow line perpendicular to the direction between stat
 4. Line endpoints offset from state centers and converted to local coordinates: `lineStartX = startX - layoutX + offsetX`, `lineStartY = startY - layoutY + offsetY`, `lineEndX = endX - layoutX + offsetX`, `lineEndY = endY - layoutY + offsetY`
 5. Arrowhead position and rotation: `arrowhead.translateX = offsetX`, `arrowhead.translateY = offsetY`, `arrowhead.rotate = -angle / PI * 180.0` (radians to degrees, negated)
 6. Label offset (perpendicular, further out from the line): `labelTextTranslateX = 75.0 * sin(angle)`, `labelTextTranslateY = 50.0 * cos(angle)`
+
+```mermaid
+flowchart TD
+    A["Start State\n(centerX, centerY)"] --> B["Compute dx, dy\nbetween centers"]
+    B --> C["angle = atan2(dx, dy) + PI/2"]
+    C --> D["offsetX = 10 * sin(angle)\noffsetY = 10 * cos(angle)"]
+    D --> E["Line endpoints:\nstartX - layoutX + offsetX\nendX - layoutX + offsetX"]
+    D --> F["Arrowhead transform:\ntranslateX = offsetX\ntranslateY = offsetY\nrotate = -angle/PI*180"]
+    D --> G["Label offset:\n75 * sin(angle)\n50 * cos(angle)"]
+    E --> H["ArrowGeometry output"]
+    F --> H
+    G --> H
+```
 
 ### Why `atan2(dx, dy)` Instead of `atan2(dy, dx)`?
 
@@ -79,6 +83,41 @@ The flow is: `MOUSE_PRESSED` sets `isDragged = false` and stores the event. `MOU
 The `ClickDisambiguator` class takes `singleClick` ((MouseEvent) -> Unit), `doubleClick` ((MouseEvent) -> Unit), and `clickDelay` (Long, default 200L) in its constructor. It holds `pendingTimeline` (Timeline?), `isDragged` (Boolean), and `lastEvent` (MouseEvent?). The `coroutineScope` parameter was removed — all timing is handled by JavaFX `Timeline` instead of coroutines. See `ClickDisambiguator.kt` for the full implementation.
 
 ### Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+
+    Idle --> Pending: onClick() — clickCount == 1
+    Idle --> DoubleClick: onClick() — clickCount == 2
+
+    Pending --> Fired: 200ms elapsed, !isDragged
+    Pending --> Idle: isDragged == true (drag detected)
+    Pending --> DoubleClick: onClick() — clickCount == 2
+
+    Fired --> Idle: singleClick callback done
+    DoubleClick --> Idle: doubleClick callback done
+
+    note right of Idle
+        Waiting for mouse event
+        isDragged = false (reset by onKeyPress)
+    end note
+
+    note right of Pending
+        200ms Timeline running
+        isDragged = true if dragged
+    end note
+
+    note right of Fired
+        Single-click confirmed
+        isDragged was false
+    end note
+
+    note right of DoubleClick
+        Double-click confirmed
+        Timeline cancelled
+    end note
+```
 
 | Event | Action |
 |-------|--------|
@@ -114,6 +153,27 @@ The arrow body click (for removal in RemoveTransition mode) is handled separatel
 
 The function signature is `fun BlueprintModel.toLismaText(): LismaTextModel`. The algorithm processes the model in three phases: Phase 1 (Main state text, top-level content), Phase 2 (Regular transactions, grouped by target state + predicate), Phase 3 (Loop transactions, expanded into pseudo-state pairs).
 
+```mermaid
+flowchart LR
+    BM[BlueprintModel] --> P1[Phase 1: Main state text]
+    P1 --> P2[Phase 2: StateBlock grouping]
+    P2 --> P3[Phase 3: Loop expansion]
+    P3 --> LTM[LismaTextModel]
+    LTM --> FT[fullText: LISMA source]
+    LTM --> CR[regions: CodeRegion list]
+
+    subgraph P2 Details
+        direction TB
+        S1[Iterate transactions] --> S2{Block exists\nfor key?}
+        S2 -->|No| S3[Create StateBlock\nwith target state]
+        S2 -->|Yes| S4[Add start state\nto inputStates]
+        S3 --> S5[Output: state key { text } from start1,start2,...;]
+        S4 --> S5
+    end
+
+    P2 --> P2 Details
+```
+
 ### Phase 1 — Main State Text
 
 `mainTextFragment = this.main.text`, appended to `resultStringBuilder` via `appendLine()`. `linesCounter = mainTextFragment.lines().count() + 1`. The main state's text is output first as top-level content (not inside a `state` block). The line counter starts after this content.
@@ -142,6 +202,45 @@ Each loop transaction is expanded into **two pseudo-states** that form a cycle. 
 
 **Example**: A loop on state "Work" with predicate `"x > 5"` and loop text `"process()"` generates: `state Work_pseudo_1 (x > 5) { process() } from Work;` followed by `state Work (1 > 0) { <original Work body text> } from Work_pseudo_1;`
 
+```mermaid
+flowchart TB
+    subgraph Input
+        WS[Work state\nbody text]
+    end
+
+    subgraph Output
+        direction TB
+        P1[state Work_pseudo_1 (x > 5) {\n  process()\n} from Work;]
+        P2[state Work (1 > 0) {\n  <original Work body text>\n} from Work_pseudo_1;]
+    end
+
+    WS --> P1
+    WS --> P2
+
+    P1 -.->|transitions from| WS
+    P2 -.->|transitions from| P1
+
+    note1[Creates pseudo-state:\n<stateName>_pseudo_1\nwith loop predicate + text]
+    note2[Original state gets:\npredicate = 1 > 0\ntransitions from pseudo-state]
+    note1 -.-> P1
+    note2 -.-> P2
+```
+
+```mermaid
+graph TD
+    subgraph Before
+        A[Work] -->|loop arrow| A
+    end
+
+    subgraph After
+        B[Work] -->|from Work_pseudo_1\npredicate: 1 > 0| C[Work_pseudo_1\npredicate: x > 5\nbody: process()]
+        C -->|from Work| B
+    end
+
+    Before --> Transformation[Expand into cycle]
+    Transformation --> After
+```
+
 ### Output Order
 
 1. Main state text, followed by a blank line
@@ -156,9 +255,22 @@ For each generated fragment, `fragmentLinesCount = fragmentText.lines().count()`
 
 `LismaTextModel` provides `fragmentNameByIndex(index: Int)` which returns `regions.firstOrNull { index > it.startLine && index <= it.endLine }` or `DefaultFragment` if no region matches. The companion object defines `DefaultFragment = CodeRegion(name = "Main", startLine = 0, endLine = 0)`. If no region matches, returns `DefaultFragment` (named "Main").
 
+## EditorMode
+
+Sealed class hierarchy with four mutually exclusive modes:
+
+| Type | Properties | Purpose |
+|------|-----------|---------|
+| `EditorMode.Idle` | None | Default mode |
+| `EditorMode.AddTransition` | `selectedStates: MutableSet<StateViewModel>` | Collects 1-2 states for transition/loop creation |
+| `EditorMode.RemoveState` | None | Click states to remove them |
+| `EditorMode.RemoveTransition` | None | Click arrows to remove them |
+
+`isNotEditingMode()` extension returns `true` for `Idle` and `RemoveTransition` modes, `false` for `AddTransition` and `RemoveState`.
+
 ## Editability Bindings
 
-User state `isEditable` is dynamically bound to the editor mode: `isEditableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })`.
+User state `isEditable` is dynamically bound to the editor mode: `editableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })`.
 
 The `isNotEditingMode()` extension function returns `true` when `this !is EditorMode.RemoveState && this !is EditorMode.AddTransition`.
 

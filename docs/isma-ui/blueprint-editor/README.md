@@ -7,15 +7,16 @@ Visual finite-state machine editor for ISMA. Users create states as draggable bo
 ```mermaid
 graph TB
     subgraph View
-        Editor[IsmaBlueprintEditor<br/>BorderPane, 112 lines<br/>Zero business logic]
+        Editor[IsmaBlueprintEditor<br/>BorderPane, 91 lines<br/>Zero business logic]
+        CV[CanvasView<br/>Node synchronization]
     end
 
     subgraph ViewModel
-        VM[IsmaBlueprintViewModel<br/>All business logic, 461 lines]
-    end
-
-    subgraph ViewAdapter
-        VA[BlueprintViewAdapter interface<br/>JavaFxBlueprintViewAdapter impl]
+        VM[IsmaBlueprintViewModel<br/>All business logic, 318 lines]
+        CVM[CanvasViewModel<br/>ObservableLists, CRUD]
+        SVM[StateViewModel<br/>JavaFX properties]
+        TVM[TransactionViewModel<br/>JavaFX properties]
+        LTV[LoopTransactionViewModel<br/>JavaFX properties]
     end
 
     subgraph Model_Serializable
@@ -25,9 +26,9 @@ graph TB
         BLTM[BlueprintLoopTransactionModel]
     end
 
-    subgraph Model_Runtime
-        CVM[CanvasViewModel<br/>ObservableLists]
+    subgraph Model_Output
         LTM[LismaTextModel<br/>Generated LISMA output]
+        CR[CodeRegion<br/>Line mappings]
     end
 
     subgraph Controls
@@ -48,16 +49,19 @@ graph TB
     end
 
     Editor --> VM
-    VM --> VA
+    Editor --> CV
+    CV --> CVM
     VM --> CVM
     VM --> BM
     VM --> IEF
-    VM --> CD
+    VM --> SVM
+    VM --> TVM
+    VM --> LTV
 
-    VA --> SB
-    VA --> TA
-    VA --> LTA
-    VA --> EAP
+    CV --> SB
+    CV --> TA
+    CV --> LTA
+    CV --> EAP
 
     SB --> CD
     TA --> AG
@@ -66,39 +70,51 @@ graph TB
 
 The architecture follows an MVVM pattern with these layers:
 
-- **View:** `IsmaBlueprintEditor` — a `BorderPane` with zero business logic
-- **ViewModel:** `IsmaBlueprintViewModel` — all business logic
-- **ViewAdapter:** `BlueprintViewAdapter` interface and `JavaFxBlueprintViewAdapter` implementation — abstraction over JavaFX canvas operations
+- **View:** `IsmaBlueprintEditor` — a `BorderPane` with zero business logic, `CanvasView` — handles JavaFX node synchronization with `CanvasViewModel` via `ListChangeListener`
+- **ViewModel:** `IsmaBlueprintViewModel` — all business logic, `CanvasViewModel` — runtime observable lists with CRUD operations, `StateViewModel` / `TransactionViewModel` / `LoopTransactionViewModel` — JavaFX property-backed view models
 - **Model (plain data):** `BlueprintModel`, `BlueprintStateModel`, `BlueprintTransactionModel`, `BlueprintLoopTransactionModel` — plain data classes, no serialization annotations
-- **Model (runtime):** `CanvasViewModel` — runtime observable lists, `LismaTextModel` + `CodeRegion` for generated LISMA output
+- **Model (runtime):** `LismaTextModel` + `CodeRegion` for generated LISMA output
 - **Controls:** `StateBox` (draggable Group), `TransactionArrow` (inter-state), `LoopTransactionArrow` (self-loop), `EditArrowPopOver` (edit dialog)
-- **Utilities:** `ClickDisambiguator` (200ms JavaFX `Timeline`), `ArrowGeometry` (atan2 math), `JavaFxExtensions` (property delegates)
+- **Utilities:** `ClickDisambiguator` (200ms JavaFX `Timeline`: single-click vs drag vs double-click), `ArrowGeometry` (atan2 math), `NameChangingMonitor` (unique name enforcement — legacy, replaced by `isNameUnique` callback in `StateViewModel`)
 - **Services:** `ITextEditorFactory` (SPI, Koin injected), `BlueprintModelSerializer` (JSON serialization, located in app module)
 
-The `IsmaBlueprintEditor` depends on `IsmaBlueprintViewModel`, which depends on `CanvasViewModel`, `BlueprintModel`, `BlueprintViewAdapter`, `ITextEditorFactory`, and `NameChangingMonitor`. The `BlueprintViewAdapter` is implemented by `JavaFxBlueprintViewAdapter`. The controls (`StateBox`, `TransactionArrow`, `LoopTransactionArrow`, `EditArrowPopOver`) are used by the ViewModel. `StateBox` uses `ClickDisambiguator`, `TransactionArrow` uses `ArrowGeometry`, and `LoopTransactionArrow` uses `ClickDisambiguator`.
+The `IsmaBlueprintEditor` depends on `IsmaBlueprintViewModel` and `CanvasView`. `CanvasView` depends on `CanvasViewModel` and manages JavaFX node lifecycle. `IsmaBlueprintViewModel` depends on `CanvasViewModel`, `StateViewModel`, `TransactionViewModel`, `LoopTransactionViewModel`, `BlueprintModel`, `ITextEditorFactory`, and `EditorMode`. The controls (`StateBox`, `TransactionArrow`, `LoopTransactionArrow`, `EditArrowPopOver`) are instantiated by `CanvasView`. `StateBox` uses `ClickDisambiguator`, `TransactionArrow` uses `ArrowGeometry`, and `LoopTransactionArrow` uses `ClickDisambiguator`.
 
 ## Module Structure
 
-The module source lives in `blueprint-editor/src/main/kotlin/ru/isma/next/editor/blueprint/` and contains: `IsmaBlueprintEditor.kt` (View — BorderPane layout, zero business logic, 112 lines), `IsmaBlueprintViewModel.kt` (ViewModel — all business logic, 461 lines), `EditorMode.kt` (Sealed class: Idle, AddTransition, RemoveState, RemoveTransition, 12 lines), `NameChangingMonitor.kt` (Unique name enforcement, 33 lines), `constants/BlueprintEditorConstants.kt` (All magic numbers: dimensions, offsets, colors, 35 lines), `constants/StateNames.kt` (MAIN_STATE = "Main", INIT_STATE = "init", 4 lines), `controls/StateBox.kt` (Draggable state box: Rectangle + HBox + inline name edit, 118 lines), `controls/TransactionArrow.kt` (Inter-state transition arrow with atan2 geometry, 137 lines), `controls/LoopTransactionArrow.kt` (Self-loop arrow with circle + arrowhead, 84 lines), `controls/EditArrowPopOver.kt` (Floating VBox with alias/predicate TextField bidirectional binding, 44 lines),  `models/BlueprintModel.kt` (Plain data model + toLismaText() converter, 125 lines), `models/BlueprintStateModel.kt` (Plain data state: position, name, text, 11 lines), `models/BlueprintTransactionModel.kt` (Plain data transition: start/end names, predicate, alias, 11 lines), `models/BlueprintLoopTransactionModel.kt` (Plain data loop: state name, predicate, alias, text, 11 lines), `models/CanvasViewModel.kt` (Runtime: ObservableList of EditorState/EditorTransaction/EditorLoopTransaction, 69 lines), `models/LismaTextModel.kt` (Generated LISMA output: fullText + CodeRegion list, 23 lines), `services/ITextEditorFactory.kt` (SPI: createTextEditor() + disposeInstance(), 9 lines), `utilities/ClickDisambiguator.kt` (200ms JavaFX Timeline: single-click vs drag vs double-click, 57 lines), `utilities/ArrowGeometry.kt` (atan2-based perpendicular offset calculation, 50 lines), `utilities/JavaFxExtensions.kt` (getValue/setValue delegates for JavaFX Properties, 23 lines), `views/BlueprintViewAdapter.kt` (Abstract interface decoupling ViewModel from JavaFX, 41 lines), and `views/JavaFxBlueprintViewAdapter.kt` (JavaFX implementation: canvas.children.add/remove, 67 lines).
+The module source lives in `blueprint-editor/src/main/kotlin/ru/isma/next/editor/blueprint/` and contains: `IsmaBlueprintEditor.kt` (View — BorderPane layout, zero business logic, 91 lines), `viewmodels/IsmaBlueprintViewModel.kt` (ViewModel — all business logic, 318 lines), `viewmodels/CanvasViewModel.kt` (Runtime: ObservableList CRUD with cascade removal, 110 lines), `viewmodels/StateViewModel.kt` (JavaFX property-backed state model, 110 lines), `viewmodels/TransactionViewModel.kt` (JavaFX property-backed transaction model, 49 lines), `viewmodels/LoopTransactionViewModel.kt` (JavaFX property-backed loop model, 58 lines), `viewmodels/EditorMode.kt` (Sealed class: Idle, AddTransition(selectedStates), RemoveState, RemoveTransition, 10 lines), `views/CanvasView.kt` (Node synchronization via ListChangeListener, 194 lines), `EditorMode.kt` (Sealed class: Idle, AddTransition, RemoveState, RemoveTransition, 10 lines), `NameChangingMonitor.kt` (Unique name enforcement — legacy, 33 lines), `constants/BlueprintEditorConstants.kt` (All magic numbers: dimensions, offsets, colors, 35 lines), `constants/StateNames.kt` (MAIN_STATE = "Main", INIT_STATE = "init", 4 lines), `controls/StateBox.kt` (Draggable Group bound to StateViewModel, 112 lines), `controls/TransactionArrow.kt` (Inter-state transition arrow with atan2 geometry, 117 lines), `controls/LoopTransactionArrow.kt` (Self-loop arrow with circle + arrowhead, 66 lines), `controls/EditArrowPopOver.kt` (Floating VBox with alias/predicate TextField bidirectional binding, 45 lines),  `models/BlueprintModel.kt` (Plain data model + toLismaText() converter, 128 lines), `models/BlueprintStateModel.kt` (Plain data state: position, name, text, 8 lines), `models/BlueprintTransactionModel.kt` (Plain data transition: start/end names, predicate, alias, 8 lines), `models/BlueprintLoopTransactionModel.kt` (Plain data loop: state name, predicate, alias, text, 8 lines), `models/LismaTextModel.kt` (Generated LISMA output: fullText + CodeRegion list, 23 lines), `services/ITextEditorFactory.kt` (SPI: createTextEditor() + disposeInstance(), 9 lines), `utilities/ClickDisambiguator.kt` (200ms JavaFX Timeline: single-click vs drag vs double-click, 60 lines), `utilities/ArrowGeometry.kt` (atan2-based perpendicular offset calculation, 50 lines), `utilities/NameChangingMonitor.kt` (Unique name enforcement, 33 lines), `utilities/JavaFxExtensions.kt` (getValue/setValue delegates for JavaFX Properties — legacy, 23 lines). Tests live in `src/test/kotlin/ru/isma/next/editor/blueprint/`.t interface decoupling ViewModel from JavaFX, 41 lines), and `views/JavaFxBlueprintViewAdapter.kt` (JavaFX implementation: canvas.children.add/remove, 67 lines).
 
 ## MVVM Pattern
 
 | Role | Class | Responsibility |
 |------|-------|----------------|
 | **View** | `IsmaBlueprintEditor` | Pure UI — `BorderPane` layout with `TabPane` and `ToolBar`. Exposes `getBlueprintModel()` and `setBlueprintModel()`. Zero business logic. |
+| **View** | `CanvasView` | Node synchronization — listens to `CanvasViewModel` ObservableLists via `ListChangeListener` and creates/removes JavaFX nodes (`StateBox`, `TransactionArrow`, `LoopTransactionArrow`). Handles drag events. |
 | **ViewModel** | `IsmaBlueprintViewModel` | All business logic — state management, canvas operations, editor modes, serialization/deserialization, text editor tab lifecycle. |
-| **ViewAdapter** | `BlueprintViewAdapter` / `JavaFxBlueprintViewAdapter` | Abstraction layer over JavaFX `Pane.children` operations. Enables testability and future view implementations. |
+| **ViewModel** | `CanvasViewModel` | Runtime observable lists of `StateViewModel`, `TransactionViewModel`, `LoopTransactionViewModel`. Provides CRUD with cascade removal. |
+| **ViewModel** | `StateViewModel` | JavaFX property-backed state model with `nameProperty`, `textProperty`, `xProperty`, `yProperty`, `centerX()`/`centerY()` bindings, and `isNameUnique` callback. |
+| **ViewModel** | `TransactionViewModel` | JavaFX property-backed transaction with `startStateName`, `endStateName`, `predicate`, `alias`, and computed `displayText` binding. |
+| **ViewModel** | `LoopTransactionViewModel` | JavaFX property-backed loop with `stateName`, `predicate`, `alias`, `text`, and computed `displayText` binding. |
 | **Model (plain data)** | `BlueprintModel`, `BlueprintStateModel`, `BlueprintTransactionModel`, `BlueprintLoopTransactionModel` | Plain data classes — no serialization annotations. JSON serialization handled by `BlueprintModelSerializer` in the app module. |
-| **Model (runtime)** | `CanvasViewModel` | Holds `ObservableList<EditorState>`, `ObservableList<EditorTransaction>`, `ObservableList<EditorLoopTransaction>`. Provides CRUD with cascade removal. |
 | **Model (output)** | `LismaTextModel`, `CodeRegion` | Generated LISMA text with line number mappings for error highlighting. |
 
 ## Container Hierarchy
 
 `IsmaBlueprintEditor` (BorderPane) — View contains:
-- **center:** `TabPane` with a single "Diagram" tab (non-closable) containing a `ScrollPane` with a `Pane` canvas (absolute positioning, no layout manager). The canvas contains: `mainStateBox` (fixed, LIGHTGREEN, from ViewModel), `initStateBox` (fixed, LIGHTBLUE, from ViewModel), `userStateBox[]` (from CanvasViewModel.states), `transactionArrow[]` (from CanvasViewModel.transactions), `loopTransactionArrow[]` (from CanvasViewModel.loopTransactions), and `EditArrowPopOver` (floating VBox, transient).
+- **center:** `TabPane` with a single "Diagram" tab (non-closable) containing a `ScrollPane` with a `Pane` canvas (absolute positioning, no layout manager). `CanvasView` synchronizes JavaFX nodes with `CanvasViewModel` — it listens to ObservableLists and creates/removes `StateBox`, `TransactionArrow`, and `LoopTransactionArrow` nodes. The canvas contains: `StateBox` instances (bound to StateViewModel properties), `TransactionArrow` instances (bound to TransactionViewModel and source/target StateViewModel), `LoopTransactionArrow` instances (bound to LoopTransactionViewModel and StateViewModel), and `EditArrowPopOver` (floating VBox, transient).
 - **bottom:** `ToolBar` bound to Diagram tab visibility. Buttons: "New state" → viewModel.addState(), "New transition" / "Stop adding transaction" → viewModel.toggleAddTransition(), Separator, "Remove state" / "Stop remove state" → viewModel.toggleRemoveState(), "Remove transition" / "Stop remove transition" → viewModel.toggleRemoveTransition().
 
 The toolbar binds to the Diagram tab's visibility via `visibleProperty().bind(visible)` and `managedProperty().bind(visible)`. When the Diagram tab is inactive, the toolbar is invisible and unmanaged.
+
+## CanvasView Node Synchronization
+
+`CanvasView` eliminates the `BlueprintViewAdapter` abstraction layer. Instead of a factory-based adapter pattern, `CanvasView` directly manages JavaFX node lifecycle by observing `CanvasViewModel`'s `ObservableList`s:
+
+- **ObservableList listeners:** `ListChangeListener` on `states`, `transactions`, and `loopTransactions` triggers `syncStates()`, `syncTransactions()`, and `syncLoopTransactions()` respectively.
+- **Sync strategy:** Each sync method iterates the current list and adds nodes for new entries, then removes nodes for entries no longer present (using `removeAll` on the key set).
+- **Node-to-ViewModel maps:** `stateNodeMap`, `transactionNodeMap`, and `loopTransactionNodeMap` track the relationship between ViewModel instances and their corresponding JavaFX nodes.
+- **Drag handling:** `CanvasView` directly handles `MOUSE_PRESSED`, `MOUSE_DRAGGED`, and `MOUSE_RELEASED` events on state boxes, updating `stateViewModel.xProperty` and `stateViewModel.yProperty` with clamped coordinates (`max(pos, 0.0)`).
+- **Arrow geometry:** `TransactionArrow` and `LoopTransactionArrow` bind their visual properties directly to ViewModel properties — no adapter indirection.
 
 ## Data Model Summary
 
@@ -118,7 +134,27 @@ The toolbar binds to the Diagram tab's visibility via `visibleProperty().bind(vi
 
 ### Editor-Only Models (runtime, not serializable)
 
-`CanvasViewModel.EditorState` pairs `model` (BlueprintStateModel) with `node` (StateBox JavaFX node). `CanvasViewModel.EditorTransaction` pairs `startBox` (StateBox), `endBox` (StateBox), `arrow` (TransactionArrow), and `node` (Node). `CanvasViewModel.EditorLoopTransaction` pairs `stateBox` (StateBox), `arrow` (LoopTransactionArrow), and `node` (Node).
+`StateViewModel` — JavaFX property-backed model with `nameProperty`, `textProperty`, `xProperty`, `yProperty`, `squareWidthProperty`, `squareHeightProperty`, `colorProperty`, `editableProperty`, `editModeProperty`, `editButtonVisibleProperty`, `centerX()`/`centerY()` DoubleBinding, and `isNameUnique` callback for uniqueness validation.
+
+`TransactionViewModel` — JavaFX property-backed model with `startStateName`, `endStateName`, `predicate`, `alias`, `selected`, and computed `displayText` binding (shows alias if non-blank, otherwise predicate).
+
+`LoopTransactionViewModel` — JavaFX property-backed model with `stateName`, `predicate`, `alias`, `text`, `selected`, and computed `displayText` binding.
+`CanvasViewModel` — Holds `ObservableList<StateViewModel>`, `ObservableList<TransactionViewModel>`, `ObservableList<LoopTransactionViewModel>`. Provides CRUD methods with cascade removal and name registration/unregistration.
+
+## CanvasViewModel Operations
+
+### Cascade Removal
+
+Removing a `StateViewModel` automatically removes all associated transitions. The `removeState(state)` function removes from `_states` where `it == state` (object identity), removes from `_transactions` where `it.startStateName == state.name || it.endStateName == state.name`, and removes from `_loopTransactions` where `it.stateName == state.name`. Also calls `tryUnregisterStateName(state.name)` to clean up the name registry. See `CanvasViewModel.kt` for the full implementation.
+
+### Name Registration
+
+`CanvasViewModel` maintains a `registeredStateNames` HashSet and `stateNameCounter` for unique name enforcement. `tryRegisterStateName(name)` returns `false` if the name is already taken. `tryUnregisterStateName(name)` removes the name from the registry. `createNextDefaultStateName()` generates `"State N"` names with auto-incrementing counter.
+
+### Observable Lists
+
+All three lists (`states`, `transactions`, `loopTransactions`) are exposed as immutable `ObservableList` wrappers around private `FXCollections.observableArrayList`. External code can observe changes but cannot directly modify the lists — all mutations go through the provided CRUD methods.
+
 
 ## Editor Modes
 
@@ -154,13 +190,13 @@ Every toolbar button action calls `resetMode()` before setting or toggling its o
 | Mode | `EditorMode` type | Arrow Body Click | Arrowhead Click | State Box Single-Click | State Box Drag |
 |------|-------------------|------------------|-----------------|----------------------|----------------|
 | **Default** | `EditorMode.Idle` | No effect | Open PopOver | Inline name edit | Yes |
-| **Add Transition** | `EditorMode.AddTransition` | No effect | Open PopOver | Record as source/target | No |
+| **Add Transition** | `EditorMode.AddTransition(selectedStates)` | No effect | Open PopOver | Add to selectedStates set (creates transition on 2nd click) | No |
 | **Remove State** | `EditorMode.RemoveState` | No effect | Open PopOver | Remove state + arrows (Main/Init protected) | No |
 | **Remove Transition** | `EditorMode.RemoveTransition` | Remove arrow | Open PopOver | Inline name edit | Yes |
 
 ## Module Declaration
 
-The module `isma.ui.editor.blueprint` requires: `kotlin.stdlib`, `javafx.graphics`, `javafx.controls`, `javafx.fxml`. It exports: `ru.isma.next.editor.blueprint`, `ru.isma.next.editor.blueprint.constants`, `ru.isma.next.editor.blueprint.controls`, `ru.isma.next.editor.blueprint.models`, `ru.isma.next.editor.blueprint.services`, `ru.isma.next.editor.blueprint.utilities`, `ru.isma.next.editor.blueprint.views`. See `module-info.java` for the full declaration.
+The module `isma.ui.editor.blueprint` requires: `kotlin.stdlib`, `javafx.graphics`, `javafx.controls`, `javafx.fxml`. It exports: `ru.isma.next.editor.blueprint`, `ru.isma.next.editor.blueprint.constants`, `ru.isma.next.editor.blueprint.controls`, `ru.isma.next.editor.blueprint.models`, `ru.isma.next.editor.blueprint.services`, `ru.isma.next.editor.blueprint.utilities`, `ru.isma.next.editor.blueprint.viewmodels`, `ru.isma.next.editor.blueprint.views`. See `module-info.java` for the full declaration.
 
 ## Text Editor Factory SPI
 
@@ -172,10 +208,8 @@ JSON serialization was moved from the blueprint-editor module to the app module.
 
 ## Index
 
-## Index
-
 | File | Content |
 |------|---------|
-| `01-architecture.md` | Canvas properties, rendering order, coordinate system, data flow (save/load), ViewAdapter pattern, project lifecycle, editor-only data classes, text editor integration |
-| `02-algorithms.md` | NameChangingMonitor, ArrowGeometry, ClickDisambiguator, LISMA conversion algorithm, CodeRegion tracking, editability bindings |
+| `01-architecture.md` | Canvas properties, rendering order, coordinate system, data flow (save/load), CanvasView node synchronization, project lifecycle, ViewModel classes, text editor integration |
+| `02-algorithms.md` | ArrowGeometry, ClickDisambiguator, LISMA conversion algorithm, CodeRegion tracking, EditorMode, name uniqueness |
 | `03-ux-spec.md` | State boxes, transition arrows, loop arrows, PopOver, toolbar, interaction modes, known limitations, color palette, dimensions reference |

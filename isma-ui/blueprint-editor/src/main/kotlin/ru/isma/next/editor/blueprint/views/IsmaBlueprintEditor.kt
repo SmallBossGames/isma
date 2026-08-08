@@ -9,7 +9,7 @@ import ru.isma.next.editor.blueprint.viewmodels.IsmaBlueprintViewModel
 import ru.isma.next.editor.blueprint.viewmodels.StateViewModel
 
 class IsmaBlueprintEditor(
-    editorFactory: ITextEditorFactory
+    private val editorFactory: ITextEditorFactory
 ) : BorderPane() {
 
     private val canvas = javafx.scene.layout.Pane()
@@ -17,16 +17,39 @@ class IsmaBlueprintEditor(
         isClosable = false
     }
     private val tabs = TabPane(diagramTab)
-    private val viewModel = IsmaBlueprintViewModel(editorFactory)
-    private val canvasView = CanvasView(canvas, viewModel.canvasViewModel) { stateVm ->
-        val tab = viewModel.openStateTextEditor(stateVm)
-        tabs.tabs.add(tab)
-    }
+    private val viewModel = IsmaBlueprintViewModel()
 
     init {
-        viewModel.onStateDoubleClick = { stateViewModel: StateViewModel ->
-            val tab = viewModel.openStateTextEditor(stateViewModel)
+        viewModel.onOpenStateTextEditor = { stateVm ->
+            val editor = editorFactory.createTextEditor(
+                text = stateVm.text,
+                onTextChanged = { stateVm.text = it }
+            )
+            val tab = Tab(stateVm.name, editor).apply {
+                textProperty().bind(stateVm.nameProperty)
+                setOnCloseRequest { editorFactory.disposeInstance(editor) }
+            }
             tabs.tabs.add(tab)
+        }
+
+        viewModel.onOpenLoopTextEditor = { loopTxVm, stateVm ->
+            val editor = editorFactory.createTextEditor(
+                text = loopTxVm.text,
+                onTextChanged = { loopTxVm.text = it }
+            )
+            val tab = Tab("${stateVm.name} (loop)", editor).apply {
+                textProperty().bind(stateVm.nameProperty.concat(" (loop)"))
+                setOnCloseRequest { editorFactory.disposeInstance(editor) }
+            }
+            tabs.tabs.add(tab)
+        }
+
+        viewModel.onStateDoubleClick = { stateViewModel: StateViewModel ->
+            viewModel.onOpenStateTextEditor(stateViewModel)
+        }
+
+        val canvasView = CanvasView(canvas, viewModel.canvasViewModel) { stateVm ->
+            viewModel.onOpenStateTextEditor(stateVm)
         }
 
         center = tabs

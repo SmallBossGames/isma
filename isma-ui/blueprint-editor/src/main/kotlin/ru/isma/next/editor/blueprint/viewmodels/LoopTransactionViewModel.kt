@@ -1,6 +1,7 @@
 package ru.isma.next.editor.blueprint.viewmodels
 
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
@@ -48,7 +49,7 @@ class LoopTransactionViewModel(
             selectedProperty.value = value
         }
 
-    val displayText = Bindings.createObjectBinding(
+    val displayText: ObjectBinding<String> = Bindings.createObjectBinding(
         {
             alias.ifBlank { predicate }
         },

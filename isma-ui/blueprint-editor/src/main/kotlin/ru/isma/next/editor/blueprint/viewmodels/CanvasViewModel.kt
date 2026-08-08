@@ -37,7 +37,6 @@ class CanvasViewModel {
         squareWidth: Double = DEFAULT_STATE_WIDTH,
         squareHeight: Double = DEFAULT_STATE_HEIGHT
     ): StateViewModel {
-        val stateName = name
         val state = StateViewModel(
             name = name,
             text = text,
@@ -49,7 +48,7 @@ class CanvasViewModel {
             editable = editable,
             editButtonVisible = editButtonVisible,
             isNameUnique = { candidate ->
-                candidate == stateName || !registeredStateNames.contains(candidate)
+                candidate == name || !registeredStateNames.contains(candidate)
             }
         )
         return state

@@ -3,22 +3,17 @@ package ru.isma.next.editor.blueprint.viewmodels
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
-import javafx.scene.control.Tab
 import javafx.scene.paint.Color
-import ru.isma.next.editor.blueprint.constants.*
+import ru.isma.next.editor.blueprint.constants.FIXED_STATE_HEIGHT
+import ru.isma.next.editor.blueprint.constants.INIT_STATE
+import ru.isma.next.editor.blueprint.constants.MAIN_STATE
+import ru.isma.next.editor.blueprint.constants.STATE_INSET
 import ru.isma.next.editor.blueprint.models.BlueprintLoopTransactionModel
 import ru.isma.next.editor.blueprint.models.BlueprintModel
 import ru.isma.next.editor.blueprint.models.BlueprintStateModel
 import ru.isma.next.editor.blueprint.models.BlueprintTransactionModel
-import ru.isma.next.editor.blueprint.services.ITextEditorFactory
-import ru.isma.next.editor.blueprint.viewmodels.CanvasViewModel
-import ru.isma.next.editor.blueprint.viewmodels.LoopTransactionViewModel
-import ru.isma.next.editor.blueprint.viewmodels.StateViewModel
-import ru.isma.next.editor.blueprint.viewmodels.TransactionViewModel
 
-class IsmaBlueprintViewModel(
-    private val editorFactory: ITextEditorFactory
-) {
+class IsmaBlueprintViewModel {
     val editorModeProperty = SimpleObjectProperty<EditorMode>(EditorMode.Idle)
     var editorMode: EditorMode
         get() = editorModeProperty.value
@@ -253,38 +248,11 @@ class IsmaBlueprintViewModel(
         }
     }
 
-    fun openStateTextEditor(stateViewModel: StateViewModel): Tab {
-        val editor = editorFactory.createTextEditor(
-            text = stateViewModel.text,
-            onTextChanged = { stateViewModel.text = it }
-        )
-
-        return Tab(stateViewModel.name, editor).apply {
-            textProperty().bind(stateViewModel.nameProperty)
-
-            setOnCloseRequest {
-                editorFactory.disposeInstance(editor)
-            }
-        }
-    }
-
-    fun openLoopTextEditor(loopTxViewModel: LoopTransactionViewModel, stateViewModel: StateViewModel): Tab {
-        val editor = editorFactory.createTextEditor(
-            text = loopTxViewModel.text,
-            onTextChanged = { loopTxViewModel.text = it }
-        )
-
-        return Tab("${stateViewModel.name} (loop)", editor).apply {
-            textProperty().bind(stateViewModel.nameProperty.concat(" (loop)"))
-
-            setOnCloseRequest {
-                editorFactory.disposeInstance(editor)
-            }
-        }
-    }
+    var onOpenStateTextEditor: (StateViewModel) -> Unit = {}
+    var onOpenLoopTextEditor: (LoopTransactionViewModel, StateViewModel) -> Unit = { _, _ -> }
 
     fun computeArrowDisplayText(alias: String, predicate: String): String {
-        return if (alias.isNotBlank()) alias else predicate
+        return alias.ifBlank { predicate }
     }
 
     private fun createMainState(): StateViewModel {

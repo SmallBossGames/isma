@@ -1,17 +1,10 @@
 package ru.isma.next.app.services.simulation
 
-import javafx.collections.FXCollections
-import javafx.stage.FileChooser
-import javafx.stage.Window
 import kotlinx.coroutines.*
-import kotlinx.coroutines.javafx.JavaFx
 import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.launcher.GrinProcessLauncher
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.SimulationTask
-import ru.isma.next.app.views.dialogs.NamedPickerItem
-import ru.isma.next.app.views.dialogs.NamedPickerModel
-import ru.isma.next.app.views.dialogs.pickAxisVariables
 import ru.isma.next.domain.models.SimulationPoint
 import ru.isma.next.external.BinaryFilePointProvider
 import java.io.File
@@ -25,44 +18,18 @@ class SimulationResultService(
 
     private val resultServiceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    private val fileFilers = arrayOf(
-        FileChooser.ExtensionFilter("Comma separate file", "*.csv")
-    )
-
     fun removeResult(task: SimulationTask) = uiThreadExecutor.executeOnUi {
-        simulationTaskService.tasks.remove(task)
+        simulationTaskService.removeTask(task)
         task.result = null
     }
 
-    fun showChart(task: SimulationTask) = resultServiceScope.launch {
-        val result = task.result ?: return@launch
-        val headerColumnPairs = result.cachedColumnNames.mapIndexed { i, header ->
-            NamedPickerItem(header, i)
+    fun launchChart(result: CompletedSimulationModel, xAxisName: String, columnNames: List<String>) {
+        resultServiceScope.launch {
+            grinProcessLauncher.launch(result.cachedFile, xAxisName, columnNames)
         }
-
-        val pickerModel = NamedPickerModel(
-            headerColumnPairs.find { it.name == "TIME" }!!,
-            headerColumnPairs
-        )
-
-        val pickedItems = withContext(Dispatchers.JavaFx) {
-            pickAxisVariables(pickerModel)
-        } ?: return@launch
-
-        val selectedColumnNames = pickedItems.yAxisItems.map { it.name }
-        val xAxisName = pickedItems.xAxisItem.name
-
-        grinProcessLauncher.launch(result.cachedFile, xAxisName, selectedColumnNames)
     }
 
-    fun exportToFile(task: SimulationTask, ownerWindow: Window? = null){
-        val result = task.result ?: return
-        val file = FileChooser().run {
-            title = "Export Results"
-            extensionFilters.addAll(fileFilers)
-            return@run showSaveDialog(ownerWindow)
-        } ?: return
-
+    fun exportToFile(result: CompletedSimulationModel, file: File) {
         resultServiceScope.launch {
             exportToFileAsync(result, file)
         }

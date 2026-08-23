@@ -6,14 +6,13 @@ import javafx.scene.control.Separator
 import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
 import org.controlsfx.control.PopOver
-import org.koin.core.component.KoinComponent
 import ru.isma.next.app.extensions.matIconMZ
-import ru.isma.next.app.services.simulation.ISimulationService
+import ru.isma.next.app.viewmodels.MainCommandsViewModel
 
 class SimulationProcessBar(
-    private val simulationService: ISimulationService,
+    private val commands: MainCommandsViewModel,
     private val tasksPopOver: TasksPopOver,
-) : ToolBar(), KoinComponent {
+) : ToolBar() {
 
     init {
         tasksPopOver.apply {
@@ -25,7 +24,7 @@ class SimulationProcessBar(
                 graphic = matIconMZ("play_arrow")
                 tooltip = Tooltip("Play")
                 onAction = EventHandler {
-                    simulationService.simulate()
+                    commands.simulate()
                 }
             },
             Separator(),

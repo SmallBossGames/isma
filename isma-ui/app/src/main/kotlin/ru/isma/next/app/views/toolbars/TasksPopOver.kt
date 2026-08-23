@@ -1,34 +1,27 @@
 package ru.isma.next.app.views.toolbars
 
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ChangeListener
+import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.Label
+import javafx.scene.control.ProgressBar
+import javafx.scene.control.Separator
+import javafx.scene.control.Tooltip
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.javafx.JavaFx
-import kotlinx.coroutines.launch
 import org.controlsfx.control.PopOver
-import ru.isma.javafx.extensions.coroutines.flow.changeAsFlow
 import ru.isma.next.app.extensions.matIconAL
-import ru.isma.next.app.models.simulation.CompletedSimulationModel
-import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.models.simulation.SimulationTaskStatus
-import ru.isma.next.app.services.simulation.SimulationResultService
-import ru.isma.next.app.services.simulation.ISimulationTaskService
+import ru.isma.next.app.viewmodels.TaskItemViewModel
+import ru.isma.next.app.viewmodels.TasksViewModel
+import ru.isma.next.app.views.dialogs.pickAxisVariables
 
 class TasksPopOver(
-    private val simulationTaskService: ISimulationTaskService,
-    private val simulationResultService: SimulationResultService,
+    private val viewModel: TasksViewModel,
 ) : PopOver() {
-    private val coroutineScope = CoroutineScope(Dispatchers.JavaFx)
-
     private val inProgressContainer = VBox()
         .apply {
             spacing = 5.0
@@ -47,7 +40,7 @@ class TasksPopOver(
             padding = Insets(2.0)
         }
 
-    private val detailsTextProperty = SimpleStringProperty("")
+    private val detailsTextProperty = javafx.beans.property.SimpleStringProperty("")
 
     private val detailsPopover = PopOver().apply {
         arrowLocation = ArrowLocation.LEFT_BOTTOM
@@ -60,7 +53,7 @@ class TasksPopOver(
         }
     }
 
-    private val itemMap = mutableMapOf<SimulationTask, HBox>()
+    private val itemNodes = mutableMapOf<TaskItemViewModel, HBox>()
 
     init {
         contentNode = VBox(
@@ -77,80 +70,50 @@ class TasksPopOver(
             padding = Insets(10.0)
         }
 
-        bindTasksList()
+        observeList(viewModel.inProgress, inProgressContainer)
+        observeList(viewModel.completed, completedContainer)
+        observeList(viewModel.failed, failedContainer)
     }
 
-    private fun bindTasksList() {
-        coroutineScope.launch {
-            simulationTaskService.tasks.changeAsFlow()
-                .cancellable()
-                .collect {
-                    while (it.next()) {
-                        if (it.wasAdded()) {
-                            it.addedSubList.forEach { task ->
-                                val node = renderTask(task)
-                                itemMap[task] = node
-                                addToContainer(task, node)
-                                observeStatusChanges(task, node)
-                            }
-                        } else if (it.wasRemoved()) {
-                            it.removed.forEach { task ->
-                                val node = itemMap[task]
-                                itemMap.remove(task)
-                                removeFromContainer(task, node)
-                            }
+    private fun observeList(list: ObservableList<TaskItemViewModel>, container: VBox) {
+        list.addListener(ListChangeListener { change ->
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    change.addedSubList.forEach { item ->
+                        val node = renderItem(item)
+                        itemNodes[item] = node
+                        container.children.add(node)
+                    }
+                }
+                if (change.wasRemoved()) {
+                    change.removed.forEach { item ->
+                        val node = itemNodes.remove(item)
+                        if (node != null) {
+                            container.children.remove(node)
                         }
                     }
                 }
-        }
+            }
+        })
     }
 
-    private fun renderTask(task: SimulationTask): HBox {
-        return when (task.statusValue) {
-            SimulationTaskStatus.RUNNING -> createInProgressItem(task)
-            SimulationTaskStatus.COMPLETED -> createCompletedItem(task)
-            SimulationTaskStatus.FAILED, SimulationTaskStatus.CANCELLED -> createFailedItem(task)
-        }
+    private fun renderItem(item: TaskItemViewModel): HBox = when (item.task.status) {
+        SimulationTaskStatus.RUNNING -> createInProgressItem(item)
+        SimulationTaskStatus.COMPLETED -> createCompletedItem(item)
+        SimulationTaskStatus.FAILED, SimulationTaskStatus.CANCELLED -> createFailedItem(item)
     }
 
-    private fun observeStatusChanges(task: SimulationTask, node: HBox) {
-        task.status.addListener { _, _, newStatus ->
-            removeFromContainer(task, node)
-            val newNode = renderTask(task)
-            itemMap[task] = newNode
-            addToContainer(task, newNode)
-        }
-    }
-
-    private fun addToContainer(task: SimulationTask, node: HBox) {
-        when (task.statusValue) {
-            SimulationTaskStatus.RUNNING -> inProgressContainer.children.add(node)
-            SimulationTaskStatus.COMPLETED -> completedContainer.children.add(node)
-            SimulationTaskStatus.FAILED, SimulationTaskStatus.CANCELLED -> failedContainer.children.add(node)
-        }
-    }
-
-    private fun removeFromContainer(task: SimulationTask, node: HBox?) {
-        inProgressContainer.children.remove(node)
-        completedContainer.children.remove(node)
-        failedContainer.children.remove(node)
-    }
-
-    fun dispose() {
-        coroutineScope.cancel()
-    }
-
-    private fun createInProgressItem(task: SimulationTask): HBox {
+    private fun createInProgressItem(item: TaskItemViewModel): HBox {
         return HBox(
-            Label("Task #${task.id}"),
+            Label("Task #${item.task.id}"),
             ProgressBar().apply {
-                progressProperty().bind(task.progress)
+                progressProperty().bind(item.progressProperty)
             },
             Button().apply {
                 graphic = matIconAL("close")
                 tooltip = Tooltip("Abort")
                 onAction = EventHandler {
-                    simulationTaskService.cancelTask(task)
+                    viewModel.cancel(item.task)
                 }
             }
         ).apply {
@@ -159,32 +122,31 @@ class TasksPopOver(
         }
     }
 
-    private fun createCompletedItem(task: SimulationTask): HBox {
-        val result = task.result ?: return HBox()
+    private fun createCompletedItem(item: TaskItemViewModel): HBox {
         return HBox(
-            Label("Task #${task.id}"),
+            Label("Task #${item.task.id}"),
             Button("Show").apply {
                 onAction = EventHandler {
-                    simulationResultService.showChart(task)
+                    val picked = viewModel.prepareChartPicker(item.task) ?: return@EventHandler
+                    val model = pickAxisVariables(picked) ?: return@EventHandler
+                    viewModel.launchChart(item.task, model)
                 }
             },
             Button("Export").apply {
                 onAction = EventHandler {
-                    simulationResultService.exportToFile(task)
+                    viewModel.exportToFile(item.task, scene?.window)
                 }
             },
             Button("Remove").apply {
                 onAction = EventHandler {
-                    PopOverScope.launch {
-                        simulationResultService.removeResult(task)
-                    }
+                    viewModel.removeResult(item.task)
                 }
             },
             Button().apply {
                 tooltip = Tooltip("Details")
                 graphic = matIconAL("chevron_right")
                 onAction = EventHandler {
-                    detailsTextProperty.value = result.toMultilineDetails()
+                    detailsTextProperty.value = item.detailsText()
                     detailsPopover.show(this)
                 }
             }
@@ -194,63 +156,20 @@ class TasksPopOver(
         }
     }
 
-    private fun createFailedItem(task: SimulationTask): HBox {
+    private fun createFailedItem(item: TaskItemViewModel): HBox {
         return HBox(
-            Label("Task #${task.id}"),
-            Label(task.errorValue ?: "Unknown error").apply {
+            Label("Task #${item.task.id}"),
+            Label(item.task.error ?: "Unknown error").apply {
                 style = "-fx-text-fill: red;"
             },
             Button("Remove").apply {
                 onAction = EventHandler {
-                    PopOverScope.launch {
-                        simulationResultService.removeResult(task)
-                    }
+                    viewModel.removeResult(item.task)
                 }
             }
         ).apply {
             alignment = Pos.CENTER_LEFT
             spacing = 5.0
         }
-    }
-
-    companion object {
-        val PopOverScope = CoroutineScope(Dispatchers.JavaFx)
-
-        private fun CompletedSimulationModel.toMultilineDetails(): String {
-            val builder = StringBuilder()
-
-            builder
-                .appendLine("Model")
-                .appendLine("Name: $modelName")
-                .appendLine()
-
-            builder
-                .appendLine("Cauchy Initials")
-                .appendLine("Start: ${parameters.cauchyInitials.startTime}")
-                .appendLine("End: ${parameters.cauchyInitials.endTime}")
-                .appendLine("Initial step: ${parameters.cauchyInitials.initialStep}")
-                .appendLine()
-
-            builder
-                .appendLine("Integration Method")
-                .appendLine("Method: ${parameters.integrationMethodParameters.selectedMethod}")
-                .appendLine("Is accurate: ${parameters.integrationMethodParameters.isAccuracyInUse}")
-
-            if (parameters.integrationMethodParameters.isAccuracyInUse) {
-                builder.appendLine("Accuracy: ${parameters.integrationMethodParameters.accuracy}")
-            }
-
-            builder
-                .appendLine("Is stable: ${parameters.integrationMethodParameters.isStableInUse}")
-                .appendLine()
-
-            builder
-                .appendLine("Statistic")
-                .appendLine("Simulation time: ${metricData.simulationTime}ms")
-                .appendLine()
-
-            return builder.toString()
-        }
-
     }
 }

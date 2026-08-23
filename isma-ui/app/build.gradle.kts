@@ -62,6 +62,7 @@ dependencies {
     testImplementation(project(":isma-ui:toolkit"))
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {
@@ -72,4 +73,6 @@ tasks.test {
         "--add-opens=java.base/java.util=ALL-UNNAMED",
         "--add-opens=java.base/java.io=ALL-UNNAMED"
     )
+    // Run tests on the classpath to avoid JPMS split-package conflicts (e.g. MockK)
+    (extensions.getByName("moduleOptions") as org.javamodularity.moduleplugin.extensions.TestModuleOptions).runOnClasspath = true
 }

@@ -1,91 +1,18 @@
 package ru.isma.next.app.services.simulation
 
-import javafx.collections.FXCollections
-import javafx.stage.FileChooser
-import javafx.stage.Window
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import ru.isma.next.app.constants.SIMULATION_PARAMETERS_FILE
-import ru.isma.next.app.viewmodels.*
-import ru.isma.next.app.models.simulation.SaveTarget
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 
-class SimulationParametersService(methodNames: List<String>) {
-    val integrationMethods = FXCollections.observableArrayList(methodNames)
-
-    val cauchyInitials = CauchyInitialsViewModel()
-
-    val integrationMethod = IntegrationMethodParametersViewModel()
-
-    val resultSaving = ResultSavingParametersViewModel()
-
-    val eventDetection = EventDetectionParametersViewModel()
+class SimulationParametersService(availableMethods: List<String>) {
+    val methodNames: List<String> = availableMethods
 
     init {
-        if (integrationMethods.isEmpty()) {
-            throw IllegalArgumentException("integrationMethods must not be empty")
-        }
-        integrationMethod.selectedMethod = integrationMethods.firstOrNull() ?: throw IllegalArgumentException("No integration methods available")
-
-        cauchyInitials.step = 0.1
-        require(cauchyInitials.step > 0) { "Step must be > 0, was ${cauchyInitials.step}" }
-        cauchyInitials.startTime = 0.0
-        cauchyInitials.endTime = 10.0
-        require(cauchyInitials.endTime > cauchyInitials.startTime) { "endTime must be > startTime" }
-
-        integrationMethod.accuracy = 0.1
-        integrationMethod.server = "localhost"
-        integrationMethod.port = 7890
-
-        resultSaving.savingTarget = SaveTarget.MEMORY
-
-        eventDetection.gamma = 0.8
-        eventDetection.lowBorder = 0.001
+        require(availableMethods.isNotEmpty()) { "availableMethods must not be empty" }
     }
 
-    fun store(ownerWindow: Window? = null) {
-        val file = FileChooser().run {
-            title = "Save Simulation Parameters"
-            extensionFilters.addAll(simulationParametersFileFilters)
-            return@run showSaveDialog(ownerWindow)
-        } ?: return
+    fun serialize(model: SimulationParametersModel): String = Json.encodeToString(model)
 
-        val fileOutput = Json.encodeToString(snapshot())
-
-        file.writeText(fileOutput)
-    }
-
-    fun load(ownerWindow: Window? = null) {
-        val file = FileChooser().run {
-            title = "Load Simulation Parameters"
-            extensionFilters.addAll(simulationParametersFileFilters)
-            return@run showOpenDialog(ownerWindow)
-        } ?: return
-
-        val inputText = file.readText()
-
-        val simulationParameters = Json.decodeFromString<SimulationParametersModel>(inputText)
-
-        commit(simulationParameters)
-    }
-
-    fun commit(model: SimulationParametersModel){
-        cauchyInitials.commit(model.cauchyInitials)
-        eventDetection.commit(model.eventDetectionParameters)
-        integrationMethod.commit(model.integrationMethodParameters)
-        resultSaving.commit(model.resultSavingParameters)
-    }
-
-    fun snapshot() = SimulationParametersModel(
-        cauchyInitials.snapshot(),
-        eventDetection.snapshot(),
-        integrationMethod.snapshot(),
-        resultSaving.snapshot()
-    )
-
-    companion object {
-        private val simulationParametersFileFilters = arrayOf(
-            FileChooser.ExtensionFilter("Simulation Parameters File", SIMULATION_PARAMETERS_FILE),
-        )
-    }
+    fun deserialize(text: String): SimulationParametersModel = Json.decodeFromString(text)
 }

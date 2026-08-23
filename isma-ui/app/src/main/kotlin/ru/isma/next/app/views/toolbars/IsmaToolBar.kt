@@ -7,85 +7,70 @@ import javafx.scene.control.ToolBar
 import javafx.scene.control.Tooltip
 import ru.isma.next.app.extensions.matIconAL
 import ru.isma.next.app.extensions.matIconMZ
-import ru.isma.next.app.services.project.LismaPdeService
-import ru.isma.next.app.services.project.ProjectFileService
-import ru.isma.next.app.services.project.IProjectService
-import ru.isma.next.app.services.simulation.SimulationParametersService
-import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
+import ru.isma.next.app.viewmodels.MainCommandsViewModel
 
 class IsmaToolBar(
-    private val projectController: IProjectService,
-    private val projectFileService: ProjectFileService,
-    private val lismaPdeService: LismaPdeService,
-    private val textEditorService: IEditorPlatformService,
-    private val simulationParametersService: SimulationParametersService,
+    private val commands: MainCommandsViewModel,
 ): ToolBar() {
     init {
         items.addAll(
             Button().apply {
                 graphic = matIconAL("add_circle_outline")
                 tooltip = Tooltip("New model")
-                onAction = EventHandler { projectController.createNew() }
+                onAction = EventHandler { commands.newProject() }
             },
             Button().apply {
                 graphic = matIconAL("add_box")
                 tooltip = Tooltip("New statechart")
-                onAction = EventHandler { projectController.createNewBlueprint() }
+                onAction = EventHandler { commands.newBlueprint() }
             },
             Button().apply {
                 graphic = matIconAL("folder_open")
                 tooltip = Tooltip("Open model")
-                onAction = EventHandler { projectFileService.open() }
+                onAction = EventHandler { commands.open(scene?.window) }
             },
             Button().apply {
                 graphic = matIconMZ("save")
                 tooltip = Tooltip("Save current model")
-                onAction = EventHandler { projectFileService.save() }
+                onAction = EventHandler { commands.save() }
             },
             Button().apply {
                 graphic = matIconMZ("save_alt")
                 tooltip = Tooltip("Save all models")
-                onAction = EventHandler { projectFileService.saveAll() }
+                onAction = EventHandler { commands.saveAll(scene?.window) }
             },
             Separator(),
             Button().apply {
                 graphic = matIconAL("content_cut")
                 tooltip = Tooltip("Cut")
-                onAction = EventHandler { textEditorService.cut() }
+                onAction = EventHandler { commands.cut() }
             },
             Button().apply {
                 graphic = matIconAL("content_copy")
                 tooltip = Tooltip("Copy")
-                onAction = EventHandler { textEditorService.copy() }
+                onAction = EventHandler { commands.copy() }
             },
             Button().apply {
                 graphic = matIconAL("content_paste")
                 tooltip = Tooltip("Paste")
-                onAction = EventHandler { textEditorService.paste() }
+                onAction = EventHandler { commands.paste() }
             },
             Separator(),
             Button().apply {
                 graphic = matIconAL("check_circle")
                 tooltip = Tooltip("Verify")
-                onAction = EventHandler {
-                    val lismaSnapshot = projectController.activeProject?.snapshot() ?: return@EventHandler
-                    lismaPdeService.translateLisma(lismaSnapshot)
-                }
+                onAction = EventHandler { commands.verify() }
             },
             Separator(),
             Button().apply {
                 graphic = matIconAL("bookmark")
                 tooltip = Tooltip("Store Settings")
-                onAction = EventHandler {
-                    simulationParametersService.store()
-                }
+                onAction = EventHandler { commands.storeSettings(scene?.window) }
             },
             Button().apply {
                 graphic = matIconAL("bookmark_border")
                 tooltip = Tooltip("Load Settings")
-                onAction = EventHandler {
-                    simulationParametersService.load()
-                }
+                onAction = EventHandler { commands.loadSettings(scene?.window) }
             },
         )
     }

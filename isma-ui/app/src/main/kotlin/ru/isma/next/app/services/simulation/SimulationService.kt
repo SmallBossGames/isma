@@ -1,27 +1,21 @@
 package ru.isma.next.app.services.simulation
 
-import javafx.collections.FXCollections
+import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.models.simulation.SimulationTask
-import ru.isma.next.app.services.project.IProjectService
-import ru.isma.next.app.services.project.ProjectService
-import ru.isma.next.app.services.simulation.ISimulationService
-import ru.isma.next.app.services.simulation.ISimulationTaskService
-import ru.isma.next.external.dtos.RunSimulationParams
-import org.koin.core.component.KoinComponent
+import ru.isma.next.app.services.project.ProjectEditorPort
 
 class SimulationService(
-    private val projectService: IProjectService,
+    private val editorPort: ProjectEditorPort,
     private val simulationTaskService: ISimulationTaskService,
-    private val simulationParametersService: SimulationParametersService,
-) : ISimulationService, KoinComponent {
+) : ISimulationService {
 
-    override fun simulate() {
-        val simulationParameters = simulationParametersService.snapshot()
-        val project = projectService.activeProject ?: return
+    override fun simulate(project: IProjectModel, simulationParameters: SimulationParametersModel) {
+        val sourceCode = editorPort.content(project).fullText
 
         simulationTaskService.submit(
             modelName = project.name,
+            sourceCode = sourceCode,
             simulationParameters = simulationParameters,
         )
     }
@@ -29,6 +23,4 @@ class SimulationService(
     override fun stopSimulation(task: SimulationTask) {
         simulationTaskService.cancelTask(task)
     }
-
-
 }

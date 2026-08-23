@@ -1,13 +1,15 @@
 package ru.isma.next.app.services
 
-import ru.isma.next.app.models.ErrorViewModel
-import javafx.collections.FXCollections
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import ru.isma.next.app.models.CompilationErrorItem
 
 class ModelErrorService {
-    val errors = FXCollections.observableArrayList<ErrorViewModel>()
+    private val errorsInternal = MutableSharedFlow<List<CompilationErrorItem>>(replay = 1)
 
-    fun putErrorList(errors: Iterable<ErrorViewModel>){
-        this.errors.clear()
-        this.errors.addAll(errors)
+    val errors: Flow<List<CompilationErrorItem>> = errorsInternal
+
+    fun putErrorList(errors: Iterable<CompilationErrorItem>) {
+        errorsInternal.tryEmit(errors.toList())
     }
 }

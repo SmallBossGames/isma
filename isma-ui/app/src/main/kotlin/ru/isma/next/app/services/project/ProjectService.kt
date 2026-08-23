@@ -1,14 +1,24 @@
 package ru.isma.next.app.services.project
 
-import javafx.collections.FXCollections
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
 
 class ProjectService : IProjectService {
-    override val projects = FXCollections.observableSet<IProjectModel>()
+    private val projectsInternal = mutableListOf<IProjectModel>()
 
-    override var activeProject: IProjectModel? = null
+    private val addedProjectsInternal = MutableSharedFlow<IProjectModel>(
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
+    override val projects: List<IProjectModel>
+        get() = projectsInternal.toList()
+
+    override val addedProjects: Flow<IProjectModel> = addedProjectsInternal
 
     override fun createNewBlueprint(name: String) {
         BlueprintProjectModel().apply {
@@ -17,33 +27,34 @@ class ProjectService : IProjectService {
         }
     }
 
-    override fun createNew(name: String){
+    override fun createNew(name: String) {
         LismaProjectModel().apply {
             this.name = name
             addText(this)
         }
     }
 
-    override fun addText(project: LismaProjectModel){
-        projects.add(project)
+    override fun addText(project: LismaProjectModel) {
+        addProject(project)
     }
 
-    override fun addBlueprint(project: BlueprintProjectModel){
-        projects.add(project)
+    override fun addBlueprint(project: BlueprintProjectModel) {
+        addProject(project)
     }
 
-    override fun close(project: IProjectModel){
-        projects.remove(project)
+    override fun close(project: IProjectModel) {
+        projectsInternal.remove(project)
         project.dispose()
     }
 
     override fun closeAll() {
-        val temp = projects.toTypedArray()
-
-        projects.clear()
-
-        temp.forEach { it.dispose() }
+        val snapshot = projectsInternal.toList()
+        projectsInternal.clear()
+        snapshot.forEach { it.dispose() }
     }
 
-    override fun getAllProjects() = projects.toTypedArray()
+    private fun addProject(project: IProjectModel) {
+        projectsInternal.add(project)
+        addedProjectsInternal.tryEmit(project)
+    }
 }

@@ -1,6 +1,7 @@
 package ru.isma.next.editor.blueprint.views
 
 import javafx.event.EventHandler
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
@@ -18,6 +19,7 @@ class IsmaBlueprintEditor(
     }
     private val tabs = TabPane(diagramTab)
     private val viewModel = IsmaBlueprintViewModel()
+    private val openEditorTabs = mutableMapOf<Tab, Node>()
 
     init {
         viewModel.onOpenStateTextEditor = { stateVm ->
@@ -27,8 +29,12 @@ class IsmaBlueprintEditor(
             )
             val tab = Tab(stateVm.name, editor).apply {
                 textProperty().bind(stateVm.nameProperty)
-                setOnCloseRequest { editorFactory.disposeInstance(editor) }
+                setOnCloseRequest {
+                    editorFactory.disposeInstance(editor)
+                    openEditorTabs.remove(this@apply)
+                }
             }
+            openEditorTabs[tab] = editor
             tabs.tabs.add(tab)
         }
 
@@ -39,8 +45,12 @@ class IsmaBlueprintEditor(
             )
             val tab = Tab("${stateVm.name} (loop)", editor).apply {
                 textProperty().bind(stateVm.nameProperty.concat(" (loop)"))
-                setOnCloseRequest { editorFactory.disposeInstance(editor) }
+                setOnCloseRequest {
+                    editorFactory.disposeInstance(editor)
+                    openEditorTabs.remove(this@apply)
+                }
             }
+            openEditorTabs[tab] = editor
             tabs.tabs.add(tab)
         }
 
@@ -110,5 +120,10 @@ class IsmaBlueprintEditor(
 
     fun setBlueprintModel(model: ru.isma.next.editor.blueprint.models.BlueprintModel) {
         viewModel.fromBlueprintModel(model)
+    }
+
+    fun dispose() {
+        openEditorTabs.values.forEach { editorFactory.disposeInstance(it) }
+        openEditorTabs.clear()
     }
 }

@@ -3,32 +3,33 @@ package ru.isma.next.app.views.settings
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Pane
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.isma.next.app.services.simulation.SimulationParametersService
+import ru.isma.next.app.viewmodels.SimulationParametersViewModel
 
 class MethodSettingsView(
-    private val parametersService: SimulationParametersService
+    private val parametersViewModel: SimulationParametersViewModel
 ) : Pane() {
     val title: String = "Integration"
 
     init {
+        val integrationMethod = parametersViewModel.integrationMethod
         val scrollPane = ScrollPane(
             propertiesGrid {
                 addNode(
                     "Method",
-                    parametersService.integrationMethods,
-                    parametersService.integrationMethod.selectedMethodProperty
+                    parametersViewModel.integrationMethods,
+                    integrationMethod.selectedMethodProperty
                 )
-                addNode("Accurate", parametersService.integrationMethod.isAccuracyInUseProperty)
-                addNode("Accuracy", parametersService.integrationMethod.accuracyProperty).apply {
-                    disableProperty().bind(parametersService.integrationMethod.isAccuracyInUseProperty.not())
+                addNode("Accurate", integrationMethod.isAccuracyInUseProperty)
+                addNode("Accuracy", integrationMethod.accuracyProperty).apply {
+                    disableProperty().bind(integrationMethod.isAccuracyInUseProperty.not())
                 }
-                addNode("Stable", parametersService.integrationMethod.isStableInUseProperty)
-                addNode("Parallel", parametersService.integrationMethod.isParallelInUseProperty)
-                addNode("Server", parametersService.integrationMethod.serverProperty).apply {
-                    disableProperty().bind(parametersService.integrationMethod.isParallelInUseProperty.not())
+                addNode("Stable", integrationMethod.isStableInUseProperty)
+                addNode("Parallel", integrationMethod.isParallelInUseProperty)
+                addNode("Server", integrationMethod.serverProperty).apply {
+                    disableProperty().bind(integrationMethod.isParallelInUseProperty.not())
                 }
-                addNode("Port", parametersService.integrationMethod.portProperty).apply {
-                    disableProperty().bind(parametersService.integrationMethod.isParallelInUseProperty.not())
+                addNode("Port", integrationMethod.portProperty).apply {
+                    disableProperty().bind(integrationMethod.isParallelInUseProperty.not())
                 }
             }
         )

@@ -64,6 +64,7 @@ kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = 
 
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:6.1.0"
 junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:6.1.0"
+junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.1.0"
 
 [plugins]
 java-modules = { id = "org.javamodularity.moduleplugin", version = "2.0.1" }

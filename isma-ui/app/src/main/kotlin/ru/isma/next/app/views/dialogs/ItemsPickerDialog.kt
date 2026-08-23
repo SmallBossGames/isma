@@ -12,14 +12,10 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import ru.isma.javafx.extensions.controls.cellFactory
 import ru.isma.javafx.extensions.controls.comboBox
+import ru.isma.next.app.models.simulation.NamedPickerItem
+import ru.isma.next.app.models.simulation.NamedPickerModel
 
 private const val LIST_ITEMS_SPACING = 10.0
-
-data class NamedPickerItem<T>(val name: String, val value: T)
-data class NamedPickerModel<T>(
-    val xAxisItem: NamedPickerItem<T>,
-    val yAxisItems: List<NamedPickerItem<T>>
-)
 
 fun <T> pickAxisVariables(
     model: NamedPickerModel<T>

@@ -1,15 +1,15 @@
 package ru.isma.next.app.services.project
 
-import javafx.collections.ObservableSet
+import kotlinx.coroutines.flow.Flow
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
 
 interface IProjectService {
 
-    val projects: ObservableSet<IProjectModel>
+    val projects: List<IProjectModel>
 
-    var activeProject: IProjectModel?
+    val addedProjects: Flow<IProjectModel>
 
     fun createNewBlueprint(name: String = "New statechart")
 
@@ -22,6 +22,4 @@ interface IProjectService {
     fun close(project: IProjectModel)
 
     fun closeAll()
-
-    fun getAllProjects(): Array<IProjectModel>
 }

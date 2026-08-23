@@ -6,18 +6,15 @@ import javafx.scene.image.Image
 import javafx.stage.Stage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import ru.isma.next.app.models.preferences.DefaultFilesPreferencesModel
-import ru.isma.next.app.models.preferences.WindowPreferencesModel
-import ru.isma.next.app.services.preferences.PreferencesProvider
-import ru.isma.next.app.services.project.ProjectFileService
+import org.koin.core.context.stopKoin
+import ru.isma.next.app.viewmodels.WindowViewModel
 import ru.isma.next.app.views.MainView
 import ru.isma.next.external.SimulationServerFacade
 
 class IsmaApplication : Application(), KoinComponent {
     lateinit var stage: Stage
 
-    private val projectFileService: ProjectFileService by inject()
-    private val preferencesProvider: PreferencesProvider by inject()
+    private val windowViewModel: WindowViewModel by inject()
     private val mainView: MainView by inject()
     private val serverFacade: SimulationServerFacade by inject()
 
@@ -31,7 +28,12 @@ class IsmaApplication : Application(), KoinComponent {
 
         val scene = Scene(mainView)
 
-        stage.initWindow(scene, "ISMA 22")
+        stage.title = "ISMA 22"
+        stage.scene = scene
+        stage.minHeight = 500.0
+        stage.minWidth = 600.0
+
+        windowViewModel.applyPreferences(stage)
 
         stage.icons.add(Image("/ru/isma/next/app/launcher/isma-2016-title.png"))
         stage.show()
@@ -41,43 +43,8 @@ class IsmaApplication : Application(), KoinComponent {
     }
 
     override fun stop() {
-        stage.tearDownWindow()
+        windowViewModel.capture(stage)
         serverFacade.shutdown()
-    }
-
-    private fun Stage.initWindow(scene: Scene, title: String) {
-        val windowProps = preferencesProvider.preferences.windowPreferences
-        val defaultFilesPreferences = preferencesProvider.preferences.defaultFilesPreferencesModel
-
-        this.title = title
-        this.scene = scene
-
-        isMaximized = windowProps.isMaximized
-        height = windowProps.height
-        width = windowProps.width
-        x = windowProps.x
-        y = windowProps.y
-
-        minHeight = 500.0
-        minWidth = 600.0
-
-        projectFileService.open(*defaultFilesPreferences.lastOpenedProjectPath.filterNotNull().toTypedArray())
-    }
-
-    private fun Stage.tearDownWindow() {
-        val preferencesModel = WindowPreferencesModel(
-            isMaximized = this.isMaximized,
-            height = this.height,
-            width = this.width,
-            x = this.x,
-            y = this.y,
-        )
-
-        val defaultFilesPreferences = DefaultFilesPreferencesModel(
-            lastOpenedProjectPath = projectFileService.listAllFilesPaths().toTypedArray()
-        )
-
-        preferencesProvider.commit(preferencesModel)
-        preferencesProvider.commit(defaultFilesPreferences)
+        stopKoin()
     }
 }

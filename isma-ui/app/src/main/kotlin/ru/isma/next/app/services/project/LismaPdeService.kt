@@ -1,7 +1,7 @@
 package ru.isma.next.app.services.project
 
+import ru.isma.next.app.models.CompilationErrorItem
 import ru.isma.next.app.services.ModelErrorService
-import ru.isma.next.app.models.ErrorViewModel
 import ru.isma.next.editor.blueprint.models.LismaTextModel
 import ru.isma.next.external.SimulationServerFacade
 import ru.isma.next.external.dtos.CompilationErrorDto
@@ -13,16 +13,12 @@ class LismaPdeService(
     fun translateLisma(sourceSnapshot: LismaTextModel): LismaPdeTranslationResult {
         val validationResult = serverFacade.validateModel(sourceSnapshot.fullText)
 
-        val errorViewModels = validationResult.errors.map { error: CompilationErrorDto ->
-            ErrorViewModel(error.row, error.column, LismaTextModel.DefaultFragment.name, error.message)
+        val errorItems = validationResult.errors.map { error: CompilationErrorDto ->
+            CompilationErrorItem(error.row, error.column, LismaTextModel.DefaultFragment.name, error.message)
         }
 
-        modelService.putErrorList(errorViewModels)
+        modelService.putErrorList(errorItems)
 
-        if (validationResult.errors.isEmpty()) {
-            return SuccessTranslation
-        }
-
-        return FailedTranslation
+        return if (validationResult.errors.isEmpty()) SuccessTranslation else FailedTranslation
     }
 }

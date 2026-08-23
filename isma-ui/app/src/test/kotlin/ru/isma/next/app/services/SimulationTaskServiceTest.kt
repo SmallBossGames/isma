@@ -5,10 +5,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import ru.isma.javafx.extensions.coroutines.TestUiThreadExecutor
+import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.models.simulation.CauchyInitialsModel
 import ru.isma.next.app.models.simulation.EventDetectionParametersModel
 import ru.isma.next.app.models.simulation.IntegrationMethodParametersModel
@@ -19,16 +18,34 @@ import ru.isma.next.app.models.simulation.SimulationTask
 import ru.isma.next.app.models.simulation.SimulationTaskStatus
 import ru.isma.next.app.services.simulation.SimulationTaskService
 import ru.isma.next.external.SimulationServerFacade
+import ru.isma.next.external.dtos.CachedSimulationResult
 import ru.isma.next.external.dtos.CompileResult
 import ru.isma.next.external.dtos.CompilationErrorDto
 import ru.isma.next.external.dtos.RunSimulationParams
+import ru.isma.next.domain.models.SimulationProgress
+import java.io.File
 
 class SimulationTaskServiceTest {
 
+    private class QueueUiThreadExecutor : UiThreadExecutor {
+        private val queue = ArrayDeque<() -> Unit>()
+        private val lock = Any()
+
+        override fun executeOnUi(runnable: () -> Unit) {
+            synchronized(lock) { queue.addLast(runnable) }
+        }
+
+        fun drain() {
+            while (true) {
+                val runnable = synchronized(lock) { queue.removeFirstOrNull() } ?: break
+                runnable()
+            }
+        }
+    }
+
     private val serverFacade = mockk<SimulationServerFacade>()
     private val modelErrorService = mockk<ModelErrorService>()
-    private val projectService = mockk<ru.isma.next.app.services.project.IProjectService>()
-    private val uiThreadExecutor = TestUiThreadExecutor()
+    private val uiExecutor = QueueUiThreadExecutor()
 
     private lateinit var service: SimulationTaskService
 
@@ -39,92 +56,78 @@ class SimulationTaskServiceTest {
         resultSavingParameters = ResultSavingParametersModel(SaveTarget.MEMORY),
     )
 
-    private fun createTask(id: Long = 1, name: String = "TestModel") =
-        SimulationTask(id, name, testParameters())
-
     private fun mockSuccessfulCompile(source: String, modelId: String = "model-123") {
-        every { projectService.activeProject } returns mockk {
-            every { snapshot() } returns mockk {
-                every { fullText } returns source
-            }
-        }
         every { serverFacade.compileModel(source) } returns CompileResult(
             modelId = modelId, errors = emptyList(), warnings = emptyList()
         )
         every { serverFacade.runSimulation(any<RunSimulationParams>()) } returns 42L
-        every { serverFacade.monitorSimulation(42L, 0.01) } returns kotlinx.coroutines.flow.flow {
-            emit(ru.isma.next.domain.models.SimulationProgress(0.0, 10.0, 5.0))
-            emit(ru.isma.next.domain.models.SimulationProgress(0.0, 10.0, 10.0))
+        every { serverFacade.monitorSimulation(42L, 0.01) } returns flow {
+            emit(SimulationProgress(0.0, 10.0, 5.0))
+            emit(SimulationProgress(0.0, 10.0, 10.0))
         }
-        coEvery { serverFacade.downloadResultToCache(42L) } returns mockk {
-            every { file } returns java.io.File("/tmp/test.bin")
-            every { columnNames } returns listOf("x", "y")
+        coEvery { serverFacade.downloadResultToCache(42L) } returns CachedSimulationResult(
+            file = File("/tmp/test.bin"),
+            columnNames = listOf("x", "y")
+        )
+    }
+
+    private fun awaitUi(timeoutMs: Long = 5000, condition: () -> Boolean) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            uiExecutor.drain()
+            if (condition()) return
+            Thread.sleep(10)
         }
+        uiExecutor.drain()
+        assert(condition()) { "Condition not met within ${timeoutMs}ms" }
     }
 
     @BeforeEach
     fun setUp() {
         every { modelErrorService.putErrorList(any()) } returns Unit
-        service = SimulationTaskService(serverFacade, modelErrorService, projectService, uiThreadExecutor)
+        service = SimulationTaskService(serverFacade, modelErrorService, uiExecutor)
     }
 
     @Test
-    fun `compileProject returns result with successful compilation`() {
+    fun `submit returns task with correct id and modelName`() {
         mockSuccessfulCompile("model TestModel {}")
 
-        val task = createTask(1, "TestModel")
-        service.submit("TestModel", mockk(relaxed = true), testParameters())
-
-        uiThreadExecutor.executePending()
+        val task = service.submit("TestModel", "model TestModel {}", testParameters())
 
         assert(task.id == 1L) { "Expected id=1, got ${task.id}" }
         assert(task.modelName == "TestModel") { "Expected TestModel, got ${task.modelName}" }
     }
 
     @Test
-    fun `compileProject fails with compilation errors`() {
+    fun `submit fails with compilation errors`() {
         val source = "bad code"
-        every { projectService.activeProject } returns mockk {
-            every { snapshot() } returns mockk {
-                every { fullText } returns source
-            }
-        }
         every { serverFacade.compileModel(source) } returns CompileResult(
             modelId = "", errors = listOf(CompilationErrorDto(1, 5, "Syntax error")), warnings = emptyList()
         )
 
-        val task = createTask(2, "BadModel")
-        service.submit("BadModel", mockk(relaxed = true), testParameters())
+        val task = service.submit("BadModel", source, testParameters())
 
-        uiThreadExecutor.executePending()
+        awaitUi { task.status == SimulationTaskStatus.FAILED }
 
-        assert(task.statusValue == SimulationTaskStatus.FAILED) { "Expected FAILED, got ${task.statusValue}" }
-        assert(task.errorValue == "Compilation failed: Syntax error") { "Expected compilation error message, got ${task.errorValue}" }
+        assert(task.error == "Compilation failed: Syntax error") { "Expected compilation error message, got ${task.error}" }
     }
 
     @Test
-    fun `runSimulation invokes progress callback`() = runTest {
+    fun `submit adds task to list and completes on success`() {
         mockSuccessfulCompile("model Progress {}")
 
-        val task = createTask(3, "ProgressModel")
-        service.submit("ProgressModel", mockk(relaxed = true), testParameters())
+        val task = service.submit("ProgressModel", "model Progress {}", testParameters())
 
-        uiThreadExecutor.executePending()
-        uiThreadExecutor.executePending()
+        awaitUi { service.tasks.any { it.id == task.id } && task.status == SimulationTaskStatus.COMPLETED }
 
         assert(service.tasks.size == 1) { "Expected 1 task in list, got ${service.tasks.size}" }
-        assert(service.tasks[0].id == 3L) { "Expected task id=3, got ${service.tasks[0].id}" }
+        assert(service.tasks[0].id == task.id) { "Expected task id=${task.id}, got ${service.tasks[0].id}" }
+        assert(task.progress == 1.0) { "Expected progress 1.0, got ${task.progress}" }
     }
 
     @Test
-    fun `cancelSimulation delegates to client`() {
-        mockSuccessfulCompile("model Cancel {}")
-
-        val task = createTask(4, "CancelModel")
-        service.submit("CancelModel", mockk(relaxed = true), testParameters())
-
-        uiThreadExecutor.executePending()
-
+    fun `cancelTask delegates to serverFacade`() {
+        val task = SimulationTask(4L, "CancelModel", testParameters())
         every { serverFacade.cancelSimulation(4L) } returns Unit
 
         service.cancelTask(task)
@@ -133,44 +136,15 @@ class SimulationTaskServiceTest {
     }
 
     @Test
-    fun `cancelTask removes job from currentJobs`() {
-        mockSuccessfulCompile("model JobCancel {}")
-
-        val task = createTask(5, "JobCancelModel")
-        service.submit("JobCancelModel", mockk(relaxed = true), testParameters())
-
-        uiThreadExecutor.executePending()
-
-        every { serverFacade.cancelSimulation(5L) } returns Unit
-
-        service.cancelTask(task)
-
-        verify(exactly = 1) { serverFacade.cancelSimulation(5L) }
-    }
-
-    @Test
-    fun `submit adds task to observable list`() {
+    fun `removeTask removes task from list`() {
         mockSuccessfulCompile("model List {}")
 
-        val task = createTask(6, "ListModel")
-        service.submit("ListModel", mockk(relaxed = true), testParameters())
+        val task = service.submit("ListModel", "model List {}", testParameters())
 
-        uiThreadExecutor.executePending()
+        awaitUi { service.tasks.any { it.id == task.id } }
 
-        assert(service.tasks.size == 1) { "Expected 1 task, got ${service.tasks.size}" }
-        assert(service.tasks[0].modelName == "ListModel") { "Expected ListModel, got ${service.tasks[0].modelName}" }
-    }
+        service.removeTask(task)
 
-    @Test
-    fun `submit handles no active project`() {
-        every { projectService.activeProject } returns null
-
-        val task = createTask(7, "NoProjectModel")
-        service.submit("NoProjectModel", mockk(relaxed = true), testParameters())
-
-        uiThreadExecutor.executePending()
-
-        assert(task.statusValue == SimulationTaskStatus.FAILED) { "Expected FAILED, got ${task.statusValue}" }
-        assert(task.errorValue == "No active project") { "Expected 'No active project', got ${task.errorValue}" }
+        assert(service.tasks.none { it.id == task.id }) { "Expected task removed from list" }
     }
 }

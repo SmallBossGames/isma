@@ -4,11 +4,11 @@ import javafx.collections.FXCollections
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Pane
 import ru.isma.javafx.extensions.controls.propertiesGrid
-import ru.isma.next.app.services.simulation.SimulationParametersService
 import ru.isma.next.app.models.simulation.SaveTarget
+import ru.isma.next.app.viewmodels.SimulationParametersViewModel
 
 class ResultSavingView(
-    private val parametersService: SimulationParametersService
+    private val parametersViewModel: SimulationParametersViewModel
 ) : Pane() {
     val title: String = "Result saving"
 
@@ -18,7 +18,7 @@ class ResultSavingView(
                 addNode(
                     "Save result",
                     FXCollections.observableArrayList(SaveTarget.values().toList()),
-                    parametersService.resultSaving.savingTargetProperty
+                    parametersViewModel.resultSaving.savingTargetProperty
                 )
             }
         )

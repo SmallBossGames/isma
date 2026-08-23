@@ -1,128 +1,83 @@
 package ru.isma.next.app.views.toolbars
 
-import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.scene.control.SeparatorMenuItem
 import javafx.scene.input.KeyCombination
-import ru.isma.next.app.services.project.IProjectService
-import ru.isma.next.app.services.project.ProjectFileService
-import ru.isma.next.app.services.simulation.ISimulationService
-import ru.isma.next.app.services.simulation.SimulationParametersService
-import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
+import ru.isma.next.app.viewmodels.MainCommandsViewModel
 
 class IsmaMenuBar(
-    private val projectController: IProjectService,
-    private val projectFileService: ProjectFileService,
-    private val simulationService: ISimulationService,
-    private val textEditorService: IEditorPlatformService,
-    private val simulationParametersService: SimulationParametersService,
+    private val commands: MainCommandsViewModel,
 ): MenuBar() {
     init {
         menus.addAll(
             Menu("File", null,
                 MenuItem("New text", null).apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+N")
-                    onAction = EventHandler {
-                        projectController.createNew()
-                    }
+                    onAction = EventHandler { commands.newProject() }
                 },
                 MenuItem("New Statechart").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+B")
-                    onAction = EventHandler {
-                        projectController.createNewBlueprint()
-                    }
+                    onAction = EventHandler { commands.newBlueprint() }
                 },
                 MenuItem("Open").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+O")
-                    onAction = EventHandler {
-                        projectFileService.open()
-                    }
+                    onAction = EventHandler { commands.open(scene?.window) }
                 },
                 MenuItem("Save").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+S")
-                    onAction = EventHandler {
-                        projectFileService.save()
-                    }
+                    onAction = EventHandler { commands.save() }
                 },
                 MenuItem("Save as...").apply {
-                    onAction = EventHandler {
-                        projectFileService.saveAs()
-                    }
+                    onAction = EventHandler { commands.saveAs(scene?.window) }
                 },
                 MenuItem("Save all").apply {
-                    onAction = EventHandler {
-                        projectFileService.saveAll()
-                    }
+                    onAction = EventHandler { commands.saveAll(scene?.window) }
                 },
                 SeparatorMenuItem(),
                 MenuItem("Close").apply {
-                    onAction = EventHandler {
-                        val project = projectController.activeProject
-                        if(project != null){
-                            projectController.close(project)
-                        }
-                    }
+                    onAction = EventHandler { commands.closeActive() }
                 },
                 MenuItem("Close all").apply {
-                    onAction = EventHandler {
-                        projectController.closeAll()
-                    }
+                    onAction = EventHandler { commands.closeAll() }
                 },
                 SeparatorMenuItem(),
                 MenuItem("Exit").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+W")
-                    onAction = EventHandler {
-                        // TODO: Implement application shutdown logic
-                        Platform.exit()
-                    }
+                    onAction = EventHandler { commands.exit() }
                 }
             ),
             Menu("Edit", null,
                 MenuItem("Cut").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+X")
-                    onAction = EventHandler {
-                        textEditorService.cut()
-                    }
+                    onAction = EventHandler { commands.cut() }
                 },
                 MenuItem("Copy").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+C")
-                    onAction = EventHandler {
-                        textEditorService.copy()
-                    }
+                    onAction = EventHandler { commands.copy() }
                 },
                 MenuItem("Paste").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+P")
-                    onAction = EventHandler {
-                        textEditorService.paste()
-                    }
+                    onAction = EventHandler { commands.paste() }
                 },
             ),
             Menu("Simulation", null,
                 MenuItem("Verify").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+F4")
-                    onAction = EventHandler {
-                        // TODO: Implement model verification logic
-                    }
+                    onAction = EventHandler { commands.verify() }
                 },
                 MenuItem("Run").apply {
                     accelerator = KeyCombination.keyCombination("Shortcut+F5")
-                    onAction = EventHandler {
-                        simulationService.simulate()
-                    }
+                    onAction = EventHandler { commands.simulate() }
                 },
                 SeparatorMenuItem(),
                 MenuItem("Store Settings").apply {
-                    onAction = EventHandler {
-                        simulationParametersService.store()
-                    }
+                    onAction = EventHandler { commands.storeSettings(scene?.window) }
                 },
                 MenuItem("Load Settings").apply {
-                    onAction = EventHandler {
-                        simulationParametersService.load()
-                    }
+                    onAction = EventHandler { commands.loadSettings(scene?.window) }
                 },
             )
         )

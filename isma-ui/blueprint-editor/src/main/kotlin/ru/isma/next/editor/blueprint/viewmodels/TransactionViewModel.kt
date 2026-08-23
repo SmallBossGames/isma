@@ -1,17 +1,14 @@
 package ru.isma.next.editor.blueprint.viewmodels
 
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
-import javafx.beans.property.BooleanProperty
 import javafx.beans.binding.Bindings
 
 class TransactionViewModel(
     startStateName: String = "",
     endStateName: String = "",
     predicate: String = "",
-    alias: String = "",
-    selected: Boolean = false
+    alias: String = ""
 ) {
     val startStateNameProperty: StringProperty = SimpleStringProperty(startStateName)
     var startStateName: String
@@ -32,11 +29,6 @@ class TransactionViewModel(
     var alias: String
         get() = aliasProperty.value
         set(value) { aliasProperty.value = value }
-
-    val selectedProperty: BooleanProperty = SimpleBooleanProperty(selected)
-    var selected: Boolean
-        get() = selectedProperty.value
-        set(value) { selectedProperty.value = value }
 
     val displayText = Bindings.createStringBinding(
         {

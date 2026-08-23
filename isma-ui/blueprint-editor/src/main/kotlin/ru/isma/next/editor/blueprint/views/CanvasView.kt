@@ -3,20 +3,24 @@ package ru.isma.next.editor.blueprint.views
 import javafx.collections.ListChangeListener
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
+import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 import ru.isma.next.editor.blueprint.viewmodels.CanvasViewModel
+import ru.isma.next.editor.blueprint.viewmodels.IsmaBlueprintViewModel
+import ru.isma.next.editor.blueprint.viewmodels.StateKind
 import ru.isma.next.editor.blueprint.controls.StateBox
 import ru.isma.next.editor.blueprint.controls.TransactionArrow
 import ru.isma.next.editor.blueprint.controls.LoopTransactionArrow
 import ru.isma.next.editor.blueprint.controls.EditArrowPopOver
+import ru.isma.next.editor.blueprint.viewmodels.LoopTransactionViewModel
 import ru.isma.next.editor.blueprint.viewmodels.StateViewModel
 import ru.isma.next.editor.blueprint.viewmodels.TransactionViewModel
-import ru.isma.next.editor.blueprint.viewmodels.LoopTransactionViewModel
 import kotlin.math.max
 
 class CanvasView(
     private val canvas: Pane,
-    private val viewModel: CanvasViewModel,
-    private val onStateDoubleClick: (StateViewModel) -> Unit = {}
+    private val canvasViewModel: CanvasViewModel,
+    private val blueprintViewModel: IsmaBlueprintViewModel
 ) {
     private val stateNodeMap = mutableMapOf<StateViewModel, StateBox>()
     private val transactionNodeMap = mutableMapOf<TransactionViewModel, TransactionArrow>()
@@ -33,9 +37,9 @@ class CanvasView(
     )
 
     init {
-        viewModel.states.addListener(ListChangeListener { _ -> syncStates() })
-        viewModel.transactions.addListener(ListChangeListener { _ -> syncTransactions() })
-        viewModel.loopTransactions.addListener(ListChangeListener { _ -> syncLoopTransactions() })
+        canvasViewModel.states.addListener(ListChangeListener { _ -> syncStates() })
+        canvasViewModel.transactions.addListener(ListChangeListener { _ -> syncTransactions() })
+        canvasViewModel.loopTransactions.addListener(ListChangeListener { _ -> syncLoopTransactions() })
 
         // Initial render
         syncStates()
@@ -45,52 +49,44 @@ class CanvasView(
 
     private fun syncStates() {
         // Add new states
-        viewModel.states.forEach { stateViewModel: StateViewModel ->
+        canvasViewModel.states.forEach { stateViewModel: StateViewModel ->
             if (!stateNodeMap.containsKey(stateViewModel)) {
                 createStateNode(stateViewModel)
             }
         }
         // Remove deleted states
-        stateNodeMap.keys.removeAll { stateViewModel ->
-            !viewModel.states.contains(stateViewModel)
-        }
+        stateNodeMap.keys.filter { !canvasViewModel.states.contains(it) }.forEach { removeState(it) }
     }
 
     private fun syncTransactions() {
         // Add new transactions
-        viewModel.transactions.forEach { txViewModel: TransactionViewModel ->
+        canvasViewModel.transactions.forEach { txViewModel: TransactionViewModel ->
             if (!transactionNodeMap.containsKey(txViewModel)) {
                 createTransactionNode(txViewModel)
             }
         }
         // Remove deleted transactions
-        transactionNodeMap.keys.removeAll { txViewModel ->
-            !viewModel.transactions.contains(txViewModel)
-        }
+        transactionNodeMap.keys.filter { !canvasViewModel.transactions.contains(it) }.forEach { removeTransaction(it) }
     }
 
     private fun syncLoopTransactions() {
         // Add new loop transactions
-        viewModel.loopTransactions.forEach { loopViewModel: LoopTransactionViewModel ->
+        canvasViewModel.loopTransactions.forEach { loopViewModel: LoopTransactionViewModel ->
             if (!loopTransactionNodeMap.containsKey(loopViewModel)) {
                 createLoopTransactionNode(loopViewModel)
             }
         }
         // Remove deleted loop transactions
-        loopTransactionNodeMap.keys.removeAll { loopViewModel ->
-            !viewModel.loopTransactions.contains(loopViewModel)
-        }
+        loopTransactionNodeMap.keys.filter { !canvasViewModel.loopTransactions.contains(it) }.forEach { removeLoopTransaction(it) }
     }
 
     private fun createStateNode(stateViewModel: StateViewModel) {
         val stateBox = StateBox(
             viewModel = stateViewModel,
-            onClick = { _ -> },
-            onDoubleClick = {
-                if (it.editable) {
-                    onStateDoubleClick(it)
-                }
-            }
+            fill = stateFill(stateViewModel.kind),
+            onSingleClick = { vm -> blueprintViewModel.handleStateClick(vm) },
+            onDoubleClick = { vm -> blueprintViewModel.handleStateDoubleClick(vm) },
+            onNameCommitted = { vm, name -> blueprintViewModel.commitNameEdit(vm, name) }
         )
 
         setupStateDrag(stateBox, stateViewModel)
@@ -107,8 +103,8 @@ class CanvasView(
     }
 
     private fun createTransactionNode(txViewModel: TransactionViewModel) {
-        val startState = findStateByViewModel(txViewModel.startStateName)
-        val endState = findStateByViewModel(txViewModel.endStateName)
+        val startState = canvasViewModel.stateByName(txViewModel.startStateName)
+        val endState = canvasViewModel.stateByName(txViewModel.endStateName)
 
         if (startState == null || endState == null) return
 
@@ -116,13 +112,15 @@ class CanvasView(
             viewModel = txViewModel,
             startViewModel = startState,
             endViewModel = endState,
-            onArrowClick = { _, event ->
-                val canvasPos = canvas.sceneToLocal(event.sceneX, event.sceneY)
-                val popover = EditArrowPopOver(txViewModel, canvasPos.x, canvasPos.y)
-                canvas.children.add(popover)
-                popover.setOnMouseExited { canvas.children.remove(popover) }
+            onArrowheadClicked = { _, event ->
+                if (blueprintViewModel.handleArrowheadClick(txViewModel)) {
+                    val canvasPos = canvas.sceneToLocal(event.sceneX, event.sceneY)
+                    val popover = EditArrowPopOver(txViewModel, canvasPos.x, canvasPos.y)
+                    canvas.children.add(popover)
+                    popover.setOnMouseExited { canvas.children.remove(popover) }
+                }
             },
-            onClick = { _, _ -> }
+            onBodyClicked = { _, _ -> blueprintViewModel.handleArrowBodyClick(txViewModel) }
         )
 
         transactionNodeMap[txViewModel] = arrow
@@ -137,15 +135,17 @@ class CanvasView(
     }
 
     private fun createLoopTransactionNode(loopViewModel: LoopTransactionViewModel) {
-        val stateViewModel = findStateByViewModel(loopViewModel.stateName)
+        val stateViewModel = canvasViewModel.stateByName(loopViewModel.stateName)
         if (stateViewModel == null) return
 
         val arrow = LoopTransactionArrow(
             viewModel = loopViewModel,
             stateViewModel = stateViewModel,
-            onClick = { _, _ -> },
-            onArrowClick = { _, _ -> },
-            onArrowDoubleClick = { _, _ -> }
+            onBodyClicked = { _, _ -> blueprintViewModel.handleLoopArrowBodyClick(loopViewModel) },
+            onArrowheadClicked = { _, _ -> },
+            onArrowheadDoubleClicked = { _, _ ->
+                blueprintViewModel.handleLoopArrowheadDoubleClick(loopViewModel, stateViewModel)
+            }
         )
 
         loopTransactionNodeMap[loopViewModel] = arrow
@@ -159,8 +159,10 @@ class CanvasView(
         }
     }
 
-    private fun findStateByViewModel(stateName: String): StateViewModel? {
-        return viewModel.states.find { it.name == stateName }
+    private fun stateFill(kind: StateKind): Paint = when (kind) {
+        StateKind.MAIN -> Color.LIGHTGREEN
+        StateKind.INIT -> Color.LIGHTBLUE
+        StateKind.USER -> Color.CORAL
     }
 
     private fun setupStateDrag(stateBox: StateBox, stateViewModel: StateViewModel) {

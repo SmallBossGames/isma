@@ -18,8 +18,8 @@ class TransactionArrow(
     val viewModel: TransactionViewModel,
     val startViewModel: StateViewModel,
     val endViewModel: StateViewModel,
-    val onArrowClick: (TransactionArrow, MouseEvent) -> Unit = { _, _ -> },
-    val onClick: (TransactionArrow, MouseEvent) -> Unit = { _, _ -> }
+    val onArrowheadClicked: (TransactionArrow, MouseEvent) -> Unit = { _, _ -> },
+    val onBodyClicked: (TransactionArrow, MouseEvent) -> Unit = { _, _ -> }
 ) : Group() {
 
     init {
@@ -44,7 +44,7 @@ class TransactionArrow(
                 viewOrder = 6.0
             }
         ).apply {
-            setOnMouseClicked { onArrowClick(this@TransactionArrow, it) }
+            setOnMouseClicked { onArrowheadClicked(this@TransactionArrow, it) }
         }
 
         children.addAll(arrowhead, predicateTextWrapped)
@@ -98,7 +98,7 @@ class TransactionArrow(
             endViewModel.squareHeightProperty.onChange { updateGeometry() }
         }
 
-        setOnMouseClicked { onClick(this@TransactionArrow, it) }
+        setOnMouseClicked { onBodyClicked(this@TransactionArrow, it) }
     }
 
     fun <T> ObservableValue<T>.onChange(op: () -> Unit){

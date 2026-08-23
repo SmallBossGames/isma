@@ -48,16 +48,26 @@ All elements use absolute `layoutX` and `layoutY` on the canvas `Pane`. There is
 
 ```
 IsmaBlueprintEditor ──┐
-                      ├──► IsmaBlueprintViewModel ──► CanvasViewModel ◄── CanvasView
-                      │                                                        │
-                      └────────────────────────────────────────────────────────┘
-                                                                       │
-                                                              Creates/Removes Nodes:
-                                                              - StateBox (bound to StateViewModel)
-                                                              - TransactionArrow (bound to TransactionViewModel)
-                                                              - LoopTransactionArrow (bound to LoopTransactionViewModel)
-                                                              - EditArrowPopOver (transient)
+                       ├──► IsmaBlueprintViewModel ──► CanvasViewModel ◄── CanvasView
+                       │         ▲   ▲                          │              │
+                       │         │   └── commands (handle*Click)│              │
+                       │         └───── events (BlueprintEvent) │              │
+                       └──────────────────────────────────────────────────────┘
+                                                                        │
+                                                               Creates/Removes Nodes:
+                                                               - StateBox (bound to StateViewModel)
+                                                               - TransactionArrow (bound to TransactionViewModel)
+                                                               - LoopTransactionArrow (bound to LoopTransactionViewModel)
+                                                               - EditArrowPopOver (transient)
 ```
+
+### MVVM Contract
+
+The module follows strict MVVM with one-way data flow:
+
+- **View → ViewModel (commands):** user intent is forwarded as raw events; the ViewModel routes them by `editorMode` via the `handle*Click` command surface (`handleStateClick`, `handleStateDoubleClick`, `handleArrowBodyClick`, `handleLoopArrowBodyClick`, `handleArrowheadClick`, `handleLoopArrowheadDoubleClick`, `commitNameEdit`). Controls never mutate ViewModel state directly.
+- **ViewModel → View (events):** one-shot UI intents flow through `IsmaBlueprintViewModel.eventProperty` (`SimpleObjectProperty<BlueprintEvent>`) with the sealed `BlueprintEvent { OpenStateEditor(state), OpenLoopEditor(loop, state) }`. `IsmaBlueprintEditor` subscribes and opens text editor tabs.
+- **ViewModel → View (state):** all observable state is JavaFX properties on the item ViewModels; the View binds to them. The ViewModel layer contains no `javafx.scene.*` types — state appearance (colors) is owned by the View via `StateKind`.
 
 ### Observable List Synchronization
 
@@ -68,11 +78,11 @@ IsmaBlueprintEditor ──┐
 
 When an `ObservableList` changes, the corresponding `sync*()` method runs:
 1. **Add new nodes:** Iterate the current list; for each ViewModel not in the map, create the node and add to canvas
-2. **Remove stale nodes:** Remove map entries whose ViewModel is no longer in the list, and remove their nodes from canvas
+2. **Remove stale nodes:** Stale map entries are routed through `removeState`/`removeTransaction`/`removeLoopTransaction`, which remove the map entry **and** the node from `canvas.children`
 
 ### Node Creation
 
-**State nodes:** `StateBox` is created with `viewModel` bound via `layoutXProperty`/`layoutYProperty` to `viewModel.xProperty`/`viewModel.yProperty`. Drag events are handled by `CanvasView.setupStateDrag()` which updates `stateViewModel.xProperty`/`yProperty` with clamped coordinates.
+**State nodes:** `StateBox` is created with `viewModel` bound via `layoutXProperty`/`layoutYProperty` to `viewModel.xProperty`/`viewModel.yProperty`, plus a `fill: Paint` resolved by `CanvasView.stateFill(kind)` from the state's `StateKind` (MAIN → `LIGHTGREEN`, INIT → `LIGHTBLUE`, USER → `CORAL`). The box forwards semantic callbacks (`onSingleClick`, `onDoubleClick`, `onNameCommitted`) to `IsmaBlueprintViewModel` commands. Drag events are handled by `CanvasView.setupStateDrag()` which updates `stateViewModel.xProperty`/`yProperty` with clamped coordinates.
 
 **Transaction nodes:** `TransactionArrow` is created with `startViewModel` and `endViewModel` references. Arrow geometry binds to state center positions via `layoutXProperty().bind(startViewModel.centerX().add(endViewModel.centerX()).divide(2))`.
 
@@ -125,7 +135,7 @@ sequenceDiagram
 1. `getBlueprintModel()` is called on `IsmaBlueprintEditor`
 2. `toBlueprintModel()` is called on `IsmaBlueprintViewModel`
 3. `mainState.x/y/name/text` and `initState.x/y/name/text` are read directly from `StateViewModel` properties
-4. Each `StateViewModel` in `CanvasViewModel.states` is converted to `BlueprintStateModel`: extracts `x`, `y`, `name`, `text`
+4. Each **user** `StateViewModel` (`kind == StateKind.USER`) in `CanvasViewModel.states` is converted to `BlueprintStateModel`: extracts `x`, `y`, `name`, `text`. Main and Init are excluded — they are carried by the dedicated `main`/`init` model fields
 5. Each `TransactionViewModel` in `CanvasViewModel.transactions` is converted to `BlueprintTransactionModel`: extracts `startStateName`, `endStateName`, `predicate`, `alias`
 6. Each `LoopTransactionViewModel` in `CanvasViewModel.loopTransactions` is converted to `BlueprintLoopTransactionModel`: extracts `stateName`, `predicate`, `alias`, `text`
 7. A `BlueprintModel` is assembled from main, init, states, transactions, and loopTransactions
@@ -177,7 +187,7 @@ sequenceDiagram
 5. Main and Init state data is applied onto the pre-created `mainState` and `initState` `StateViewModel` instances via property assignment
 6. Main and Init ViewModels are added to `CanvasViewModel.states`
 7. A name → StateViewModel map is built including Main, Init, and new states
-8. New `StateViewModel` instances are created from `model.states`, added to `CanvasViewModel`, and `CanvasView` automatically creates corresponding `StateBox` nodes
+8. New `StateViewModel` instances are created from `model.states` (entries named `Main`/`init` are skipped as a legacy safeguard), added to `CanvasViewModel`, and `CanvasView` automatically creates corresponding `StateBox` nodes
 9. For each `BlueprintTransactionModel`, start/end states are looked up by name and a `TransactionViewModel` is created and added to `CanvasViewModel.transactions` (triggers `CanvasView` to create `TransactionArrow`)
 10. For each `BlueprintLoopTransactionModel`, a `LoopTransactionViewModel` is created and added to `CanvasViewModel.loopTransactions` (triggers `CanvasView` to create `LoopTransactionArrow`)
 11. All arrow geometry is handled automatically by `TransactionArrow` and `LoopTransactionArrow` bindings to ViewModel properties
@@ -188,13 +198,15 @@ See `IsmaBlueprintViewModel.kt` for the full implementation.
 
 Source: `viewmodels/` package
 
-**`StateViewModel`** — JavaFX property-backed model with `nameProperty`, `textProperty`, `xProperty`, `yProperty`, `squareWidthProperty`, `squareHeightProperty`, `colorProperty`, `editableProperty`, `editModeProperty`, `editButtonVisibleProperty`. Exposes `centerX()` and `centerY()` as `DoubleBinding` for arrow geometry. The `name` setter uses `isNameUnique` callback for uniqueness validation.
+**`StateViewModel`** — JavaFX property-backed model with `nameProperty`, `textProperty`, `xProperty`, `yProperty`, `squareWidthProperty`, `squareHeightProperty`, `editModeProperty` and a `kind: StateKind` (`MAIN`/`INIT`/`USER`). Exposes `centerX()` and `centerY()` as `DoubleBinding` for arrow geometry. The `name` setter uses the `isNameUnique` callback for uniqueness validation. No presentation data (colors) — the View resolves `StateKind` → `Paint`.
 
-**`TransactionViewModel`** — JavaFX property-backed model with `startStateName`, `endStateName`, `predicate`, `alias`, `selected`. Exposes computed `displayText` binding that shows alias if non-blank, otherwise predicate.
+**`TransactionViewModel`** — JavaFX property-backed model with `startStateName`, `endStateName`, `predicate`, `alias`. Exposes computed `displayText` binding that shows alias if non-blank, otherwise predicate.
 
-**`LoopTransactionViewModel`** — JavaFX property-backed model with `stateName`, `predicate`, `alias`, `text`, `selected`. Exposes computed `displayText` binding.
+**`LoopTransactionViewModel`** — JavaFX property-backed model with `stateName`, `predicate`, `alias`, `text`. Exposes computed `displayText` binding.
 
-**`CanvasViewModel`** — Holds `ObservableList<StateViewModel>`, `ObservableList<TransactionViewModel>`, `ObservableList<LoopTransactionViewModel>`. Provides CRUD methods with cascade removal and name registration/unregistration.
+**`CanvasViewModel`** — Holds `ObservableList<StateViewModel>`, `ObservableList<TransactionViewModel>`, `ObservableList<LoopTransactionViewModel>`. Provides CRUD methods with cascade removal, `stateByName(name)` lookup, and name registration/unregistration via `NameChangingMonitor`.
+
+**`BlueprintEvent`** — Sealed event class (`OpenStateEditor(state)`, `OpenLoopEditor(loop, state)`) carried by `IsmaBlueprintViewModel.eventProperty` for one-shot ViewModel → View intents.
 
 These classes exist only at runtime. They are converted to/from serializable `BlueprintModel*` classes during save/load operations.
 
@@ -206,7 +218,7 @@ Removing a `StateViewModel` automatically removes all associated transitions. Th
 
 ### Name Registration
 
-`CanvasViewModel` maintains a `registeredStateNames` HashSet and `stateNameCounter` for unique name enforcement. `tryRegisterStateName(name)` returns `false` if the name is already taken. `tryUnregisterStateName(name)` removes the name from the registry. `createNextDefaultStateName()` generates `"State N"` names with auto-incrementing counter.
+`CanvasViewModel` delegates name uniqueness to a single `NameChangingMonitor("State")` instance (see `02-algorithms.md`). `addState` registers the state name, `removeState` unregisters it, `clearAll` resets the monitor. `createNextDefaultStateName()` delegates to `nameMonitor.createNextDefaultName()` and generates `"State N"` names with auto-incrementing counter. `StateViewModel`'s `isNameUnique` callback consults the monitor: `candidate == name || !nameMonitor.isRegistered(candidate)`.
 
 ### Observable Lists
 
@@ -216,18 +228,18 @@ All three lists (`states`, `transactions`, `loopTransactions`) are exposed as im
 
 ### Opening State Text Editor Tabs
 
-Double-clicking a state box (handled by `CanvasView` → `IsmaBlueprintViewModel`) triggers `openStateTextEditor(stateViewModel)`:
+Double-clicking a state box flows: `StateBox.onDoubleClick` → `IsmaBlueprintViewModel.handleStateDoubleClick(state)` → fires `BlueprintEvent.OpenStateEditor(state)` on `eventProperty`. `IsmaBlueprintEditor` subscribes to `eventProperty` and opens the tab:
 
 1. `editorFactory.createTextEditor(stateViewModel.text, onTextChanged = { stateViewModel.text = it })` creates a text editor bound to the ViewModel's text
 2. `Tab(stateViewModel.name, editor)` creates a closable Tab
 3. `Tab.textProperty()` binds to `stateViewModel.nameProperty` — tab name updates when state is renamed
 4. `Tab.setOnCloseRequest { editorFactory.disposeInstance(editor) }` disposes the editor on tab close
 
-See `IsmaBlueprintViewModel.kt` for the full implementation.
+See `IsmaBlueprintEditor.kt` for the full implementation.
 
 ### Opening Loop Content Editor Tabs
 
-Double-clicking a loop arrow's arrowhead triggers `openLoopTextEditor(loopTxViewModel, stateViewModel)`:
+Double-clicking a loop arrow's arrowhead flows: `LoopTransactionArrow.onArrowheadDoubleClicked` → `IsmaBlueprintViewModel.handleLoopArrowheadDoubleClick(loop, state)` → fires `BlueprintEvent.OpenLoopEditor(loop, state)`. The editor opens the tab:
 
 1. `editorFactory.createTextEditor(loopTxViewModel.text, onTextChanged = { loopTxViewModel.text = it })`
 2. `Tab("${stateViewModel.name} (loop)", editor)`

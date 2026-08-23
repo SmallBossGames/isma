@@ -3,8 +3,6 @@ package ru.isma.next.editor.blueprint.viewmodels
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.DoubleBinding
 import javafx.beans.property.*
-import javafx.scene.paint.Color
-import javafx.scene.paint.Paint
 import ru.isma.next.editor.blueprint.constants.DEFAULT_STATE_HEIGHT
 import ru.isma.next.editor.blueprint.constants.DEFAULT_STATE_WIDTH
 
@@ -15,10 +13,8 @@ class StateViewModel(
     y: Double = 0.0,
     squareWidth: Double = DEFAULT_STATE_WIDTH,
     squareHeight: Double = DEFAULT_STATE_HEIGHT,
-    color: Paint = Color.WHITE,
-    editable: Boolean = true,
+    val kind: StateKind = StateKind.USER,
     editMode: Boolean = false,
-    editButtonVisible: Boolean = true,
     val isNameUnique: (String) -> Boolean = { true }
 ) {
     val nameProperty = SimpleStringProperty(name)
@@ -27,10 +23,7 @@ class StateViewModel(
     val yProperty = SimpleDoubleProperty(y)
     val squareWidthProperty = SimpleDoubleProperty(squareWidth)
     val squareHeightProperty = SimpleDoubleProperty(squareHeight)
-    val colorProperty = SimpleObjectProperty<Paint>(color)
-    val editableProperty = SimpleBooleanProperty(editable)
     val editModeProperty = SimpleBooleanProperty(editMode)
-    val editButtonVisibleProperty = SimpleBooleanProperty(editButtonVisible)
 
     var name: String
         get() = nameProperty.value
@@ -72,18 +65,6 @@ class StateViewModel(
             squareHeightProperty.value = value
         }
 
-    var color: Paint
-        get() = colorProperty.value
-        set(value) {
-            colorProperty.value = value
-        }
-
-    var editable: Boolean
-        get() = editableProperty.value
-        set(value) {
-            editableProperty.value = value
-        }
-
     var editMode: Boolean
         get() = editModeProperty.value
         set(value) {
@@ -101,10 +82,6 @@ class StateViewModel(
     }
 
     fun commitEdit() {
-        editMode = false
-    }
-
-    fun cancelEdit() {
         editMode = false
     }
 }

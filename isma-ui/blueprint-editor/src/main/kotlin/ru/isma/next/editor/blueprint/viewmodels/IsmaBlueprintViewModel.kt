@@ -3,7 +3,6 @@ package ru.isma.next.editor.blueprint.viewmodels
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
-import javafx.scene.paint.Color
 import ru.isma.next.editor.blueprint.constants.FIXED_STATE_HEIGHT
 import ru.isma.next.editor.blueprint.constants.INIT_STATE
 import ru.isma.next.editor.blueprint.constants.MAIN_STATE
@@ -20,6 +19,8 @@ class IsmaBlueprintViewModel {
         private set(value) {
             editorModeProperty.value = value
         }
+
+    val eventProperty = SimpleObjectProperty<BlueprintEvent>()
 
     val addTransitionButtonText: StringProperty by lazy {
         SimpleStringProperty().also { prop ->
@@ -54,8 +55,6 @@ class IsmaBlueprintViewModel {
         }
     }
 
-    var onStateDoubleClick: (StateViewModel) -> Unit = {}
-
     val canvasViewModel = CanvasViewModel()
 
     private val mainState: StateViewModel = createMainState()
@@ -66,45 +65,51 @@ class IsmaBlueprintViewModel {
     }
 
     fun toggleAddTransition() {
-        resetMode()
-        editorMode = EditorMode.AddTransition(mutableSetOf())
+        editorMode = if (editorMode is EditorMode.AddTransition) {
+            EditorMode.Idle
+        } else {
+            EditorMode.AddTransition(mutableListOf())
+        }
     }
 
     fun toggleRemoveState() {
-        resetMode()
-        editorMode = EditorMode.RemoveState
+        editorMode = if (editorMode is EditorMode.RemoveState) {
+            EditorMode.Idle
+        } else {
+            EditorMode.RemoveState
+        }
     }
 
     fun toggleRemoveTransition() {
-        resetMode()
-        editorMode = EditorMode.RemoveTransition
+        editorMode = if (editorMode is EditorMode.RemoveTransition) {
+            EditorMode.Idle
+        } else {
+            EditorMode.RemoveTransition
+        }
     }
 
-    fun isNotEditingMode(): Boolean = editorMode.isNotEditingMode()
-
     fun addState(positionX: Double = 10.0, positionY: Double = 200.0, stateText: String = ""): StateViewModel {
+        resetMode()
         val name = canvasViewModel.createNextDefaultStateName()
         val state = canvasViewModel.createState(
             text = stateText,
             x = positionX,
             y = positionY,
             name = name,
-            color = Color.CORAL
+            kind = StateKind.USER
         )
         canvasViewModel.addState(state)
         return state
     }
 
     fun removeState(stateViewModel: StateViewModel) {
-        if (stateViewModel.name == MAIN_STATE || stateViewModel.name == INIT_STATE) return
+        if (stateViewModel.kind != StateKind.USER) return
         canvasViewModel.removeState(stateViewModel)
     }
 
-    fun getMainState(): StateViewModel = mainState
-    fun getInitState(): StateViewModel = initState
-    fun getAllStates(): List<StateViewModel> = canvasViewModel.states.toList()
-
     fun recordTransitionSource(stateViewModel: StateViewModel) {
+        if (stateViewModel.kind != StateKind.USER) return
+
         val addTransitionMode = editorMode as? EditorMode.AddTransition ?: return
 
         addTransitionMode.selectedStates.add(stateViewModel)
@@ -158,6 +163,51 @@ class IsmaBlueprintViewModel {
         canvasViewModel.removeLoopTransaction(loop)
     }
 
+    fun handleStateClick(state: StateViewModel) {
+        when (val mode = editorMode) {
+            is EditorMode.AddTransition -> recordTransitionSource(state)
+            is EditorMode.RemoveState -> removeState(state)
+            else -> if (state.kind == StateKind.USER) state.startEdit()
+        }
+    }
+
+    fun handleStateDoubleClick(state: StateViewModel) {
+        fireEvent(BlueprintEvent.OpenStateEditor(state))
+    }
+
+    fun handleArrowBodyClick(tx: TransactionViewModel) {
+        if (editorMode is EditorMode.RemoveTransition) {
+            removeTransaction(tx)
+        }
+    }
+
+    fun handleLoopArrowBodyClick(loop: LoopTransactionViewModel) {
+        if (editorMode is EditorMode.RemoveTransition) {
+            removeLoopArrow(loop)
+        }
+    }
+
+    fun handleArrowheadClick(tx: TransactionViewModel): Boolean {
+        if (editorMode is EditorMode.RemoveTransition) {
+            removeTransaction(tx)
+            return false
+        }
+        return true
+    }
+
+    fun handleLoopArrowheadDoubleClick(loop: LoopTransactionViewModel, state: StateViewModel) {
+        fireEvent(BlueprintEvent.OpenLoopEditor(loop, state))
+    }
+
+    fun commitNameEdit(state: StateViewModel, newName: String) {
+        state.name = newName
+        state.commitEdit()
+    }
+
+    fun fireEvent(event: BlueprintEvent) {
+        eventProperty.value = event
+    }
+
     fun toBlueprintModel(): BlueprintModel {
         val main = BlueprintStateModel(
             mainState.x,
@@ -171,9 +221,12 @@ class IsmaBlueprintViewModel {
             initState.name,
             initState.text
         )
-        val states = canvasViewModel.states.map {
-            BlueprintStateModel(it.x, it.y, it.name, it.text)
-        }.toTypedArray()
+        val states = canvasViewModel.states
+            .filter { it.kind == StateKind.USER }
+            .map {
+                BlueprintStateModel(it.x, it.y, it.name, it.text)
+            }
+            .toTypedArray()
         val blueprintTransactions = canvasViewModel.transactions.map {
             BlueprintTransactionModel(
                 startStateName = it.startStateName,
@@ -202,7 +255,6 @@ class IsmaBlueprintViewModel {
             y = model.main.canvasPositionY
             name = model.main.name
             text = model.main.text
-            editable = true
         }
         canvasViewModel.addState(mainState)
 
@@ -211,7 +263,6 @@ class IsmaBlueprintViewModel {
             y = model.init.canvasPositionY
             name = model.init.name
             text = model.init.text
-            editable = false
         }
         canvasViewModel.addState(initState)
 
@@ -220,13 +271,15 @@ class IsmaBlueprintViewModel {
             put(mainState.name, mainState)
         }
 
-        model.states.forEach { blueprintState ->
+        model.states
+            .filter { it.name != MAIN_STATE && it.name != INIT_STATE }
+            .forEach { blueprintState ->
             val state = canvasViewModel.createState(
                 name = blueprintState.name,
                 text = blueprintState.text,
                 x = blueprintState.canvasPositionX,
                 y = blueprintState.canvasPositionY,
-                color = Color.CORAL
+                kind = StateKind.USER
             )
             canvasViewModel.addState(state)
             stateMap[blueprintState.name] = state
@@ -248,13 +301,6 @@ class IsmaBlueprintViewModel {
         }
     }
 
-    var onOpenStateTextEditor: (StateViewModel) -> Unit = {}
-    var onOpenLoopTextEditor: (LoopTransactionViewModel, StateViewModel) -> Unit = { _, _ -> }
-
-    fun computeArrowDisplayText(alias: String, predicate: String): String {
-        return alias.ifBlank { predicate }
-    }
-
     private fun createMainState(): StateViewModel {
         val state = StateViewModel(
             name = MAIN_STATE,
@@ -262,8 +308,7 @@ class IsmaBlueprintViewModel {
             x = STATE_INSET,
             y = 0.0,
             squareHeight = FIXED_STATE_HEIGHT,
-            color = Color.LIGHTGREEN,
-            editable = false
+            kind = StateKind.MAIN
         )
         canvasViewModel.addState(state)
         return state
@@ -276,9 +321,7 @@ class IsmaBlueprintViewModel {
             x = STATE_INSET,
             y = 100.0,
             squareHeight = FIXED_STATE_HEIGHT,
-            color = Color.LIGHTBLUE,
-            editable = false,
-            editButtonVisible = false
+            kind = StateKind.INIT
         )
         canvasViewModel.addState(state)
         return state

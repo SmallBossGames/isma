@@ -18,15 +18,17 @@ The state box is a `Group` containing:
 
 ### State Types
 
-| Type | Color | Position (x, y) | Editable | Edit Button Visible | Draggable |
-|------|-------|------------------|----------|---------------------|-----------|
-| **Main** | `LIGHTGREEN` (#90EE90) | (10, 0) | No | No | Yes |
-| **Init** | `LIGHTBLUE` (#ADD8E6) | (10, 100) | No | No | Yes |
-| **User** | `CORAL` (#F08080) | (10, 200) | Yes | Yes | Yes |
+| Type | `StateKind` | Color (View-side) | Position (x, y) | Name editable | Draggable |
+|------|-------------|-------------------|------------------|---------------|-----------|
+| **Main** | `MAIN` | `LIGHTGREEN` (#90EE90) | (10, 0) | No | Yes |
+| **Init** | `INIT` | `LIGHTBLUE` (#ADD8E6) | (10, 100) | No | Yes |
+| **User** | `USER` | `CORAL` (#F08080) | (10, 200) | Yes | Yes |
 
-**Main state**: Created in `IsmaBlueprintViewModel.createMainState()` with `StateViewModel(name = "Main", x = STATE_INSET, y = 0.0, squareHeight = FIXED_STATE_HEIGHT, color = Color.LIGHTGREEN, editable = false)`. Position is **(10, 0)**.
+Colors are presentation data owned by the View: `CanvasView.stateFill(kind)` maps `StateKind` → `Paint` and passes it to `StateBox` at creation time. The ViewModel carries only the semantic `kind`.
 
-**Init state**: Created in `IsmaBlueprintViewModel.createInitState()` with `StateViewModel(name = "init", x = STATE_INSET, y = 100.0, squareHeight = FIXED_STATE_HEIGHT, color = Color.LIGHTBLUE, editable = false, editButtonVisible = false)`. Position is **(10, 100)**.
+**Main state**: Created in `IsmaBlueprintViewModel.createMainState()` with `StateViewModel(name = "Main", x = STATE_INSET, y = 0.0, squareHeight = FIXED_STATE_HEIGHT, kind = StateKind.MAIN)`. Position is **(10, 0)**.
+
+**Init state**: Created in `IsmaBlueprintViewModel.createInitState()` with `StateViewModel(name = "init", x = STATE_INSET, y = 100.0, squareHeight = FIXED_STATE_HEIGHT, kind = StateKind.INIT)`. Position is **(10, 100)**.
 
 > **Serialization note**: `BlueprintModel.empty` serializes both Main and Init at (10.0, 10.0) as defaults. On load from a saved model, `x`/`y` are set directly from `canvasPositionX`/`canvasPositionY`.
 
@@ -38,6 +40,7 @@ sequenceDiagram
     participant SB as StateBox
     participant CD as ClickDisambiguator
     participant TA as TextArea
+    participant VM as IsmaBlueprintViewModel
     participant SVM as StateViewModel
 
     U->>SB: Single-click (not dragged)
@@ -45,19 +48,14 @@ sequenceDiagram
     CD->>CD: Schedule 200ms check
     alt 200ms elapsed, !isDragged
         CD-->>SB: singleClick callback
-        SB->>SVM: startEdit() → editMode = true
+        SB->>VM: handleStateClick(state)
+        VM->>SVM: startEdit() → editMode = true (USER states, Idle/RemoveTransition modes)
         SB->>TA: Show TextArea, populate name, request focus
         U->>TA: Type new name
         U->>TA: Lose focus (click away / Enter)
-        TA->>SVM: name = textArea.text
-        SVM->>SVM: isNameUnique(newName) callback
-        alt Name is duplicate
-            SVM-->>TA: Setter ignores change
-            TA->>TA: Name unchanged (silent rollback)
-        else Name is unique
-            SVM->>SVM: nameProperty.value = newName
-        end
-        SVM->>SVM: commitEdit() → editMode = false
+        TA->>VM: commitNameEdit(state, text)
+        VM->>SVM: name = newName (isNameUnique validated)
+        VM->>SVM: commitEdit() → editMode = false
         SB->>TA: Hide TextArea, show Label
     else Mouse was dragged
         SB->>CD: onDragged() → isDragged=true
@@ -65,27 +63,30 @@ sequenceDiagram
     end
 ```
 
-When a user single-clicks an editable (user) state box:
+When a user single-clicks a user state box (in `Idle` or `RemoveTransition` mode):
 
 1. A 200ms delay begins via `ClickDisambiguator`. If the mouse was **not** dragged during that period:
-    - `StateViewModel.startEdit()` sets `editMode = true`
+    - `StateBox` forwards the click to `IsmaBlueprintViewModel.handleStateClick(state)`
+    - In `Idle`/`RemoveTransition` mode the VM calls `state.startEdit()` for `USER` states → `editMode = true`
     - A `TextArea` appears inside the state box (replacing the `Label`)
     - The text area is populated with the current `name`
     - Focus is requested on the text area
 2. If the mouse **was** dragged during that period, `isDragged = true` and the singleClick is cancelled (drag is handled instead).
 3. When the text area loses focus:
-    - The `name` property is updated from the text area's content via `viewModel.name = textArea.text`
-    - `StateViewModel.name` setter calls `isNameUnique(value)` callback
+    - `StateBox` forwards the text via `onNameCommitted` → `IsmaBlueprintViewModel.commitNameEdit(state, newName)`
+    - The VM sets `state.name = newName` — the `StateViewModel.name` setter calls the `isNameUnique` callback
     - If the name is **already taken**, the setter ignores the change (silent rollback)
-    - If unique, `nameProperty.value` is set to the new value
-    - `StateViewModel.commitEdit()` sets `editMode = false`
+    - If unique, `nameProperty.value` is set to the new name
+    - The VM calls `state.commitEdit()` → `editMode = false`
     - The `TextArea` hides, the `Label` reappears
 
-See `StateBox.kt` and `StateViewModel.kt` for the implementation.
+In `AddTransition`/`RemoveState` modes the same single-click is routed to `recordTransitionSource`/`removeState` instead (see Mode-Aware Click Routing below).
+
+See `StateBox.kt`, `IsmaBlueprintViewModel.kt`, and `StateViewModel.kt` for the implementation.
 
 ### Double-Click Behavior
 
-Double-clicking any state box (Main, Init, or User) opens a **text editor tab** in the main TabPane:
+Double-clicking any state box (Main, Init, or User) flows through `IsmaBlueprintViewModel.handleStateDoubleClick(state)` → `BlueprintEvent.OpenStateEditor` → `IsmaBlueprintEditor`, which opens a **text editor tab** in the main TabPane:
 
 - Tab name: bound to the state's `nameProperty` (updates when state is renamed)
 - Tab content: the state's `text` property (the LISMA body of that state)
@@ -104,13 +105,18 @@ Drag is handled by `CanvasView.setupStateDrag()`, which attaches event handlers 
 
 Position is clamped to non-negative values: `max(pos, 0.0)`. Drag updates the ViewModel properties directly — `StateBox` layout properties are bound to these ViewModel properties.
 
-### Editability Bindings
+### Mode-Aware Click Routing
 
-User state `isEditable` is dynamically bound to the editor mode: `isEditableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })`.
+There is no editability binding. `IsmaBlueprintViewModel.handleStateClick(state)` routes the single-click by the current `editorMode`:
 
-Equivalently: `isEditable = !(isRemoveStateMode OR isAddTransitionMode)`.
+| Mode | Effect of state single-click |
+|------|------------------------------|
+| `Idle` | Inline name edit (USER states only) |
+| `AddTransition` | `recordTransitionSource(state)` — collect 1-2 states |
+| `RemoveState` | `removeState(state)` — USER states only (Main/Init protected) |
+| `RemoveTransition` | Inline name edit (USER states only) |
 
-When in add-transition or remove-state mode, inline name editing is disabled. The `isNotEditingMode()` function returns `true` for `Idle` and `RemoveTransition` modes, `false` for `AddTransition` and `RemoveState` modes.
+`recordTransitionSource` ignores non-USER states, so Main/Init can never become transition sources.
 
 ## Transition Arrows (Inter-State)
 
@@ -143,8 +149,8 @@ The label text is bound to `TransactionViewModel.displayText`: shows alias if no
 
 | Target | Action |
 |--------|--------|
-| Arrow body (group level) | Calls `onClick` callback — used by `CanvasView` in RemoveTransition mode |
-| Arrowhead (group level) | Single-click: opens `EditArrowPopOver` via `onArrowClick` |
+| Arrow body (group level) | `onBodyClicked` → `IsmaBlueprintViewModel.handleArrowBodyClick(tx)` — removes the arrow in RemoveTransition mode |
+| Arrowhead (group level) | `onArrowheadClicked` → `IsmaBlueprintViewModel.handleArrowheadClick(tx)` — opens `EditArrowPopOver` when the VM returns `true`; in RemoveTransition mode the VM removes the arrow and returns `false` |
 | Arrow label | Part of the arrow group — handled by the group's click handler |
 
 ### Duplication Prevention
@@ -180,9 +186,9 @@ Same alias-or-predicate logic as inter-state arrows: bound to `LoopTransactionVi
 
 | Target | Action |
 |--------|--------|
-| Arrow body (group level) | Calls `onClick` callback — used by `CanvasView` in RemoveTransition mode |
-| Arrowhead (single-click) | Opens `EditArrowPopOver` via `onArrowClick` |
-| Arrowhead (double-click) | Opens text editor tab for loop content via `onArrowDoubleClick`, tab name = `"{stateName} (loop)"` |
+| Arrow body (group level) | `onBodyClicked` → `IsmaBlueprintViewModel.handleLoopArrowBodyClick(loop)` — removes the loop arrow in RemoveTransition mode |
+| Arrowhead (single-click) | `onArrowheadClicked` — no-op (the PopOver only supports `TransactionViewModel`) |
+| Arrowhead (double-click) | `onArrowheadDoubleClicked` → `IsmaBlueprintViewModel.handleLoopArrowheadDoubleClick(loop, state)` → `OpenLoopEditor` event → text editor tab, tab name = `"{stateName} (loop)"` |
 
 ### Loop Content Text
 
@@ -217,7 +223,7 @@ The PopOver is a `VBox` with default spacing, containing an "Alias (optional)" T
 
 The PopOver takes a `TransactionViewModel` and binds both text fields bidirectionally: `TextField.textProperty().bindBidirectional(viewModel.aliasProperty)` and `TextField.textProperty().bindBidirectional(viewModel.predicateProperty)`. Changes in either direction propagate immediately. Typing in the PopOver updates the ViewModel's properties in real-time.
 
-> **Note**: Only `TransactionViewModel` is supported (not `LoopTransactionViewModel`). Loop arrows use `onClick`/`onArrowClick`/`onArrowDoubleClick` callbacks handled at the control level.
+> **Note**: Only `TransactionViewModel` is supported (not `LoopTransactionViewModel`). Loop arrowhead single-clicks are therefore no-ops; double-clicks open the loop content editor tab via the `OpenLoopEditor` event.
 
 ### Dismissal
 
@@ -241,18 +247,16 @@ The toolbar binds to the Diagram tab's visibility: `val visible = tabs.selection
 
 | Action | Effect |
 |--------|--------|
-| Click | 1. `viewModel.resetMode()` → `EditorMode.Idle` |
-| | 2. `viewModel.addState()` → creates new `StateBox` at (10, 200) |
-| | 3. Auto-generate name via `NameChangingMonitor.createNextDefaultName()` |
-| | 4. Register name with monitor |
-| | 5. Add to `CanvasViewModel.states` |
+| Click | `viewModel.addState()` — the command resets the mode to `Idle` internally, then: |
+| | 1. Auto-generates name via `NameChangingMonitor.createNextDefaultName()` ("State N") |
+| | 2. Creates a `StateViewModel` with `kind = USER` |
+| | 3. Adds it to `CanvasViewModel.states` → `CanvasView` creates the `StateBox` at (10, 200) |
 
 **New state properties**:
-- Color: `CORAL`
-- Name: `"New state N"` where N is the next available integer
+- Color: `CORAL` (resolved by `CanvasView.stateFill(USER)`)
+- Name: `"State N"` where N is the next available integer
 - Position: `layoutX=10`, `layoutY=200`
-- Editable: yes (bound to `editorModeProperty.map { it.isNotEditingMode() }`)
-- Edit button visible: yes
+- Name editable: yes
 - Initial text: `""`
 
 #### "New transition" / "Stop adding transaction"
@@ -266,18 +270,18 @@ Toggle button. Text changes based on `EditorMode`:
 
 **Toggle logic**:
 
-If `viewModel.editorMode is EditorMode.AddTransition`, call `viewModel.resetMode()` (Turn off). Otherwise, call `viewModel.toggleAddTransition()` (Turn on).
+The toolbar handler calls `viewModel.toggleAddTransition()` unconditionally — the VM decides: if the current mode is `AddTransition` it resets to `Idle`, otherwise it sets `EditorMode.AddTransition(mutableListOf())`.
 
 **When turned ON**:
-1. `viewModel.toggleAddTransition()` → `resetMode()` then `editorMode = EditorMode.AddTransition(mutableSetOf())`
-2. First click on a state → adds to `selectedStates` set (shown in the `AddTransition` data class)
+1. `viewModel.toggleAddTransition()` → `editorMode = EditorMode.AddTransition(mutableListOf())`
+2. First click on a state → `handleStateClick` → `recordTransitionSource` adds it to `selectedStates`
 3. Second click on a state → if same state → `addLoopArrow()`, else → `addTransactionArrow()`
 4. Mode auto-resets to `Idle` after creating the transition
 
+`selectedStates` is a `MutableList`, so clicking the same state twice records it twice and produces a loop arrow. `recordTransitionSource` ignores non-USER states.
+
 **During add-transaction mode**:
-- User states become non-editable (`editable` bound to `editorModeProperty.map { it.isNotEditingMode() }` → `false`)
-- Clicking states triggers `recordTransitionSource()` (not name editing)
-- The state box click handler calls `recordTransitionSource()` on the ViewModel
+- State single-clicks are routed to `recordTransitionSource()` instead of inline name editing (see Mode-Aware Click Routing)
 
 #### "Remove state" / "Stop remove state"
 
@@ -288,20 +292,18 @@ Toggle button.
 | `EditorMode.Idle` | "Remove state" |
 | `EditorMode.RemoveState` | "Stop remove state" |
 
-**When turned ON**: `viewModel.toggleRemoveState()` → sets `editorMode = EditorMode.RemoveState`
-
-**When turned OFF**: `viewModel.resetMode()` → sets `editorMode = EditorMode.Idle`
+The toolbar handler calls `viewModel.toggleRemoveState()` unconditionally — the VM toggles between `RemoveState` and `Idle`.
 
 **During remove-state mode**:
-- Clicking any state box triggers `onClick` handler in `IsmaBlueprintViewModel`
-- `removeState(stateViewModel)` checks `stateViewModel.name == MAIN_STATE || stateViewModel.name == INIT_STATE` → returns early (Main/Init protected)
+- Clicking a state box routes through `handleStateClick` → `removeState(stateViewModel)`
+- `removeState` checks `stateViewModel.kind != StateKind.USER` → returns early (Main/Init protected)
 - Otherwise: `canvasViewModel.removeState(stateViewModel)` removes state + all associated transactions/loops
 
 **`CanvasViewModel.removeState(stateViewModel)` cascade**:
 1. Removes `stateViewModel` from `_states` (object identity)
 2. Removes all transactions where `it.startStateName == state.name || it.endStateName == state.name`
 3. Removes all loop transactions where `it.stateName == state.name`
-4. Calls `tryUnregisterStateName(state.name)` to clean up the name registry
+4. Calls `nameMonitor.tryUnregister(state.name)` to clean up the name registry
 
 Matching for transactions/loops is by **state name** (not object reference), which handles recreated state ViewModels after load.
 
@@ -314,24 +316,24 @@ Toggle button.
 | `EditorMode.Idle` | "Remove transition" |
 | `EditorMode.RemoveTransition` | "Stop remove transition" |
 
-**When ON**: clicking the body of any arrow (inter-state or loop) removes it via `canvasViewModel.removeTransaction()` or `canvasViewModel.removeLoopTransaction()`. The arrow body click handler fires at the group level before the arrowhead's individual handler.
+The toolbar handler calls `viewModel.toggleRemoveTransition()` unconditionally — the VM toggles between `RemoveTransition` and `Idle`.
 
-**When ON**: clicking an arrowhead does **not** open the PopOver — the arrow body click handler fires first (group-level handler on the arrow's `Group`).
+**When ON**: clicking the body of any arrow (inter-state or loop) removes it via `handleArrowBodyClick`/`handleLoopArrowBodyClick` → `canvasViewModel.removeTransaction()`/`removeLoopTransaction()`. Clicking an inter-state arrowhead also removes the arrow — `handleArrowheadClick` returns `false` so the PopOver is not shown.
 
-**When OFF**: normal behavior resumes — arrow body clicks have no effect, arrowhead clicks open PopOver.
+**When OFF**: normal behavior resumes — arrow body clicks have no effect, arrowhead clicks open the PopOver.
 
 ### Mode Reset
 
-`viewModel.resetMode()` sets `editorMode = EditorMode.Idle`. Every toolbar button action calls `resetMode()` before setting or toggling its own mode. This ensures only one mode is active at a time and prevents stale mode state.
+`viewModel.resetMode()` sets `editorMode = EditorMode.Idle`. The toggle commands are self-contained — each checks the current mode and resets or activates, so only one mode is ever active. `addState()` also resets the mode before creating the state.
 
 ## Interaction Modes Summary
 
 | Mode | `EditorMode` type | Arrow Body Click | Arrowhead Click | State Box Single-Click | State Box Drag |
 |------|-------------------|------------------|-----------------|----------------------|----------------|
-| **Default** | `EditorMode.Idle` | No effect | Open PopOver | Inline name edit | Yes |
-| **Add Transition** | `EditorMode.AddTransition` | No effect | Open PopOver | Record as source/target | No |
-| **Remove State** | `EditorMode.RemoveState` | No effect | Open PopOver | Remove state + arrows (Main/Init protected) | No |
-| **Remove Transition** | `EditorMode.RemoveTransition` | Remove arrow | Open PopOver | Inline name edit | Yes |
+| **Default** | `EditorMode.Idle` | No effect | Open PopOver | Inline name edit (USER states) | Yes |
+| **Add Transition** | `EditorMode.AddTransition` | No effect | Open PopOver | Record as source/target (USER states) | Yes |
+| **Remove State** | `EditorMode.RemoveState` | No effect | Open PopOver | Remove state + arrows (Main/Init protected) | Yes |
+| **Remove Transition** | `EditorMode.RemoveTransition` | Remove arrow | Remove arrow (no PopOver) | Inline name edit (USER states) | Yes |
 
 ## Known Limitations
 

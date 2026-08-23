@@ -29,5 +29,12 @@ class NameChangingMonitor(private val itemDefaultName: String) {
         return true
     }
 
+    fun isRegistered(name: String): Boolean = existedNames.contains(name)
+
+    fun reset() {
+        existedNames.clear()
+        nextNameCounter = 1
+    }
+
     fun createNextDefaultName(): String = "$itemDefaultName $nextNameCounter"
 }

@@ -2,11 +2,9 @@
 
 ## NameChangingMonitor
 
-> **Legacy**: `NameChangingMonitor` is no longer used by the ViewModel. Name uniqueness is now enforced via the `isNameUnique` callback in `StateViewModel`. The class is retained for reference.
-
 ### Purpose
 
-Ensures all state names are unique within the blueprint. Tracks registered names in a `HashSet` and auto-increments default name counters. Source: `NameChangingMonitor.kt` (33 lines).
+The single name registry for the blueprint editor. `CanvasViewModel` owns one `NameChangingMonitor("State")` instance; it tracks registered names in a `HashSet` and auto-increments the default name counter. Source: `NameChangingMonitor.kt`.
 
 ### Fields
 
@@ -35,6 +33,10 @@ Unregistering does **not** adjust `nextNameCounter` — the counter only moves f
 ### `createNextDefaultName()`
 
 Returns `"$itemDefaultName $nextNameCounter"` and does not advance the counter (advancement happens on the next `tryRegister` call).
+
+### `isRegistered(name)` / `reset()`
+
+`isRegistered(name)` reports whether `name` is in `existedNames` — used by `StateViewModel`'s `isNameUnique` callback. `reset()` clears the registry and resets the counter to 1 — called by `CanvasViewModel.clearAll()`.
 
 ## ArrowGeometry
 
@@ -131,19 +133,21 @@ stateDiagram-v2
 ### Usage in StateBox
 
 The `StateBox` constructor creates a `ClickDisambiguator` with:
-- **singleClick**: Enables inline name editing (`isEditModeEnabled = true`) + calls `onClick` callback
-- **doubleClick**: Calls `onDoubleClick` callback (opens text editor tab)
+- **singleClick**: Forwards to the `onSingleClick` callback (`IsmaBlueprintViewModel.handleStateClick`), then requests focus on the name `TextArea` if the ViewModel entered edit mode
+- **doubleClick**: Forwards to the `onDoubleClick` callback (`IsmaBlueprintViewModel.handleStateDoubleClick` → `OpenStateEditor` event)
 - **clickDelay**: 200L (passed directly to constructor, no shared scope needed)
+
+The name `TextArea`'s focus listener forwards committed text via the `onNameCommitted` callback (`IsmaBlueprintViewModel.commitNameEdit`) — the control never writes to the ViewModel directly.
 
 Event handlers route JavaFX mouse events to the disambiguator: `MOUSE_PRESSED` calls `clickDisambiguator.onKeyPress()`, `MOUSE_DRAGGED` calls `clickDisambiguator.onDragged()`, and `MOUSE_CLICKED` calls `clickDisambiguator.onClick(it)`. See `StateBox.kt` for the full implementation.
 
 ### Usage in LoopTransactionArrow
 
 The `LoopTransactionArrow` uses its own `ClickDisambiguator` for arrowhead clicks:
-- **singleClick**: Opens `EditArrowPopOver`
-- **doubleClick**: Opens text editor tab for loop content
+- **singleClick**: Forwards to `onArrowheadClicked` (currently a no-op — the PopOver only supports `TransactionViewModel`)
+- **doubleClick**: Forwards to `onArrowheadDoubleClicked` (`IsmaBlueprintViewModel.handleLoopArrowheadDoubleClick` → `OpenLoopEditor` event)
 
-The arrow body click (for removal in RemoveTransition mode) is handled separately via `setOnMouseClicked { onClick(...) }`.
+The arrow body click (for removal in RemoveTransition mode) is handled separately via `setOnMouseClicked { onBodyClicked(...) }`.
 
 ## LISMA Conversion
 
@@ -262,23 +266,23 @@ Sealed class hierarchy with four mutually exclusive modes:
 | Type | Properties | Purpose |
 |------|-----------|---------|
 | `EditorMode.Idle` | None | Default mode |
-| `EditorMode.AddTransition` | `selectedStates: MutableSet<StateViewModel>` | Collects 1-2 states for transition/loop creation |
+| `EditorMode.AddTransition` | `selectedStates: MutableList<StateViewModel>` | Collects 1-2 states for transition/loop creation |
 | `EditorMode.RemoveState` | None | Click states to remove them |
 | `EditorMode.RemoveTransition` | None | Click arrows to remove them |
 
-`isNotEditingMode()` extension returns `true` for `Idle` and `RemoveTransition` modes, `false` for `AddTransition` and `RemoveState`.
+`selectedStates` is a `MutableList` (not a `Set`) so the same state can be recorded twice — a double-click on one state creates a loop arrow instead of a transition. `recordTransitionSource` only accepts `StateKind.USER` states.
 
-## Editability Bindings
+## Mode-Aware Click Routing
 
-User state `isEditable` is dynamically bound to the editor mode: `editableProperty.bind(editorModeProperty.map { it.isNotEditingMode() })`.
+There is no editable/editMode binding to the editor mode. Instead, `IsmaBlueprintViewModel.handleStateClick(state)` routes user intent by the current mode:
 
-The `isNotEditingMode()` extension function returns `true` when `this !is EditorMode.RemoveState && this !is EditorMode.AddTransition`.
+| Mode | State single-click | State double-click | Arrow body click | Arrowhead click |
+|------|--------------------|--------------------|------------------|-----------------|
+| `Idle` | Inline name edit (USER states) | Open state editor tab | No effect | Open PopOver |
+| `AddTransition` | Record transition source | Open state editor tab | No effect | Open PopOver |
+| `RemoveState` | Remove state (USER only) | Open state editor tab | No effect | Open PopOver |
+| `RemoveTransition` | Inline name edit (USER states) | Open state editor tab | Remove arrow | Remove arrow (no PopOver) |
 
-| Mode | `isNotEditingMode()` | Inline name edit |
-|------|---------------------|-----------------|
-| `EditorMode.Idle` | `true` | Enabled |
-| `EditorMode.AddTransition` | `false` | Disabled |
-| `EditorMode.RemoveState` | `false` | Disabled |
-| `EditorMode.RemoveTransition` | `true` | Enabled |
+`handleArrowheadClick(tx)` returns `true` when the View should show the PopOver and `false` when the click was consumed by the current mode (RemoveTransition removes the arrow instead).
 
 

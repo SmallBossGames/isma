@@ -16,8 +16,10 @@ import ru.isma.next.editor.blueprint.viewmodels.StateViewModel
 
 class StateBox(
     val viewModel: StateViewModel,
-    onClick: (StateViewModel) -> Unit = {},
+    fill: Paint,
+    onSingleClick: (StateViewModel) -> Unit = {},
     onDoubleClick: (StateViewModel) -> Unit = {},
+    onNameCommitted: (StateViewModel, String) -> Unit = { _, _ -> }
 ) : Group() {
     private val registeredHandlers = mutableListOf<Pair<javafx.event.EventType<MouseEvent>, EventHandler<MouseEvent>>>()
 
@@ -28,7 +30,7 @@ class StateBox(
         children.add(Rectangle().apply {
             heightProperty().bind(viewModel.squareHeightProperty)
             widthProperty().bind(viewModel.squareWidthProperty)
-            fillProperty().bind(viewModel.colorProperty)
+            this.fill = fill
             viewOrder = 3.0
             arcWidth = CORNER_RADIUS
             arcHeight = CORNER_RADIUS
@@ -41,8 +43,7 @@ class StateBox(
                 if (focused) {
                     text = viewModel.name
                 } else {
-                    viewModel.name = text
-                    viewModel.commitEdit()
+                    onNameCommitted(viewModel, text)
                 }
             }
         }
@@ -66,11 +67,10 @@ class StateBox(
 
         val clickDisambiguator = ClickDisambiguator(
             singleClick = {
-                if (viewModel.editable) {
-                    viewModel.startEdit()
+                onSingleClick(viewModel)
+                if (viewModel.editMode) {
                     nameTextArea.requestFocus()
                 }
-                onClick(viewModel)
             },
             doubleClick = { onDoubleClick(viewModel) },
             clickDelay = 200L

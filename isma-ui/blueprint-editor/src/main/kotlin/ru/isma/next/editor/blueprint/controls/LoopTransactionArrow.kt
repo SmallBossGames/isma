@@ -16,9 +16,9 @@ import ru.isma.next.editor.blueprint.viewmodels.LoopTransactionViewModel
 class LoopTransactionArrow(
     val viewModel: LoopTransactionViewModel,
     val stateViewModel: ru.isma.next.editor.blueprint.viewmodels.StateViewModel,
-    val onClick: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
-    val onArrowClick: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
-    val onArrowDoubleClick: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
+    val onBodyClicked: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
+    val onArrowheadClicked: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
+    val onArrowheadDoubleClicked: (LoopTransactionArrow, MouseEvent) -> Unit = { _, _ -> },
 ): Group() {
     init {
         layoutXProperty().bind(stateViewModel.centerX())
@@ -26,8 +26,8 @@ class LoopTransactionArrow(
         viewOrder = 4.0
 
         val clickDisambiguator = ClickDisambiguator(
-            singleClick = { onArrowClick(this@LoopTransactionArrow, it) },
-            doubleClick = { onArrowDoubleClick(this@LoopTransactionArrow, it) },
+            singleClick = { onArrowheadClicked(this@LoopTransactionArrow, it) },
+            doubleClick = { onArrowheadDoubleClicked(this@LoopTransactionArrow, it) },
             clickDelay = 200L
         )
 
@@ -60,7 +60,7 @@ class LoopTransactionArrow(
         )
 
         setOnMouseClicked {
-            onClick(this@LoopTransactionArrow, it)
+            onBodyClicked(this@LoopTransactionArrow, it)
         }
     }
 }

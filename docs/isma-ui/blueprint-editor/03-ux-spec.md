@@ -89,9 +89,9 @@ See `StateBox.kt`, `IsmaBlueprintViewModel.kt`, and `StateViewModel.kt` for the 
 Double-clicking any state box (Main, Init, or User) flows through `IsmaBlueprintViewModel.handleStateDoubleClick(state)` → `BlueprintEvent.OpenStateEditor` → `IsmaBlueprintEditor`, which opens a **text editor tab** in the main TabPane:
 
 - Tab name: bound to the state's `nameProperty` (updates when state is renamed)
-- Tab content: the state's `text` property (the LISMA body of that state)
-- Changes in the text editor write back to `state.text` via `onTextChanged` callback
-- Tab close: disposes the text editor instance via `editorFactory.disposeInstance()`
+- Tab content: an `ITextEditor` (from `ITextEditorFactory`) whose `text` property is bidirectionally bound to the state's `textProperty` (the LISMA body of that state)
+- One tab per state: re-opening an already-open state selects the existing tab
+- Tab close: unbinds the text property and disposes the editor via `ITextEditor.dispose()`
 
 ### Drag Interaction
 

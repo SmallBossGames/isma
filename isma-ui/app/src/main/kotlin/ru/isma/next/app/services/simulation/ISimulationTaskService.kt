@@ -1,6 +1,7 @@
 package ru.isma.next.app.services.simulation
 
 import kotlinx.coroutines.flow.Flow
+import ru.isma.next.app.models.LismaTextModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.models.simulation.SimulationTask
 
@@ -12,7 +13,7 @@ interface ISimulationTaskService : AutoCloseable {
 
     fun submit(
         modelName: String,
-        sourceCode: String,
+        lisma: LismaTextModel,
         simulationParameters: SimulationParametersModel,
     ): SimulationTask
 

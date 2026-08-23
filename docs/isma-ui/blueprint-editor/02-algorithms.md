@@ -153,7 +153,7 @@ The arrow body click (for removal in RemoveTransition mode) is handled separatel
 
 ### Overview
 
-`BlueprintModel.toLismaText()` (in `models/BlueprintModel.kt`) transforms the visual statechart into LISMA text. This runs at **compile/snapshot time**, not during editing. The output is a `LismaTextModel` containing the generated LISMA text and `CodeRegion` line mappings.
+`BlueprintModel.toLismaText()` (app module, `ru.isma.next.app.services.blueprint.LismaCodegen`) transforms the visual statechart into LISMA text. This runs at **compile/snapshot time**, not during editing. The output is a `LismaTextModel` (app module, `ru.isma.next.app.models`) containing the generated LISMA text and `CodeRegion` line mappings. The blueprint-editor module only provides the plain `BlueprintModel` data.
 
 The function signature is `fun BlueprintModel.toLismaText(): LismaTextModel`. The algorithm processes the model in three phases: Phase 1 (Main state text, top-level content), Phase 2 (Regular transactions, grouped by target state + predicate), Phase 3 (Loop transactions, expanded into pseudo-state pairs).
 
@@ -247,17 +247,27 @@ graph TD
 
 ### Output Order
 
-1. Main state text, followed by a blank line
-2. State blocks from regular transactions (grouped by target + predicate), with a blank line after each block
-3. Loop transaction expansions (one pseudo-state pair per loop), with a blank line after each pair
+1. Main state text
+2. State blocks from regular transactions (grouped by target + predicate, in first-transaction order via `LinkedHashMap`), followed by one blank line after each block
+3. Loop transaction expansions (one pseudo-state pair per loop), followed by two blank lines after each pair
 
 ### Line Number Tracking
 
-For each generated fragment, `fragmentLinesCount = fragmentText.lines().count()`, `startLineNumber = linesCounter`, `endLineNumber = linesCounter + fragmentLinesCount + 1`. The fragment is appended to `resultStringBuilder` with a trailing blank line, and a `CodeRegion` is added with the state name, start line, and end line. `linesCounter = endLineNumber`. The `+1` accounts for the trailing blank line. `CodeRegion` objects are used by the text editor for error highlighting — mapping LISMA compilation errors back to specific fragments.
+`appendFragment()` (in `LismaCodegen.kt`) records a `CodeRegion` per fragment using 1-based line numbers:
 
-### fragmentNameByIndex
+```kotlin
+val startLine = sb.lineCount() + 1          // lineCount() = number of '\n' already in the buffer
+sb.appendLine(fragmentText)
+repeat(extraBlankLines) { sb.appendLine() } // 1 for state blocks, 2 for loop expansions
+val fragmentLines = fragmentText.lines().count() - if (fragmentText.endsWith("\n")) 1 else 0
+regions.add(CodeRegion(name, startLine, startLine + fragmentLines - 1))
+```
 
-`LismaTextModel` provides `fragmentNameByIndex(index: Int)` which returns `regions.firstOrNull { index > it.startLine && index <= it.endLine }` or `DefaultFragment` if no region matches. The companion object defines `DefaultFragment = CodeRegion(name = "Main", startLine = 0, endLine = 0)`. If no region matches, returns `DefaultFragment` (named "Main").
+Kotlin's `String.lines()` counts the empty line after a trailing newline, so the `- 1` correction applies only to fragments that end with `"\n"` (loop expansions — `toLisma()` ends with a blank line). State block fragments (`StateBlockModel.toString()`) have no trailing newline and need no correction. `CodeRegion` objects map LISMA compilation errors back to the owning state fragment.
+
+### fragmentNameByLine
+
+`LismaTextModel` provides `fragmentNameByLine(line: Int): String` which returns `regions.firstOrNull { line >= it.startLine && line <= it.endLine }?.name` or `DefaultFragment.name` if no region matches. The companion object defines `DefaultFragment = CodeRegion(name = "Main", startLine = 0, endLine = 0)`. Used by `LismaPdeService` (verify) and `SimulationTaskService` (simulate) to fill the Fragment column of the error list.
 
 ## EditorMode
 

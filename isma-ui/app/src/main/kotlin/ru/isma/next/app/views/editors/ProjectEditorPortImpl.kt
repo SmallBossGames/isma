@@ -1,12 +1,13 @@
 package ru.isma.next.app.views.editors
 
 import javafx.scene.Node
+import ru.isma.next.app.models.LismaTextModel
 import ru.isma.next.app.models.projects.BlueprintProjectModel
 import ru.isma.next.app.models.projects.IProjectModel
 import ru.isma.next.app.models.projects.LismaProjectModel
 import ru.isma.next.app.models.projects.ProjectContent
-import ru.isma.next.app.services.editors.TextEditorFactory
 import ru.isma.next.app.services.project.ProjectEditorPort
+import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.blueprint.views.IsmaBlueprintEditor
 import ru.isma.next.editor.text.IsmaTextEditor
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
@@ -15,12 +16,9 @@ import ru.isma.next.editor.text.services.contracts.IHighlightingService
 class ProjectEditorPortImpl(
     private val editorPlatformService: IEditorPlatformService,
     private val highlightingService: IHighlightingService,
+    private val blueprintTextEditorFactory: ITextEditorFactory,
 ) : ProjectEditorPort {
     private val editors = mutableMapOf<IProjectModel, Node>()
-
-    private val blueprintTextEditorFactory = TextEditorFactory {
-        IsmaTextEditor(editorPlatformService, highlightingService)
-    }
 
     override fun editorFor(project: IProjectModel): Node = editors.getOrPut(project) {
         createEditor(project)
@@ -28,7 +26,7 @@ class ProjectEditorPortImpl(
 
     override fun content(project: IProjectModel): ProjectContent = when (project) {
         is LismaProjectModel -> ProjectContent.Text(
-            (editorFor(project) as IsmaTextEditor).textProperty().value
+            LismaTextModel((editorFor(project) as IsmaTextEditor).textProperty().value)
         )
         is BlueprintProjectModel -> ProjectContent.Blueprint(
             (editorFor(project) as IsmaBlueprintEditor).getBlueprintModel()

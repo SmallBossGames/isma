@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.models.CompilationErrorItem
+import ru.isma.next.app.models.LismaTextModel
 import ru.isma.next.app.models.simulation.CompletedSimulationModel
 import ru.isma.next.app.models.simulation.SimulationParametersModel
 import ru.isma.next.app.models.simulation.SimulationTask
@@ -54,14 +55,14 @@ class SimulationTaskService(
 
     override fun submit(
         modelName: String,
-        sourceCode: String,
+        lisma: LismaTextModel,
         simulationParameters: SimulationParametersModel,
     ): SimulationTask {
         val task = SimulationTask(nextId++, modelName, simulationParameters)
 
         val job = simulationScope.launch {
             try {
-                runSimulationJob(task, sourceCode, simulationParameters)
+                runSimulationJob(task, lisma, simulationParameters)
             } finally {
                 currentJobs.remove(task)
             }
@@ -72,11 +73,11 @@ class SimulationTaskService(
 
     private suspend fun runSimulationJob(
         task: SimulationTask,
-        sourceCode: String,
+        lisma: LismaTextModel,
         simulationParameters: SimulationParametersModel,
     ) {
         val compileResult = try {
-            serverFacade.compileModel(sourceCode)
+            serverFacade.compileModel(lisma.fullText)
         } catch (e: StatusException) {
             fail(task, "Compilation error: ${e.status.description}: ${e.message}")
             return
@@ -91,7 +92,7 @@ class SimulationTaskService(
         }
 
         val errorItems = compileResult.errors.map { error: CompilationErrorDto ->
-            CompilationErrorItem(error.row, error.column, "LISMA", error.message)
+            CompilationErrorItem(error.row, error.column, lisma.fragmentNameByLine(error.row), error.message)
         }
         modelErrorService.putErrorList(errorItems)
 

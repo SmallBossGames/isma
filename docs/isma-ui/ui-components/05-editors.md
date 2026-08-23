@@ -15,8 +15,9 @@ The text editor module provides a rich text editing component with server-driven
 - Line numbers via `LineNumberFactory`
 - Remote syntax highlighting via `IHighlightingService` (delegates to server's `highlightSource()`)
 - Cut/copy/paste event propagation from `IEditorPlatformService`
+- `textProperty(): Property<String>` — a `SimpleStringProperty` bridged two-way to the `CodeArea` text (the `CodeArea` only exposes `ObservableValue<String>`), so external code can bind to the editor text
 
-Constructor takes `textEditorService: IEditorPlatformService` and `highlightingService: IHighlightingService`. In `init`: creates `CodeArea` with CSS font style, subscribes to `cutEvent`/`copyEvent`/`pasteEvent` flows (propagates only if focused), adds `textProperty()` listener that calls `highlightingService.createHighlightingStyleSpans()` and applies via `setStyleSpans(0, highlighting)`.
+Constructor takes `textEditorService: IEditorPlatformService` and `highlightingService: IHighlightingService`. In `init`: creates `CodeArea` with CSS font style, subscribes to `cutEvent`/`copyEvent`/`pasteEvent` flows (propagates only if focused), adds a `textProperty()` listener that calls `highlightingService.createHighlightingStyleSpans()` and applies via `setStyleSpans(0, highlighting)`, and wires the bridged text property (equality-guarded listeners in both directions).
 
 ### Syntax Highlighting Pipeline
 
@@ -184,13 +185,25 @@ Inner data classes:
 - `EditorTransaction(startBox, endBox, arrow: TransactionArrow)`
 - `EditorLoopTransaction(stateBox, arrow: LoopTransactionArrow)`
 
-### Editor Factory SPI
+### Text Editor Port
 
 **File:** [`ITextEditorFactory.kt`](../../blueprint-editor/src/main/kotlin/.../services/ITextEditorFactory.kt)
 
-Interface for creating/disposing text editor nodes. Injected via Koin to decouple the blueprint editor from the text-editor module. Declares: `createTextEditor(text: String, onTextChanged: (String) -> Unit): Node`, `disposeInstance(node: Node)`.
+Port that decouples the blueprint editor from the text-editor module. Declares:
 
-The implementation (in app module) wraps `IsmaTextEditor` instances and provides per-project Koin scopes. Each blueprint project gets its own factory and editor pool.
+```kotlin
+interface ITextEditor {
+    val node: Node              // docked into a Tab
+    val text: Property<String>  // two-way bindable text
+    fun dispose()
+}
+
+interface ITextEditorFactory {
+    fun createEditor(): ITextEditor
+}
+```
+
+The factory is registered as a Koin `single` in the app module (`appServicesModule`) and injected into `IsmaBlueprintEditor` via `ProjectEditorPortImpl`. The app-module adapter `TextEditorFactory` wraps `IsmaTextEditor` instances; the text-editor and blueprint-editor modules do not reference each other. `IsmaBlueprintEditor` binds `editor.text` to the state/loop `textProperty` with `bindBidirectional`, so edits flow both ways without callbacks.
 
 ### Editor Mode State Machine
 

@@ -1,4 +1,4 @@
-package ru.isma.next.editor.blueprint.models
+package ru.isma.next.app.models
 
 data class CodeRegion(
     val name: String,
@@ -10,8 +10,10 @@ data class LismaTextModel(
     val fullText: String,
     val regions: List<CodeRegion> = emptyList(),
 ) {
-    fun fragmentNameByIndex(index: Int) = regions
-        .firstOrNull { index > it.startLine && index <= it.endLine } ?: DefaultFragment
+    fun fragmentNameByLine(line: Int): String = regions
+        .firstOrNull { line >= it.startLine && line <= it.endLine }
+        ?.name
+        ?: DefaultFragment.name
 
     companion object {
         val DefaultFragment = CodeRegion(

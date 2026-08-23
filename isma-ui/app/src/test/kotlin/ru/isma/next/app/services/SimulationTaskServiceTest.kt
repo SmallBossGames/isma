@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flow
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
+import ru.isma.next.app.models.LismaTextModel
 import ru.isma.next.app.models.simulation.CauchyInitialsModel
 import ru.isma.next.app.models.simulation.EventDetectionParametersModel
 import ru.isma.next.app.models.simulation.IntegrationMethodParametersModel
@@ -92,7 +93,7 @@ class SimulationTaskServiceTest {
     fun `submit returns task with correct id and modelName`() {
         mockSuccessfulCompile("model TestModel {}")
 
-        val task = service.submit("TestModel", "model TestModel {}", testParameters())
+        val task = service.submit("TestModel", LismaTextModel("model TestModel {}"), testParameters())
 
         assert(task.id == 1L) { "Expected id=1, got ${task.id}" }
         assert(task.modelName == "TestModel") { "Expected TestModel, got ${task.modelName}" }
@@ -105,7 +106,7 @@ class SimulationTaskServiceTest {
             modelId = "", errors = listOf(CompilationErrorDto(1, 5, "Syntax error")), warnings = emptyList()
         )
 
-        val task = service.submit("BadModel", source, testParameters())
+        val task = service.submit("BadModel", LismaTextModel(source), testParameters())
 
         awaitUi { task.status == SimulationTaskStatus.FAILED }
 
@@ -116,7 +117,7 @@ class SimulationTaskServiceTest {
     fun `submit adds task to list and completes on success`() {
         mockSuccessfulCompile("model Progress {}")
 
-        val task = service.submit("ProgressModel", "model Progress {}", testParameters())
+        val task = service.submit("ProgressModel", LismaTextModel("model Progress {}"), testParameters())
 
         awaitUi { service.tasks.any { it.id == task.id } && task.status == SimulationTaskStatus.COMPLETED }
 
@@ -139,7 +140,7 @@ class SimulationTaskServiceTest {
     fun `removeTask removes task from list`() {
         mockSuccessfulCompile("model List {}")
 
-        val task = service.submit("ListModel", "model List {}", testParameters())
+        val task = service.submit("ListModel", LismaTextModel("model List {}"), testParameters())
 
         awaitUi { service.tasks.any { it.id == task.id } }
 

@@ -11,11 +11,9 @@ class SimulationService(
 ) : ISimulationService {
 
     override fun simulate(project: IProjectModel, simulationParameters: SimulationParametersModel) {
-        val sourceCode = editorPort.content(project).fullText
-
         simulationTaskService.submit(
             modelName = project.name,
-            sourceCode = sourceCode,
+            lisma = editorPort.content(project).lisma,
             simulationParameters = simulationParameters,
         )
     }

@@ -1,6 +1,7 @@
 package ru.isma.next.editor.text
 
-import javafx.beans.value.ObservableValue
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleStringProperty
 import javafx.scene.layout.BorderPane
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,8 @@ class IsmaTextEditor(
     private val highlightingService: IHighlightingService,
 ) : BorderPane() {
     private val area: CodeArea
+
+    private val text = SimpleStringProperty()
 
     private val fxCoroutineScope = CoroutineScope(Dispatchers.JavaFx)
 
@@ -53,10 +56,21 @@ class IsmaTextEditor(
             }
         }
 
+        area.textProperty().addListener { _, _, newValue ->
+            if (text.value != newValue) {
+                text.value = newValue
+            }
+        }
+        text.addListener { _, _, newValue ->
+            if (area.text != newValue) {
+                area.replaceText(newValue)
+            }
+        }
+
         center = area
     }
 
-    fun textProperty(): ObservableValue<String> = area.textProperty()
+    fun textProperty(): Property<String> = text
 
     fun replaceText(text: String) = area.replaceText(text)
 

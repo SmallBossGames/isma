@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import org.junit.jupiter.api.Test
+import ru.isma.next.app.models.LismaTextModel
 import ru.isma.next.app.models.simulation.CauchyInitialsModel
 import ru.isma.next.app.models.simulation.EventDetectionParametersModel
 import ru.isma.next.app.models.simulation.IntegrationMethodParametersModel
@@ -31,7 +32,7 @@ class TasksViewModelTest {
 
         override fun submit(
             modelName: String,
-            sourceCode: String,
+            lisma: LismaTextModel,
             simulationParameters: SimulationParametersModel,
         ): SimulationTask = throw UnsupportedOperationException()
 

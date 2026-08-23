@@ -226,29 +226,31 @@ All three lists (`states`, `transactions`, `loopTransactions`) are exposed as im
 
 ## Text Editor Integration
 
+The View depends only on the `ITextEditorFactory` / `ITextEditor` port (see `ITextEditorFactory.kt`). The factory is a Koin `single` provided by the app module and injected through `ProjectEditorPortImpl`; the app-module adapter wraps `IsmaTextEditor`. The text-editor and blueprint-editor modules do not reference each other.
+
 ### Opening State Text Editor Tabs
 
 Double-clicking a state box flows: `StateBox.onDoubleClick` → `IsmaBlueprintViewModel.handleStateDoubleClick(state)` → fires `BlueprintEvent.OpenStateEditor(state)` on `eventProperty`. `IsmaBlueprintEditor` subscribes to `eventProperty` and opens the tab:
 
-1. `editorFactory.createTextEditor(stateViewModel.text, onTextChanged = { stateViewModel.text = it })` creates a text editor bound to the ViewModel's text
-2. `Tab(stateViewModel.name, editor)` creates a closable Tab
-3. `Tab.textProperty()` binds to `stateViewModel.nameProperty` — tab name updates when state is renamed
-4. `Tab.setOnCloseRequest { editorFactory.disposeInstance(editor) }` disposes the editor on tab close
+1. `editorFactory.createEditor()` creates an `ITextEditor`
+2. `editor.text.bindBidirectional(stateViewModel.textProperty)` two-way binds editor text to the ViewModel
+3. `Tab(stateViewModel.name, editor.node)` creates a closable Tab; `Tab.textProperty()` binds to `stateViewModel.nameProperty` — tab name updates when the state is renamed
+4. `Tab.setOnCloseRequest { … }` unbinds both properties, disposes the editor, and drops the tab from the open-tab map
 
-See `IsmaBlueprintEditor.kt` for the full implementation.
+If the state already has an open tab, the existing tab is selected instead of creating a duplicate.
 
 ### Opening Loop Content Editor Tabs
 
 Double-clicking a loop arrow's arrowhead flows: `LoopTransactionArrow.onArrowheadDoubleClicked` → `IsmaBlueprintViewModel.handleLoopArrowheadDoubleClick(loop, state)` → fires `BlueprintEvent.OpenLoopEditor(loop, state)`. The editor opens the tab:
 
-1. `editorFactory.createTextEditor(loopTxViewModel.text, onTextChanged = { loopTxViewModel.text = it })`
-2. `Tab("${stateViewModel.name} (loop)", editor)`
-3. `Tab.textProperty()` binds to `stateViewModel.nameProperty.concat(" (loop)")`
-4. Tab close disposes the editor instance
+1. `editorFactory.createEditor()`
+2. `editor.text.bindBidirectional(loopTxViewModel.textProperty)`
+3. `Tab(stateViewModel.name + " (loop)", editor.node)`; `Tab.textProperty()` binds to `stateViewModel.nameProperty.concat(" (loop)")`
+4. Tab close unbinds, disposes, and drops the tab from the map
 
 ### Editor Lifecycle
 
-The editor lifecycle is: Create → Tab opened → onTextChanged fires on edits → Tab closed → disposeInstance(). Each open tab owns one editor instance. Closing the tab releases the editor back to the factory's pool.
+The editor lifecycle is: Create → Tab opened → bidirectional binding keeps `ITextEditor.text` and the ViewModel `textProperty` in sync → Tab closed → unbind + `dispose()`. One tab per state/loop; re-opening activates the existing tab. `IsmaBlueprintEditor.dispose()` (called on project close) removes all editor tabs from the `TabPane` and disposes their editors.
 
 ## Project Lifecycle
 
@@ -256,11 +258,10 @@ The editor lifecycle is: Create → Tab opened → onTextChanged fires on edits 
 
 1. User clicks "New statechart" toolbar button or uses File → New Statechart (Ctrl+B)
 2. `ProjectService.createNewBlueprint("New statechart")` is called
-3. A new `BlueprintProjectModel` is created with `BlueprintModel.empty`
-4. A Koin scope is created for this project
-5. The `IsmaBlueprintEditor` is instantiated within the scope
-6. The project is added to `ProjectService.projects`
-7. A new tab opens in the main TabPane showing the editor
+3. A new `BlueprintProjectModel` is created with `BlueprintModel.empty` (it carries a Koin scope, closed on `dispose()`)
+4. The project is added to `ProjectService.projects`
+5. `ProjectEditorPortImpl.editorFor(project)` instantiates `IsmaBlueprintEditor` with the Koin-injected `ITextEditorFactory` and applies the model
+6. A new tab opens in the main TabPane showing the editor
 
 ### Blueprint Project Save
 
@@ -280,10 +281,10 @@ The editor lifecycle is: Create → Tab opened → onTextChanged fires on edits 
 
 ### Snapshot (Compile)
 
-1. At compile/verification time, `project.snapshot()` is called
-2. For blueprint projects, this calls `blueprint.toLismaText()`
-3. The result is a `LismaTextModel` containing the generated LISMA text and `CodeRegion` mappings
-4. `CodeRegion` objects provide line number ranges for error highlighting in the text editor
+1. At compile/verification time the app reads `ProjectEditorPort.content(project)`
+2. For blueprint projects, `ProjectContent.Blueprint` carries the model plus a `LismaTextModel` produced by `BlueprintModel.toLismaText()` (app module, `ru.isma.next.app.services.blueprint.LismaCodegen`)
+3. `LismaTextModel` contains the generated LISMA text and `CodeRegion` line mappings
+4. `LismaPdeService` (verify) and `SimulationTaskService` (simulate) resolve each compilation error's fragment via `LismaTextModel.fragmentNameByLine(row)`, so the error list shows the owning state name instead of a placeholder
 
 ## Integration with Main App Shell
 

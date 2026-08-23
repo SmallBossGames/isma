@@ -1,9 +1,11 @@
 package ru.isma.next.editor.blueprint.views
 
+import javafx.beans.property.StringProperty
+import javafx.beans.value.ObservableValue
 import javafx.event.EventHandler
-import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
+import ru.isma.next.editor.blueprint.services.ITextEditor
 import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.blueprint.viewmodels.BlueprintEvent
 import ru.isma.next.editor.blueprint.viewmodels.IsmaBlueprintViewModel
@@ -20,7 +22,8 @@ class IsmaBlueprintEditor(
         isClosable = false
     }
     private val tabs = TabPane(diagramTab)
-    private val openEditorTabs = mutableMapOf<Tab, Node>()
+    private val openStateEditorTabs = mutableMapOf<StateViewModel, OpenEditorTab>()
+    private val openLoopEditorTabs = mutableMapOf<LoopTransactionViewModel, OpenEditorTab>()
 
     init {
         viewModel.eventProperty.addListener { _, _, event ->
@@ -36,36 +39,47 @@ class IsmaBlueprintEditor(
         bottom = buildToolbar()
     }
 
+    private class OpenEditorTab(
+        val tab: Tab,
+        val editor: ITextEditor,
+        val boundText: StringProperty,
+    )
+
     private fun openStateEditorTab(stateVm: StateViewModel) {
-        val editor = editorFactory.createTextEditor(
-            text = stateVm.text,
-            onTextChanged = { stateVm.text = it }
-        )
-        val tab = Tab(stateVm.name, editor).apply {
-            textProperty().bind(stateVm.nameProperty)
-            setOnCloseRequest {
-                editorFactory.disposeInstance(editor)
-                openEditorTabs.remove(this@apply)
-            }
-        }
-        openEditorTabs[tab] = editor
-        tabs.tabs.add(tab)
+        openEditorTab(openStateEditorTabs, stateVm, stateVm.nameProperty, stateVm.textProperty)
     }
 
     private fun openLoopEditorTab(loopTxVm: LoopTransactionViewModel, stateVm: StateViewModel) {
-        val editor = editorFactory.createTextEditor(
-            text = loopTxVm.text,
-            onTextChanged = { loopTxVm.text = it }
-        )
-        val tab = Tab("${stateVm.name} (loop)", editor).apply {
-            textProperty().bind(stateVm.nameProperty.concat(" (loop)"))
+        openEditorTab(openLoopEditorTabs, loopTxVm, stateVm.nameProperty.concat(" (loop)"), loopTxVm.textProperty)
+    }
+
+    private fun <K : Any> openEditorTab(
+        openTabs: MutableMap<K, OpenEditorTab>,
+        key: K,
+        title: ObservableValue<String>,
+        boundText: StringProperty,
+    ) {
+        openTabs[key]?.let { openTab ->
+            tabs.selectionModel.select(openTab.tab)
+            return
+        }
+
+        val editor = editorFactory.createEditor()
+        editor.text.bindBidirectional(boundText)
+
+        val tab = Tab(title.value, editor.node).apply {
+            textProperty().bind(title)
             setOnCloseRequest {
-                editorFactory.disposeInstance(editor)
-                openEditorTabs.remove(this@apply)
+                editor.text.unbind()
+                boundText.unbind()
+                editor.dispose()
+                openTabs.remove(key)
             }
         }
-        openEditorTabs[tab] = editor
+
+        openTabs[key] = OpenEditorTab(tab, editor, boundText)
         tabs.tabs.add(tab)
+        tabs.selectionModel.select(tab)
     }
 
     private fun buildToolbar(): ToolBar {
@@ -112,7 +126,13 @@ class IsmaBlueprintEditor(
     }
 
     fun dispose() {
-        openEditorTabs.values.forEach { editorFactory.disposeInstance(it) }
-        openEditorTabs.clear()
+        (openStateEditorTabs.values + openLoopEditorTabs.values).forEach { openTab ->
+            openTab.editor.text.unbind()
+            openTab.boundText.unbind()
+            tabs.tabs.remove(openTab.tab)
+            openTab.editor.dispose()
+        }
+        openStateEditorTabs.clear()
+        openLoopEditorTabs.clear()
     }
 }

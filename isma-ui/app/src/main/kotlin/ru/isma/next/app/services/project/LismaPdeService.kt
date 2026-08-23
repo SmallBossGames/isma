@@ -1,8 +1,8 @@
 package ru.isma.next.app.services.project
 
 import ru.isma.next.app.models.CompilationErrorItem
+import ru.isma.next.app.models.LismaTextModel
 import ru.isma.next.app.services.ModelErrorService
-import ru.isma.next.editor.blueprint.models.LismaTextModel
 import ru.isma.next.external.SimulationServerFacade
 import ru.isma.next.external.dtos.CompilationErrorDto
 
@@ -14,7 +14,7 @@ class LismaPdeService(
         val validationResult = serverFacade.validateModel(sourceSnapshot.fullText)
 
         val errorItems = validationResult.errors.map { error: CompilationErrorDto ->
-            CompilationErrorItem(error.row, error.column, LismaTextModel.DefaultFragment.name, error.message)
+            CompilationErrorItem(error.row, error.column, sourceSnapshot.fragmentNameByLine(error.row), error.message)
         }
 
         modelService.putErrorList(errorItems)

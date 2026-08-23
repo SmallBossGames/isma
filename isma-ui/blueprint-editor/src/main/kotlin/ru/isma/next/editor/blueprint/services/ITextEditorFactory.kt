@@ -1,9 +1,16 @@
 package ru.isma.next.editor.blueprint.services
 
+import javafx.beans.property.Property
 import javafx.scene.Node
 
-interface ITextEditorFactory {
-    fun createTextEditor(text: String, onTextChanged: (String) -> Unit): Node
+interface ITextEditor {
+    val node: Node
 
-    fun disposeInstance(node: Node)
+    val text: Property<String>
+
+    fun dispose()
+}
+
+interface ITextEditorFactory {
+    fun createEditor(): ITextEditor
 }

@@ -25,7 +25,7 @@ The `app` module depends on all other isma-ui modules (text-editor, blueprint-ed
 
 All services and UI components are instantiated through Koin. There are no constructors called manually outside the DI root. The DI hierarchy follows module boundaries: simulationServerModule → appServicesModule → grinProcessLauncherModule → editorModule → lismaTextEditorModule → blueprintEditorModule → toolbarsModule → editorTabPaneModule → settingsPanelModule → mainViewModule. Service-layer DI modules are defined in `di/serviceModules.kt` (replacing the old `services/koin/KoinExtentions.kt`). View-layer DI modules are in `di/viewModules.kt` (replacing `views/koin/KoinExtensions.kt`).
 
-Scoped DI is used for project-specific editors: each `LismaProjectModel` and `BlueprintProjectModel` gets its own Koin scope with scoped `IsmaTextEditor` instances that are cleaned up on `dispose()`.
+Each `LismaProjectModel` and `BlueprintProjectModel` carries a Koin scope (`KoinScopeComponent`), closed on `dispose()`. Editors themselves are created per project by `ProjectEditorPortImpl` using the singleton `ITextEditorFactory` (app module) and disposed with the project.
 
 ### Coroutine-Based Concurrency
 

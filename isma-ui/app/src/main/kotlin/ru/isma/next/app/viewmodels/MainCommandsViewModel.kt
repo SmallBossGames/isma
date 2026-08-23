@@ -14,7 +14,6 @@ import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectEditorPort
 import ru.isma.next.app.services.project.ProjectFileService
 import ru.isma.next.app.services.simulation.ISimulationService
-import ru.isma.next.editor.blueprint.models.LismaTextModel
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 
 class MainCommandsViewModel(
@@ -99,8 +98,7 @@ class MainCommandsViewModel(
 
     fun verify() {
         val project = activeProject ?: return
-        val content = editorPort.content(project)
-        lismaPdeService.translateLisma(LismaTextModel(content.fullText))
+        lismaPdeService.translateLisma(editorPort.content(project).lisma)
     }
 
     fun simulate() {

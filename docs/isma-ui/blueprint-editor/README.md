@@ -1,6 +1,6 @@
 # Blueprint Editor
 
-Visual finite-state machine editor for ISMA. Users create states as draggable boxes on an infinite canvas, draw transitions between them, and define transition predicates (conditions). The visual statechart compiles into LISMA text at build time via `BlueprintModel.toLismaText()`.
+Visual finite-state machine editor for ISMA. Users create states as draggable boxes on an infinite canvas, draw transitions between them, and define transition predicates (conditions). The module produces a plain `BlueprintModel`; conversion into LISMA text (`BlueprintModel.toLismaText()`) lives in the app module (`ru.isma.next.app.services.blueprint.LismaCodegen`) together with the `LismaTextModel`/`CodeRegion` output types.
 
 ## Architecture Overview
 
@@ -26,11 +26,6 @@ graph TB
         BLTM[BlueprintLoopTransactionModel]
     end
 
-    subgraph Model_Output
-        LTM[LismaTextModel<br/>Generated LISMA output]
-        CR[CodeRegion<br/>Line mappings]
-    end
-
     subgraph Controls
         SB[StateBox<br/>Draggable Group]
         TA[TransactionArrow]
@@ -44,7 +39,7 @@ graph TB
     end
 
     subgraph Services
-        IEF[ITextEditorFactory<br/>SPI, Koin injected]
+        IEF[ITextEditorFactory<br/>Port, Koin injected]
         BMS[BlueprintModelSerializer<br/>app module, JSON serialization]
     end
 
@@ -73,17 +68,16 @@ The architecture follows an MVVM pattern with these layers:
 
 - **View:** `IsmaBlueprintEditor` — a `BorderPane` with zero business logic, `CanvasView` — handles JavaFX node synchronization with `CanvasViewModel` via `ListChangeListener`
 - **ViewModel:** `IsmaBlueprintViewModel` — all business logic, `CanvasViewModel` — runtime observable lists with CRUD operations, `StateViewModel` / `TransactionViewModel` / `LoopTransactionViewModel` — JavaFX property-backed view models
-- **Model (plain data):** `BlueprintModel`, `BlueprintStateModel`, `BlueprintTransactionModel`, `BlueprintLoopTransactionModel` — plain data classes, no serialization annotations
-- **Model (runtime):** `LismaTextModel` + `CodeRegion` for generated LISMA output
+- **Model (plain data):** `BlueprintModel`, `BlueprintStateModel`, `BlueprintTransactionModel`, `BlueprintLoopTransactionModel` — plain data classes, no serialization annotations. LISMA code generation (`toLismaText()`, `LismaTextModel`, `CodeRegion`) lives in the app module (`ru.isma.next.app.services.blueprint.LismaCodegen` + `ru.isma.next.app.models.LismaTextModel`)
 - **Controls:** `StateBox` (draggable Group), `TransactionArrow` (inter-state), `LoopTransactionArrow` (self-loop), `EditArrowPopOver` (edit dialog)
 - **Utilities:** `ClickDisambiguator` (200ms JavaFX `Timeline`: single-click vs drag vs double-click), `ArrowGeometry` (atan2 math), `NameChangingMonitor` (unique name registry — owned by `CanvasViewModel`, consulted by `StateViewModel`'s `isNameUnique` callback)
-- **Services:** `ITextEditorFactory` (SPI, Koin injected), `BlueprintModelSerializer` (JSON serialization, located in app module)
+- **Services:** `ITextEditorFactory` / `ITextEditor` (port, Koin injected — see "Text Editor Port"), `BlueprintModelSerializer` (JSON serialization, located in app module)
 
 The `IsmaBlueprintEditor` depends on `IsmaBlueprintViewModel`, `CanvasView`, and `ITextEditorFactory`. `CanvasView` depends on `IsmaBlueprintViewModel` (commands) and `CanvasViewModel` (observable lists) and manages JavaFX node lifecycle. `IsmaBlueprintViewModel` depends on `CanvasViewModel`, `StateViewModel`, `TransactionViewModel`, `LoopTransactionViewModel`, `BlueprintModel`, `BlueprintEvent`, and `EditorMode` — no `javafx.scene.*` types. The controls (`StateBox`, `TransactionArrow`, `LoopTransactionArrow`, `EditArrowPopOver`) are instantiated by `CanvasView` and forward user intent to ViewModel commands. `StateBox` uses `ClickDisambiguator`, `TransactionArrow` uses `ArrowGeometry`, and `LoopTransactionArrow` uses `ClickDisambiguator`.
 
 ## Module Structure
 
-The module source lives in `blueprint-editor/src/main/kotlin/ru/isma/next/editor/blueprint/` and contains: `IsmaBlueprintEditor.kt` (View — BorderPane layout, event subscription, zero business logic), `viewmodels/IsmaBlueprintViewModel.kt` (ViewModel — all business logic, mode-aware click routing, `BlueprintEvent` channel), `viewmodels/CanvasViewModel.kt` (Runtime: ObservableList CRUD with cascade removal, 110 lines), `viewmodels/StateViewModel.kt` (JavaFX property-backed state model, 110 lines), `viewmodels/TransactionViewModel.kt` (JavaFX property-backed transaction model, 49 lines), `viewmodels/LoopTransactionViewModel.kt` (JavaFX property-backed loop model, 58 lines), `viewmodels/EditorMode.kt` (Sealed class: Idle, AddTransition(selectedStates), RemoveState, RemoveTransition, 10 lines), `views/CanvasView.kt` (Node synchronization via ListChangeListener, 194 lines), `EditorMode.kt` (Sealed class: Idle, AddTransition, RemoveState, RemoveTransition, 10 lines), `NameChangingMonitor.kt` (Unique name registry — owned by `CanvasViewModel`), `constants/BlueprintEditorConstants.kt` (All magic numbers: dimensions, offsets, colors, 35 lines), `constants/StateNames.kt` (MAIN_STATE = "Main", INIT_STATE = "init", 4 lines), `controls/StateBox.kt` (Draggable Group bound to StateViewModel, 112 lines), `controls/TransactionArrow.kt` (Inter-state transition arrow with atan2 geometry, 117 lines), `controls/LoopTransactionArrow.kt` (Self-loop arrow with circle + arrowhead, 66 lines), `controls/EditArrowPopOver.kt` (Floating VBox with alias/predicate TextField bidirectional binding, 45 lines),  `models/BlueprintModel.kt` (Plain data model + toLismaText() converter, 128 lines), `models/BlueprintStateModel.kt` (Plain data state: position, name, text, 8 lines), `models/BlueprintTransactionModel.kt` (Plain data transition: start/end names, predicate, alias, 8 lines), `models/BlueprintLoopTransactionModel.kt` (Plain data loop: state name, predicate, alias, text, 8 lines), `models/LismaTextModel.kt` (Generated LISMA output: fullText + CodeRegion list, 23 lines), `services/ITextEditorFactory.kt` (SPI: createTextEditor() + disposeInstance(), 9 lines), `utilities/ClickDisambiguator.kt` (200ms JavaFX Timeline: single-click vs drag vs double-click, 60 lines), `utilities/ArrowGeometry.kt` (atan2-based perpendicular offset calculation, 50 lines), `utilities/NameChangingMonitor.kt` (Unique name enforcement, 33 lines), `utilities/JavaFxExtensions.kt` (getValue/setValue delegates for JavaFX Properties — legacy, 23 lines). Tests live in `src/test/kotlin/ru/isma/next/editor/blueprint/`.t interface decoupling ViewModel from JavaFX, 41 lines), and `views/JavaFxBlueprintViewAdapter.kt` (JavaFX implementation: canvas.children.add/remove, 67 lines).
+The module source lives in `blueprint-editor/src/main/kotlin/ru/isma/next/editor/blueprint/` and contains: `IsmaBlueprintEditor.kt` (View — BorderPane layout, event subscription, zero business logic), `viewmodels/IsmaBlueprintViewModel.kt` (ViewModel — all business logic, mode-aware click routing, `BlueprintEvent` channel), `viewmodels/CanvasViewModel.kt` (Runtime: ObservableList CRUD with cascade removal, 110 lines), `viewmodels/StateViewModel.kt` (JavaFX property-backed state model, 110 lines), `viewmodels/TransactionViewModel.kt` (JavaFX property-backed transaction model, 49 lines), `viewmodels/LoopTransactionViewModel.kt` (JavaFX property-backed loop model, 58 lines), `viewmodels/EditorMode.kt` (Sealed class: Idle, AddTransition(selectedStates), RemoveState, RemoveTransition, 10 lines), `views/CanvasView.kt` (Node synchronization via ListChangeListener, 194 lines), `EditorMode.kt` (Sealed class: Idle, AddTransition, RemoveState, RemoveTransition, 10 lines), `NameChangingMonitor.kt` (Unique name registry — owned by `CanvasViewModel`), `constants/BlueprintEditorConstants.kt` (All magic numbers: dimensions, offsets, colors, 35 lines), `constants/StateNames.kt` (MAIN_STATE = "Main", INIT_STATE = "init", 4 lines), `controls/StateBox.kt` (Draggable Group bound to StateViewModel, 112 lines), `controls/TransactionArrow.kt` (Inter-state transition arrow with atan2 geometry, 117 lines), `controls/LoopTransactionArrow.kt` (Self-loop arrow with circle + arrowhead, 66 lines), `controls/EditArrowPopOver.kt` (Floating VBox with alias/predicate TextField bidirectional binding, 45 lines),  `models/BlueprintModel.kt` (Plain data model, 22 lines), `models/BlueprintStateModel.kt` (Plain data state: position, name, text, 8 lines), `models/BlueprintTransactionModel.kt` (Plain data transition: start/end names, predicate, alias, 8 lines), `models/BlueprintLoopTransactionModel.kt` (Plain data loop: state name, predicate, alias, text, 8 lines), `services/ITextEditorFactory.kt` (Port: `ITextEditorFactory` + `ITextEditor`, 16 lines), `utilities/ClickDisambiguator.kt` (200ms JavaFX Timeline: single-click vs drag vs double-click, 60 lines), `utilities/ArrowGeometry.kt` (atan2-based perpendicular offset calculation, 50 lines), `utilities/NameChangingMonitor.kt` (Unique name enforcement, 33 lines), `utilities/JavaFxExtensions.kt` (getValue/setValue delegates for JavaFX Properties — legacy, 23 lines). Tests live in `src/test/kotlin/ru/isma/next/editor/blueprint/`.t interface decoupling ViewModel from JavaFX, 41 lines), and `views/JavaFxBlueprintViewAdapter.kt` (JavaFX implementation: canvas.children.add/remove, 67 lines).
 
 ## MVVM Pattern
 
@@ -96,8 +90,7 @@ The module source lives in `blueprint-editor/src/main/kotlin/ru/isma/next/editor
 | **ViewModel** | `StateViewModel` | JavaFX property-backed state model with `nameProperty`, `textProperty`, `xProperty`, `yProperty`, `kind: StateKind`, `editModeProperty`, `centerX()`/`centerY()` bindings, and `isNameUnique` callback. |
 | **ViewModel** | `TransactionViewModel` | JavaFX property-backed transaction with `startStateName`, `endStateName`, `predicate`, `alias`, and computed `displayText` binding. |
 | **ViewModel** | `LoopTransactionViewModel` | JavaFX property-backed loop with `stateName`, `predicate`, `alias`, `text`, and computed `displayText` binding. |
-| **Model (plain data)** | `BlueprintModel`, `BlueprintStateModel`, `BlueprintTransactionModel`, `BlueprintLoopTransactionModel` | Plain data classes — no serialization annotations. JSON serialization handled by `BlueprintModelSerializer` in the app module. |
-| **Model (output)** | `LismaTextModel`, `CodeRegion` | Generated LISMA text with line number mappings for error highlighting. |
+| **Model (plain data)** | `BlueprintModel`, `BlueprintStateModel`, `BlueprintTransactionModel`, `BlueprintLoopTransactionModel` | Plain data classes — no serialization annotations. JSON serialization handled by `BlueprintModelSerializer` in the app module. LISMA code generation and the `LismaTextModel`/`CodeRegion` output types live in the app module. |
 
 ## Container Hierarchy
 
@@ -129,9 +122,7 @@ The toolbar binds to the Diagram tab's visibility via `visibleProperty().bind(vi
 
 `BlueprintLoopTransactionModel` has `stateName` (String, state with the loop), `predicate` (String, transition condition), `alias` (String, default empty), and `text` (String, LISMA body text for the loop pseudo-state).
 
-`LismaTextModel` has `fullText` (String, generated LISMA source code) and `regions` (List of CodeRegion, line number mappings for error highlighting).
-
-`CodeRegion` has `name` (String, fragment name), `startLine` (Int), and `endLine` (Int).
+**LISMA output types (app module):** `LismaTextModel` (`ru.isma.next.app.models`) has `fullText` (String, generated LISMA source code) and `regions` (List of `CodeRegion`, line number mappings for error highlighting). `CodeRegion` has `name` (String, fragment name), `startLine` (Int), and `endLine` (Int). Both are produced by `BlueprintModel.toLismaText()` in `ru.isma.next.app.services.blueprint.LismaCodegen` — the blueprint-editor module no longer contains LISMA code generation.
 
 ### Editor-Only Models (runtime, not serializable)
 
@@ -199,9 +190,25 @@ The toolbar toggle commands are self-contained — each checks the current mode 
 
 The module `isma.ui.editor.blueprint` requires: `kotlin.stdlib`, `javafx.graphics`, `javafx.controls`, `javafx.fxml`. It exports: `ru.isma.next.editor.blueprint`, `ru.isma.next.editor.blueprint.constants`, `ru.isma.next.editor.blueprint.controls`, `ru.isma.next.editor.blueprint.models`, `ru.isma.next.editor.blueprint.services`, `ru.isma.next.editor.blueprint.utilities`, `ru.isma.next.editor.blueprint.viewmodels`, `ru.isma.next.editor.blueprint.views`. See `module-info.java` for the full declaration.
 
-## Text Editor Factory SPI
+## Text Editor Port
 
-`ITextEditorFactory` is injected via Koin at the `IsmaBlueprintEditor` construction site (app module). Each blueprint project gets its own Koin scope and factory instance with an editor pool. The interface declares `createTextEditor(text: String, onTextChanged: (String) -> Unit): Node` and `disposeInstance(node: Node)`. The implementation wraps `IsmaTextEditor` instances. Changes in the editor write back to `state.text` or `arrow.text` via the `onTextChanged` callback. See `ITextEditorFactory.kt` for the full interface.
+The blueprint editor never sees a concrete text editor. It depends only on the port declared in `services/ITextEditorFactory.kt`:
+
+```kotlin
+interface ITextEditor {
+    val node: Node            // docked into a Tab
+    val text: Property<String> // two-way bindable text
+    fun dispose()
+}
+
+interface ITextEditorFactory {
+    fun createEditor(): ITextEditor
+}
+```
+
+`ITextEditorFactory` is registered as a Koin `single` in the app module (`appServicesModule`) and injected into `IsmaBlueprintEditor` via `ProjectEditorPortImpl`. The app-module adapter `TextEditorFactory` (`app/src/main/kotlin/ru/isma/next/app/services/editors/TextEditorFactory.kt`) wraps `IsmaTextEditor` instances; the text-editor and blueprint-editor modules do not reference each other.
+
+`IsmaBlueprintEditor` binds the editor to a state/loop ViewModel with `editor.text.bindBidirectional(viewModel.textProperty)`, so edits flow both ways without callbacks. One tab per state/loop is kept open (re-opening activates the existing tab); closing a tab unbinds and disposes the editor, and `IsmaBlueprintEditor.dispose()` removes all editor tabs and disposes their editors.
 
 ## JSON Serialization
 

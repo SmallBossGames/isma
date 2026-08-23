@@ -6,6 +6,7 @@ import ru.isma.javafx.extensions.coroutines.JavaFxUiThreadExecutor
 import ru.isma.javafx.extensions.coroutines.UiThreadExecutor
 import ru.isma.next.app.constants.APPLICATION_PREFERENCES_FILE
 import ru.isma.next.app.services.ModelErrorService
+import ru.isma.next.app.services.editors.TextEditorFactory
 import ru.isma.next.app.services.preferences.PreferencesProvider
 import ru.isma.next.app.services.project.LismaPdeService
 import ru.isma.next.app.services.project.ProjectFileService
@@ -17,6 +18,7 @@ import ru.isma.next.app.services.simulation.SimulationParametersService
 import ru.isma.next.app.services.simulation.SimulationResultService
 import ru.isma.next.app.services.simulation.SimulationService
 import ru.isma.next.app.services.simulation.SimulationTaskService
+import ru.isma.next.editor.blueprint.services.ITextEditorFactory
 import ru.isma.next.editor.text.services.EditorPlatformService
 import ru.isma.next.editor.text.services.contracts.IEditorPlatformService
 import ru.isma.next.external.SimulationServerFacade
@@ -30,6 +32,7 @@ val simulationServerModule = module {
 val appServicesModule = module {
     single<UiThreadExecutor> { JavaFxUiThreadExecutor() }
     single<IEditorPlatformService> { EditorPlatformService() }
+    single<ITextEditorFactory> { TextEditorFactory(get(), get()) }
     single<IProjectService> { ProjectService() }
     single<ProjectFileService> { ProjectFileService(get(), get()) }
     single<ModelErrorService> { ModelErrorService() }

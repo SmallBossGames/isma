@@ -21,7 +21,7 @@ val editorModule = module {
 
 val editorPortModule = module {
     includes(editorModule)
-    single<ProjectEditorPort> { ProjectEditorPortImpl(get(), get()) }
+    single<ProjectEditorPort> { ProjectEditorPortImpl(get(), get(), get()) }
 }
 
 val toolbarsModule = module {

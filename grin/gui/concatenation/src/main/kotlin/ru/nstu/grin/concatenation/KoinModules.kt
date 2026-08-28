@@ -1,0 +1,252 @@
+package ru.nstu.grin.concatenation
+
+import org.koin.core.module.dsl.scopedOf
+import org.koin.dsl.module
+import org.koin.dsl.onClose
+import ru.nstu.grin.concatenation.axis.controller.AxisListViewController
+import ru.nstu.grin.concatenation.axis.model.AxisChangeFragmentViewModel
+import ru.nstu.grin.concatenation.axis.model.AxisListViewModel
+import ru.nstu.grin.concatenation.axis.service.AxisCanvasService
+import ru.nstu.grin.concatenation.axis.view.*
+import ru.nstu.grin.concatenation.canvas.controller.ConcatenationCanvasController
+import ru.nstu.grin.concatenation.canvas.controller.MatrixTransformer
+import ru.nstu.grin.concatenation.canvas.handlers.DraggedHandler
+import ru.nstu.grin.concatenation.canvas.handlers.PressedMouseHandler
+import ru.nstu.grin.concatenation.canvas.handlers.ReleaseMouseHandler
+import ru.nstu.grin.concatenation.canvas.handlers.ScalableScrollHandler
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasModel
+import ru.nstu.grin.concatenation.canvas.model.ConcatenationCanvasViewModel
+import ru.nstu.grin.concatenation.canvas.model.EditModeViewModel
+import ru.nstu.grin.concatenation.canvas.model.InitCanvasData
+import ru.nstu.grin.concatenation.canvas.view.*
+import ru.nstu.grin.concatenation.cartesian.controller.CartesianListViewController
+import ru.nstu.grin.concatenation.cartesian.model.CartesianListViewModel
+import ru.nstu.grin.concatenation.cartesian.model.ChangeCartesianSpaceViewModel
+import ru.nstu.grin.concatenation.cartesian.model.CopyCartesianViewModel
+import ru.nstu.grin.concatenation.cartesian.service.CartesianCanvasService
+import ru.nstu.grin.concatenation.cartesian.view.CartesianListView
+import ru.nstu.grin.concatenation.cartesian.view.ChangeCartesianFragment
+import ru.nstu.grin.concatenation.cartesian.view.CopyCartesianFragment
+import ru.nstu.grin.concatenation.description.controller.DescriptionListViewController
+import ru.nstu.grin.concatenation.description.model.ChangeDescriptionViewModel
+import ru.nstu.grin.concatenation.description.model.DescriptionListViewModel
+import ru.nstu.grin.concatenation.description.service.DescriptionCanvasService
+import ru.nstu.grin.concatenation.description.view.ChangeDescriptionView
+import ru.nstu.grin.concatenation.description.view.DescriptionDrawElement
+import ru.nstu.grin.concatenation.description.view.DescriptionListView
+import ru.nstu.grin.concatenation.file.CanvasProjectLoader
+import ru.nstu.grin.concatenation.file.options.controller.FileOptionsController
+import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
+import ru.nstu.grin.concatenation.function.controller.*
+import ru.nstu.grin.concatenation.function.model.*
+import ru.nstu.grin.concatenation.function.service.FunctionCanvasService
+import ru.nstu.grin.concatenation.function.service.FunctionOperationsService
+import ru.nstu.grin.concatenation.function.view.*
+import ru.nstu.grin.concatenation.koin.*
+
+
+val grinGuiModule = module {
+    scope<MainGrinScope> {
+        scoped { params ->
+            val initData = params.getOrNull<InitCanvasData>()
+
+            if(initData!=null){
+                get<ConcatenationCanvasController>().replaceAll(
+                    cartesianSpaces = initData.cartesianSpaces,
+                    normalizeSpaces = true,
+                )
+            }
+
+            ConcatenationView(get(), get(), get(), get())
+        }
+
+        scopedOf(::CanvasProjectLoader)
+
+        scopedOf(::CanvasMenuBar)
+        scopedOf(::CanvasToolBar)
+        scopedOf(::ElementsView)
+
+        scopedOf(::ConcatenationCanvas)
+        scopedOf(::EditModeViewModel)
+        scopedOf(::ConcatenationCanvasViewModel)
+        scopedOf(::ConcatenationCanvasController)
+        scopedOf(::ConcatenationCanvasModel)
+
+        scopedOf(::ConcatenationChainDrawer)
+        scopedOf(::AxisDrawElement)
+        scopedOf(::VerticalAxisDrawStrategy)
+        scopedOf(::VerticalPixelMarksArrayBuilder)
+        scopedOf(::VerticalValueMarksArrayBuilder)
+        scopedOf(::HorizontalAxisDrawStrategy)
+        scopedOf(::HorizontalPixelMarksArrayBuilder)
+        scopedOf(::HorizontalValueMarksArrayBuilder)
+        scopedOf(::ConcatenationFunctionDrawElement)
+        scopedOf(::SelectionDrawElement)
+        scopedOf(::DescriptionDrawElement)
+        scopedOf(::MatrixTransformer)
+        scopedOf(::CartesianCanvasContextMenu)
+
+        scopedOf(::FunctionListView)
+        scopedOf(::FunctionListViewController)
+        scopedOf(::FunctionListViewModel)
+
+        scopedOf(::AxisListView)
+        scopedOf(::AxisListViewController)
+        scopedOf(::AxisListViewModel)
+
+        scopedOf(::CartesianListView)
+        scopedOf(::CartesianListViewController)
+        scopedOf(::CartesianListViewModel)
+
+        scopedOf(::DescriptionListView)
+        scopedOf(::DescriptionListViewController)
+        scopedOf(::DescriptionListViewModel)
+
+        scopedOf(::ChartToolBar)
+        scopedOf(::ModesToolBar)
+
+        scopedOf(::MathToolBar)
+        scopedOf(::DerivativeFunctionController)
+
+        scopedOf(::TransformToolBar)
+        scopedOf(::MirrorFunctionController)
+
+        scopedOf(::CartesianCanvasService)
+        scopedOf(::DescriptionCanvasService)
+        scopedOf(::AxisCanvasService)
+        scopedOf(::FunctionCanvasService)
+        scopedOf(::FunctionOperationsService)
+
+        scopedOf(::ScalableScrollHandler)
+        scopedOf(::DraggedHandler)
+        scopedOf(::PressedMouseHandler)
+        scopedOf(::ReleaseMouseHandler)
+
+        scopedOf(::SpacesTransformationController)
+        scopedOf(::FileOptionsController)
+        scopedOf(::FileOptionsView)
+
+        scoped { FileFragmentController(lazy { get() }, get()) }
+
+        factory {
+            FunctionChangeModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            AxisChangeModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            FunctionCopyModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            DescriptionChangeModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            CartesianCopyModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            CartesianChangeModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            AddFunctionModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            SearchIntersectionsModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            FunctionIntegrationModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+        factory {
+            FunctionWaveletModalScope().apply {
+                scope.linkTo(get<MainGrinScope>().scope)
+            }
+        }
+
+    }
+
+    scope<FunctionChangeModalScope> {
+        scopedOf(::ChangeFunctionFragment)
+        scopedOf(::ChangeFunctionViewModel)
+    }
+
+    scope<AxisChangeModalScope> {
+        scopedOf(::AxisChangeFragment)
+        scopedOf(::AxisChangeFragmentViewModel)
+    }
+
+    scope<FunctionCopyModalScope> {
+        scopedOf(::CopyFunctionFragment)
+        scopedOf(::CopyFunctionViewModel)
+    }
+
+    scope<DescriptionChangeModalScope> {
+        scopedOf(::ChangeDescriptionView)
+        scopedOf(::ChangeDescriptionViewModel)
+    }
+
+    scope<CartesianCopyModalScope> {
+        scopedOf(::CopyCartesianFragment)
+        scopedOf(::CopyCartesianViewModel)
+    }
+
+    scope<CartesianChangeModalScope> {
+        scopedOf(::ChangeCartesianFragment)
+        scopedOf(::ChangeCartesianSpaceViewModel)
+    }
+
+    scope<AddFunctionModalScope> {
+        scopedOf(::AddFunctionModalView)
+        scopedOf(::AddFunctionController)
+        scopedOf(::AddFunctionModel)
+
+        scopedOf(::FileFunctionFragment)
+        scopedOf(::FileFunctionModel)
+
+        scopedOf(::AnalyticFunctionFragment)
+        scopedOf(::AnalyticFunctionModel)
+
+        scopedOf(::ManualFunctionFragment)
+        scopedOf(::ManualFunctionModel)
+    }
+
+    scope<SearchIntersectionsModalScope>{
+        scopedOf(::IntersectionFunctionView)
+        scopedOf(::IntersectionFunctionViewModel)
+    }
+
+    scope<FunctionIntegrationModalScope>{
+        scopedOf(::FunctionIntegrationView)
+        scopedOf(::FunctionIntegrationViewModel)
+    }
+
+    scope<FunctionWaveletModalScope>{
+        scopedOf(::FunctionWaveletView)
+        scopedOf(::FunctionWaveletViewModel)
+    }
+}

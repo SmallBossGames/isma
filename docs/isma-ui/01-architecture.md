@@ -1,0 +1,103 @@
+# ISMA-UI Architecture
+
+## Purpose
+
+ISMA-UI is a multi-module JavaFX desktop application that provides editing, simulation, and visualization capabilities for the ISMA mathematical modeling environment. It follows a layered architecture: domain models (pure Kotlin) → external services (gRPC/HTTP clients) → app layer (views, services, models) with Koin dependency injection wiring the layers together.
+
+## Module Structure
+
+The `isma-ui/` directory contains the following modules: `app/` (main application entry point with launcher, models, services, viewmodels, views, utilities, extensions, and constants), `domain/` (pure Kotlin domain models with no UI dependencies), `external-services/` (gRPC clients, HTTP client, server manager), `grpc/` (generated gRPC stubs), `text-editor/` (rich text editor with syntax highlighting), `blueprint-editor/` (visual statechart editor), and `toolkit/` (shared JavaFX utilities).
+
+## Dependency Graph
+
+The `app` module depends on all other isma-ui modules (text-editor, blueprint-editor, toolkit, external-services, grpc, domain). The `external-services` module depends on `grpc`, `domain`, and `exchange-format`. The `blueprint-editor` module depends on `text-editor` and `toolkit`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
+
+## Design Principles
+
+### Separation of Concerns
+
+- **Domain layer** — No UI dependencies. Pure data classes and interfaces for simulation results, progress, and metadata.
+- **External services** — No JavaFX. gRPC stubs, HTTP client, and server process management are all plain Kotlin.
+- **Text editor / Blueprint editor** — Reusable editor components injected into project models.
+- **App layer** — Wires everything together. Views observe services; services consume external services and domain models.
+
+### Koin Dependency Injection
+
+All services and UI components are instantiated through Koin. There are no constructors called manually outside the DI root. The DI hierarchy follows module boundaries: simulationServerModule → appServicesModule → grinProcessLauncherModule → editorModule → lismaTextEditorModule → blueprintEditorModule → toolbarsModule → editorTabPaneModule → settingsPanelModule → mainViewModule. Service-layer DI modules are defined in `di/serviceModules.kt` (replacing the old `services/koin/KoinExtentions.kt`). View-layer DI modules are in `di/viewModules.kt` (replacing `views/koin/KoinExtensions.kt`).
+
+Each `LismaProjectModel` and `BlueprintProjectModel` carries a Koin scope (`KoinScopeComponent`), closed on `dispose()`. Editors themselves are created per project by `ProjectEditorPortImpl` using the singleton `ITextEditorFactory` (app module) and disposed with the project.
+
+### Coroutine-Based Concurrency
+
+JavaFX's single-threaded UI model is respected through `Dispatchers.JavaFx` coroutine context. Long-running operations (simulation monitoring, CSV export) run on `Dispatchers.IO` or a virtual-thread-backed dispatcher, with results marshalled back to the JavaFX thread via `Platform.runLater` or `withContext(Dispatchers.JavaFx)`.
+
+Simulation execution uses a global `CoroutineScope` backed by `Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()` with `SupervisorJob()`. Each simulation runs as an independent coroutine in this scope (`SimulationTaskService.SimulationScope`), allowing concurrent simulation runs without cancellation propagation.
+
+### Observable Collections
+
+UI state is managed through JavaFX `ObservableList` and `ObservableSet` collections, bridged to coroutine `Flow` via `addedAsFlow()` and `changeAsFlow()` extensions from the toolkit module.
+
+## Application Startup Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant L as Launcher.main()
+    participant JFX as JavaFX Application
+    participant K as Koin DI
+    participant S as SimulationServerFacade
+    participant JVM as Server Process
+    participant M as MainView
+
+    U->>L: Launch application
+    L->>JFX: Application.launch(IsmaApplication)
+    JFX->>JFX: init block
+    JFX->>K: startKoin()
+    K-->>JFX: DI container ready
+    JFX->>S: warmup()
+    S->>JVM: Launch server process
+    JVM-->>S: gRPC + HTTP socket paths
+    S-->>JFX: warmup complete
+    JFX->>JFX: JavaFX.start(stage)
+    JFX->>M: new Scene(MainView)
+    M->>M: Load window preferences
+    M->>M: Open last projects
+    M-->>U: Show main window
+```
+
+The startup sequence follows this flow: `Launcher.main()` calls `Application.launch(IsmaApplication::class.java)`. The `IsmaApplication.init` block calls `startKoin()` to initialize the Koin DI container. After Koin is ready, `warmup()` is called on `SimulationServerFacade`, which starts the server process and creates the gRPC and HTTP clients. Once warmup completes, `JavaFX.start(stage)` is invoked, which creates a `Scene` with `MainView`, loads window preferences, opens the last projects, and shows the stage. See `IsmaApplication.kt` in the launcher package for the full implementation.
+
+## Key Interfaces
+
+### IProjectModel
+
+Defined in [`IProjectModel.kt`](app/src/main/kotlin/ru/isma/next/app/models/projects/IProjectModel.kt). Two implementations: `LismaProjectModel` and `BlueprintProjectModel`, both implementing `KoinScopeComponent` for per-project DI scoping.
+
+### SimulationTask
+
+Defined in [`SimulationTask.kt`](app/src/main/kotlin/ru/isma/next/app/models/simulation/SimulationTask.kt). Tracks lifecycle state through `ObjectProperty<SimulationTaskStatus>` with a global `ALL` observable list shared across `SimulationTaskService`, `TasksPopOver`, and `SimulationResultService`.
+
+### SimulationService
+
+Defined in [`SimulationService.kt`](app/src/main/kotlin/ru/isma/next/app/services/simulation/SimulationService.kt). 36-line thin coordinator that delegates to `SimulationTaskService`. See [`ui-components/02-services.md`](ui-components/02-services.md) for the full simulation pipeline.
+
+### SimulationTaskService
+
+Defined in [`SimulationTaskService.kt`](app/src/main/kotlin/ru/isma/next/app/services/simulation/SimulationTaskService.kt). 151 lines. Owns the `tasks` list and manages the 4-phase lifecycle (compile → run → monitor → download). Full algorithm in [`ui-components/02-services.md`](ui-components/02-services.md).
+
+## Architecture Decisions
+
+### Why Koin over constructor injection
+Koin provides a visible DI graph, scoped instances per project, and avoids verbose constructor chains across 7 modules. Constructor injection would require passing 10+ dependencies through every layer.
+
+### Why virtual threads for simulation
+`Executors.newVirtualThreadPerTaskExecutor()` enables concurrent simulation runs without managing a bounded thread pool. Each simulation is an independent coroutine in a `SupervisorJob` scope.
+
+### Why `SupervisorJob` for simulation scope
+Prevents cancellation propagation between concurrent simulations. If one simulation fails, it does not cancel other running simulations.
+
+### Why server-driven syntax highlighting
+Centralized grammar in the server avoids duplicating tokenization logic in the UI. The UI receives token positions and kinds via gRPC, then applies CSS class-based styling.
+
+### Why `BlueprintViewAdapter` abstraction
+Decouples the blueprint editor ViewModel from JavaFX types, enabling framework-independent logic. The concrete `JavaFxBlueprintViewAdapter` delegates to JavaFX `Pane.children` and `Tab` creation.

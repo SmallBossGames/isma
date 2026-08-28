@@ -1,7 +1,4 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-}
-
-dependencies {
-
+    alias(libs.plugins.java.modules)
 }

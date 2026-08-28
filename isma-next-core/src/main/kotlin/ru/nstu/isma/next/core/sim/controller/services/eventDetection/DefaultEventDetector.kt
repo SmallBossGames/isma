@@ -1,6 +1,6 @@
 package ru.nstu.isma.next.core.sim.controller.services.eventDetection
 
-import ru.nstu.isma.intg.api.calcmodel.Guard
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.Guard
 import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.core.methods.EventDetectionIntgController
 import kotlin.math.max

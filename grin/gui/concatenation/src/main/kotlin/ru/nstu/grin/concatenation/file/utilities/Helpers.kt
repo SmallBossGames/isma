@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.file.utilities
 
+import ru.nstu.grin.concatenation.file.utilities.showError
 import ru.nstu.grin.concatenation.function.model.FileType
 import java.io.File
 
@@ -15,7 +16,7 @@ fun File.getFileType() =
             FileType.CSV
         }
         else -> {
-            tornadofx.error("Неправильный формат файла")
+            showError("Неправильный формат файла")
             null
         }
     }

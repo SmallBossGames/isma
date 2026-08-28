@@ -2,27 +2,27 @@ package ru.nstu.grin.concatenation.function.controller
 
 import javafx.stage.FileChooser
 import javafx.stage.Window
+import org.koin.core.scope.Scope
 import ru.nstu.grin.concatenation.file.options.view.FileOptionsView
 import ru.nstu.grin.concatenation.function.model.FileModel
 
 class FileFragmentController(
-    model: Lazy<FileModel>,
-    fileOptionsView: Lazy<FileOptionsView>,
+    private val model: Lazy<FileModel>,
+    private val scope: Scope,
 ) {
-    private val model by model
-    private val fileOptionsView by fileOptionsView
+    private val file by model
 
     fun chooseFile(window: Window? = null) {
-        val file = FileChooser().run {
+        val fileChooser = FileChooser().apply {
             title = "Choose File"
             extensionFilters.addAll(
                 FileChooser.ExtensionFilter("File Path", "*.csv", "*.xls", "*.xlsx")
             )
+        }
 
-            showOpenDialog(window)
-        } ?: return
+        val selectedFile = fileChooser.showOpenDialog(window) ?: return
 
-        model.file = file
-        fileOptionsView.openModal()
+        file.file = selectedFile
+        FileOptionsView.openModal(scope, window)
     }
 }

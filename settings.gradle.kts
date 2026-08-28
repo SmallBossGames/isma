@@ -1,42 +1,41 @@
 rootProject.name = "isma"
+
 //JAVA 11+ projects
-include("isma-next-app")
+include("isma-ui:app")
+include("isma-ui:grpc")
+include("isma-ui:external-services")
+include("isma-ui:domain")
+include("isma-ui:text-editor")
+include("isma-ui:blueprint-editor")
+include("isma-ui:toolkit")
 
 include("isma-next-core")
-include("isma-next-tools")
-include("isma-next-integration-library")
-include("isma-next-common-services")
-include("isma-blueprint-editor")
-include("isma-text-editor")
 
 include("grin:gui")
 include("grin:analytic-fu")
 include("grin:math")
 include("grin:gui:concatenation")
 include("grin:gui:common")
-include("grin:integration")
-include("grin:app")
+include("grin:gui:app")
+
+include("isma-compiler:hsm-core")
+include("isma-compiler:hsm-fdm")
+include("isma-compiler:lisma-translator-hsm")
+include("isma-compiler:hsm-jvm")
+include("isma-compiler:hsm-jvm-calcmodel")
+
+include("isma-solver:api")
+include("isma-solver:core")
+include("isma-solver:lib-utils")
+include("isma-solver:lib-meta")
+include("isma-solver:lib:euler")
+include("isma-solver:lib:rk2")
+include("isma-solver:lib:rk3")
+include("isma-solver:lib:rk31")
+include("isma-solver:lib:rkmerson")
+include("isma-solver:lib:rkfehlberg")
 
 //Java 8 projects
-include("isma-hsm")
-include("isma-intg-api")
-include("isma-intg-core")
-include("isma-intg-core-solvers-parallel")
-include("isma-intg-demo-problems")
-include("isma-intg-lib:isma-intg-lib-common")
-include("isma-intg-lib:isma-intg-lib-euler")
-include("isma-intg-lib:isma-intg-lib-rk2")
-include("isma-intg-lib:isma-intg-lib-rk3")
-include("isma-intg-lib:isma-intg-lib-rk31")
-include("isma-intg-lib:isma-intg-lib-rkmerson")
-include("isma-intg-lib:isma-intg-lib-rkfehlberg")
-include("isma-intg-server:isma-intg-server-common")
-include("isma-intg-server:isma-intg-server-api")
-include("isma-intg-server:isma-intg-server-client")
-include("isma-intg-server:isma-intg-server-tests")
-include("isma-lisma")
-
-include("isma-intg-parallel-ignite")
 
 
 // Java 8 legacy
@@ -50,9 +49,21 @@ include("isma-intg-parallel-ignite")
 //include("isma-tools")
 //include("state-chart")
 
+// Legacy
+//include("isma-intg-server:isma-intg-server-common")
+//include("isma-intg-server:isma-intg-server-api")
+//include("isma-intg-server:isma-intg-server-client")
+//include("isma-intg-server:isma-intg-server-tests")
+//include("isma-intg-core-solvers-parallel")
+//include("isma-intg-parallel-ignite")
+//include("isma-intg-demo-problems")
+
 include("isma-next-math-engine")
 include("isma-next-math-common")
-include("isma-next-services-simulation-abstractions")
-include("isma-next-core-fdm")
-include("isma-next-core-simulation-gen")
-include("isma-javafx-extensions")
+
+include("isma-jvm-lib:exchange-format")
+
+include("isma-server:domain")
+include("isma-server:grpc")
+include("isma-server:infrastructure")
+include("isma-server:app")

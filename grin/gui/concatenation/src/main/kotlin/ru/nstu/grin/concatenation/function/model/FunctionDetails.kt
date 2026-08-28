@@ -4,7 +4,8 @@ import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.points.model.AddFunctionsMode
-import tornadofx.*
+import ru.isma.javafx.extensions.helpers.getValue
+import ru.isma.javafx.extensions.helpers.setValue
 
 sealed interface FunctionDetails
 

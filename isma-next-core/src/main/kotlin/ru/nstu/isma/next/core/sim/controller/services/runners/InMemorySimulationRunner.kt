@@ -1,6 +1,5 @@
 package ru.nstu.isma.next.core.sim.controller.services.runners
 
-import kotlinx.coroutines.coroutineScope
 import ru.nstu.isma.intg.api.models.IntgMetricData
 import ru.nstu.isma.intg.api.providers.MemoryPointProvider
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
@@ -11,7 +10,7 @@ import ru.nstu.isma.next.core.sim.controller.services.simulators.IHybridSystemSi
 class InMemorySimulationRunner(
     private val hybridSystemSimulator: IHybridSystemSimulator
 ) : ISimulationRunner {
-    override suspend fun run(context: SimulationParameters): HybridSystemIntegrationResult = coroutineScope {
+    override fun run(context: SimulationParameters): HybridSystemIntegrationResult {
         val resultMemoryStore = MemoryPointProvider()
 
         val simulatorParameters = HybridSystemSimulatorParameters(
@@ -23,7 +22,7 @@ class InMemorySimulationRunner(
 
         val metricData: IntgMetricData = hybridSystemSimulator.runAsync(simulatorParameters)
 
-        return@coroutineScope HybridSystemIntegrationResult(
+        return HybridSystemIntegrationResult(
             context.compilationResult.indexProvider,
             metricData,
             resultMemoryStore

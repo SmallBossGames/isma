@@ -1,5 +1,6 @@
 package ru.nstu.grin.concatenation.function.controller
 
+import ru.nstu.grin.concatenation.file.utilities.showError
 import ru.nstu.grin.common.controller.PointsBuilder
 import ru.nstu.grin.common.model.DrawSize
 import ru.nstu.grin.common.model.Point
@@ -60,13 +61,13 @@ class AddFunctionController(
     private fun addFileFunction() {
         val points = fileFunctionModel.points
         if (points == null) {
-            tornadofx.error("Точки не выбраны")
+            showError("Точки не выбраны")
             return
         }
 
         val addFunctionsMode = fileFunctionModel.addFunctionsMode
         if (addFunctionsMode == null) {
-            tornadofx.error("Что-то пошло не так, попробуйте сначала")
+            showError("Что-то пошло не так, попробуйте сначала")
             return
         }
 

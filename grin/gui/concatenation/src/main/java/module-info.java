@@ -3,12 +3,11 @@ module isma.grin.gui.concatenation.main {
     requires kotlinx.coroutines.core;
     requires kotlinx.coroutines.javafx;
     requires kotlinx.serialization.json;
-    requires isma.isma.javafx.extensions.main;
+    requires isma.ui.toolkit;
     requires javafx.graphics;
     requires javafx.controls;
     requires transitive isma.grin.gui.common.main;
     requires isma.grin.math.main;
-    requires tornadofx;
     requires koin.core.jvm;
     requires org.apache.poi.poi;
     requires org.apache.poi.ooxml;
@@ -39,4 +38,5 @@ module isma.grin.gui.concatenation.main {
     exports ru.nstu.grin.concatenation.file;
     exports ru.nstu.grin.concatenation.file.options.view;
     exports ru.nstu.grin.concatenation.function.service;
+    exports ru.nstu.grin.concatenation;
 }

@@ -3,19 +3,19 @@ package ru.nstu.grin.concatenation.points.controller
 import ru.nstu.grin.common.model.Point
 import ru.nstu.grin.concatenation.points.events.FileCheckedEvent
 import ru.nstu.grin.concatenation.file.options.model.FileReaderMode
-import ru.nstu.grin.concatenation.points.model.PointsViewModel
+import ru.nstu.grin.concatenation.points.model.PointsModel
 import ru.nstu.grin.concatenation.file.options.model.CsvDetails
 import ru.nstu.grin.concatenation.file.options.model.ExcelDetails
 import ru.nstu.grin.concatenation.file.readers.*
 import ru.nstu.grin.concatenation.function.model.FileModel
 import ru.nstu.grin.concatenation.function.model.FileType
-import tornadofx.Controller
+import ru.nstu.grin.concatenation.points.events.EventBus
 import java.io.File
 
-class PointsViewController : Controller() {
-    private val model: PointsViewModel by inject()
-    private val fileModel: FileModel by inject()
-
+class PointsViewController(
+    private val model: PointsModel,
+    private val fileModel: FileModel
+) {
     fun readPoints() {
         model.pointsListProperty.setAll(readPoints(fileModel.file))
     }
@@ -77,7 +77,7 @@ class PointsViewController : Controller() {
             }
         }.transpose()
 
-        fire(
+        EventBus.fire(
             FileCheckedEvent(
                 points = points,
                 addFunctionsMode = model.addFunctionsMode

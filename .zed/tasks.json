@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Run isma-ui:app",
+    "command": "./gradlew",
+    "args": [":isma-ui:app:run"],
+    "cwd": "/home/agarder/IdeaProjects/isma",
+  },
+  {
+    "label": "Run grin:gui:app",
+    "command": "./gradlew",
+    "args": [":grin:gui:app:run"],
+    "cwd": "/home/agarder/IdeaProjects/isma",
+  },
+]

@@ -1,10 +1,12 @@
 package ru.nstu.grin.concatenation.file.options.controller
 
+import org.koin.core.scope.Scope
 import ru.nstu.grin.concatenation.points.view.PointsView
-import tornadofx.Controller
 
-class FileOptionsController : Controller() {
+class FileOptionsController(
+    private val koinScope: Scope,
+) {
     fun openPointsWindow() {
-        find<PointsView>().openModal()
+        PointsView.openModal(koinScope)
     }
 }

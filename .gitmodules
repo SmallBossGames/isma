@@ -1,0 +1,3 @@
+[submodule "protobuf-contracts"]
+	path = protobuf-contracts
+	url = https://github.com/SmallBossGames/isma-contracts-proto.git

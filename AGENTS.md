@@ -26,7 +26,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 ## Project Modules
 
 ### Core Math & Analysis
-- **grin/** - JavaFX-based interactive function visualization and analysis environment
+- **grin/** - JavaFX-based interactive function visualization and analysis environment *(git submodule → [grin-javafx](https://github.com/SmallBossGames/grin-javafx), standalone Gradle project)*
   - `gui/` - JavaFX GUI components
   - `gui:app/`, `gui:common/`, `gui:concatenation/` - GUI submodules
   - `analytic-fu/` - Analytical function parser, expression evaluator, validator
@@ -40,7 +40,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `lisma-translator-hsm/` - LISMA to HSM translator
 
 ### User Interface
-- **isma-ui/** - JavaFX-based UI components (see `isma-ui/AGENTS.md` for details)
+- **isma-ui/** - JavaFX-based UI components *(git submodule → [isma-ui-javafx](https://github.com/SmallBossGames/isma-ui-javafx), standalone Gradle project; see `isma-ui/AGENTS.md` for details)*
   - `app/` - Main application entry point
   - `domain/` - Domain models and business logic
   - `external-services/` - gRPC client layer for server communication
@@ -108,6 +108,16 @@ The UI launches the server as a separate JVM process communicating via gRPC over
 
 All applications in this repository should use `module-info.java` for proper module system configuration.
 
+
+## Git Submodules
+
+- `protobuf-contracts/` → https://github.com/SmallBossGames/isma-contracts-proto
+- `isma-ui/` → https://github.com/SmallBossGames/isma-ui-javafx
+- `grin/` → https://github.com/SmallBossGames/grin-javafx
+
+Fresh clones need `git submodule update --init --recursive` before building.
+`isma-ui` and `grin` are standalone Gradle projects — build them with their own `./gradlew`, not the root one.
+
 ## Build
 
 ```bash
@@ -131,4 +141,4 @@ This ensures that protocol changes only affect the mapping layer, not the busine
 
 ## Proto Contracts
 
-All protobuf definitions live in `protobuf-contracts/v1/`. Proto changes require rebuilding both `isma-server:grpc` and `isma-ui:grpc` modules.
+All protobuf definitions live in `protobuf-contracts/v1/` (git submodule). Proto changes require rebuilding the `isma-server:grpc` module in this repo, and syncing the `protobuf-contracts/` copy in the isma-ui-javafx repo and rebuilding `isma-ui:grpc` there.

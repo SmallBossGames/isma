@@ -1,22 +1,11 @@
 rootProject.name = "isma"
 
 //JAVA 11+ projects
-include("isma-ui:app")
-include("isma-ui:grpc")
-include("isma-ui:external-services")
-include("isma-ui:domain")
-include("isma-ui:text-editor")
-include("isma-ui:blueprint-editor")
-include("isma-ui:toolkit")
+
+// isma-ui and grin are git submodules (standalone Gradle projects)
+// built separately by .ci-cd/build-bundle.sh
 
 include("isma-next-core")
-
-include("grin:gui")
-include("grin:analytic-fu")
-include("grin:math")
-include("grin:gui:concatenation")
-include("grin:gui:common")
-include("grin:gui:app")
 
 include("isma-compiler:hsm-core")
 include("isma-compiler:hsm-fdm")

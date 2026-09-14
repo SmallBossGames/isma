@@ -1,3 +1,9 @@
 [submodule "protobuf-contracts"]
 	path = protobuf-contracts
 	url = https://github.com/SmallBossGames/isma-contracts-proto.git
+[submodule "isma-ui"]
+	path = isma-ui
+	url = https://github.com/SmallBossGames/isma-ui-javafx.git
+[submodule "grin"]
+	path = grin
+	url = https://github.com/SmallBossGames/grin-javafx.git

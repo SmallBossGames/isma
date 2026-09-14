@@ -103,7 +103,7 @@ gRPC stubs are generated from `../../protobuf-contracts/v1/`. Two services:
 
 - **compiler_service** — LISMA compilation and validation endpoints
 
-Proto changes require rebuilding both `isma-server:grpc` and `isma-ui:grpc`.
+Proto changes require rebuilding `isma-server:grpc` in this repo. The `isma-ui:grpc` module lives in the isma-ui-javafx repo (which keeps its own copy of `protobuf-contracts`), so that copy must be synced and rebuilt there as well.
 
 ## Build
 

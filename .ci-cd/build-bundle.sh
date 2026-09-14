@@ -10,11 +10,21 @@ mkdir -p "$BUNDLE_DIR"
 
 cd "$PROJECT_ROOT"
 
-./gradlew :isma-ui:app:installDist :isma-server:app:installDist :grin:gui:app:installDist
+# Ensure app submodules are checked out
+if [ ! -f isma-ui/settings.gradle.kts ] || [ ! -f grin/settings.gradle.kts ]; then
+    git submodule update --init --recursive
+fi
 
-cp -r "$PROJECT_ROOT/isma-ui/app/build/install/app" "$BUNDLE_DIR/isma-ui-app"
+# isma-ui and grin are standalone Gradle projects (git submodules)
+(cd isma-ui && ./gradlew :isma-ui:app:installDist)
+(cd grin && ./gradlew :grin:gui:app:installDist)
+
+# Server is built in the main repo
+./gradlew :isma-server:app:installDist
+
+cp -r "$PROJECT_ROOT/isma-ui/isma-ui/app/build/install/app" "$BUNDLE_DIR/isma-ui-app"
 cp -r "$PROJECT_ROOT/isma-server/app/build/install/app" "$BUNDLE_DIR/isma-server-app"
-cp -r "$PROJECT_ROOT/grin/gui/app/build/install/app" "$BUNDLE_DIR/grin-app"
+cp -r "$PROJECT_ROOT/grin/grin/gui/app/build/install/app" "$BUNDLE_DIR/grin-app"
 
 cat > "$BUNDLE_DIR/run-ui.sh" << 'SCRIPT'
 #!/bin/bash

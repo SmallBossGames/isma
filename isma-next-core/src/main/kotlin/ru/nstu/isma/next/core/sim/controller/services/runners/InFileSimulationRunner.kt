@@ -2,8 +2,8 @@ package ru.nstu.isma.next.core.sim.controller.services.runners
 
 import ru.nstu.isma.intg.api.models.IntgMetricData
 import ru.nstu.isma.intg.api.models.IntgResultPoint
-import ru.nstu.isma.intg.api.providers.AsyncFilePointProvider
-import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers
+import ru.nstu.isma.intg.core.providers.AsyncFilePointProvider
+import ru.nstu.isma.intg.core.utilities.IntegrationResultPointFileHelpers
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters

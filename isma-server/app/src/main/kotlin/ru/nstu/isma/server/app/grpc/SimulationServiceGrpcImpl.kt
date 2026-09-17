@@ -64,7 +64,7 @@ class SimulationServiceGrpcImpl(
         responseObserver: StreamObserver<GetSimulationResultResponse>
     ) {
         try {
-            getSimulationResultHandler.handle(request.simulationId).close()
+            getSimulationResultHandler.handle(request.simulationId)
             val downloadUrl = "/simulation/${request.simulationId}/download"
             responseObserver.onNext(
                 GetSimulationResultResponse.newBuilder()

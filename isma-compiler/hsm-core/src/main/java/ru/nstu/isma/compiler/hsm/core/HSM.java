@@ -8,7 +8,6 @@ import ru.nstu.isma.compiler.hsm.core.var.HMDerivativeEquation;
 import ru.nstu.isma.compiler.hsm.core.var.HMVariable;
 import ru.nstu.isma.compiler.hsm.core.var.HMVariableTable;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import java.util.List;
  * Date: 25.10.13
  * Time: 0:04
  */
-public final class HSM implements Serializable {
+public final class HSM implements IHSM {
     public final static String INIT_STATE = "init";
 
     private final HMVariableTable variables = new HMVariableTable();

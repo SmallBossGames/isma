@@ -1,11 +1,11 @@
 package ru.nstu.isma.domain.handlers.runSimulation
 
-import ru.nstu.isma.compiler.hsm.core.HSM
-import ru.nstu.isma.compiler.hsm.core.models.IsmaErrorList
+import ru.nstu.isma.compiler.hsm.core.IHSM
+import ru.nstu.isma.domain.handlers.compileLisma.CompilationError
 
 interface ILismaTranslator {
-    fun translate(sourceCode: String): Result<HSM>
-    fun validate(sourceCode: String): IsmaErrorList
+    fun translate(sourceCode: String): Result<IHSM>
+    fun validate(sourceCode: String): List<CompilationError>
 }
 
-class TranslationException(val errors: IsmaErrorList) : Exception("Translation failed")
+class TranslationException(val errors: List<CompilationError>) : Exception("Translation failed")

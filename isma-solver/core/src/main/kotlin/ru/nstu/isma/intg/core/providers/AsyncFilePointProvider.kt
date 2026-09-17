@@ -1,10 +1,11 @@
-package ru.nstu.isma.intg.api.providers
+package ru.nstu.isma.intg.core.providers
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers.buildIntegrationResultPoint
-import ru.nstu.isma.intg.api.utilities.IntegrationResultPointFileHelpers.buildMetdataFromHeader
+import ru.nstu.isma.intg.api.providers.IntegrationResultPointProvider
+import ru.nstu.isma.intg.core.utilities.IntegrationResultPointFileHelpers.buildIntegrationResultPoint
+import ru.nstu.isma.intg.core.utilities.IntegrationResultPointFileHelpers.buildMetdataFromHeader
 import java.io.File
 
 class AsyncFilePointProvider(file: File) : IntegrationResultPointProvider {

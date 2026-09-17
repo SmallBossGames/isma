@@ -1,4 +1,4 @@
-package ru.nstu.isma.intg.api.calcmodel
+package ru.nstu.isma.intg.core.calcmodel
 
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.AlgebraicEquation
 

@@ -5,5 +5,4 @@ plugins {
 
 dependencies {
     implementation(project(":isma-solver:api"))
-    implementation(project(":isma-solver:core"))
 }

@@ -1,4 +1,4 @@
-package ru.nstu.isma.intg.api.utilities
+package ru.nstu.isma.intg.core.utilities
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

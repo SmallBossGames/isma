@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.java.modules)
     application
 }
 
@@ -8,9 +9,15 @@ version = "1.0.0-SNAPSHOT"
 
 application {
     mainClass.set("ru.nstu.isma.server.app.ApplicationKt")
+    mainModule.set("isma.server.app")
 }
 
 dependencies {
+    // netty-codec-protobuf's module descriptor requires protobuf.javanano,
+    // which does not exist for protobuf 4.x; nothing in the runtime uses it.
+    configurations.all {
+        exclude(group = "io.netty", module = "netty-codec-protobuf")
+    }
     implementation(project(":isma-server:domain"))
     implementation(project(":isma-server:grpc"))
     implementation(project(":isma-server:infrastructure"))
@@ -35,7 +42,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.koin.core)
     implementation(libs.slf4j.api)
-    runtimeOnly(libs.logback.classic)
+    implementation(libs.logback.classic)
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.cio)

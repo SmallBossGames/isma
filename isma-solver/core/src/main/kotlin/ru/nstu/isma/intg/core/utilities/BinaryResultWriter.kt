@@ -1,4 +1,4 @@
-package ru.nstu.isma.intg.api.utilities
+package ru.nstu.isma.intg.core.utilities
 
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import java.io.DataOutputStream

@@ -40,3 +40,9 @@ dependencies {
     implementation(libs.protobuf.java)
     implementation(libs.grpc.java)
 }
+
+tasks.withType<Jar>().configureEach {
+    manifest {
+        attributes("Automatic-Module-Name" to "isma.server.grpc")
+    }
+}

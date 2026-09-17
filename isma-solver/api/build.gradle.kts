@@ -8,4 +8,6 @@ dependencies{
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.jetbrains.annotations)
+    implementation(libs.slf4j.api)
+    implementation(libs.org.apache.commons.lang)
 }

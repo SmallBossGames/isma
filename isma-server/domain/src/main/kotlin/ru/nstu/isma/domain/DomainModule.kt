@@ -9,7 +9,6 @@ import ru.nstu.isma.domain.handlers.deleteCompiledModel.DeleteCompiledModelHandl
 import ru.nstu.isma.domain.handlers.deleteCompiledModel.IDeleteCompiledModelHandler
 import ru.nstu.isma.domain.handlers.getSimulationResult.GetSimulationResultHandlerImpl
 import ru.nstu.isma.domain.handlers.getSimulationResult.IGetSimulationResultHandler
-import ru.nstu.isma.domain.handlers.highlightLisma.IHighlightLismaHandler
 import ru.nstu.isma.domain.handlers.listSimulationMethods.IListSimulationMethodsHandler
 import ru.nstu.isma.domain.handlers.listSimulationMethods.ListSimulationMethodsHandlerImpl
 import ru.nstu.isma.domain.handlers.monitorSimulation.IMonitorSimulationHandler
@@ -28,5 +27,4 @@ val domainModule = module {
     single<ICompileLismaHandler> { CompileLismaHandlerImpl(get(), get()) }
     single<IValidateLismaHandler> { ValidateLismaHandlerImpl(get()) }
     single<IDeleteCompiledModelHandler> { DeleteCompiledModelHandlerImpl(get()) }
-    single<IHighlightLismaHandler> { get<IHighlightLismaHandler>() }
 }

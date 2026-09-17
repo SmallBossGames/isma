@@ -17,13 +17,15 @@ import ru.nstu.isma.server.infrastructure.highlight.HighlightLismaHandlerImpl
 import ru.nstu.isma.server.infrastructure.stores.compiledModels.CompiledModelStore
 import ru.nstu.isma.server.infrastructure.stores.integrationMethods.IntegrationMethodsStore
 import ru.nstu.isma.server.infrastructure.stores.simulationSessions.SimulationSessionStore
+import ru.nstu.isma.server.infrastructure.simulation.HsmSimulationEngine
+import ru.nstu.isma.server.infrastructure.simulation.ISimulationEngine
 import ru.nstu.isma.server.infrastructure.simulation.SimulationExecutorImpl
 import ru.nstu.isma.server.infrastructure.translation.LismaTranslatorImpl
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 val infrastructureModule = module {
-    single<IIntegrationMethodsStore> { IntegrationMethodsStore() }
+    single<IIntegrationMethodsStore> { IntegrationMethodsStore(get()) }
     single<ISimulationSessionStore> { SimulationSessionStore() }
     single<ICompiledModelStore> { CompiledModelStore() }
     single<InputTranslator> { LismaTranslator() }
@@ -31,10 +33,10 @@ val infrastructureModule = module {
     single<IHsmCompiler> { HsmCompiler() }
     single<IntegrationMethodsLibrary> { IntegrationMethodLibraryLoader.load() }
     single<ExecutorService> { Executors.newCachedThreadPool() }
+    single<ISimulationEngine> { HsmSimulationEngine(get(), get()) }
     single<ISimulationExecutor> {
         SimulationExecutorImpl(
-            integrationMethodsLibrary = get(),
-            hsmCompiler = get(),
+            engine = get(),
             sessionStore = get(),
             executorService = get(),
         )

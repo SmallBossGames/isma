@@ -1,7 +1,5 @@
 package ru.nstu.isma.domain.handlers.compileLisma
 
-import ru.nstu.isma.compiler.hsm.core.models.IsmaSemanticError
-import ru.nstu.isma.compiler.hsm.core.models.IsmaSyntaxError
 import ru.nstu.isma.domain.compiler.ICompiledModelStore
 import ru.nstu.isma.domain.handlers.runSimulation.ILismaTranslator
 import ru.nstu.isma.domain.handlers.runSimulation.TranslationException
@@ -24,21 +22,14 @@ class CompileLismaHandlerImpl(
                 )
             },
             onFailure = { error ->
-                val ismaErrors = when (error) {
+                val compilationErrors = when (error) {
                     is TranslationException -> error.errors
                     else -> {
                         val errors = translator.validate(sourceCode)
                         if (errors.isNotEmpty()) errors
-                        else null
+                        else listOf(CompilationError(-1, -1, error.message ?: "Unknown error"))
                     }
                 }
-                
-                val compilationErrors = ismaErrors?.map { ismaError ->
-                    when (ismaError) {
-                        is IsmaSyntaxError -> CompilationError(ismaError.row, ismaError.col, ismaError.msg)
-                        is IsmaSemanticError -> CompilationError(-1, -1, ismaError.msg)
-                    }
-                } ?: listOf(CompilationError(-1, -1, error.message ?: "Unknown error"))
 
                 CompileLismaResult(
                     compiledModelId = "",

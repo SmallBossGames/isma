@@ -1,7 +1,8 @@
-package ru.nstu.isma.intg.api.providers
+package ru.nstu.isma.intg.core.providers
 
 import kotlinx.coroutines.flow.asFlow
 import ru.nstu.isma.intg.api.models.IntgResultPoint
+import ru.nstu.isma.intg.api.providers.IntegrationResultPointProvider
 import java.util.*
 
 

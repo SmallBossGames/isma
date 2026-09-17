@@ -5,8 +5,8 @@ import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunction
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunctionGroup
 import ru.nstu.isma.intg.api.methods.IntgController
 import ru.nstu.isma.intg.api.methods.IntgPoint
-import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
-import ru.nstu.isma.intg.core.methods.utils.minOrThrow
+import ru.nstu.isma.intg.api.utilities.maxOrThrow
+import ru.nstu.isma.intg.api.utilities.minOrThrow
 
 /**
  * @author Maria

@@ -1,7 +1,7 @@
 package ru.nstu.isma.next.core.sim.controller.services.runners
 
 import ru.nstu.isma.intg.api.models.IntgMetricData
-import ru.nstu.isma.intg.api.providers.MemoryPointProvider
+import ru.nstu.isma.intg.core.providers.MemoryPointProvider
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResult
 import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters

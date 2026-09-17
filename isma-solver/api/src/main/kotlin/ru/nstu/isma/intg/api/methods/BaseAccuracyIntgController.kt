@@ -1,12 +1,10 @@
-package ru.nstu.isma.intg.core.methods
+package ru.nstu.isma.intg.api.methods
 
 import org.apache.commons.lang3.builder.ToStringBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import ru.nstu.isma.intg.api.methods.AccuracyIntgController
-import ru.nstu.isma.intg.api.methods.IntgPoint
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
-import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
+import ru.nstu.isma.intg.api.utilities.maxOrThrow
 
 import kotlin.math.abs
 

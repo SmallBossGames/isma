@@ -1,7 +1,5 @@
 package ru.nstu.isma.domain.handlers.getSimulationResult
 
-import java.io.InputStream
-
 interface IGetSimulationResultHandler {
-    fun handle(simulationId: Long): InputStream
+    fun handle(simulationId: Long): String
 }

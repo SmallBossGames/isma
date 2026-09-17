@@ -2,8 +2,8 @@ package ru.nstu.isma.intg.core.solvers
 
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystem
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.DaeSystemChangeSet
-import ru.nstu.isma.intg.api.calcmodel.AlgebraicEquationCalculator
-import ru.nstu.isma.intg.api.calcmodel.DifferentialEquationsCalculator
+import ru.nstu.isma.intg.core.calcmodel.AlgebraicEquationCalculator
+import ru.nstu.isma.intg.core.calcmodel.DifferentialEquationsCalculator
 import ru.nstu.isma.intg.api.methods.*
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
 
@@ -12,7 +12,7 @@ import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
  * @since 01.09.14
  */
 class DefaultDaeSystemStepSolver(
-    private val intgMethod: IntegrationMethodRungeKutta,
+    private val intgMethod: IIntegrationMethod,
     private var daeSystem: DaeSystem
 ) : DaeSystemStepSolver {
     private var stepCalculationCount = 0L

@@ -1,6 +1,6 @@
 package ru.nstu.isma.intg.lib.rungeKutta.rkMerson.internal
 
-import ru.nstu.isma.intg.core.methods.BaseAccuracyIntgController
+import ru.nstu.isma.intg.api.methods.BaseAccuracyIntgController
 
 /**
  * @author Mariya Nasyrova

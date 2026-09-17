@@ -1,4 +1,4 @@
-package ru.nstu.isma.intg.core.methods.utils
+package ru.nstu.isma.intg.api.utilities
 
 fun DoubleArray.maxOrThrow(): Double {
     return maxOrNull() ?: throw NoSuchElementException()

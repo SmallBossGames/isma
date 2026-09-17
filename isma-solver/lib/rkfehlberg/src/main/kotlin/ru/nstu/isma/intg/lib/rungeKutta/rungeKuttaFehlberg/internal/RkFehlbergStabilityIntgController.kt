@@ -1,8 +1,8 @@
 package ru.nstu.isma.intg.lib.rungeKutta.rungeKuttaFehlberg.internal
 
 import ru.nstu.isma.intg.api.methods.IntgPoint
-import ru.nstu.isma.intg.core.methods.BaseStabilityIntgController
-import ru.nstu.isma.intg.core.methods.utils.maxOrThrow
+import ru.nstu.isma.intg.api.methods.BaseStabilityIntgController
+import ru.nstu.isma.intg.api.utilities.maxOrThrow
 import kotlin.math.abs
 
 class RkFehlbergStabilityIntgController : BaseStabilityIntgController() {

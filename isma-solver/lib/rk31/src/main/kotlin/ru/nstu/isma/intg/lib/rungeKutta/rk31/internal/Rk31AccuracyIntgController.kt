@@ -1,6 +1,6 @@
 package ru.nstu.isma.intg.lib.rungeKutta.rk31.internal
 
-import ru.nstu.isma.intg.core.methods.BaseAccuracyIntgController
+import ru.nstu.isma.intg.api.methods.BaseAccuracyIntgController
 import kotlin.math.pow
 
 /**

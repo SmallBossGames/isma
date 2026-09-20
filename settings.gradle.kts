@@ -56,3 +56,5 @@ include("isma-server:domain")
 include("isma-server:grpc")
 include("isma-server:infrastructure")
 include("isma-server:app")
+
+include("isma-lsp")

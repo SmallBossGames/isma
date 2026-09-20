@@ -36,8 +36,7 @@ domain/
       └── Compiler handlers:
           ├── ICompileLismaHandler / CompileLismaHandlerImpl
           ├── IValidateLismaHandler / ValidateLismaHandlerImpl
-          ├── IDeleteCompiledModelHandler / DeleteCompiledModelHandlerImpl
-          └── IHighlightLismaHandler / HighlightLismaHandlerImpl (infra impl)
+          └── IDeleteCompiledModelHandler / DeleteCompiledModelHandlerImpl
 
 domain/simulation/ — ISimulationExecutor, ISimulationSessionStore, SimulationSession, SimulationStatus
 domain/compiler/   — ICompiledModelStore
@@ -50,10 +49,8 @@ infrastructure/
  │   └── integrationMethods/ — IIntegrationMethodsStore (ServiceLoader for IIntegrationMethodFactory)
  ├── simulation/
  │   └── SimulationExecutorImpl — Virtual threads, result writing
- ├── translation/
- │   └── LismaTranslatorImpl — LISMA → HSM translation with FDM support
- └── highlight/
-     └── HighlightLismaHandlerImpl — ANTLR4-based syntax highlighting
+ └── translation/
+     └── LismaTranslatorImpl — LISMA → HSM translation with FDM support
 ```
 
 ## Handler Responsibilities
@@ -68,14 +65,13 @@ infrastructure/
 | `ICompileLismaHandler` | Compiles LISMA source code to HSM model |
 | `IValidateLismaHandler` | Validates LISMA source code |
 | `IDeleteCompiledModelHandler` | Deletes a compiled model |
-| `IHighlightLismaHandler` | Syntax highlighting for LISMA source (ANTLR4-based) |
 
 ## gRPC Services
 
 | Service | RPC Methods |
 |---------|-------------|
 | `SimulationService` | RunSimulation, GetSimulationResult, MonitorSimulation, CancelSimulation, ListSimulationMethods |
-| `LismaCompilerService` | Compile, Validate, DeleteCompiledModel, HighlightLisma |
+| `LismaCompilerService` | Compile, Validate, DeleteCompiledModel |
 
 ## Key Dependencies
 
@@ -90,7 +86,6 @@ infrastructure/
 | protobuf-java | Protocol buffers |
 | kotlin-reflect, koin-core | DI and reflection |
 | ktor-server-core, ktor-server-cio | Ktor HTTP server (for result downloads) |
-| antlr4-runtime | Syntax highlighting for LISMA |
 
 ## Proto Contracts
 

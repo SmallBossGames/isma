@@ -2,17 +2,17 @@
 
 ## Purpose
 
-The `external-services` module handles all communication with the ISMA server process. It manages the server's lifecycle (start/stop as a child JVM process), provides gRPC clients over Unix Domain Sockets (Netty Epoll), an HTTP client over Unix sockets (Ktor CIO) for result file downloads, and a facade that orchestrates these clients into high-level operations.
+The `external-services` module handles all communication with the ISMA server process. It manages the server's lifecycle (start/stop as a child JVM process), provides gRPC clients over Unix Domain Sockets (Netty Epoll), an HTTP client over Unix sockets (Ktor CIO) for result file downloads, a facade that orchestrates these clients into high-level operations, and an LSP client that drives the standalone `isma-lsp` language server process for syntax highlighting (see [../isma-lsp/](../isma-lsp/README.md)).
 
 ## Structure
 
-The module source lives in `external-services/src/main/kotlin/ru/isma/next/external/` and contains: `BinaryEquationIndexProvider.kt`, `BinaryFilePointProvider.kt`, `CompilationClient.kt`, `DownloadClient.kt`, `GrpcLismaCompilerClient.kt`, `GrpcSimulationClient.kt`, `HttpSimulationClient.kt`, `SimulationServerFacade.kt`, and `SimulationServerManager.kt`. The `dtos/` subdirectory contains `ExternalDtoTypes.kt` and `RunSimulationParams.kt`. Module group: `ru.isma.next.ui`, version: `1.0.0-SNAPSHOT`.
+The module source lives in `external-services/src/main/kotlin/ru/isma/next/external/` and contains: `BinaryEquationIndexProvider.kt`, `BinaryFilePointProvider.kt`, `CompilationClient.kt`, `DownloadClient.kt`, `GrpcLismaCompilerClient.kt`, `GrpcSimulationClient.kt`, `HttpSimulationClient.kt`, `SimulationServerFacade.kt`, and `SimulationServerManager.kt`. The `dtos/` subdirectory contains `ExternalDtoTypes.kt` and `RunSimulationParams.kt`. The `lsp/` subdirectory contains the LSP client stack: `LspTransport.kt`, `ProcessLspTransport.kt`, `LspProcessManager.kt`, and `LspClient.kt`. Module group: `ru.isma.next.ui`, version: `1.0.0-SNAPSHOT`.
 
 ## Module Configuration
 
 **File:** `external-services/build.gradle.kts`
 
-The module applies the Kotlin JVM plugin and Java modules plugin. Dependencies include project references to `:isma-ui:grpc`, `:isma-ui:domain`, and `:isma-jvm-lib:exchange-format`. External dependencies cover gRPC-Netty, gRPC-protobuf, gRPC-stub, protobuf-java, kotlinx-coroutines-core, slf4j-api, ktor-client-core, ktor-client-cio, kotlinx-io-core, and Netty transport (with Linux x86_64 epoll classifier). See `external-services/build.gradle.kts` for the full configuration.
+The module applies the Kotlin JVM plugin and Java modules plugin. Dependencies include project references to `:isma-ui:grpc`, `:isma-ui:domain`, and `:isma-jvm-lib:exchange-format`. External dependencies cover gRPC-Netty, gRPC-protobuf, gRPC-stub, protobuf-java, kotlinx-coroutines-core, kotlinx-serialization-json, slf4j-api, ktor-client-core, ktor-client-cio, kotlinx-io-core, and Netty transport (with Linux x86_64 epoll classifier). See `external-services/build.gradle.kts` for the full configuration.
 
 ## Server Lifecycle
 
@@ -45,7 +45,6 @@ The facade orchestrates the three client connections. It's initialized lazily vi
 | `warmup()` | — | Starts server, creates all 3 clients |
 | `compileModel(String)` | `compilerClient` | Compiles LISMA source, returns `CompileResult` |
 | `validateModel(String)` | `compilerClient` | Validates LISMA source, returns `ValidationResult` |
-| `highlightSource(String)` | `compilerClient` | Tokenizes source for syntax highlighting |
 | `deleteCompiledModel(String)` | `compilerClient` | Removes compiled model from server cache |
 | `runSimulation(RunSimulationParams)` | `grpcClient` | Starts simulation, returns `simulationId` |
 | `monitorSimulation(Long, Double)` | `grpcClient` | Returns `Flow<SimulationProgress>` |
@@ -56,12 +55,12 @@ The facade orchestrates the three client connections. It's initialized lazily vi
 
 **DTOs defined in `dtos/ExternalDtoTypes.kt`:**
 
-`CachedSimulationResult` (File + List<String> columnNames), `CompileResult` (String modelId + List<CompilationErrorDto> errors + List<String> warnings), `ValidationResult` (List<CompilationErrorDto> errors + List<String> warnings), `CompilationErrorDto` (Int row + Int column + String message), `SyntaxTokenKind` enum (UNSPECIFIED, KEYWORD, COMMENT, NUMBER, TEXT), and `SyntaxTokenDto` (Int start + Int length + SyntaxTokenKind kind). See `ExternalDtoTypes.kt` for the full definitions.
+`CachedSimulationResult` (File + List<String> columnNames), `CompileResult` (String modelId + List<CompilationErrorDto> errors + List<String> warnings), `ValidationResult` (List<CompilationErrorDto> errors + List<String> warnings), and `CompilationErrorDto` (Int row + Int column + String message). See `ExternalDtoTypes.kt` for the full definitions.
 
 **DTOs relocated from facade:** `RunSimulationParams.kt` is now in `dtos/` subdirectory (was previously at the root of `external/`).
 
 **New extracted clients:**
-- `CompilationClient.kt` — encapsulates compile, validate, highlight, and delete-compiled-model operations (previously inline in `SimulationServerFacade`)
+- `CompilationClient.kt` — encapsulates compile, validate, and delete-compiled-model operations (previously inline in `SimulationServerFacade`)
 - `DownloadClient.kt` — encapsulates result download logic (previously inline in `SimulationServerFacade`)
 
 ## gRPC Clients
@@ -88,7 +87,7 @@ A class that takes a `socketPath` string in its constructor. Creates a `MultiThr
 
 **File:** `GrpcLismaCompilerClient.kt`
 
-Same Epoll/Unix socket setup, communicates with `LismaCompilerServiceGrpc` for compile, validate, and highlight operations.
+Same Epoll/Unix socket setup, communicates with `LismaCompilerServiceGrpc` for compile, validate, and delete operations.
 
 ## HTTP Client
 
@@ -97,6 +96,42 @@ Same Epoll/Unix socket setup, communicates with `LismaCompilerServiceGrpc` for c
 **File:** `HttpSimulationClient.kt`
 
 Ktor CIO HTTP client for downloading simulation result files over Unix Domain Sockets. Used exclusively by `downloadResultToCache()` — the gRPC client returns a download URL, and the HTTP client fetches the binary file.
+
+## LSP Client
+
+The LSP client stack in `lsp/` drives the standalone `isma-lsp` language server (see [../isma-lsp/](../isma-lsp/README.md)) for syntax highlighting. It replaces the previous gRPC `Highlight` RPC.
+
+### LspTransport
+
+**File:** `lsp/LspTransport.kt`
+
+Byte-level transport interface: `send(json: String)`, `readNext(): String?` (blocking; null on end of stream), and `close()`. Implementations deliver complete LSP messages without `Content-Length` framing.
+
+### ProcessLspTransport
+
+**File:** `lsp/ProcessLspTransport.kt`
+
+`LspTransport` backed by a child process speaking LSP over stdio. stdout carries the protocol (`Content-Length: N\r\n\r\n` + N UTF-8 bytes); stderr is drained to the logger so it cannot corrupt the protocol stream.
+
+### LspProcessManager
+
+**File:** `lsp/LspProcessManager.kt`
+
+Manages the `isma-lsp` child process, mirroring `SimulationServerManager` for the gRPC server. The script path is resolved from environment variable `ISMA_LSP_SCRIPT` or system property `isma.lsp.script`. `start()` is idempotent — repeated calls return the same transport; `stop()` closes the transport and kills the process.
+
+### LspClient
+
+**File:** `lsp/LspClient.kt`
+
+Minimal LSP client. Takes an `LspTransport` in its constructor (the app wires `LspClient(LspProcessManager().start())`). A daemon reader thread dispatches responses to `CompletableDeferred` instances keyed by request id. The `initialize`/`initialized` handshake is performed lazily on the first request.
+
+| Member | Description |
+| --- | --- |
+| `suspend semanticTokens(documentId: String, source: String): List<Token>` | Opens the document on first call (`didOpen`), updates on subsequent calls (`didChange` with incrementing version), then requests `semanticTokens/full` and decodes the relative-format data |
+| `closeDocument(documentId: String)` | Sends `textDocument/didClose` (idempotent) |
+| `shutdown()` | Blocking best-effort: `shutdown` request, `exit` notification, transport close. Never throws |
+
+`Token` is a data class `(line: Int, startChar: Int, length: Int, type: String)` with line/column offsets. Document URIs are `file:///isma/<documentId>.lisma`. Requests time out after 10 seconds. The token legend (`keyword`, `comment`, `number`) is captured from the `initialize` response.
 
 ## Data Providers
 

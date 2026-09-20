@@ -2,7 +2,6 @@ module isma.server.infrastructure {
     requires kotlin.stdlib;
     requires koin.core.jvm;
     requires org.slf4j;
-    requires org.antlr.antlr4.runtime;
     requires isma.server.domain;
     requires isma.compiler.hsm.core;
     requires isma.compiler.hsm.jvm;
@@ -21,5 +20,4 @@ module isma.server.infrastructure {
     exports ru.nstu.isma.server.infrastructure.stores.simulationSessions;
     exports ru.nstu.isma.server.infrastructure.simulation;
     exports ru.nstu.isma.server.infrastructure.translation;
-    exports ru.nstu.isma.server.infrastructure.highlight;
 }

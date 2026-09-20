@@ -4,7 +4,7 @@ User interface module for the ISMA application, built with Kotlin and JavaFX.
 
 ## Purpose
 
-ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It provides a multi-project editing interface with syntax-highlighted LISMA source code, a visual statechart (blueprint) editor, simulation execution pipeline, and result visualization. The UI runs as a separate process from `isma-server`, communicating via gRPC over Unix Domain Sockets (Netty Epoll) and HTTP over Unix sockets (Ktor CIO).
+ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It provides a multi-project editing interface with syntax-highlighted LISMA source code, a visual statechart (blueprint) editor, simulation execution pipeline, and result visualization. The UI runs as a separate process from `isma-server`, communicating via gRPC over Unix Domain Sockets (Netty Epoll) and HTTP over Unix sockets (Ktor CIO). Syntax highlighting is provided by a separate `isma-lsp` language server process (LSP over stdio; see [../isma-lsp/](../isma-lsp/README.md)).
 
 ## Quick Navigation
 
@@ -41,14 +41,16 @@ ISMA-UI is the desktop client for the ISMA mathematical modeling environment. It
 | `app/src/main/kotlin/.../models/simulation/SimulationTask.kt` | Running/completed/failed simulation task tracking |
 | `app/src/main/kotlin/.../models/simulation/CompletedSimulationModel.kt` | Completed simulation result wrapper |
 | `app/src/main/kotlin/.../services/ModelErrorService.kt` | Compilation/validation error tracking |
-| `app/src/main/kotlin/.../services/editors/SyntaxHighlighterService.kt` | Syntax highlighting service |
+| `app/src/main/kotlin/.../services/editors/LspSyntaxHighlighter.kt` | LSP-backed syntax highlighting service |
 | `app/src/main/kotlin/.../services/editors/TextEditorFactory.kt` | Text editor factory |
 | `app/src/main/kotlin/.../services/preferences/PreferencesProvider.kt` | Window and file preferences persistence |
 | `app/src/main/kotlin/.../views/layout/Drawer.kt` | Collapsible drawer panel |
 | `app/src/main/kotlin/.../views/dialogs/ItemsPickerDialog.kt` | Variable/axis selection dialog |
 | `external-services/src/main/kotlin/.../SimulationServerFacade.kt` | Server communication facade |
 | `external-services/src/main/kotlin/.../SimulationServerManager.kt` | Server process lifecycle |
-| `external-services/src/main/kotlin/.../CompilationClient.kt` | Compile/validate/highlight/delete operations |
+| `external-services/src/main/kotlin/.../lsp/LspProcessManager.kt` | `isma-lsp` process lifecycle |
+| `external-services/src/main/kotlin/.../lsp/LspClient.kt` | LSP client (semantic tokens over stdio) |
+| `external-services/src/main/kotlin/.../CompilationClient.kt` | Compile/validate/delete operations |
 | `external-services/src/main/kotlin/.../DownloadClient.kt` | Result download operations |
 | `external-services/src/main/kotlin/.../dtos/ExternalDtoTypes.kt` | DTO types (relocated from facade) |
 | `external-services/src/main/kotlin/.../dtos/RunSimulationParams.kt` | Simulation parameter DTO |

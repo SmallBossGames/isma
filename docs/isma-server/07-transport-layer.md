@@ -4,7 +4,7 @@ The ISMA server communicates with the UI over **Unix domain sockets** (UDS) usin
 
 | Channel | Purpose | Technology |
 |---------|---------|------------|
-| **gRPC** | Simulation execution, model compilation, highlighting | Netty `grpc-netty` transport |
+| **gRPC** | Simulation execution, model compilation | Netty `grpc-netty` transport |
 | **HTTP** | Binary result file downloads | Ktor CIO engine |
 
 This document covers the Netty-based Unix domain socket transport in detail.

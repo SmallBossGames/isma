@@ -13,11 +13,11 @@ The text editor module provides a rich text editing component with server-driven
 `BorderPane` wrapping `fxmisc.richtext.CodeArea` with:
 - Consolas 12pt font
 - Line numbers via `LineNumberFactory`
-- Remote syntax highlighting via `IHighlightingService` (delegates to server's `highlightSource()`)
+- LSP-driven syntax highlighting via `IHighlightingService` (tokens arrive from the `isma-lsp` language server process)
 - Cut/copy/paste event propagation from `IEditorPlatformService`
 - `textProperty(): Property<String>` — a `SimpleStringProperty` bridged two-way to the `CodeArea` text (the `CodeArea` only exposes `ObservableValue<String>`), so external code can bind to the editor text
 
-Constructor takes `textEditorService: IEditorPlatformService` and `highlightingService: IHighlightingService`. In `init`: creates `CodeArea` with CSS font style, subscribes to `cutEvent`/`copyEvent`/`pasteEvent` flows (propagates only if focused), adds a `textProperty()` listener that calls `highlightingService.createHighlightingStyleSpans()` and applies via `setStyleSpans(0, highlighting)`, and wires the bridged text property (equality-guarded listeners in both directions).
+Constructor takes `textEditorService: IEditorPlatformService` and `highlightingService: IHighlightingService`. The editor allocates its own `documentId` from `highlightingService.newDocumentId()`. In `init`: creates `CodeArea` with CSS font style, subscribes to `cutEvent`/`copyEvent`/`pasteEvent` flows (propagates only if focused), and adds a `textProperty()` listener that launches a versioned coroutine on `Dispatchers.JavaFx` calling `highlightingService.createHighlightingStyleSpans(documentId, text)` and applying the result via `setStyleSpans(0, spans)`. A `@Volatile highlightVersion` counter cancels stale in-flight requests; `dispose()` increments the version, cancels the coroutine, and calls `closeDocument(documentId)`.
 
 ### Syntax Highlighting Pipeline
 
@@ -26,25 +26,26 @@ sequenceDiagram
     participant User as User
     participant CA as CodeArea
     participant Listener as textProperty() listener
-    participant Service as IHighlightingService
-    participant Facade as SimulationServerFacade
-    participant Server as ISMA Server
+    participant Service as RemoteLismaHighlightingService
+    participant Highlighter as LspSyntaxHighlighter
+    participant Client as LspClient
+    participant LSP as isma-lsp process
     participant Spans as StyleSpans<Collection<String>>
-    participant CSS as CSS classes
 
     User->>CA: Type in editor
     CA->>Listener: textProperty() change
-    Listener->>Service: createHighlightingStyleSpans(text)
-    Service->>Facade: highlightSource(text)
-    Facade->>Server: gRPC HighlightRequest
-    Server-->>Facade: SyntaxTokenDto[]
-    Facade-->>Service: SyntaxTokenDto[]
-    Service->>Spans: Build StyleSpans
-    Spans->>CSS: syntax-keyword, syntax-comment,<br/>syntax-decimal, syntax-default
-    CSS->>CA: setStyleSpans(0, StyleSpans)
+    Listener->>Service: createHighlightingStyleSpans(documentId, text)
+    Service->>Highlighter: highlight(documentId, text)
+    Highlighter->>Client: semanticTokens(documentId, source)
+    Client->>LSP: didOpen / didChange + semanticTokens/full
+    LSP-->>Client: relative-format token data
+    Client-->>Highlighter: List<Token>
+    Highlighter-->>Service: List<SyntaxToken>
+    Service->>Spans: Build StyleSpans (line-start offsets)
+    Spans->>CA: setStyleSpans(0, StyleSpans)
 ```
 
-The syntax highlighting pipeline: User types in `CodeArea` → `textProperty()` change → `IHighlightingService.createHighlightingStyleSpans()` → `SimulationServerFacade.highlightSource()` → `SyntaxTokenDto[]` → back to `IHighlightingService` → `StyleSpans<Collection<String>>` → CSS classes (`syntax-keyword`, `syntax-comment`, `syntax-decimal`, `syntax-default`) → `CodeArea.setStyleSpans(0, StyleSpans)`.
+The syntax highlighting pipeline: User types in `CodeArea` → `textProperty()` change → versioned coroutine → `IHighlightingService.createHighlightingStyleSpans(documentId, text)` → `ISyntaxHighlighter.highlight()` → `LspClient` → `isma-lsp` process (JSON-RPC over stdio) → `List<SyntaxToken>` → back to `RemoteLismaHighlightingService` → `StyleSpans<Collection<String>>` → `CodeArea.setStyleSpans(0, StyleSpans)`.
 
 CSS classes applied: `syntax-keyword`, `syntax-comment`, `syntax-decimal`, `syntax-default`.
 
@@ -80,11 +81,15 @@ Interface declares: `cutEvent: Flow<Unit>`, `copyEvent: Flow<Unit>`, `pasteEvent
 
 **File:** [`IHighlightingService.kt`](../../text-editor/src/main/kotlin/.../services/contracts/IHighlightingService.kt)
 
-Interface declares: `createHighlightingStyleSpans(text: String): StyleSpans<Collection<String>>`.
+Interface declares: `newDocumentId(): String` (allocates a unique document id per editor), `suspend createHighlightingStyleSpans(documentId: String, source: String): StyleSpans<Collection<String>>?` (computes spans for the full document; the first call opens the document on the provider, subsequent calls update it), and `closeDocument(documentId: String)` (releases provider state).
+
+**File:** [`ISyntaxHighlighter.kt`](../../text-editor/src/main/kotlin/.../services/contracts/ISyntaxHighlighter.kt)
+
+Contract between the text-editor module and the highlighting backend. Declares `suspend highlight(documentId: String, source: String): List<SyntaxToken>` and `closeDocument(documentId: String)`. `SyntaxToken` is a data class `(line: Int, startChar: Int, length: Int, kind: SyntaxTokenKind)` with line/column offsets; `SyntaxTokenKind` is `UNSPECIFIED | KEYWORD | COMMENT | NUMBER | TEXT`. The app module binds `ISyntaxHighlighter` to `LspSyntaxHighlighter`, which maps LSP token types (`keyword`, `comment`, `number`) to `SyntaxTokenKind` via the `LspClient`.
 
 **File:** [`RemoteLismaHighlightingService.kt`](../../text-editor/src/main/kotlin/.../services/RemoteLismaHighlightingService.kt)
 
-Implementation of `IHighlightingService` that delegates to `SimulationServerFacade.highlightSource()`. Converts `SyntaxTokenDto[]` from the server into `StyleSpans<Collection<String>>` with CSS class mappings.
+Implementation of `IHighlightingService` that delegates to `ISyntaxHighlighter`. Converts `List<SyntaxToken>` into `StyleSpans<Collection<String>>` by computing line-start offsets from the source text, clamping overlapping tokens, and mapping kinds to CSS classes.
 
 ## Blueprint Editor Module
 

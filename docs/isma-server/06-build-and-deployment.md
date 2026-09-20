@@ -77,7 +77,6 @@ All versions are centralized in `gradle/libs.versions.toml`:
 | gRPC (Netty + Protobuf) | RPC framework |
 | Koin | Lightweight DI framework |
 | Ktor (CIO) | Embedded HTTP server |
-| ANTLR4 | LISMA lexer for syntax highlighting |
 | SLF4J + Logback | Logging |
 | Kotlin reflection | Koin runtime support |
 

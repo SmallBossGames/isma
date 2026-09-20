@@ -75,9 +75,17 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `infrastructure/` - Infrastructure implementations
   - *See `isma-server/AGENTS.md` for details*
 
+### Language Server (LSP)
+- **isma-lsp/** - Standalone LISMA language server: LSP over stdio (JSON-RPC 2.0, Content-Length framing), semantic tokens via ANTLR4 lexer
+  - `protocol/` - LSP framing + request dispatch
+  - `lsp/` - LISMA language service (semantic tokens) + token codec
+  - `smoke.py` - stdio smoke test
+  - *See `docs/isma-lsp/` for details*
+
 ### Documentation
 - **docs/isma-server/** - Server module documentation
 - **docs/isma-ui/** - UI module documentation
+- **docs/isma-lsp/** - Language server documentation
 - **docs/grin/** - Grin (Graphical Interactive Functions) documentation
 - **docs/dotnet-ui-migration/** - WPF to Avalonia migration documentation and guides
 - **docs/legacy/** - Legacy system documentation and historical context
@@ -85,14 +93,16 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 ### Out-of-Process Architecture (UI + Server)
 
-The UI launches the server as a separate JVM process communicating via gRPC over Unix Domain Sockets.
+The UI launches the server as a separate JVM process communicating via gRPC over Unix Domain Sockets, and the `isma-lsp` language server as a separate process communicating via LSP over stdio (syntax highlighting).
 
 - **isma-ui/external-services/** - gRPC client layer
   - `GrpcSimulationClient` - Netty-based gRPC client with Unix socket transport
   - `SimulationServerManager` - Manages server process lifecycle (start/stop)
   - `SimulationServerFacade` - High-level facade for simulation operations
+  - `lsp/` - LSP client layer (`LspProcessManager`, `LspClient`, `LspTransport`) driving `isma-lsp`
 - **Server launch** — `ISMA_SERVER_SCRIPT` env var (bundle) or `isma.server.script` sysprop (IDE/Gradle)
-- **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with both apps + `run-ui.sh` launcher
+- **LSP launch** — `ISMA_LSP_SCRIPT` env var (bundle) or `isma.lsp.script` sysprop (IDE/Gradle)
+- **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with all apps + `run-ui.sh` launcher
 
 ---
 

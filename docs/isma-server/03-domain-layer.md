@@ -8,7 +8,7 @@ The domain layer is unusual in that it contains **both interfaces and their impl
 
 ## Dependency Injection
 
-All domain bindings are defined in `DomainModule.kt`. Each handler interface is registered as a singleton via `single<Interface> { Implementation(...) }`. Simulation handlers include `IRunSimulationHandler`, `IGetSimulationResultHandler`, `IMonitorSimulationHandler`, `IListSimulationMethodsHandler`, and `ICancelSimulationHandler`. LISMA compiler handlers include `ICompileLismaHandler`, `IValidateLismaHandler`, `IDeleteCompiledModelHandler`, and `IHighlightLismaHandler` (which is resolved from the infrastructure module). All handlers are registered as **singletons** (`single`) — they are stateless and delegate to injected dependencies.
+All domain bindings are defined in `DomainModule.kt`. Each handler interface is registered as a singleton via `single<Interface> { Implementation(...) }`. Simulation handlers include `IRunSimulationHandler`, `IGetSimulationResultHandler`, `IMonitorSimulationHandler`, `IListSimulationMethodsHandler`, and `ICancelSimulationHandler`. LISMA compiler handlers include `ICompileLismaHandler`, `IValidateLismaHandler`, and `IDeleteCompiledModelHandler`. All handlers are registered as **singletons** (`single`) — they are stateless and delegate to injected dependencies.
 
 ---
 
@@ -153,31 +153,6 @@ All domain bindings are defined in `DomainModule.kt`. Each handler interface is 
 
 ---
 
-#### IHighlightLismaHandler / HighlightLismaHandlerImpl
-
-**Purpose:** Lexical analysis for IDE syntax highlighting.
-
-**Dependencies:** None (uses ANTLR4 runtime directly).
-
-**Flow:**
-1. Tokenize source with `LismaLexer`
-2. Filter tokens to only: KEYWORD, COMMENT, NUMBER
-3. Return `HighlightLismaResult(tokens)`
-
-**Token categories returned:**
-
-| ANTLR token type | SyntaxKind |
-|-----------------|------------|
-| CONST_KEYWORD, STATE_KEYWORD, FOR_KEYWORD, IF_KEYWORD, ELSE_KEYWORD, FROM_KEYWORD, MACRO_KEYWORD, SET_KEYWORD | `KEYWORD` |
-| COMMENT, SL_COMMENT | `COMMENT` |
-| FloatingPointLiteral, DecimalLiteral | `NUMBER` |
-
-All other token types are silently filtered out. The `SyntaxKind` enum also includes `TEXT` (never produced by this handler — reserved for future use).
-
-**Implementation file:** `infrastructure/src/main/kotlin/.../HighlightLismaHandlerImpl.kt` — uses `LismaLexer` from the LISMA compiler module.
-
----
-
 ## Domain Entities
 
 ### SimulationSession
@@ -199,7 +174,7 @@ See `SimulationStatus.kt` for the enum definition. It has four values: `RUNNING`
 
 ### Supporting Data Classes
 
-See the respective source files for full definitions. The domain layer defines these data classes: `RunningSimulationResult` (holds `simulationId`), `SimulationProgress` (holds `startTime`, `endTime`, `currentTime`), `SimulationMethodItem` (holds `name` and `title`), `CompilationError` (holds `row`, `column`, `message`), `CompileLismaResult` (holds `compiledModelId`, `errors`, `warnings`), `ValidateLismaResult` (holds `errors`, `warnings`), `HighlightLismaResult` (holds `tokens`), and `SyntaxToken` (holds `start`, `length`, `kind`).
+See the respective source files for full definitions. The domain layer defines these data classes: `RunningSimulationResult` (holds `simulationId`), `SimulationProgress` (holds `startTime`, `endTime`, `currentTime`), `SimulationMethodItem` (holds `name` and `title`), `CompilationError` (holds `row`, `column`, `message`), `CompileLismaResult` (holds `compiledModelId`, `errors`, `warnings`), and `ValidateLismaResult` (holds `errors`, `warnings`).
 
 ---
 
@@ -227,6 +202,3 @@ See `IIntegrationMethodsStore.kt` for the interface definition. It declares meth
 
 See `ILismaTranslator.kt` for the interface and exception class definition. The interface declares `translate(sourceCode: String): Result<HSM>` and `validate(sourceCode: String): IsmaErrorList`. The `TranslationException` class holds an `IsmaErrorList` and extends `Exception`. Translates LISMA source code to HSM models. The `translate()` method returns `Result<HSM>` — `success` with the model or `failure` with a `TranslationException`.
 
-### IHighlightLismaHandler
-
-See `IHighlightLismaHandler.kt` for the interface definition. It declares `handle(sourceCode: String): HighlightLismaResult`. Lexical analysis contract for syntax highlighting.

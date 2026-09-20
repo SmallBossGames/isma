@@ -66,11 +66,11 @@ CSV export uses `BinaryFilePointProvider` to stream points via coroutine flow, w
 
 Validates LISMA source code via `serverFacade.validateModel()` and populates `ModelErrorService` with `ErrorViewModel` entries. Returns a sealed interface: `LismaPdeTranslationResult` with implementations `SuccessTranslation` and `FailedTranslation` (both data objects).
 
-### SyntaxHighlighterService
+### LspSyntaxHighlighter
 
-**File:** [`editors/SyntaxHighlighterService.kt`](../../app/src/main/kotlin/.../services/editors/SyntaxHighlighterService.kt)
+**File:** [`editors/LspSyntaxHighlighter.kt`](../../app/src/main/kotlin/.../services/editors/LspSyntaxHighlighter.kt)
 
-Provides syntax highlighting for the text editor. Delegates to `RemoteLismaHighlightingService` which calls `serverFacade.highlightSource()` to get token positions and kinds from the server.
+Implements `ISyntaxHighlighter` for the text editor by delegating to the `LspClient` (see [`../03-external-services.md`](../03-external-services.md)). Maps LSP token types (`keyword`, `comment`, `number`) to `SyntaxTokenKind`. The `LspClient` is wired in `simulationServerModule` as `single { LspClient(get<LspProcessManager>().start()) }` with an `onClose { it?.shutdown() }` shutdown hook, and `LspProcessManager` resolves the `isma-lsp` script from `ISMA_LSP_SCRIPT` / `isma.lsp.script`. `IsmaApplication.init` starts the process via `lspProcessManager.start()` after `serverFacade.warmup()`.
 
 ### TextEditorFactory
 

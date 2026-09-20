@@ -13,7 +13,6 @@ See `InfrastructureModule.kt` for the full Koin module definition. All registrat
 - **Integration methods library:** Loaded via `IntegrationMethodLibraryLoader.load()`
 - **Thread pool:** `Executors.newCachedThreadPool()` for async simulation execution
 - **Simulation executor:** `SimulationExecutorImpl` with dependencies on library, compiler, session store, and executor service
-- **Highlight handler:** `HighlightLismaHandlerImpl` with no external dependencies
 
 ---
 
@@ -204,10 +203,3 @@ See `LismaTranslatorImpl.kt` for the full implementation. The `translate()` meth
 - Runs the same translator but discards the model
 - Returns only the error list — used by `IValidateLismaHandler` for IDE feedback without compilation
 
----
-
-## Syntax Highlighting
-
-### HighlightLismaHandlerImpl
-
-See `HighlightLismaHandlerImpl.kt` for the implementation. Uses ANTLR4 runtime (no parser, only lexer) for fast lexical analysis. It creates a `CharStreams.fromString(sourceCode)` and tokenizes with `LismaLexer`. Only three token kinds are returned (others filtered): **Keywords** (`const`, `state`, `for`, `if`, `else`, `from`, `macro`, `set`), **Comments** (block comments and single-line comments), and **Numbers** (floating-point literals and decimal integers). All identifiers, operators, and punctuation are silently ignored — this is sufficient for basic syntax highlighting in an IDE.

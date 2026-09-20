@@ -11,7 +11,7 @@ The ISMA UI (JavaFX / Blueprint Editor) communicates with the server via gRPC ov
 The server communicates with the UI via a **two-service gRPC architecture**:
 
 1. **SimulationService** — Run, monitor, and manage numerical simulations
-2. **LismaCompilerService** — Compile, validate, and highlight LISMA source code
+2. **LismaCompilerService** — Compile, validate, and delete compiled LISMA models
 
 ```mermaid
 graph LR
@@ -39,12 +39,11 @@ graph LR
 | `domain/src/main/kotlin/ru/nstu/isma/domain/` | Domain layer: interfaces + handler implementations |
 | `DomainModule.kt` | Koin DI module (handler bindings) |
 | `compiler/ICompiledModelStore.kt` | Compiled model store interface |
-| `handlers/` | Handler packages (cancelSimulation, compileLisma, deleteCompiledModel, getSimulationResult, highlightLisma, listSimulationMethods, monitorSimulation, runSimulation, validateLisma) |
+| `handlers/` | Handler packages (cancelSimulation, compileLisma, deleteCompiledModel, getSimulationResult, listSimulationMethods, monitorSimulation, runSimulation, validateLisma) |
 | `integration/IIntegrationMethodsStore.kt` | Integration methods store interface |
 | `simulation/` | Simulation domain (ISimulationExecutor, ISimulationSessionStore, SimulationSession, SimulationStatus) |
 | `infrastructure/src/main/kotlin/ru/nstu/isma/server/infrastructure/` | Infrastructure layer: concrete implementations |
 | `InfrastructureModule.kt` | Koin DI module (infrastructure bindings) |
-| `highlight/HighlightLismaHandlerImpl.kt` | Syntax highlighting implementation |
 | `simulation/SimulationExecutorImpl.kt` | Simulation execution engine |
 | `stores/` | Concrete store implementations (CompiledModelStore, IntegrationMethodsStore, SimulationSessionStore) |
 | `translation/LismaTranslatorImpl.kt` | LISMA to HSM translator |

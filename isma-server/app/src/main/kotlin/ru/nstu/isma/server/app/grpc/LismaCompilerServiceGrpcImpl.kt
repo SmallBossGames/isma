@@ -7,15 +7,12 @@ import org.slf4j.LoggerFactory
 import ru.nstu.isma.contracts.v1.compiler_service.*
 import ru.nstu.isma.domain.handlers.compileLisma.ICompileLismaHandler
 import ru.nstu.isma.domain.handlers.deleteCompiledModel.IDeleteCompiledModelHandler
-import ru.nstu.isma.domain.handlers.highlightLisma.IHighlightLismaHandler
-import ru.nstu.isma.domain.handlers.highlightLisma.SyntaxKind
 import ru.nstu.isma.domain.handlers.validateLisma.IValidateLismaHandler
 
 class LismaCompilerServiceGrpcImpl(
     private val compileLismaHandler: ICompileLismaHandler,
     private val validateLismaHandler: IValidateLismaHandler,
     private val deleteCompiledModelHandler: IDeleteCompiledModelHandler,
-    private val highlightLismaHandler: IHighlightLismaHandler,
 ) : LismaCompilerServiceGrpc.LismaCompilerServiceImplBase() {
 
     private val logger = LoggerFactory.getLogger(LismaCompilerServiceGrpcImpl::class.java)
@@ -108,42 +105,6 @@ class LismaCompilerServiceGrpcImpl(
             responseObserver.onCompleted()
         } catch (e: Exception) {
             logger.error("delete failed for compiledModelId=${request.compiledModelId}", e)
-            responseObserver.onError(toStatusException(e))
-        }
-    }
-
-    override fun highlight(
-        request: HighlightRequest,
-        responseObserver: StreamObserver<HighlightResponse>
-    ) {
-        try {
-            if (request.sourceCode.isBlank()) {
-                responseObserver.onNext(HighlightResponse.getDefaultInstance())
-                responseObserver.onCompleted()
-                return
-            }
-
-            val result = highlightLismaHandler.handle(request.sourceCode)
-            val syntaxTokens = result.tokens.map { token ->
-                SyntaxToken.newBuilder()
-                    .setStart(token.start)
-                    .setLength(token.length)
-                    .setKind(when (token.kind) {
-                        SyntaxKind.KEYWORD -> TokenKind.TOKEN_KIND_KEYWORD
-                        SyntaxKind.COMMENT -> TokenKind.TOKEN_KIND_COMMENT
-                        SyntaxKind.NUMBER -> TokenKind.TOKEN_KIND_NUMBER
-                        SyntaxKind.TEXT -> TokenKind.TOKEN_KIND_TEXT
-                    })
-                    .build()
-            }
-            responseObserver.onNext(
-                HighlightResponse.newBuilder()
-                    .addAllTokens(syntaxTokens)
-                    .build()
-            )
-            responseObserver.onCompleted()
-        } catch (e: Exception) {
-            logger.error("highlight failed", e)
             responseObserver.onError(toStatusException(e))
         }
     }

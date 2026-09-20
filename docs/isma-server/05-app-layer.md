@@ -63,7 +63,7 @@ The server uses Linux-specific **Netty Epoll** transport for Unix domain socket 
 | `cancelSimulationHandler` | `ICancelSimulationHandler` | `domainModule` |
 
 **Request flow:** Each RPC method follows the same pattern:
-1. Validates required fields (blank check for `compiledModelId`, `lismaSourceCode`, `sourceCode`)
+1. Validates required fields (blank check for `compiledModelId`, `lismaSourceCode`)
 2. Calls domain handler with transformed request data
 3. Maps domain types to protobuf response builders
 4. Calls `responseObserver.onNext()` + `responseObserver.onCompleted()`
@@ -75,7 +75,6 @@ The server uses Linux-specific **Netty Epoll** transport for Unix domain socket 
 - `compile`: Returns `INVALID_ARGUMENT` if `lismaSourceCode` is blank
 - `validate`: Returns `INVALID_ARGUMENT` if `lismaSourceCode` is blank
 - `delete`: Returns `INVALID_ARGUMENT` if `compiledModelId` is blank
-- `highlight`: Returns empty response (no error) if `sourceCode` is blank
 
 ### LismaCompilerServiceGrpcImpl
 
@@ -83,14 +82,13 @@ The server uses Linux-specific **Netty Epoll** transport for Unix domain socket 
 
 **Base class:** `LismaCompilerServiceGrpc.LismaCompilerServiceImplBase()`
 
-**Injected dependencies (4 handlers):**
+**Injected dependencies (3 handlers):**
 
 | Parameter | Interface | Resolved from |
 |-----------|-----------|---------------|
 | `compileLismaHandler` | `ICompileLismaHandler` | `domainModule` |
 | `validateLismaHandler` | `IValidateLismaHandler` | `domainModule` |
 | `deleteCompiledModelHandler` | `IDeleteCompiledModelHandler` | `domainModule` |
-| `highlightLismaHandler` | `IHighlightLismaHandler` | `infrastructureModule` |
 
 **Request flow:** Same pattern as SimulationService.
 
@@ -119,11 +117,11 @@ The server embeds a Ktor HTTP server (CIO engine) on a separate Unix socket for 
 
 ## Dependency Injection (AppModule)
 
-See `AppModule.kt` for the full module definition. The `appModule` only registers the gRPC service implementations: `SimulationServiceGrpcImpl` (with 5 handler dependencies) and `LismaCompilerServiceGrpcImpl` (with 4 handler dependencies). All handler dependencies are resolved transitively from `domainModule` and `infrastructureModule`.
+See `AppModule.kt` for the full module definition. The `appModule` only registers the gRPC service implementations: `SimulationServiceGrpcImpl` (with 5 handler dependencies) and `LismaCompilerServiceGrpcImpl` (with 3 handler dependencies). All handler dependencies are resolved transitively from `domainModule` and `infrastructureModule`.
 
 ### DI Resolution Chain
 
-`SimulationServiceGrpcImpl` depends on 5 handlers: `IRunSimulationHandler`, `IGetSimulationResultHandler`, `IMonitorSimulationHandler`, `IListSimulationMethodsHandler`, and `ICancelSimulationHandler`. `LismaCompilerServiceGrpcImpl` depends on 4 handlers: `ICompileLismaHandler`, `IValidateLismaHandler`, `IDeleteCompiledModelHandler`, and `IHighlightLismaHandler`.
+`SimulationServiceGrpcImpl` depends on 5 handlers: `IRunSimulationHandler`, `IGetSimulationResultHandler`, `IMonitorSimulationHandler`, `IListSimulationMethodsHandler`, and `ICancelSimulationHandler`. `LismaCompilerServiceGrpcImpl` depends on 3 handlers: `ICompileLismaHandler`, `IValidateLismaHandler`, and `IDeleteCompiledModelHandler`.
 
 The simulation handlers depend on `ICompiledModelStore`, `ISimulationSessionStore`, and `ISimulationExecutor`. The `ISimulationExecutor` depends on `IntegrationMethodsLibrary`, `IHsmCompiler`, `ISimulationSessionStore`, and `ExecutorService`. The `ICompileLismaHandler` depends on `ILismaTranslator` and `ICompiledModelStore`. The `IValidateLismaHandler` depends on `ILismaTranslator`. The `IDeleteCompiledModelHandler` depends on `ICompiledModelStore`. `ILismaTranslator` is implemented by `LismaTranslatorImpl` which wraps `InputTranslator`.
 
@@ -141,7 +139,6 @@ graph TD
     LispcGrpc --> CompH["ICompileLismaHandler"]
     LispcGrpc --> ValH["IValidateLismaHandler"]
     LispcGrpc --> DelH["IDeleteCompiledModelHandler"]
-    LispcGrpc --> HighH["IHighlightLismaHandler"]
 
     RunH --> CompStore["ICompiledModelStore"]
     RunH --> SessionStore["ISimulationSessionStore"]

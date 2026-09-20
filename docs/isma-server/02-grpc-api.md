@@ -7,7 +7,7 @@ The server exposes two gRPC services defined in `protobuf-contracts/v1/`:
 | Service | Purpose |
 |---------|---------|
 | `SimulationService` | Simulation lifecycle: run, monitor, cancel, retrieve results, list methods |
-| `LismaCompilerService` | LISMA language processing: compile, validate, highlight, delete compiled models |
+| `LismaCompilerService` | LISMA language processing: compile, validate, delete compiled models |
 
 Both services use **unary RPCs** (request/response) except `MonitorSimulation` which returns a **server-streaming** response.
 
@@ -169,7 +169,7 @@ Cancels a running simulation.
 
 ### RPC Methods
 
-The `LismaCompilerService` exposes four RPC methods: `Compile`, `Validate`, `Delete`, and `Highlight`. See `protobuf-contracts/v1/` for the full `.proto` definition.
+The `LismaCompilerService` exposes three RPC methods: `Compile`, `Validate`, and `Delete`. See `protobuf-contracts/v1/` for the full `.proto` definition.
 
 ### Compile
 
@@ -242,47 +242,6 @@ Removes a previously compiled model from the in-memory store.
 | `success` | `bool` | Whether the model was found and deleted |
 
 **Implementation:** `LismaCompilerServiceGrpcImpl.delete()` → `IDeleteCompiledModelHandler.handle()` → `ICompiledModelStore.delete()`.
-
----
-
-### Highlight
-
-Performs lexical analysis on LISMA source code, returning syntax tokens for IDE highlighting.
-
-**Request:** `HighlightRequest`
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `source_code` | `string` | Yes | Source code to analyze |
-
-**Response:** `HighlightResponse`
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `tokens[]` | `SyntaxToken` | List of syntax tokens |
-
-**SyntaxToken:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `start` | `int32` | Character offset in source |
-| `length` | `int32` | Token length |
-| `kind` | `TokenKind` | Token category |
-
-**TokenKind enum:**
-
-| Value | Description |
-|-------|-------------|
-| `KEYWORD` | LISMA keywords (const, state, for, if, else, from, macro, set) |
-| `COMMENT` | Single-line and block comments |
-| `NUMBER` | Floating-point and decimal literals |
-| `TEXT` | Reserved — never produced by the handler |
-
-Note: `TEXT` is defined in the proto. The infrastructure handler (`HighlightLismaHandlerImpl`) filters out TEXT tokens (`else -> return@mapNotNull null`), so TEXT never reaches the gRPC layer in practice. However, the gRPC mapping code in `LismaCompilerServiceGrpcImpl` includes a mapping for `SyntaxKind.TEXT -> TokenKind.TOKEN_KIND_TEXT`, meaning it's prepared to send TEXT tokens if they ever appeared.
-
-**Implementation:** Uses ANTLR4 `LismaLexer` to tokenize source code. Only keywords, comments, and numbers are returned (other token types are filtered out).
-
-**Empty input:** Returns an empty token list (no error).
 
 ---
 

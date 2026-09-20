@@ -17,7 +17,7 @@ This use case describes creating a new text-based LISMA project, editing the sou
 1. **User creates a new text project** — via toolbar button, keyboard shortcut, or File → New text menu.
 2. **A new tab is created** labeled "New project" and becomes the active tab.
 3. **An empty text editor opens** with line numbers displayed on the left margin.
-4. **Syntax highlighting is active** — as the user types, keywords, comments, and numbers are automatically colored by the simulation engine.
+4. **Syntax highlighting is active** — as the user types, keywords, comments, and numbers are automatically colored by the `isma-lsp` language server.
 5. **User edits source code** — standard text editing is available:
    a. Insert, delete, and select text
    b. Cut, copy, and paste via toolbar, menu, or keyboard shortcuts
@@ -27,7 +27,7 @@ This use case describes creating a new text-based LISMA project, editing the sou
 
 ### A1: Large file performance
 
-For very large files (thousands of lines), syntax highlighting may cause slight lag as each keystroke triggers a server-side analysis. The UI remains responsive but highlighting updates may not be instantaneous.
+For very large files (thousands of lines), syntax highlighting may cause slight lag as each keystroke triggers a full-document analysis in the `isma-lsp` process. The UI remains responsive but highlighting updates may not be instantaneous.
 
 ### A2: New project without existing projects
 

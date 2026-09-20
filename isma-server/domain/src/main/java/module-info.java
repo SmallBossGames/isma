@@ -9,7 +9,6 @@ module isma.server.domain {
     exports ru.nstu.isma.domain.handlers.compileLisma;
     exports ru.nstu.isma.domain.handlers.deleteCompiledModel;
     exports ru.nstu.isma.domain.handlers.getSimulationResult;
-    exports ru.nstu.isma.domain.handlers.highlightLisma;
     exports ru.nstu.isma.domain.handlers.listSimulationMethods;
     exports ru.nstu.isma.domain.handlers.monitorSimulation;
     exports ru.nstu.isma.domain.handlers.runSimulation;

@@ -96,8 +96,8 @@ Koin provides a visible DI graph, scoped instances per project, and avoids verbo
 ### Why `SupervisorJob` for simulation scope
 Prevents cancellation propagation between concurrent simulations. If one simulation fails, it does not cancel other running simulations.
 
-### Why server-driven syntax highlighting
-Centralized grammar in the server avoids duplicating tokenization logic in the UI. The UI receives token positions and kinds via gRPC, then applies CSS class-based styling.
+### Why LSP-driven syntax highlighting
+Centralized grammar in the `isma-lsp` language server avoids duplicating tokenization logic in the UI. The UI launches `isma-lsp` as a background process and pulls semantic tokens over LSP (JSON-RPC 2.0 over stdio), then applies CSS class-based styling. This replaces the previous gRPC `Highlight` RPC and keeps language features decoupled from the simulation server.
 
 ### Why `BlueprintViewAdapter` abstraction
 Decouples the blueprint editor ViewModel from JavaFX types, enabling framework-independent logic. The concrete `JavaFxBlueprintViewAdapter` delegates to JavaFX `Pane.children` and `Tab` creation.

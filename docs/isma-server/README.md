@@ -7,7 +7,7 @@ Quick navigation to detailed documents:
 | [01-overview.md](01-overview.md) | Architecture overview, module structure, design principles, communication flows |
 | [02-grpc-api.md](02-grpc-api.md) | Complete gRPC API reference: both services, all RPCs, request/response types, error mapping |
 | [03-domain-layer.md](03-domain-layer.md) | Domain handlers, entities, interfaces, DI configuration |
-| [04-infrastructure-layer.md](04-infrastructure-layer.md) | Stores, simulation executor, translator, syntax highlighting |
+| [04-infrastructure-layer.md](04-infrastructure-layer.md) | Stores, simulation executor, translator |
 | [05-app-layer.md](05-app-layer.md) | Entry point, gRPC services, HTTP server, DI wiring |
 | [06-build-and-deployment.md](06-build-and-deployment.md) | Build configuration, dependencies, startup/shutdown, deployment |
 | [07-transport-layer.md](07-transport-layer.md) | Unix domain sockets via Netty, Ktor CIO, client discovery, troubleshooting |
@@ -33,7 +33,7 @@ Use `grpcurl` with the `-plaintext` flag and the `-grpc-header ":pseudo-protocol
 | `isma-server/app/src/main/kotlin/.../Application.kt` | Server entry point, CLI parsing, server lifecycle |
 | `isma-server/app/src/main/kotlin/.../AppModule.kt` | Koin DI module (gRPC service bindings) |
 | `isma-server/app/src/main/kotlin/.../grpc/SimulationServiceGrpcImpl.kt` | gRPC SimulationService: 5 RPC methods |
-| `isma-server/app/src/main/kotlin/.../grpc/LismaCompilerServiceGrpcImpl.kt` | gRPC LismaCompilerService: 4 RPC methods |
+| `isma-server/app/src/main/kotlin/.../grpc/LismaCompilerServiceGrpcImpl.kt` | gRPC LismaCompilerService: 3 RPC methods |
 | `isma-server/app/src/main/kotlin/.../http/HttpRoutes.kt` | Ktor HTTP routes (`GET /simulation/{id}/download`) |
 | `isma-server/domain/src/main/kotlin/.../handlers/runSimulation/RunSimulationHandlerImpl.kt` | Simulation start logic |
 | `isma-server/domain/src/main/kotlin/.../handlers/runSimulation/RunSimulationParameters.kt` | Simulation parameters data class |
@@ -44,7 +44,6 @@ Use `grpcurl` with the `-plaintext` flag and the `-grpc-header ":pseudo-protocol
 | `isma-server/domain/src/main/kotlin/.../handlers/runSimulation/ILismaTranslator.kt` | ILismaTranslator interface + TranslationException |
 | `isma-server/infrastructure/src/main/kotlin/.../SimulationExecutorImpl.kt` | Simulation execution engine (virtual threads, result writing) |
 | `isma-server/infrastructure/src/main/kotlin/.../LismaTranslatorImpl.kt` | LISMA → HSM translation with FDM support |
-| `isma-server/infrastructure/src/main/kotlin/.../HighlightLismaHandlerImpl.kt` | ANTLR4-based syntax highlighting |
 | `isma-server/infrastructure/src/main/kotlin/.../InfrastructureModule.kt` | DI configuration (stores, executors, translators) |
 | `isma-server/grpc/build.gradle.kts` | Protobuf/gRPC code generation config |
 | `isma-server/app/build.gradle.kts` | Application build config (main class, dependencies) |

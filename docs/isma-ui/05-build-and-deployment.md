@@ -101,7 +101,7 @@ The `app` module uses `opens` (not `exports`) for packages that need reflection 
 - `./gradlew :isma-ui:blueprint-editor:build` — Build blueprint-editor module
 - `./gradlew :isma-ui:toolkit:build` — Build toolkit module
 - `./gradlew build` — Build entire project (includes isma-ui)
-- `./.ci-cd/build-bundle.sh` — Build bundle (UI + server)
+- `./.ci-cd/build-bundle.sh` — Build bundle (UI + server + `isma-lsp`)
 
 ## Dependency Resolution
 
@@ -111,7 +111,7 @@ All dependency versions are centralized in `gradle/libs.versions.toml` with alia
 
 ### Via Gradle
 
-The `JavaExec` task in `app/build.gradle.kts` auto-configures system properties `isma.server.script` and `isma.grin.script` pointing to the bundle paths. Run with: `./gradlew :isma-ui:app:run`. See `app/build.gradle.kts` for the full configuration.
+The `JavaExec` task in `app/build.gradle.kts` auto-configures system properties `isma.server.script`, `isma.grin.script`, and `isma.lsp.script` pointing to the bundle paths. Run with: `./gradlew :isma-ui:app:run`. See `app/build.gradle.kts` for the full configuration.
 
 ### Via IDE
 
@@ -120,10 +120,11 @@ Set VM options in run configuration:
 - `--enable-native-access=io.netty.common`
 - `-Disma.server.script=/path/to/isma-server-script`
 - `-Disma.grin.script=/path/to/grin-script`
+- `-Disma.lsp.script=/path/to/isma-lsp/bin/isma-lsp`
 
 ### Via Bundle
 
-After `./.ci-cd/build-bundle.sh`, the bundle at `build/bundle/` contains both `isma-ui` and `isma-server` with a launcher script that resolves paths automatically.
+After `./.ci-cd/build-bundle.sh`, the bundle at `build/bundle/` contains `isma-ui`, `isma-server`, and `isma-lsp` (as `isma-lsp-app/`) with a `run-ui.sh` launcher script that resolves paths automatically.
 
 ## Server Script Resolution Priority
 
@@ -131,7 +132,7 @@ After `./.ci-cd/build-bundle.sh`, the bundle at `build/bundle/` contains both `i
 2. System property `isma.server.script`
 3. Throws `IllegalStateException` if neither is set
 
-Same pattern for Grin: `ISMA_GRIN_SCRIPT` → `isma.grin.script` → exception.
+Same pattern for Grin: `ISMA_GRIN_SCRIPT` → `isma.grin.script` → exception, and for the language server: `ISMA_LSP_SCRIPT` → `isma.lsp.script` → exception.
 
 ## Cache Directory
 

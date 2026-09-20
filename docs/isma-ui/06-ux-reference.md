@@ -136,7 +136,7 @@ The central area is a tab pane. Each tab represents one open project.
 A rich text editor with:
 - **Font:** Consolas 12pt
 - **Line numbers:** Displayed on the left margin
-- **Syntax highlighting:** Server-driven — keywords (orange, bold), comments (gray, italic), numbers (blue)
+- **Syntax highlighting:** LSP-driven (via the `isma-lsp` process) — keywords (orange, bold), comments (gray, italic), numbers (blue)
 - **Text editing:** Full insert/delete/cut/copy/paste via keyboard and menu
 - **Content:** LISMA mathematical modeling language source code
 
@@ -704,7 +704,7 @@ See `LismaPdeService.kt` for the implementation.
 | **Multi-project editing** | Editor tab pane | Open, create, switch, and close multiple projects simultaneously |
 | **Text-based LISMA editing** | Text editor tab | Rich text editor with syntax highlighting and line numbers |
 | **Visual statechart editing** | Blueprint editor tab | Drag-and-drop canvas with states, transitions, and loop transactions |
-| **Remote syntax highlighting** | Text editor | Server-driven tokenization — keywords, comments, numbers colored |
+| **Remote syntax highlighting** | Text editor | LSP tokenization via the `isma-lsp` process — keywords, comments, numbers colored |
 | **Model compilation** | Server (via gRPC) | Compiles LISMA text or blueprint to a runnable model |
 | **Model validation** | Server (via gRPC) | Validates source code without running (Verify button) |
 | **Simulation execution** | Server (via gRPC) | Runs the compiled model with given parameters |
@@ -758,15 +758,16 @@ For detailed specification of the blueprint editor interaction model (state crea
 When building a replacement UI with the same features:
 
 1. **Separation of concerns:** The UI is cleanly layered — domain models (pure data) → services (business logic) → views (UI components) → controllers (event handlers)
-2. **Server communication:** All compilation, validation, and simulation happen on a separate server process. The UI communicates via gRPC (compile, validate, run, monitor, cancel, download, highlight) and HTTP (binary result download).
+2. **Server communication:** All compilation, validation, and simulation happen on a separate server process. The UI communicates via gRPC (compile, validate, run, monitor, cancel, download) and HTTP (binary result download).
 3. **Multi-project:** Projects are managed in an observable set with an active project concept. Each project has its own editor and Koin scope.
 4. **Observable collections:** UI state is driven by observable collections (projects, tasks, results, errors) that update the UI reactively via `addedAsFlow()` and `changeAsFlow()` extensions.
 5. **Blueprint-to-text:** The blueprint editor is a visual layer that serializes to/from a LISMA text representation. The conversion happens at compile time via `BlueprintModel.convertToLisma()`, not in real-time.
-6. **External processes:** Two external processes are launched by the UI:
+6. **External processes:** Three external processes are launched by the UI:
    - ISMA Server (gRPC backend) — launched automatically on startup via `SimulationServerManager`
+   - LISMA Language Server (`isma-lsp`) — launched automatically on startup via `LspProcessManager`, provides syntax highlighting over LSP
    - Grin Chart Viewer — launched on-demand when user clicks "Show" on results via `GrinProcessLauncher`
 7. **Preferences:** Window geometry and last-opened files are persisted as JSON via `PreferencesProvider`. Simulation parameters are stored/loaded as separate JSON files by the user via `SimulationParametersService`.
-8. **Syntax highlighting:** Computed server-side via `highlightSource()` gRPC call. The UI receives token positions and kinds, then applies CSS class-based styling to the rich text editor.
+8. **Syntax highlighting:** Computed by the `isma-lsp` language server process (LSP `semanticTokens/full` over stdio). The UI receives line/column token positions and kinds, then applies CSS class-based styling to the rich text editor.
 9. **Result format:** Binary files containing `SimulationPoint` records (x, yForDe[], rhs[][]). Column names come from server metadata. Both the chart viewer and CSV export consume this binary format via `BinaryFilePointProvider`.
 10. **Clipboard propagation:** Cut/copy/paste events are propagated via `EditorPlatformService` using Kotlin `SharedFlow`, allowing the text editor to respond to platform clipboard commands from anywhere in the UI.
 11. **Result simplification:** Post-processing simplification uses Radial-Distance or Douglas-Peucker algorithms to reduce data points for smoother chart rendering.

@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.fdm
+package ru.nstu.isma.compiler.hsm.fdm
 
 import ru.nstu.isma.compiler.hsm.core.`var`.HMConst
 import ru.nstu.isma.compiler.hsm.core.`var`.pde.HMSampledSpatialVariable
@@ -25,8 +25,10 @@ class FDMIndexedApxVar(v: HMSampledSpatialVariable) : HMSampledSpatialVariable()
 
     fun setIndex(index: Int) {
         if (!validate(index)) {
-            throw RuntimeException("index is not valid! index ="
-                    + index.toString() + " but range = [1; " + pointsCount.toString() + "].")
+            throw RuntimeException(
+                "index is not valid! index ="
+                        + index.toString() + " but range = [1; " + pointsCount.toString() + "]."
+            )
         }
         this.index = index
     }

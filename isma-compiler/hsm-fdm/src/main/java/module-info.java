@@ -1,5 +1,5 @@
-module isma.isma.next.core.fdm.main {
-    exports ru.nstu.isma.next.core.fdm;
+module isma.compiler.hsm.fdm {
+    exports ru.nstu.isma.compiler.hsm.fdm;
 
     requires kotlin.stdlib;
     requires isma.compiler.hsm.core;

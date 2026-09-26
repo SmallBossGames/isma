@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.fdm
+package ru.nstu.isma.compiler.hsm.fdm
 
 import ru.nstu.isma.compiler.hsm.core.`var`.HMConst
 import ru.nstu.isma.compiler.hsm.core.`var`.HMEquation
@@ -123,8 +123,9 @@ class FDMContext {
                 for (s in keys) {
                     val `var`: HMVariable = variables.get(s)
                     if (`var` is HMEquation
-                            && `var` !is HMConst
-                            && !context.containsEquation(`var`.getCode())) {
+                        && `var` !is HMConst
+                        && !context.containsEquation(`var`.getCode())
+                    ) {
                         // проверяем правую часть на аппроксимируемые элементы
                         eqNeedApx = false
                         val right: HMExpression = `var`.rightPart

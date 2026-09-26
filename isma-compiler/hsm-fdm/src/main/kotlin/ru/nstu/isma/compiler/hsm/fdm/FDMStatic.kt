@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.fdm
+package ru.nstu.isma.compiler.hsm.fdm
 
 /**
  * by

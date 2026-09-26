@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.fdm
+package ru.nstu.isma.compiler.hsm.fdm
 
 import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.compiler.hsm.core.exp.*
@@ -98,7 +98,9 @@ class FDMConverter(private val model: HSM?) {
         // запоминаем все не апроксимируемые элементы
         for (varCode in variableCodes) {
             val `var`: HMVariable = vT.get(varCode)
-            if (!approximatedEquations.contains(`var`) && !approximatedVariables.contains(`var`)) notApproximated.add(`var`)
+            if (!approximatedEquations.contains(`var`) && !approximatedVariables.contains(`var`)) notApproximated.add(
+                `var`
+            )
         }
 
         // создаем итератор
@@ -197,26 +199,39 @@ class FDMConverter(private val model: HSM?) {
         return newRP
     }
 
-    private fun addSubst(pde: HMPartialDerivativeEquation, av: HMSampledSpatialVariable, idx: FDMIndexedApxVar?, o: EXPPDEOperand,
-                         newRP: HMExpression
+    private fun addSubst(
+        pde: HMPartialDerivativeEquation, av: HMSampledSpatialVariable, idx: FDMIndexedApxVar?, o: EXPPDEOperand,
+        newRP: HMExpression
     ) {
         val eq_idx_plus_1: HMEquation = vT.get(equationNameMappingSpecIndex(pde, av, idx!!.index!! + 1)) as HMEquation
         val eq_idx_minus_1: HMEquation = vT.get(equationNameMappingSpecIndex(pde, av, idx.index!! - 1)) as HMEquation
         val eq_cur: HMEquation = vT.get(equationNameMapping(pde)) as HMEquation
         val uc: HMUnnamedConst
         if (idx.isMax && pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).derOrder > 0) {
-            pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
+            pde.getBound(
+                HMBoundaryCondition.SideType.RIGHT,
+                av
+            ).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
         } else if (idx.isFirst && pde.getBound(HMBoundaryCondition.SideType.LEFT, av).derOrder > 0) {
-            pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
+            pde.getBound(
+                HMBoundaryCondition.SideType.LEFT,
+                av
+            ).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) })
         } else if (o.order == EXPPDEOperand.Order.ONE) {
 //            if (eq_idx_plus_1 == null || eq_idx_minus_1 == null || eq_cur == null) {
 //                throw new RuntimeException("FDM: all is bad");
 //            }
             uc = HMUnnamedConst(o.sampledFirstSpatialVar.stepSize)
-            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+            if (idx.isMax) pde.getBound(
+                HMBoundaryCondition.SideType.RIGHT,
+                av
+            ).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
                 EXPOperand(eq_idx_plus_1)
             )
-            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+            if (idx.isFirst) pde.getBound(
+                HMBoundaryCondition.SideType.LEFT,
+                av
+            ).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
                 EXPOperand(eq_idx_minus_1)
             )
             newRP.add(EXPOperator.sub())
@@ -226,14 +241,20 @@ class FDMConverter(private val model: HSM?) {
             newRP.add(EXPOperator.div())
         } else if (o.order == EXPPDEOperand.Order.TWO) {
             uc = HMUnnamedConst(Math.pow(o.sampledFirstSpatialVar.stepSize, 2.0))
-            if (idx.isFirst) pde.getBound(HMBoundaryCondition.SideType.LEFT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+            if (idx.isFirst) pde.getBound(
+                HMBoundaryCondition.SideType.LEFT,
+                av
+            ).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
                 EXPOperand(eq_idx_minus_1)
             )
             newRP.add(EXPOperand(HMUnnamedConst(2.0)))
             newRP.add(EXPOperand(eq_cur))
             newRP.add(EXPOperator.mult())
             newRP.add(EXPOperator.sub())
-            if (idx.isMax) pde.getBound(HMBoundaryCondition.SideType.RIGHT, av).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
+            if (idx.isMax) pde.getBound(
+                HMBoundaryCondition.SideType.RIGHT,
+                av
+            ).value.tokens.forEach(Consumer<EXPToken> { t: EXPToken? -> newRP.add(t) }) else newRP.add(
                 EXPOperand(eq_idx_plus_1)
             )
             newRP.add(EXPOperator.add())
@@ -271,6 +292,7 @@ class FDMConverter(private val model: HSM?) {
             `var` is HMEquation && `var` !is HMConst && !approximatedEquations.contains(`var`) -> {
                 checkExpression(`var`.rightPart)
             }
+
             else -> {
                 false
             }
@@ -324,7 +346,11 @@ class FDMConverter(private val model: HSM?) {
         return newName.toString()
     }
 
-    protected fun equationNameMappingSpecIndex(equation: HMVariable, av: HMSampledSpatialVariable, specValue: Int?): String {
+    protected fun equationNameMappingSpecIndex(
+        equation: HMVariable,
+        av: HMSampledSpatialVariable,
+        specValue: Int?
+    ): String {
         if (!approximatedEquations.contains(equation)) {
             throw RuntimeException("FDM converter doesn't contain " + equation.code)
         }
@@ -351,12 +377,15 @@ class FDMConverter(private val model: HSM?) {
             notApproximated.contains(v) || v is HMUnnamedConst -> {
                 v
             }
+
             v is HMSampledSpatialVariable -> {
                 vT.get(apxVarNameMapping(v))
             }
+
             v is HMEquation -> {
                 vT.get(equationNameMapping(v))
             }
+
             else -> throw RuntimeException("Cant find mapped variable: " + v.code)
         }
     }

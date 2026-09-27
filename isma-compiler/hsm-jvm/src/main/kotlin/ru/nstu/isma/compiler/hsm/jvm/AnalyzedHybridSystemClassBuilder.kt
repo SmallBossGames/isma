@@ -13,6 +13,9 @@ import ru.nstu.isma.compiler.hsm.core.`var`.HMAlgebraicEquation
 import ru.nstu.isma.compiler.hsm.core.`var`.HMDerivativeEquation
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.*
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.EventFunctionGroup.StepChoiceRule
+import java.io.ByteArrayOutputStream
+import java.io.ObjectOutputStream
+import java.util.Base64
 
 /**
  * @author Maria Nasyrova
@@ -32,8 +35,21 @@ class AnalyzedHybridSystemClassBuilder(
             packageName = packageName,
             importStatements = renderImports(),
             className = className,
+            hsmBlob = renderHsmBlob(),
             hsbBody = renderHsbBody()
         )
+    }
+
+    /**
+     * Serializes the HSM to a base64 string. The blob is inlined into the
+     * generated class so the compiled `.class` is self-contained: the runner
+     * loads the class, reads the blob, and deserializes the HSM for equation
+     * metadata, initial conditions, and result column naming.
+     */
+    private fun renderHsmBlob(): String {
+        val bytes = ByteArrayOutputStream()
+        ObjectOutputStream(bytes).use { it.writeObject(hsm) }
+        return Base64.getEncoder().encodeToString(bytes.toByteArray())
     }
 
     private fun renderImports(): String {
@@ -246,6 +262,7 @@ class AnalyzedHybridSystemClassBuilder(
             packageName: String,
             importStatements: String,
             className: String,
+            hsmBlob: String,
             hsbBody: String
         ) = """
             package $packageName;
@@ -256,6 +273,13 @@ class AnalyzedHybridSystemClassBuilder(
             */
             
             public class $className extends HybridSystem {
+                private static final byte[] __ISMA_HSM__ =
+                    java.util.Base64.getDecoder().decode("$hsmBlob");
+                
+                public static byte[] ismaHsmBytes() {
+                    return __ISMA_HSM__;
+                }
+                
                 public $className() {
                     super(hybridSystemBuilder().toHybridSystem());
                 }

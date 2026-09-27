@@ -13,6 +13,10 @@ import javax.tools.*
 class MemoryFileManager(manager: StandardJavaFileManager?) :
     ForwardingJavaFileManager<StandardJavaFileManager?>(manager) {
     private var obj: MemoryJavaClassObject? = null
+
+    /** Bytes of the last compiled class, or null if javac produced no class output yet. */
+    val compiledClassBytes: ByteArray?
+        get() = obj?.bytes
     override fun getClassLoader(location: JavaFileManager.Location?): ClassLoader {
         return object : SecureClassLoader() {
             @Throws(ClassNotFoundException::class)

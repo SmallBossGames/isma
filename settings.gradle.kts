@@ -12,6 +12,7 @@ include("isma-compiler:hsm-fdm")
 include("isma-compiler:lisma-translator-hsm")
 include("isma-compiler:hsm-jvm")
 include("isma-compiler:hsm-jvm-calcmodel")
+include("isma-compiler:cli")
 
 include("isma-solver:api")
 include("isma-solver:core")
@@ -49,12 +50,12 @@ include("isma-solver:lib:rkfehlberg")
 
 include("isma-next-math-engine")
 include("isma-next-math-common")
-
 include("isma-jvm-lib:exchange-format")
+include("isma-runner")
 
-include("isma-server:domain")
-include("isma-server:grpc")
-include("isma-server:infrastructure")
-include("isma-server:app")
+include("isma-daemon:domain")
+include("isma-daemon:grpc")
+include("isma-daemon:infrastructure")
+include("isma-daemon:app")
 
 include("isma-lsp")

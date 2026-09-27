@@ -19,12 +19,12 @@ fi
 (cd isma-ui && ./gradlew :isma-ui:app:installDist)
 (cd grin && ./gradlew :grin:gui:app:installDist)
 
-# Server is built in the main repo
-./gradlew :isma-server:app:installDist
+# Daemon is built in the main repo
+./gradlew :isma-daemon:app:installDist
 ./gradlew :isma-lsp:installDist
 
 cp -r "$PROJECT_ROOT/isma-ui/isma-ui/app/build/install/app" "$BUNDLE_DIR/isma-ui-app"
-cp -r "$PROJECT_ROOT/isma-server/app/build/install/app" "$BUNDLE_DIR/isma-server-app"
+cp -r "$PROJECT_ROOT/isma-daemon/app/build/install/app" "$BUNDLE_DIR/isma-daemon-app"
 cp -r "$PROJECT_ROOT/grin/grin/gui/app/build/install/app" "$BUNDLE_DIR/grin-app"
 cp -r "$PROJECT_ROOT/isma-lsp/build/install/isma-lsp" "$BUNDLE_DIR/isma-lsp-app"
 
@@ -33,7 +33,7 @@ cat > "$BUNDLE_DIR/run-ui.sh" << 'SCRIPT'
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
-exec env "ISMA_SERVER_SCRIPT=$SCRIPT_DIR/isma-server-app/bin/app" "ISMA_GRIN_SCRIPT=$SCRIPT_DIR/grin-app/bin/app" "ISMA_LSP_SCRIPT=$SCRIPT_DIR/isma-lsp-app/bin/isma-lsp" "$SCRIPT_DIR/isma-ui-app/bin/app"
+exec env "ISMA_DAEMON_SCRIPT=$SCRIPT_DIR/isma-daemon-app/bin/app" "ISMA_GRIN_SCRIPT=$SCRIPT_DIR/grin-app/bin/app" "ISMA_LSP_SCRIPT=$SCRIPT_DIR/isma-lsp-app/bin/isma-lsp" "$SCRIPT_DIR/isma-ui-app/bin/app"
 SCRIPT
 chmod +x "$BUNDLE_DIR/run-ui.sh"
 

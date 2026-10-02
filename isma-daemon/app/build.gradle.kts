@@ -21,12 +21,11 @@ dependencies {
     implementation(project(":isma-daemon:domain"))
     implementation(project(":isma-daemon:grpc"))
     implementation(project(":isma-daemon:infrastructure"))
-    implementation(project(":isma-solver:lib-meta"))
-    // The LISMA compiler CLI and the simulation runner CLI are launched as
-    // separate processes by the daemon; their classes must ship in the app
-    // distribution's lib directory.
+    // The LISMA compiler CLI is launched as a separate process by the daemon; its
+    // classes ship in the app distribution's lib directory. The simulation runner
+    // is batteries-included: its full distribution (bin + lib, including the
+    // integration-method jars) is embedded separately (see installRunnerDist).
     runtimeOnly(project(":isma-compiler:cli"))
-    runtimeOnly(project(":isma-runner"))
 
     implementation(libs.grpc.netty)
     implementation(libs.netty.transport)
@@ -52,4 +51,18 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.content.negotiation)
+}
+
+// Embed the batteries-included simulation-runner distribution (bin + lib, including
+// the integration-method jars) into the daemon's distribution so the daemon can
+// launch the runner as a self-contained process.
+val installRunnerDist by tasks.registering(Copy::class) {
+    dependsOn(":isma-solver:cli:installDist")
+    from(project(":isma-solver:cli").layout.buildDirectory.dir("install/simulation-runner-cli"))
+    into(layout.buildDirectory.dir("install/app/runner"))
+}
+tasks.named("installDist") {
+    // Run AFTER installDist: the application plugin's installDist repopulates the
+    // distribution root, so the runner must be copied in afterwards.
+    finalizedBy(installRunnerDist)
 }

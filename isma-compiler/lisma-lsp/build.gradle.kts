@@ -10,6 +10,9 @@ version = "1.0.0-SNAPSHOT"
 application {
     mainClass.set("ru.nstu.isma.lsp.MainKt")
     mainModule.set("isma.lsp")
+    // Keep the distribution/launcher name stable (isma-lsp) even though the module
+    // directory is lisma-lsp; the bundle script and UI reference bin/isma-lsp.
+    applicationName = "isma-lsp"
 }
 
 dependencies {

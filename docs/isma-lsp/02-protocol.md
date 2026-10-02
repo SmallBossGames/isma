@@ -131,7 +131,7 @@ The `exit` notification is sent after the `shutdown` response; clients treat a m
 
 ## Smoke Test
 
-`isma-lsp/smoke.py` drives the installed binary over a real stdio subprocess:
+`isma-compiler/lisma-lsp/smoke.py` drives the installed binary over a real stdio subprocess:
 
 1. `initialize` → asserts capabilities and legend
 2. `textDocument/didOpen` with the 8-line example above
@@ -140,6 +140,6 @@ The `exit` notification is sent after the `shutdown` response; clients treat a m
 5. `textDocument/didClose`, `shutdown`, `exit` → asserts exit code 0
 
 ```bash
-./gradlew :isma-lsp:installDist
-python3 isma-lsp/smoke.py isma-lsp/build/install/isma-lsp/bin/isma-lsp
+./gradlew :isma-compiler:lisma-lsp:installDist
+python3 isma-compiler/lisma-lsp/smoke.py isma-compiler/lisma-lsp/build/install/isma-lsp/bin/isma-lsp
 ```

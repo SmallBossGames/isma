@@ -7,7 +7,7 @@ coordinates them:
 
 - **LISMA compiler CLI** (`isma-compiler:cli`) — compiles LISMA source to a
   compiled `.class` file (and validates LISMA).
-- **Simulation runner CLI** (`isma-runner`) — runs a simulation from a
+- **Simulation runner CLI** (`isma-solver:cli`, batteries-included) — runs a simulation from a
   compiled `.class` file and writes the result file.
 
 The gRPC API (protobuf contracts) is frozen; the daemon only orchestrates.
@@ -117,9 +117,8 @@ Compiler main class: `ru.nstu.isma.compiler.cli.LismaCompilerCliKt`.
 
 | Dependency | Purpose |
 |------------|---------|
-| isma-solver:lib-meta, isma-solver:lib-utils | SPI + library for integration method factories (used only to answer ListSimulationMethods) |
 | isma-compiler:cli | Standalone LISMA compiler CLI — launched as a separate process (runtimeOnly, resolved via `ISMA_COMPILER_CLI` env / `isma.compiler.cli` sysprop, fallback to app lib dir) |
-| isma-runner | Simulation runner CLI — launched as a separate process per simulation (runtimeOnly, resolved via `ISMA_RUNNER_CLI` env / `isma.runner.cli` sysprop, fallback to app lib dir) |
+| isma-solver:cli | Batteries-included simulation runner CLI — launched as a separate process per simulation (embedded as its own distribution via `installRunnerDist`, resolved via `ISMA_RUNNER_CLI` env / `isma.runner.cli` sysprop, fallback to the runner's own `runner/lib`); also answers `ListSimulationMethods` via `--list-methods` |
 | grpc-netty | Netty-based gRPC server transport |
 | netty-transport + netty-transport-classes-epoll | Epoll event loop for Linux domain sockets |
 | grpc-stub, grpc-protobuf, grpc-java | gRPC API and generated code |

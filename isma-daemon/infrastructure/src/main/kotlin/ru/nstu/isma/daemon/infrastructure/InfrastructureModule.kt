@@ -7,8 +7,6 @@ import ru.nstu.isma.domain.integration.IIntegrationMethodsStore
 import ru.nstu.isma.domain.simulation.ISimulationExecutor
 import ru.nstu.isma.domain.simulation.ISimulationProcessRegistry
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
-import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
-import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
 import ru.nstu.isma.daemon.infrastructure.stores.compiledModels.CompiledModelStore
 import ru.nstu.isma.daemon.infrastructure.stores.integrationMethods.IntegrationMethodsStore
 import ru.nstu.isma.daemon.infrastructure.stores.simulationSessions.SimulationSessionStore
@@ -19,12 +17,11 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 val infrastructureModule = module {
-    single<IIntegrationMethodsStore> { IntegrationMethodsStore(get()) }
+    single<IIntegrationMethodsStore> { IntegrationMethodsStore() }
     single<ISimulationSessionStore> { SimulationSessionStore() }
     single<ICompiledModelStore> { CompiledModelStore() }
     single<ISimulationProcessRegistry> { SimulationProcessRegistry() }
     single<ILismaCompiler> { CliLismaCompiler() }
-    single<IntegrationMethodsLibrary> { IntegrationMethodLibraryLoader.load() }
     single<ExecutorService> { Executors.newCachedThreadPool() }
     single<ISimulationExecutor> {
         SimulationExecutorImpl(

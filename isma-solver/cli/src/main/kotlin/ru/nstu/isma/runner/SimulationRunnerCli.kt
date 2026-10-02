@@ -37,6 +37,7 @@ import kotlin.system.exitProcess
  * it. The process stops on SIGTERM/SIGINT (cancellation).
  *
  * Arguments:
+ *   --list-methods      print the bundled integration method names (one per line) and exit
  *   --model <path>        path to the compiled-model .class file (required)
  *   --out <path>          path to write the result file (required)
  *   --progress <path>     path to write progress (current time) (optional)
@@ -51,6 +52,13 @@ import kotlin.system.exitProcess
  *   --low-border <double> event-detection step lower bound
  */
 fun main(args: Array<String>) {
+    // Batteries-included introspection: print the integration methods bundled with
+    // this runner (one per line) and exit. Used by the daemon's ListSimulationMethods.
+    if (args.contains("--list-methods")) {
+        IntegrationMethodLibraryLoader.load().getIntegrationMethodNames().forEach { println(it) }
+        return
+    }
+
     val p = RunnerParams.parse(args)
 
     val logger = LoggerFactory.getLogger("simulation-runner")

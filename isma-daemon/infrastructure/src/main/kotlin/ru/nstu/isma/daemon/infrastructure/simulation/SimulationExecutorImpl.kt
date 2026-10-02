@@ -28,7 +28,7 @@ class SimulationExecutorImpl(
     private val sessionStore: ISimulationSessionStore,
     private val processRegistry: ISimulationProcessRegistry,
     private val executorService: ExecutorService,
-    private val runnerCommand: List<String> = resolveRunnerCommand(),
+    private val runnerCommand: List<String> = RunnerCli.resolveCommand(),
 ) : ISimulationExecutor {
 
     override fun execute(simulationId: Long, parameters: RunSimulationParameters, model: CompiledModel) {
@@ -149,44 +149,8 @@ class SimulationExecutorImpl(
     }
 
     companion object {
-        private const val ENV_VAR = "ISMA_RUNNER_CLI"
-        private const val PROP_NAME = "isma.runner.cli"
-        private const val RUNNER_MAIN_CLASS = "ru.nstu.isma.runner.SimulationRunnerCliKt"
         private const val POLL_INTERVAL_MS = 100L
 
         private val logger = LoggerFactory.getLogger(SimulationExecutorImpl::class.java)
-
-        private fun resolveRunnerCommand(): List<String> {
-            val explicit = System.getenv(ENV_VAR) ?: System.getProperty(PROP_NAME)
-            if (!explicit.isNullOrBlank()) {
-                val path = File(explicit)
-                val command = if (path.isDirectory || path.name.endsWith(".jar")) {
-                    javaCommand("-cp", runnerClasspathOf(path), RUNNER_MAIN_CLASS)
-                } else {
-                    listOf(explicit)
-                }
-                logger.debug("Using simulation-runner-cli from $ENV_VAR/$PROP_NAME: $command")
-                return command
-            }
-            val libDir = File(SimulationExecutorImpl::class.java.protectionDomain.codeSource.location.toURI())
-                .parentFile
-                ?.takeIf { dir ->
-                    dir.isDirectory && dir.listFiles { f -> f.name.endsWith(".jar") }?.isNotEmpty() == true
-                }
-                ?: throw IllegalStateException(
-                    "Cannot locate simulation-runner-cli: set $ENV_VAR or $PROP_NAME " +
-                        "to the runner launch script, jar, or lib directory"
-                )
-            logger.debug("Using simulation-runner-cli from lib dir: ${libDir.absolutePath}")
-            return javaCommand("-cp", "${libDir.absolutePath}/*", RUNNER_MAIN_CLASS)
-        }
-
-        private fun runnerClasspathOf(path: File): String =
-            if (path.isDirectory) "${path.absolutePath}/*" else path.absolutePath
-
-        private fun javaCommand(vararg args: String): List<String> {
-            val java = File(System.getProperty("java.home"), "bin/java")
-            return listOf(java.absolutePath) + args
-        }
     }
 }

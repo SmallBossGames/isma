@@ -14,7 +14,7 @@ processes and coordinates them:
 - **LISMA compiler CLI** (`isma-compiler:cli`) — compiles LISMA source to a
   compiled `.class` file (analyzed hybrid-system class with the translated HSM
   inlined as a serialized blob) and validates LISMA.
-- **Simulation runner CLI** (`isma-runner`) — runs a simulation from a
+- **Simulation runner CLI** (`isma-solver:cli`, batteries-included) — runs a simulation from a
   compiled `.class` file and writes the result file.
 
 ## Position in the ISMA Architecture
@@ -22,11 +22,11 @@ processes and coordinates them:
 The ISMA UI (JavaFX / Blueprint Editor) communicates with the daemon via gRPC
 over a Unix domain socket. The daemon consists of three internal modules:
 `app/` (entry point and services), `domain/` (business logic), and
-`infrastructure/` (concrete implementations). The daemon depends on
-`isma-solver:lib-meta` / `isma-solver:lib-utils` only to answer
-`ListSimulationMethods` (the integration-method library, via ServiceLoader).
-LISMA compilation and simulation are delegated to the two CLIs, which ship in
-the app distribution's `lib/` directory and are resolved via the
+`infrastructure/` (concrete implementations). The daemon holds no solver jars of
+its own; `ListSimulationMethods` asks the batteries-included runner CLI for its
+method list. LISMA compilation and simulation are delegated to the two CLIs:
+the compiler CLI ships in the app distribution's `lib/` directory, and the
+runner ships as its own embedded distribution. Both are resolved via the
 `ISMA_COMPILER_CLI` / `ISMA_RUNNER_CLI` environment variables (or
 `isma.compiler.cli` / `isma.runner.cli` system properties).
 
@@ -46,7 +46,7 @@ graph LR
     Domain -.->|"interfaces"| Infra
     Infra -->|"implements"| Domain
     Infra -->|"launches (Compile/Validate)"| Cli["lisma-compiler-cli\n(process)"]
-    Infra -->|"launches (Run)"| Runner["isma-runner\n(process)"]
+    Infra -->|"launches (Run)"| Runner["isma-solver:cli\n(process)"]
 ```
 
 ## Module Structure
@@ -76,7 +76,7 @@ graph LR
 | Protobuf source | `../../protobuf-contracts/` |
 
 ### Module Dependencies
-The `:isma-daemon:grpc` module generates Java stubs from protobuf definitions and has no project dependencies. The `:isma-daemon:domain` module depends on `isma-compiler:hsm-core` (for the `IHSM` type in `CompiledModel`'s artifact contract) and `koin-core`. The `:isma-daemon:infrastructure` module depends on `:isma-daemon:domain`, `isma-solver:lib-utils` (the integration-method library), `koin-core`, and `slf4j-api`. The `:isma-daemon:app` module depends on all three internal modules plus `isma-solver:lib-meta`, gRPC/Netty/Ktor libraries, and — via `runtimeOnly` — `isma-compiler:cli` and `isma-runner`, so both CLI jars land in the distribution's `lib/` directory and the daemon can launch them as separate processes.
+The `:isma-daemon:grpc` module generates Java stubs from protobuf definitions and has no project dependencies. The `:isma-daemon:domain` module depends on `isma-compiler:hsm-core` (for the `IHSM` type in `CompiledModel`'s artifact contract) and `koin-core`. The `:isma-daemon:infrastructure` module depends on `:isma-daemon:domain`, `koin-core`, and `slf4j-api`. The `:isma-daemon:app` module depends on all three internal modules, gRPC/Netty/Ktor libraries, and — via `runtimeOnly` — `isma-compiler:cli`, so the compiler CLI jar lands in the distribution's `lib/` directory. The batteries-included runner (`isma-solver:cli`) is embedded as its own distribution (via the `installRunnerDist` task) so the daemon can launch both CLIs as separate processes.
 
 ```mermaid
 graph TD
@@ -84,15 +84,13 @@ graph TD
     HsmCore["isma-compiler:hsm-core"] --> Domain[":isma-daemon:domain"]
     Koin["koin-core"] --> Domain
     Domain --> Infra[":isma-daemon:infrastructure"]
-    SolverLibUtils["isma-solver:lib-utils"] --> Infra
     Grpc --> App[":isma-daemon:app"]
     Domain --> App
     Infra --> App
-    SolverMeta["isma-solver:lib-meta"] --> App
     GrpcLib["grpc-netty"] --> App
     Ktor["ktor"] --> App
     Cli["isma-compiler:cli\nstandalone compiler"] -->|"runtimeOnly (jars in lib/)"| App
-    Runner["isma-runner\nstandalone runner"] -->|"runtimeOnly (jars in lib/)"| App
+    Runner["isma-solver:cli\nstandalone runner (batteries-included)"] -->|"embedded dist (runner/lib)"| App
     Infra -.->|"launches as process\n(Compile/Validate RPC)"| Cli
     Infra -.->|"launches as process\n(Run RPC)"| Runner
 ```
@@ -118,7 +116,7 @@ See `Application.kt` for the `startKoin { modules(domainModule, infrastructureMo
 ### 3. Process Orchestration
 
 The daemon never loads model classes or runs the solver in-process. Each
-simulation runs in its own `isma-runner` process, and each compile/validate
+simulation runs in its own `isma-solver:cli` process, and each compile/validate
 runs in its own `isma-compiler:cli` process. This isolates crashes, allows the
 solver/compiler to evolve independently (and be rewritten in another language
 later), and keeps the daemon a thin coordination layer.
@@ -134,7 +132,7 @@ later), and keeps the daemon a thin coordination layer.
 
 ### Simulation Lifecycle
 
-The client sends a `RunSimulationRequest` to `SimulationServiceGrpcImpl`, which delegates to `RunSimulationHandlerImpl`. The handler retrieves the compiled model (artifact bytes) from `CompiledModelStore`, creates a new `SimulationSession`, and submits async execution to the `ExecutorService`. The daemon returns a `RunSimulationResponse` with the `simulationId`. The `SimulationExecutorImpl` writes the artifact to a temp file, launches the `isma-runner` CLI as a separate process, and polls the runner's progress file (every 100ms) to update the session. When the runner exits, the session is completed (result file path), failed, or left cancelled. The client can send `MonitorSimulationRequest` messages, which trigger a polling loop in `MonitorSimulationHandlerImpl` that checks the session store every 100ms and sends progress updates. The client sends `CancelSimulationRequest` to cancel: the daemon marks the session CANCELLED and sends SIGTERM to the runner process.
+The client sends a `RunSimulationRequest` to `SimulationServiceGrpcImpl`, which delegates to `RunSimulationHandlerImpl`. The handler retrieves the compiled model (artifact bytes) from `CompiledModelStore`, creates a new `SimulationSession`, and submits async execution to the `ExecutorService`. The daemon returns a `RunSimulationResponse` with the `simulationId`. The `SimulationExecutorImpl` writes the artifact to a temp file, launches the `isma-solver:cli` runner as a separate process, and polls the runner's progress file (every 100ms) to update the session. When the runner exits, the session is completed (result file path), failed, or left cancelled. The client can send `MonitorSimulationRequest` messages, which trigger a polling loop in `MonitorSimulationHandlerImpl`.
 
 ```mermaid
 sequenceDiagram
@@ -144,7 +142,7 @@ sequenceDiagram
     participant Store as CompiledModelStore
     participant Session as SimulationSessionStore
     participant Executor as SimulationExecutorImpl
-    participant Runner as isma-runner (process)
+    participant Runner as isma-solver:cli (process)
     participant Mon as MonitorSimulationHandlerImpl
     participant Http as Ktor HTTP Server
 
@@ -195,7 +193,7 @@ sequenceDiagram
 
 The client sends a `CompileRequest` with LISMA source code to `LismaCompilerServiceGrpcImpl`, which delegates to `CompileLismaHandlerImpl`. The handler invokes `ILismaCompiler` — implemented by `CliLismaCompiler`, which launches the standalone LISMA compiler CLI (`isma-compiler:cli`) as a separate process: the LISMA source goes to the CLI's stdin, and the compiled `.class` file (the analyzed hybrid-system class with the translated HSM inlined as a serialized blob) comes back on its stdout. On success, the handler stores the `.class` bytes as a `CompiledModel` in `CompiledModelStore`. On failure, the CLI emits one error line per diagnostic (`<row>:<col>:<message>`) on stdout, which the handler parses and returns.
 
-The compiled `.class` is consumed at simulation time: `SimulationExecutorImpl` writes it to a temp file and passes it to the `isma-runner` CLI, which loads the class in a fresh class loader, extracts and deserializes the inlined HSM blob, and runs the simulation.
+The compiled `.class` is consumed at simulation time: `SimulationExecutorImpl` writes it to a temp file and passes it to the `isma-solver:cli` runner, which loads the class in a fresh class loader, extracts and deserializes the inlined HSM blob, and runs the simulation.
 
 ```mermaid
 sequenceDiagram

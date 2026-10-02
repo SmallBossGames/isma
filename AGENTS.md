@@ -60,9 +60,8 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `lib-meta/` - SPI interface for integration method factories
   - `lib-utils/` - Utilities
   - `lib:euler/`, `lib:rk2/`, `lib:rk3/`, `lib:rk31/`, `lib:rkmerson/`, `lib:rkfehlberg/` - Integration methods
+  - `cli/` - Batteries-included simulation runner CLI. Accepts a compiled `.class` file + simulation parameters, loads the class in a fresh classloader, extracts and deserializes the inlined HSM blob, runs the simulation (equation index provider, initials), and writes the result file in the existing binary format. Ships the integration-method libs itself; launched by isma-daemon as a separate process per simulation.
 
-### Simulation Runner
-- **isma-runner/** - Standalone simulation runner CLI. Accepts a compiled `.class` file + simulation parameters, loads the class in a fresh classloader, extracts and deserializes the inlined HSM blob, runs the simulation (equation index provider, initials), and writes the result file in the existing binary format. Launched by isma-daemon as a separate process per simulation.
 
 ### Protocol Buffers
 - **protobuf-contracts/** - Shared protobuf definitions
@@ -79,7 +78,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - *See `isma-daemon/AGENTS.md` for details*
 
 ### Language Server (LSP)
-- **isma-lsp/** - Standalone LISMA language server: LSP over stdio (JSON-RPC 2.0, Content-Length framing), semantic tokens via ANTLR4 lexer
+- **isma-compiler/lisma-lsp/** - Standalone LISMA language server: LSP over stdio (JSON-RPC 2.0, Content-Length framing), semantic tokens via ANTLR4 lexer
   - `protocol/` - LSP framing + request dispatch
   - `lsp/` - LISMA language service (semantic tokens) + token codec
   - `smoke.py` - stdio smoke test
@@ -96,7 +95,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 ### Out-of-Process Architecture (UI + Daemon)
 
-The UI launches the daemon as a separate JVM process communicating via gRPC over Unix Domain Sockets, and the `isma-lsp` language server as a separate process communicating via LSP over stdio (syntax highlighting). The daemon in turn launches two standalone CLIs as separate processes: the LISMA compiler CLI (`isma-compiler:cli`) to compile LISMA sources to a compiled `.class` file (LISMA on stdin, `.class` on stdout), and the simulation runner CLI (`isma-runner`) to run each simulation and write the result file.
+The UI launches the daemon as a separate JVM process communicating via gRPC over Unix Domain Sockets, and the `isma-compiler/lisma-lsp` language server as a separate process communicating via LSP over stdio (syntax highlighting). The daemon in turn launches two standalone CLIs as separate processes: the LISMA compiler CLI (`isma-compiler:cli`) to compile LISMA sources to a compiled `.class` file (LISMA on stdin, `.class` on stdout), and the simulation runner CLI (`isma-solver:cli`, batteries-included) to run each simulation and write the result file.
 
 - **isma-ui/external-services/** - gRPC client layer
   - `GrpcSimulationClient` - Netty-based gRPC client with Unix socket transport
@@ -106,7 +105,7 @@ The UI launches the daemon as a separate JVM process communicating via gRPC over
 - **Daemon launch** — `ISMA_DAEMON_SCRIPT` env var (bundle) or `isma.daemon.script` sysprop (IDE/Gradle)
 - **LSP launch** — `ISMA_LSP_SCRIPT` env var (bundle) or `isma.lsp.script` sysprop (IDE/Gradle)
 - **Compiler CLI launch** — `ISMA_COMPILER_CLI` env var or `isma.compiler.cli` sysprop (path to launch script, jar, or lib dir); fallback: the daemon's own `lib/` directory (the CLI jar ships there via `runtimeOnly`)
-- **Runner CLI launch** — `ISMA_RUNNER_CLI` env var or `isma.runner.cli` sysprop (path to launch script, jar, or lib dir); fallback: the daemon's own `lib/` directory (the runner jar ships there via `runtimeOnly`)
+- **Runner CLI launch** — `ISMA_RUNNER_CLI` env var or `isma.runner.cli` sysprop (path to launch script, jar, or lib dir); fallback: the runner's own batteries-included distribution embedded in the daemon's dist (`runner/lib`, via the `installRunnerDist` task)
 - **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with all apps + `run-ui.sh` launcher
 
 ---

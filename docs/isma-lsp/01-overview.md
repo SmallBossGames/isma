@@ -9,7 +9,7 @@ The first cut covers **syntax highlighting only** (keywords, comments, numbers).
 ## Module Structure
 
 ```
-isma-lsp/
+isma-compiler/lisma-lsp/
 ├── build.gradle.kts                     # application plugin, JPMS module isma.lsp
 ├── smoke.py                             # stdio smoke test (Python, no deps)
 └── src/
@@ -123,8 +123,8 @@ Tokens are encoded in the LSP **relative** format — 5 integers per token `[del
 ## Build
 
 ```bash
-./gradlew :isma-lsp:build          # compile + 17 tests
-./gradlew :isma-lsp:installDist    # distribution with bin/isma-lsp launcher
+./gradlew :isma-compiler:lisma-lsp:build          # compile + 17 tests
+./gradlew :isma-compiler:lisma-lsp:installDist    # distribution with bin/isma-lsp launcher
 ```
 
 - `application` plugin: main class `ru.nstu.isma.lsp.MainKt`, JPMS module `isma.lsp`.

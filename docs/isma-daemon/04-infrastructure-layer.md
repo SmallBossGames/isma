@@ -4,9 +4,10 @@
 
 The `infrastructure/` module provides concrete implementations of domain
 interfaces. As a pure orchestrator, it bridges the domain layer to the
-**external CLI processes** (the LISMA compiler CLI and the simulation runner
-CLI), the in-memory stores, and the Java ServiceLoader SPI (for the
-integration-method library).
+**external CLI processes** (the LISMA compiler CLI and the batteries-included
+simulation runner CLI) and the in-memory stores. The runner is the single source
+of truth for the integration-method list: `ListSimulationMethods` asks the runner
+(`--list-methods`) rather than loading a solver library in-process.
 
 ### DI Registration (`InfrastructureModule.kt`)
 
@@ -15,7 +16,7 @@ See `InfrastructureModule.kt` for the full Koin module definition. All registrat
 - **Stores:** `IntegrationMethodsStore`, `SimulationSessionStore`, `CompiledModelStore` implementing domain interfaces
 - **Process registry:** `SimulationProcessRegistry` (tracks runner processes for cancellation)
 - **Compiler:** `CliLismaCompiler` (launches the standalone LISMA compiler CLI)
-- **Integration methods library:** Loaded via `IntegrationMethodLibraryLoader.load()`
+- **Integration methods:** `IntegrationMethodsStore` asks the runner CLI (`--list-methods`) for the bundled method names
 - **Thread pool:** `Executors.newCachedThreadPool()` for async simulation supervision
 - **Simulation executor:** `SimulationExecutorImpl` with dependencies on the session store, process registry, and executor service
 
@@ -88,7 +89,7 @@ See `IntegrationMethodsStore.kt` for the implementation. It uses Java `ServiceLo
 - `rkmerson`
 - `rkfehlberg`
 
-**SPI interface:** `IIntegrationMethodFactory` is defined in `isma-solver:lib-meta` (the solver library's SPI module). Each integration method module (e.g., `isma-solver:lib:euler`) provides a factory implementation registered via `META-INF/services`. The daemon uses this library only to answer `ListSimulationMethods`.
+**SPI interface:** `IIntegrationMethodFactory` is defined in `isma-solver:lib-meta` (the solver library's SPI module). Each integration method module (e.g., `isma-solver:lib:euler`) provides a factory implementation registered via `META-INF/services`. The runner discovers these factories via ServiceLoader and reports the method names to the daemon (`--list-methods`); the daemon holds no solver library of its own.
 
 ---
 
@@ -96,7 +97,7 @@ See `IntegrationMethodsStore.kt` for the implementation. It uses Java `ServiceLo
 
 ### SimulationExecutorImpl
 
-The central orchestration component. It supervises one `isma-runner` process per simulation: it writes the compiled `.class` to a temp file, launches the runner CLI, polls the runner's progress file, and updates the session when the runner exits.
+The central orchestration component. It supervises one `isma-solver:cli` runner process per simulation: it writes the compiled `.class` to a temp file, launches the runner CLI, polls the runner's progress file, and updates the session when the runner exits.
 
 **Dependencies:**
 
@@ -111,7 +112,7 @@ The central orchestration component. It supervises one `isma-runner` process per
 See `SimulationExecutorImpl.kt` for the full implementation. The executor runs on a single `ExecutorService` thread per simulation:
 
 1. **Artifact file:** Writes the stored artifact bytes to a temp file (`isma_model_<id>.bin`).
-2. **Runner launch:** Builds the runner command (model file, output file, progress file, start/end/step, method, optional accuracy/stability/event-detection flags) and launches the `isma-runner` CLI as a separate process. The runner's stderr is redirected to a temp file. The process is registered in `SimulationProcessRegistry`.
+2. **Runner launch:** Builds the runner command (model file, output file, progress file, start/end/step, method, optional accuracy/stability/event-detection flags) and launches the `isma-solver:cli` runner as a separate process. The runner's stderr is redirected to a temp file. The process is registered in `SimulationProcessRegistry`.
 3. **Progress polling:** While the process is alive, the thread reads the runner's progress file (which the runner overwrites with the current time on each step) every 100ms and calls `sessionStore.updateProgress` when the time advances.
 4. **Exit handling:** After `process.waitFor()`, the thread does a final progress read (the polling loop may not have run for fast simulations), then:
    - If the session is already `CANCELLED`, deletes the output file and leaves the session CANCELLED.
@@ -124,7 +125,7 @@ See `SimulationExecutorImpl.kt` for the full implementation. The executor runs o
 ```mermaid
 graph TB
     ES["ExecutorService Thread\n(per simulation)"] --> W["write artifact to temp file"]
-    W --> L["launch isma-runner process"]
+    W --> L["launch isma-solver:cli process"]
     L --> R["register in ProcessRegistry"]
     R --> P["poll progress file every 100ms"]
     P -->|"updateProgress"| Store["sessionStore"]
@@ -155,9 +156,9 @@ The runner writes the result file (`--out`) in the existing binary format and ov
 | Priority | Source | Form |
 |----------|--------|------|
 | 1 | `ISMA_RUNNER_CLI` env var or `isma.runner.cli` system property | launch script (executed directly), jar (`java -cp`), or lib directory (`java -cp dir/*`) |
-| 2 | Fallback | the `lib/` directory next to the daemon's jar (installDist layout), running `ru.nstu.isma.runner.SimulationRunnerCliKt` via `java -cp` |
+| 2 | Fallback | the runner's own batteries-included distribution embedded in the daemon's dist (`runner/lib`), running `ru.nstu.isma.runner.SimulationRunnerCliKt` via `java -cp` |
 
-The runner jar (and its transitive dependencies) reach the distribution via `runtimeOnly(project(":isma-runner"))` in `app/build.gradle.kts`.
+The runner's full distribution (bin + lib, including the batteries-included integration-method jars) is embedded into the daemon's distribution by the `installRunnerDist` task in `app/build.gradle.kts` (a `Copy` of the runner's `installDist` output into `runner/`); the daemon holds no solver jars of its own.
 
 ### Exception Handling
 

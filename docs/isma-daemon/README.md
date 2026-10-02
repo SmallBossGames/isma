@@ -24,7 +24,7 @@ Run `./gradlew :isma-daemon:app:build` to build the application module and all d
 
 ### Running (from source)
 
-Launch the JAR with `--socket-path` and `--http-socket-path` CLI arguments to specify Unix socket paths. The built artifact is located at `build/libs/isma-daemon-app-1.0.0-SNAPSHOT.jar`. The daemon resolves the compiler and runner CLIs from the `lib/` directory next to its jar (or via `ISMA_COMPILER_CLI` / `ISMA_RUNNER_CLI`).
+Launch the JAR with `--socket-path` and `--http-socket-path` CLI arguments to specify Unix socket paths. The built artifact is located at `build/libs/isma-daemon-app-1.0.0-SNAPSHOT.jar`. The daemon resolves the compiler CLI from the `lib/` directory next to its jar and the batteries-included runner from its own embedded distribution (`runner/lib`), or via `ISMA_COMPILER_CLI` / `ISMA_RUNNER_CLI`.
 
 ### Interacting
 

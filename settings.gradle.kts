@@ -13,6 +13,7 @@ include("isma-compiler:lisma-translator-hsm")
 include("isma-compiler:hsm-jvm")
 include("isma-compiler:hsm-jvm-calcmodel")
 include("isma-compiler:cli")
+include("isma-compiler:lisma-lsp")
 
 include("isma-solver:api")
 include("isma-solver:core")
@@ -24,6 +25,7 @@ include("isma-solver:lib:rk3")
 include("isma-solver:lib:rk31")
 include("isma-solver:lib:rkmerson")
 include("isma-solver:lib:rkfehlberg")
+include("isma-solver:cli")
 
 //Java 8 projects
 
@@ -51,11 +53,9 @@ include("isma-solver:lib:rkfehlberg")
 include("isma-next-math-engine")
 include("isma-next-math-common")
 include("isma-jvm-lib:exchange-format")
-include("isma-runner")
 
 include("isma-daemon:domain")
 include("isma-daemon:grpc")
 include("isma-daemon:infrastructure")
 include("isma-daemon:app")
 
-include("isma-lsp")

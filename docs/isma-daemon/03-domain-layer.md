@@ -106,7 +106,7 @@ All domain bindings are defined in `DomainModule.kt`. Each handler interface is 
 3. Call `sessionStore.updateStatus(id, CANCELLED)`
 4. Call `processRegistry.kill(id)` to send SIGTERM to the runner process
 
-**Cancellation propagation:** The daemon marks the session CANCELLED and sends SIGTERM to the `isma-runner` process. The runner's shutdown hook stops its integration loop, and the process exits. The supervising `SimulationExecutorImpl` detects the exit and leaves the session CANCELLED (ignoring the exit code).
+**Cancellation propagation:** The daemon marks the session CANCELLED and sends SIGTERM to the `isma-solver:cli` runner process. The runner's shutdown hook stops its integration loop, and the process exits. The supervising `SimulationExecutorImpl` detects the exit and leaves the session CANCELLED (ignoring the exit code).
 
 ---
 
@@ -182,7 +182,7 @@ See the respective source files for full definitions. The domain layer defines t
 
 See `ICompiledModelStore.kt` for the interface definition. It declares methods: `create(model: CompiledModel): String` (stores model, returns UUID), `get(id: String): CompiledModel?` (retrieves model), `delete(id: String): Boolean` (removes model), and `exists(id: String): Boolean` (checks presence). Manages in-memory storage of compiled models keyed by UUID.
 
-**CompiledModel:** A data class holding the compiled-model **artifact** (`artifact: ByteArray`) — the raw `.class` file of the analyzed hybrid-system class, produced by the standalone LISMA compiler CLI. The `.class` inlines the translated HSM as a serialized blob (`__ISMA_HSM__` field, exposed via `ismaHsmBytes()`). The daemon stores it opaquely; the `isma-runner` CLI loads the class in a fresh class loader, extracts and deserializes the HSM blob, and runs the simulation.
+**CompiledModel:** A data class holding the compiled-model **artifact** (`artifact: ByteArray`) — the raw `.class` file of the analyzed hybrid-system class, produced by the standalone LISMA compiler CLI. The `.class` inlines the translated HSM as a serialized blob (`__ISMA_HSM__` field, exposed via `ismaHsmBytes()`). The daemon stores it opaquely; the `isma-solver:cli` runner loads the class in a fresh class loader, extracts and deserializes the HSM blob, and runs the simulation.
 
 ### ISimulationSessionStore
 
@@ -222,5 +222,5 @@ interface ISimulationProcessRegistry {
 }
 ```
 
-**Purpose:** Tracks the `isma-runner` process launched for each running simulation so that `CancelSimulation` can terminate it. `kill` sends SIGTERM to the registered process.
+**Purpose:** Tracks the `isma-solver:cli` runner process launched for each running simulation so that `CancelSimulation` can terminate it. `kill` sends SIGTERM to the registered process.
 

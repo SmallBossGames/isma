@@ -123,7 +123,7 @@ See `AppModule.kt` for the full module definition. The `appModule` only register
 
 `SimulationServiceGrpcImpl` depends on 5 handlers: `IRunSimulationHandler`, `IGetSimulationResultHandler`, `IMonitorSimulationHandler`, `IListSimulationMethodsHandler`, and `ICancelSimulationHandler`. `LismaCompilerServiceGrpcImpl` depends on 3 handlers: `ICompileLismaHandler`, `IValidateLismaHandler`, and `IDeleteCompiledModelHandler`.
 
-The simulation handlers depend on `ICompiledModelStore`, `ISimulationSessionStore`, and `ISimulationExecutor`. The `ISimulationExecutor` depends on `ISimulationEngine` (implemented by `HsmSimulationEngine`, which depends on `IntegrationMethodsLibrary` and `ICompiledModelLoader`), `ISimulationSessionStore`, and `ExecutorService`. The `ICompileLismaHandler` depends on `ILismaTranslator`, `ICompiledModelStore`, and `ILismaClassCompiler` (implemented by `CliLismaClassCompiler`, which launches the standalone LISMA compiler CLI). The `IValidateLismaHandler` depends on `ILismaTranslator`. The `IDeleteCompiledModelHandler` depends on `ICompiledModelStore`. `ILismaTranslator` is implemented by `LismaTranslatorImpl` which wraps `InputTranslator`.
+The simulation handlers depend on `ICompiledModelStore`, `ISimulationSessionStore`, and `ISimulationExecutor`. The `ISimulationExecutor` (implemented by `SimulationExecutorImpl`) depends on `ISimulationSessionStore`, `ISimulationProcessRegistry`, and `ExecutorService`; it launches the batteries-included runner CLI as a separate process and polls its progress file. The `ICompileLismaHandler` depends on `ILismaCompiler` (implemented by `CliLismaCompiler`, which launches the standalone LISMA compiler CLI) and `ICompiledModelStore`. The `IValidateLismaHandler` depends on `ILismaCompiler`. The `IDeleteCompiledModelHandler` depends on `ICompiledModelStore`.
 
 ```mermaid
 graph TD
@@ -148,17 +148,14 @@ graph TD
     MonH --> SessionStore
     CancelH --> SessionStore
 
-    Exec --> Engine["ISimulationEngine (HsmSimulationEngine)"]
-    Engine --> IntgLib["IntegrationMethodsLibrary"]
-    Engine --> ModelLoader["ICompiledModelLoader (CompiledModelLoader)"]
+    Exec --> ProcReg["ISimulationProcessRegistry"]
     Exec --> SessionStore2["ISimulationSessionStore"]
     Exec --> ThreadPool["ExecutorService"]
 
-    CompH --> Translator["ILismaTranslator"]
+    CompH --> Compiler["ILismaCompiler (CliLismaCompiler)"]
     CompH --> CompStore2["ICompiledModelStore"]
-    CompH --> CliCompiler["ILismaClassCompiler (CliLismaClassCompiler)"]
 
-    ValH --> Translator2["ILismaTranslator"]
+    ValH --> Compiler2["ILismaCompiler (CliLismaCompiler)"]
 
     DelH --> CompStore3["ICompiledModelStore"]
 
@@ -170,7 +167,7 @@ graph TD
     CompH -.-> Domain
     ValH -.-> Domain
     DelH -.-> Domain
-    Translator -.-> Infra2["infrastructureModule"]
+    Compiler -.-> Infra2["infrastructureModule"]
 ```
 
 ---

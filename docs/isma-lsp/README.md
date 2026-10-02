@@ -12,22 +12,22 @@ Standalone LISMA language server. A CLI process speaking the [Language Server Pr
 ## Quick Start
 
 ```bash
-./gradlew :isma-lsp:build            # compile + tests (17 tests)
-./gradlew :isma-lsp:installDist      # -> isma-lsp/build/install/isma-lsp/bin/isma-lsp
-python3 isma-lsp/smoke.py isma-lsp/build/install/isma-lsp/bin/isma-lsp   # stdio smoke test
+./gradlew :isma-compiler:lisma-lsp:build            # compile + tests (17 tests)
+./gradlew :isma-compiler:lisma-lsp:installDist      # -> isma-compiler/lisma-lsp/build/install/isma-lsp/bin/isma-lsp
+python3 isma-compiler/lisma-lsp/smoke.py isma-compiler/lisma-lsp/build/install/isma-lsp/bin/isma-lsp   # stdio smoke test
 ```
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `isma-lsp/src/main/kotlin/ru/nstu/isma/lsp/Main.kt` | Entry point — `LspServer(System.in, System.out, LismaLanguageService()).run()` |
-| `isma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspServer.kt` | JSON-RPC dispatch loop, document store, request handlers |
-| `isma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspMessages.kt` | `Content-Length` framing: read/write LSP messages |
-| `isma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/LismaLanguageService.kt` | LISMA language features — semantic tokens via ANTLR4 lexer |
-| `isma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/SemanticTokens.kt` | Token types, legend, LSP relative-format encoder/decoder |
-| `isma-lsp/smoke.py` | End-to-end stdio smoke test (initialize → tokens → didChange → shutdown) |
-| `isma-lsp/build.gradle.kts` | Build config (application plugin, JPMS module `isma.lsp`) |
+| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/Main.kt` | Entry point — `LspServer(System.in, System.out, LismaLanguageService()).run()` |
+| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspServer.kt` | JSON-RPC dispatch loop, document store, request handlers |
+| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspMessages.kt` | `Content-Length` framing: read/write LSP messages |
+| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/LismaLanguageService.kt` | LISMA language features — semantic tokens via ANTLR4 lexer |
+| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/SemanticTokens.kt` | Token types, legend, LSP relative-format encoder/decoder |
+| `isma-compiler/lisma-lsp/smoke.py` | End-to-end stdio smoke test (initialize → tokens → didChange → shutdown) |
+| `isma-compiler/lisma-lsp/build.gradle.kts` | Build config (application plugin, JPMS module `isma.lsp`) |
 
 ## Who Uses It
 

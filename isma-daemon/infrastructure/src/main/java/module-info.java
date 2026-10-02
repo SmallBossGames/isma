@@ -3,7 +3,6 @@ module isma.daemon.infrastructure {
     requires koin.core.jvm;
     requires org.slf4j;
     requires isma.daemon.domain;
-    requires isma.isma.next.integration.library.main;
 
     exports ru.nstu.isma.daemon.infrastructure;
     exports ru.nstu.isma.daemon.infrastructure.stores.compiledModels;

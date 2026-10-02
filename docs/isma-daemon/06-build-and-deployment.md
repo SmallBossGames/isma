@@ -27,11 +27,11 @@ See `domain/build.gradle.kts` for the full configuration. It applies `kotlin.jvm
 
 #### `infrastructure/build.gradle.kts`
 
-See `infrastructure/build.gradle.kts` for the full configuration. It applies `kotlin.jvm` and `java.modules` plugins and depends on the domain module, `isma-solver:lib-utils` (the integration-method library), `koin-core`, and `slf4j-api`. The daemon is a pure orchestrator, so it no longer depends on the solver, compiler, or next-core modules in-process.
+See `infrastructure/build.gradle.kts` for the full configuration. It applies `kotlin.jvm` and `java.modules` plugins and depends on the domain module, `koin-core`, and `slf4j-api`. The daemon is a pure orchestrator, so it holds no solver, compiler, or next-core modules in-process; `ListSimulationMethods` asks the runner CLI for its method list.
 
 #### `app/build.gradle.kts`
 
-See `app/build.gradle.kts` for the full configuration. It applies `kotlin.jvm`, `java.modules`, and `application` plugins, sets `mainClass` to `ru.nstu.isma.daemon.app.ApplicationKt`, and depends on all three internal modules, `isma-solver:lib-meta`, gRPC/Netty libraries, Kotlin reflection, Koin, SLF4J/Logback, and Ktor server libraries. It also depends on `isma-compiler:cli` and `isma-runner` via `runtimeOnly`, so both CLI jars land in the distribution's `lib/` directory.
+See `app/build.gradle.kts` for the full configuration. It applies `kotlin.jvm`, `java.modules`, and `application` plugins, sets `mainClass` to `ru.nstu.isma.daemon.app.ApplicationKt`, and depends on all three internal modules, gRPC/Netty libraries, Kotlin reflection, Koin, SLF4J/Logback, and Ktor server libraries. It depends on `isma-compiler:cli` via `runtimeOnly` (the compiler CLI jar lands in the distribution's `lib/` directory). The batteries-included runner (`isma-solver:cli`) is embedded as its own distribution via the `installRunnerDist` task (its full `bin` + `lib`, including the integration-method jars, lands in `runner/`), so the daemon launches the runner from its own lib.
 
 ### Dependency Versions
 
@@ -58,11 +58,9 @@ All versions are centralized in `gradle/libs.versions.toml`:
 
 | Module | Provides | Used by |
 |--------|----------|---------|
-| `isma-solver:lib-meta` | SPI interface `IIntegrationMethodFactory` | app (ServiceLoader) |
-| `isma-solver:lib-utils` | `IntegrationMethodsLibrary`, `IntegrationMethodLibraryLoader` | infrastructure |
 | `isma-compiler:hsm-core` | `IHSM` (the HSM type in the artifact contract) | domain |
 | `isma-compiler:cli` | Standalone LISMA compiler CLI (launched as a process; jar ships in `lib/` via `runtimeOnly`) | app (runtimeOnly), infrastructure (launches it) |
-| `isma-runner` | Standalone simulation runner CLI (launched as a process per simulation; jar ships in `lib/` via `runtimeOnly`) | app (runtimeOnly), infrastructure (launches it) |
+| `isma-solver:cli` | Batteries-included simulation runner CLI (launched as a process per simulation; ships integration-method libs; embedded as its own distribution via `installRunnerDist`) | app (installRunnerDist), infrastructure (launches it) |
 
 ### Third-Party Dependencies
 

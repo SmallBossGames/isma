@@ -22,7 +22,6 @@ dependencies {
     implementation(project(":isma-compiler:hsm-core"))
     implementation(project(":isma-compiler:hsm-jvm"))
     implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
-    implementation(project(":isma-next-core"))
     implementation(project(":isma-solver:api"))
     implementation(project(":isma-solver:core"))
     implementation(project(":isma-solver:lib-utils"))

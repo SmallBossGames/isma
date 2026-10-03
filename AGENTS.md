@@ -50,7 +50,6 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `toolkit/` - Shared UI utilities
 
 ### Next-Generation Core
-- **isma-next-core/** - Core functionality
 - **isma-next-math-engine/** - Math engine
 - **isma-next-math-common/** - Common math utilities
 

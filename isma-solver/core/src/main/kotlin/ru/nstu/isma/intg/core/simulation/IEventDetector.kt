@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.services.eventDetection
+package ru.nstu.isma.intg.core.simulation
 
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.Guard
 import ru.nstu.isma.intg.api.methods.IntgPoint

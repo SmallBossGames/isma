@@ -1,7 +1,6 @@
-package ru.nstu.isma.next.core.sim.controller.services.simulators
+package ru.nstu.isma.intg.core.simulation
 
 import ru.nstu.isma.intg.api.models.IntgMetricData
-import ru.nstu.isma.next.core.sim.controller.models.HybridSystemSimulatorParameters
 
 interface IHybridSystemSimulator {
     fun runAsync(parameters: HybridSystemSimulatorParameters): IntgMetricData

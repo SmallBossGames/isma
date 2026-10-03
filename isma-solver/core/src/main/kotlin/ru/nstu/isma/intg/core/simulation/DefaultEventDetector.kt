@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.services.eventDetection
+package ru.nstu.isma.intg.core.simulation
 
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.Guard
 import ru.nstu.isma.intg.api.methods.IntgPoint
@@ -9,7 +9,7 @@ import kotlin.math.min
 class DefaultEventDetector(
     gamma: Double,
     private val stepLowBound: Double
-): IEventDetector {
+) : IEventDetector {
     private val eventDetectionIntegrationController = EventDetectionIntgController(gamma).apply {
         enabled = true
     }

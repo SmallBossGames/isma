@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.models
+package ru.nstu.isma.intg.core.simulation
 
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 

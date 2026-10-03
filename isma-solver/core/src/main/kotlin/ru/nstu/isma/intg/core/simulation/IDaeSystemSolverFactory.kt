@@ -1,7 +1,6 @@
-package ru.nstu.isma.next.core.sim.controller.services.solvers
+package ru.nstu.isma.intg.core.simulation
 
 import ru.nstu.isma.intg.api.solvers.DaeSystemStepSolver
-import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
 
 interface IDaeSystemSolverFactory {
     fun create(hsmCompilationResult: HsmCompilationResult): DaeSystemStepSolver

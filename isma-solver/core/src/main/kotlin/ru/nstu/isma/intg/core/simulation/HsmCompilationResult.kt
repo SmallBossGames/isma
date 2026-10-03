@@ -1,4 +1,4 @@
-package ru.nstu.isma.next.core.sim.controller.models
+package ru.nstu.isma.intg.core.simulation
 
 import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
 import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystem

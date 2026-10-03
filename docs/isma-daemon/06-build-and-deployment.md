@@ -27,7 +27,7 @@ See `domain/build.gradle.kts` for the full configuration. It applies `kotlin.jvm
 
 #### `infrastructure/build.gradle.kts`
 
-See `infrastructure/build.gradle.kts` for the full configuration. It applies `kotlin.jvm` and `java.modules` plugins and depends on the domain module, `koin-core`, and `slf4j-api`. The daemon is a pure orchestrator, so it holds no solver, compiler, or next-core modules in-process; `ListSimulationMethods` asks the runner CLI for its method list.
+See `infrastructure/build.gradle.kts` for the full configuration. It applies `kotlin.jvm` and `java.modules` plugins and depends on the domain module, `koin-core`, and `slf4j-api`. The daemon is a pure orchestrator, so it holds no solver or compiler modules in-process; `ListSimulationMethods` asks the runner CLI for its method list.
 
 #### `app/build.gradle.kts`
 

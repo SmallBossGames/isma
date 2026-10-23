@@ -8,15 +8,13 @@ module isma.isma.next.core.main {
     exports ru.nstu.isma.next.core.sim.controller.services.solvers;
 
     requires kotlin.stdlib;
-    requires isma.isma.hsm.main;
+    requires isma.compiler.hsm.core;
     requires isma.isma.intg.api.main;
-    requires transitive isma.isma.next.core.simulation.gen.main;
+    requires transitive isma.compiler.hsm.jvm;
     requires kotlinx.coroutines.core;
     requires transitive isma.isma.intg.core.main;
-    //requires transitive isma.isma.intg.server.isma.intg.server.client.main;
-    requires org.apache.commons.text;
     requires com.google.common;
     requires java.compiler;
-    requires isma.isma.next.tools.main;
     requires org.slf4j;
+    requires isma.compiler.hsm.jvm.calcmodel;
 }

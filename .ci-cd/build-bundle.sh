@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+BUNDLE_DIR="$PROJECT_ROOT/build/bundle"
+
+rm -rf "$BUNDLE_DIR"
+mkdir -p "$BUNDLE_DIR"
+
+cd "$PROJECT_ROOT"
+
+# Ensure app submodules are checked out
+if [ ! -f isma-ui/settings.gradle.kts ] || [ ! -f grin/settings.gradle.kts ]; then
+    git submodule update --init --recursive
+fi
+
+# isma-ui and grin are standalone Gradle projects (git submodules)
+(cd isma-ui && ./gradlew :isma-ui:app:installDist)
+(cd grin && ./gradlew :grin:gui:app:installDist)
+
+# Server is built in the main repo
+./gradlew :isma-server:app:installDist
+./gradlew :isma-lsp:installDist
+
+cp -r "$PROJECT_ROOT/isma-ui/isma-ui/app/build/install/app" "$BUNDLE_DIR/isma-ui-app"
+cp -r "$PROJECT_ROOT/isma-server/app/build/install/app" "$BUNDLE_DIR/isma-server-app"
+cp -r "$PROJECT_ROOT/grin/grin/gui/app/build/install/app" "$BUNDLE_DIR/grin-app"
+cp -r "$PROJECT_ROOT/isma-lsp/build/install/isma-lsp" "$BUNDLE_DIR/isma-lsp-app"
+
+cat > "$BUNDLE_DIR/run-ui.sh" << 'SCRIPT'
+#!/bin/bash
+set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+exec env "ISMA_SERVER_SCRIPT=$SCRIPT_DIR/isma-server-app/bin/app" "ISMA_GRIN_SCRIPT=$SCRIPT_DIR/grin-app/bin/app" "ISMA_LSP_SCRIPT=$SCRIPT_DIR/isma-lsp-app/bin/isma-lsp" "$SCRIPT_DIR/isma-ui-app/bin/app"
+SCRIPT
+chmod +x "$BUNDLE_DIR/run-ui.sh"
+
+echo "Bundles created in $BUNDLE_DIR"
+ls -la "$BUNDLE_DIR"

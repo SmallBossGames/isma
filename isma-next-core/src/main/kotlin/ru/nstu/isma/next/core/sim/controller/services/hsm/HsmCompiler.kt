@@ -1,24 +1,25 @@
 package ru.nstu.isma.next.core.sim.controller.services.hsm
 
-import kotlinx.coroutines.coroutineScope
-import ru.nstu.isma.core.hsm.HSM
-import ru.nstu.isma.intg.api.calcmodel.HybridSystem
+import ru.nstu.isma.compiler.hsm.jvm.AnalyzedHybridSystemClassBuilder
+import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
+import ru.nstu.isma.compiler.hsm.jvm.SourceCodeCompiler
+import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystem
+import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.next.core.sim.controller.models.HsmCompilationResult
-import ru.nstu.isma.next.core.simulation.gen.AnalyzedHybridSystemClassBuilder
-import ru.nstu.isma.next.core.simulation.gen.EquationIndexProvider
-import ru.nstu.isma.next.core.simulation.gen.SourceCodeCompiler
 
 class HsmCompiler : IHsmCompiler {
-    override suspend fun compile(hsm: HSM): HsmCompilationResult = coroutineScope {
-        val indexProvider = EquationIndexProvider(hsm)
-        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, indexProvider, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
+    private val sourceCodeCompiler: SourceCodeCompiler<HybridSystem> by lazy {
+        SourceCodeCompiler()
+    }
+
+    override fun compile(hsm: HSM): HsmCompilationResult {
+        val hsClassBuilder = AnalyzedHybridSystemClassBuilder(hsm, DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME)
         val hsSourceCode = hsClassBuilder.buildSourceCode()
-        val hybridSystem = SourceCodeCompiler<HybridSystem>().compile(
+        val hybridSystem = sourceCodeCompiler.compile(
             DEFAULT_PACKAGE_NAME, DEFAULT_CLASS_NAME, hsSourceCode
         )
-        val modelClassLoader = hybridSystem.javaClass.classLoader!!
 
-        return@coroutineScope HsmCompilationResult(indexProvider, hybridSystem, modelClassLoader)
+        return HsmCompilationResult(hsClassBuilder.indexProvider, hybridSystem)
     }
 
     companion object {

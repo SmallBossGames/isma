@@ -4,6 +4,6 @@ import ru.nstu.isma.next.core.sim.controller.models.HybridSystemIntegrationResul
 import ru.nstu.isma.next.core.sim.controller.models.SimulationParameters
 
 interface ISimulationRunner {
-    suspend fun run(context: SimulationParameters): HybridSystemIntegrationResult
+    fun run(context: SimulationParameters): HybridSystemIntegrationResult
 }
 

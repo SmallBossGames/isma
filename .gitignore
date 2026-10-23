@@ -10,6 +10,7 @@ export.csv
 result.csv
 .idea/
 .gradle/
+.opencode/
 
 target/
 out/
@@ -19,3 +20,10 @@ build/
 local.properties
 *.log
 .kotlin/
+.project
+.settings
+.classpath
+bin/
+
+docs/**/todo
+docs/**/in-progress

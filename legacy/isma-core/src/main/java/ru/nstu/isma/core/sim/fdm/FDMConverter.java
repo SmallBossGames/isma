@@ -1,8 +1,5 @@
 package ru.nstu.isma.core.sim.fdm;
 
-import ru.nstu.isma.core.hsm.*;
-import ru.nstu.isma.core.hsm.exp.*;
-import ru.nstu.isma.core.hsm.var.*;
 import ru.nstu.isma.core.hsm.var.pde.HMBoundaryCondition;
 import ru.nstu.isma.core.hsm.var.pde.HMPartialDerivativeEquation;
 import ru.nstu.isma.core.hsm.var.pde.HMSampledSpatialVariable;

@@ -25,7 +25,7 @@ dependencies {
     // classes ship in the app distribution's lib directory. The simulation runner
     // is batteries-included: its full distribution (bin + lib, including the
     // integration-method jars) is embedded separately (see installRunnerDist).
-    runtimeOnly(project(":isma-compiler:cli"))
+    runtimeOnly(project(":lisma-compiler:cli"))
 
     implementation(libs.grpc.netty)
     implementation(libs.netty.transport)

@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import ru.isma.next.exchange.format.writeAll
 import ru.nstu.isma.compiler.hsm.core.HSM
 import ru.nstu.isma.compiler.hsm.jvm.EquationIndexProvider
-import ru.nstu.isma.compiler.hsm.jvm.calcmodel.HybridSystem
+import ru.nstu.isma.lisma.runtime.LismaModelRuntime
 import ru.nstu.isma.intg.api.methods.IIntegrationMethod
 import ru.nstu.isma.intg.api.models.IntgResultPoint
 import ru.nstu.isma.intg.api.providers.IIntegrationMethodProvider
@@ -20,8 +20,6 @@ import ru.nstu.isma.intg.core.simulation.IEventDetectorFactory
 import ru.nstu.isma.intg.core.simulation.SimulationInitials
 import ru.nstu.isma.next.integration.services.IntegrationMethodLibraryLoader
 import ru.nstu.isma.next.integration.services.IntegrationMethodsLibrary
-import java.io.ByteArrayInputStream
-import java.io.ObjectInputStream
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -101,8 +99,8 @@ private fun runSimulation(
     params: RunnerParams,
     cancelled: AtomicBoolean,
 ): String? {
-    val (hybridSystem, hsm) = loadModel(classBytes)
-    hsm.initTimeEquation(params.start)
+    val model = LismaModelRuntime.load(classBytes)
+    model.hsm.initTimeEquation(params.start)
 
     val integrationMethodsLibrary: IntegrationMethodsLibrary = IntegrationMethodLibraryLoader.load()
     val method: IIntegrationMethod = integrationMethodsLibrary
@@ -121,16 +119,15 @@ private fun runSimulation(
         stabilityController.enabled = params.stabilityEnabled
     }
 
-    val indexProvider = EquationIndexProvider(hsm)
-    val compilationResult = HsmCompilationResult(indexProvider, hybridSystem)
+    val compilationResult = HsmCompilationResult(model.equationIndexProvider, model.hybridSystem)
 
     val simulationInitials = SimulationInitials(
-        differentialEquationInitials = createOdeInitials(indexProvider, hsm),
+        differentialEquationInitials = createOdeInitials(model.equationIndexProvider, model.hsm),
         start = params.start,
         end = params.end,
         step = params.step,
     )
-    val columnNames = buildColumnNames(indexProvider)
+    val columnNames = buildColumnNames(model.equationIndexProvider)
 
     val outFile = File(params.out)
     val pointQueue = LinkedBlockingQueue<QueueItem>()
@@ -216,38 +213,6 @@ private fun run(
     )
 }
 
-/**
- * Defines the compiled `.class` bytes in a fresh class loader (parented to the
- * class loader that sees the calcmodel types), instantiates the generated
- * hybrid-system class, and reads the inlined HSM blob. A fresh loader per
- * model is required because every compiled model produces the same FQCN.
- *
- * Returns the instantiated [HybridSystem] and the deserialized [HSM] (the
- * latter provides equation metadata, initial conditions, and column naming).
- */
-private fun loadModel(classBytes: ByteArray): Pair<HybridSystem, HSM> {
-    val loader = object : ClassLoader(HybridSystem::class.java.classLoader) {
-        fun defineGeneratedClass(): Class<*> =
-            defineClass(GENERATED_CLASS_NAME, classBytes, 0, classBytes.size)
-    }
-
-    return try {
-        val clazz = loader.defineGeneratedClass()
-        val hybridSystem = clazz
-            .getDeclaredConstructor()
-            .newInstance() as HybridSystem
-        val hsmBytes = clazz.getMethod("ismaHsmBytes").invoke(null) as ByteArray
-        val hsm = deserializeHsm(hsmBytes)
-        hybridSystem to hsm
-    } catch (e: Exception) {
-        throw IllegalStateException("Failed to load compiled hybrid-system class", e)
-    }
-}
-
-private fun deserializeHsm(bytes: ByteArray): HSM {
-    ObjectInputStream(ByteArrayInputStream(bytes)).use { return it.readObject() as HSM }
-}
-
 private fun buildColumnNames(indexProvider: EquationIndexProvider): List<String> {
     val deCount = indexProvider.getDifferentialEquationCount()
     val aeCount = indexProvider.getAlgebraicEquationCount()
@@ -313,5 +278,3 @@ private sealed class QueueItem {
     data class Point(val point: DoubleArray) : QueueItem()
     data object EndOfStream : QueueItem()
 }
-
-private const val GENERATED_CLASS_NAME = "ru.nstu.isma.core.simulation.controller.AnalyzedHybridSystem"

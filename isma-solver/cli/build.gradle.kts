@@ -11,7 +11,7 @@ application {
     applicationName = "simulation-runner-cli"
 }
 
-// Distinct jar name: this module is named `cli` (like isma-compiler:cli), so the
+// Distinct jar name: this module is named `cli` (like lisma-compiler:cli), so the
 // default `cli-<version>.jar` would collide in the daemon's lib. Name it after the
 // application so the batteries-included runner jar is unambiguous.
 tasks.jar {
@@ -19,9 +19,7 @@ tasks.jar {
 }
 
 dependencies {
-    implementation(project(":isma-compiler:hsm-core"))
-    implementation(project(":isma-compiler:hsm-jvm"))
-    implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
+    implementation(project(":lisma-compiler:runtime"))
     implementation(project(":isma-solver:api"))
     implementation(project(":isma-solver:core"))
     implementation(project(":isma-solver:lib-utils"))

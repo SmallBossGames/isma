@@ -33,11 +33,14 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `math/` - Numerical math primitives — derivatives, integration, intersection search
 
 ### Compiler Infrastructure
-- **isma-compiler/** - HSM (High School Math) compiler
+- **lisma-compiler/** - LISMA compiler
+  - `lib/` - Minimal public compiler API (`LismaCompiler`: compile LISMA source to a self-contained `.class`, validate) for embedding into other JVM projects
+  - `runtime/` - Minimal public API (`LismaModelRuntime.load`) to launch a model from a compiled `.class` file (fresh classloader per model, HSM blob deserialization)
   - `hsm-core/` - Core compiler
   - `hsm-fdm/` - Finite difference method backend
   - `hsm-jvm/`, `hsm-jvm-calcmodel/` - JVM implementation
-  - `cli/` - Standalone LISMA compiler CLI: reads LISMA from stdin, writes the compiled `.class` file (analyzed hybrid-system class with the translated HSM inlined as a serialized blob) to stdout (`lisma-compiler-cli`); also supports `--validate`; launched by isma-daemon as a separate process
+  - `lisma-translator-hsm/` - LISMA → HSM translator (ANTLR4 grammar)
+  - `cli/` - Standalone LISMA compiler CLI: thin wrapper over `lib`; reads LISMA from stdin, writes the compiled `.class` file (analyzed hybrid-system class with the translated HSM inlined as a serialized blob) to stdout (`lisma-compiler-cli`); also supports `--validate`; launched by isma-daemon as a separate process
 
 ### User Interface
 - **isma-ui/** - JavaFX-based UI components *(git submodule → [isma-ui-javafx](https://github.com/SmallBossGames/isma-ui-javafx), standalone Gradle project; see `isma-ui/AGENTS.md` for details)*
@@ -59,7 +62,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `lib-meta/` - SPI interface for integration method factories
   - `lib-utils/` - Utilities
   - `lib:euler/`, `lib:rk2/`, `lib:rk3/`, `lib:rk31/`, `lib:rkmerson/`, `lib:rkfehlberg/` - Integration methods
-  - `cli/` - Batteries-included simulation runner CLI. Accepts a compiled `.class` file + simulation parameters, loads the class in a fresh classloader, extracts and deserializes the inlined HSM blob, runs the simulation (equation index provider, initials), and writes the result file in the existing binary format. Ships the integration-method libs itself; launched by isma-daemon as a separate process per simulation.
+  - `cli/` - Batteries-included simulation runner CLI. Accepts a compiled `.class` file + simulation parameters, loads the model via `lisma-compiler:runtime`, runs the simulation (equation index provider, initials), and writes the result file in the existing binary format. Ships the integration-method libs itself; launched by isma-daemon as a separate process per simulation.
 
 
 ### Protocol Buffers
@@ -77,7 +80,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - *See `isma-daemon/AGENTS.md` for details*
 
 ### Language Server (LSP)
-- **isma-compiler/lisma-lsp/** - Standalone LISMA language server: LSP over stdio (JSON-RPC 2.0, Content-Length framing), semantic tokens via ANTLR4 lexer
+- **lisma-compiler/lisma-lsp/** - Standalone LISMA language server: LSP over stdio (JSON-RPC 2.0, Content-Length framing), semantic tokens via ANTLR4 lexer
   - `protocol/` - LSP framing + request dispatch
   - `lsp/` - LISMA language service (semantic tokens) + token codec
   - `smoke.py` - stdio smoke test
@@ -94,7 +97,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 ### Out-of-Process Architecture (UI + Daemon)
 
-The UI launches the daemon as a separate JVM process communicating via gRPC over Unix Domain Sockets, and the `isma-compiler/lisma-lsp` language server as a separate process communicating via LSP over stdio (syntax highlighting). The daemon in turn launches two standalone CLIs as separate processes: the LISMA compiler CLI (`isma-compiler:cli`) to compile LISMA sources to a compiled `.class` file (LISMA on stdin, `.class` on stdout), and the simulation runner CLI (`isma-solver:cli`, batteries-included) to run each simulation and write the result file.
+The UI launches the daemon as a separate JVM process communicating via gRPC over Unix Domain Sockets, and the `lisma-compiler/lisma-lsp` language server as a separate process communicating via LSP over stdio (syntax highlighting). The daemon in turn launches two standalone CLIs as separate processes: the LISMA compiler CLI (`lisma-compiler:cli`, a thin wrapper over the `lisma-compiler:lib` public API) to compile LISMA sources to a compiled `.class` file (LISMA on stdin, `.class` on stdout), and the simulation runner CLI (`isma-solver:cli`, batteries-included) to run each simulation and write the result file.
 
 - **isma-ui/external-services/** - gRPC client layer
   - `GrpcSimulationClient` - Netty-based gRPC client with Unix socket transport

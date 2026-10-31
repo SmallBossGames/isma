@@ -12,22 +12,22 @@ Standalone LISMA language server. A CLI process speaking the [Language Server Pr
 ## Quick Start
 
 ```bash
-./gradlew :isma-compiler:lisma-lsp:build            # compile + tests (17 tests)
-./gradlew :isma-compiler:lisma-lsp:installDist      # -> isma-compiler/lisma-lsp/build/install/isma-lsp/bin/isma-lsp
-python3 isma-compiler/lisma-lsp/smoke.py isma-compiler/lisma-lsp/build/install/isma-lsp/bin/isma-lsp   # stdio smoke test
+./gradlew :lisma-compiler:lisma-lsp:build            # compile + tests (17 tests)
+./gradlew :lisma-compiler:lisma-lsp:installDist      # -> lisma-compiler/lisma-lsp/build/install/isma-lsp/bin/isma-lsp
+python3 lisma-compiler/lisma-lsp/smoke.py lisma-compiler/lisma-lsp/build/install/isma-lsp/bin/isma-lsp   # stdio smoke test
 ```
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/Main.kt` | Entry point — `LspServer(System.in, System.out, LismaLanguageService()).run()` |
-| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspServer.kt` | JSON-RPC dispatch loop, document store, request handlers |
-| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspMessages.kt` | `Content-Length` framing: read/write LSP messages |
-| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/LismaLanguageService.kt` | LISMA language features — semantic tokens via ANTLR4 lexer |
-| `isma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/SemanticTokens.kt` | Token types, legend, LSP relative-format encoder/decoder |
-| `isma-compiler/lisma-lsp/smoke.py` | End-to-end stdio smoke test (initialize → tokens → didChange → shutdown) |
-| `isma-compiler/lisma-lsp/build.gradle.kts` | Build config (application plugin, JPMS module `isma.lsp`) |
+| `lisma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/Main.kt` | Entry point — `LspServer(System.in, System.out, LismaLanguageService()).run()` |
+| `lisma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspServer.kt` | JSON-RPC dispatch loop, document store, request handlers |
+| `lisma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/protocol/LspMessages.kt` | `Content-Length` framing: read/write LSP messages |
+| `lisma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/LismaLanguageService.kt` | LISMA language features — semantic tokens via ANTLR4 lexer |
+| `lisma-compiler/lisma-lsp/src/main/kotlin/ru/nstu/isma/lsp/lsp/SemanticTokens.kt` | Token types, legend, LSP relative-format encoder/decoder |
+| `lisma-compiler/lisma-lsp/smoke.py` | End-to-end stdio smoke test (initialize → tokens → didChange → shutdown) |
+| `lisma-compiler/lisma-lsp/build.gradle.kts` | Build config (application plugin, JPMS module `isma.lsp`) |
 
 ## Who Uses It
 

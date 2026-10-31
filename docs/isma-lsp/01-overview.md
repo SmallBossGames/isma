@@ -9,7 +9,7 @@ The first cut covers **syntax highlighting only** (keywords, comments, numbers).
 ## Module Structure
 
 ```
-isma-compiler/lisma-lsp/
+lisma-compiler/lisma-lsp/
 ├── build.gradle.kts                     # application plugin, JPMS module isma.lsp
 ├── smoke.py                             # stdio smoke test (Python, no deps)
 └── src/
@@ -43,7 +43,7 @@ flowchart LR
 
     subgraph deps["external"]
         ANTLR["antlr4-runtime"]
-        LismaLexer["LismaLexer<br/>(:isma-compiler:lisma-translator-hsm)"]
+        LismaLexer["LismaLexer<br/>(:lisma-compiler:lisma-translator-hsm)"]
         Serial["kotlinx-serialization-json"]
     end
 
@@ -63,7 +63,7 @@ flowchart LR
     class ANTLR,LismaLexer,Serial external
 ```
 
-The lexer is **not duplicated**: `LismaLanguageService` reuses the ANTLR4-generated `ru.nstu.isma.lisma.analysis.gen.LismaLexer` from `:isma-compiler:lisma-translator-hsm`, which generates it at build time from `Lisma.g4` via the Gradle `antlr` plugin (no generated sources are checked in).
+The lexer is **not duplicated**: `LismaLanguageService` reuses the ANTLR4-generated `ru.nstu.isma.lisma.analysis.gen.LismaLexer` from `:lisma-compiler:lisma-translator-hsm`, which generates it at build time from `Lisma.g4` via the Gradle `antlr` plugin (no generated sources are checked in).
 
 ## Communication Flow
 
@@ -123,10 +123,10 @@ Tokens are encoded in the LSP **relative** format — 5 integers per token `[del
 ## Build
 
 ```bash
-./gradlew :isma-compiler:lisma-lsp:build          # compile + 17 tests
-./gradlew :isma-compiler:lisma-lsp:installDist    # distribution with bin/isma-lsp launcher
+./gradlew :lisma-compiler:lisma-lsp:build          # compile + 17 tests
+./gradlew :lisma-compiler:lisma-lsp:installDist    # distribution with bin/isma-lsp launcher
 ```
 
 - `application` plugin: main class `ru.nstu.isma.lsp.MainKt`, JPMS module `isma.lsp`.
-- Dependencies: `:isma-compiler:lisma-translator-hsm` (lexer), `antlr4-runtime`, `kotlinx-coroutines-core`, `kotlinx-serialization-json`, `slf4j-api`.
-- The lexer comes from `:isma-compiler:lisma-translator-hsm`, which generates it at build time (`./gradlew :isma-compiler:lisma-translator-hsm:generateGrammarSource`) from `src/main/antlr/ru/nstu/isma/lisma/analysis/gen/Lisma.g4` using the ANTLR 4.13.2 tool — matching the `antlr4-runtime` 4.13.2 version, so there is no tool/runtime version warning.
+- Dependencies: `:lisma-compiler:lisma-translator-hsm` (lexer), `antlr4-runtime`, `kotlinx-coroutines-core`, `kotlinx-serialization-json`, `slf4j-api`.
+- The lexer comes from `:lisma-compiler:lisma-translator-hsm`, which generates it at build time (`./gradlew :lisma-compiler:lisma-translator-hsm:generateGrammarSource`) from `src/main/antlr/ru/nstu/isma/lisma/analysis/gen/Lisma.g4` using the ANTLR 4.13.2 tool — matching the `antlr4-runtime` 4.13.2 version, so there is no tool/runtime version warning.

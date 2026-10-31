@@ -5,13 +5,15 @@ rootProject.name = "isma"
 // isma-ui and grin are git submodules (standalone Gradle projects)
 // built separately by .ci-cd/build-bundle.sh
 
-include("isma-compiler:hsm-core")
-include("isma-compiler:hsm-fdm")
-include("isma-compiler:lisma-translator-hsm")
-include("isma-compiler:hsm-jvm")
-include("isma-compiler:hsm-jvm-calcmodel")
-include("isma-compiler:cli")
-include("isma-compiler:lisma-lsp")
+include("lisma-compiler:hsm-core")
+include("lisma-compiler:hsm-fdm")
+include("lisma-compiler:lisma-translator-hsm")
+include("lisma-compiler:hsm-jvm")
+include("lisma-compiler:hsm-jvm-calcmodel")
+include("lisma-compiler:lib")
+include("lisma-compiler:cli")
+include("lisma-compiler:runtime")
+include("lisma-compiler:lisma-lsp")
 
 include("isma-solver:api")
 include("isma-solver:core")

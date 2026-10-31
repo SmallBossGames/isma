@@ -11,6 +11,5 @@ module isma.isma.intg.core.main {
     requires kotlinx.coroutines.core;
 
     requires isma.isma.intg.api.main;
-    requires isma.compiler.hsm.jvm.calcmodel;
-    requires transitive isma.compiler.hsm.jvm;
+    requires transitive isma.lisma.runtime;
 }

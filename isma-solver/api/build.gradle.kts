@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies{
-    implementation(project(":isma-compiler:hsm-jvm-calcmodel"))
+    implementation(project(":lisma-compiler:runtime"))
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.jetbrains.annotations)

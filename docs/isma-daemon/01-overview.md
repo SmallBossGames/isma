@@ -11,7 +11,7 @@ The daemon is a **pure orchestrator**. It performs no LISMA translation and no
 in-process simulation. It launches two standalone CLI tools as separate
 processes and coordinates them:
 
-- **LISMA compiler CLI** (`isma-compiler:cli`) — compiles LISMA source to a
+- **LISMA compiler CLI** (`lisma-compiler:cli`) — compiles LISMA source to a
   compiled `.class` file (analyzed hybrid-system class with the translated HSM
   inlined as a serialized blob) and validates LISMA.
 - **Simulation runner CLI** (`isma-solver:cli`, batteries-included) — runs a simulation from a
@@ -76,12 +76,11 @@ graph LR
 | Protobuf source | `../../protobuf-contracts/` |
 
 ### Module Dependencies
-The `:isma-daemon:grpc` module generates Java stubs from protobuf definitions and has no project dependencies. The `:isma-daemon:domain` module depends on `isma-compiler:hsm-core` (for the `IHSM` type in `CompiledModel`'s artifact contract) and `koin-core`. The `:isma-daemon:infrastructure` module depends on `:isma-daemon:domain`, `koin-core`, and `slf4j-api`. The `:isma-daemon:app` module depends on all three internal modules, gRPC/Netty/Ktor libraries, and — via `runtimeOnly` — `isma-compiler:cli`, so the compiler CLI jar lands in the distribution's `lib/` directory. The batteries-included runner (`isma-solver:cli`) is embedded as its own distribution (via the `installRunnerDist` task) so the daemon can launch both CLIs as separate processes.
+The `:isma-daemon:grpc` module generates Java stubs from protobuf definitions and has no project dependencies. The `:isma-daemon:domain` module depends only on `koin-core` (compiled models are stored as opaque `.class` bytes). The `:isma-daemon:infrastructure` module depends on `:isma-daemon:domain`, `koin-core`, and `slf4j-api`. The `:isma-daemon:app` module depends on all three internal modules, gRPC/Netty/Ktor libraries, and — via `runtimeOnly` — `lisma-compiler:cli`, so the compiler CLI jar lands in the distribution's `lib/` directory. The batteries-included runner (`isma-solver:cli`) is embedded as its own distribution (via the `installRunnerDist` task) so the daemon can launch both CLIs as separate processes.
 
 ```mermaid
 graph TD
     Proto["protobuf-contracts/v1/\n.proto definitions"] --> Grpc[":isma-daemon:grpc\nJava stubs"]
-    HsmCore["isma-compiler:hsm-core"] --> Domain[":isma-daemon:domain"]
     Koin["koin-core"] --> Domain
     Domain --> Infra[":isma-daemon:infrastructure"]
     Grpc --> App[":isma-daemon:app"]
@@ -89,7 +88,7 @@ graph TD
     Infra --> App
     GrpcLib["grpc-netty"] --> App
     Ktor["ktor"] --> App
-    Cli["isma-compiler:cli\nstandalone compiler"] -->|"runtimeOnly (jars in lib/)"| App
+    Cli["lisma-compiler:cli\nstandalone compiler"] -->|"runtimeOnly (jars in lib/)"| App
     Runner["isma-solver:cli\nstandalone runner (batteries-included)"] -->|"embedded dist (runner/lib)"| App
     Infra -.->|"launches as process\n(Compile/Validate RPC)"| Cli
     Infra -.->|"launches as process\n(Run RPC)"| Runner
@@ -117,7 +116,7 @@ See `Application.kt` for the `startKoin { modules(domainModule, infrastructureMo
 
 The daemon never loads model classes or runs the solver in-process. Each
 simulation runs in its own `isma-solver:cli` process, and each compile/validate
-runs in its own `isma-compiler:cli` process. This isolates crashes, allows the
+runs in its own `lisma-compiler:cli` process. This isolates crashes, allows the
 solver/compiler to evolve independently (and be rewritten in another language
 later), and keeps the daemon a thin coordination layer.
 
@@ -191,9 +190,9 @@ sequenceDiagram
 
 ### Model Compilation Flow
 
-The client sends a `CompileRequest` with LISMA source code to `LismaCompilerServiceGrpcImpl`, which delegates to `CompileLismaHandlerImpl`. The handler invokes `ILismaCompiler` — implemented by `CliLismaCompiler`, which launches the standalone LISMA compiler CLI (`isma-compiler:cli`) as a separate process: the LISMA source goes to the CLI's stdin, and the compiled `.class` file (the analyzed hybrid-system class with the translated HSM inlined as a serialized blob) comes back on its stdout. On success, the handler stores the `.class` bytes as a `CompiledModel` in `CompiledModelStore`. On failure, the CLI emits one error line per diagnostic (`<row>:<col>:<message>`) on stdout, which the handler parses and returns.
+The client sends a `CompileRequest` with LISMA source code to `LismaCompilerServiceGrpcImpl`, which delegates to `CompileLismaHandlerImpl`. The handler invokes `ILismaCompiler` — implemented by `CliLismaCompiler`, which launches the standalone LISMA compiler CLI (`lisma-compiler:cli`) as a separate process: the LISMA source goes to the CLI's stdin, and the compiled `.class` file (the analyzed hybrid-system class with the translated HSM inlined as a serialized blob) comes back on its stdout. On success, the handler stores the `.class` bytes as a `CompiledModel` in `CompiledModelStore`. On failure, the CLI emits one error line per diagnostic (`<row>:<col>:<message>`) on stdout, which the handler parses and returns.
 
-The compiled `.class` is consumed at simulation time: `SimulationExecutorImpl` writes it to a temp file and passes it to the `isma-solver:cli` runner, which loads the class in a fresh class loader, extracts and deserializes the inlined HSM blob, and runs the simulation.
+The compiled `.class` is consumed at simulation time: `SimulationExecutorImpl` writes it to a temp file and passes it to the `isma-solver:cli` runner, which loads the model via `lisma-compiler:runtime` (fresh class loader per model, inlined HSM blob deserialization) and runs the simulation.
 
 ```mermaid
 sequenceDiagram

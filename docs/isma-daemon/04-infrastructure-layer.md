@@ -178,7 +178,7 @@ See `simulation/SimulationProcessRegistry.kt` for the implementation. It impleme
 
 ### CliLismaCompiler
 
-See `translation/CliLismaCompiler.kt` for the implementation. Implements `ILismaCompiler` by launching the standalone LISMA compiler CLI (`isma-compiler:cli`) as a separate process: the LISMA source is written to the process's stdin, and the output is read from its stdout.
+See `translation/CliLismaCompiler.kt` for the implementation. Implements `ILismaCompiler` by launching the standalone LISMA compiler CLI (`lisma-compiler:cli`) as a separate process: the LISMA source is written to the process's stdin, and the output is read from its stdout.
 
 - **`compile(sourceCode)`** — runs the CLI in compile mode. On exit 0, the stdout bytes are the compiled `.class` file (`CompileOutcome.Success`). On exit 1, the stdout lines are parsed as `<row>:<col>:<message>` error lines (`CompileOutcome.Failure`).
 - **`validate(sourceCode)`** — runs the CLI in `--validate` mode. On exit 0, no errors. On exit 1, the stdout lines are parsed as error lines.
@@ -192,4 +192,4 @@ The process is given a 60-second timeout.
 | 1 | `ISMA_COMPILER_CLI` env var or `isma.compiler.cli` system property | launch script (executed directly), jar (`java -cp`), or lib directory (`java -cp dir/*`) |
 | 2 | Fallback | the `lib/` directory next to the daemon's jar (installDist layout), running `ru.nstu.isma.compiler.cli.LismaCompilerCliKt` via `java -cp` |
 
-The CLI jar reaches the distribution via `runtimeOnly(project(":isma-compiler:cli"))` in `app/build.gradle.kts`.
+The CLI jar reaches the distribution via `runtimeOnly(project(":lisma-compiler:cli"))` in `app/build.gradle.kts`.

@@ -21,12 +21,12 @@ fi
 
 # Daemon is built in the main repo
 ./gradlew :isma-daemon:app:installDist
-./gradlew :isma-compiler:lisma-lsp:installDist
+./gradlew :lisma-compiler:lisma-lsp:installDist
 
 cp -r "$PROJECT_ROOT/isma-ui/isma-ui/app/build/install/app" "$BUNDLE_DIR/isma-ui-app"
 cp -r "$PROJECT_ROOT/isma-daemon/app/build/install/app" "$BUNDLE_DIR/isma-daemon-app"
 cp -r "$PROJECT_ROOT/grin/grin/gui/app/build/install/app" "$BUNDLE_DIR/grin-app"
-cp -r "$PROJECT_ROOT/isma-compiler/lisma-lsp/build/install/isma-lsp" "$BUNDLE_DIR/isma-lsp-app"
+cp -r "$PROJECT_ROOT/lisma-compiler/lisma-lsp/build/install/isma-lsp" "$BUNDLE_DIR/isma-lsp-app"
 
 cat > "$BUNDLE_DIR/run-ui.sh" << 'SCRIPT'
 #!/bin/bash

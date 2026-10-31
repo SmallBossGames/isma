@@ -1,7 +1,7 @@
 module isma.isma.intg.api.main {
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core;
-    requires isma.compiler.hsm.jvm.calcmodel;
+    requires isma.lisma.runtime;
     requires org.slf4j;
     requires org.apache.commons.lang3;
 

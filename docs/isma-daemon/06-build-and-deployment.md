@@ -179,9 +179,15 @@ The daemon is launched by the ISMA UI process (`SimulationServerManager`) as a s
 ### Bundle Distribution
 
 The `.ci-cd/build-bundle.sh` script creates a distribution bundle at `build/bundle/` containing:
-- `isma-daemon-app` executable (the daemon, with the compiler and runner CLI jars in its `lib/`)
+- `isma-daemon-app` executable (the daemon, with the compiler CLI jar in its `lib/` and the runner distribution embedded in `runner/`)
 - `isma-ui-app` executable
-- `run-ui.sh` launcher script
+- `grin-app` executable
+- `isma-lsp-app` executable
+- `lisma-compiler-cli-app` executable — standalone LISMA compiler CLI (launch script at `bin/lisma-compiler-cli`)
+- `simulation-runner-cli-app` executable — standalone batteries-included simulation runner CLI (launch script at `bin/simulation-runner-cli`)
+- `run-ui.sh` launcher script (sets `ISMA_DAEMON_SCRIPT`, `ISMA_GRIN_SCRIPT`, `ISMA_LSP_SCRIPT`, `ISMA_COMPILER_CLI`, `ISMA_RUNNER_CLI`)
+
+The standalone CLI distributions are the script paths for UIs that launch the CLIs directly (e.g. the Avalonia UI: `Compiler:ScriptPath` / `Runner:ScriptPath` in `appsettings.json`, or `ISMA_COMPILER_CLI` / `ISMA_RUNNER_CLI` env vars).
 
 ### Platform Requirements
 

@@ -68,7 +68,7 @@ graph LR
 | `integration/IIntegrationMethodsStore.kt` | Integration methods store interface |
 | `simulation/` | Simulation domain (ISimulationExecutor, ISimulationProcessRegistry, ISimulationSessionStore, SimulationSession, SimulationStatus) |
 | `infrastructure/src/main/kotlin/ru/nstu/isma/daemon/infrastructure/` | Infrastructure layer: concrete implementations |
-| `simulation/SimulationExecutorImpl.kt` | Launches the runner CLI, polls the progress file, completes/fails/cancels the session |
+| `simulation/SimulationExecutorImpl.kt` | Launches the runner CLI, reads the runner's stdout (deriving progress from the TIME column), completes/fails/cancels the session |
 | `simulation/SimulationProcessRegistry.kt` | Tracks runner processes so CancelSimulation can kill them |
 | `stores/` | Concrete store implementations (CompiledModelStore, IntegrationMethodsStore, SimulationSessionStore) |
 | `translation/CliLismaCompiler.kt` | Launches the LISMA compiler CLI (compile → artifact, validate → error lines) |
@@ -124,14 +124,14 @@ later), and keeps the daemon a thin coordination layer.
 | -------------------- | ---------------------------------------------------------------- |
 | gRPC calls           | Netty event loops (per-call)                                     |
 | Simulation execution | Java `ExecutorService` (cached thread pool) — one thread supervises one runner process |
-| Progress polling     | The supervising thread polls the runner's progress file every 100ms |
+| Progress tracking    | The supervising thread reads the runner's stdout and derives progress from the TIME column |
 | Session stores       | `ConcurrentHashMap` for lock-free thread safety                  |
 
 ## Communication Flow
 
 ### Simulation Lifecycle
 
-The client sends a `RunSimulationRequest` to `SimulationServiceGrpcImpl`, which delegates to `RunSimulationHandlerImpl`. The handler retrieves the compiled model (artifact bytes) from `CompiledModelStore`, creates a new `SimulationSession`, and submits async execution to the `ExecutorService`. The daemon returns a `RunSimulationResponse` with the `simulationId`. The `SimulationExecutorImpl` writes the artifact to a temp file, launches the `isma-solver:cli` runner as a separate process, and polls the runner's progress file (every 100ms) to update the session. When the runner exits, the session is completed (result file path), failed, or left cancelled. The client can send `MonitorSimulationRequest` messages, which trigger a polling loop in `MonitorSimulationHandlerImpl`.
+The client sends a `RunSimulationRequest` to `SimulationServiceGrpcImpl`, which delegates to `RunSimulationHandlerImpl`. The handler retrieves the compiled model (artifact bytes) from `CompiledModelStore`, creates a new `SimulationSession`, and submits async execution to the `ExecutorService`. The daemon returns a `RunSimulationResponse` with the `simulationId`. The `SimulationExecutorImpl` writes the artifact to a temp file, launches the `isma-solver:cli` runner as a separate process, and reads the runner's stdout (which streams the binary result rows), deriving `progress = (t − t0) / (tEnd − t0)` from the TIME column to update the session. When the runner exits, the accumulated result is written to a file and the session is completed (result file path), failed, or left cancelled. The client can send `MonitorSimulationRequest` messages, which trigger a polling loop in `MonitorSimulationHandlerImpl`.
 
 ```mermaid
 sequenceDiagram
@@ -156,11 +156,11 @@ sequenceDiagram
     Grpc-->>Client: simulationId
 
     Executor->>Runner: launch (artifact file + params)
-    loop Poll every 100ms
-        Runner-->>Executor: progress file (current time)
+    loop per streamed row
+        Runner-->>Executor: stdout row (TIME column)
         Executor->>Session: updateProgress(currentTime)
     end
-    Runner-->>Executor: exit 0 + result file
+    Runner-->>Executor: exit 0 (stdout drained)
     Executor->>Session: status=COMPLETED (resultFile)
 
     Client->>Grpc: MonitorSimulationRequest

@@ -26,7 +26,6 @@ dependencies {
     // lib-meta transitively pulls in every integration-method lib (euler, rk2, ...)
     // so the ServiceLoader discovers all factories at runtime.
     implementation(project(":isma-solver:lib-meta"))
-    implementation(project(":isma-jvm-lib:exchange-format"))
 
     implementation(libs.slf4j.api)
 }

@@ -108,7 +108,7 @@ The UI launches the daemon as a separate JVM process communicating via gRPC over
 - **LSP launch** — `ISMA_LSP_SCRIPT` env var (bundle) or `isma.lsp.script` sysprop (IDE/Gradle)
 - **Compiler CLI launch** — `ISMA_COMPILER_CLI` env var or `isma.compiler.cli` sysprop (path to launch script, jar, or lib dir); fallback: the daemon's own `lib/` directory (the CLI jar ships there via `runtimeOnly`)
 - **Runner CLI launch** — `ISMA_RUNNER_CLI` env var or `isma.runner.cli` sysprop (path to launch script, jar, or lib dir); fallback: the runner's own batteries-included distribution embedded in the daemon's dist (`runner/lib`, via the `installRunnerDist` task)
-- **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with all apps + `run-ui.sh` launcher
+- **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with all apps (UI, daemon, Grin, LSP, plus standalone `lisma-compiler-cli-app` and `simulation-runner-cli-app` distributions) + `run-ui.sh` launcher that wires all script paths via env vars
 
 ---
 

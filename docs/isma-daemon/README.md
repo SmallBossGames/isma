@@ -48,7 +48,7 @@ Use `grpcurl` with the `-plaintext` flag and the `-grpc-header ":pseudo-protocol
 | `isma-daemon/domain/src/main/kotlin/.../compiler/ILismaCompiler.kt` | Compiler interface (compile → artifact, validate → errors) |
 | `isma-daemon/domain/src/main/kotlin/.../simulation/ISimulationProcessRegistry.kt` | Process registry for cancellation |
 | `isma-daemon/domain/src/main/kotlin/.../DomainModule.kt` | DI configuration (handler interfaces → implementations) |
-| `isma-daemon/infrastructure/src/main/kotlin/.../simulation/SimulationExecutorImpl.kt` | Launches the runner CLI, polls the progress file, completes/fails/cancels the session |
+| `isma-daemon/infrastructure/src/main/kotlin/.../simulation/SimulationExecutorImpl.kt` | Launches the runner CLI, reads the runner's stdout (deriving progress from the TIME column), completes/fails/cancels the session |
 | `isma-daemon/infrastructure/src/main/kotlin/.../simulation/SimulationProcessRegistry.kt` | Tracks runner processes so CancelSimulation can kill them |
 | `isma-daemon/infrastructure/src/main/kotlin/.../translation/CliLismaCompiler.kt` | Launches the compiler CLI (compile → artifact, validate → error lines) |
 | `isma-daemon/infrastructure/src/main/kotlin/.../InfrastructureModule.kt` | DI configuration (stores, executor, process registry, compiler) |

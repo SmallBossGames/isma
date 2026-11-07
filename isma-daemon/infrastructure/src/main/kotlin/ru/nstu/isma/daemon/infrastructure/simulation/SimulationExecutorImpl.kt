@@ -7,15 +7,21 @@ import ru.nstu.isma.domain.simulation.ISimulationExecutor
 import ru.nstu.isma.domain.simulation.ISimulationProcessRegistry
 import ru.nstu.isma.domain.simulation.ISimulationSessionStore
 import ru.nstu.isma.domain.simulation.SimulationStatus
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.io.EOFException
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.concurrent.ExecutorService
 
 /**
  * Executes simulations by launching the standalone simulation-runner CLI as a
  * separate process. The compiled `.class` is written to a temp file and
- * passed to the runner; the runner writes the result file and a progress file.
- * This executor polls the progress file to update the session and waits for the
- * runner process to exit.
+ * passed to the runner; the runner streams the result to stdout in the ISMA
+ * exchange binary format. This executor reads the runner's stdout to obtain the
+ * result and to derive progress from the TIME column, and waits for the runner
+ * process to exit.
  *
  * Runner resolution order:
  * 1. `ISMA_RUNNER_CLI` environment variable or `isma.runner.cli` system
@@ -49,51 +55,47 @@ class SimulationExecutorImpl(
 
     private fun runSimulation(simulationId: Long, parameters: RunSimulationParameters, model: CompiledModel) {
         val modelFile = File.createTempFile("isma_model_$simulationId", ".bin")
-        val outFile = File.createTempFile("isma_simulation_$simulationId", ".bin")
-        val progressFile = File.createTempFile("isma_progress_$simulationId", ".txt")
+        val resultFile = File.createTempFile("isma_simulation_$simulationId", ".bin")
         val errFile = File.createTempFile("isma_runner_$simulationId", ".err")
 
         try {
             modelFile.writeBytes(model.artifact)
 
-            val command = buildRunnerCommand(modelFile, outFile, progressFile, parameters)
+            val command = buildRunnerCommand(modelFile, parameters)
             val process = ProcessBuilder(command)
                 .redirectError(errFile)
                 .start()
             processRegistry.register(simulationId, process)
 
+            // The runner streams the result to stdout in the ISMA exchange binary
+            // format; progress is derived from the TIME column of each streamed
+            // row. All stdout bytes are accumulated and written to the result
+            // file once the process exits.
+            val result = ByteArrayOutputStream()
             var lastProgress = parameters.startTime
-            while (process.isAlive) {
-                readProgress(progressFile)?.let { currentTime ->
+            process.inputStream.use { stdout ->
+                consumeRunnerOutput(stdout, result) { currentTime ->
                     if (currentTime > lastProgress) {
                         sessionStore.updateProgress(simulationId, currentTime)
                         lastProgress = currentTime
                     }
                 }
-                Thread.sleep(POLL_INTERVAL_MS)
             }
 
             val exitCode = process.waitFor()
             processRegistry.unregister(simulationId)
 
-            // Final progress read: the polling loop above may not have run if the
-            // process exited before the first poll (fast simulations).
-            readProgress(progressFile)?.let { currentTime ->
-                if (currentTime > lastProgress) {
-                    sessionStore.updateProgress(simulationId, currentTime)
-                }
-            }
-
             val session = sessionStore.get(simulationId)
             when {
                 session?.status == SimulationStatus.CANCELLED -> {
-                    outFile.delete()
+                    resultFile.delete()
                 }
                 exitCode == 0 -> {
-                    sessionStore.completeSimulation(simulationId, outFile.absolutePath)
+                    resultFile.writeBytes(result.toByteArray())
+                    sessionStore.completeSimulation(simulationId, resultFile.absolutePath)
                 }
                 else -> {
-                    outFile.delete()
+                    resultFile.delete()
                     val diagnostics = errFile.readText().trim()
                     sessionStore.failSimulation(
                         simulationId,
@@ -104,22 +106,17 @@ class SimulationExecutorImpl(
             }
         } finally {
             modelFile.delete()
-            progressFile.delete()
             errFile.delete()
         }
     }
 
     private fun buildRunnerCommand(
         modelFile: File,
-        outFile: File,
-        progressFile: File,
         params: RunSimulationParameters,
     ): List<String> {
         val cmd = runnerCommand.toMutableList()
         cmd += listOf(
             "--model", modelFile.absolutePath,
-            "--out", outFile.absolutePath,
-            "--progress", progressFile.absolutePath,
             "--start", params.startTime.toString(),
             "--end", params.endTime.toString(),
             "--step", params.initialStep.toString(),
@@ -139,18 +136,58 @@ class SimulationExecutorImpl(
         return cmd
     }
 
-    private fun readProgress(file: File): Double? {
-        return try {
-            val content = file.readText().trim()
-            if (content.isEmpty()) null else content.toDouble()
-        } catch (e: Exception) {
-            null
+    /**
+     * Reads the runner's stdout, which carries the result in the ISMA exchange
+     * binary format. The header (column count + names) is read first; then each
+     * row is read and its first value (the TIME column) is reported via [onTime]
+     * for progress tracking. Every byte read is also written to [result] so the
+     * accumulated stream is the complete result payload.
+     */
+    private fun consumeRunnerOutput(
+        stdout: InputStream,
+        result: OutputStream,
+        onTime: (time: Double) -> Unit,
+    ) {
+        val dis = DataInputStream(TeeInputStream(stdout, result))
+        try {
+            val columnCount = dis.readUnsignedShort()
+            repeat(columnCount) {
+                val len = dis.readUnsignedShort()
+                dis.readNBytes(len)
+            }
+            while (true) {
+                onTime(dis.readDouble())
+                for (i in 1 until columnCount) {
+                    dis.readDouble()
+                }
+            }
+        } catch (_: EOFException) {
+            // stream exhausted — the runner has finished writing
+        }
+    }
+
+    /**
+     * An [InputStream] that forwards every byte read from [source] to [sink],
+     * so the result can be accumulated while the same bytes are parsed.
+     */
+    private class TeeInputStream(
+        private val source: InputStream,
+        private val sink: OutputStream,
+    ) : InputStream() {
+        override fun read(): Int {
+            val b = source.read()
+            if (b >= 0) sink.write(b)
+            return b
+        }
+
+        override fun read(b: ByteArray, off: Int, len: Int): Int {
+            val n = source.read(b, off, len)
+            if (n > 0) sink.write(b, off, n)
+            return n
         }
     }
 
     companion object {
-        private const val POLL_INTERVAL_MS = 100L
-
         private val logger = LoggerFactory.getLogger(SimulationExecutorImpl::class.java)
     }
 }

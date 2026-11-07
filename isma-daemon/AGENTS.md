@@ -8,7 +8,7 @@ coordinates them:
 - **LISMA compiler CLI** (`lisma-compiler:cli`) — compiles LISMA source to a
   compiled `.class` file (and validates LISMA).
 - **Simulation runner CLI** (`isma-solver:cli`, batteries-included) — runs a simulation from a
-  compiled `.class` file and writes the result file.
+  compiled `.class` file and streams the binary result records to stdout.
 
 The gRPC API (protobuf contracts) is frozen; the daemon only orchestrates.
 
@@ -58,7 +58,7 @@ infrastructure/
  │   ├── compiledModels/     — ICompiledModelStore implementation
  │   └── integrationMethods/ — IIntegrationMethodsStore (ServiceLoader for IIntegrationMethodFactory)
  ├── simulation/
- │   ├── SimulationExecutorImpl — launches the simulation-runner CLI, writes the `.class` to a temp file, polls the progress file, and completes/fails/cancels the session
+ │   ├── SimulationExecutorImpl — launches the simulation-runner CLI, writes the `.class` to a temp file, reads the runner's stdout (deriving progress from the TIME column), and completes/fails/cancels the session
  │   └── SimulationProcessRegistry — tracks runner processes so CancelSimulation can kill them
  └── translation/
      └── CliLismaCompiler — launches the lisma-compiler CLI (compile → `.class`, validate → error lines)
@@ -74,9 +74,11 @@ operation is a separate process:
   (compile) or error lines to stdout (validate). The `.class` bytes are stored in
   `ICompiledModelStore`.
 - **Run** — `SimulationExecutorImpl` writes the stored `.class` to a temp file,
-  launches the runner CLI with the parameters, and polls a progress file
-  (written by the runner on each step) to update the session. When the runner
-  exits, the session is completed (result file path), failed, or left cancelled.
+  launches the runner CLI with the parameters, and reads the runner's stdout
+  (which streams the binary result records, one per time step), deriving
+  `progress = (t − t0) / (tEnd − t0)` from the TIME column to update the session.
+  When the runner exits, the accumulated result is written to a file and the
+  session is completed (result file path), failed, or left cancelled.
 - **Cancel** — `CancelSimulationHandlerImpl` marks the session CANCELLED and
   `SimulationProcessRegistry` sends SIGTERM to the runner process. The runner's
   shutdown hook stops the integration loop.

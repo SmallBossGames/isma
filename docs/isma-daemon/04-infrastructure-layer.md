@@ -97,7 +97,7 @@ See `IntegrationMethodsStore.kt` for the implementation. It uses Java `ServiceLo
 
 ### SimulationExecutorImpl
 
-The central orchestration component. It supervises one `isma-solver:cli` runner process per simulation: it writes the compiled `.class` to a temp file, launches the runner CLI, polls the runner's progress file, and updates the session when the runner exits.
+The central orchestration component. It supervises one `isma-solver:cli` runner process per simulation: it writes the compiled `.class` to a temp file, launches the runner CLI, reads the runner's stdout (which streams the binary result records, one per time step) and derives progress from the TIME column, then writes the accumulated result to a file and updates the session when the runner exits.
 
 **Dependencies:**
 
@@ -112,13 +112,13 @@ The central orchestration component. It supervises one `isma-solver:cli` runner 
 See `SimulationExecutorImpl.kt` for the full implementation. The executor runs on a single `ExecutorService` thread per simulation:
 
 1. **Artifact file:** Writes the stored artifact bytes to a temp file (`isma_model_<id>.bin`).
-2. **Runner launch:** Builds the runner command (model file, output file, progress file, start/end/step, method, optional accuracy/stability/event-detection flags) and launches the `isma-solver:cli` runner as a separate process. The runner's stderr is redirected to a temp file. The process is registered in `SimulationProcessRegistry`.
-3. **Progress polling:** While the process is alive, the thread reads the runner's progress file (which the runner overwrites with the current time on each step) every 100ms and calls `sessionStore.updateProgress` when the time advances.
-4. **Exit handling:** After `process.waitFor()`, the thread does a final progress read (the polling loop may not have run for fast simulations), then:
-   - If the session is already `CANCELLED`, deletes the output file and leaves the session CANCELLED.
-   - If the exit code is 0, calls `sessionStore.completeSimulation(id, outFile)`.
-   - Otherwise, deletes the output file and calls `sessionStore.failSimulation(id, ...)` with the runner's stderr diagnostics.
-5. **Cleanup:** The model, progress, and stderr temp files are deleted in a `finally` block. The process is unregistered.
+2. **Runner launch:** Builds the runner command (model file, start/end/step, method, optional accuracy/stability/event-detection flags) and launches the `isma-solver:cli` runner as a separate process. The runner's stderr is redirected to a temp file. The process is registered in `SimulationProcessRegistry`.
+3. **Progress from stdout:** While the process is alive, the thread reads the runner's stdout, which streams the binary result records (header, then one row per time step). Each row's first column is TIME; the thread derives `progress = (t − t0) / (tEnd − t0)` from it and calls `sessionStore.updateProgress` when the time advances. The full byte stream is accumulated so the result can be written to a file on exit.
+4. **Exit handling:** After the stdout stream is exhausted (process exit), the thread:
+   - If the session is already `CANCELLED`, deletes the result file and leaves the session CANCELLED.
+   - If the exit code is 0, writes the accumulated result bytes to the result file and calls `sessionStore.completeSimulation(id, outFile)`.
+   - Otherwise, deletes the result file and calls `sessionStore.failSimulation(id, ...)` with the runner's stderr diagnostics.
+5. **Cleanup:** The model and stderr temp files are deleted in a `finally` block. The process is unregistered.
 
 **Thread model:**
 
@@ -127,13 +127,12 @@ graph TB
     ES["ExecutorService Thread\n(per simulation)"] --> W["write artifact to temp file"]
     W --> L["launch isma-solver:cli process"]
     L --> R["register in ProcessRegistry"]
-    R --> P["poll progress file every 100ms"]
+    R --> P["read stdout, derive progress from TIME"]
     P -->|"updateProgress"| Store["sessionStore"]
-    P --> E["process.waitFor()"]
-    E --> FP["final progress read"]
-    FP --> C{"exit code / status"}
-    C -->|"CANCELLED"| CD["delete outFile, leave CANCELLED"]
-    C -->|"exit 0"| CC["completeSimulation(outFile)"]
+    P --> E["stdout exhausted (process exit)"]
+    E --> C{"exit code / status"}
+    C -->|"CANCELLED"| CD["delete result file, leave CANCELLED"]
+    C -->|"exit 0"| CC["write result file, completeSimulation(outFile)"]
     C -->|"exit != 0"| CF["failSimulation(stderr)"]
 ```
 
@@ -142,14 +141,14 @@ graph TB
 The runner is launched with:
 
 ```
-<runner> --model <artifact.bin> --out <result.bin> --progress <progress.txt> \
+<runner> --model <artifact.bin> \
          --start <t0> --end <t1> --step <h> --method <name> \
          [--accuracy <a> --accuracy-enabled] \
          [--stability-enabled] \
          [--gamma <g> --low-border <b>]
 ```
 
-The runner writes the result file (`--out`) in the existing binary format and overwrites the progress file (`--progress`) with the current time on each integration step.
+The runner streams the result to stdout in the existing binary format: a metadata header (column count, then per-column name length + UTF-8 name), flushed before the first row, followed by one row per time step (each a sequence of big-endian doubles; the first column is TIME), each row flushed as it is produced. The daemon accumulates the stream, derives progress from the TIME column, and writes the accumulated bytes to the result file on a successful exit.
 
 ### Runner Resolution Order
 

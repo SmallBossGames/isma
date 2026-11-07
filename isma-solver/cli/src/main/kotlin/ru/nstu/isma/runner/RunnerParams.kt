@@ -2,11 +2,14 @@ package ru.nstu.isma.runner
 
 /**
  * Parsed command-line parameters for the simulation runner CLI.
+ *
+ * The CLI is invoked with `--name value` pairs and boolean flags. Required
+ * options: `--model`, `--start`, `--end`, `--step`, `--method`. Optional:
+ * `--accuracy`, `--accuracy-enabled`, `--stability-enabled`, `--gamma`,
+ * `--low-border`.
  */
 data class RunnerParams(
     val model: String,
-    val out: String,
-    val progress: String?,
     val start: Double,
     val end: Double,
     val step: Double,
@@ -18,42 +21,52 @@ data class RunnerParams(
     val lowBorder: Double?,
 ) {
     companion object {
+        private val VALUE_OPTIONS = setOf(
+            "model", "start", "end", "step", "method", "accuracy", "gamma", "low-border",
+        )
+        private val FLAG_OPTIONS = setOf("accuracy-enabled", "stability-enabled")
+        private val REQUIRED = setOf("model", "start", "end", "step", "method")
+
+        /**
+         * Parses [args] into a [RunnerParams].
+         *
+         * @throws IllegalArgumentException on an unknown option, a missing value,
+         *   a missing required option, or a non-positive `--step`.
+         */
         fun parse(args: Array<String>): RunnerParams {
-            val values = HashMap<String, String>()
-            val flags = HashSet<String>()
+            val values = LinkedHashMap<String, String>()
+            val flags = LinkedHashSet<String>()
+
             var i = 0
             while (i < args.size) {
                 val arg = args[i]
-                when {
-                    arg == "--accuracy-enabled" -> flags.add(arg)
-                    arg == "--stability-enabled" -> flags.add(arg)
-                    arg.startsWith("--") && i + 1 < args.size -> {
-                        values[arg.removePrefix("--")] = args[i + 1]
-                        i++
-                    }
-                    else -> error("Unexpected argument: $arg")
+                require(arg.startsWith("--")) { "Unexpected argument: $arg" }
+                val name = arg.removePrefix("--")
+                require(name in VALUE_OPTIONS || name in FLAG_OPTIONS) { "Unknown option: $arg" }
+                if (name in FLAG_OPTIONS) {
+                    flags.add(name)
+                } else {
+                    require(i + 1 < args.size) { "Missing value for $arg" }
+                    values[name] = args[i + 1]
+                    i++
                 }
                 i++
             }
 
-            require("model" in values) { "Missing required argument --model" }
-            require("out" in values) { "Missing required argument --out" }
-            require("start" in values) { "Missing required argument --start" }
-            require("end" in values) { "Missing required argument --end" }
-            require("step" in values) { "Missing required argument --step" }
-            require("method" in values) { "Missing required argument --method" }
+            REQUIRED.forEach { name ->
+                require(name in values) { "Missing required option --$name" }
+            }
+            require(values.getValue("step").toDouble() > 0.0) { "Option --step must be positive" }
 
             return RunnerParams(
                 model = values.getValue("model"),
-                out = values.getValue("out"),
-                progress = values["progress"],
                 start = values.getValue("start").toDouble(),
                 end = values.getValue("end").toDouble(),
                 step = values.getValue("step").toDouble(),
                 method = values.getValue("method"),
                 accuracy = values["accuracy"]?.toDouble() ?: 0.0,
-                accuracyEnabled = "--accuracy-enabled" in flags,
-                stabilityEnabled = "--stability-enabled" in flags,
+                accuracyEnabled = "accuracy-enabled" in flags,
+                stabilityEnabled = "stability-enabled" in flags,
                 gamma = values["gamma"]?.toDouble(),
                 lowBorder = values["low-border"]?.toDouble(),
             )

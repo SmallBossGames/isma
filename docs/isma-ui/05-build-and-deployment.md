@@ -124,7 +124,7 @@ Set VM options in run configuration:
 
 ### Via Bundle
 
-After `./.ci-cd/build-bundle.sh`, the bundle at `build/bundle/` contains `isma-ui`, `isma-server`, and `isma-lsp` (as `isma-lsp-app/`) with a `run-ui.sh` launcher script that resolves paths automatically.
+After `./.ci-cd/build-bundle.sh`, the bundle at `build/bundle/` contains `isma-ui-app`, `isma-daemon-app`, `grin-app`, `isma-lsp-app`, plus the standalone `lisma-compiler-cli-app` and `simulation-runner-cli-app` distributions, with a `run-ui.sh` launcher script that resolves all script paths via environment variables.
 
 ## Server Script Resolution Priority
 

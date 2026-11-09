@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.java.modules) apply false
+    alias(libs.plugins.ben.manes.versions)
 }
 
 allprojects {
@@ -19,6 +21,7 @@ subprojects {
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
 
-        targetCompatibility = "22"
+        sourceCompatibility = "26"
+        targetCompatibility = "26"
     }
 }

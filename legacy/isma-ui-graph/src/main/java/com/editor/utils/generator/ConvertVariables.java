@@ -1,6 +1,5 @@
 package com.editor.utils.generator;
 
-import ru.nstu.isma.core.hsm.exp.*;
 import ru.nstu.isma.core.hsm.service.Poliz2InfixConverter;
 import ru.nstu.isma.core.hsm.var.HMDerivativeEquation;
 import ru.nstu.isma.core.hsm.var.HMUnnamedConst;

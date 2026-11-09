@@ -54,8 +54,3 @@ include("isma-next-math-engine")
 include("isma-next-math-common")
 include("isma-jvm-lib:exchange-format")
 
-include("isma-daemon:domain")
-include("isma-daemon:grpc")
-include("isma-daemon:infrastructure")
-include("isma-daemon:app")
-

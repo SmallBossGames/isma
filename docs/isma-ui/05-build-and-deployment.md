@@ -8,12 +8,12 @@ All modules use the Kotlin JVM plugin (`alias(libs.plugins.kotlin.jvm)`) and Jav
 
 **File:** `app/build.gradle.kts`
 
-The module applies plugins: `kotlin.jvm`, `kotlin.serialization`, `java.modules`, `javafx`, and `application`. Configuration sets `mainModule` to `isma.ui.app.main`, `mainClass` to `ru.isma.next.app.launcher.IsmaApplication`, and `applicationDefaultJvmArgs` to include `--enable-native-access=javafx.graphics` and `--enable-native-access=io.netty.common`. `JavaExec` tasks are configured with JVM args for native access and system properties pointing to server and Grin scripts. JavaFX version is 25.0.2 with modules `javafx.controls` and `javafx.fxml`. See `app/build.gradle.kts` for the full configuration.
+The module applies plugins: `kotlin.jvm`, `kotlin.serialization`, `java.modules`, `javafx`, and `application`. Configuration sets `mainModule` to `isma.ui.app.main`, `mainClass` to `ru.isma.next.app.launcher.IsmaApplication`, and `applicationDefaultJvmArgs` to include `--enable-native-access=javafx.graphics`. `JavaExec` tasks are configured with JVM args for native access and system properties pointing to the CLI tools, Grin, and the language server. JavaFX version is 25.0.2 with modules `javafx.controls` and `javafx.fxml`. See `app/build.gradle.kts` for the full configuration.
 
 Key configuration:
 - JavaFX 25.0.2 with `controls` and `fxml` modules
-- JVM args require `--enable-native-access` for JavaFX graphics and Netty native code
-- `JavaExec` tasks auto-configure `isma.server.script` and `isma.grin.script` system properties
+- JVM args require `--enable-native-access` for JavaFX graphics
+- `JavaExec` tasks auto-configure `isma.compiler.cli`, `isma.runner.cli`, `isma.grin.script`, and `isma.lsp.script` system properties
 - Main class: `ru.isma.next.app.launcher.IsmaApplication`
 
 ### domain Module
@@ -28,17 +28,9 @@ No JavaFX modules. Pure Kotlin module with only kotlinx-coroutines-core.
 
 **File:** `external-services/build.gradle.kts`
 
-The module sets group `ru.isma.next.ui` and version `1.0.0-SNAPSHOT`. Applies the Kotlin JVM plugin and Java modules plugin. Dependencies include project references to `:isma-ui:grpc`, `:isma-ui:domain`, and `:isma-jvm-lib:exchange-format`, plus gRPC-Netty, gRPC-protobuf, gRPC-stub, protobuf-java, slf4j-api, ktor-client-core, ktor-client-cio, kotlinx-io-core, and Netty transport (with Linux x86_64 epoll classifier). See `external-services/build.gradle.kts` for the full configuration.
+The module sets group `ru.isma.next.ui` and version `1.0.0-SNAPSHOT`. Applies the Kotlin JVM plugin and Java modules plugin. Dependencies include project references to `:isma-ui:domain` and `:isma-jvm-lib:exchange-format`, plus kotlinx-coroutines-core, kotlinx-serialization-json, and slf4j-api. See `external-services/build.gradle.kts` for the full configuration.
 
-No JavaFX modules. Depends on gRPC-Netty, Ktor CIO, and Netty Epoll for Unix Domain Socket support.
-
-### grpc Module
-
-**File:** `grpc/build.gradle.kts`
-
-The module sets group `ru.isma.next.ui` and version `1.0.0-SNAPSHOT`. Applies the Google protobuf plugin and Java modules plugin. Protobuf configuration uses `protoc` from the centralized version, generates gRPC Java stubs, and sources proto files from `../../protobuf-contracts`. Dependencies include gRPC-Netty, Netty transport (with Linux x86_64 epoll classifier), gRPC-stub, gRPC-protobuf, protobuf-java, grpc-java, and Guava. See `grpc/build.gradle.kts` for the full configuration.
-
-Generates Java gRPC stubs from protobuf definitions in `../../protobuf-contracts`. Exports `ru.nstu.isma.contracts.simulation`.
+No JavaFX modules. Plain Kotlin process management for the standalone CLI tools.
 
 ### text-editor Module
 
@@ -76,15 +68,13 @@ Each module declares a `module-info.java` with appropriate `exports`:
 | --- | --- | --- |
 | `app` | `isma.ui.app.main` | `ru.isma.next.app.launcher` |
 | `domain` | `isma.ui.domain` | `ru.isma.next.domain.models` |
-| `external-services` | `isma.ui.external.services` | `ru.isma.next.external`, `ru.isma.next.external.dtos` |
-| `grpc` | `isma.ui.grpc` | `ru.nstu.isma.contracts.v1.simulation_service`, `ru.nstu.isma.contracts.v1.compiler_service` |
+| `external-services` | `isma.ui.external.services` | `ru.isma.next.external`, `ru.isma.next.external.cli`, `ru.isma.next.external.dtos`, `ru.isma.next.external.lsp` |
 | `text-editor` | `isma.ui.editor.text` | `ru.isma.next.editor.text`, `services`, `services.contracts` |
 | `blueprint-editor` | `isma.ui.editor.blueprint` | `ru.isma.next.editor.blueprint`, `ru.isma.next.editor.blueprint.constants`, `ru.isma.next.editor.blueprint.controls`, `ru.isma.next.editor.blueprint.models`, `ru.isma.next.editor.blueprint.services`, `ru.isma.next.editor.blueprint.utilities`, `ru.isma.next.editor.blueprint.views` |
 | `toolkit` | `isma.ui.toolkit` | `ru.isma.javafx.extensions.controls`, `ru.isma.javafx.extensions.coroutines`, `ru.isma.javafx.extensions.coroutines.flow`, `ru.isma.javafx.extensions.helpers`, `ru.isma.javafx.extensions.viewmodel` |
 
 **Requires notes:**
 - `text-editor` requires `javafx.graphics` (not `javafx.controls`)
-- `external-services` requires `io.netty.transport.unix.common`, `io.netty.common`, `io.netty.buffer`, `io.netty.codec`
 
 **Opens declarations (app module):**
 The `app` module uses `opens` (not `exports`) for packages that need reflection access:
@@ -96,47 +86,46 @@ The `app` module uses `opens` (not `exports`) for packages that need reflection 
 - `./gradlew :isma-ui:app:build` — Build all isma-ui modules
 - `./gradlew :isma-ui:domain:build` — Build domain module
 - `./gradlew :isma-ui:external-services:build` — Build external-services module
-- `./gradlew :isma-ui:grpc:build` — Build grpc module
 - `./gradlew :isma-ui:text-editor:build` — Build text-editor module
 - `./gradlew :isma-ui:blueprint-editor:build` — Build blueprint-editor module
 - `./gradlew :isma-ui:toolkit:build` — Build toolkit module
 - `./gradlew build` — Build entire project (includes isma-ui)
-- `./.ci-cd/build-bundle.sh` — Build bundle (UI + server + `isma-lsp`)
+- `./.ci-cd/build-bundle.sh` — Build bundle (UI + CLIs + `isma-lsp`)
 
 ## Dependency Resolution
 
-All dependency versions are centralized in `gradle/libs.versions.toml` with aliases. The file defines `[versions]` sections for javafx (25.0.2), koin (4.x.x), and grpc (1.x.x), and `[libraries]` sections mapping aliases to module coordinates with version references. The `app` module imports `libs.koin.core` for DI and `libs.kotlinx.coroutines.*` for coroutine-based concurrency. No TornadoFX dependency. See `gradle/libs.versions.toml` for the full configuration.
+All dependency versions are centralized in `gradle/libs.versions.toml` with aliases. The file defines `[versions]` sections for javafx (25.0.2), koin (4.x.x), and kotlinx (coroutines/serialization), and `[libraries]` sections mapping aliases to module coordinates with version references. The `app` module imports `libs.koin.core` for DI and `libs.kotlinx.coroutines.*` for coroutine-based concurrency. No TornadoFX dependency. See `gradle/libs.versions.toml` for the full configuration.
 
 ## Running
 
 ### Via Gradle
 
-The `JavaExec` task in `app/build.gradle.kts` auto-configures system properties `isma.server.script`, `isma.grin.script`, and `isma.lsp.script` pointing to the bundle paths. Run with: `./gradlew :isma-ui:app:run`. See `app/build.gradle.kts` for the full configuration.
+The `JavaExec` task in `app/build.gradle.kts` auto-configures system properties `isma.compiler.cli`, `isma.runner.cli`, `isma.grin.script`, and `isma.lsp.script` pointing to the bundle paths. Run with: `./gradlew :isma-ui:app:run`. See `app/build.gradle.kts` for the full configuration.
 
 ### Via IDE
 
 Set VM options in run configuration:
 - `--enable-native-access=javafx.graphics`
-- `--enable-native-access=io.netty.common`
-- `-Disma.server.script=/path/to/isma-server-script`
+- `-Disma.compiler.cli=/path/to/lisma-compiler-cli`
+- `-Disma.runner.cli=/path/to/simulation-runner-cli`
 - `-Disma.grin.script=/path/to/grin-script`
 - `-Disma.lsp.script=/path/to/isma-lsp/bin/isma-lsp`
 
 ### Via Bundle
 
-After `./.ci-cd/build-bundle.sh`, the bundle at `build/bundle/` contains `isma-ui-app`, `isma-daemon-app`, `grin-app`, `isma-lsp-app`, plus the standalone `lisma-compiler-cli-app` and `simulation-runner-cli-app` distributions, with a `run-ui.sh` launcher script that resolves all script paths via environment variables.
+After `./.ci-cd/build-bundle.sh`, the bundle at `build/bundle/` contains `isma-ui-app`, `grin-app`, `isma-lsp-app`, plus the standalone `lisma-compiler-cli-app` and `simulation-runner-cli-app` distributions, with a `run-ui.sh` launcher script that resolves all script paths via environment variables.
 
-## Server Script Resolution Priority
+## Tool Script Resolution Priority
 
-1. Environment variable `ISMA_SERVER_SCRIPT`
-2. System property `isma.server.script`
+For each tool, the resolution order is:
+
+1. Environment variable (`ISMA_COMPILER_CLI`, `ISMA_RUNNER_CLI`, `ISMA_GRIN_SCRIPT`, `ISMA_LSP_SCRIPT`)
+2. System property (`isma.compiler.cli`, `isma.runner.cli`, `isma.grin.script`, `isma.lsp.script`)
 3. Throws `IllegalStateException` if neither is set
 
-Same pattern for Grin: `ISMA_GRIN_SCRIPT` → `isma.grin.script` → exception, and for the language server: `ISMA_LSP_SCRIPT` → `isma.lsp.script` → exception.
+## Work Directory
 
-## Cache Directory
-
-Simulation results are cached to `<java.io.tmpdir>/isma-simulation-cache/simulation_<id>.bin`. The directory is created automatically on first download if it doesn't exist.
+Compiled `.class` models and simulation result files are written to `<java.io.tmpdir>/isma-ui/` (the CLI work directory). The directory is created automatically on first use and cleaned up by `SimulationServerFacade.shutdown()`.
 
 ## Version Alignment
 

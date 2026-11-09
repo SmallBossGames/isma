@@ -162,7 +162,7 @@ A drag-and-drop visual canvas for building finite-state machines. The blueprint 
 
 **Implementation:** `SettingsPanelView.kt` extends `PropertiesAccordion` and adds four sub-views, each wrapped in a `VBox` with `prefWidth = 240.0` and `styleClass = "settings-box"`. Each sub-view contains a `ScrollPane` with a `propertiesGrid` layout (label on the left, control on the right) provided by `ru.isma.javafx.extensions.controls.propertiesGrid`.
 
-**Data flow:** The panel reads from and writes to the singleton `SimulationParametersService`, which holds five JavaFX property-based view model instances (no TornadoFX dependency). When the user clicks "Run" (▶ Play or `Ctrl+F5`), the service's `snapshot()` method captures the current view model state into a serializable `SimulationParametersModel`, which is then converted to `RunSimulationParams` and sent to the server via gRPC. The panel values are **not** live-bound to the simulation — they are only read at the moment of execution.
+**Data flow:** The panel reads from and writes to the singleton `SimulationParametersService`, which holds five JavaFX property-based view model instances (no TornadoFX dependency). When the user clicks "Run" (▶ Play or `Ctrl+F5`), the service's `snapshot()` method captures the current view model state into a serializable `SimulationParametersModel`, which is then converted to `RunSimulationParams` and passed to the runner CLI via `SimulationServerFacade.runSimulation()`. The panel values are **not** live-bound to the simulation — they are only read at the moment of execution.
 
 ---
 
@@ -328,8 +328,8 @@ graph LR
         SimModel[SimulationParametersModel]
         RunParams[RunSimulationParams]
     end
-    subgraph Server
-        Server[ISMA Server gRPC]
+    subgraph Tools
+        Server[CLI Tools (compiler + runner)]
     end
 
     Settings --> Cauchy
@@ -347,11 +347,11 @@ graph LR
     RunParams --> Server
 ```
 
-The data flow is: User edits settings → ViewModel properties (JavaFX Simple*Property) → `SimulationParametersService` holds all 5 ViewModels as singletons → On "Run" click, `snapshot()` captures all ViewModels into `SimulationParametersModel` → `toRunSimulationParams()` converts to `RunSimulationParams` (gRPC message) → `ServerFacade.runSimulation(params)` sends to server via gRPC.
+The data flow is: User edits settings → ViewModel properties (JavaFX Simple*Property) → `SimulationParametersService` holds all 5 ViewModels as singletons → On "Run" click, `snapshot()` captures all ViewModels into `SimulationParametersModel` → `toRunSimulationParams()` converts to `RunSimulationParams` → `SimulationServerFacade.runSimulation(params)` launches the runner CLI.
 
-**Parameters sent to server:** Cauchy initials (start, end, step), integration method (name, accuracy, flags), event detection (gamma, low border — only when enabled).
+**Parameters passed to the runner:** Cauchy initials (start, end, step), integration method (name, accuracy, flags), event detection (gamma, low border — only when enabled).
 
-**Parameters NOT sent to server:** `isStableAllowedInUse` (metadata only), `isParallelInUse` / `server` / `port` (client-side connection config), `savingTarget` (client-side storage preference), result processing settings (client-side rendering only).
+**Parameters NOT passed to the runner:** `isStableAllowedInUse` (metadata only), `isParallelInUse` / `server` / `port` (client-side connection config), `savingTarget` (client-side storage preference), result processing settings (client-side rendering only).
 
 **Parameters NOT persisted in Store/Load:** Result processing settings (`isSimplifyInUse`, `selectedSimplifyMethod`, `tolerance`). All other settings sections are included in the JSON serialization.
 
@@ -467,8 +467,9 @@ sequenceDiagram
     participant U as User
     participant SS as SimulationService
     participant STS as SimulationTaskService
-    participant Facade as ServerFacade
-    participant Server as ISMA Server
+    participant Facade as SimulationServerFacade
+    participant Compiler as Compiler CLI
+    participant Runner as Runner CLI
     participant Tasks as TasksPopOver
     participant Error as Error List
 
@@ -476,27 +477,26 @@ sequenceDiagram
     SS->>SS: snapshot() parameters
     SS->>STS: submit(modelName, params, simParams)
     STS->>Facade: compileModel(source)
-    Facade->>Server: gRPC CompileRequest
-    Server-->>Facade: CompileResponse
+    Facade->>Compiler: Launch compiler CLI (source on stdin)
+    Compiler-->>Facade: .class bytes / error lines
     alt Compilation errors
         Facade-->>Error: putErrorList(errors)
         Facade-->>STS: FAILED
         STS-->>Tasks: Add Failed row
     else Compilation success
         STS->>Facade: runSimulation(params)
-        Facade->>Server: gRPC RunSimulationRequest
-        Server-->>Facade: simulationId
-        STS->>Facade: monitorSimulation(id)
-        Facade->>Server: gRPC monitor stream
-        Server-->>Facade: Flow<SimulationProgress>
-        loop Progress updates
-            Facade-->>STS: SimulationProgress
+        Facade->>Runner: Launch runner CLI
+        Runner-->>Facade: simulationId (local)
+        STS->>Facade: monitorSimulation(id, onProgress)
+        Facade->>Runner: Stream TIME column from stdout
+        Runner-->>Facade: TIME values (streamed)
+        loop Progress updates (coalesced)
+            Facade-->>STS: onProgress(SimulationProgress)
             STS-->>Tasks: Update progress bar
         end
         STS->>Facade: downloadResultToCache(id)
-        Facade->>Server: gRPC getSimulationResult()
-        Server-->>Facade: download URL
-        Facade->>Facade: HTTP GET binary file
+        Facade->>Runner: Wait for exit
+        Runner-->>Facade: Result file + column names
         Facade-->>STS: CachedSimulationResult
         STS->>STS: setStatus(COMPLETED)
         STS-->>Tasks: Move to Completed section
@@ -513,9 +513,9 @@ The simulation run follows this sequence:
 2. User clicks Play button or Ctrl+F5, which calls `simulate()` on `SimulationService`
 3. `SimulationService` snapshots parameters, gets the active project source, and calls `SimulationTaskService.submit(modelName, params, simParams)`
 4. **Compile phase:** `SimulationTaskService` calls `serverFacade.compileModel(source)`. If compilation errors occur, they are displayed in the Error List and a "Failed" row is added to Tasks PopOver. If compilation succeeds:
-5. **Run phase:** `runSimulation(params)` is called, returning a `simulationId` from the server
-6. **Monitor phase:** `monitorSimulation(id)` starts a server stream; progress updates are received and the progress bar in Tasks PopOver is updated
-7. **Download phase:** `downloadResultToCache(id)` fetches the result, creating a `CachedSimulationResult`
+5. **Run phase:** `runSimulation(params)` launches the runner CLI, returning a local `simulationId`
+6. **Monitor phase:** `monitorSimulation(id)` streams the runner's TIME column; progress updates are received and the progress bar in Tasks PopOver is updated
+7. **Download phase:** `downloadResultToCache(id)` waits for the runner to exit and returns the result file, creating a `CachedSimulationResult`
 8. The task status changes to COMPLETED and moves from "In progress" to "Completed" in Tasks PopOver
 9. User clicks "Show" on the completed task, which opens the axis picker dialog
 10. User selects X and Y variables, confirms, and the Grin chart viewer launches with the data
@@ -528,14 +528,14 @@ See `SimulationService.kt`, `SimulationTaskService.kt`, and `SimulationResultSer
 sequenceDiagram
     participant U as User
     participant LismaPde as LismaPdeService
-    participant Facade as ServerFacade
-    participant Server as ISMA Server
+    participant Facade as SimulationServerFacade
+    participant Compiler as Compiler CLI
     participant Error as Error List
 
     U->>LismaPde: Click Verify / Ctrl+F4
     LismaPde->>Facade: validateModel(source)
-    Facade->>Server: gRPC ValidateRequest
-    Server-->>Facade: ValidationResult
+    Facade->>Compiler: Launch compiler CLI (--validate)
+    Compiler-->>Facade: ValidationResult
     alt Validation errors exist
         Facade-->>LismaPde: ValidationResult(errors)
         LismaPde->>Error: putErrorList(errors)
@@ -705,11 +705,11 @@ See `LismaPdeService.kt` for the implementation.
 | **Text-based LISMA editing** | Text editor tab | Rich text editor with syntax highlighting and line numbers |
 | **Visual statechart editing** | Blueprint editor tab | Drag-and-drop canvas with states, transitions, and loop transactions |
 | **Remote syntax highlighting** | Text editor | LSP tokenization via the `isma-lsp` process — keywords, comments, numbers colored |
-| **Model compilation** | Server (via gRPC) | Compiles LISMA text or blueprint to a runnable model |
-| **Model validation** | Server (via gRPC) | Validates source code without running (Verify button) |
-| **Simulation execution** | Server (via gRPC) | Runs the compiled model with given parameters |
-| **Real-time progress** | gRPC stream | Server pushes progress updates during simulation |
-| **Simulation cancellation** | gRPC call | Stops a running simulation mid-execution |
+| **Model compilation** | Compiler CLI process | Compiles LISMA text or blueprint to a runnable model |
+| **Model validation** | Compiler CLI process | Validates source code without running (Verify button) |
+| **Simulation execution** | Runner CLI process | Runs the compiled model with given parameters |
+| **Real-time progress** | Runner stdout stream | Runner streams the TIME column during simulation |
+| **Simulation cancellation** | Process termination | Stops a running simulation mid-execution (SIGTERM → hard kill) |
 | **Error list** | Bottom drawer | Tabular display of compilation/validation errors |
 | **Simulation parameters** | Right sidebar | Configurable: time range, integration method, event detection, result storage |
 | **Parameter presets** | Store/Load settings | Save and load parameter sets as JSON files |
@@ -758,17 +758,18 @@ For detailed specification of the blueprint editor interaction model (state crea
 When building a replacement UI with the same features:
 
 1. **Separation of concerns:** The UI is cleanly layered — domain models (pure data) → services (business logic) → views (UI components) → controllers (event handlers)
-2. **Server communication:** All compilation, validation, and simulation happen on a separate server process. The UI communicates via gRPC (compile, validate, run, monitor, cancel, download) and HTTP (binary result download).
+2. **CLI communication:** All compilation, validation, and simulation happen in separate CLI tool processes. The UI drives the compiler CLI (compile, validate) and the runner CLI (run, monitor, cancel, result download) directly — no server.
 3. **Multi-project:** Projects are managed in an observable set with an active project concept. Each project has its own editor and Koin scope.
 4. **Observable collections:** UI state is driven by observable collections (projects, tasks, results, errors) that update the UI reactively via `addedAsFlow()` and `changeAsFlow()` extensions.
 5. **Blueprint-to-text:** The blueprint editor is a visual layer that serializes to/from a LISMA text representation. The conversion happens at compile time via `BlueprintModel.convertToLisma()`, not in real-time.
-6. **External processes:** Three external processes are launched by the UI:
-   - ISMA Server (gRPC backend) — launched automatically on startup via `SimulationServerManager`
+6. **External processes:** External processes are launched by the UI:
+   - LISMA Compiler CLI — launched on-demand for each compile/validate via `LismaCompilerCli`
+   - Simulation Runner CLI — launched on-demand for each simulation via `SimulationRunnerCli`
    - LISMA Language Server (`isma-lsp`) — launched automatically on startup via `LspProcessManager`, provides syntax highlighting over LSP
    - Grin Chart Viewer — launched on-demand when user clicks "Show" on results via `GrinProcessLauncher`
 7. **Preferences:** Window geometry and last-opened files are persisted as JSON via `PreferencesProvider`. Simulation parameters are stored/loaded as separate JSON files by the user via `SimulationParametersService`.
 8. **Syntax highlighting:** Computed by the `isma-lsp` language server process (LSP `semanticTokens/full` over stdio). The UI receives line/column token positions and kinds, then applies CSS class-based styling to the rich text editor.
-9. **Result format:** Binary files containing `SimulationPoint` records (x, yForDe[], rhs[][]). Column names come from server metadata. Both the chart viewer and CSV export consume this binary format via `BinaryFilePointProvider`.
+9. **Result format:** Binary files containing `SimulationPoint` records (x, yForDe[], rhs[][]). Column names come from the runner's metadata header. Both the chart viewer and CSV export consume this binary format via `BinaryFilePointProvider`.
 10. **Clipboard propagation:** Cut/copy/paste events are propagated via `EditorPlatformService` using Kotlin `SharedFlow`, allowing the text editor to respond to platform clipboard commands from anywhere in the UI.
 11. **Result simplification:** Post-processing simplification uses Radial-Distance or Douglas-Peucker algorithms to reduce data points for smoother chart rendering.
-12. **Virtual thread dispatcher:** Simulation execution uses a virtual-thread-backed coroutine dispatcher with `SupervisorJob` for concurrent simulation runs.
+12. **Virtual threads:** Simulation execution is coroutine-free — each simulation job runs on its own virtual thread from a shared `Executors.newVirtualThreadPerTaskExecutor()`, parking during the blocking runner stream and exit wait.

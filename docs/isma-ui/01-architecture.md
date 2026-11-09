@@ -2,22 +2,22 @@
 
 ## Purpose
 
-ISMA-UI is a multi-module JavaFX desktop application that provides editing, simulation, and visualization capabilities for the ISMA mathematical modeling environment. It follows a layered architecture: domain models (pure Kotlin) → external services (gRPC/HTTP clients) → app layer (views, services, models) with Koin dependency injection wiring the layers together.
+ISMA-UI is a multi-module JavaFX desktop application that provides editing, simulation, and visualization capabilities for the ISMA mathematical modeling environment. It follows a layered architecture: domain models (pure Kotlin) → external services (direct CLI integration) → app layer (views, services, models) with Koin dependency injection wiring the layers together.
 
 ## Module Structure
 
-The `isma-ui/` directory contains the following modules: `app/` (main application entry point with launcher, models, services, viewmodels, views, utilities, extensions, and constants), `domain/` (pure Kotlin domain models with no UI dependencies), `external-services/` (gRPC clients, HTTP client, server manager), `grpc/` (generated gRPC stubs), `text-editor/` (rich text editor with syntax highlighting), `blueprint-editor/` (visual statechart editor), and `toolkit/` (shared JavaFX utilities).
+The `isma-ui/` directory contains the following modules: `app/` (main application entry point with launcher, models, services, viewmodels, views, utilities, extensions, and constants), `domain/` (pure Kotlin domain models with no UI dependencies), `external-services/` (CLI process layer, facade, LSP client), `text-editor/` (rich text editor with syntax highlighting), `blueprint-editor/` (visual statechart editor), and `toolkit/` (shared JavaFX utilities).
 
 ## Dependency Graph
 
-The `app` module depends on all other isma-ui modules (text-editor, blueprint-editor, toolkit, external-services, grpc, domain). The `external-services` module depends on `grpc`, `domain`, and `exchange-format`. The `blueprint-editor` module depends on `text-editor` and `toolkit`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
+The `app` module depends on all other isma-ui modules (text-editor, blueprint-editor, toolkit, external-services, domain). The `external-services` module depends on `domain` and `exchange-format`. The `blueprint-editor` module depends on `text-editor` and `toolkit`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
 
 ## Design Principles
 
 ### Separation of Concerns
 
 - **Domain layer** — No UI dependencies. Pure data classes and interfaces for simulation results, progress, and metadata.
-- **External services** — No JavaFX. gRPC stubs, HTTP client, and server process management are all plain Kotlin.
+- **External services** — No JavaFX. CLI process management (compiler/runner CLIs) and the LSP client are all plain Kotlin.
 - **Text editor / Blueprint editor** — Reusable editor components injected into project models.
 - **App layer** — Wires everything together. Views observe services; services consume external services and domain models.
 
@@ -29,9 +29,9 @@ Each `LismaProjectModel` and `BlueprintProjectModel` carries a Koin scope (`Koin
 
 ### Coroutine-Based Concurrency
 
-JavaFX's single-threaded UI model is respected through `Dispatchers.JavaFx` coroutine context. Long-running operations (simulation monitoring, CSV export) run on `Dispatchers.IO` or a virtual-thread-backed dispatcher, with results marshalled back to the JavaFX thread via `Platform.runLater` or `withContext(Dispatchers.JavaFx)`.
+JavaFX's single-threaded UI model is respected through `Dispatchers.JavaFx` coroutine context. Long-running operations (CSV export, LSP requests) run on `Dispatchers.IO` or `Dispatchers.Default`, with results marshalled back to the JavaFX thread via `Platform.runLater` or `withContext(Dispatchers.JavaFx)`.
 
-Simulation execution uses a global `CoroutineScope` backed by `Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()` with `SupervisorJob()`. Each simulation runs as an independent coroutine in this scope (`SimulationTaskService.SimulationScope`), allowing concurrent simulation runs without cancellation propagation.
+Simulation execution is coroutine-free: each simulation job runs on its own virtual thread from a shared `Executors.newVirtualThreadPerTaskExecutor()` in `SimulationTaskService`. The job blocks on the runner stream (monitor) and the runner exit (download) — a virtual thread parks instead of holding a platform thread. Task-list changes are broadcast to listeners registered via `addTaskListener(...)` and marshalled to the JavaFX thread via `Platform.runLater`.
 
 ### Observable Collections
 
@@ -45,8 +45,7 @@ sequenceDiagram
     participant L as Launcher.main()
     participant JFX as JavaFX Application
     participant K as Koin DI
-    participant S as SimulationServerFacade
-    participant JVM as Server Process
+    participant LSP as LspProcessManager
     participant M as MainView
 
     U->>L: Launch application
@@ -54,10 +53,8 @@ sequenceDiagram
     JFX->>JFX: init block
     JFX->>K: startKoin()
     K-->>JFX: DI container ready
-    JFX->>S: warmup()
-    S->>JVM: Launch server process
-    JVM-->>S: gRPC + HTTP socket paths
-    S-->>JFX: warmup complete
+    JFX->>LSP: start()
+    LSP-->>JFX: isma-lsp process running
     JFX->>JFX: JavaFX.start(stage)
     JFX->>M: new Scene(MainView)
     M->>M: Load window preferences
@@ -65,7 +62,7 @@ sequenceDiagram
     M-->>U: Show main window
 ```
 
-The startup sequence follows this flow: `Launcher.main()` calls `Application.launch(IsmaApplication::class.java)`. The `IsmaApplication.init` block calls `startKoin()` to initialize the Koin DI container. After Koin is ready, `warmup()` is called on `SimulationServerFacade`, which starts the server process and creates the gRPC and HTTP clients. Once warmup completes, `JavaFX.start(stage)` is invoked, which creates a `Scene` with `MainView`, loads window preferences, opens the last projects, and shows the stage. See `IsmaApplication.kt` in the launcher package for the full implementation.
+The startup sequence follows this flow: `Launcher.main()` calls `Application.launch(IsmaApplication::class.java)`. The `IsmaApplication.init` block calls `startKoin()` to initialize the Koin DI container, then starts the `isma-lsp` language server process via `LspProcessManager`. The CLI tools (compiler, runner) are launched on demand — no daemon or server process is started at startup. Once init completes, `JavaFX.start(stage)` is invoked, which creates a `Scene` with `MainView`, loads window preferences, opens the last projects, and shows the stage. See `IsmaApplication.kt` in the launcher package for the full implementation.
 
 ## Key Interfaces
 
@@ -91,13 +88,13 @@ Defined in [`SimulationTaskService.kt`](app/src/main/kotlin/ru/isma/next/app/ser
 Koin provides a visible DI graph, scoped instances per project, and avoids verbose constructor chains across 7 modules. Constructor injection would require passing 10+ dependencies through every layer.
 
 ### Why virtual threads for simulation
-`Executors.newVirtualThreadPerTaskExecutor()` enables concurrent simulation runs without managing a bounded thread pool. Each simulation is an independent coroutine in a `SupervisorJob` scope.
+`Executors.newVirtualThreadPerTaskExecutor()` enables concurrent simulation runs without managing a bounded thread pool. Each simulation job is an independent virtual thread that blocks on the runner stream and the runner exit; a virtual thread parks during that blocking I/O instead of holding a platform thread, so many simulations can run at once.
 
-### Why `SupervisorJob` for simulation scope
-Prevents cancellation propagation between concurrent simulations. If one simulation fails, it does not cancel other running simulations.
+### Why a listener instead of a `Flow` for task changes
+The simulation path is coroutine-free, so `SimulationTaskService` broadcasts task-list changes to listeners registered via `addTaskListener(...)` (a `CopyOnWriteArrayList`), invoked on the UI thread. Each simulation is an independent virtual thread, so one failing simulation does not cancel the others — no shared scope or `SupervisorJob` is needed.
 
 ### Why LSP-driven syntax highlighting
-Centralized grammar in the `isma-lsp` language server avoids duplicating tokenization logic in the UI. The UI launches `isma-lsp` as a background process and pulls semantic tokens over LSP (JSON-RPC 2.0 over stdio), then applies CSS class-based styling. This replaces the previous gRPC `Highlight` RPC and keeps language features decoupled from the simulation server.
+Centralized grammar in the `isma-lsp` language server avoids duplicating tokenization logic in the UI. The UI launches `isma-lsp` as a background process and pulls semantic tokens over LSP (JSON-RPC 2.0 over stdio), then applies CSS class-based styling. This replaces the previous gRPC `Highlight` RPC and keeps language features decoupled from the simulation tools.
 
 ### Why `BlueprintViewAdapter` abstraction
 Decouples the blueprint editor ViewModel from JavaFX types, enabling framework-independent logic. The concrete `JavaFxBlueprintViewAdapter` delegates to JavaFX `Pane.children` and `Tab` creation.

@@ -12,9 +12,9 @@ The `app` module source lives in `app/src/main/kotlin/ru/isma/next/app/` with su
 
 **File:** [`build.gradle.kts`](../../app/build.gradle.kts)
 
-Applies plugins: `kotlin.jvm`, `kotlin.serialization`, `java.modules`, `javafx`, `application`. Sets `mainModule` to `isma.ui.app.main` and `mainClass` to `ru.isma.next.app.launcher.IsmaApplication`. JVM args include `--enable-native-access=javafx.graphics` and `--enable-native-access=io.netty.common`.
+Applies plugins: `kotlin.jvm`, `kotlin.serialization`, `java.modules`, `javafx`, `application`. Sets `mainModule` to `isma.ui.app.main` and `mainClass` to `ru.isma.next.app.launcher.IsmaApplication`. JVM args include `--enable-native-access=javafx.graphics`.
 
-JavaFX modules: `javafx.controls`, `javafx.fxml`. Key dependencies: Koin, ControlsFX, fxmisc.richtext, Ikonli (Material2 icons), gRPC-Netty with Linux Epoll, Kotlinx Coroutines (JavaFX + serialization).
+JavaFX modules: `javafx.controls`, `javafx.fxml`. Key dependencies: Koin, ControlsFX, fxmisc.richtext, Ikonli (Material2 icons), Kotlinx Coroutines (JavaFX + serialization).
 
 ## Application Entry Point
 
@@ -52,7 +52,7 @@ Dependencies: `Facade` → `ProjSvc`, `TaskSvc`, `ParamsSvc`. `TaskSvc` → `Err
 
 **File:** [`serviceModules.kt`](../../app/src/main/kotlin/.../di/serviceModules.kt)
 
-Defines `simulationServerModule` (SimulationServerManager, SimulationServerFacade) and `appServicesModule` (UiThreadExecutor, EditorPlatformService, ProjectService, ProjectFileService, ModelErrorService, LismaPdeService, SimulationParametersService, ISimulationTaskService, SimulationResultService, ISimulationService, PreferencesProvider).
+Defines `simulationServerModule` (CliToolLaunchers, LismaCompilerCli, SimulationRunnerCli, SimulationServerFacade, LspProcessManager, LspClient) and `appServicesModule` (UiThreadExecutor, EditorPlatformService, ProjectService, ProjectFileService, ModelErrorService, LismaPdeService, SimulationParametersService, ISimulationTaskService, SimulationResultService, ISimulationService, PreferencesProvider).
 
 All registrations use `single()` (singleton) lifecycle.
 
@@ -91,7 +91,7 @@ All registrations use `single()` (singleton) except `TasksPopOver` which uses `f
 
 ## Component Dependency Graph
 
-The `app` module depends on all other isma-ui modules (text-editor, blueprint-editor, toolkit, external-services, grpc, domain). The `external-services` module depends on `grpc`, `domain`, and `exchange-format`. The `blueprint-editor` module depends on `text-editor` and `toolkit`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
+The `app` module depends on all other isma-ui modules (text-editor, blueprint-editor, toolkit, external-services, domain). The `external-services` module depends on `domain` and `exchange-format`. The `blueprint-editor` module depends on `text-editor` and `toolkit`. The `domain` module is the leaf — pure Kotlin with only kotlinx-coroutines as a dependency.
 
 ## Java Module System
 
@@ -101,15 +101,14 @@ Each module declares a `module-info.java` with appropriate `exports`:
 | --- | --- | --- |
 | `app` | `isma.ui.app.main` | `ru.isma.next.app.launcher` |
 | `domain` | `isma.ui.domain` | `ru.isma.next.domain.models` |
-| `external-services` | `isma.ui.external.services` | `ru.isma.next.external`, `ru.isma.next.external.dtos` |
-| `grpc` | `isma.ui.grpc` | `ru.nstu.isma.contracts.v1.simulation_service`, `ru.nstu.isma.contracts.v1.compiler_service` |
+| `external-services` | `isma.ui.external.services` | `ru.isma.next.external`, `ru.isma.next.external.cli`, `ru.isma.next.external.dtos`, `ru.isma.next.external.lsp` |
 | `text-editor` | `isma.ui.editor.text` | `ru.isma.next.editor.text`, `services`, `services.contracts` |
 | `blueprint-editor` | `isma.ui.editor.blueprint` | `ru.isma.next.editor.blueprint`, `ru.isma.next.editor.blueprint.constants`, `ru.isma.next.editor.blueprint.controls`, `ru.isma.next.editor.blueprint.models`, `ru.isma.next.editor.blueprint.services`, `ru.isma.next.editor.blueprint.utilities`, `ru.isma.next.editor.blueprint.views` |
 | `toolkit` | `isma.ui.toolkit` | `ru.isma.javafx.extensions.controls`, `ru.isma.javafx.extensions.coroutines`, `ru.isma.javafx.extensions.coroutines.flow`, `ru.isma.javafx.extensions.helpers`, `ru.isma.javafx.extensions.viewmodel` |
 
 **Requires notes:**
 - `text-editor` requires `javafx.graphics` (not `javafx.controls`)
-- `external-services` requires `io.netty.transport.unix.common`, `io.netty.common`, `io.netty.buffer`, `io.netty.codec`
+- `external-services` requires `kotlinx.coroutines.core`, `kotlinx.serialization.json`, `org.slf4j`, `isma.ui.domain`, `isma.jvm.lib.exchange.format` — it drives the CLI tools as child processes and has no network transport dependencies
 
 **Opens declarations (app module):**
 The `app` module uses `opens` (not `exports`) for packages that need reflection access:

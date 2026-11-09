@@ -19,14 +19,12 @@ fi
 (cd isma-ui && ./gradlew :isma-ui:app:installDist)
 (cd grin && ./gradlew :grin:gui:app:installDist)
 
-# Daemon, language server, and standalone CLIs are built in the main repo
-./gradlew :isma-daemon:app:installDist
+# Language server and standalone CLIs are built in the main repo
 ./gradlew :lisma-compiler:lisma-lsp:installDist
 ./gradlew :lisma-compiler:cli:installDist
 ./gradlew :isma-solver:cli:installDist
 
 cp -r "$PROJECT_ROOT/isma-ui/isma-ui/app/build/install/app" "$BUNDLE_DIR/isma-ui-app"
-cp -r "$PROJECT_ROOT/isma-daemon/app/build/install/app" "$BUNDLE_DIR/isma-daemon-app"
 cp -r "$PROJECT_ROOT/grin/grin/gui/app/build/install/app" "$BUNDLE_DIR/grin-app"
 cp -r "$PROJECT_ROOT/lisma-compiler/lisma-lsp/build/install/isma-lsp" "$BUNDLE_DIR/isma-lsp-app"
 cp -r "$PROJECT_ROOT/lisma-compiler/cli/build/install/lisma-compiler-cli" "$BUNDLE_DIR/lisma-compiler-cli-app"
@@ -38,7 +36,6 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 exec env \
-  "ISMA_DAEMON_SCRIPT=$SCRIPT_DIR/isma-daemon-app/bin/app" \
   "ISMA_GRIN_SCRIPT=$SCRIPT_DIR/grin-app/bin/app" \
   "ISMA_LSP_SCRIPT=$SCRIPT_DIR/isma-lsp-app/bin/isma-lsp" \
   "ISMA_COMPILER_CLI=$SCRIPT_DIR/lisma-compiler-cli-app/bin/lisma-compiler-cli" \

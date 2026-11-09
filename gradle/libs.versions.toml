@@ -4,10 +4,6 @@ kotlinx-coroutines = "1.11.0"
 kotlin-plugin = "2.4.0"
 kotlinx-serialization-json = "1.11.0"
 org-apache-poi = "5.5.1"
-grpc = "1.82.0"
-ktor = "3.5.0"
-netty = "4.2.15.Final"
-google-protobuf-plugin = "0.10.0"
 ben-manes-versions = "0.54.0"
 
 [libraries]
@@ -33,29 +29,6 @@ org-apache-poi = { module = "org.apache.poi:poi", version.ref = "org-apache-poi"
 org-apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "org-apache-poi" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
 
-
-netty-transport = { module = "io.netty:netty-transport", version.ref = "netty" }
-netty-transport-classes-epoll = { module = "io.netty:netty-transport-classes-epoll", version.ref = "netty" }
-netty-transport-native-epoll = { module = "io.netty:netty-transport-native-epoll", version.ref = "netty" }
-netty-codec = { module = "io.netty:netty-codec", version.ref = "netty" }
-netty-handler = { module = "io.netty:netty-handler", version.ref = "netty" }
-
-protobuf-java = { module = "com.google.protobuf:protobuf-java", version = "4.35.1" }
-
-grpc-protobuf = { module = "io.grpc:grpc-protobuf", version.ref = "grpc" }
-grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpc" }
-grpc-java = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
-grpc-netty = { module = "io.grpc:grpc-netty", version.ref = "grpc" }
-grpc-netty-shaded = { module = "io.grpc:grpc-netty-shaded", version.ref = "grpc" }
-grpc-services = { module = "io.grpc:grpc-services", version.ref = "grpc" }
-
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
-ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
-kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.0" }
-
 junit-jupiter-api = "org.junit.jupiter:junit-jupiter-api:6.1.0"
 junit-jupiter-engine = "org.junit.jupiter:junit-jupiter-engine:6.1.0"
 junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.1.0"
@@ -64,5 +37,4 @@ junit-platform-launcher = "org.junit.platform:junit-platform-launcher:6.1.0"
 java-modules = { id = "org.javamodularity.moduleplugin", version = "2.0.1" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-plugin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-plugin" }
-google-protobuf = { id = "com.google.protobuf", version.ref = "google-protobuf-plugin" }
 ben-manes-versions = { id = "com.github.ben-manes.versions", version.ref = "ben-manes-versions" }

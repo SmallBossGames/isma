@@ -29,7 +29,7 @@ Save operations write `project.lismaText` or `Json.encodeToString(project.bluepr
 
 **File:** [`ISimulationService.kt`](../../app/src/main/kotlin/.../services/simulation/ISimulationService.kt)
 
-A 36-line thin wrapper that delegates to `SimulationTaskService`. Constructor takes `projectService`, `simulationTaskService`, `simulationParametersService`. Methods: `simulate()` (snaps parameters, resolves active project, calls `SimulationTaskService.submit()`), `stopSimulation()` (cancels task). Companion exposes `SimulationScope` from `SimulationTaskService`.
+A thin wrapper that delegates to `SimulationTaskService`. Constructor takes `editorPort`, `simulationTaskService`. Methods: `simulate(project, simulationParameters)` (resolves the project's LISMA source and calls `SimulationTaskService.submit()`), `stopSimulation(task)` (cancels the task).
 
 ### ISimulationTaskService / SimulationTaskService (full lifecycle)
 
@@ -41,10 +41,10 @@ The complete simulation pipeline (151 lines). Constructor takes `serverFacade`, 
 |-------|--------|-------------|
 | Compile | `serverFacade.compileModel(sourceCode)` | Populates `ModelErrorService` with errors; fails fast if errors exist |
 | Run | `serverFacade.runSimulation(runParams)` | Starts simulation, adds task to `tasks` list |
-| Monitor | `serverFacade.monitorSimulation(simulationId, 0.01)` | Collects `Flow<SimulationProgress>`, normalizes to 0.0–1.0, calls `task.setProgress()` |
-| Download | `serverFacade.downloadResultToCache(simulationId)` | Creates `CompletedSimulationModel`, sets `task.result` and `task.setStatus(COMPLETED)` |
+| Monitor | `serverFacade.monitorSimulation(simulationId) { progress -> ... }` | Blocking; invokes the callback with coalesced `SimulationProgress` updates, normalizes to 0.0–1.0, sets `task.progress` on the UI thread |
+| Download | `serverFacade.downloadResultToCache(simulationId)` | Blocking; creates `CompletedSimulationModel`, sets `task.result` and `task.status = COMPLETED` on the UI thread |
 
-Uses `SimulationScope` — a global `CoroutineScope` backed by `Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()` with `SupervisorJob()`. Each job is tracked in `currentJobs: MutableMap<SimulationTask, Job>`. Methods: `submit(modelName, params, simulationParameters)`, `cancelTask(task)`.
+Each simulation job runs on a per-task virtual thread via `Executors.newVirtualThreadPerTaskExecutor()` (no coroutine scope). Task-list changes are broadcast to listeners registered with `addTaskListener(listener): AutoCloseable`, invoked on the UI thread. Methods: `submit(modelName, lisma, simulationParameters)`, `cancelTask(task)`, `removeTask(task)`.
 
 ### ISimulationResultService / SimulationResultService
 
@@ -70,7 +70,7 @@ Validates LISMA source code via `serverFacade.validateModel()` and populates `Mo
 
 **File:** [`editors/LspSyntaxHighlighter.kt`](../../app/src/main/kotlin/.../services/editors/LspSyntaxHighlighter.kt)
 
-Implements `ISyntaxHighlighter` for the text editor by delegating to the `LspClient` (see [`../03-external-services.md`](../03-external-services.md)). Maps LSP token types (`keyword`, `comment`, `number`) to `SyntaxTokenKind`. The `LspClient` is wired in `simulationServerModule` as `single { LspClient(get<LspProcessManager>().start()) }` with an `onClose { it?.shutdown() }` shutdown hook, and `LspProcessManager` resolves the `isma-lsp` script from `ISMA_LSP_SCRIPT` / `isma.lsp.script`. `IsmaApplication.init` starts the process via `lspProcessManager.start()` after `serverFacade.warmup()`.
+Implements `ISyntaxHighlighter` for the text editor by delegating to the `LspClient` (see [`../03-external-services.md`](../03-external-services.md)). Maps LSP token types (`keyword`, `comment`, `number`) to `SyntaxTokenKind`. The `LspClient` is wired in `simulationServerModule` as `single { LspClient(get<LspProcessManager>().start()) }` with an `onClose { it?.shutdown() }` shutdown hook, and `LspProcessManager` resolves the `isma-lsp` script from `ISMA_LSP_SCRIPT` / `isma.lsp.script`. `IsmaApplication.init` starts the process via `lspProcessManager.start()` after Koin is ready.
 
 ### TextEditorFactory
 
@@ -120,16 +120,17 @@ JSON file persistence using `kotlinx.serialization`. Constructor takes `settings
 sequenceDiagram
     participant SS as SimulationService
     participant STS as SimulationTaskService
-    participant Facade as ServerFacade
-    participant Server as ISMA Server
+    participant Facade as SimulationServerFacade
+    participant Compiler as Compiler CLI
+    participant Runner as Runner CLI
     participant ErrorSvc as ModelErrorService
     participant Tasks as TasksPopOver
     participant ResultSvc as SimulationResultService
 
     SS->>STS: submit(modelName, params, simParams)
     STS->>Facade: compileModel(source)
-    Facade->>Server: gRPC CompileRequest
-    Server-->>Facade: CompileResponse
+    Facade->>Compiler: Launch compiler CLI (source on stdin)
+    Compiler-->>Facade: .class bytes / error lines
     alt Compilation errors
         Facade-->>ErrorSvc: putErrorList(errors)
         Facade-->>STS: FAILED
@@ -137,19 +138,18 @@ sequenceDiagram
         STS-->>SS: FAILED
     else Compilation success
         STS->>Facade: runSimulation(params)
-        Facade->>Server: gRPC RunSimulationRequest
-        Server-->>Facade: simulationId
-        STS->>Facade: monitorSimulation(id)
-        Facade->>Server: gRPC monitor stream
-        Server-->>Facade: Flow<SimulationProgress>
-        loop Progress updates
-            Facade-->>STS: SimulationProgress
+        Facade->>Runner: Launch runner CLI
+        Runner-->>Facade: simulationId (local)
+        STS->>Facade: monitorSimulation(id, onProgress)
+        Facade->>Runner: Stream TIME column from stdout
+        Runner-->>Facade: TIME values (streamed)
+        loop Progress updates (coalesced)
+            Facade-->>STS: onProgress(SimulationProgress)
             STS-->>Tasks: Update progress bar
         end
         STS->>Facade: downloadResultToCache(id)
-        Facade->>Server: gRPC getSimulationResult()
-        Server-->>Facade: download URL
-        Facade->>Facade: HTTP GET binary file
+        Facade->>Runner: Wait for exit
+        Runner-->>Facade: Result file + column names
         Facade-->>STS: CachedSimulationResult
         STS->>STS: setStatus(COMPLETED)
         STS->>STS: task.result = result
@@ -158,7 +158,7 @@ sequenceDiagram
     end
 ```
 
-The service data flow follows this sequence: `SimulationService` calls `SimulationTaskService.submit(modelName, params, simParams)`. `SimulationTaskService` calls `Facade.compileModel(source)`. If errors, they are sent to `ModelErrorService.putErrorList(ErrorViewModel[])` and the task returns FAILED to `SimulationService`. If success: `runSimulation(params)` returns a `simulationId`, then `monitorSimulation(id)` returns a `Flow<SimulationProgress>` which is used to call `task.setProgress(normalized)`, then `downloadResultToCache(id)` returns a `CachedSimulationResult`, and finally the task is marked COMPLETED with the result and passed to `SimulationResultService`.
+The service data flow follows this sequence: `SimulationService` calls `SimulationTaskService.submit(modelName, lisma, simParams)`. `SimulationTaskService` runs the job on a per-task virtual thread and calls `Facade.compileModel(source)`. If errors, they are sent to `ModelErrorService.putErrorList(...)` and the task is marked FAILED. If success: `runSimulation(params)` returns a `simulationId`, then `monitorSimulation(id, onProgress)` blocks, invoking `onProgress` with coalesced updates (which set `task.progress` on the UI thread) until the stream ends, then `downloadResultToCache(id)` returns a `CachedSimulationResult`, and finally the task is marked COMPLETED with the result and passed to `SimulationResultService`.
 
 ## CSV Export Algorithm
 
@@ -204,7 +204,7 @@ graph LR
         end
         ParamsSvc[SimulationParametersService<br/>snapshot() + toRunSimulationParams()]
         RunParams[RunSimulationParams]
-        Server[ISMA Server gRPC]
+        Server[CLI Tools (compiler + runner)]
 
         Cauchy --> ParamsSvc
         Integration --> ParamsSvc
@@ -232,7 +232,7 @@ graph LR
 
 The snapshot/commit pattern has two flows:
 
-- **Snapshot flow (ViewModel → Model → Server):** `snapshot()` on each ViewModel (CauchyInitialsViewModel, IntegrationMethodParametersViewModel, EventDetectionParametersViewModel, ResultSavingParametersViewModel) captures `Simple*Property` values into data class → `SimulationParametersService.snapshot()` assembles `SimulationParametersModel` → `toRunSimulationParams()` converts to `RunSimulationParams` → sent to server via gRPC
+- **Snapshot flow (ViewModel → Model → CLI):** `snapshot()` on each ViewModel (CauchyInitialsViewModel, IntegrationMethodParametersViewModel, EventDetectionParametersViewModel, ResultSavingParametersViewModel) captures `Simple*Property` values into data class → `SimulationParametersService.snapshot()` assembles `SimulationParametersModel` → `toRunSimulationParams()` converts to `RunSimulationParams` → passed to the runner CLI via `SimulationServerFacade.runSimulation()`
 - **Commit flow (Model → ViewModel):** `commit(model)` on each ViewModel applies values from `SimulationParametersModel` to `Simple*Property` instances
 
 ## Error Propagation Flow

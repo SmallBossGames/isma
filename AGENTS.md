@@ -17,7 +17,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 
 **Always read `docs/` before reading any source code.** When investigating or modifying a component:
 
-1. Check if `docs/<module>/` exists (e.g. `docs/isma-daemon/`)
+1. Check if `docs/<module>/` exists (e.g. `docs/isma-ui/`)
 2. Read the documentation first — it provides context, architecture, and API contracts
 3. Only then read the source code files
 
@@ -40,14 +40,13 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `hsm-fdm/` - Finite difference method backend
   - `hsm-jvm/`, `hsm-jvm-calcmodel/` - JVM implementation
   - `lisma-translator-hsm/` - LISMA → HSM translator (ANTLR4 grammar)
-  - `cli/` - Standalone LISMA compiler CLI: thin wrapper over `lib`; reads LISMA from stdin, writes the compiled `.class` file (analyzed hybrid-system class with the translated HSM inlined as a serialized blob) to stdout (`lisma-compiler-cli`); also supports `--validate`; launched by isma-daemon as a separate process
+  - `cli/` - Standalone LISMA compiler CLI: thin wrapper over `lib`; reads LISMA from stdin, writes the compiled `.class` file (analyzed hybrid-system class with the translated HSM inlined as a serialized blob) to stdout (`lisma-compiler-cli`); also supports `--validate`; launched by the UI as a separate process
 
 ### User Interface
 - **isma-ui/** - JavaFX-based UI components *(git submodule → [isma-ui-javafx](https://github.com/SmallBossGames/isma-ui-javafx), standalone Gradle project; see `isma-ui/AGENTS.md` for details)*
   - `app/` - Main application entry point
   - `domain/` - Domain models and business logic
-  - `external-services/` - gRPC client layer for server communication
-  - `grpc/` - Generated gRPC stubs
+  - `external-services/` - Direct CLI integration layer (compiler/runner CLIs) + LSP client
   - `text-editor/` - Text editing component
   - `blueprint-editor/` - Blueprint/visual editing component
   - `toolkit/` - Shared UI utilities
@@ -62,22 +61,7 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - `lib-meta/` - SPI interface for integration method factories
   - `lib-utils/` - Utilities
   - `lib:euler/`, `lib:rk2/`, `lib:rk3/`, `lib:rk31/`, `lib:rkmerson/`, `lib:rkfehlberg/` - Integration methods
-  - `cli/` - Batteries-included simulation runner CLI. Accepts a compiled `.class` file + simulation parameters, loads the model via `lisma-compiler:runtime`, runs the simulation (equation index provider, initials), and writes the result file in the existing binary format. Ships the integration-method libs itself; launched by isma-daemon as a separate process per simulation.
-
-
-### Protocol Buffers
-- **protobuf-contracts/** - Shared protobuf definitions
-  - `v1/` - Proto definitions
-    - `simulation_service/` - Simulation service proto files
-    - `compiler_service/` - LISMA compiler service proto files
-
-### Daemon (gRPC-based orchestrator)
-- **isma-daemon/** - Orchestration daemon with Netty transport and Koin DI. Pure orchestrator: launches the LISMA compiler CLI and the simulation runner CLI as separate processes; no in-process translation or simulation.
-  - `app/` - Application entry point
-  - `domain/` - Business logic with handlers
-  - `grpc/` - Generated gRPC stubs
-  - `infrastructure/` - Infrastructure implementations (CLI launching, process registry, stores)
-  - *See `isma-daemon/AGENTS.md` for details*
+  - `cli/` - Batteries-included simulation runner CLI. Accepts a compiled `.class` file + simulation parameters, loads the model via `lisma-compiler:runtime`, runs the simulation (equation index provider, initials), and writes the result file in the existing binary format. Ships the integration-method libs itself; launched by the UI as a separate process per simulation.
 
 ### Language Server (LSP)
 - **lisma-compiler/lisma-lsp/** - Standalone LISMA language server: LSP over stdio (JSON-RPC 2.0, Content-Length framing), semantic tokens via ANTLR4 lexer
@@ -87,7 +71,6 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
   - *See `docs/isma-lsp/` for details*
 
 ### Documentation
-- **docs/isma-daemon/** - Daemon module documentation
 - **docs/isma-ui/** - UI module documentation
 - **docs/isma-lsp/** - Language server documentation
 - **docs/grin/** - Grin (Graphical Interactive Functions) documentation
@@ -95,20 +78,18 @@ Kotlin-based mathematical modeling and symbolic computation environment for educ
 - **docs/legacy/** - Legacy system documentation and historical context
 - **docs/todo/** - TODO templates and planning
 
-### Out-of-Process Architecture (UI + Daemon)
+### Out-of-Process Architecture (UI + CLIs)
 
-The UI launches the daemon as a separate JVM process communicating via gRPC over Unix Domain Sockets, and the `lisma-compiler/lisma-lsp` language server as a separate process communicating via LSP over stdio (syntax highlighting). The daemon in turn launches two standalone CLIs as separate processes: the LISMA compiler CLI (`lisma-compiler:cli`, a thin wrapper over the `lisma-compiler:lib` public API) to compile LISMA sources to a compiled `.class` file (LISMA on stdin, `.class` on stdout), and the simulation runner CLI (`isma-solver:cli`, batteries-included) to run each simulation and write the result file.
+The UI launches the two standalone CLIs as separate processes, and the `lisma-compiler/lisma-lsp` language server as a separate process communicating via LSP over stdio (syntax highlighting): the LISMA compiler CLI (`lisma-compiler:cli`, a thin wrapper over the `lisma-compiler:lib` public API) to compile LISMA sources to a compiled `.class` file (LISMA on stdin, `.class` on stdout), and the simulation runner CLI (`isma-solver:cli`, batteries-included) to run each simulation, streaming the result on stdout in the ISMA exchange binary format.
 
-- **isma-ui/external-services/** - gRPC client layer
-  - `GrpcSimulationClient` - Netty-based gRPC client with Unix socket transport
-  - `SimulationServerManager` - Manages daemon process lifecycle (start/stop)
-  - `SimulationServerFacade` - High-level facade for simulation operations
+- **isma-ui/external-services/** - Direct CLI integration layer
+  - `cli/` - CLI process layer: `CliProcess` (stdin/stdout/stderr + graceful termination), `CliLauncher` (path resolution + launch), `CliToolLaunchers` (compiler/runner launchers), `LismaCompilerCli` (compile/validate via stdin), `SimulationRunnerCli` (run + `--list-methods`), `ActiveSimulation` (streams the runner's binary stdout into a result file, exposes TIME values for progress)
+  - `SimulationServerFacade` - High-level facade: compile (model ID = local `.class` path), validate, run/monitor/cancel (local simulation IDs), result download, method listing
   - `lsp/` - LSP client layer (`LspProcessManager`, `LspClient`, `LspTransport`) driving `isma-lsp`
-- **Daemon launch** — `ISMA_DAEMON_SCRIPT` env var (bundle) or `isma.daemon.script` sysprop (IDE/Gradle)
+- **Compiler CLI launch** — `ISMA_COMPILER_CLI` env var (bundle) or `isma.compiler.cli` sysprop (IDE/Gradle); path to the launch script
+- **Runner CLI launch** — `ISMA_RUNNER_CLI` env var (bundle) or `isma.runner.cli` sysprop (IDE/Gradle); path to the launch script
 - **LSP launch** — `ISMA_LSP_SCRIPT` env var (bundle) or `isma.lsp.script` sysprop (IDE/Gradle)
-- **Compiler CLI launch** — `ISMA_COMPILER_CLI` env var or `isma.compiler.cli` sysprop (path to launch script, jar, or lib dir); fallback: the daemon's own `lib/` directory (the CLI jar ships there via `runtimeOnly`)
-- **Runner CLI launch** — `ISMA_RUNNER_CLI` env var or `isma.runner.cli` sysprop (path to launch script, jar, or lib dir); fallback: the runner's own batteries-included distribution embedded in the daemon's dist (`runner/lib`, via the `installRunnerDist` task)
-- **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with all apps (UI, daemon, Grin, LSP, plus standalone `lisma-compiler-cli-app` and `simulation-runner-cli-app` distributions) + `run-ui.sh` launcher that wires all script paths via env vars
+- **Bundle** — `.ci-cd/build-bundle.sh` creates `build/bundle/` with all apps (UI, Grin, LSP, plus standalone `lisma-compiler-cli-app` and `simulation-runner-cli-app` distributions) + `run-ui.sh` launcher that wires all script paths via env vars
 
 ---
 
@@ -127,7 +108,6 @@ All applications in this repository should use `module-info.java` for proper mod
 
 ## Git Submodules
 
-- `protobuf-contracts/` → https://github.com/SmallBossGames/isma-contracts-proto
 - `isma-ui/` → https://github.com/SmallBossGames/isma-ui-javafx
 - `grin/` → https://github.com/SmallBossGames/grin-javafx
 
@@ -139,22 +119,17 @@ Fresh clones need `git submodule update --init --recursive` before building.
 ```bash
 ./gradlew build          # Build all modules
 ./gradlew :module:build  # Build specific module
-./.ci-cd/build-bundle.sh # Build application distribution bundle UI + daemon
+./.ci-cd/build-bundle.sh # Build application distribution bundle (UI + CLIs)
 ```
 
 ## Architecture Rules
 
-### Separate Domain Models from gRPC Contracts
+### Keep CLI Process Details Out of Business Logic
 
-**Never use gRPC-generated protobuf types in business logic.** Each module must have its own domain models that are mapped from/to gRPC contracts at the boundary.
+**Never launch or inspect CLI tool processes outside `external-services/cli/`.** The UI's business logic talks to the tools only through the `SimulationServerFacade` and its DTOs.
 
-- **Server `domain/`** — pure business logic, domain entities, and handlers. No gRPC stubs.
-- **Server `infrastructure/`** — maps gRPC types to domain types (and vice versa) when crossing the gRPC boundary.
-- **UI `external-services/`** — maps gRPC protobuf types to UI domain models. No protobuf types leak into `app/`, `domain/`, or UI components.
-- **UI `domain/`** — pure domain models and interfaces. No gRPC types, no JavaFX types.
+- **UI `external-services/cli/`** — owns process launching, stdin/stdout/stderr plumbing, exit-code handling, and the CLI protocols (compiler: source on stdin, `.class` bytes or `row:col:message` diagnostics on stdout; runner: binary exchange format on stdout).
+- **UI `external-services/`** — `SimulationServerFacade` maps CLI outcomes to UI DTOs (`CompileResult`, `ValidationResult`, `RunSimulationParams`, `CachedSimulationResult`). No process handles leak into `app/`, `domain/`, or UI components.
+- **UI `domain/`** — pure domain models and interfaces. No process/CLI types, no JavaFX types.
 
-This ensures that protocol changes only affect the mapping layer, not the business logic. It also keeps domain models free from protobuf annotations, code generation artifacts, and wire-format concerns.
-
-## Proto Contracts
-
-All protobuf definitions live in `protobuf-contracts/v1/` (git submodule). Proto changes require rebuilding the `isma-daemon:grpc` module in this repo, and syncing the `protobuf-contracts/` copy in the isma-ui-javafx repo and rebuilding `isma-ui:grpc` there.
+This keeps the CLI protocols (arguments, streams, exit codes) confined to the integration layer, so the tools can evolve or be rewritten independently.

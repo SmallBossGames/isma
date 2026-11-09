@@ -24,7 +24,7 @@ End-to-end user flows for the ISMA desktop application. Each document describes 
 All use cases assume the following architecture:
 
 - **ISMA UI** — JavaFX desktop application (this module)
-- **isma-server** — Separate JVM process providing compilation, validation, and simulation via gRPC over Unix Domain Sockets
+- **Standalone CLI tools** — Separate processes providing compilation/validation (LISMA compiler CLI) and simulation (runner CLI), driven directly by the UI
 - **Grin** — External chart viewer process launched on-demand
 - **Koin DI** — Dependency injection wiring all services and UI components
 - **Virtual thread dispatcher** — Simulation execution runs on Java 21+ virtual threads
@@ -35,7 +35,7 @@ All use cases assume the following architecture:
 |-----------|---------|------|
 | `ProjectService` | UC-002, UC-003, UC-004, UC-009 | Manages the observable set of open projects |
 | `ProjectFileService` | UC-004 | FileChooser-based open/save operations |
-| `SimulationServerFacade` | UC-005, UC-006, UC-008, UC-010 | Orchestrates gRPC + HTTP communication with server |
+| `SimulationServerFacade` | UC-005, UC-006, UC-008, UC-010 | Orchestrates the compiler/runner CLI processes |
 | `SimulationService` | UC-006, UC-010 | Thin coordinator — delegates to SimulationTaskService |
 | `SimulationTaskService` | UC-006, UC-010 | Full simulation lifecycle (compile, run, monitor, download) |
 | `SimulationParametersService` | UC-008 | Parameter view models and persistence |
